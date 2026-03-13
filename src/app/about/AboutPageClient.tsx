@@ -29,7 +29,7 @@ const technologies = [
     icon: ScanFace,
     name: "AI Skin Analysis",
     description:
-      "State-of-the-art skin analysis technology that maps your skin\u2019s condition across multiple dimensions \u2014 including texture, pores, wrinkles, pigmentation, and UV damage \u2014 to create a personalized treatment plan backed by data.",
+      "State-of-the-art skin analysis technology that maps your skin's condition across multiple dimensions — including texture, pores, wrinkles, pigmentation, and UV damage — to create a personalized treatment plan backed by data.",
   },
 ];
 
@@ -91,7 +91,7 @@ export default function AboutPageClient() {
       <Hero
         label="ABOUT US"
         title="About Rani Beauty Clinic"
-        subtitle="A physician-supervised medspa and wellness clinic in Renton, WA \u2014 where advanced aesthetics and medical wellness come together under one roof."
+        subtitle="A physician-supervised medspa and wellness clinic in Renton, WA — where advanced aesthetics and medical wellness come together under one roof."
         dark={false}
       />
 
@@ -112,7 +112,7 @@ export default function AboutPageClient() {
                   Rani Beauty Clinic was born from a simple belief: everyone deserves
                   access to physician-supervised aesthetic and wellness treatments in a
                   space that feels welcoming, not intimidating. After years in the
-                  aesthetics industry, our founder Rina saw a gap between high-end
+                  aesthetics industry, our founders saw a gap between high-end
                   clinics and the warm, personal care every patient deserves.
                 </p>
                 <p className="mt-4 font-body text-base leading-relaxed text-rani-text">

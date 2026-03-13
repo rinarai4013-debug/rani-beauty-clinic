@@ -68,8 +68,8 @@ export default function WellnessPage() {
         label="MEDICAL WELLNESS"
         title="Medical Wellness Programs"
         subtitle="Comprehensive medical wellness programs designed and supervised by Dr. Alexander Landfield, Board-Certified Neurologist. Your health, optimized from the inside out."
-        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url }}
-        backgroundImage="/images/services/exosomes/2.webp"
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.consultation.url }}
+        backgroundImage="/images/providers/treatment-room.jpg"
         backgroundOverlay={70}
         dark
       />

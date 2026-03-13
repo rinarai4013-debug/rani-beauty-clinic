@@ -268,7 +268,7 @@ export default function PricingPageClient() {
       </CategorySection>
 
       {/* Membership */}
-      <section className="bg-white py-20 md:py-28">
+      <section id="membership" className="bg-white py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="MEMBERSHIP" />
@@ -342,7 +342,7 @@ export default function PricingPageClient() {
                       </span>
                     ) : (
                       <Button
-                        href={clinicInfo.booking.url}
+                        href="/contact"
                         className={
                           tier.popular
                             ? "!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
@@ -353,10 +353,35 @@ export default function PricingPageClient() {
                       </Button>
                     )}
                   </div>
+                  <p className="mt-3 text-center font-body text-[11px] text-rani-muted">
+                    Memberships are activated during your consultation
+                  </p>
                 </div>
               </Card>
             ))}
           </StaggerChildren>
+
+          {/* Membership FAQ */}
+          <FadeInOnScroll delay={0.3}>
+            <div className="mt-16 mx-auto max-w-2xl">
+              <h3 className="text-center font-body text-lg font-bold text-rani-navy mb-6">
+                Membership FAQ
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { q: "Can I upgrade my tier?", a: "Yes, anytime. Billing is prorated to your new tier." },
+                  { q: "Is there a contract?", a: "No contracts. Cancel anytime with 30 days notice." },
+                  { q: "When do my monthly services reset?", a: "On your billing date each month. Unused services roll over for up to 2 months (3 months for Elite Aura)." },
+                  { q: "Can I share my membership?", a: "Memberships are non-transferable and tied to your account." },
+                ].map((faq) => (
+                  <div key={faq.q} className="rounded-lg border border-rani-border bg-rani-cream p-4">
+                    <p className="font-body text-sm font-bold text-rani-navy">{faq.q}</p>
+                    <p className="mt-1 font-body text-sm text-rani-muted">{faq.a}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeInOnScroll>
         </div>
       </section>
 

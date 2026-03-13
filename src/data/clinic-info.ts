@@ -49,6 +49,10 @@ export const clinicInfo = {
     provider: "Mangomint",
     companyId: 876418,
   },
+  consultation: {
+    url: "https://07l76i25tvv.typeform.com/to/Ecgz85JA",
+    provider: "Typeform",
+  },
   n8n: {
     baseUrl: "https://ranibeautyclinic.app.n8n.cloud",
   },

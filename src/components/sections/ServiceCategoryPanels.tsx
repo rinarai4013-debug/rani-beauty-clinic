@@ -32,8 +32,8 @@ const categories = [
   {
     title: "Medical Wellness",
     description: "GLP-1, Peptides, Hormones, NAD+ & IV Therapy",
-    image: "/images/services/exosomes/1.webp",
-    href: "/wellness/glp1-weight-management",
+    image: "/images/services/wellness/glp1-1.jpg",
+    href: "/wellness",
     count: 6,
   },
 ];

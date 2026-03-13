@@ -28,7 +28,7 @@ const galleryItems = [
   { id: 5, category: "RF Microneedling", title: "RF Microneedling — Acne Scars" },
   { id: 6, category: "RF Microneedling", title: "RF Microneedling — Skin Tightening" },
   { id: 7, category: "Botox", title: "Botox — Forehead Lines" },
-  { id: 8, category: "Botox", title: "Botox — Crow\u2019s Feet" },
+  { id: 8, category: "Botox", title: "Botox — Crow's Feet" },
   { id: 9, category: "Fillers", title: "Lip Filler — Natural Enhancement" },
   { id: 10, category: "Fillers", title: "Cheek Filler — Volume Restoration" },
   { id: 11, category: "Peels", title: "Chemical Peel — Hyperpigmentation" },

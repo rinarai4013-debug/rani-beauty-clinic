@@ -175,7 +175,7 @@ export default function CostPage({ params }: PageProps) {
         label={`${page.service.toUpperCase()} PRICING`}
         title={page.heroTitle}
         subtitle={page.intro}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={[
           "Transparent Pricing",

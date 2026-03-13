@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Menu, X, ChevronDown } from "lucide-react";
+import { Phone, Menu, X, ChevronDown, Sparkles } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
 
 const aestheticLinks = [
@@ -44,6 +44,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeMega, setActiveMega] = useState<string | null>(null);
+  const [announcementVisible, setAnnouncementVisible] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -59,30 +60,61 @@ export default function Navbar() {
     }
   }, [mobileOpen]);
 
+  const showAnnouncement = announcementVisible && !scrolled;
+
   return (
     <>
+      {/* Announcement Bar */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
+          showAnnouncement ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="bg-rani-gold px-4 py-2.5 text-center font-body text-sm font-medium text-rani-navy">
+          <div className="mx-auto flex max-w-7xl items-center justify-center gap-3">
+            <Sparkles size={14} className="shrink-0" />
+            <span>New Patient Special: 20% Off Your First Treatment</span>
+            <a
+              href={clinicInfo.booking.url}
+              className="inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70"
+            >
+              Book Now &rarr;
+            </a>
+          </div>
+          <button
+            onClick={() => setAnnouncementVisible(false)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 transition-colors hover:bg-rani-navy/10"
+            aria-label="Dismiss announcement"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      </div>
+
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+          showAnnouncement ? "top-[40px]" : "top-0"
+        } ${
           scrolled
             ? "bg-rani-navy/95 backdrop-blur-md h-16 shadow-lg"
             : "bg-transparent h-20"
         }`}
       >
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto flex h-full items-center justify-between px-6 2xl:max-w-[1400px]">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3 shrink-0 mr-16">
             <Image
               src="/images/logo/logo-light.png"
               alt="Rani Beauty Clinic"
-              width={200}
-              height={25}
-              className="h-6 w-auto md:h-7"
+              width={220}
+              height={28}
+              className="h-7 w-auto md:h-8"
               priority
             />
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="hidden items-center gap-5 lg:flex flex-1 justify-center">
             {navLinks.map((link) => (
               <div
                 key={link.name}
@@ -94,7 +126,7 @@ export default function Navbar() {
               >
                 <Link
                   href={link.href}
-                  className="group relative flex items-center gap-1 font-body text-sm font-semibold uppercase tracking-wider text-white/90 transition-colors hover:text-white"
+                  className="group relative flex items-center gap-1 font-body text-[13px] font-semibold uppercase tracking-wider text-white/90 transition-colors hover:text-white whitespace-nowrap"
                 >
                   {link.name}
                   {link.megaMenu && <ChevronDown size={14} className="opacity-60" />}
@@ -142,17 +174,17 @@ export default function Navbar() {
           </div>
 
           {/* Right side — Phone + Book Now */}
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden items-center gap-8 lg:flex shrink-0 ml-10">
             <a
               href={clinicInfo.phoneTel}
-              className="flex items-center gap-2 font-body text-sm font-semibold text-white/90 transition-colors hover:text-rani-gold"
+              className="flex items-center gap-2.5 font-body text-sm font-semibold text-white/90 transition-colors hover:text-rani-gold whitespace-nowrap tracking-wide"
             >
               <Phone size={16} />
               {clinicInfo.phone}
             </a>
             <a
               href={clinicInfo.booking.url}
-              className="rounded-lg bg-rani-gold px-6 py-2.5 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy transition-all duration-300 hover:bg-rani-gold-light hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(243,214,190,0.3)]"
+              className="rounded-lg bg-rani-gold px-10 py-3 font-body text-sm font-semibold uppercase tracking-widest text-rani-navy transition-all duration-300 hover:bg-rani-gold-light hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(243,214,190,0.3)] whitespace-nowrap"
             >
               Book Now
             </a>

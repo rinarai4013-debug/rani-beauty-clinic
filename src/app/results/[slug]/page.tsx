@@ -87,7 +87,7 @@ export default function GalleryPage({ params }: PageProps) {
         label="BEFORE & AFTER"
         title={page.title}
         subtitle={`Real patient results from Rani Beauty Clinic in Renton, WA. All treatments physician-supervised by ${clinicInfo.medicalDirector.name}.`}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Learn More", href: servicePath }}
         badges={["Physician Supervised", "Real Patients"]}
         dark

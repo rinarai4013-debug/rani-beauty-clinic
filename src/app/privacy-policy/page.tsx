@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
                     Attorney Review Required
                   </p>
                   <p className="mt-1 font-body text-sm text-amber-700">
-                    [RINA: Have an attorney review this privacy policy before publishing to ensure
+                    [NOTE: Have an attorney review this privacy policy before publishing to ensure
                     compliance with all applicable federal, state, and local laws, including HIPAA,
                     the Washington Consumer Privacy Act, and other relevant regulations.]
                   </p>

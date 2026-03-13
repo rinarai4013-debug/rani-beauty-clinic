@@ -71,7 +71,7 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
 
         <FadeInOnScroll delay={0.3}>
           <div className="mt-10 text-center">
-            <Button variant="ghost" href="#">
+            <Button variant="ghost" href="https://g.page/ranibeautyclinic" target="_blank">
               Read More Reviews
             </Button>
           </div>

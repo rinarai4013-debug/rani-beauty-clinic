@@ -120,7 +120,7 @@ export default function ComparePage({ params }: PageProps) {
         label="TREATMENT COMPARISON"
         title={`${page.treatmentA} vs ${page.treatmentB}`}
         subtitle={page.intro}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         dark
       />

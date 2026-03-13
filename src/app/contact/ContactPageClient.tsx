@@ -103,7 +103,7 @@ export default function ContactPageClient() {
       <Hero
         label="GET IN TOUCH"
         title="Contact Us"
-        subtitle="Have questions about our treatments? Ready to book a consultation? We\u2019d love to hear from you."
+        subtitle="Have questions about our treatments? Ready to book a consultation? We'd love to hear from you."
         dark={false}
       />
 

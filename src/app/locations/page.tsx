@@ -98,7 +98,7 @@ export default function LocationsPage() {
         label="AREAS WE SERVE"
         title="Serving Greater Seattle & King County"
         subtitle={`Rani Beauty Clinic is centrally located in Renton with easy access from 40+ cities and neighborhoods across King County. Physician-supervised aesthetic and medical wellness treatments for the entire region.`}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Centrally Located", "Open 7 Days", "Free Parking"]}
         dark

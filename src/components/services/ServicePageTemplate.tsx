@@ -92,7 +92,7 @@ export default function ServicePageTemplate({
         subtitle={service.heroDescription}
         primaryCTA={{ text: "Book This Treatment", href: clinicInfo.booking.url }}
         badge={`Supervised by ${clinicInfo.medicalDirector.name}, ${clinicInfo.medicalDirector.specialty}`}
-        backgroundImage={serviceImageData?.image}
+        backgroundImage={serviceImageData?.image || undefined}
         backgroundOverlay={65}
         dark
       />
@@ -308,7 +308,7 @@ export default function ServicePageTemplate({
               Treatment Gallery
             </h2>
             <div className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-3">
-              {serviceImageData ? (
+              {serviceImageData && serviceImageData.image ? (
                 <>
                   <div className="relative aspect-square overflow-hidden rounded-xl">
                     <Image
@@ -396,7 +396,7 @@ export default function ServicePageTemplate({
                       href={`${related.isWellness ? "/wellness" : "/services"}/${related.slug}`}
                       className="group block overflow-hidden rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_10px_40px_rgba(15,29,44,0.08)] hover:-translate-y-1"
                     >
-                      {relatedImg && (
+                      {relatedImg && relatedImg.image ? (
                         <div className="relative aspect-[16/9] w-full overflow-hidden">
                           <Image
                             src={relatedImg.image}
@@ -405,6 +405,10 @@ export default function ServicePageTemplate({
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
+                        </div>
+                      ) : (
+                        <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-rani-navy via-rani-navy-light to-rani-navy flex items-center justify-center">
+                          <div className="h-px w-12 bg-rani-gold/30" />
                         </div>
                       )}
                       <div className="p-5">

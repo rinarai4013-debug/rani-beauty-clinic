@@ -88,33 +88,33 @@ export const serviceImages: Record<string, ServiceImageEntry> = {
 
   // ─── Wellness Services ──────────────────────────────────────
   "glp1-weight-management": {
-    image: "/images/services/abdomen/1.jpg",
-    hoverImage: "/images/services/abdomen/2.jpg",
+    image: "/images/services/wellness/glp1-1.jpg",
+    hoverImage: "/images/services/wellness/glp1-2.jpg",
     category: "wellness",
   },
   "peptide-therapy": {
-    image: "/images/services/exosomes/1.webp",
-    hoverImage: "/images/services/exosomes/2.webp",
+    image: "/images/services/wellness/peptide-1.jpg",
+    hoverImage: "/images/services/wellness/peptide-2.jpg",
     category: "wellness",
   },
   "nad-injections": {
-    image: "/images/services/salmondna/1.webp",
-    hoverImage: "/images/services/salmondna/2.webp",
+    image: "/images/services/wellness/nad-1.jpg",
+    hoverImage: "/images/services/wellness/nad-2.jpg",
     category: "wellness",
   },
   "vitamin-injections": {
-    image: "/images/services/hydraskinbooster/1.jpg",
-    hoverImage: "/images/services/hydraskinbooster/2.jpg",
+    image: "/images/services/wellness/vitamin-1.jpg",
+    hoverImage: "/images/services/wellness/vitamin-2.jpg",
     category: "wellness",
   },
   "hormone-therapy": {
-    image: "/images/services/keravive/1.webp",
-    hoverImage: "/images/services/keravive/2.jpg",
+    image: "/images/services/wellness/hormone-1.jpg",
+    hoverImage: "/images/services/wellness/hormone-2.jpg",
     category: "wellness",
   },
   "blood-work": {
-    image: "/images/services/bluelight/1.jpg",
-    hoverImage: "/images/services/bluelight/2.webp",
+    image: "/images/services/wellness/bloodwork-1.jpg",
+    hoverImage: "/images/services/wellness/bloodwork-2.jpg",
     category: "wellness",
   },
 };
@@ -387,89 +387,89 @@ export const variationImages: Record<string, ServiceImageEntry> = {
 
   // ─── Peptide Therapy Variations ─────────────────────────────
   "peptide-therapy/bpc-157": {
-    image: "/images/services/exosomes/1.webp",
-    hoverImage: "/images/services/exosomes/2.webp",
+    image: "/images/services/wellness/peptide-1.jpg",
+    hoverImage: "/images/services/wellness/peptide-2.jpg",
     category: "wellness",
   },
   "peptide-therapy/ghk-cu": {
-    image: "/images/services/salmondna/1.webp",
-    hoverImage: "/images/services/salmondna/2.webp",
+    image: "/images/services/wellness/peptide-2.jpg",
+    hoverImage: "/images/services/wellness/peptide-1.jpg",
     category: "wellness",
   },
   "peptide-therapy/tb-500": {
-    image: "/images/services/exosomes/1.webp",
-    hoverImage: "/images/services/exosomes/2.webp",
+    image: "/images/services/wellness/peptide-1.jpg",
+    hoverImage: "/images/services/wellness/peptide-2.jpg",
     category: "wellness",
   },
   "peptide-therapy/aod-9604": {
-    image: "/images/services/abdomen/1.jpg",
-    hoverImage: "/images/services/abdomen/2.jpg",
+    image: "/images/services/wellness/peptide-2.jpg",
+    hoverImage: "/images/services/wellness/peptide-1.jpg",
     category: "wellness",
   },
   "peptide-therapy/sermorelin": {
-    image: "/images/services/hydraskinbooster/1.jpg",
-    hoverImage: "/images/services/hydraskinbooster/2.jpg",
+    image: "/images/services/wellness/peptide-1.jpg",
+    hoverImage: "/images/services/wellness/peptide-2.jpg",
     category: "wellness",
   },
   "peptide-therapy/cjc-1295": {
-    image: "/images/services/keravive/1.webp",
-    hoverImage: "/images/services/keravive/2.jpg",
+    image: "/images/services/wellness/peptide-2.jpg",
+    hoverImage: "/images/services/wellness/peptide-1.jpg",
     category: "wellness",
   },
 
   // ─── GLP-1 Weight Management Variations ─────────────────────
   "glp1-weight-management/semaglutide": {
-    image: "/images/services/abdomen/1.jpg",
-    hoverImage: "/images/services/abdomen/2.jpg",
+    image: "/images/services/wellness/glp1-1.jpg",
+    hoverImage: "/images/services/wellness/glp1-2.jpg",
     category: "wellness",
   },
   "glp1-weight-management/tirzepatide": {
-    image: "/images/services/brafatsculp/1.jpg",
-    hoverImage: "/images/services/brafatsculp/2.png",
+    image: "/images/services/wellness/glp1-2.jpg",
+    hoverImage: "/images/services/wellness/glp1-1.jpg",
     category: "wellness",
   },
 
   // ─── Hormone Therapy Variations ─────────────────────────────
   "hormone-therapy/testosterone": {
-    image: "/images/services/keravive/1.webp",
-    hoverImage: "/images/services/keravive/2.jpg",
+    image: "/images/services/wellness/hormone-1.jpg",
+    hoverImage: "/images/services/wellness/hormone-2.jpg",
     category: "wellness",
   },
   "hormone-therapy/female-hrt": {
-    image: "/images/services/salmondna/1.webp",
-    hoverImage: "/images/services/salmondna/2.webp",
+    image: "/images/services/wellness/hormone-2.jpg",
+    hoverImage: "/images/services/wellness/hormone-1.jpg",
     category: "wellness",
   },
   "hormone-therapy/thyroid-optimization": {
-    image: "/images/services/bluelight/1.jpg",
-    hoverImage: "/images/services/bluelight/2.webp",
+    image: "/images/services/wellness/hormone-1.jpg",
+    hoverImage: "/images/services/wellness/hormone-2.jpg",
     category: "wellness",
   },
   "hormone-therapy/dhea-therapy": {
-    image: "/images/services/exosomes/1.webp",
-    hoverImage: "/images/services/exosomes/2.webp",
+    image: "/images/services/wellness/hormone-2.jpg",
+    hoverImage: "/images/services/wellness/hormone-1.jpg",
     category: "wellness",
   },
 
   // ─── Vitamin Injections Variations ──────────────────────────
   "vitamin-injections/b12": {
-    image: "/images/services/hydraskinbooster/1.jpg",
-    hoverImage: "/images/services/hydraskinbooster/2.jpg",
+    image: "/images/services/wellness/vitamin-1.jpg",
+    hoverImage: "/images/services/wellness/vitamin-2.jpg",
     category: "wellness",
   },
   "vitamin-injections/glutathione": {
-    image: "/images/services/diorhydrafacial/1.jpg",
-    hoverImage: "/images/services/diorhydrafacial/2.webp",
+    image: "/images/services/wellness/vitamin-2.jpg",
+    hoverImage: "/images/services/wellness/vitamin-1.jpg",
     category: "wellness",
   },
   "vitamin-injections/lipo-mino": {
-    image: "/images/services/brafatsculp/1.jpg",
-    hoverImage: "/images/services/brafatsculp/2.png",
+    image: "/images/services/wellness/vitamin-1.jpg",
+    hoverImage: "/images/services/wellness/vitamin-2.jpg",
     category: "wellness",
   },
   "vitamin-injections/biotin": {
-    image: "/images/services/keravive/1.webp",
-    hoverImage: "/images/services/keravive/2.jpg",
+    image: "/images/services/wellness/vitamin-2.jpg",
+    hoverImage: "/images/services/wellness/vitamin-1.jpg",
     category: "wellness",
   },
 };
@@ -481,7 +481,7 @@ export const categoryImages = {
   face: "/images/services/hydrafacial/1.png",
   body: "/images/services/laserhairremovals/fullbodylaser.jpeg",
   "non-surgical": "/images/services/softwave/1.jpg",
-  wellness: "/images/services/exosomes/1.webp",
+  wellness: "/images/services/wellness/hormone-2.jpg",
 };
 
 /**

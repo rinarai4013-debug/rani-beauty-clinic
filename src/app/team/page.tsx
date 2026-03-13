@@ -14,7 +14,7 @@ import { teamMembers } from "@/data/team";
 export const metadata: Metadata = {
   title: "Our Team | Meet the Experts at Rani Beauty Clinic",
   description:
-    "Meet the physician-supervised team at Rani Beauty Clinic in Renton, WA. Led by Medical Director Dr. Alexander Landfield, board-certified neurologist, and founded by Rina.",
+    "Meet the physician-supervised team at Rani Beauty Clinic in Renton, WA. Led by Medical Director Dr. Alexander Landfield, board-certified neurologist.",
   alternates: {
     canonical: `${clinicInfo.website}/team`,
   },
@@ -51,13 +51,6 @@ export default function TeamPage() {
         description:
           "Board-certified neurologist and Medical Director of Rani Beauty Clinic. Supervises all medical treatments and protocols.",
       },
-      {
-        "@type": "Person",
-        name: "Rina",
-        jobTitle: "Founder & CEO",
-        description:
-          "Founded Rani Beauty Clinic in 2022 to bring physician-supervised aesthetic and wellness treatments to the Renton community.",
-      },
     ],
   };
 
@@ -75,7 +68,7 @@ export default function TeamPage() {
         label="OUR TEAM"
         title="The Experts Behind Your Care"
         subtitle="Every treatment at Rani Beauty Clinic is delivered by a skilled team under the direct supervision of our board-certified Medical Director. Meet the people committed to your safety and results."
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Physician Supervised", "Board-Certified", "Woman-Owned"]}
         dark

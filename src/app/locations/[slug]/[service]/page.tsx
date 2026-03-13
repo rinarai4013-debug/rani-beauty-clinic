@@ -209,7 +209,7 @@ export default function GeoServicePage({ params }: PageProps) {
         label={`${serviceInfo.name.toUpperCase()} NEAR ${geo.city.toUpperCase()}`}
         title={content.h1}
         subtitle={content.intro}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={[
           "Physician Supervised",

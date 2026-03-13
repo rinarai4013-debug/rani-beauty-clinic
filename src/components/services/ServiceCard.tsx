@@ -41,7 +41,7 @@ export default function ServiceCard({
       <Link href={href} className="group block h-full">
         <div className="relative h-full overflow-hidden rounded-xl border border-rani-border bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_10px_40px_rgba(15,29,44,0.08)] hover:-translate-y-1 hover:border-b-2 hover:border-b-rani-gold">
           {/* Image area */}
-          {image ? (
+          {image && image.length > 0 ? (
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-rani-cream">
               <Image
                 src={image}
@@ -79,18 +79,38 @@ export default function ServiceCard({
               )}
             </div>
           ) : (
-            /* Fallback: icon-based card (no image) */
-            <div className="px-6 pt-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-rani-cream">
-                <IconComponent size={24} className="text-rani-gold" />
+            /* Fallback: elegant gradient card for wellness services */
+            <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-rani-navy via-rani-navy-light to-rani-navy">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(243,214,190,0.12)_0%,transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(243,214,190,0.06)_0%,transparent_50%)]" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-rani-gold/20 bg-white/5 backdrop-blur-sm">
+                  <IconComponent size={28} className="text-rani-gold" />
+                </div>
+                <div className="mt-3 h-px w-8 bg-rani-gold/30" />
               </div>
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent" />
+              {(price || duration) && (
+                <div className="absolute bottom-3 left-3 flex gap-2">
+                  {price && (
+                    <span className="rounded-full bg-rani-gold px-3 py-1 font-body text-xs font-semibold text-rani-navy">
+                      {price}
+                    </span>
+                  )}
+                  {duration && (
+                    <span className="rounded-full bg-white/90 px-3 py-1 font-body text-xs font-semibold text-rani-navy backdrop-blur-sm">
+                      {duration}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           {/* Text content */}
-          <div className={image ? "p-5" : "px-6 pb-6"}>
+          <div className={image && image.length > 0 ? "p-5" : "p-5"}>
             {/* Show small icon next to title when image is present */}
-            {image && (
+            {image && image.length > 0 && (
               <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-md bg-rani-cream">
                 <IconComponent size={16} className="text-rani-gold" />
               </div>

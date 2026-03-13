@@ -46,10 +46,10 @@ export default function CTABanner({
         <FadeInOnScroll delay={0.6}>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
-              href={clinicInfo.booking.url}
+              href={clinicInfo.consultation.url}
               className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
             >
-              Book Online
+              Book Your Consultation
             </Button>
             <Button variant="secondary" href={clinicInfo.phoneTel}>
               Call Now

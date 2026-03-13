@@ -18,7 +18,7 @@ import TrustLogosBar from "@/components/sections/TrustLogosBar";
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import MeetTheTeam from "@/components/sections/MeetTheTeam";
 import BeforeAfterSlider from "@/components/sections/BeforeAfterSlider";
-import AnnouncementBar from "@/components/sections/AnnouncementBar";
+// AnnouncementBar is now integrated into the Navbar component
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import StaggerChildren from "@/components/animations/StaggerChildren";
@@ -197,7 +197,7 @@ const structuredData = {
   "@context": "https://schema.org",
   "@type": "MedicalBusiness",
   name: "Rani Beauty Clinic",
-  image: "https://ranibeautyclinic.com/images/logo/logo-horizontal.png",
+  image: "https://ranibeautyclinic.com/images/logo/logo-dark.png",
   address: {
     "@type": "PostalAddress",
     streetAddress: "401 Olympia Ave NE, Suite 101",
@@ -223,7 +223,7 @@ const structuredData = {
     closes: "19:00",
   },
   priceRange: "$$$",
-  founder: { "@type": "Person", name: "Rina" },
+  founder: { "@type": "Person", name: "Raj" },
   employee: {
     "@type": "Physician",
     name: "Dr. Alexander Landfield",
@@ -272,19 +272,14 @@ export default function HomePage() {
     <>
       <StructuredData data={structuredData} />
 
-      {/* 1. Announcement Bar */}
-      <AnnouncementBar
-        text="New Patient Special: 20% Off Your First Treatment"
-        href={clinicInfo.booking.url}
-        linkText="Book Now"
-      />
+      {/* 1. Announcement Bar — now in Navbar */}
 
       {/* 2. Hero Section — with background image */}
       <Hero
         label="PHYSICIAN-SUPERVISED MEDSPA & WELLNESS"
         title="Your Skin. Your Wellness. Our Expertise."
         subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist"
-        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url }}
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.consultation.url }}
         secondaryCTA={{ text: "Explore Services", href: "/services" }}
         backgroundImage="/images/providers/facility-drone.jpg"
         backgroundOverlay={65}
@@ -352,7 +347,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Meet Rina & Raj — Real facility photos */}
+      {/* 6. Meet The Founders — Real founder photos */}
       <MeetTheTeam />
 
       {/* 7. Dr. Landfield Introduction */}

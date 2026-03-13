@@ -63,7 +63,7 @@ export default function TermsPage() {
                     Attorney Review Required
                   </p>
                   <p className="mt-1 font-body text-sm text-amber-700">
-                    [RINA: Have an attorney review these terms of service before publishing to
+                    [NOTE: Have an attorney review these terms of service before publishing to
                     ensure compliance with all applicable federal, state, and local laws, including
                     Washington State consumer protection statutes and healthcare regulations.]
                   </p>

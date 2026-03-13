@@ -7,10 +7,10 @@ export const teamMembers = [
     initials: "AL",
   },
   {
-    name: "Rina",
-    role: "Founder & CEO",
-    bio: "Rina founded Rani Beauty Clinic in 2022 with a simple vision: to create a medspa where advanced science meets genuine care. After years in the aesthetics industry, she saw a gap between high-end clinics and the warm, personal attention every patient deserves. As a woman-owned business, Rani Beauty Clinic reflects Rina's belief that everyone should have access to physician-supervised aesthetic and wellness treatments in a space that feels welcoming, not intimidating.",
-    image: "/images/team/rina.jpg",
+    name: "Raj",
+    role: "Co-Founder & Operations",
+    bio: "After training in many different dermatology clinics in Los Angeles, Dubai and Korea, Raj brings world-class aesthetic techniques and genuine, personalized care to the Greater Seattle & Bellevue area. His commitment to combining cutting-edge technology with exceptional patient experiences has made Rani Beauty Clinic the premier medspa destination in the Pacific Northwest.",
+    image: "/images/team/raj.jpg",
     initials: "R",
   },
 ];
