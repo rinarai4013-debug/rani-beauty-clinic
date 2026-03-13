@@ -8,8 +8,8 @@ interface HeroProps {
   label?: string;
   title: string;
   subtitle?: string;
-  primaryCTA?: { text: string; href: string };
-  secondaryCTA?: { text: string; href: string };
+  primaryCTA?: { text: string; href: string; target?: string };
+  secondaryCTA?: { text: string; href: string; target?: string };
   badges?: string[];
   dark?: boolean;
   fullHeight?: boolean;
@@ -111,6 +111,7 @@ export default function Hero({
               {primaryCTA && (
                 <Button
                   href={primaryCTA.href}
+                  target={primaryCTA.target}
                   className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
                 >
                   {primaryCTA.text}

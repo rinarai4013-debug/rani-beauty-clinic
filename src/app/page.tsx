@@ -25,6 +25,7 @@ import BlogTeaser from "@/components/sections/BlogTeaser";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
+import { clinicInfo } from "@/data/clinic-info";
 
 const aestheticServices = [
   {
@@ -254,7 +255,7 @@ export default function HomePage() {
         label="PHYSICIAN-SUPERVISED MEDSPA & WELLNESS"
         title="Your Skin. Your Wellness. Our Expertise."
         subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist"
-        primaryCTA={{ text: "Book a Consultation", href: "/contact" }}
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url, target: "_blank" }}
         secondaryCTA={{ text: "Explore Services", href: "/services" }}
         badges={[
           "Open 7 Days",

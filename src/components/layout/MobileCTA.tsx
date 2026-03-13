@@ -2,7 +2,7 @@
 
 import { Phone, CalendarDays } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
-import Link from "next/link";
+
 
 export default function MobileCTA() {
   return (
@@ -15,13 +15,15 @@ export default function MobileCTA() {
           <Phone size={16} />
           Call Now
         </a>
-        <Link
-          href="/contact"
+        <a
+          href={clinicInfo.booking.url}
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-rani-gold py-2.5 font-body text-sm font-semibold text-rani-navy transition-colors hover:bg-rani-gold-light"
         >
           <CalendarDays size={16} />
           Book Now
-        </Link>
+        </a>
       </div>
     </div>
   );

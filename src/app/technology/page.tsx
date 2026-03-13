@@ -125,7 +125,7 @@ export default function TechnologyPage() {
         label="OUR TECHNOLOGY"
         title="Advanced Medical Devices for Superior Results"
         subtitle="At Rani Beauty Clinic, we invest in FDA-approved, industry-leading technology to deliver safe, effective, and consistent results. Every device is maintained to manufacturer specifications and operated by trained clinicians under physician supervision."
-        primaryCTA={{ text: "Book Consultation", href: "/contact" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
         secondaryCTA={{ text: "View Services", href: "/services" }}
         badges={["FDA-Approved", "Industry-Leading", "Physician Supervised"]}
         dark

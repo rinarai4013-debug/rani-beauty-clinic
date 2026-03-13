@@ -175,7 +175,7 @@ export default function CostPage({ params }: PageProps) {
         label={`${page.service.toUpperCase()} PRICING`}
         title={page.heroTitle}
         subtitle={page.intro}
-        primaryCTA={{ text: "Book Consultation", href: "/contact" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={[
           "Transparent Pricing",
@@ -379,13 +379,15 @@ export default function CostPage({ params }: PageProps) {
                 Want to learn more about the treatment itself?
               </p>
             </div>
-            <Link
-              href="/contact"
+            <a
+              href={clinicInfo.booking.url}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-3 inline-flex items-center gap-2 font-body text-base font-semibold text-rani-navy transition-colors hover:text-rani-gold"
             >
               Book a free consultation
               <ChevronRight size={16} />
-            </Link>
+            </a>
           </FadeInOnScroll>
         </div>
       </section>

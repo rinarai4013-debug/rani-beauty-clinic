@@ -6,6 +6,7 @@ import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import StaggerChildren from "@/components/animations/StaggerChildren";
 import ServiceCard from "@/components/services/ServiceCard";
 import CTABanner from "@/components/sections/CTABanner";
+import { clinicInfo } from "@/data/clinic-info";
 
 const services = [
   {
@@ -89,7 +90,7 @@ export default function ServicesPage() {
         label="AESTHETIC SERVICES"
         title="Advanced Aesthetic Treatments"
         subtitle="Every treatment at Rani Beauty Clinic is performed under physician supervision using industry-leading technology for safe, effective results."
-        primaryCTA={{ text: "Book a Consultation", href: "/contact" }}
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url, target: "_blank" }}
         dark
       />
 

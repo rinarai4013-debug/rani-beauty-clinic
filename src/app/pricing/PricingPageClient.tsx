@@ -11,6 +11,7 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { pricingData } from "@/data/pricing";
+import { clinicInfo } from "@/data/clinic-info";
 
 type PriceItem = { name: string; price: string; note?: string; time?: string };
 
@@ -341,7 +342,8 @@ export default function PricingPageClient() {
                       </span>
                     ) : (
                       <Button
-                        href="/contact"
+                        href={clinicInfo.booking.url}
+                        target="_blank"
                         className={
                           tier.popular
                             ? "!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
@@ -420,7 +422,7 @@ export default function PricingPageClient() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button href="/contact" icon>
+                  <Button href={clinicInfo.booking.url} target="_blank" icon>
                     Ask About Financing
                   </Button>
                 </div>

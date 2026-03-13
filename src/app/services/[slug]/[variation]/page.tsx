@@ -150,7 +150,7 @@ export default function ServiceVariationPage({ params }: PageProps) {
         label={variation.parentTitle.toUpperCase()}
         title={variation.title}
         subtitle={`Physician-supervised ${variation.title.toLowerCase()} at Rani Beauty Clinic in Renton, WA. Supervised by Dr. Alexander Landfield.`}
-        primaryCTA={{ text: "Book Consultation", href: "/contact" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Physician Supervised", "Open 7 Days"]}
         dark

@@ -43,9 +43,17 @@ export const clinicInfo = {
     reviewCount: 127,
     platform: "Google",
   },
+  booking: {
+    url: "https://booking.ranibeautyclinic.com",
+    provider: "Mangomint",
+  },
+  n8n: {
+    baseUrl: "https://ranibeautyclinic.app.n8n.cloud",
+  },
   analytics: {
     ga4: "G-4YXJ90MXGG",
     gtm: "GTM-MPS3MPNG",
     metaPixel: "",
+    clarity: "vnjnfo8pn5",
   },
 };

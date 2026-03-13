@@ -6,7 +6,15 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/"],
+        disallow: [
+          "/api/",
+          "/wp-admin/",
+          "/wp-login.php",
+          "/cart/",
+          "/checkout/",
+          "/my-account/",
+          "/xmlrpc.php",
+        ],
       },
     ],
     sitemap: "https://ranibeautyclinic.com/sitemap.xml",

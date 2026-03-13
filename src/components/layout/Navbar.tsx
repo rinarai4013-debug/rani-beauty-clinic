@@ -144,12 +144,14 @@ export default function Navbar() {
               <Phone size={16} />
               {clinicInfo.phone}
             </a>
-            <Link
-              href="/contact"
+            <a
+              href={clinicInfo.booking.url}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-rani-gold px-6 py-2.5 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy transition-all duration-300 hover:bg-rani-gold-light hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(243,214,190,0.3)]"
             >
               Book Now
-            </Link>
+            </a>
           </div>
 
           {/* Mobile hamburger */}
@@ -208,13 +210,15 @@ export default function Navbar() {
                 <Phone size={18} />
                 {clinicInfo.phone}
               </a>
-              <Link
-                href="/contact"
+              <a
+                href={clinicInfo.booking.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg bg-rani-gold px-8 py-3 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy"
               >
                 Book Now
-              </Link>
+              </a>
             </div>
           </motion.div>
         )}

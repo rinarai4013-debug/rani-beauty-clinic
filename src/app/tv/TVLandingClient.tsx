@@ -131,7 +131,7 @@ export default function TVLandingClient() {
     setSubmitted(true);
   }
 
-  const bookingUrl = "https://ranibeautyclinic.com/contact";
+  const bookingUrl = clinicInfo.booking.url;
 
   return (
     <div data-tv-landing className="bg-white">

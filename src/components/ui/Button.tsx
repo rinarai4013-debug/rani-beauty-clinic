@@ -14,6 +14,7 @@ interface ButtonProps {
   className?: string;
   icon?: boolean;
   type?: "button" | "submit";
+  target?: string;
 }
 
 const variants = {
@@ -33,6 +34,7 @@ export default function Button({
   className = "",
   icon = false,
   type = "button",
+  target,
 }: ButtonProps) {
   const baseStyles =
     variant === "ghost"
@@ -55,6 +57,19 @@ export default function Button({
   );
 
   if (href) {
+    const isExternal = href.startsWith("http") || href.startsWith("tel:");
+    if (isExternal || target) {
+      return (
+        <a
+          href={href}
+          target={target}
+          rel={target === "_blank" ? "noopener noreferrer" : undefined}
+          className={`${baseStyles} ${variants[variant]} relative ${className}`}
+        >
+          {content}
+        </a>
+      );
+    }
     return (
       <Link
         href={href}

@@ -7,6 +7,7 @@ import StaggerChildren from "@/components/animations/StaggerChildren";
 import ServiceCard from "@/components/services/ServiceCard";
 import CTABanner from "@/components/sections/CTABanner";
 import Badge from "@/components/ui/Badge";
+import { clinicInfo } from "@/data/clinic-info";
 
 const services = [
   {
@@ -54,7 +55,7 @@ export default function WellnessPage() {
         label="MEDICAL WELLNESS"
         title="Medical Wellness Programs"
         subtitle="Comprehensive medical wellness programs designed and supervised by Dr. Alexander Landfield, Board-Certified Neurologist. Your health, optimized from the inside out."
-        primaryCTA={{ text: "Book a Consultation", href: "/contact" }}
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url, target: "_blank" }}
         dark
       />
 

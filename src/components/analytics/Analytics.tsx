@@ -2,7 +2,7 @@ import Script from "next/script";
 import { clinicInfo } from "@/data/clinic-info";
 
 export default function Analytics() {
-  const { ga4, gtm, metaPixel } = clinicInfo.analytics;
+  const { ga4, gtm, metaPixel, clarity } = clinicInfo.analytics;
 
   return (
     <>
@@ -36,6 +36,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }}
           />
         </>
+      )}
+
+      {/* Microsoft Clarity */}
+      {clarity && (
+        <Script
+          id="microsoft-clarity"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(c,l,a,r,i,t,y){
+c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window,document,"clarity","script","${clarity}");`,
+          }}
+        />
       )}
 
       {/* Meta Pixel */}

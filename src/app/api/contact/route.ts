@@ -3,6 +3,7 @@ import { Resend } from "resend";
 
 const CLINIC_EMAIL = process.env.CONTACT_EMAIL || "hello@ranibeautyclinic.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Rani Beauty Clinic <noreply@ranibeautyclinic.com>";
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "";
 
 interface ContactFormData {
   name: string;
@@ -12,6 +13,29 @@ interface ContactFormData {
   preferredDate?: string;
   message?: string;
   honeypot?: string;
+}
+
+/**
+ * Fire-and-forget POST to N8N webhook.
+ * This feeds the lead into the N8N automation suite (WF2 Immediate Lead Response,
+ * WF2b No-Booking Follow-Up, etc.) via Airtable CRM.
+ * Failures are logged but never block the user response.
+ */
+async function notifyN8N(data: Record<string, string>) {
+  if (!N8N_WEBHOOK_URL) return;
+
+  try {
+    await fetch(N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source: "website_contact_form",
+        ...data,
+      }),
+    });
+  } catch (err) {
+    console.error("N8N webhook error (non-blocking):", err);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -123,6 +147,11 @@ export async function POST(request: NextRequest) {
       console.log(JSON.stringify(sanitizedData, null, 2));
       console.log("===================================");
     }
+
+    // Fire-and-forget: notify N8N automation workflows
+    // This feeds the lead into WF2 (Immediate Lead Response) → Twilio SMS,
+    // WF2b (No-Booking Follow-Up Ladder), and the Airtable CRM pipeline
+    notifyN8N(sanitizedData);
 
     return NextResponse.json(
       {
