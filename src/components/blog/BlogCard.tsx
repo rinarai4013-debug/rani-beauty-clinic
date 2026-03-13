@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Calendar, User } from "lucide-react";
+import { getCategoryImage } from "@/data/blog/category-images";
 
 interface BlogCardProps {
   slug: string;
@@ -21,13 +23,14 @@ export default function BlogCard({
   return (
     <Link href={`/blog/${slug}`} className="group block h-full">
       <article className="flex h-full flex-col overflow-hidden rounded-xl border border-rani-border bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(15,29,44,0.08)]">
-        {/* Image placeholder */}
-        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-rani-navy to-rani-navy-light">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-heading text-5xl text-rani-gold/20 select-none">
-              R
-            </span>
-          </div>
+        <div className="relative h-52 overflow-hidden bg-rani-navy">
+          <Image
+            src={getCategoryImage(category)}
+            alt={category}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
           {/* Category badge */}
           <div className="absolute left-4 top-4">
             <span className="inline-block rounded-full bg-rani-gold/90 px-3 py-1 font-body text-[10px] font-semibold uppercase tracking-wider text-rani-navy backdrop-blur-sm">

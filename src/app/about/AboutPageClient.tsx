@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Shield, Target, Heart, Lightbulb, Cpu, Sparkles, ScanFace } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import CTABanner from "@/components/sections/CTABanner";
@@ -132,10 +133,14 @@ export default function AboutPageClient() {
             </FadeInOnScroll>
 
             <FadeInOnScroll direction="right">
-              <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-cream to-rani-gold/20 flex items-center justify-center">
-                <div className="text-center px-4">
-                  <span className="font-heading text-6xl text-rani-navy/10">R</span>
-                </div>
+              <div className="aspect-[4/5] overflow-hidden rounded-xl">
+                <Image
+                  src="/images/about/our-story.jpg"
+                  alt="Rani Beauty Clinic interior"
+                  width={600}
+                  height={750}
+                  className="h-full w-full object-cover"
+                />
               </div>
             </FadeInOnScroll>
           </div>

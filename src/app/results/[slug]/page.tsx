@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Clock, Layers, RefreshCw, ImageIcon } from "lucide-react";
+import Image from "next/image";
+import { ChevronRight, Clock, Layers, RefreshCw } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import CTABanner from "@/components/sections/CTABanner";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -142,11 +143,16 @@ export default function GalleryPage({ params }: PageProps) {
           </FadeInOnScroll>
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {page.images.map((src, i) => (
               <FadeInOnScroll key={i} delay={i * 0.1}>
-                <div className="aspect-square rounded-xl border border-rani-gold/10 bg-white flex flex-col items-center justify-center gap-3">
-                  <ImageIcon size={32} className="text-rani-muted/30" />
-                  <span className="font-body text-xs text-rani-muted/50">Schedule a Consultation</span>
+                <div className="aspect-square overflow-hidden rounded-xl border border-rani-gold/10 bg-white">
+                  <Image
+                    src={src}
+                    alt={`${page.title} result ${i + 1}`}
+                    width={600}
+                    height={600}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               </FadeInOnScroll>
             ))}

@@ -1,7 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
 import { ArrowRight, Calendar } from "lucide-react";
+import { getCategoryImage } from "@/data/blog/category-images";
 
 interface BlogPost {
   slug: string;
@@ -32,11 +34,14 @@ export default function BlogTeaser({ posts }: BlogTeaserProps) {
             <FadeInOnScroll key={post.slug} delay={i * 0.15}>
               <Link href={`/blog/${post.slug}`} className="group block">
                 <div className="overflow-hidden rounded-xl border border-rani-border bg-white transition-all duration-300 hover:shadow-[0_10px_40px_rgba(15,29,44,0.08)] hover:-translate-y-1">
-                  {/* Placeholder image */}
-                  <div className="h-48 bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center">
-                    <span className="font-heading text-4xl text-rani-gold/20">
-                      R
-                    </span>
+                  <div className="relative h-48 overflow-hidden bg-rani-navy">
+                    <Image
+                      src={getCategoryImage(post.category)}
+                      alt={post.category}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
                   </div>
                   <div className="p-6">
                     <span className="font-body text-xs font-semibold uppercase tracking-wider text-rani-gold">

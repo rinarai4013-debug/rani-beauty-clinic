@@ -9,6 +9,7 @@ export interface GalleryPage {
   resultTimeline: string;
   sessionsNeeded: string;
   maintenanceInfo: string;
+  images: string[];
   faqs: { question: string; answer: string }[];
 }
 
@@ -21,6 +22,14 @@ export const galleryPages: GalleryPage[] = [
       "See real laser hair removal before and after results at Rani Beauty Clinic in Renton, WA. Smooth, hair-free skin with the Candela GentleMax Pro Plus.",
     serviceSlug: "laser-hair-removal",
     category: "aesthetic",
+    images: [
+      "/images/services/laserhairremovals/fullbodylaser.jpeg",
+      "/images/services/laserhairremovals/fullbrazilian.jpeg",
+      "/images/services/laserhairremovals/underarms.jpeg",
+      "/images/services/laserhairremovals/fulllegs.jpeg",
+      "/images/services/laserhairremovals/FullFaceLaserHairRemoval.jpeg",
+      "/images/services/laserhairremovals/fullback.jpeg",
+    ],
     description:
       "Our patients typically see 70-90% permanent hair reduction after completing their series. Results become progressively visible after each session as follicles are disabled. Most enjoy smooth, maintenance-free skin for years.",
     resultTimeline: "Visible reduction after 2-3 sessions, optimal results at 6-8 sessions spaced 4-8 weeks apart.",
@@ -40,6 +49,14 @@ export const galleryPages: GalleryPage[] = [
       "View HydraFacial before and after photos at Rani Beauty Clinic in Renton, WA. Clearer, hydrated skin with instant visible results after one session.",
     serviceSlug: "hydrafacial",
     category: "aesthetic",
+    images: [
+      "/images/services/hydrafacial/1.png",
+      "/images/services/hydrafacial/2.webp",
+      "/images/services/signaturehydrafacial/1.jpg",
+      "/images/services/signaturehydrafacial/2.jpeg",
+      "/images/services/diorhydrafacial/1.jpg",
+      "/images/services/diorhydrafacial/2.webp",
+    ],
     description:
       "HydraFacial delivers immediate visible improvement in skin clarity, hydration, and texture. Patients leave with a noticeable glow after just one treatment. Results compound with consistent monthly sessions.",
     resultTimeline: "Immediate glow after first session. Cumulative improvement over monthly treatments.",
@@ -59,6 +76,14 @@ export const galleryPages: GalleryPage[] = [
       "See RF microneedling before and after results at Rani Beauty Clinic in Renton, WA. Tighter skin, reduced scars, and improved texture with Cutera Secret Pro.",
     serviceSlug: "rf-microneedling",
     category: "aesthetic",
+    images: [
+      "/images/services/cutera/1.jpg",
+      "/images/services/cutera/2.webp",
+      "/images/services/fullface/1.jpg",
+      "/images/services/fullface/2.jpg",
+      "/images/services/faceneck/1.avif",
+      "/images/services/faceneck/2.webp",
+    ],
     description:
       "RF microneedling with the Cutera Secret Pro stimulates deep collagen remodeling. Patients see progressive improvement in skin tightness, texture, and scar appearance over 3-6 months as new collagen forms.",
     resultTimeline: "Initial improvement within 2-4 weeks; full collagen remodeling over 3-6 months post-treatment.",
@@ -78,6 +103,14 @@ export const galleryPages: GalleryPage[] = [
       "View Botox and Dysport before and after photos at Rani Beauty Clinic in Renton, WA. Natural-looking wrinkle reduction supervised by a neurologist.",
     serviceSlug: "botox-dysport",
     category: "aesthetic",
+    images: [
+      "/images/services/botox/1.png",
+      "/images/services/botox/2.webp",
+      "/images/services/traptox/1.png",
+      "/images/services/traptox/2.jpg",
+      "/images/services/lipfiller/1.jpg",
+      "/images/services/lipfiller/2.jpg",
+    ],
     description:
       "Our neurologist-supervised Botox and Dysport treatments deliver natural-looking wrinkle reduction. Results appear within 3-7 days, with full effect at two weeks. Our conservative approach prevents a frozen look.",
     resultTimeline: "Initial smoothing within 3-5 days; full results at 10-14 days post-treatment.",
@@ -97,6 +130,14 @@ export const galleryPages: GalleryPage[] = [
       "See dermal filler before and after results at Rani Beauty Clinic in Renton, WA. Natural volume restoration for lips, cheeks, jawline, and under eyes.",
     serviceSlug: "dermal-fillers",
     category: "aesthetic",
+    images: [
+      "/images/services/lipfiller/1.jpg",
+      "/images/services/lipfiller/2.jpg",
+      "/images/services/cheekfiller/1.webp",
+      "/images/services/cheekfiller/2.webp",
+      "/images/services/jawlinefiller/1.webp",
+      "/images/services/eyefiller/1.webp",
+    ],
     description:
       "Dermal fillers provide immediate volume restoration and facial contouring. Results are visible right away, with final settling at two weeks. Our approach focuses on natural enhancement that complements your features.",
     resultTimeline: "Immediate volume; minor swelling resolves in 3-7 days; final results at 2 weeks.",
@@ -116,6 +157,14 @@ export const galleryPages: GalleryPage[] = [
       "View chemical peel before and after photos at Rani Beauty Clinic in Renton, WA. Improved texture, reduced pigmentation, and clearer skin after treatment.",
     serviceSlug: "chemical-peels",
     category: "aesthetic",
+    images: [
+      "/images/services/vipeel/1.webp",
+      "/images/services/vipeel/2.webp",
+      "/images/services/acnevipeel/1.jpg",
+      "/images/services/acnevipeel/2.webp",
+      "/images/services/hyperpigmintaionpeel/1.webp",
+      "/images/services/cosmelan/1.png",
+    ],
     description:
       "Chemical peels reveal fresher, more even-toned skin by removing damaged outer layers. Light peels show subtle improvement immediately, while medium-depth peels produce dramatic results after the peeling phase completes.",
     resultTimeline: "Light peels: 1-3 days recovery. Medium peels: 5-7 days of peeling, full results at 2-3 weeks.",
@@ -135,6 +184,14 @@ export const galleryPages: GalleryPage[] = [
       "See scar reduction before and after results at Rani Beauty Clinic in Renton, WA. Multi-modality treatments for acne scars, surgical scars, and more.",
     serviceSlug: "scar-reduction",
     category: "aesthetic",
+    images: [
+      "/images/services/acnescarvipeel/1.png",
+      "/images/services/acnescarvipeel/2.jpg",
+      "/images/services/cutera/1.jpg",
+      "/images/services/cutera/2.webp",
+      "/images/services/laserresurfacing/1.webp",
+      "/images/services/laserresurfacing/2.webp",
+    ],
     description:
       "Our multi-modality scar reduction approach combines RF microneedling, chemical peels, and targeted therapies to progressively improve scar texture, color, and depth. Most patients see significant improvement over a treatment series.",
     resultTimeline: "Initial improvement at 4-6 weeks; dramatic results over 3-6 months with multiple sessions.",
@@ -154,6 +211,14 @@ export const galleryPages: GalleryPage[] = [
       "See GLP-1 weight loss before and after transformations at Rani Beauty Clinic in Renton, WA. Physician-supervised Semaglutide and Tirzepatide results.",
     serviceSlug: "glp1-weight-management",
     category: "wellness",
+    images: [
+      "/images/services/wellness/glp1-1.jpg",
+      "/images/services/wellness/glp1-2.jpg",
+      "/images/services/wellness/peptide-1.jpg",
+      "/images/services/wellness/vitamin-1.jpg",
+      "/images/services/wellness/bloodwork-1.jpg",
+      "/images/services/wellness/hormone-1.jpg",
+    ],
     description:
       "Our physician-supervised GLP-1 program helps patients achieve 15-22% total body weight loss. Results begin within the first month and continue throughout the treatment program with consistent medication and lifestyle support.",
     resultTimeline: "Weight loss begins within 2-4 weeks; significant results at 3 months; peak results at 12-15 months.",
@@ -173,6 +238,14 @@ export const galleryPages: GalleryPage[] = [
       "View Sofwave before and after results at Rani Beauty Clinic in Renton, WA. Non-invasive skin tightening for face, neck, and jawline with zero downtime.",
     serviceSlug: "sofwave",
     category: "aesthetic",
+    images: [
+      "/images/services/softwave/1.jpg",
+      "/images/services/softwave/2.webp",
+      "/images/services/neckfiller/1.webp",
+      "/images/services/neckfiller/2.webp",
+      "/images/services/jawlinefiller/1.webp",
+      "/images/services/jawlinefiller/2.webp",
+    ],
     description:
       "Sofwave delivers noticeable skin tightening and lifting with a single treatment and zero downtime. Ultrasound energy stimulates collagen production deep in the dermis, with results that continue improving for months.",
     resultTimeline: "Some immediate tightening; progressive improvement over 3-6 months as collagen rebuilds.",

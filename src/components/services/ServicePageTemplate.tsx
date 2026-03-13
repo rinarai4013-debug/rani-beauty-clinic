@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Shield, CheckCircle, Clock } from "lucide-react";
+import { ChevronRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import Hero from "@/components/sections/Hero";
@@ -15,6 +15,38 @@ import { clinicInfo } from "@/data/clinic-info";
 import { motion } from "framer-motion";
 import { staggerItem } from "@/components/animations/StaggerChildren";
 import { getServiceImage } from "@/data/service-images";
+
+/** Maps service slug → cost page slug (only for services that have a cost page) */
+const COST_SLUG_MAP: Record<string, string> = {
+  "laser-hair-removal": "laser-hair-removal-cost",
+  "hydrafacial": "hydrafacial-cost",
+  "rf-microneedling": "rf-microneedling-cost",
+  "botox-dysport": "botox-cost",
+  "dermal-fillers": "dermal-fillers-cost",
+  "chemical-peels": "chemical-peels-cost",
+  "biorepeel": "biorepeel-cost",
+  "sofwave": "sofwave-cost",
+  "scar-reduction": "scar-reduction-cost",
+  "glp1-weight-management": "glp1-cost",
+  "peptide-therapy": "peptide-therapy-cost",
+  "nad-injections": "nad-injections-cost",
+  "hormone-therapy": "hormone-therapy-cost",
+  "vitamin-injections": "vitamin-injections-cost",
+  "blood-work": "blood-work-cost",
+};
+
+/** Service slugs that have a results/gallery page */
+const RESULTS_SLUGS = new Set([
+  "laser-hair-removal",
+  "hydrafacial",
+  "rf-microneedling",
+  "botox-dysport",
+  "dermal-fillers",
+  "chemical-peels",
+  "scar-reduction",
+  "glp1-weight-management",
+  "sofwave",
+]);
 
 interface ServiceData {
   slug: string;
@@ -429,23 +461,27 @@ export default function ServicePageTemplate({
       <section className="bg-rani-cream py-12">
         <div className="mx-auto max-w-4xl px-6">
           <div className="flex flex-wrap justify-center gap-3">
+            {COST_SLUG_MAP[service.slug] && (
+              <Link
+                href={`/cost/${COST_SLUG_MAP[service.slug]}`}
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+              >
+                {service.title} Cost →
+              </Link>
+            )}
+            {RESULTS_SLUGS.has(service.slug) && (
+              <Link
+                href={`/results/${service.slug}`}
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+              >
+                Before & After →
+              </Link>
+            )}
             <Link
-              href={`/cost/${service.slug}-cost`}
+              href="/contact"
               className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
             >
-              {service.title} Cost →
-            </Link>
-            <Link
-              href={`/results/${service.slug}`}
-              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
-            >
-              Before & After →
-            </Link>
-            <Link
-              href="/locations"
-              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
-            >
-              Locations Near You →
+              Visit Our Clinic →
             </Link>
           </div>
         </div>

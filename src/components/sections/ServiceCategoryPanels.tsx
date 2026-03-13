@@ -11,14 +11,14 @@ const categories = [
   {
     title: "Face & Skin",
     description: "HydraFacial, Chemical Peels, Laser Facials & more",
-    image: "/images/services/hydrafacial/1.png",
+    image: "/images/services/face-skin-cover.jpg",
     href: "/services",
     count: 8,
   },
   {
     title: "Injectables",
     description: "Botox, Dysport & Dermal Fillers",
-    image: "/images/services/lipfiller/1.jpg",
+    image: "/images/services/injectables-cover.jpg",
     href: "/services/botox-dysport",
     count: 6,
   },
