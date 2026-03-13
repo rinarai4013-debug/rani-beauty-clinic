@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "About Us",
   description:
     "Learn about Rani Beauty Clinic — a woman-owned, physician-supervised medspa in Renton, WA. Meet our Medical Director Dr. Alexander Landfield, board-certified neurologist, and our expert team.",
+  alternates: {
+    canonical: "https://ranibeautyclinic.com/about",
+  },
 };
 
 export default function AboutPage() {

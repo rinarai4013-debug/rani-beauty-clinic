@@ -17,7 +17,7 @@ export default function MeetTheTeam() {
             <div className="grid grid-cols-2 gap-4">
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
                 <Image
-                  src="/images/team/rina.jpg"
+                  src="/images/team/co-founder.jpg"
                   alt="Rani Beauty Clinic Co-Founder"
                   fill
                   className="object-cover"

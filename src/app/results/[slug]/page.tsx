@@ -137,7 +137,7 @@ export default function GalleryPage({ params }: PageProps) {
               Patient Results
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center font-body text-sm text-rani-muted">
-              Before and after photos coming soon. Schedule a consultation to see results in person.
+              Schedule a consultation to see real patient results in person.
             </p>
           </FadeInOnScroll>
 
@@ -146,7 +146,7 @@ export default function GalleryPage({ params }: PageProps) {
               <FadeInOnScroll key={i} delay={i * 0.1}>
                 <div className="aspect-square rounded-xl border border-rani-gold/10 bg-white flex flex-col items-center justify-center gap-3">
                   <ImageIcon size={32} className="text-rani-muted/30" />
-                  <span className="font-body text-xs text-rani-muted/50">Coming Soon</span>
+                  <span className="font-body text-xs text-rani-muted/50">Schedule a Consultation</span>
                 </div>
               </FadeInOnScroll>
             ))}

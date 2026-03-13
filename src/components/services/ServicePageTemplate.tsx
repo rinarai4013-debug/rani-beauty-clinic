@@ -345,9 +345,6 @@ export default function ServicePageTemplate({
                     key={i}
                     className="aspect-square rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center"
                   >
-                    <p className="font-body text-xs text-gray-400 px-4 text-center">
-                      Photos coming soon
-                    </p>
                   </div>
                 ))
               )}

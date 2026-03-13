@@ -135,9 +135,6 @@ export default function AboutPageClient() {
               <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-cream to-rani-gold/20 flex items-center justify-center">
                 <div className="text-center px-4">
                   <span className="font-heading text-6xl text-rani-navy/10">R</span>
-                  <p className="mt-4 font-body text-sm text-rani-muted">
-                    Clinic photo coming soon
-                  </p>
                 </div>
               </div>
             </FadeInOnScroll>
@@ -159,9 +156,6 @@ export default function AboutPageClient() {
                 <div className="flex h-64 w-64 items-center justify-center rounded-full border-4 border-rani-gold/30 bg-gradient-to-br from-rani-navy to-rani-navy-light shadow-lg">
                   <span className="font-heading text-6xl text-rani-gold">AL</span>
                 </div>
-                <p className="mt-4 font-body text-sm text-rani-muted">
-                  Photo coming soon
-                </p>
               </div>
             </FadeInOnScroll>
 

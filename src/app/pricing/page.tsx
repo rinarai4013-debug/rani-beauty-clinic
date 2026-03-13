@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "Pricing & Packages",
   description:
     "View pricing for aesthetic treatments, medical wellness programs, and membership packages at Rani Beauty Clinic in Renton, WA. HSA/FSA accepted. Financing available through Cherry and PatientFi.",
+  alternates: {
+    canonical: "https://ranibeautyclinic.com/pricing",
+  },
 };
 
 export default function PricingPage() {

@@ -142,10 +142,7 @@ export async function POST(request: NextRequest) {
         `,
       });
     } else {
-      // Fallback: log to console if RESEND_API_KEY is not configured
-      console.log("=== New Contact Form Submission ===");
-      console.log(JSON.stringify(sanitizedData, null, 2));
-      console.log("===================================");
+      // Fallback: no email sent if RESEND_API_KEY is not configured
     }
 
     // Fire-and-forget: notify N8N automation workflows

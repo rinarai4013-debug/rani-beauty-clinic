@@ -126,8 +126,6 @@ export default function TVLandingClient() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // In production this would POST to an API
-    console.log("Form submitted:", { ...formData, ...utmParams });
     setSubmitted(true);
   }
 

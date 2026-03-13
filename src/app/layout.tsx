@@ -46,16 +46,28 @@ export const metadata: Metadata = {
     title: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
     description:
       "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, peptides, NAD+ & more.",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Rani Beauty Clinic — Premier Medspa & Wellness in Renton, WA",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
     description:
       "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, peptides, NAD+ & more.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    canonical: "https://ranibeautyclinic.com",
   },
   metadataBase: new URL("https://ranibeautyclinic.com"),
 };

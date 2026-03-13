@@ -362,9 +362,6 @@ export default function HomePage() {
                       AL
                     </span>
                   </div>
-                  <p className="mt-4 font-body text-sm text-gray-400">
-                    Photo coming soon
-                  </p>
                 </div>
               </div>
             </FadeInOnScroll>

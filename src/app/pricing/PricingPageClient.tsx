@@ -337,9 +337,12 @@ export default function PricingPageClient() {
 
                   <div className="mt-8 w-full">
                     {pricingData.membership.comingSoon ? (
-                      <span className="inline-flex w-full items-center justify-center rounded-lg border border-rani-border bg-rani-cream px-8 py-3 font-body text-sm font-semibold text-rani-muted">
-                        Coming Soon
-                      </span>
+                      <Button
+                        href="/contact"
+                        className="!w-full"
+                      >
+                        Contact Us
+                      </Button>
                     ) : (
                       <Button
                         href="/contact"
