@@ -288,7 +288,7 @@ export default function ServicePageTemplate({
               <Badge icon="heart">Financing Available</Badge>
             </div>
             <div className="mt-8">
-              <Button href="/contact">Get a Quote</Button>
+              <Button href={clinicInfo.booking.url} target="_blank">Get a Quote</Button>
             </div>
           </FadeInOnScroll>
         </div>
