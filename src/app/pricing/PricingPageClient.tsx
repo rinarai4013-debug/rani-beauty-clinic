@@ -343,7 +343,6 @@ export default function PricingPageClient() {
                     ) : (
                       <Button
                         href={clinicInfo.booking.url}
-                        target="_blank"
                         className={
                           tier.popular
                             ? "!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
@@ -422,7 +421,7 @@ export default function PricingPageClient() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button href={clinicInfo.booking.url} target="_blank" icon>
+                  <Button href={clinicInfo.booking.url} icon>
                     Ask About Financing
                   </Button>
                 </div>

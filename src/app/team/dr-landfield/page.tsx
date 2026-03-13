@@ -105,7 +105,7 @@ export default function DrLandfieldPage() {
         label="MEDICAL DIRECTOR"
         title="Dr. Alexander Landfield"
         subtitle="Board-certified neurologist and Medical Director of Rani Beauty Clinic. Dr. Landfield's expertise in neuromuscular anatomy and neurotoxin science brings unparalleled precision to every treatment."
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Board-Certified", "Neurologist", "Medical Director"]}
         dark

@@ -255,7 +255,7 @@ export default function HomePage() {
         label="PHYSICIAN-SUPERVISED MEDSPA & WELLNESS"
         title="Your Skin. Your Wellness. Our Expertise."
         subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist"
-        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Explore Services", href: "/services" }}
         badges={[
           "Open 7 Days",

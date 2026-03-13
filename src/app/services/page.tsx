@@ -90,7 +90,7 @@ export default function ServicesPage() {
         label="AESTHETIC SERVICES"
         title="Advanced Aesthetic Treatments"
         subtitle="Every treatment at Rani Beauty Clinic is performed under physician supervision using industry-leading technology for safe, effective results."
-        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url }}
         dark
       />
 

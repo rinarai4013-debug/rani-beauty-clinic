@@ -150,7 +150,7 @@ export default function WellnessVariationPage({ params }: PageProps) {
         label={variation.parentTitle.toUpperCase()}
         title={variation.title}
         subtitle={`Physician-supervised ${variation.title.toLowerCase()} at Rani Beauty Clinic in Renton, WA. Under the care of Dr. Alexander Landfield.`}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Physician Supervised", "Open 7 Days"]}
         dark

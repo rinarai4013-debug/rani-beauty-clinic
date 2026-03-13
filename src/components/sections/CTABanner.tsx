@@ -47,7 +47,6 @@ export default function CTABanner({
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               href={clinicInfo.booking.url}
-              target="_blank"
               className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
             >
               Book Online

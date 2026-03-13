@@ -87,7 +87,7 @@ export default function ServicePageTemplate({
       <Hero
         title={service.title}
         subtitle={service.heroDescription}
-        primaryCTA={{ text: "Book This Treatment", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book This Treatment", href: clinicInfo.booking.url }}
         badge={`Supervised by ${clinicInfo.medicalDirector.name}, ${clinicInfo.medicalDirector.specialty}`}
         dark
       />
@@ -288,7 +288,7 @@ export default function ServicePageTemplate({
               <Badge icon="heart">Financing Available</Badge>
             </div>
             <div className="mt-8">
-              <Button href={clinicInfo.booking.url} target="_blank">Get a Quote</Button>
+              <Button href={clinicInfo.booking.url}>Get a Quote</Button>
             </div>
           </FadeInOnScroll>
         </div>

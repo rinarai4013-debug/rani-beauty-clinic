@@ -79,7 +79,7 @@ export default function SafetyPage() {
         label="PATIENT SAFETY"
         title="Your Safety Is Our Foundation"
         subtitle="At Rani Beauty Clinic, physician supervision is not a marketing phrase — it is the standard that governs every treatment, protocol, and clinical decision we make."
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Meet Our Team", href: "/team" }}
         badges={["Physician Supervised", "FDA-Approved Devices", "Board-Certified MD"]}
         dark

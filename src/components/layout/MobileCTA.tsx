@@ -17,8 +17,6 @@ export default function MobileCTA() {
         </a>
         <a
           href={clinicInfo.booking.url}
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-rani-gold py-2.5 font-body text-sm font-semibold text-rani-navy transition-colors hover:bg-rani-gold-light"
         >
           <CalendarDays size={16} />

@@ -53,6 +53,21 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         />
       )}
 
+      {/* Mangomint Online Booking Overlay */}
+      <Script
+        id="mangomint-booking"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `window.Mangomint = window.Mangomint || {};
+window.Mangomint.CompanyId = ${clinicInfo.booking.companyId};`,
+        }}
+      />
+      <Script
+        id="mangomint-booking-sdk"
+        src="https://booking.mangomint.com/app.js"
+        strategy="afterInteractive"
+      />
+
       {/* Meta Pixel */}
       {metaPixel && (
         <Script

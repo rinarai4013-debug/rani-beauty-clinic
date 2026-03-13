@@ -75,7 +75,7 @@ export default function TeamPage() {
         label="OUR TEAM"
         title="The Experts Behind Your Care"
         subtitle="Every treatment at Rani Beauty Clinic is delivered by a skilled team under the direct supervision of our board-certified Medical Director. Meet the people committed to your safety and results."
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Physician Supervised", "Board-Certified", "Woman-Owned"]}
         dark

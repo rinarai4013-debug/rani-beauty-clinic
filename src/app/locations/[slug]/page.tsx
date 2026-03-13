@@ -148,7 +148,7 @@ export default function LocationPage({ params }: PageProps) {
         label={`SERVING ${page.city.toUpperCase()}, ${page.state}`}
         title={`Premier Medspa Serving ${page.city}, WA`}
         subtitle={`Physician-supervised aesthetic treatments and medical wellness services for ${page.city} residents. ${page.driveTime} from our Renton clinic.`}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         badges={["Physician Supervised", "Open 7 Days", page.driveTime]}
         dark

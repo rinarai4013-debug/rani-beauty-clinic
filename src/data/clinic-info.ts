@@ -44,8 +44,10 @@ export const clinicInfo = {
     platform: "Google",
   },
   booking: {
-    url: "https://booking.ranibeautyclinic.com",
+    url: "https://booking.mangomint.com/876418",
+    shareableUrl: "https://booking.mangomint.com/ranibeautyclinic1",
     provider: "Mangomint",
+    companyId: 876418,
   },
   n8n: {
     baseUrl: "https://ranibeautyclinic.app.n8n.cloud",

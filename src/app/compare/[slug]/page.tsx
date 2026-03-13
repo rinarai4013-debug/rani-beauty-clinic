@@ -120,7 +120,7 @@ export default function ComparePage({ params }: PageProps) {
         label="TREATMENT COMPARISON"
         title={`${page.treatmentA} vs ${page.treatmentB}`}
         subtitle={page.intro}
-        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        primaryCTA={{ text: "Book Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Call Now", href: clinicInfo.phoneTel }}
         dark
       />
@@ -362,8 +362,6 @@ export default function ComparePage({ params }: PageProps) {
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <a
                   href={clinicInfo.booking.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-rani-gold px-6 py-3 font-body text-sm font-semibold text-rani-navy transition-colors hover:bg-rani-gold-light"
                 >
                   Book a Consultation
