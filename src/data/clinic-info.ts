@@ -44,7 +44,7 @@ export const clinicInfo = {
     platform: "Google",
   },
   analytics: {
-    ga4: "",
+    ga4: "G-4YXJ90MXGG",
     gtm: "",
     metaPixel: "",
   },
