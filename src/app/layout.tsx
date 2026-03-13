@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import MobileCTA from "@/components/layout/MobileCTA";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -66,7 +67,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${montserrat.variable} ${playfairDisplay.variable}`}>
+      <head>
+        <Analytics />
+      </head>
       <body className="font-body text-rani-text antialiased">
+        <GTMNoScript />
         <ScrollProgress />
         <Navbar />
         <main className="min-h-screen">{children}</main>

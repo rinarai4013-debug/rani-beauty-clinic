@@ -370,6 +370,32 @@ export default function ServicePageTemplate({
         </section>
       )}
 
+      {/* Cross Links */}
+      <section className="bg-rani-cream py-12">
+        <div className="mx-auto max-w-4xl px-6">
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              href={`/cost/${service.slug}-cost`}
+              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+            >
+              {service.title} Cost →
+            </Link>
+            <Link
+              href={`/results/${service.slug}`}
+              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+            >
+              Before & After →
+            </Link>
+            <Link
+              href="/locations"
+              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+            >
+              Locations Near You →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <CTABanner
         title={`Ready to Book Your ${service.title}?`}

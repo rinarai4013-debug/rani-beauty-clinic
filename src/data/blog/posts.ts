@@ -1,3 +1,7 @@
+import { postsBatch1 } from "./posts-batch1";
+import { postsBatch2 } from "./posts-batch2";
+import { postsBatch3 } from "./posts-batch3";
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -13,7 +17,7 @@ export interface BlogPost {
   relatedSlugs: string[];
 }
 
-export const blogPosts: BlogPost[] = [
+const originalPosts: BlogPost[] = [
   {
     slug: "what-is-glp1-weight-management",
     title: "GLP-1 Weight Management: What Semaglutide and Tirzepatide Can Do That Diet Alone Cannot",
@@ -485,4 +489,11 @@ If you would like to learn more about Rani Beauty Clinic or schedule a consultat
     ],
     relatedSlugs: ["why-neurologist-for-botox", "pain-free-laser-hair-removal-guide", "what-is-glp1-weight-management"]
   }
+];
+
+export const blogPosts: BlogPost[] = [
+  ...originalPosts,
+  ...postsBatch1,
+  ...postsBatch2,
+  ...postsBatch3,
 ];

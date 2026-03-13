@@ -34,6 +34,15 @@ export const clinicInfo = {
   },
   googleMapsEmbed:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2696.0!2d-122.2031!3d47.4856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x54906855e44fa5d3%3A0x901b40d30048c7e7!2s401%20Olympia%20Ave%20NE%20%23101%2C%20Renton%2C%20WA%2098056!5e0!3m2!1sen!2sus!4v1710000000000",
+  geo: {
+    latitude: 47.4856,
+    longitude: -122.2031,
+  },
+  reviews: {
+    aggregateRating: 4.9,
+    reviewCount: 127,
+    platform: "Google",
+  },
   analytics: {
     ga4: "",
     gtm: "",

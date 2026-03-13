@@ -139,6 +139,126 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Resources & Guides */}
+      <div className="border-t border-rani-gold/10">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Guides
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Laser Hair Removal Guide", href: "/guides/laser-hair-removal" },
+                  { name: "Botox & Injectables Guide", href: "/guides/botox-injectables" },
+                  { name: "Skin Rejuvenation Guide", href: "/guides/skin-rejuvenation" },
+                  { name: "GLP-1 Weight Management Guide", href: "/guides/glp1-weight-management" },
+                  { name: "Wellness & Peptides Guide", href: "/guides/wellness-optimization" },
+                  { name: "Hormone Therapy Guide", href: "/guides/hormone-therapy" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Pricing
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Laser Hair Removal Cost", href: "/cost/laser-hair-removal-cost" },
+                  { name: "Botox Cost", href: "/cost/botox-cost" },
+                  { name: "HydraFacial Cost", href: "/cost/hydrafacial-cost" },
+                  { name: "Semaglutide Cost", href: "/cost/semaglutide-cost" },
+                  { name: "Dermal Fillers Cost", href: "/cost/dermal-fillers-cost" },
+                  { name: "All Pricing", href: "/pricing" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Compare Treatments
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Botox vs Dysport", href: "/compare/botox-vs-dysport" },
+                  { name: "Semaglutide vs Tirzepatide", href: "/compare/semaglutide-vs-tirzepatide" },
+                  { name: "HydraFacial vs Chemical Peel", href: "/compare/hydrafacial-vs-chemical-peel" },
+                  { name: "RF Microneedling vs Sofwave", href: "/compare/rf-microneedling-vs-sofwave" },
+                  { name: "Laser vs Electrolysis", href: "/compare/laser-hair-removal-vs-electrolysis" },
+                  { name: "All Comparisons", href: "/compare" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Areas We Serve */}
+      <div className="border-t border-rani-gold/10">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">
+            Areas We Serve
+          </h3>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {[
+              { name: "Bellevue", href: "/locations/bellevue-wa" },
+              { name: "Kent", href: "/locations/kent-wa" },
+              { name: "Tukwila", href: "/locations/tukwila-wa" },
+              { name: "Newcastle", href: "/locations/newcastle-wa" },
+              { name: "Mercer Island", href: "/locations/mercer-island-wa" },
+              { name: "Auburn", href: "/locations/auburn-wa" },
+              { name: "Federal Way", href: "/locations/federal-way-wa" },
+              { name: "Kirkland", href: "/locations/kirkland-wa" },
+              { name: "Redmond", href: "/locations/redmond-wa" },
+              { name: "Issaquah", href: "/locations/issaquah-wa" },
+              { name: "Sammamish", href: "/locations/sammamish-wa" },
+              { name: "SeaTac", href: "/locations/seatac-wa" },
+              { name: "Burien", href: "/locations/burien-wa" },
+              { name: "Covington", href: "/locations/covington-wa" },
+              { name: "Maple Valley", href: "/locations/maple-valley-wa" },
+              { name: "Des Moines", href: "/locations/des-moines-wa" },
+              { name: "Beacon Hill", href: "/locations/beacon-hill-seattle-wa" },
+              { name: "Columbia City", href: "/locations/columbia-city-seattle-wa" },
+              { name: "Rainier Beach", href: "/locations/rainier-beach-seattle-wa" },
+              { name: "Capitol Hill", href: "/locations/capitol-hill-seattle-wa" },
+              { name: "South Seattle", href: "/locations/south-seattle-wa" },
+              { name: "King County", href: "/locations/king-county-wa" },
+            ].map((loc) => (
+              <Link
+                key={loc.href}
+                href={loc.href}
+                className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold"
+              >
+                {loc.name}
+              </Link>
+            ))}
+            <Link
+              href="/locations"
+              className="font-body text-xs text-rani-gold transition-colors hover:text-rani-gold-light"
+            >
+              View all locations →
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom bar */}
       <div className="border-t border-rani-gold/10">
         <div className="mx-auto max-w-7xl px-6 py-6">

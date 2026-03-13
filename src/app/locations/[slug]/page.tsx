@@ -9,6 +9,7 @@ import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 import { geoPages } from "@/data/locations/geo-pages";
 
@@ -32,6 +33,9 @@ export function generateMetadata({ params }: PageProps): Metadata {
   return {
     title: page.metaTitle,
     description: page.metaDescription,
+    alternates: {
+      canonical: `${clinicInfo.website}/locations/${page.slug}`,
+    },
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
@@ -97,11 +101,29 @@ export default function LocationPage({ params }: PageProps) {
     },
     openingHours: "Mo-Su 10:00-19:00",
     medicalSpecialty: "Dermatology",
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: clinicInfo.geo.latitude,
+      longitude: clinicInfo.geo.longitude,
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: clinicInfo.reviews.aggregateRating.toString(),
+      reviewCount: clinicInfo.reviews.reviewCount.toString(),
+      bestRating: "5",
+    },
   };
+
+  const breadcrumbs = [
+    { name: "Home", url: clinicInfo.website },
+    { name: "Locations", url: `${clinicInfo.website}/locations` },
+    { name: `${page.city}, ${page.state}`, url: `${clinicInfo.website}/locations/${page.slug}` },
+  ];
 
   return (
     <>
       <StructuredData data={structuredData} />
+      <BreadcrumbSchema items={breadcrumbs} />
 
       {/* Breadcrumb */}
       <div className="bg-rani-cream pt-28 pb-4">
@@ -110,6 +132,10 @@ export default function LocationPage({ params }: PageProps) {
             <ol className="flex items-center gap-2">
               <li>
                 <Link href="/" className="hover:text-rani-navy transition-colors">Home</Link>
+              </li>
+              <li><ChevronRight size={14} className="text-rani-muted/50" /></li>
+              <li>
+                <Link href="/locations" className="hover:text-rani-navy transition-colors">Locations</Link>
               </li>
               <li><ChevronRight size={14} className="text-rani-muted/50" /></li>
               <li><span className="text-rani-navy font-semibold">{page.city}, {page.state}</span></li>
