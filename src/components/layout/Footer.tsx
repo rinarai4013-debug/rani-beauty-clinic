@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram, Facebook, MapPin, Phone, Clock } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
 
@@ -27,11 +28,15 @@ const wellnessLinks = [
 export default function Footer() {
   return (
     <footer className="bg-rani-navy border-t border-rani-gold/20">
-      {/* Lotus mark */}
+      {/* Logo */}
       <div className="flex justify-center pt-12 pb-8">
-        <div className="h-12 w-12 rounded-full bg-rani-gold/10 flex items-center justify-center animate-glow-pulse">
-          <span className="font-heading text-2xl text-rani-gold">R</span>
-        </div>
+        <Image
+          src="/images/logo/logo-light.png"
+          alt="Rani Beauty Clinic"
+          width={200}
+          height={25}
+          className="h-6 w-auto opacity-80"
+        />
       </div>
 
       <div className="mx-auto max-w-7xl px-6 pb-12">

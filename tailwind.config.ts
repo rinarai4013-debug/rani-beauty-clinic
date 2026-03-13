@@ -28,6 +28,8 @@ const config: Config = {
         "slide-up": "slideUp 0.6s ease-out",
         "glow-pulse": "glowPulse 2s ease-in-out infinite",
         "underline-in": "underlineIn 0.3s ease-out forwards",
+        "shimmer": "shimmer 2s ease-in-out infinite",
+        "float": "float 6s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
@@ -45,6 +47,14 @@ const config: Config = {
         underlineIn: {
           from: { width: "0" },
           to: { width: "100%" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
         },
       },
     },

@@ -7,6 +7,7 @@ import StaggerChildren from "@/components/animations/StaggerChildren";
 import ServiceCard from "@/components/services/ServiceCard";
 import CTABanner from "@/components/sections/CTABanner";
 import { clinicInfo } from "@/data/clinic-info";
+import { serviceImages } from "@/data/service-images";
 
 const services = [
   {
@@ -14,72 +15,96 @@ const services = [
     description: "Pain-free treatments with the Candela GentleMax Pro Plus. Safe for all skin types and tones.",
     icon: "Zap",
     href: "/services/laser-hair-removal",
+    image: serviceImages["laser-hair-removal"]?.image,
+    hoverImage: serviceImages["laser-hair-removal"]?.hoverImage,
   },
   {
     title: "HydraFacial MD",
     description: "Deep cleanse, extract, and hydrate in one session. Immediate glow with zero downtime.",
     icon: "Droplets",
     href: "/services/hydrafacial",
+    image: serviceImages["hydrafacial"]?.image,
+    hoverImage: serviceImages["hydrafacial"]?.hoverImage,
   },
   {
     title: "RF Microneedling",
     description: "Cutera Secret Pro combines microneedling with radiofrequency for collagen stimulation.",
     icon: "Sparkles",
     href: "/services/rf-microneedling",
+    image: serviceImages["rf-microneedling"]?.image,
+    hoverImage: serviceImages["rf-microneedling"]?.hoverImage,
   },
   {
     title: "BioRePeel",
     description: "Innovative bi-phasic peel with TCA 35% for brighter, smoother skin. Zero downtime.",
     icon: "FlaskConical",
     href: "/services/biorepeel",
+    image: serviceImages["biorepeel"]?.image,
+    hoverImage: serviceImages["biorepeel"]?.hoverImage,
   },
   {
     title: "Botox & Dysport",
     description: "Neurologist-supervised neurotoxin injections for natural, refreshed results.",
     icon: "Syringe",
     href: "/services/botox-dysport",
+    image: serviceImages["botox-dysport"]?.image,
+    hoverImage: serviceImages["botox-dysport"]?.hoverImage,
   },
   {
     title: "Dermal Fillers",
     description: "FDA-approved hyaluronic acid fillers for natural volume restoration and facial contouring.",
     icon: "Heart",
     href: "/services/dermal-fillers",
+    image: serviceImages["dermal-fillers"]?.image,
+    hoverImage: serviceImages["dermal-fillers"]?.hoverImage,
   },
   {
     title: "Red Light Therapy",
     description: "Full body red light therapy for collagen production, inflammation reduction, and recovery.",
     icon: "Sun",
     href: "/services/red-light-therapy",
+    image: serviceImages["red-light-therapy"]?.image,
+    hoverImage: serviceImages["red-light-therapy"]?.hoverImage,
   },
   {
     title: "Laser Acne Facial",
     description: "Clinical-grade laser technology to target active acne, bacteria, and scarring.",
     icon: "ScanFace",
     href: "/services/laser-acne-facial",
+    image: serviceImages["laser-acne-facial"]?.image,
+    hoverImage: serviceImages["laser-acne-facial"]?.hoverImage,
   },
   {
     title: "Chemical Peels",
     description: "Medical-grade peels from light to deep for acne, hyperpigmentation, and anti-aging.",
     icon: "Layers",
     href: "/services/chemical-peels",
+    image: serviceImages["chemical-peels"]?.image,
+    hoverImage: serviceImages["chemical-peels"]?.hoverImage,
   },
   {
     title: "AI Skin Analysis",
     description: "Advanced AI-powered imaging to identify concerns and create your personalized treatment plan.",
     icon: "Brain",
     href: "/services/ai-skin-analysis",
+    image: serviceImages["ai-skin-analysis"]?.image,
+    hoverImage: serviceImages["ai-skin-analysis"]?.hoverImage,
   },
   {
     title: "Sofwave",
     description: "Non-invasive ultrasound skin tightening and lifting. Stimulates collagen for a naturally firmer appearance.",
     icon: "Waves",
     href: "/services/sofwave",
+    image: serviceImages["sofwave"]?.image,
+    hoverImage: serviceImages["sofwave"]?.hoverImage,
   },
   {
     title: "Scar Reduction",
     description: "Advanced laser and RF microneedling to reduce acne scars, surgical scars, and stretch marks.",
     icon: "Eraser",
     href: "/services/scar-reduction",
+    image: serviceImages["scar-reduction"]?.image,
+    hoverImage: serviceImages["scar-reduction"]?.hoverImage,
   },
 ];
 
@@ -91,6 +116,8 @@ export default function ServicesPage() {
         title="Advanced Aesthetic Treatments"
         subtitle="Every treatment at Rani Beauty Clinic is performed under physician supervision using industry-leading technology for safe, effective results."
         primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url }}
+        backgroundImage="/images/services/hydrafacial/2.webp"
+        backgroundOverlay={70}
         dark
       />
 

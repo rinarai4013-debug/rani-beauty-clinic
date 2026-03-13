@@ -1,8 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+
+interface HeroStat {
+  value: string;
+  label: string;
+}
 
 interface HeroProps {
   label?: string;
@@ -14,6 +20,14 @@ interface HeroProps {
   dark?: boolean;
   fullHeight?: boolean;
   badge?: string;
+  /** Background image path (local or remote) */
+  backgroundImage?: string;
+  /** Overlay opacity 0-100 (default 60) */
+  backgroundOverlay?: number;
+  /** Stats bar below CTA */
+  stats?: HeroStat[];
+  /** Layout: full-bleed image vs split */
+  layout?: "full" | "split";
 }
 
 export default function Hero({
@@ -26,6 +40,10 @@ export default function Hero({
   dark = true,
   fullHeight = false,
   badge,
+  backgroundImage,
+  backgroundOverlay = 60,
+  stats,
+  layout = "full",
 }: HeroProps) {
   const bg = dark ? "bg-rani-navy" : "bg-rani-cream";
   const textColor = dark ? "text-white" : "text-rani-navy";
@@ -33,11 +51,34 @@ export default function Hero({
   return (
     <section
       className={`relative ${bg} ${
-        fullHeight ? "min-h-screen flex items-center" : "pt-32 pb-20 md:pt-40 md:pb-28"
+        fullHeight
+          ? "min-h-screen flex items-center"
+          : "pt-32 pb-20 md:pt-40 md:pb-28"
       } overflow-hidden`}
     >
-      {/* Subtle gradient overlay */}
-      {dark && (
+      {/* Background Image */}
+      {backgroundImage && (
+        <div className="absolute inset-0">
+          <Image
+            src={backgroundImage}
+            alt=""
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+            quality={85}
+          />
+          <div
+            className="absolute inset-0 bg-rani-navy"
+            style={{ opacity: backgroundOverlay / 100 }}
+          />
+          {/* Gradient fade for readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-rani-navy/90 via-rani-navy/60 to-transparent" />
+        </div>
+      )}
+
+      {/* Fallback gradient overlay (no background image) */}
+      {!backgroundImage && dark && (
         <div className="absolute inset-0 bg-gradient-to-br from-rani-navy via-rani-navy to-rani-navy-light opacity-80" />
       )}
 
@@ -47,7 +88,7 @@ export default function Hero({
       )}
 
       <div className="relative mx-auto max-w-7xl px-6">
-        <div className="max-w-3xl">
+        <div className={layout === "split" ? "max-w-xl" : "max-w-3xl"}>
           {label && (
             <motion.p
               initial={{ opacity: 0 }}
@@ -118,7 +159,11 @@ export default function Hero({
                 </Button>
               )}
               {secondaryCTA && (
-                <Button variant="ghost" href={secondaryCTA.href} className="!text-white">
+                <Button
+                  variant="ghost"
+                  href={secondaryCTA.href}
+                  className="!text-white"
+                >
                   {secondaryCTA.text}
                 </Button>
               )}
@@ -140,6 +185,27 @@ export default function Hero({
             </motion.div>
           )}
         </div>
+
+        {/* Stats Bar */}
+        {stats && stats.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            className="mt-12 grid grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4"
+          >
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <p className="font-heading text-3xl font-bold text-rani-gold md:text-4xl">
+                  {stat.value}
+                </p>
+                <p className="mt-1 font-body text-sm text-gray-400">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );

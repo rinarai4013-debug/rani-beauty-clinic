@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Menu, X, ChevronDown } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
@@ -70,9 +71,14 @@ export default function Navbar() {
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <span className="font-heading text-xl font-bold text-white tracking-wide">
-              RANI BEAUTY CLINIC
-            </span>
+            <Image
+              src="/images/logo/logo-light.png"
+              alt="Rani Beauty Clinic"
+              width={200}
+              height={25}
+              className="h-6 w-auto md:h-7"
+              priority
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -173,9 +179,13 @@ export default function Navbar() {
             className="fixed inset-0 z-40 bg-rani-navy flex flex-col items-center justify-center"
           >
             <div className="mb-8">
-              <span className="font-heading text-2xl font-bold text-white">
-                RANI BEAUTY CLINIC
-              </span>
+              <Image
+                src="/images/logo/logo-light.png"
+                alt="Rani Beauty Clinic"
+                width={250}
+                height={31}
+                className="h-8 w-auto"
+              />
             </div>
 
             <nav className="flex flex-col items-center gap-1">

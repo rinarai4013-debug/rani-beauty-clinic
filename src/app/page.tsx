@@ -14,6 +14,11 @@ import {
   Pill,
 } from "lucide-react";
 import Hero from "@/components/sections/Hero";
+import TrustLogosBar from "@/components/sections/TrustLogosBar";
+import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
+import MeetTheTeam from "@/components/sections/MeetTheTeam";
+import BeforeAfterSlider from "@/components/sections/BeforeAfterSlider";
+import AnnouncementBar from "@/components/sections/AnnouncementBar";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import StaggerChildren from "@/components/animations/StaggerChildren";
@@ -26,6 +31,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+import { serviceImages } from "@/data/service-images";
 
 const aestheticServices = [
   {
@@ -34,6 +40,8 @@ const aestheticServices = [
       "Pain-free treatments with the Candela GentleMax Pro Plus. Safe for all skin types.",
     icon: "Zap",
     href: "/services/laser-hair-removal",
+    image: serviceImages["laser-hair-removal"]?.image,
+    hoverImage: serviceImages["laser-hair-removal"]?.hoverImage,
   },
   {
     title: "HydraFacial MD",
@@ -41,6 +49,8 @@ const aestheticServices = [
       "Deep cleanse, extract, and hydrate in one session. Immediate glow, zero downtime.",
     icon: "Droplets",
     href: "/services/hydrafacial",
+    image: serviceImages["hydrafacial"]?.image,
+    hoverImage: serviceImages["hydrafacial"]?.hoverImage,
   },
   {
     title: "RF Microneedling",
@@ -48,6 +58,8 @@ const aestheticServices = [
       "Cutera Secret Pro collagen stimulation for tighter, smoother skin.",
     icon: "Sparkles",
     href: "/services/rf-microneedling",
+    image: serviceImages["rf-microneedling"]?.image,
+    hoverImage: serviceImages["rf-microneedling"]?.hoverImage,
   },
   {
     title: "Botox & Fillers",
@@ -55,6 +67,8 @@ const aestheticServices = [
       "Neurologist-supervised injections for natural, refreshed results.",
     icon: "Syringe",
     href: "/services/botox-dysport",
+    image: serviceImages["botox-dysport"]?.image,
+    hoverImage: serviceImages["botox-dysport"]?.hoverImage,
   },
 ];
 
@@ -65,6 +79,8 @@ const wellnessServices = [
       "Physician-supervised Semaglutide and Tirzepatide programs with in-house blood work.",
     icon: "Scale",
     href: "/wellness/glp1-weight-management",
+    image: serviceImages["glp1-weight-management"]?.image,
+    hoverImage: serviceImages["glp1-weight-management"]?.hoverImage,
   },
   {
     title: "Hormone Therapy",
@@ -72,6 +88,8 @@ const wellnessServices = [
       "Bioidentical HRT for men and women. Comprehensive blood panels included.",
     icon: "Activity",
     href: "/wellness/hormone-therapy",
+    image: serviceImages["hormone-therapy"]?.image,
+    hoverImage: serviceImages["hormone-therapy"]?.hoverImage,
   },
   {
     title: "NAD+ Injections",
@@ -79,6 +97,8 @@ const wellnessServices = [
       "Boost cellular energy, brain function, and recovery with quick subcutaneous injections.",
     icon: "Brain",
     href: "/wellness/nad-injections",
+    image: serviceImages["nad-injections"]?.image,
+    hoverImage: serviceImages["nad-injections"]?.hoverImage,
   },
   {
     title: "Peptide Therapy",
@@ -86,6 +106,8 @@ const wellnessServices = [
       "BPC-157, CJC-1295 and more for recovery, anti-aging, and performance.",
     icon: "Pill",
     href: "/wellness/peptide-therapy",
+    image: serviceImages["peptide-therapy"]?.image,
+    hoverImage: serviceImages["peptide-therapy"]?.hoverImage,
   },
 ];
 
@@ -250,24 +272,39 @@ export default function HomePage() {
     <>
       <StructuredData data={structuredData} />
 
-      {/* 1. Hero Section */}
+      {/* 1. Announcement Bar */}
+      <AnnouncementBar
+        text="New Patient Special: 20% Off Your First Treatment"
+        href={clinicInfo.booking.url}
+        linkText="Book Now"
+      />
+
+      {/* 2. Hero Section — with background image */}
       <Hero
         label="PHYSICIAN-SUPERVISED MEDSPA & WELLNESS"
         title="Your Skin. Your Wellness. Our Expertise."
         subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist"
         primaryCTA={{ text: "Book a Consultation", href: clinicInfo.booking.url }}
         secondaryCTA={{ text: "Explore Services", href: "/services" }}
-        badges={[
-          "Open 7 Days",
-          "Woman-Owned",
-          "HSA Accepted",
-          "Pain-Free Treatments",
+        backgroundImage="/images/providers/facility-drone.jpg"
+        backgroundOverlay={65}
+        stats={[
+          { value: "4.9", label: "Google Rating" },
+          { value: "127+", label: "5-Star Reviews" },
+          { value: "7", label: "Days Open" },
+          { value: "25+", label: "Treatments" },
         ]}
         dark
         fullHeight
       />
 
-      {/* 2. Services Overview */}
+      {/* 3. Trust Logos Bar */}
+      <TrustLogosBar />
+
+      {/* 4. Service Category Panels */}
+      <ServiceCategoryPanels />
+
+      {/* 5. Services Overview — With Images */}
       <section className="bg-rani-cream py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
@@ -315,7 +352,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Dr. Landfield Introduction */}
+      {/* 6. Meet Rina & Raj — Real facility photos */}
+      <MeetTheTeam />
+
+      {/* 7. Dr. Landfield Introduction */}
       <section className="bg-white py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
@@ -370,7 +410,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Why Rani Section */}
+      {/* 8. Why Rani Section */}
       <section className="bg-rani-cream py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
@@ -409,53 +449,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Results Teaser */}
-      <section className="bg-white py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-6">
-          <FadeInOnScroll>
-            <SectionLabel label="TRANSFORMATIONS" />
-            <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-              Real Patients. Real Results.
-            </h2>
-          </FadeInOnScroll>
+      {/* 9. Before & After Slider — Real patient results */}
+      <BeforeAfterSlider />
 
-          <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <FadeInOnScroll key={i} delay={i * 0.1}>
-                <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center">
-                  <div className="text-center px-4">
-                    <span className="font-heading text-3xl text-rani-gold/10">
-                      R
-                    </span>
-                    <p className="mt-2 font-body text-xs text-gray-400">
-                      Before &amp; After coming soon
-                    </p>
-                  </div>
-                </div>
-              </FadeInOnScroll>
-            ))}
-          </div>
-
-          <FadeInOnScroll delay={0.3}>
-            <div className="mt-10 text-center">
-              <Button variant="ghost" href="/results">
-                View Full Gallery
-              </Button>
-            </div>
-          </FadeInOnScroll>
-        </div>
-      </section>
-
-      {/* 6. Reviews/Testimonials */}
+      {/* 10. Reviews/Testimonials */}
       <ReviewCarousel reviews={reviews} />
 
-      {/* 7. Blog Teaser */}
+      {/* 11. Blog Teaser */}
       <BlogTeaser posts={blogPosts} />
 
-      {/* 8. CTA Banner */}
+      {/* 12. CTA Banner */}
       <CTABanner />
 
-      {/* 9. Map & Location */}
+      {/* 13. Map & Location */}
       <MapSection />
     </>
   );

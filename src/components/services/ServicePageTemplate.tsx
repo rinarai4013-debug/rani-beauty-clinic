@@ -2,6 +2,7 @@
 
 import { ChevronRight, Shield, CheckCircle, Clock } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import Hero from "@/components/sections/Hero";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
@@ -13,6 +14,7 @@ import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
 import { motion } from "framer-motion";
 import { staggerItem } from "@/components/animations/StaggerChildren";
+import { getServiceImage } from "@/data/service-images";
 
 interface ServiceData {
   slug: string;
@@ -46,6 +48,7 @@ export default function ServicePageTemplate({
   );
 
   const basePath = service.isWellness ? "/wellness" : "/services";
+  const serviceImageData = getServiceImage(service.slug);
 
   const faqStructuredData = {
     "@context": "https://schema.org",
@@ -83,12 +86,14 @@ export default function ServicePageTemplate({
       <StructuredData data={faqStructuredData} />
       <StructuredData data={serviceStructuredData} />
 
-      {/* Hero */}
+      {/* Hero — with service image background */}
       <Hero
         title={service.title}
         subtitle={service.heroDescription}
         primaryCTA={{ text: "Book This Treatment", href: clinicInfo.booking.url }}
         badge={`Supervised by ${clinicInfo.medicalDirector.name}, ${clinicInfo.medicalDirector.specialty}`}
+        backgroundImage={serviceImageData?.image}
+        backgroundOverlay={65}
         dark
       />
 
@@ -294,25 +299,58 @@ export default function ServicePageTemplate({
         </div>
       </section>
 
-      {/* Before & After placeholder */}
+      {/* Results Gallery — service treatment images */}
       <section className="bg-rani-cream py-20 md:py-28">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <FadeInOnScroll>
             <SectionLabel label="RESULTS GALLERY" />
             <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
-              Before &amp; After
+              Treatment Gallery
             </h2>
             <div className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center"
-                >
-                  <p className="font-body text-xs text-gray-400 px-4 text-center">
-                    Photos coming soon
-                  </p>
-                </div>
-              ))}
+              {serviceImageData ? (
+                <>
+                  <div className="relative aspect-square overflow-hidden rounded-xl">
+                    <Image
+                      src={serviceImageData.image}
+                      alt={`${service.title} treatment`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                    />
+                  </div>
+                  {serviceImageData.hoverImage && (
+                    <div className="relative aspect-square overflow-hidden rounded-xl">
+                      <Image
+                        src={serviceImageData.hoverImage}
+                        alt={`${service.title} results`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 50vw, 33vw"
+                      />
+                    </div>
+                  )}
+                  <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex flex-col items-center justify-center p-4">
+                    <p className="font-heading text-2xl text-rani-gold mb-2">
+                      Book Now
+                    </p>
+                    <p className="font-body text-xs text-gray-300">
+                      See your own results
+                    </p>
+                  </div>
+                </>
+              ) : (
+                [1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="aspect-square rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center"
+                  >
+                    <p className="font-body text-xs text-gray-400 px-4 text-center">
+                      Photos coming soon
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </FadeInOnScroll>
         </div>
@@ -350,21 +388,37 @@ export default function ServicePageTemplate({
             </FadeInOnScroll>
 
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {relatedServices.map((related, i) => (
-                <FadeInOnScroll key={related.slug} delay={i * 0.15}>
-                  <Link
-                    href={`${related.isWellness ? "/wellness" : "/services"}/${related.slug}`}
-                    className="group block rounded-xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_10px_40px_rgba(15,29,44,0.08)] hover:-translate-y-1"
-                  >
-                    <h3 className="font-body text-lg font-bold text-rani-navy group-hover:text-rani-gold transition-colors">
-                      {related.title}
-                    </h3>
-                    <p className="mt-2 font-body text-sm text-rani-muted">
-                      {related.shortDescription}
-                    </p>
-                  </Link>
-                </FadeInOnScroll>
-              ))}
+              {relatedServices.map((related, i) => {
+                const relatedImg = getServiceImage(related.slug);
+                return (
+                  <FadeInOnScroll key={related.slug} delay={i * 0.15}>
+                    <Link
+                      href={`${related.isWellness ? "/wellness" : "/services"}/${related.slug}`}
+                      className="group block overflow-hidden rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_10px_40px_rgba(15,29,44,0.08)] hover:-translate-y-1"
+                    >
+                      {relatedImg && (
+                        <div className="relative aspect-[16/9] w-full overflow-hidden">
+                          <Image
+                            src={relatedImg.image}
+                            alt={related.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          />
+                        </div>
+                      )}
+                      <div className="p-5">
+                        <h3 className="font-body text-lg font-bold text-rani-navy group-hover:text-rani-gold transition-colors">
+                          {related.title}
+                        </h3>
+                        <p className="mt-2 font-body text-sm text-rani-muted line-clamp-2">
+                          {related.shortDescription}
+                        </p>
+                      </div>
+                    </Link>
+                  </FadeInOnScroll>
+                );
+              })}
             </div>
           </div>
         </section>
