@@ -64,7 +64,7 @@ export default function GuidePage({ params }: PageProps) {
 
   const breadcrumbs = [
     { name: "Home", url: clinicInfo.website },
-    { name: "Guides", url: `${clinicInfo.website}/guides` },
+    { name: "Guides", url: `${clinicInfo.website}` },
     { name: guide.title, url: `${clinicInfo.website}/guides/${guide.slug}` },
   ];
 
@@ -80,7 +80,7 @@ export default function GuidePage({ params }: PageProps) {
             <ol className="flex flex-wrap items-center gap-2">
               <li><Link href="/" className="hover:text-rani-navy transition-colors">Home</Link></li>
               <li><ChevronRight size={14} className="text-rani-muted/50" /></li>
-              <li><Link href="/guides" className="hover:text-rani-navy transition-colors">Guides</Link></li>
+              <li><span className="hover:text-rani-navy transition-colors">Guides</span></li>
               <li><ChevronRight size={14} className="text-rani-muted/50" /></li>
               <li><span className="text-rani-navy font-semibold">{guide.title}</span></li>
             </ol>

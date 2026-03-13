@@ -62,7 +62,7 @@ const aestheticServices = [
     hoverImage: serviceImages["rf-microneedling"]?.hoverImage,
   },
   {
-    title: "Botox & Fillers",
+    title: "Botox & Dysport",
     description:
       "Neurologist-supervised injections for natural, refreshed results.",
     icon: "Syringe",

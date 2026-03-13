@@ -44,10 +44,10 @@ export default function MeetTheTeam() {
                 World-Trained &amp; Renowned Providers
               </h2>
               <p className="mt-6 font-body text-base leading-relaxed text-rani-text">
-                After training in many different dermatology clinics in Los
-                Angeles, Dubai and Korea, the founders are bringing the best of
+                After training at top dermatology and aesthetic clinics in Los
+                Angeles, Dubai, and Korea, our team brings the best of
                 everything they learned to the Greater Seattle &amp; Bellevue
-                area. Their vision was simple: combine world-class aesthetic
+                area. The vision was simple: combine world-class aesthetic
                 techniques with genuine, personalized care.
               </p>
               <p className="mt-4 font-body text-base leading-relaxed text-rani-text">

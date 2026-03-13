@@ -53,24 +53,8 @@ export default function PrivacyPolicyPage() {
             </p>
           </FadeInOnScroll>
 
-          {/* Attorney Review Notice */}
-          <FadeInOnScroll delay={0.2}>
-            <div className="mt-6 rounded-lg border-2 border-amber-400 bg-amber-50 p-5">
-              <div className="flex items-start gap-3">
-                <AlertTriangle size={22} className="mt-0.5 shrink-0 text-amber-600" />
-                <div>
-                  <p className="font-body font-semibold text-amber-800">
-                    Attorney Review Required
-                  </p>
-                  <p className="mt-1 font-body text-sm text-amber-700">
-                    [NOTE: Have an attorney review this privacy policy before publishing to ensure
-                    compliance with all applicable federal, state, and local laws, including HIPAA,
-                    the Washington Consumer Privacy Act, and other relevant regulations.]
-                  </p>
-                </div>
-              </div>
-            </div>
-          </FadeInOnScroll>
+          {/* Attorney Review Notice - hidden from public, visible only in source */}
+          {/* TODO: Have an attorney review this privacy policy */}
         </div>
       </section>
 

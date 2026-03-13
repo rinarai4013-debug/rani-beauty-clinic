@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Zap, Droplets, Sparkles, Syringe, Layers, Heart } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import CTABanner from "@/components/sections/CTABanner";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -10,40 +11,40 @@ import { clinicInfo } from "@/data/clinic-info";
 
 const treatmentHighlights = [
   {
-    icon: "💎",
+    icon: Zap,
     title: "Laser Hair Removal",
     description:
       "Smooth, hair-free skin with our advanced Candela GentleMax Pro Plus laser technology.",
   },
   {
-    icon: "✨",
+    icon: Droplets,
     title: "HydraFacial",
     description:
       "Deep cleansing, exfoliation, and hydration for an instant glow with zero downtime.",
   },
   {
-    icon: "🔬",
+    icon: Sparkles,
     title: "RF Microneedling",
     description:
       "Stimulate collagen production to improve skin texture, acne scars, and fine lines.",
   },
   {
-    icon: "💉",
-    title: "Botox & Fillers",
+    icon: Syringe,
+    title: "Botox & Dysport",
     description:
       "Natural-looking results that enhance your features while maintaining facial harmony.",
   },
   {
-    icon: "🧬",
+    icon: Layers,
     title: "Chemical Peels",
     description:
       "Medical-grade peels to target hyperpigmentation, sun damage, and uneven skin tone.",
   },
   {
-    icon: "⚡",
+    icon: Heart,
     title: "Wellness Treatments",
     description:
-      "GLP-1 weight management, NAD+ therapy, peptides, and vitamin IV infusions.",
+      "GLP-1 weight management, NAD+ therapy, peptides, and vitamin injections.",
   },
 ];
 
@@ -83,8 +84,8 @@ export default function ResultsPageClient() {
                   transition={{ duration: 0.3 }}
                   className="rounded-xl border border-rani-border bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-md"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rani-cream text-2xl">
-                    {item.icon}
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rani-cream">
+                    <item.icon size={24} className="text-rani-gold" />
                   </div>
                   <h3 className="mt-4 font-heading text-lg font-bold text-rani-navy">
                     {item.title}

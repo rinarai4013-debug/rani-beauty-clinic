@@ -158,7 +158,7 @@ export const pricingData = {
     { name: "LHR Underarms 6-Pack", price: "$749", retailValue: "$894", savings: "$145" },
     { name: "RF Micro 3-Pack (Face)", price: "$1,999", retailValue: "$2,250", savings: "$251" },
     { name: "RF Micro 3-Pack (Face+Neck)", price: "$2,799", retailValue: "$3,300", savings: "$501" },
-    { name: "Sofwave + RF Micro Combo", price: "$4,499", retailValue: "$4,500", note: "1 Sofwave Full Face + 3 RF Micro Face" },
+    { name: "Sofwave + RF Micro Combo", price: "$4,499", retailValue: "$5,250", savings: "$751", note: "1 Sofwave Full Face + 3 RF Micro Face" },
     { name: "Glow Up 3-Pack", price: "$699", retailValue: "$822", savings: "$123", note: "3 Signature Hydrafacials + 3 LED sessions" },
     { name: "Laser Facial 3-Pack", price: "$1,299", retailValue: "$1,425", savings: "$126" },
     { name: "VI Peel 3-Pack", price: "$899", retailValue: "$975", savings: "$76" },

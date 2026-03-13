@@ -23,7 +23,7 @@ const technologies = [
     icon: Cpu,
     name: "Cutera Secret Pro",
     description:
-      "Advanced RF microneedling system combining fractional CO2 laser with radiofrequency microneedling in one device. Stimulates collagen production for skin tightening, scar revision, and overall skin rejuvenation.",
+      "Advanced radiofrequency microneedling system that delivers precise RF energy through gold-plated microneedles. Stimulates collagen production for skin tightening, scar revision, and overall skin rejuvenation.",
   },
   {
     icon: ScanFace,

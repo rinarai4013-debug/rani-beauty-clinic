@@ -40,8 +40,8 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
           </h2>
         </FadeInOnScroll>
 
-        <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {/* Show 3 at a time on desktop, cycle through on mobile */}
+        {/* Desktop: show all 3 */}
+        <div className="mt-12 hidden gap-8 md:grid md:grid-cols-3">
           {reviews.slice(0, 3).map((review, i) => (
             <FadeInOnScroll key={review.id} delay={i * 0.15}>
               <TestimonialCard
@@ -53,6 +53,27 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
               />
             </FadeInOnScroll>
           ))}
+        </div>
+
+        {/* Mobile: carousel */}
+        <div className="mt-12 md:hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TestimonialCard
+                name={reviews[current]?.name ?? ""}
+                text={reviews[current]?.text ?? ""}
+                rating={reviews[current]?.rating ?? 5}
+                treatment={reviews[current]?.treatment}
+                date={reviews[current]?.date}
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Mobile carousel indicator */}

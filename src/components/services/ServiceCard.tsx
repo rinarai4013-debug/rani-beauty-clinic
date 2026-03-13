@@ -108,7 +108,7 @@ export default function ServiceCard({
           )}
 
           {/* Text content */}
-          <div className={image && image.length > 0 ? "p-5" : "p-5"}>
+          <div className="p-5">
             {/* Show small icon next to title when image is present */}
             {image && image.length > 0 && (
               <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-md bg-rani-cream">

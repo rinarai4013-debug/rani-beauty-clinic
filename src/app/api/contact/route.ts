@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const CLINIC_EMAIL = process.env.CONTACT_EMAIL || "hello@ranibeautyclinic.com";
+const CLINIC_EMAIL = process.env.CONTACT_EMAIL || "info@ranibeautyclinic.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Rani Beauty Clinic <noreply@ranibeautyclinic.com>";
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "";
 

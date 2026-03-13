@@ -100,7 +100,7 @@ export default function LocationPage({ params }: PageProps) {
       },
     },
     openingHours: "Mo-Su 10:00-19:00",
-    medicalSpecialty: "Dermatology",
+    medicalSpecialty: "Neurology",
     geo: {
       "@type": "GeoCoordinates",
       latitude: clinicInfo.geo.latitude,

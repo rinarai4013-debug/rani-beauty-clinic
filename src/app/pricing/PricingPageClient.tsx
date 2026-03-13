@@ -449,7 +449,7 @@ export default function PricingPageClient() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button href={clinicInfo.booking.url} icon>
+                  <Button href="/contact" icon>
                     Ask About Financing
                   </Button>
                 </div>

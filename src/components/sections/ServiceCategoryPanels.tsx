@@ -17,7 +17,7 @@ const categories = [
   },
   {
     title: "Injectables",
-    description: "Botox, Dermal Fillers, Sculptra & PRP",
+    description: "Botox, Dysport & Dermal Fillers",
     image: "/images/services/lipfiller/1.jpg",
     href: "/services/botox-dysport",
     count: 6,
@@ -31,7 +31,7 @@ const categories = [
   },
   {
     title: "Medical Wellness",
-    description: "GLP-1, Peptides, Hormones, NAD+ & IV Therapy",
+    description: "GLP-1, Peptides, Hormones, NAD+ & Vitamin Injections",
     image: "/images/services/wellness/glp1-1.jpg",
     href: "/wellness",
     count: 6,

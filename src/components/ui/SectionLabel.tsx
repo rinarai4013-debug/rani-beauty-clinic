@@ -12,9 +12,7 @@ export default function SectionLabel({
   return (
     <div className={`flex flex-col items-center gap-4 ${className}`}>
       <span
-        className={`font-body text-xs font-semibold uppercase tracking-[0.15em] ${
-          dark ? "text-rani-gold" : "text-rani-gold"
-        }`}
+        className={`font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold`}
       >
         {label}
       </span>
