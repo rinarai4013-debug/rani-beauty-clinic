@@ -11,7 +11,7 @@ const categories = [
   {
     title: "Face & Skin",
     description: "HydraFacial, Chemical Peels, Laser Facials & more",
-    image: "/images/services/face-skin-cover.jpg",
+    image: "/images/services/face-skin-cover-new.jpg",
     href: "/services",
     count: 8,
   },
@@ -25,7 +25,7 @@ const categories = [
   {
     title: "Body & Laser",
     description: "Laser Hair Removal, Sofwave, RF Microneedling",
-    image: "/images/services/laserhairremovals/fullbodylaser.jpeg",
+    image: "/images/services/body-laser-cover.jpg",
     href: "/services/laser-hair-removal",
     count: 5,
   },

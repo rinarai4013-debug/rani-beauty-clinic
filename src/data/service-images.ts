@@ -26,7 +26,7 @@ export interface ServiceImageEntry {
 export const serviceImages: Record<string, ServiceImageEntry> = {
   // ─── Aesthetic Services ─────────────────────────────────────
   "laser-hair-removal": {
-    image: "/images/services/laserhairremovals/fullbodylaser.jpeg",
+    image: "/images/services/laserhairremovals/laser-hero.jpg",
     hoverImage: "/images/services/laserhairremovals/fullbodylaser2.jpeg",
     category: "body",
   },
@@ -479,7 +479,7 @@ export const variationImages: Record<string, ServiceImageEntry> = {
  */
 export const categoryImages = {
   face: "/images/services/hydrafacial/1.png",
-  body: "/images/services/laserhairremovals/fullbodylaser.jpeg",
+  body: "/images/services/body-laser-cover.jpg",
   "non-surgical": "/images/services/softwave/1.jpg",
   wellness: "/images/services/wellness/hormone-2.jpg",
 };
