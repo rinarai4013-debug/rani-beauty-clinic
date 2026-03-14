@@ -114,9 +114,6 @@ export const pricingData = {
 
   peptides: [
     { name: "Sermorelin (Growth Hormone)", price: "$299/mo", note: "Anti-aging, recovery, body composition" },
-    { name: "BPC-157 (Healing)", price: "$249/mo", note: "Gut healing, tissue repair, inflammation" },
-    { name: "PT-141 (Bremelanotide)", price: "$199/mo", note: "Sexual wellness" },
-    { name: "CJC-1295 / Ipamorelin", price: "$349/mo", note: "Growth hormone secretagogue" },
     { name: "Glutathione Injections", price: "$49/shot", note: "Master antioxidant" },
     { name: "Vitamin B12 Injections", price: "$25/shot" },
     { name: "Lipo-B (MIC + B12)", price: "$35/shot", note: "Fat metabolism support" },

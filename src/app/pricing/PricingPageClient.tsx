@@ -213,18 +213,18 @@ export default function PricingPageClient() {
         </CollapsibleSection>
       </CategorySection>
 
-      {/* Hormones & Peptides */}
+      {/* Hormones & Injections */}
       <CategorySection
-        label="HORMONES & PEPTIDES"
-        title="Hormone Therapy, Peptides & Injections"
-        subtitle="Physician-supervised hormone optimization and peptide therapies via Olympia Pharmacy."
+        label="HORMONES & INJECTIONS"
+        title="Hormone Therapy & Wellness Injections"
+        subtitle="Physician-supervised hormone optimization and wellness injections via Olympia Pharmacy."
         bg="cream"
       >
         <CollapsibleSection title="Hormone Replacement Therapy" defaultOpen>
           <PriceGrid items={pricingData.hormones} columns={2} />
         </CollapsibleSection>
-        <CollapsibleSection title="Peptides & Injections" defaultOpen>
-          <PriceGrid items={pricingData.peptides} />
+        <CollapsibleSection title="Wellness Injections" defaultOpen>
+          <PriceGrid items={pricingData.peptides.filter((p) => !p.name.includes('BPC-157') && !p.name.includes('CJC-1295') && !p.name.includes('PT-141'))} />
         </CollapsibleSection>
       </CategorySection>
 

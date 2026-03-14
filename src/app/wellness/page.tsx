@@ -20,14 +20,6 @@ const services = [
     hoverImage: serviceImages["glp1-weight-management"]?.hoverImage,
   },
   {
-    title: "Peptide Therapy",
-    description: "BPC-157, CJC-1295 and more for recovery, anti-aging, cognitive enhancement, and performance.",
-    icon: "Pill",
-    href: "/wellness/peptide-therapy",
-    image: serviceImages["peptide-therapy"]?.image,
-    hoverImage: serviceImages["peptide-therapy"]?.hoverImage,
-  },
-  {
     title: "NAD+ Injections",
     description: "Boost cellular energy, brain function, and recovery with quick subcutaneous NAD+ injections.",
     icon: "Brain",

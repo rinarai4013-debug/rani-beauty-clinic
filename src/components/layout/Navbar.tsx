@@ -22,7 +22,6 @@ const aestheticLinks = [
 
 const wellnessLinks = [
   { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management", desc: "Semaglutide & Tirzepatide programs" },
-  { name: "Peptide Therapy", href: "/wellness/peptide-therapy", desc: "BPC-157, CJC-1295 & more" },
   { name: "NAD+ Injections", href: "/wellness/nad-injections", desc: "Anti-aging & brain health" },
   { name: "Vitamin Injections", href: "/wellness/vitamin-injections", desc: "B12, D3, Glutathione & more" },
   { name: "Hormone Therapy", href: "/wellness/hormone-therapy", desc: "HRT for men & women" },

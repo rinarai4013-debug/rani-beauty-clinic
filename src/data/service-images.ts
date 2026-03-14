@@ -27,7 +27,7 @@ export const serviceImages: Record<string, ServiceImageEntry> = {
   // ─── Aesthetic Services ─────────────────────────────────────
   "laser-hair-removal": {
     image: "/images/services/laserhairremovals/laser-hero.jpg",
-    hoverImage: "/images/services/laserhairremovals/fullbodylaser2.jpeg",
+    hoverImage: "/images/services/laserhairremovals/laser-hover.jpg",
     category: "body",
   },
   hydrafacial: {
@@ -90,11 +90,6 @@ export const serviceImages: Record<string, ServiceImageEntry> = {
   "glp1-weight-management": {
     image: "/images/services/wellness/glp1-1.jpg",
     hoverImage: "/images/services/wellness/glp1-2.jpg",
-    category: "wellness",
-  },
-  "peptide-therapy": {
-    image: "/images/services/wellness/peptide-1.jpg",
-    hoverImage: "/images/services/wellness/peptide-2.jpg",
     category: "wellness",
   },
   "nad-injections": {
@@ -385,37 +380,7 @@ export const variationImages: Record<string, ServiceImageEntry> = {
     category: "body",
   },
 
-  // ─── Peptide Therapy Variations ─────────────────────────────
-  "peptide-therapy/bpc-157": {
-    image: "/images/services/wellness/peptide-1.jpg",
-    hoverImage: "/images/services/wellness/peptide-2.jpg",
-    category: "wellness",
-  },
-  "peptide-therapy/ghk-cu": {
-    image: "/images/services/wellness/peptide-2.jpg",
-    hoverImage: "/images/services/wellness/peptide-1.jpg",
-    category: "wellness",
-  },
-  "peptide-therapy/tb-500": {
-    image: "/images/services/wellness/peptide-1.jpg",
-    hoverImage: "/images/services/wellness/peptide-2.jpg",
-    category: "wellness",
-  },
-  "peptide-therapy/aod-9604": {
-    image: "/images/services/wellness/peptide-2.jpg",
-    hoverImage: "/images/services/wellness/peptide-1.jpg",
-    category: "wellness",
-  },
-  "peptide-therapy/sermorelin": {
-    image: "/images/services/wellness/peptide-1.jpg",
-    hoverImage: "/images/services/wellness/peptide-2.jpg",
-    category: "wellness",
-  },
-  "peptide-therapy/cjc-1295": {
-    image: "/images/services/wellness/peptide-2.jpg",
-    hoverImage: "/images/services/wellness/peptide-1.jpg",
-    category: "wellness",
-  },
+  // ─── Peptide Therapy Variations (ARCHIVED — pending FDA reclassification) ───
 
   // ─── GLP-1 Weight Management Variations ─────────────────────
   "glp1-weight-management/semaglutide": {

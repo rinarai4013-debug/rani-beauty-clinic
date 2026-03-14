@@ -124,6 +124,7 @@ The Rani Protocol is our comprehensive, physician-supervised approach to GLP-1 w
     isWellness: true,
   },
 
+  /* ARCHIVED: Peptide therapy removed pending FDA reclassification finalization
   {
     slug: "peptide-therapy",
     title: "Peptide Therapy",
@@ -231,6 +232,7 @@ What distinguishes medical peptide therapy from over-the-counter supplements is 
     ],
     isWellness: true,
   },
+  END ARCHIVED PEPTIDE THERAPY */
 
   {
     slug: "nad-injections",

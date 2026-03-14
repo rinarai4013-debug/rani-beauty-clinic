@@ -27,7 +27,6 @@ const aestheticSlugs = [
 
 const wellnessSlugs = [
   "glp1-weight-management",
-  "peptide-therapy",
   "nad-injections",
   "vitamin-injections",
   "hormone-therapy",

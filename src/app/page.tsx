@@ -105,15 +105,6 @@ const wellnessServices = [
     image: serviceImages["nad-injections"]?.image,
     hoverImage: serviceImages["nad-injections"]?.hoverImage,
   },
-  {
-    title: "Peptide Therapy",
-    description:
-      "BPC-157, CJC-1295 and more for recovery, anti-aging, and performance.",
-    icon: "Pill",
-    href: "/wellness/peptide-therapy",
-    image: serviceImages["peptide-therapy"]?.image,
-    hoverImage: serviceImages["peptide-therapy"]?.hoverImage,
-  },
 ];
 
 const whyRani = [
@@ -192,8 +183,8 @@ const reviews = [
     id: 7,
     name: "Robert H.",
     rating: 5,
-    text: "Started the peptide therapy program here and the difference in my energy and recovery is remarkable. The in-house blood work makes it so easy to track progress. This is what modern wellness should feel like.",
-    treatment: "Peptide Therapy",
+    text: "Started the NAD+ injection program here and the difference in my energy and recovery is remarkable. The in-house blood work makes it so easy to track progress. This is what modern wellness should feel like.",
+    treatment: "NAD+ Injections",
     date: "February 2026",
   },
   {

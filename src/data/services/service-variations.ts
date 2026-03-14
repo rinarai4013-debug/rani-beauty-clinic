@@ -1262,7 +1262,7 @@ export const serviceVariations: ServiceVariation[] = [
       { question: "Is tirzepatide safe for people without diabetes?", answer: "Yes, tirzepatide is FDA-approved for weight management in adults with obesity or overweight with at least one weight-related comorbidity, regardless of diabetes status. Our physician evaluates your complete health history to ensure it is appropriate for you." }
     ]
   ),
-  // ─── PEPTIDE THERAPY (52–57) ───
+  /* ─── ARCHIVED: PEPTIDE THERAPY (52–57) — pending FDA reclassification ───
   v(
     "peptide-therapy", "Peptide Therapy",
     "bpc-157", "BPC-157 Peptide Therapy", "wellness",
@@ -1407,6 +1407,7 @@ export const serviceVariations: ServiceVariation[] = [
       { question: "What lab work is needed for CJC-1295 therapy?", answer: "Baseline labs include IGF-1, complete metabolic panel, and hormonal assessment. Periodic monitoring of IGF-1 levels ensures appropriate growth hormone response. We track your biomarkers throughout treatment to optimize dosing and confirm safety." }
     ]
   ),
+  END ARCHIVED PEPTIDE THERAPY */
   // ─── HORMONE THERAPY (58–61) ───
   v(
     "hormone-therapy", "Hormone Therapy",

@@ -31,10 +31,10 @@ const categories = [
   },
   {
     title: "Medical Wellness",
-    description: "GLP-1, Peptides, Hormones, NAD+ & Vitamin Injections",
+    description: "GLP-1, Hormones, NAD+ & Vitamin Injections",
     image: "/images/services/wellness/glp1-1.jpg",
     href: "/wellness",
-    count: 6,
+    count: 5,
   },
 ];
 
