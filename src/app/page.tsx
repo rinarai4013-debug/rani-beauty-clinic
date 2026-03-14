@@ -340,7 +340,7 @@ export default function HomePage() {
           { value: "4.9", label: "Google Rating" },
           { value: "127+", label: "5-Star Reviews" },
           { value: "7", label: "Days Open" },
-          { value: "25+", label: "Treatments" },
+          { value: "13K+", label: "Treatments Performed" },
         ]}
         dark
         fullHeight
