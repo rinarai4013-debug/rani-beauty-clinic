@@ -13,12 +13,14 @@ import {
   Activity,
   Pill,
 } from "lucide-react";
+import Image from "next/image";
 import Hero from "@/components/sections/Hero";
 import TrustLogosBar from "@/components/sections/TrustLogosBar";
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import MeetTheTeam from "@/components/sections/MeetTheTeam";
 import BeforeAfterSlider from "@/components/sections/BeforeAfterSlider";
-// AnnouncementBar is now integrated into the Navbar component
+import TreatmentQuiz from "@/components/sections/TreatmentQuiz";
+import ConsultationEmbed from "@/components/sections/ConsultationEmbed";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import StaggerChildren from "@/components/animations/StaggerChildren";
@@ -159,6 +161,54 @@ const reviews = [
     treatment: "GLP-1 Weight Management",
     date: "November 2025",
   },
+  {
+    id: 4,
+    name: "Priya R.",
+    rating: 5,
+    text: "I tried HydraFacial at several spas before Rani, but the difference here is night and day. The clinical approach combined with a warm atmosphere makes it feel like genuine self-care, not just a treatment. My skin has never looked this radiant.",
+    treatment: "HydraFacial MD",
+    date: "February 2026",
+  },
+  {
+    id: 5,
+    name: "Michelle T.",
+    rating: 5,
+    text: "The RF microneedling results have been amazing for my acne scars. The team was upfront about expectations and timeline, and they were right — after three sessions, my skin texture is dramatically smoother. Worth every penny.",
+    treatment: "RF Microneedling",
+    date: "March 2026",
+  },
+  {
+    id: 6,
+    name: "Angela W.",
+    rating: 5,
+    text: "I was hesitant about fillers but the team walked me through every step. The fact that a neurologist oversees the process made me feel completely safe. The results are so subtle and natural — my friends just say I look rested.",
+    treatment: "Dermal Fillers",
+    date: "January 2026",
+  },
+  {
+    id: 7,
+    name: "Robert H.",
+    rating: 5,
+    text: "Started the peptide therapy program here and the difference in my energy and recovery is remarkable. The in-house blood work makes it so easy to track progress. This is what modern wellness should feel like.",
+    treatment: "Peptide Therapy",
+    date: "February 2026",
+  },
+  {
+    id: 8,
+    name: "Lisa K.",
+    rating: 5,
+    text: "Open 7 days a week is a game-changer for my schedule. I come in for my chemical peel on Sundays and it fits perfectly into my routine. The team remembers my preferences and my skin has never been clearer.",
+    treatment: "Chemical Peels",
+    date: "March 2026",
+  },
+  {
+    id: 9,
+    name: "Carmen D.",
+    rating: 5,
+    text: "The hormone therapy program has been transformative. Dr. Landfield took the time to review my comprehensive blood panel and created a protocol that addressed my specific needs. I finally feel like myself again.",
+    treatment: "Hormone Therapy",
+    date: "December 2025",
+  },
 ];
 
 const blogPosts = [
@@ -279,10 +329,10 @@ export default function HomePage() {
         label="PHYSICIAN-SUPERVISED MEDSPA & WELLNESS"
         title="Your Skin. Your Wellness. Our Expertise."
         subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist"
-        primaryCTA={{ text: "Book a Consultation", href: clinicInfo.consultation.url }}
+        primaryCTA={{ text: "Book a Consultation", href: "#consultation" }}
         secondaryCTA={{ text: "Explore Services", href: "/services" }}
-        backgroundImage="/images/providers/facility-drone.jpg"
-        backgroundOverlay={65}
+        backgroundImage="/images/hero/hero-aesthetic.jpg"
+        backgroundOverlay={60}
         stats={[
           { value: "4.9", label: "Google Rating" },
           { value: "127+", label: "5-Star Reviews" },
@@ -355,14 +405,15 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <FadeInOnScroll direction="left">
-              <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center">
-                <div className="text-center">
-                  <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-2 border-rani-gold/30 bg-rani-navy-light">
-                    <span className="font-heading text-3xl text-rani-gold">
-                      AL
-                    </span>
-                  </div>
-                </div>
+              <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-cream to-white">
+                <Image
+                  src="/images/team/dr-landfield.webp"
+                  alt="Dr. Alexander Landfield — Board-Certified Neurologist & Medical Director of Rani Beauty Clinic"
+                  width={600}
+                  height={750}
+                  className="h-full w-full object-cover object-top"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
               </div>
             </FadeInOnScroll>
 
@@ -447,13 +498,19 @@ export default function HomePage() {
       {/* 10. Reviews/Testimonials */}
       <ReviewCarousel reviews={reviews} />
 
-      {/* 11. Blog Teaser */}
+      {/* 11. Treatment Quiz — Email Capture / Lead Magnet */}
+      <TreatmentQuiz />
+
+      {/* 12. Blog Teaser */}
       <BlogTeaser posts={blogPosts} />
 
-      {/* 12. CTA Banner */}
+      {/* 13. Consultation Embed — Typeform on-site */}
+      <ConsultationEmbed />
+
+      {/* 14. CTA Banner */}
       <CTABanner />
 
-      {/* 13. Map & Location */}
+      {/* 15. Map & Location */}
       <MapSection />
     </>
   );

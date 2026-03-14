@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Shield, Award, GraduationCap, Stethoscope, ChevronRight } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import CTABanner from "@/components/sections/CTABanner";
@@ -132,8 +133,14 @@ export default function DrLandfieldPage() {
         <div className="mx-auto max-w-4xl px-6">
           <FadeInOnScroll>
             <div className="mb-8 flex items-center gap-6">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-rani-navy">
-                <span className="font-heading text-3xl text-rani-gold">AL</span>
+              <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-rani-gold/30 shrink-0">
+                <Image
+                  src="/images/team/dr-landfield.webp"
+                  alt="Dr. Alexander Landfield"
+                  fill
+                  className="object-cover object-top"
+                  sizes="96px"
+                />
               </div>
               <div>
                 <h2 className="font-body text-2xl font-bold text-rani-navy">

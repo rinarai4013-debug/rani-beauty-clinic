@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import MobileCTA from "@/components/layout/MobileCTA";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import ExitIntentPopup from "@/components/sections/ExitIntentPopup";
 import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
 
 const montserrat = Montserrat({
@@ -90,6 +91,7 @@ export default function RootLayout({
         <Footer />
         <MobileCTA />
         <ScrollToTop />
+        <ExitIntentPopup />
       </body>
     </html>
   );

@@ -157,9 +157,14 @@ export default function AboutPageClient() {
           <div className="mt-12 grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <FadeInOnScroll direction="left">
               <div className="flex flex-col items-center">
-                {/* Circular photo placeholder with initials */}
-                <div className="flex h-64 w-64 items-center justify-center rounded-full border-4 border-rani-gold/30 bg-gradient-to-br from-rani-navy to-rani-navy-light shadow-lg">
-                  <span className="font-heading text-6xl text-rani-gold">AL</span>
+                <div className="relative h-72 w-72 overflow-hidden rounded-full border-4 border-rani-gold/30 shadow-lg">
+                  <Image
+                    src="/images/team/dr-landfield.webp"
+                    alt="Dr. Alexander Landfield — Board-Certified Neurologist & Medical Director"
+                    fill
+                    className="object-cover object-top"
+                    sizes="288px"
+                  />
                 </div>
               </div>
             </FadeInOnScroll>
@@ -219,11 +224,14 @@ export default function AboutPageClient() {
             {teamMembers.map((member, index) => (
               <Card key={index} goldTop>
                 <div className="flex flex-col items-center text-center">
-                  {/* Circular avatar placeholder */}
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-rani-navy to-rani-navy-light">
-                    <span className="font-heading text-2xl text-rani-gold">
-                      {member.initials}
-                    </span>
+                  <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-rani-gold/20">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      className="object-cover object-top"
+                      sizes="80px"
+                    />
                   </div>
                   <h3 className="mt-4 font-body text-lg font-bold text-rani-navy">
                     {member.name}

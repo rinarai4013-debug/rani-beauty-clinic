@@ -170,10 +170,11 @@ export default function BeforeAfterSlider({
           {[
             { src: "/images/services/hydrafacial/1.png", label: "HydraFacial" },
             { src: "/images/services/botox/1.png", label: "Botox" },
-            {
-              src: "/images/services/laserfacial/2.jpg",
-              label: "Laser Facial",
-            },
+            { src: "/images/services/cheekfiller/1.webp", label: "Cheek Filler" },
+            { src: "/images/services/lipfiller/1.jpg", label: "Lip Filler" },
+            { src: "/images/services/cutera/1.jpg", label: "RF Microneedling" },
+            { src: "/images/services/acnescarvipeel/1.png", label: "Acne Scar Treatment" },
+            { src: "/images/services/laserhairremovals/fullbodylaser.jpeg", label: "Laser Hair Removal" },
             { src: "/images/before-after/result-1.webp", label: "Skin Glow" },
           ].map((item, i) => (
             <FadeInOnScroll key={item.label} delay={0.1 + i * 0.1}>
