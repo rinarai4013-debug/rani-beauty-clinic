@@ -24,11 +24,14 @@ export const galleryPages: GalleryPage[] = [
     category: "aesthetic",
     images: [
       "/images/services/laserhairremovals/fullbodylaser.jpeg",
-      "/images/services/laserhairremovals/fullbrazilian.jpeg",
-      "/images/services/laserhairremovals/underarms.jpeg",
-      "/images/services/laserhairremovals/fulllegs.jpeg",
+      "/images/services/laserhairremovals/fullbodylaser2.jpeg",
+      "/images/services/laserhairremovals/laser-gallery-1.jpg",
       "/images/services/laserhairremovals/FullFaceLaserHairRemoval.jpeg",
+      "/images/services/laserhairremovals/underarms.jpeg",
       "/images/services/laserhairremovals/fullback.jpeg",
+      "/images/services/laserhairremovals/fulllegs.jpeg",
+      "/images/services/laserhairremovals/neck.jpeg",
+      "/images/services/laserhairremovals/chin.png",
     ],
     description:
       "Our patients typically see 70-90% permanent hair reduction after completing their series. Results become progressively visible after each session as follicles are disabled. Most enjoy smooth, maintenance-free skin for years.",

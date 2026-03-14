@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Shield, Target, Heart, Lightbulb, Cpu, Sparkles, ScanFace } from "lucide-react";
+import { Shield, Target, Heart, Lightbulb, Cpu, Sparkles, ScanFace, Waves, Radiation } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import CTABanner from "@/components/sections/CTABanner";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -25,6 +25,18 @@ const technologies = [
     name: "Cutera Secret Pro",
     description:
       "Advanced radiofrequency microneedling system that delivers precise RF energy through gold-plated microneedles. Stimulates collagen production for skin tightening, scar revision, and overall skin rejuvenation.",
+  },
+  {
+    icon: Waves,
+    name: "HydraFacial Syndeo",
+    description:
+      "The next generation of HydraFacial technology. Syndeo delivers a personalized, connected treatment experience with patented Vortex-Fusion technology for deep cleansing, extraction, and hydration — all with real-time skin data tracking for optimized results.",
+  },
+  {
+    icon: Radiation,
+    name: "Sofwave",
+    description:
+      "FDA-cleared ultrasound skin tightening and lifting device. Sofwave's proprietary Synchronous Ultrasound Parallel Beam Technology (SUPERB™) stimulates new collagen production at 1.5mm depth for non-invasive brow lifting, wrinkle reduction, and skin firming.",
   },
   {
     icon: ScanFace,

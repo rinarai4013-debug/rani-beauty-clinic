@@ -15,6 +15,7 @@ import { clinicInfo } from "@/data/clinic-info";
 import { motion } from "framer-motion";
 import { staggerItem } from "@/components/animations/StaggerChildren";
 import { getServiceImage } from "@/data/service-images";
+import { galleryPages } from "@/data/results/gallery";
 
 /** Maps service slug → cost page slug (only for services that have a cost page) */
 const COST_SLUG_MAP: Record<string, string> = {
@@ -333,54 +334,60 @@ export default function ServicePageTemplate({
 
       {/* Results Gallery — service treatment images */}
       <section className="bg-rani-cream py-20 md:py-28">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+        <div className="mx-auto max-w-5xl px-6 text-center">
           <FadeInOnScroll>
             <SectionLabel label="RESULTS GALLERY" />
             <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
               Treatment Gallery
             </h2>
-            <div className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-3">
-              {serviceImageData && serviceImageData.image ? (
-                <>
-                  <div className="relative aspect-square overflow-hidden rounded-xl">
-                    <Image
-                      src={serviceImageData.image}
-                      alt={`${service.title} treatment`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                    />
-                  </div>
-                  {serviceImageData.hoverImage && (
-                    <div className="relative aspect-square overflow-hidden rounded-xl">
+            {(() => {
+              const galleryPage = galleryPages.find(
+                (g) => g.serviceSlug === service.slug
+              );
+              const galleryImages = galleryPage?.images ?? [];
+              const allImages = galleryImages.length > 0
+                ? galleryImages
+                : serviceImageData
+                  ? [serviceImageData.image, serviceImageData.hoverImage].filter(Boolean) as string[]
+                  : [];
+
+              return allImages.length > 0 ? (
+                <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {allImages.map((img, i) => (
+                    <div key={i} className="relative aspect-square overflow-hidden rounded-xl shadow-sm">
                       <Image
-                        src={serviceImageData.hoverImage}
-                        alt={`${service.title} results`}
+                        src={img}
+                        alt={`${service.title} treatment ${i + 1}`}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       />
                     </div>
-                  )}
-                  <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex flex-col items-center justify-center p-4">
+                  ))}
+                  <Link
+                    href={clinicInfo.booking.url}
+                    target="_blank"
+                    className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy/80 flex flex-col items-center justify-center p-4 transition-all hover:shadow-lg hover:scale-[1.02]"
+                  >
                     <p className="font-heading text-2xl text-rani-gold mb-2">
                       Book Now
                     </p>
                     <p className="font-body text-xs text-gray-300">
                       See your own results
                     </p>
-                  </div>
-                </>
+                  </Link>
+                </div>
               ) : (
-                [1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="aspect-square rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy-light flex items-center justify-center"
-                  >
-                  </div>
-                ))
-              )}
-            </div>
+                <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="aspect-square rounded-xl bg-gradient-to-br from-rani-navy to-rani-navy/80 flex items-center justify-center"
+                    />
+                  ))}
+                </div>
+              );
+            })()}
           </FadeInOnScroll>
         </div>
       </section>
