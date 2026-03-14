@@ -57,7 +57,7 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
   );
 
   return (
-    <section className="bg-rani-cream py-20 md:py-28">
+    <section className="bg-rani-cream py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <FadeInOnScroll>
           <SectionLabel label="TESTIMONIALS" />

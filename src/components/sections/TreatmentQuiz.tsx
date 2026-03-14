@@ -50,7 +50,7 @@ const fadeSlide = {
 };
 
 export default function TreatmentQuiz() {
-  const [quizStarted, setQuizStarted] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [name, setName] = useState("");
@@ -140,7 +140,7 @@ export default function TreatmentQuiz() {
   // ── Intro Screen ──
   if (!quizStarted) {
     return (
-      <section className="relative overflow-hidden bg-rani-navy py-24 sm:py-32">
+      <section className="relative overflow-hidden bg-rani-navy py-16 sm:py-20">
         {/* Decorative gradient blobs */}
         <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-rani-gold/5 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-rani-gold/5 blur-3xl" />
@@ -183,7 +183,7 @@ export default function TreatmentQuiz() {
   // ── Success Screen ──
   if (isComplete) {
     return (
-      <section className="relative overflow-hidden bg-rani-navy py-24 sm:py-32">
+      <section className="relative overflow-hidden bg-rani-navy py-16 sm:py-20">
         <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-rani-gold/5 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-rani-gold/5 blur-3xl" />
 
@@ -243,7 +243,7 @@ export default function TreatmentQuiz() {
 
   // ── Quiz Steps ──
   return (
-    <section className="relative overflow-hidden bg-rani-navy py-24 sm:py-32">
+    <section className="relative overflow-hidden bg-rani-navy py-16 sm:py-20">
       {/* Decorative gradient blobs */}
       <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-rani-gold/5 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-rani-gold/5 blur-3xl" />

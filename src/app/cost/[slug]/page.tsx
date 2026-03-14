@@ -383,7 +383,7 @@ export default function CostPage({ params }: PageProps) {
               href={clinicInfo.booking.url}
               className="mt-3 inline-flex items-center gap-2 font-body text-base font-semibold text-rani-navy transition-colors hover:text-rani-gold"
             >
-              Book a free consultation
+              Book a consultation
               <ChevronRight size={16} />
             </a>
           </FadeInOnScroll>

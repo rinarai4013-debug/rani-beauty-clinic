@@ -17,7 +17,7 @@ export default function CTABanner({
   subtitle,
 }: CTABannerProps) {
   return (
-    <section className="relative bg-rani-navy py-20 md:py-28 overflow-hidden">
+    <section className="relative bg-rani-navy py-16 md:py-20 overflow-hidden">
       {/* Decorative lotus watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.03]">
         <span className="font-heading text-[300px] text-rani-gold select-none">

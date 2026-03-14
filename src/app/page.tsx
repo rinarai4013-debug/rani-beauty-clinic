@@ -29,6 +29,9 @@ import CTABanner from "@/components/sections/CTABanner";
 import MapSection from "@/components/sections/MapSection";
 import ReviewCarousel from "@/components/sections/ReviewCarousel";
 import BlogTeaser from "@/components/sections/BlogTeaser";
+import FAQ from "@/components/sections/FAQ";
+import PopularPackages from "@/components/sections/PopularPackages";
+import ProcessSteps from "@/components/sections/ProcessSteps";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
@@ -350,7 +353,7 @@ export default function HomePage() {
       <ServiceCategoryPanels />
 
       {/* 5. Services Overview — With Images */}
-      <section className="bg-rani-cream py-20 md:py-28">
+      <section className="bg-rani-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="OUR SERVICES" />
@@ -400,8 +403,11 @@ export default function HomePage() {
       {/* 6. Meet The Founders — Real founder photos */}
       <MeetTheTeam />
 
+      {/* 6b. What to Expect — Process Steps */}
+      <ProcessSteps />
+
       {/* 7. Dr. Landfield Introduction */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-rani-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <FadeInOnScroll direction="left">
@@ -454,7 +460,7 @@ export default function HomePage() {
       </section>
 
       {/* 8. Why Rani Section */}
-      <section className="bg-rani-cream py-20 md:py-28">
+      <section className="bg-rani-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="WHY CHOOSE US" />
@@ -498,6 +504,9 @@ export default function HomePage() {
       {/* 10. Reviews/Testimonials */}
       <ReviewCarousel reviews={reviews} />
 
+      {/* 10b. Popular Packages */}
+      <PopularPackages />
+
       {/* 11. Treatment Quiz — Email Capture / Lead Magnet */}
       <TreatmentQuiz />
 
@@ -506,6 +515,9 @@ export default function HomePage() {
 
       {/* 13. Consultation Embed — Typeform on-site */}
       <ConsultationEmbed />
+
+      {/* 13b. FAQ Section */}
+      <FAQ />
 
       {/* 14. CTA Banner */}
       <CTABanner />

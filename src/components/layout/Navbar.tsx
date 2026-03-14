@@ -73,7 +73,7 @@ export default function Navbar() {
         <div className="bg-rani-gold px-4 py-2.5 text-center font-body text-sm font-medium text-rani-navy">
           <div className="mx-auto flex max-w-7xl items-center justify-center gap-3">
             <Sparkles size={14} className="shrink-0" />
-            <span>Complimentary Personalized Consultation — Meet Our Physician-Led Team</span>
+            <span>Personalized Consultation — $150 Deposit Applies to Your Treatment</span>
             <a
               href={clinicInfo.consultation.url}
               className="inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70"

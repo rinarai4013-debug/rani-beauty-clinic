@@ -480,7 +480,7 @@ export default function PricingPageClient() {
 
       <CTABanner
         title="Questions About Pricing?"
-        subtitle="Schedule a complimentary consultation and we'll create a personalized treatment plan with transparent pricing tailored to your goals."
+        subtitle="Schedule a consultation and we'll create a personalized treatment plan with transparent pricing. Your $150 deposit applies toward any treatment."
       />
     </>
   );

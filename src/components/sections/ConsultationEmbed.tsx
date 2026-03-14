@@ -27,29 +27,30 @@ export default function ConsultationEmbed() {
   }, []);
 
   return (
-    <section className="bg-rani-cream py-20 md:py-28" id="consultation">
+    <section className="bg-rani-cream py-16 md:py-20" id="consultation">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           {/* Left: Content */}
           <FadeInOnScroll direction="left">
             <div>
-              <SectionLabel label="FREE CONSULTATION" className="!items-start" />
+              <SectionLabel label="CONSULTATION" className="!items-start" />
               <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
-                Book Your Complimentary Consultation
+                Book Your Consultation
               </h2>
               <p className="mt-6 font-body text-base leading-relaxed text-rani-text">
                 Every journey at Rani Beauty Clinic begins with a personalized
-                consultation. Our team will assess your goals, recommend a
-                customized treatment plan, and answer all your questions — all
-                under the guidance of our board-certified Medical Director.
+                consultation. Your $150 deposit secures your appointment and
+                applies directly toward any treatment or product — so nothing
+                goes to waste.
               </p>
               <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
-                Fill out the form and we will reach out within 24 hours to
+                Fill out the form and we&apos;ll reach out within 24 hours to
                 schedule your visit. Your consultation includes a full skin
-                assessment and personalized treatment roadmap.
+                assessment and personalized treatment roadmap under the
+                guidance of our board-certified Medical Director.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Badge icon="check">No Obligation</Badge>
+                <Badge icon="check">$150 Applies to Treatment</Badge>
                 <Badge icon="shield">Physician-Supervised</Badge>
                 <Badge icon="clock">Response Within 24 Hours</Badge>
               </div>

@@ -105,7 +105,7 @@ export default function ResultsPageClient() {
                 See What&apos;s Possible for You
               </h3>
               <p className="mx-auto mt-4 max-w-xl font-body text-base text-white/80">
-                Every patient is unique. Book a complimentary consultation and
+                Every patient is unique. Book a consultation and
                 our expert providers will create a personalized treatment plan
                 tailored to your goals.
               </p>
@@ -169,7 +169,7 @@ export default function ResultsPageClient() {
       {/* CTA Banner */}
       <CTABanner
         title="Ready for Your Transformation?"
-        subtitle="Book a complimentary consultation to discuss your goals and see what treatments are right for you."
+        subtitle="Book a consultation to discuss your goals and see what treatments are right for you. Your $150 deposit applies toward treatment."
       />
     </>
   );

@@ -328,7 +328,7 @@ export default function AboutPageClient() {
       {/* CTA Banner */}
       <CTABanner
         title="Experience the Rani Difference"
-        subtitle="Book your complimentary consultation and discover how our physician-supervised approach can help you achieve your aesthetic and wellness goals."
+        subtitle="Book your consultation and discover how our physician-supervised approach can help you achieve your aesthetic and wellness goals. Your $150 deposit applies toward treatment."
       />
     </>
   );

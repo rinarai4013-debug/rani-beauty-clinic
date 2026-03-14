@@ -139,7 +139,7 @@ export default function BeforeAfterSlider({
   pairs = defaultPairs,
 }: BeforeAfterSliderProps) {
   return (
-    <section className="bg-white py-20 md:py-28">
+    <section className="bg-white py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <FadeInOnScroll>
           <SectionLabel label="TRANSFORMATIONS" />
