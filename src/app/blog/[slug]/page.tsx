@@ -9,6 +9,7 @@ import SectionLabel from "@/components/ui/SectionLabel";
 import BlogCard from "@/components/blog/BlogCard";
 import StructuredData from "@/components/seo/StructuredData";
 import { blogPosts } from "@/data/blog/posts";
+import { clinicInfo } from "@/data/clinic-info";
 import FAQSection from "./FAQSection";
 
 interface BlogPostPageProps {
@@ -31,10 +32,14 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
   return {
     title: post.metaTitle,
     description: post.metaDescription,
+    alternates: {
+      canonical: `${clinicInfo.website}/blog/${post.slug}`,
+    },
     openGraph: {
       title: post.metaTitle,
       description: post.metaDescription,
       type: "article",
+      url: `${clinicInfo.website}/blog/${post.slug}`,
       publishedTime: post.date,
       authors: [post.author],
     },

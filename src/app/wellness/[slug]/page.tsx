@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { aestheticServices } from "@/data/services/aesthetic-services";
 import { wellnessServices } from "@/data/services/wellness-services";
 import ServicePageTemplate from "@/components/services/ServicePageTemplate";
+import { clinicInfo } from "@/data/clinic-info";
 
 const allServices = [
   ...aestheticServices.map((s) => ({ ...s, isWellness: false as const })),
@@ -25,9 +26,14 @@ export function generateMetadata({
   return {
     title: service.metaTitle,
     description: service.metaDescription,
+    alternates: {
+      canonical: `${clinicInfo.website}/wellness/${service.slug}`,
+    },
     openGraph: {
       title: service.metaTitle,
       description: service.metaDescription,
+      type: "website",
+      url: `${clinicInfo.website}/wellness/${service.slug}`,
     },
   };
 }

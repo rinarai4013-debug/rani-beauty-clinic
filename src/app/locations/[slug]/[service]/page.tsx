@@ -47,7 +47,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
     title: meta.metaTitle,
     description: meta.metaDescription,
     alternates: {
-      canonical: `${clinicInfo.website}/locations/${geo.slug}/${serviceInfo.slug}`,
+      canonical: `${clinicInfo.website}/${serviceInfo.category === "wellness" ? "wellness" : "services"}/${serviceInfo.slug}`,
     },
     openGraph: {
       title: meta.metaTitle,
