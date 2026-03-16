@@ -1041,21 +1041,23 @@ This technology transforms the consultation experience from subjective observati
       "Non-invasive ultrasound skin tightening and lifting that stimulates new collagen production for a naturally lifted, firmer appearance — no surgery, no downtime.",
     icon: "Waves",
     metaTitle:
-      "Sofwave Skin Tightening in Renton, WA | Non-Invasive Lifting | Rani Beauty Clinic",
+      "Sofwave Skin Tightening in Renton, WA | Post-GLP-1 & Anti-Aging | Rani Beauty Clinic",
     metaDescription:
-      "Tighten and lift sagging skin without surgery using Sofwave ultrasound technology at Rani Beauty Clinic in Renton, WA. FDA-cleared for fine lines, wrinkles, and skin laxity. Book today.",
+      "Sofwave SUPERB ultrasound skin tightening at Rani Beauty Clinic in Renton, WA. FDA-cleared for face, neck, and body lifting. Ideal for post-GLP-1 skin laxity and aging. Book your consultation today.",
     heroDescription:
-      "Lift, tighten, and rejuvenate your skin without surgery or downtime. Sofwave uses breakthrough SUPERB ultrasound technology to stimulate new collagen deep within the skin — delivering natural-looking lifting and tightening results in a single treatment session.",
-    whatIsIt: `Sofwave is an FDA-cleared, non-invasive ultrasound skin tightening device that uses proprietary Synchronous Ultrasound Parallel Beam (SUPERB) technology to treat fine lines, wrinkles, and skin laxity on the face and neck. Unlike surgical facelifts, Sofwave delivers focused ultrasound energy at a precise depth of 1.5mm in the mid-dermis — the optimal zone for stimulating new collagen and elastin production.
+      "Lift, tighten, and rejuvenate your skin without surgery or downtime. Sofwave uses breakthrough SUPERB ultrasound technology to stimulate new collagen deep within the skin — delivering natural-looking lifting and tightening results in a single treatment session. Now a cornerstone of our signature Reveal protocol for post-GLP-1 skin restoration.",
+    whatIsIt: `Sofwave is an FDA-cleared, non-invasive ultrasound skin tightening device that uses proprietary Synchronous Ultrasound Parallel Beam (SUPERB) technology to treat fine lines, wrinkles, and skin laxity on the face, neck, and body. Unlike surgical facelifts, Sofwave delivers focused ultrasound energy at a precise depth of 1.5mm in the mid-dermis — the optimal zone for stimulating new collagen and elastin production.
 
 The treatment works by creating controlled thermal zones beneath the skin's surface while an integrated cooling mechanism protects the outer layer (epidermis) from damage. This triggers a natural wound-healing response that produces fresh, organized collagen over the following weeks and months, resulting in visibly tighter, smoother, and more lifted skin.
 
-Sofwave is clinically proven to deliver results comparable to more invasive procedures without the risks, recovery time, or cost of surgery. It is safe for all skin types and tones (Fitzpatrick I–VI) and requires no anesthesia, incisions, or downtime.`,
+Sofwave is clinically proven to deliver results comparable to more invasive procedures without the risks, recovery time, or cost of surgery. It is safe for all skin types and tones (Fitzpatrick I–VI) and requires no anesthesia, incisions, or downtime.
+
+At Rani Beauty Clinic, Sofwave is also a foundational component of The Reveal — our signature skin restoration protocol for patients experiencing skin changes after GLP-1 weight loss with medications like Ozempic, Wegovy, Mounjaro, and Zepbound. When combined with Secret RF microneedling in The Reveal protocol, Sofwave addresses deep collagen loss while RF targets surface texture — a dual-layer approach that no single technology achieves alone.`,
     howItWorks: [
       {
         step: "Consultation & Assessment",
         description:
-          "Your clinician evaluates your areas of concern — brow laxity, jowls, neck bands, fine lines — and determines whether Sofwave is the right treatment or if a combination approach (e.g., Sofwave + RF microneedling) would achieve your goals more effectively.",
+          "Your clinician evaluates your areas of concern — brow laxity, jowls, neck bands, fine lines, or post-weight-loss skin changes — and determines whether standalone Sofwave, a combination approach with RF microneedling, or our full Reveal protocol will achieve your goals most effectively.",
       },
       {
         step: "Treatment Preparation",
@@ -1077,6 +1079,8 @@ Sofwave is clinically proven to deliver results comparable to more invasive proc
       "Adults experiencing early to moderate skin laxity in the face, neck, or brow area",
       "Patients seeking a non-surgical alternative to a facelift or brow lift",
       "Anyone looking to tighten jowls, define the jawline, or improve neck texture",
+      "GLP-1 weight loss patients experiencing skin laxity after Ozempic, Wegovy, Mounjaro, or Zepbound",
+      "Patients dealing with volume loss or sagging skin after significant weight loss",
       "Those with fine lines and wrinkles who want improvement without injectables",
       "Patients of all skin types and tones (Fitzpatrick I\u2013VI)",
       "Individuals who want lifting results with zero downtime",
@@ -1084,16 +1088,16 @@ Sofwave is clinically proven to deliver results comparable to more invasive proc
     ],
     whatToExpect: {
       before:
-        "Arrive with clean, bare skin (no makeup, sunscreen, or moisturizer on the treatment area). No special preparation is required. Avoid excessive sun exposure and tanning in the 2 weeks prior to treatment.",
+        "Arrive with clean, bare skin (no makeup, sunscreen, or moisturizer on the treatment area). No special preparation is required. Avoid excessive sun exposure and tanning in the 2 weeks prior to treatment. If you are currently on a GLP-1 medication, no adjustments are needed — Sofwave is fully compatible with active weight loss programs.",
       during:
         "The treatment takes 30\u201390 minutes depending on the area treated. You will feel brief pulses of warmth as the ultrasound energy is delivered beneath the skin. The integrated cooling system keeps the surface comfortable. Most patients tolerate the treatment well without numbing.",
       after:
-        "You may experience mild redness, slight swelling, or tenderness in the treated area, which typically resolves within a few hours to a day. There is no peeling, bruising, or open wound. You can apply makeup, return to work, and resume all activities immediately. Avoid excessive heat (saunas, hot yoga) for 24\u201348 hours.",
+        "You may experience mild redness, slight swelling, or tenderness in the treated area, which typically resolves within a few hours to a day. There is no peeling, bruising, or open wound. You can apply makeup, return to work, and resume all activities immediately. Avoid excessive heat (saunas, hot yoga) for 24\u201348 hours. Collagen remodeling begins immediately and continues building for 3\u20136 months.",
     },
     resultsAndRecovery:
-      "Initial tightening is often visible within 1\u20132 weeks as the skin responds to the thermal stimulation. The most significant results develop over 3\u20136 months as new collagen matures and remodels. Clinical studies show continued improvement for up to 12 months after a single treatment. Most patients achieve noticeable lifting and tightening from one session, though a second session at 6\u201312 months can amplify results. Sofwave results are long-lasting because the new collagen is a permanent addition to your skin structure, though the natural aging process continues. Annual maintenance treatments help sustain your results.",
+      "Initial tightening is often visible within 1\u20132 weeks as the skin responds to the thermal stimulation. The most significant results develop over 3\u20136 months as new collagen matures and remodels. Clinical studies show continued improvement for up to 12 months after a single treatment. Most patients achieve noticeable lifting and tightening from one session, though a second session at 6\u201312 months can amplify results. For post-GLP-1 patients with more significant laxity, combining Sofwave with Secret RF in our Reveal protocol delivers more comprehensive restoration than either treatment alone. Sofwave results are long-lasting because the new collagen is a permanent addition to your skin structure, though the natural aging process continues. Annual maintenance treatments help sustain your results.",
     whyRani:
-      "At Rani Beauty Clinic, your Sofwave treatment is performed under the oversight of Dr. Alexander Landfield, our board-certified Medical Director, who ensures every protocol meets the highest safety standards. Our clinicians are extensively trained in Sofwave technique and facial anatomy, allowing them to customize energy delivery for optimal lifting in your specific areas of concern. We also offer combination protocols — pairing Sofwave with RF microneedling (Cutera Secret Pro) for patients who want both tightening and skin texture improvement — a powerful combination that delivers comprehensive facial rejuvenation without surgery.",
+      "At Rani Beauty Clinic, your Sofwave treatment is performed under the oversight of Dr. Alexander Landfield, our board-certified Medical Director, who ensures every protocol meets the highest safety standards. Our clinicians are extensively trained in Sofwave technique and facial anatomy, allowing them to customize energy delivery for optimal lifting in your specific areas of concern. We also offer combination protocols — pairing Sofwave with RF microneedling (Cutera Secret Pro) in our signature Reveal protocol for patients who want both deep tightening and surface texture improvement. This dual-technology approach is especially effective for patients experiencing skin changes after GLP-1 weight loss, addressing collagen loss at multiple depths for comprehensive restoration without surgery.",
     faqs: [
       {
         question: "How is Sofwave different from other skin tightening treatments?",
@@ -1108,17 +1112,42 @@ Sofwave is clinically proven to deliver results comparable to more invasive proc
       {
         question: "How many Sofwave treatments do I need?",
         answer:
-          "Most patients see meaningful results from a single Sofwave session. Clinical studies demonstrate significant improvement in skin laxity, fine lines, and wrinkles after one treatment. However, patients with more advanced laxity or those seeking more dramatic results may benefit from a second session at 6\u201312 months. Annual maintenance treatments can help sustain and build upon your results over time.",
+          "Most patients see meaningful results from a single Sofwave session. Clinical studies demonstrate significant improvement in skin laxity, fine lines, and wrinkles after one treatment. However, patients with more advanced laxity \u2014 particularly after significant weight loss \u2014 may benefit from a second session at 6\u201312 months or a combination protocol like The Reveal. Annual maintenance treatments can help sustain and build upon your results over time.",
       },
       {
         question: "Can Sofwave be combined with other treatments?",
         answer:
-          "Yes, Sofwave pairs exceptionally well with other aesthetic treatments. At Rani Beauty Clinic, we offer a popular Sofwave + RF Microneedling combo package ($4,499) that combines the deep tissue tightening of Sofwave with the surface-level texture improvement of the Cutera Secret Pro. Sofwave can also be performed alongside HydraFacial, chemical peels, and neurotoxin treatments as part of a comprehensive rejuvenation plan. Your clinician will recommend the ideal combination and timing for your goals.",
+          "Yes, Sofwave pairs exceptionally well with other aesthetic treatments. At Rani Beauty Clinic, we offer a popular Sofwave + RF Microneedling combo package ($4,499) that combines the deep tissue tightening of Sofwave with the surface-level texture improvement of the Cutera Secret Pro. For post-GLP-1 patients, our signature Reveal protocol strategically sequences Sofwave with Secret RF for comprehensive dual-layer skin restoration. Sofwave can also be performed alongside HydraFacial, chemical peels, and neurotoxin treatments as part of a comprehensive rejuvenation plan.",
       },
       {
         question: "How much does Sofwave cost?",
         answer:
-          "Sofwave pricing depends on the treatment area. A Brow Lift is $1,150, Lower Face (Jawline) is $2,250, Neck/Submental is $1,750, Full Face is $2,250, and Full Face + Neck is $3,999. We also offer a Sofwave + RF Micro Combo package at $4,499 (1 Sofwave Full Face + 3 RF Micro Face sessions). We accept HSA/FSA cards, and financing is available through Cherry and PatientFi with no credit impact. Call us at (425) 539-4440 to schedule your consultation.",
+          "Sofwave pricing depends on the treatment area. A Brow Lift is $1,150, Lower Face (Jawline) is $2,250, Neck/Submental is $1,750, Full Face is $2,250, and Full Face + Neck is $3,999. We also offer a Sofwave + RF Micro Combo package at $4,499 (1 Sofwave Full Face + 3 RF Micro Face sessions). For comprehensive post-weight-loss skin restoration, our Reveal protocol tiers start at $1,490. We accept HSA/FSA cards, and financing is available through Cherry and PatientFi with no credit impact.",
+      },
+      {
+        question: "Is Sofwave effective for skin laxity after GLP-1 weight loss?",
+        answer:
+          "Sofwave is one of the most effective non-surgical options for addressing skin laxity after GLP-1 weight loss. When fat volume decreases rapidly \u2014 as often occurs with Ozempic, Wegovy, Mounjaro, or Zepbound \u2014 the skin's collagen network can't keep pace, resulting in loose, sagging skin. Sofwave directly stimulates new collagen and elastin production in the mid-dermis, helping the skin contract and tighten. For patients with more significant laxity, we recommend combining Sofwave with Secret RF in our Reveal protocol for dual-layer restoration.",
+      },
+      {
+        question: "Can I get Sofwave while still taking my GLP-1 medication?",
+        answer:
+          "Yes. There is no contraindication between Sofwave and GLP-1 medications including Semaglutide (Ozempic, Wegovy), Tirzepatide (Mounjaro, Zepbound), or Liraglutide. In fact, many providers recommend beginning skin tightening treatments before completing your weight loss journey. Starting Sofwave while still on your GLP-1 program gives your collagen a head start on remodeling, so your skin can better keep pace with continued fat loss.",
+      },
+      {
+        question: "What is The Reveal protocol and how does Sofwave fit in?",
+        answer:
+          "The Reveal is Rani Beauty Clinic's signature skin restoration protocol designed specifically for patients experiencing skin changes after GLP-1 weight loss. Sofwave serves as the deep-tightening component of The Reveal, working at 1.5mm depth to rebuild foundational collagen. Secret RF microneedling then addresses surface texture, pores, and superficial laxity. Together, they provide dual-layer restoration that no single device can achieve. The Reveal is available in three tiers (Essential, Signature, and Complete) with complimentary assessments.",
+      },
+      {
+        question: "How does Sofwave compare to a surgical facelift?",
+        answer:
+          "Sofwave delivers meaningful lifting and tightening for patients with mild to moderate laxity without the risks, downtime, or cost of surgery. A surgical facelift remains the gold standard for severe laxity, but most patients \u2014 especially those in the early stages of post-weight-loss skin changes \u2014 achieve excellent results with Sofwave alone or in combination with RF microneedling. Sofwave requires no anesthesia, no incisions, and zero downtime. You can return to normal activities the same day.",
+      },
+      {
+        question: "What areas of the body can Sofwave treat?",
+        answer:
+          "Sofwave is FDA-cleared for the face and neck, including the brow, full face, jawline, submentum (under chin), and neck. It is also used off-label for body areas including the upper arms, abdomen, and knees. At Rani Beauty Clinic, we offer Sofwave body tightening as part of our comprehensive approach to post-weight-loss skin restoration, particularly for patients in our Reveal protocol who want face and body treatment.",
       },
     ],
     relatedSlugs: [

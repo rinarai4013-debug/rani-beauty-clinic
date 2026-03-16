@@ -22,7 +22,7 @@ const corePages: GeoPage[] = [
     state: "WA",
     region: "eastside",
     metaTitle:
-      "Medspa Near Bellevue, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Bellevue, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic in Renton serves Bellevue, WA residents with laser hair removal, HydraFacial, Botox, dermal fillers, GLP-1 weight management, and more. Just a 15-minute drive. Book today!",
     driveTime: "~15 min drive",
@@ -52,7 +52,7 @@ Getting to our clinic from Bellevue is straightforward. Simply take I-405 South 
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Kent, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Kent, WA | Renton, WA Medspa",
     metaDescription:
       "Serving Kent, WA — Rani Beauty Clinic offers laser hair removal, Botox, HydraFacial, GLP-1 weight loss, and medical wellness under physician supervision. Only 10 minutes away.",
     driveTime: "~10 min drive",
@@ -82,7 +82,7 @@ As a woman-owned business, we take pride in offering personalized care that goes
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Tukwila, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Tukwila, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic serves Tukwila, WA with physician-supervised Botox, laser hair removal, HydraFacial, RF microneedling, GLP-1 weight loss, and wellness services. Only 8 minutes away.",
     driveTime: "~8 min drive",
@@ -112,7 +112,7 @@ Tukwila is a dynamic, multicultural community, and we are proud to serve clients
     state: "WA",
     region: "eastside",
     metaTitle:
-      "Medspa Near Newcastle, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Newcastle, WA | Renton, WA Medspa",
     metaDescription:
       "Newcastle, WA residents: Rani Beauty Clinic in Renton offers laser hair removal, HydraFacial, Botox, fillers, GLP-1 weight management, and wellness treatments. Just 10 minutes away.",
     driveTime: "~10 min drive",
@@ -142,7 +142,7 @@ As a woman-owned business, Rani Beauty Clinic is committed to creating a welcomi
     state: "WA",
     region: "eastside",
     metaTitle:
-      "Medspa Near Mercer Island, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Mercer Island, WA | Renton, WA Medspa",
     metaDescription:
       "Mercer Island, WA residents trust Rani Beauty Clinic in Renton for physician-supervised Botox, laser treatments, HydraFacial, GLP-1 weight management, and medical wellness. ~20 min drive.",
     driveTime: "~20 min drive",
@@ -172,7 +172,7 @@ Rani Beauty Clinic is a woman-owned business built on the principles of trust, t
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near South Seattle, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near South Seattle, WA | Renton, WA Medspa",
     metaDescription:
       "South Seattle residents: Rani Beauty Clinic in Renton is your nearby physician-supervised medspa for Botox, laser hair removal, HydraFacial, GLP-1 weight loss, and wellness. ~15 min drive.",
     driveTime: "~15 min drive",
@@ -202,7 +202,7 @@ South Seattle has a dynamic, creative energy that we admire, from the art galler
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Federal Way, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Federal Way, WA | Renton, WA Medspa",
     metaDescription:
       "Federal Way, WA residents: Rani Beauty Clinic in Renton offers physician-supervised Botox, laser hair removal, HydraFacial, GLP-1 weight management, and medical wellness. ~25 min drive.",
     driveTime: "~25 min drive",
@@ -230,7 +230,7 @@ Rani Beauty Clinic is open seven days a week, from 10 AM to 7 PM, making it easy
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Auburn, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Auburn, WA | Renton, WA Medspa",
     metaDescription:
       "Auburn, WA residents: Rani Beauty Clinic in Renton is your physician-supervised medspa for Botox, laser hair removal, HydraFacial, GLP-1 weight loss, and medical wellness. ~20 min drive.",
     driveTime: "~20 min drive",
@@ -260,7 +260,7 @@ Rani Beauty Clinic is open seven days a week, from 10 AM to 7 PM, and provides f
     state: "WA",
     region: "regional",
     metaTitle:
-      "Premier Medspa in King County, WA | Rani Beauty Clinic in Renton",
+      "Premier Medspa in King County, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic in Renton serves all of King County, WA with physician-supervised Botox, laser hair removal, HydraFacial, GLP-1 weight management, peptide therapy, and more. Call today!",
     driveTime: "Centrally located in Renton",
@@ -290,7 +290,7 @@ Our clinic is open seven days a week, from 10 AM to 7 PM, and free parking is av
     state: "WA",
     region: "renton",
     metaTitle:
-      "Medspa Near Kennydale, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Kennydale, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic serves Kennydale residents with laser hair removal, HydraFacial, Botox, and GLP-1 weight management. Just 5 minutes from your neighborhood. Book today!",
     driveTime: "~5 min drive",
@@ -310,7 +310,7 @@ Kennydale is one of Renton's most desirable lakeside neighborhoods, known for it
     state: "WA",
     region: "renton",
     metaTitle:
-      "Medspa Near Renton Highlands, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Renton Highlands, WA | Renton, WA Medspa",
     metaDescription:
       "Serving Renton Highlands — Rani Beauty Clinic offers Botox, laser hair removal, HydraFacial, and GLP-1 weight loss under physician supervision. Only 7 minutes away!",
     driveTime: "~7 min drive",
@@ -330,7 +330,7 @@ Whether you are a long-time Renton Highlands resident or recently moved to the a
     state: "WA",
     region: "renton",
     metaTitle:
-      "Medspa Near Fairwood, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Fairwood, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic serves Fairwood, WA with Botox, HydraFacial, laser hair removal, and physician-supervised GLP-1 weight management. Just a 10-minute drive. Book now!",
     driveTime: "~10 min drive",
@@ -350,7 +350,7 @@ Fairwood is known for its family-friendly atmosphere, mature landscapes, and str
     state: "WA",
     region: "renton",
     metaTitle:
-      "Medspa Near Skyway, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Skyway, WA | Renton, WA Medspa",
     metaDescription:
       "Serving Skyway, WA — Rani Beauty Clinic offers laser hair removal, Botox, HydraFacial, and GLP-1 weight loss with physician supervision. Only 8 minutes away!",
     driveTime: "~8 min drive",
@@ -370,7 +370,7 @@ Skyway has been undergoing exciting community investment in recent years, with n
     state: "WA",
     region: "renton",
     metaTitle:
-      "Medspa Near Benson Hill, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Benson Hill, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic serves Benson Hill with laser hair removal, Botox, HydraFacial, and GLP-1 weight management under physician supervision. Just 8 minutes away!",
     driveTime: "~8 min drive",
@@ -390,7 +390,7 @@ Benson Hill is a well-established Renton neighborhood with panoramic views, conv
     state: "WA",
     region: "renton",
     metaTitle:
-      "Medspa Near The Landing, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near The Landing, WA | Renton, WA Medspa",
     metaDescription:
       "Steps from The Landing in Renton — Rani Beauty Clinic offers Botox, laser hair removal, HydraFacial, and GLP-1 weight loss under physician supervision. Book today!",
     driveTime: "~3 min drive",
@@ -410,9 +410,9 @@ The Landing area is the heart of Renton's waterfront revitalization, with easy a
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near SeaTac, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near SeaTac, WA | Skin Tightening, Botox & GLP-1 | Rani Beauty Clinic",
     metaDescription:
-      "Rani Beauty Clinic serves SeaTac, WA with laser hair removal, Botox, HydraFacial, and physician-supervised GLP-1 weight management. Just a 12-minute drive. Book now!",
+      "Rani Beauty Clinic serves SeaTac, WA with Sofwave skin tightening, laser hair removal, Botox, HydraFacial, and physician-supervised GLP-1 weight management. Just 12 min away. Book now!",
     driveTime: "~12 min drive",
     driveMinutes: 12,
     latitude: 47.4436,
@@ -422,7 +422,9 @@ The Landing area is the heart of Renton's waterfront revitalization, with easy a
 
 Every service at Rani Beauty Clinic is performed under the supervision of Dr. Alexander Landfield, our board-certified Medical Director. SeaTac clients visit us for laser hair removal with the Candela GentleMax Pro Plus, HydraFacial MD treatments for deep hydration and glow, Botox and dermal fillers for facial rejuvenation, and our physician-supervised GLP-1 weight management program with Semaglutide and Tirzepatide. In-house blood work and personalized dosing make our weight management program a seamless experience for SeaTac residents.
 
-SeaTac is a hardworking, diverse community anchored by Seattle-Tacoma International Airport and the growing Angle Lake neighborhood near the light rail station. We are proud to provide SeaTac residents with accessible, medically guided care in a welcoming environment. Our clinic is open seven days a week, 10 AM to 7 PM, with free parking on-site. Call (425) 539-4440 or book online to schedule your visit.`,
+For SeaTac patients who have experienced skin changes after GLP-1 weight loss, Rani Beauty Clinic offers advanced non-surgical skin tightening with Sofwave ultrasound and RF microneedling. Our signature Reveal protocol combines both technologies to address loose skin, volume loss, and textural changes that commonly follow significant weight loss — restoring firmness and confidence without surgery or extended downtime. Whether you are dealing with facial laxity, neck sagging, or body skin concerns after weight loss, our team designs a personalized restoration plan for your specific needs.
+
+SeaTac is a hardworking, diverse community anchored by Seattle-Tacoma International Airport and the growing Angle Lake neighborhood near the light rail station. With easy access via the Link Light Rail Angle Lake Station and direct routes along International Boulevard, reaching our Renton clinic is convenient for the entire SeaTac community. We are proud to provide SeaTac residents with accessible, medically guided care in a welcoming environment. Our clinic is open seven days a week, 10 AM to 7 PM, with free parking on-site. Call (425) 539-4440 or book online to schedule your visit.`,
   },
   {
     slug: "burien-wa",
@@ -430,7 +432,7 @@ SeaTac is a hardworking, diverse community anchored by Seattle-Tacoma Internatio
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Burien, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Burien, WA | Renton, WA Medspa",
     metaDescription:
       "Serving Burien, WA — Rani Beauty Clinic offers Botox, laser hair removal, HydraFacial, and GLP-1 weight loss under physician supervision. Only 15 minutes away!",
     driveTime: "~15 min drive",
@@ -450,9 +452,9 @@ Burien is a welcoming, culturally rich community known for its eclectic dining s
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Covington, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Covington, WA | Skin Tightening & GLP-1 | Rani Beauty Clinic",
     metaDescription:
-      "Rani Beauty Clinic serves Covington, WA with Botox, laser hair removal, HydraFacial, and physician-supervised GLP-1 weight management. About a 20-minute drive. Book now!",
+      "Rani Beauty Clinic serves Covington, WA with Sofwave skin tightening, Botox, laser hair removal, HydraFacial, and physician-supervised GLP-1 weight management. 20 min drive. Book now!",
     driveTime: "~20 min drive",
     driveMinutes: 20,
     latitude: 47.3580,
@@ -462,7 +464,9 @@ Burien is a welcoming, culturally rich community known for its eclectic dining s
 
 Dr. Alexander Landfield, our board-certified Medical Director, oversees every medical treatment at Rani Beauty Clinic, providing Covington clients with genuine physician-supervised care. Our most popular services among Covington visitors include laser hair removal with the Candela GentleMax Pro Plus for all skin types, HydraFacial MD for deep cleansing and instant glow, Botox and dermal fillers for natural rejuvenation, and our GLP-1 weight management program with Semaglutide and Tirzepatide. In-house blood work and custom dosing make the weight management process convenient and personalized.
 
-Covington is a rapidly growing community surrounded by the natural beauty of the foothills, with access to Lake Wilderness and Jenkins Creek Trail. We are delighted to serve Covington residents who value quality care in a welcoming, medically rigorous environment. Our clinic is open seven days a week, 10 AM to 7 PM, with free parking available. Call (425) 539-4440 or book your appointment online today.`,
+Covington clients on GLP-1 medications are increasingly seeking solutions for skin changes that accompany significant weight loss. Rani Beauty Clinic offers the South King County region's most advanced non-surgical skin tightening options, including Sofwave ultrasound, Secret RF microneedling, and our signature Reveal protocol — a dual-technology approach specifically designed to restore skin firmness and quality after weight loss. From facial laxity and jowling to loose skin on the abdomen and arms, our team creates personalized restoration plans that address what surgery cannot always justify.
+
+Covington is a rapidly growing community surrounded by the natural beauty of the foothills, with access to Lake Wilderness, Jenkins Creek Trail, and the popular Covington Farmers Market. Families and professionals choosing Covington for its blend of suburban convenience and natural landscape deserve access to quality aesthetic care without driving to Seattle or Bellevue. We are delighted to serve Covington residents who value results-driven care in a welcoming, medically rigorous environment. Our clinic is open seven days a week, 10 AM to 7 PM, with free parking available. Call (425) 539-4440 or book your appointment online today.`,
   },
   {
     slug: "maple-valley-wa",
@@ -470,9 +474,9 @@ Covington is a rapidly growing community surrounded by the natural beauty of the
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Maple Valley, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Maple Valley, WA | Skin Tightening & GLP-1 | Rani Beauty Clinic",
     metaDescription:
-      "Serving Maple Valley, WA — Rani Beauty Clinic offers laser hair removal, Botox, HydraFacial, and GLP-1 weight loss with physician supervision. About 22 minutes away!",
+      "Serving Maple Valley, WA — Rani Beauty Clinic offers Sofwave skin tightening, laser hair removal, Botox, HydraFacial, and GLP-1 weight loss with physician supervision. 22 min away!",
     driveTime: "~20 min drive",
     driveMinutes: 20,
     latitude: 47.3925,
@@ -482,7 +486,9 @@ Covington is a rapidly growing community surrounded by the natural beauty of the
 
 At Rani Beauty Clinic, all treatments are supervised by Dr. Alexander Landfield, our board-certified Medical Director. Maple Valley clients choose us for laser hair removal with the Candela GentleMax Pro Plus, HydraFacial MD for rejuvenated and hydrated skin, Botox for fine lines and wrinkles, and our GLP-1 weight management program featuring Semaglutide and Tirzepatide with in-house blood work and personalized dosing. Our physician-supervised approach ensures that every treatment is safe, effective, and tailored to your individual needs.
 
-Maple Valley is a picturesque community nestled among forests and farmland, known for its annual Maple Valley Days festival, the Cedar River Trail, and a strong sense of small-town community. Rani Beauty Clinic is proud to serve Maple Valley residents who want premium medspa care without traveling to Seattle or Bellevue. We are open seven days a week, 10 AM to 7 PM, with free parking on-site. Call (425) 539-4440 or book online to schedule your consultation.`,
+As more Maple Valley residents achieve weight loss success with GLP-1 medications, many are discovering that their skin hasn't kept pace with their transformation. Rani Beauty Clinic specializes in non-surgical skin restoration for post-weight-loss patients, offering Sofwave ultrasound tightening, Secret RF microneedling, and our signature Reveal protocol — a physician-supervised, dual-technology approach that addresses loose skin at multiple depths. Whether you are experiencing facial volume loss, neck laxity, or body skin concerns after losing 30, 50, or 100+ pounds, our team creates a personalized plan to help your skin match the body you have worked so hard to achieve.
+
+Maple Valley is a picturesque community nestled among forests and farmland, known for its annual Maple Valley Days festival, the Cedar River Trail, and a strong sense of small-town community. From the Four Corners commercial district to the scenic neighborhoods bordering the Green River Gorge, Maple Valley residents value quality, authenticity, and results. Rani Beauty Clinic is proud to serve this community with premium medspa care without the drive to Seattle or Bellevue. We are open seven days a week, 10 AM to 7 PM, with free parking on-site. Call (425) 539-4440 or book online to schedule your consultation.`,
   },
   {
     slug: "des-moines-wa",
@@ -490,7 +496,7 @@ Maple Valley is a picturesque community nestled among forests and farmland, know
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Des Moines, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Des Moines, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic serves Des Moines, WA with Botox, laser hair removal, HydraFacial, and physician-supervised GLP-1 weight management. About 18 minutes away!",
     driveTime: "~18 min drive",
@@ -510,7 +516,7 @@ Des Moines is a waterfront gem known for its stunning marina, fresh seafood, and
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Pacific, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Pacific, WA | Renton, WA Medspa",
     metaDescription:
       "Serving Pacific, WA — Rani Beauty Clinic offers laser hair removal, Botox, HydraFacial, and GLP-1 weight loss with physician supervision. About 25 minutes away!",
     driveTime: "~18 min drive",
@@ -530,7 +536,7 @@ Pacific is a close-knit community with a small-town character, situated along th
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Algona, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Algona, WA | Renton, WA Medspa",
     metaDescription:
       "Rani Beauty Clinic serves Algona, WA with laser hair removal, Botox, HydraFacial, and physician-supervised GLP-1 weight management. About 18 minutes away. Book now!",
     driveTime: "~12 min drive",
@@ -550,7 +556,7 @@ Algona is a quiet, tight-knit community nestled between Auburn and Pacific in th
     state: "WA",
     region: "south-king",
     metaTitle:
-      "Medspa Near Black Diamond, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Black Diamond, WA | Renton, WA Medspa",
     metaDescription:
       "Serving Black Diamond, WA — Rani Beauty Clinic offers Botox, laser hair removal, HydraFacial, and GLP-1 weight loss with physician supervision. About 30 min away!",
     driveTime: "~25 min drive",
