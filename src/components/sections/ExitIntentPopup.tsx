@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Phone, Star } from "lucide-react";
+import { clinicInfo } from "@/data/clinic-info";
 
 const SESSION_KEY = "rani-exit-intent-shown";
 const MIN_TIME_ON_PAGE_MS = 10_000;
@@ -115,36 +116,54 @@ export default function ExitIntentPopup() {
             <div className="text-center">
               {/* Sparkles Icon */}
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rani-gold/20">
-                <Sparkles className="h-7 w-7 text-rani-gold" />
+                <Phone className="h-7 w-7 text-rani-gold" />
               </div>
 
               {/* Headline */}
               <h2 className="font-heading text-2xl font-bold leading-tight text-rani-navy sm:text-3xl">
-                Wait — Your Perfect Treatment Plan is Just 60 Seconds Away
+                Before You Go — Free Phone Consultation
               </h2>
 
               {/* Subtext */}
               <p className="mt-4 font-body text-base leading-relaxed text-gray-600">
-                Take our quick treatment quiz and discover which of our 25+
-                physician-supervised treatments is right for your goals.
+                Not sure which treatment is right for you? Schedule a free phone
+                consultation with our team — no commitment, no pressure.
               </p>
+
+              {/* Social proof */}
+              <div className="mt-4 flex items-center justify-center gap-1.5">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-rani-gold text-rani-gold" />
+                  ))}
+                </div>
+                <span className="font-body text-sm font-semibold text-rani-navy">
+                  {clinicInfo.reviews.aggregateRating}
+                </span>
+                <span className="font-body text-sm text-gray-500">
+                  ({clinicInfo.reviews.reviewCount}+ reviews)
+                </span>
+              </div>
 
               {/* CTAs */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <button
-                  onClick={handleQuizClick}
+                <a
+                  href={clinicInfo.consultation.url}
+                  onClick={handleClose}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-rani-gold px-8 py-3.5 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy transition-all hover:bg-rani-gold/90 hover:shadow-lg"
                 >
                   <Sparkles className="h-4 w-4" />
-                  Take the Quiz
-                </button>
+                  Book Free Consultation
+                </a>
 
-                <button
+                <a
+                  href={clinicInfo.phoneTel}
                   onClick={handleClose}
-                  className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-transparent px-8 py-3.5 font-body text-sm font-semibold uppercase tracking-wider text-gray-500 transition-all hover:border-rani-navy hover:text-rani-navy"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-rani-navy/20 bg-transparent px-8 py-3.5 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy transition-all hover:border-rani-navy hover:bg-rani-navy/5"
                 >
-                  Maybe Later
-                </button>
+                  <Phone className="h-4 w-4" />
+                  Call Now
+                </a>
               </div>
             </div>
           </motion.div>

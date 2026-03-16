@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -8,6 +9,9 @@ import ScrollProgress from "@/components/layout/ScrollProgress";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import ExitIntentPopup from "@/components/sections/ExitIntentPopup";
 import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
+import ConditionalPublicLayout from "@/components/layout/ConditionalPublicLayout";
+import AIChatWidget from "@/components/AIChatWidget";
+import SocialProofToast from "@/components/sections/SocialProofToast";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -82,16 +86,30 @@ export default function RootLayout({
     <html lang="en" className={`${montserrat.variable} ${playfairDisplay.variable}`}>
       <head>
         <Analytics />
+        {/* Mangomint Online Booking Widget — enables overlay booking on ranibeautyclinic.com */}
+        <Script id="mangomint-config" strategy="afterInteractive">
+          {`window.Mangomint = window.Mangomint || {}; window.Mangomint.CompanyId = 876418;`}
+        </Script>
+        <Script
+          src="https://booking.mangomint.com/app.js"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="font-body text-rani-text antialiased">
-        <GTMNoScript />
-        <ScrollProgress />
-        <Navbar />
+        <ConditionalPublicLayout>
+          <GTMNoScript />
+          <ScrollProgress />
+          <Navbar />
+        </ConditionalPublicLayout>
         <main className="min-h-screen">{children}</main>
-        <Footer />
-        <MobileCTA />
-        <ScrollToTop />
-        <ExitIntentPopup />
+        <ConditionalPublicLayout>
+          <Footer />
+          <MobileCTA />
+          <ScrollToTop />
+          <ExitIntentPopup />
+          <SocialProofToast />
+          <AIChatWidget />
+        </ConditionalPublicLayout>
       </body>
     </html>
   );

@@ -18,6 +18,7 @@ import StructuredData from "@/components/seo/StructuredData";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 import { costPages } from "@/data/cost-pages";
+import { getServiceForCostPage, getComparisonsForService, getConcernsForService } from "@/data/internal-links";
 
 interface PageProps {
   params: { slug: string };
@@ -369,26 +370,52 @@ export default function CostPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── Learn More Link ──────────────────────────────────────── */}
-      <section className="bg-white py-12">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <FadeInOnScroll>
-            <div className="flex items-center justify-center gap-2">
-              <Sparkles size={18} className="text-rani-gold" />
-              <p className="font-body text-base text-rani-text">
-                Want to learn more about the treatment itself?
-              </p>
+      {/* ── Cross Links ──────────────────────────────────────────── */}
+      {(() => {
+        const svc = getServiceForCostPage(page.slug);
+        const comparisons = svc ? getComparisonsForService(svc.slug) : [];
+        const concerns = svc ? getConcernsForService(svc.slug) : [];
+        return (
+          <section className="bg-white py-12">
+            <div className="mx-auto max-w-4xl px-6">
+              <div className="flex flex-wrap justify-center gap-3">
+                {svc && (
+                  <Link
+                    href={`${svc.basePath}/${svc.slug}`}
+                    className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                  >
+                    About {page.service} →
+                  </Link>
+                )}
+                {comparisons.map((comp) => (
+                  <Link
+                    key={comp.slug}
+                    href={`/compare/${comp.slug}`}
+                    className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                  >
+                    {comp.treatmentA} vs {comp.treatmentB} →
+                  </Link>
+                ))}
+                {concerns.map((concern) => (
+                  <Link
+                    key={concern.slug}
+                    href={`/concerns/${concern.slug}`}
+                    className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                  >
+                    {concern.title} →
+                  </Link>
+                ))}
+                <Link
+                  href="/contact"
+                  className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                >
+                  Visit Our Clinic →
+                </Link>
+              </div>
             </div>
-            <a
-              href={clinicInfo.booking.url}
-              className="mt-3 inline-flex items-center gap-2 font-body text-base font-semibold text-rani-navy transition-colors hover:text-rani-gold"
-            >
-              Book a consultation
-              <ChevronRight size={16} />
-            </a>
-          </FadeInOnScroll>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* ── Trust Badges ─────────────────────────────────────────── */}
       <section className="bg-rani-cream py-8">

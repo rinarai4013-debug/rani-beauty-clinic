@@ -16,6 +16,8 @@ import { motion } from "framer-motion";
 import { staggerItem } from "@/components/animations/StaggerChildren";
 import { getServiceImage } from "@/data/service-images";
 import { galleryPages } from "@/data/results/gallery";
+import { testimonials } from "@/data/testimonials";
+import { getConcernsForService, getComparisonsForService } from "@/data/internal-links";
 
 /** Maps service slug → cost page slug (only for services that have a cost page) */
 const COST_SLUG_MAP: Record<string, string> = {
@@ -96,28 +98,97 @@ export default function ServicePageTemplate({
     })),
   };
 
+  const serviceUrl = `https://ranibeautyclinic.com${basePath}/${service.slug}`;
+  const serviceImage = serviceImageData?.image
+    ? `https://ranibeautyclinic.com${serviceImageData.image}`
+    : "https://ranibeautyclinic.com/images/logo/logo-dark.png";
+
   const serviceStructuredData = {
     "@context": "https://schema.org",
-    "@type": "Service",
+    "@type": "MedicalProcedure",
     name: service.title,
     description: service.shortDescription,
+    url: serviceUrl,
+    image: serviceImage,
+    procedureType: "https://health-lifesci.schema.org/NoninvasiveProcedure",
+    howPerformed: service.howItWorks.map((s) => s.description).join(" "),
     provider: {
       "@type": "MedicalBusiness",
       name: clinicInfo.name,
+      telephone: clinicInfo.phone,
+      url: clinicInfo.website,
       address: {
         "@type": "PostalAddress",
         streetAddress: clinicInfo.address.street,
         addressLocality: clinicInfo.address.city,
         addressRegion: clinicInfo.address.state,
         postalCode: clinicInfo.address.zip,
+        addressCountry: "US",
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: clinicInfo.geo.latitude,
+        longitude: clinicInfo.geo.longitude,
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: clinicInfo.reviews.aggregateRating,
+        reviewCount: clinicInfo.reviews.reviewCount,
+        bestRating: 5,
       },
     },
+    areaServed: {
+      "@type": "State",
+      name: "Washington",
+    },
+  };
+
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://ranibeautyclinic.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: service.isWellness ? "Medical Wellness" : "Services",
+        item: `https://ranibeautyclinic.com${basePath}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: service.title,
+        item: serviceUrl,
+      },
+    ],
   };
 
   return (
     <>
       <StructuredData data={faqStructuredData} />
       <StructuredData data={serviceStructuredData} />
+      <StructuredData data={breadcrumbStructuredData} />
+      {service.howItWorks.length > 0 && (
+        <StructuredData
+          data={{
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            name: `How ${service.title} Works at Rani Beauty Clinic`,
+            description: service.shortDescription,
+            step: service.howItWorks.map((step, i) => ({
+              "@type": "HowToStep",
+              position: i + 1,
+              name: step.step,
+              text: step.description,
+            })),
+          }}
+        />
+      )}
 
       {/* Hero — with service image background */}
       <Hero
@@ -278,6 +349,86 @@ export default function ServicePageTemplate({
           </FadeInOnScroll>
         </div>
       </section>
+
+      {/* Social Proof — Google Reviews */}
+      {(() => {
+        const serviceReviews = testimonials.filter(
+          (t) => t.treatmentSlug === service.slug
+        );
+        const displayReviews = serviceReviews.length > 0
+          ? serviceReviews
+          : testimonials.filter((t) => t.verified).slice(0, 2);
+        return displayReviews.length > 0 ? (
+          <section className="bg-rani-cream py-16 md:py-20">
+            <div className="mx-auto max-w-4xl px-6">
+              <FadeInOnScroll>
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm">
+                    <span className="font-body text-sm font-bold text-rani-navy">
+                      {clinicInfo.reviews.aggregateRating}
+                    </span>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg key={star} className="h-4 w-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="font-body text-sm text-rani-muted">
+                      {clinicInfo.reviews.reviewCount}+ verified reviews
+                    </span>
+                  </div>
+                </div>
+              </FadeInOnScroll>
+              <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+                {displayReviews.map((review) => (
+                  <FadeInOnScroll key={review.id}>
+                    <div className="rounded-xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                      <div className="flex gap-0.5 mb-3">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <svg key={star} className="h-4 w-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <p className="font-body text-sm text-rani-text leading-relaxed line-clamp-4">
+                        &ldquo;{review.text}&rdquo;
+                      </p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <div>
+                          <p className="font-body text-sm font-semibold text-rani-navy">
+                            {review.name}
+                          </p>
+                          {review.location && (
+                            <p className="font-body text-xs text-rani-muted">
+                              {review.location}
+                            </p>
+                          )}
+                        </div>
+                        <span className="font-body text-xs text-rani-muted">
+                          {review.verified && "Verified"} · {review.date}
+                        </span>
+                      </div>
+                    </div>
+                  </FadeInOnScroll>
+                ))}
+              </div>
+              <FadeInOnScroll delay={0.2}>
+                <p className="mt-6 text-center">
+                  <a
+                    href={clinicInfo.social.google}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-body text-sm font-semibold text-rani-gold hover:underline"
+                  >
+                    Read all {clinicInfo.reviews.reviewCount}+ reviews on Google &rarr;
+                  </a>
+                </p>
+              </FadeInOnScroll>
+            </div>
+          </section>
+        ) : null;
+      })()}
 
       {/* Why Rani */}
       <section className="bg-rani-cream py-20 md:py-28">
@@ -484,6 +635,24 @@ export default function ServicePageTemplate({
                 Before & After →
               </Link>
             )}
+            {getConcernsForService(service.slug).map((concern) => (
+              <Link
+                key={concern.slug}
+                href={`/concerns/${concern.slug}`}
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+              >
+                {concern.title} →
+              </Link>
+            ))}
+            {getComparisonsForService(service.slug).map((comp) => (
+              <Link
+                key={comp.slug}
+                href={`/compare/${comp.slug}`}
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+              >
+                {comp.treatmentA} vs {comp.treatmentB} →
+              </Link>
+            ))}
             <Link
               href="/contact"
               className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"

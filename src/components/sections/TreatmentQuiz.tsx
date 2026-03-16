@@ -59,6 +59,7 @@ export default function TreatmentQuiz() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState("");
+  const [aiRecommendation, setAiRecommendation] = useState<Record<string, unknown> | null>(null);
 
   const progress = ((currentStep + 1) / TOTAL_STEPS) * 100;
   const isContactStep = currentStep === quizSteps.length;
@@ -110,6 +111,7 @@ export default function TreatmentQuiz() {
     };
 
     try {
+      // Submit contact form
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,14 +122,26 @@ export default function TreatmentQuiz() {
         throw new Error("Submission failed");
       }
 
-      setIsComplete(true);
+      // Fetch AI recommendation
+      try {
+        const aiRes = await fetch("/api/ai/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            primaryGoal: answers[0],
+            experience: answers[1],
+            timeline: answers[2],
+          }),
+        });
+        if (aiRes.ok) {
+          const aiData = await aiRes.json();
+          setAiRecommendation(aiData.recommendation);
+        }
+      } catch {
+        // AI recommendation is optional — continue without it
+      }
 
-      setTimeout(() => {
-        window.open(
-          "https://form.typeform.com/to/rani-consultation",
-          "_blank"
-        );
-      }, 3000);
+      setIsComplete(true);
     } catch {
       setError(
         "Something went wrong. Please try again or contact us directly."
@@ -199,15 +213,48 @@ export default function TreatmentQuiz() {
             </div>
 
             <h2 className="font-heading text-3xl font-bold text-white sm:text-4xl">
-              You&apos;re All Set!
+              {aiRecommendation ? "Your AI Treatment Plan" : "You're All Set!"}
             </h2>
 
-            <p className="mx-auto mt-4 max-w-md font-body text-lg leading-relaxed text-white/70">
-              Thank you, {name.split(" ")[0]}! Your personalized treatment plan
-              is on its way to{" "}
-              <span className="text-rani-gold">{email}</span>. We&apos;re also
-              opening our consultation booking page for you.
-            </p>
+            {aiRecommendation ? (
+              <div className="mt-6 space-y-4 text-left">
+                {typeof (aiRecommendation as Record<string, unknown>).personalNote === "string" && (
+                  <p className="font-body text-base text-white/70 text-center mb-6">
+                    {String((aiRecommendation as Record<string, unknown>).personalNote)}
+                  </p>
+                )}
+                {['good', 'better', 'best'].map((tier) => {
+                  const plan = (aiRecommendation as Record<string, Record<string, unknown>>)[tier];
+                  if (!plan) return null;
+                  return (
+                    <div key={tier} className="rounded-xl border border-rani-gold/20 bg-white/5 p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-body font-semibold uppercase tracking-wider text-rani-gold">
+                          {tier === 'good' ? 'Good' : tier === 'better' ? 'Better' : 'Best'}
+                        </span>
+                        <span className="text-sm font-body text-white/50">{String(plan.totalEstimate || '')}</span>
+                      </div>
+                      <p className="font-heading text-lg text-white mb-2">{String(plan.title || '')}</p>
+                      {Array.isArray(plan.services) && (
+                        <ul className="space-y-1">
+                          {(plan.services as Array<{ name: string; price: string; why: string }>).map((s, i) => (
+                            <li key={i} className="text-sm font-body text-white/60">
+                              <span className="text-white/80">{s.name}</span> ({s.price}) — {s.why}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="mx-auto mt-4 max-w-md font-body text-lg leading-relaxed text-white/70">
+                Thank you, {name.split(" ")[0]}! Your personalized treatment plan
+                is on its way to{" "}
+                <span className="text-rani-gold">{email}</span>.
+              </p>
+            )}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <a

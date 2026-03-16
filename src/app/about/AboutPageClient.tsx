@@ -77,8 +77,10 @@ const physicianStructuredData = {
   "@context": "https://schema.org",
   "@type": "Physician",
   name: "Dr. Alexander Landfield",
+  url: "https://ranibeautyclinic.com/team/dr-landfield",
   medicalSpecialty: "Neurology",
   jobTitle: "Medical Director",
+  description: clinicInfo.medicalDirector.shortBio,
   worksFor: {
     "@type": "MedicalBusiness",
     name: clinicInfo.name,
@@ -95,10 +97,75 @@ const physicianStructuredData = {
   },
 };
 
+const organizationStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  name: clinicInfo.name,
+  url: clinicInfo.website,
+  logo: "https://ranibeautyclinic.com/images/logo/logo-dark.png",
+  image: "https://ranibeautyclinic.com/images/logo/logo-dark.png",
+  description:
+    "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections, hormone therapy and more.",
+  telephone: clinicInfo.phone,
+  email: clinicInfo.email,
+  priceRange: "$$$",
+  foundingDate: "2022",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: clinicInfo.address.street,
+    addressLocality: clinicInfo.address.city,
+    addressRegion: clinicInfo.address.state,
+    postalCode: clinicInfo.address.zip,
+    addressCountry: "US",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: clinicInfo.geo.latitude,
+    longitude: clinicInfo.geo.longitude,
+  },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+    opens: "10:00",
+    closes: "19:00",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: clinicInfo.reviews.aggregateRating,
+    reviewCount: clinicInfo.reviews.reviewCount,
+    bestRating: 5,
+  },
+  sameAs: [
+    clinicInfo.social.instagram,
+    clinicInfo.social.facebook,
+    clinicInfo.social.tiktok,
+    clinicInfo.social.google,
+  ],
+  medicalSpecialty: [
+    "Dermatology",
+    "PlasticSurgery",
+  ],
+  employee: {
+    "@type": "Physician",
+    name: "Dr. Alexander Landfield",
+    jobTitle: "Medical Director",
+    medicalSpecialty: "Neurology",
+  },
+};
+
 export default function AboutPageClient() {
   return (
     <>
       <StructuredData data={physicianStructuredData} />
+      <StructuredData data={organizationStructuredData} />
 
       {/* Hero */}
       <Hero

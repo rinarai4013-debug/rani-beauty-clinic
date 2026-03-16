@@ -11,6 +11,7 @@ import StructuredData from "@/components/seo/StructuredData";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 import { comparisonPages } from "@/data/comparisons";
+import { getCostSlugForService, getConcernsForService } from "@/data/internal-links";
 
 interface PageProps {
   params: { slug: string };
@@ -468,6 +469,57 @@ export default function ComparePage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* Cross Links */}
+      {(() => {
+        const slugA = page.relatedServiceA?.split("/").pop() || "";
+        const slugB = page.relatedServiceB?.split("/").pop() || "";
+        const costA = slugA ? getCostSlugForService(slugA) : null;
+        const costB = slugB ? getCostSlugForService(slugB) : null;
+        const concernsA = slugA ? getConcernsForService(slugA) : [];
+        const concernsB = slugB ? getConcernsForService(slugB) : [];
+        const allConcerns = [...concernsA, ...concernsB];
+        const seen = new Set<string>();
+        const uniqueConcerns = allConcerns.filter((c) => {
+          if (seen.has(c.slug)) return false;
+          seen.add(c.slug);
+          return true;
+        });
+        if (!costA && !costB && uniqueConcerns.length === 0) return null;
+        return (
+          <section className="bg-rani-cream py-12">
+            <div className="mx-auto max-w-4xl px-6">
+              <div className="flex flex-wrap justify-center gap-3">
+                {costA && (
+                  <Link
+                    href={`/cost/${costA}`}
+                    className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                  >
+                    {page.treatmentA} Cost →
+                  </Link>
+                )}
+                {costB && costB !== costA && (
+                  <Link
+                    href={`/cost/${costB}`}
+                    className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                  >
+                    {page.treatmentB} Cost →
+                  </Link>
+                )}
+                {uniqueConcerns.slice(0, 3).map((concern) => (
+                  <Link
+                    key={concern.slug}
+                    href={`/concerns/${concern.slug}`}
+                    className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                  >
+                    {concern.title} →
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* CTA Banner */}
       <CTABanner

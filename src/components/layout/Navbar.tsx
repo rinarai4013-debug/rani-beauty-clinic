@@ -18,6 +18,7 @@ const aestheticLinks = [
   { name: "Laser Acne Facial", href: "/services/laser-acne-facial", desc: "Target acne at the source" },
   { name: "Chemical Peels", href: "/services/chemical-peels", desc: "Medical-grade skin renewal" },
   { name: "AI Skin Analysis", href: "/services/ai-skin-analysis", desc: "Personalized treatment roadmap" },
+  { name: "Skin Concerns", href: "/concerns", desc: "Acne, aging, pigmentation & more" },
 ];
 
 const wellnessLinks = [
@@ -72,10 +73,17 @@ export default function Navbar() {
         <div className="bg-rani-gold px-4 py-2.5 text-center font-body text-sm font-medium text-rani-navy">
           <div className="mx-auto flex max-w-7xl items-center justify-center gap-3">
             <Sparkles size={14} className="shrink-0" />
-            <span>Personalized Consultation — $150 Deposit Applies to Your Treatment</span>
+            <span className="hidden sm:inline">Free Phone Consultation Available — Or Book In-Person ($150 deposit applies to treatment)</span>
+            <span className="sm:hidden">Free Phone Consultation Available</span>
+            <a
+              href={clinicInfo.phoneTel}
+              className="inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70 sm:hidden"
+            >
+              Call Now &rarr;
+            </a>
             <a
               href={clinicInfo.consultation.url}
-              className="inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70"
+              className="hidden sm:inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70"
             >
               Reserve Your Spot &rarr;
             </a>

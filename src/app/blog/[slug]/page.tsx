@@ -69,20 +69,31 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
   const articleStructuredData = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     description: post.metaDescription,
+    url: `https://ranibeautyclinic.com/blog/${post.slug}`,
+    inLanguage: "en-US",
     author: {
       "@type": "Person",
       name: post.author,
+      jobTitle: post.authorCredentials,
     },
     publisher: {
       "@type": "Organization",
       name: "Rani Beauty Clinic",
       url: "https://ranibeautyclinic.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://ranibeautyclinic.com/images/logo/logo-dark.png",
+      },
     },
     datePublished: post.date,
     articleSection: post.category,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://ranibeautyclinic.com/blog/${post.slug}`,
+    },
   };
 
   return (

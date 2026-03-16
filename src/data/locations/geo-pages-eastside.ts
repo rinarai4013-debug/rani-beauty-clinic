@@ -7,7 +7,7 @@ export const eastsideAndSeattlePages: GeoPage[] = [
     city: "Kirkland",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Kirkland, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Kirkland, WA | Renton, WA Medspa",
     metaDescription:
       "Kirkland, WA residents: Rani Beauty Clinic in Renton offers Botox, HydraFacial, RF microneedling, and GLP-1 weight management under physician supervision. Only ~20 min away.",
     driveTime: "~25 min drive",
@@ -26,7 +26,7 @@ Beyond aesthetics, our medical wellness services include GLP-1 weight management
     city: "Redmond",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Redmond, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Redmond, WA | Renton, WA Medspa",
     metaDescription:
       "Redmond, WA residents trust Rani Beauty Clinic in Renton for laser hair removal, Botox, peptide therapy, and physician-supervised medical wellness. About a 25-minute drive.",
     driveTime: "~25 min drive",
@@ -45,7 +45,7 @@ Our medical wellness offerings are equally compelling for Redmond residents. Pep
     city: "Issaquah",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Issaquah, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Issaquah, WA | Renton, WA Medspa",
     metaDescription:
       "Issaquah, WA residents: Rani Beauty Clinic in Renton offers RF microneedling, HydraFacial, GLP-1 weight loss, and physician-supervised wellness. Approximately a 22-minute drive.",
     driveTime: "~20 min drive",
@@ -64,7 +64,7 @@ Issaquah clients also turn to us for GLP-1 weight management through The Rani Pr
     city: "Sammamish",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Sammamish, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Sammamish, WA | Renton, WA Medspa",
     metaDescription:
       "Sammamish, WA residents: Rani Beauty Clinic offers Botox, laser hair removal, GLP-1 weight management, and physician-supervised aesthetic care. About a 30-minute drive to Renton.",
     driveTime: "~25 min drive",
@@ -83,7 +83,7 @@ Our medical wellness services are a major draw for the Sammamish community. The 
     city: "Woodinville",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Woodinville, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Woodinville, WA | Renton, WA Medspa",
     metaDescription:
       "Woodinville, WA residents: Rani Beauty Clinic in Renton provides HydraFacial, Botox, laser treatments, and GLP-1 physician-supervised wellness. Approximately a 30-minute drive.",
     driveTime: "~30 min drive",
@@ -102,7 +102,7 @@ For wellness, our GLP-1 weight management program provides physician-supervised 
     city: "Factoria",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Factoria, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Factoria, WA | Renton, WA Medspa",
     metaDescription:
       "Factoria residents: Rani Beauty Clinic is just 12 minutes away in Renton. Offering laser hair removal, HydraFacial, Botox, GLP-1 weight loss, and physician-supervised wellness.",
     driveTime: "~12 min drive",
@@ -121,7 +121,7 @@ Factoria clients also take advantage of our medical wellness offerings, includin
     city: "Crossroads",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Crossroads, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Crossroads, WA | Renton, WA Medspa",
     metaDescription:
       "Crossroads Bellevue residents: Rani Beauty Clinic in Renton offers RF microneedling, Botox, HydraFacial, and physician-supervised GLP-1 weight loss. Only ~18 minutes away.",
     driveTime: "~18 min drive",
@@ -141,7 +141,7 @@ Our medical wellness menu — including GLP-1 weight management through The Rani
     state: "WA",
     region: "eastside",
     metaTitle:
-      "Medspa Near Newport Hills, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Newport Hills, WA | Renton, WA Medspa",
     metaDescription:
       "Newport Hills residents: Rani Beauty Clinic in Renton is only 12 minutes away. Offering Botox, chemical peels, laser hair removal, GLP-1, and physician-supervised care.",
     driveTime: "~12 min drive",
@@ -160,7 +160,7 @@ Our wellness services round out the experience. The Rani Protocol offers physici
     city: "Eastgate",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Eastgate, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Eastgate, WA | Renton, WA Medspa",
     metaDescription:
       "Eastgate residents: Rani Beauty Clinic in Renton is approximately 14 minutes away. Physician-supervised HydraFacial, laser treatments, Botox, GLP-1, and medical wellness.",
     driveTime: "~12 min drive",
@@ -179,7 +179,7 @@ Our medical wellness offerings serve the Eastgate community with equal precision
     city: "Clyde Hill",
     state: "WA",
     region: "eastside",
-    metaTitle: "Medspa Near Clyde Hill, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Clyde Hill, WA | Renton, WA Medspa",
     metaDescription:
       "Clyde Hill, WA residents: Rani Beauty Clinic in Renton delivers physician-supervised Botox, dermal fillers, HydraFacial, and GLP-1 weight management. About an 18-minute drive.",
     driveTime: "~18 min drive",
@@ -201,7 +201,7 @@ Clyde Hill residents also choose Rani Beauty Clinic for medical wellness. Our GL
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Beacon Hill, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Beacon Hill, WA | Renton, WA Medspa",
     metaDescription:
       "Beacon Hill, Seattle residents: Rani Beauty Clinic in Renton offers laser hair removal, Botox, HydraFacial, and GLP-1 weight management with physician supervision. ~15 min drive.",
     driveTime: "~18 min drive",
@@ -221,7 +221,7 @@ Our medical wellness services, including GLP-1 weight management through The Ran
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Columbia City, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Columbia City, WA | Renton, WA Medspa",
     metaDescription:
       "Columbia City, Seattle residents: Rani Beauty Clinic offers RF microneedling, Botox, HydraFacial, and physician-supervised GLP-1 wellness. Just ~15 minutes south in Renton.",
     driveTime: "~15 min drive",
@@ -241,7 +241,7 @@ Columbia City residents also benefit from our medical wellness programs. The Ran
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Rainier Beach, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Rainier Beach, WA | Renton, WA Medspa",
     metaDescription:
       "Rainier Beach, Seattle residents: Rani Beauty Clinic in Renton is only ~12 min away. Laser hair removal, HydraFacial, Botox, GLP-1, and physician-supervised wellness services.",
     driveTime: "~12 min drive",
@@ -261,7 +261,7 @@ Our wellness services include GLP-1 weight management through The Rani Protocol,
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Georgetown, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Georgetown, WA | Renton, WA Medspa",
     metaDescription:
       "Georgetown, Seattle residents: Rani Beauty Clinic in Renton offers physician-supervised Botox, laser treatments, HydraFacial, and GLP-1 weight management. Only ~12 min away.",
     driveTime: "~15 min drive",
@@ -280,7 +280,7 @@ Medical wellness is another reason Georgetown clients visit us. The Rani Protoco
     city: "SoDo",
     state: "WA",
     region: "seattle",
-    metaTitle: "Medspa Near SoDo, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near SoDo, WA | Renton, WA Medspa",
     metaDescription:
       "SoDo, Seattle residents: Rani Beauty Clinic in Renton provides Botox, RF microneedling, HydraFacial, GLP-1 weight loss, and physician-supervised medical wellness. ~15 min drive.",
     driveTime: "~18 min drive",
@@ -300,7 +300,7 @@ Beyond aesthetics, SoDo residents turn to us for medical wellness. The Rani Prot
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Central District, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Central District, WA | Renton, WA Medspa",
     metaDescription:
       "Central District, Seattle residents: Rani Beauty Clinic offers laser hair removal, Botox, HydraFacial, and physician-supervised GLP-1 wellness. About 18 minutes from Renton.",
     driveTime: "~20 min drive",
@@ -320,7 +320,7 @@ Central District residents benefit from our full medical wellness menu, includin
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near International District, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near International District, WA | Renton, WA Medspa",
     metaDescription:
       "International District, Seattle: Rani Beauty Clinic in Renton offers HydraFacial, Botox, laser treatments, GLP-1 weight management, and physician-supervised wellness. ~15 min drive.",
     driveTime: "~18 min drive",
@@ -340,7 +340,7 @@ International District residents also rely on our medical wellness services. The
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Capitol Hill, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Capitol Hill, WA | Renton, WA Medspa",
     metaDescription:
       "Capitol Hill, Seattle residents: Rani Beauty Clinic in Renton delivers Botox, chemical peels, HydraFacial, GLP-1 weight management, and physician care. About a 20-minute drive.",
     driveTime: "~22 min drive",
@@ -360,7 +360,7 @@ Capitol Hill residents also turn to Rani for medical wellness. GLP-1 weight mana
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Mount Baker, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Mount Baker, WA | Renton, WA Medspa",
     metaDescription:
       "Mount Baker, Seattle residents: Rani Beauty Clinic in Renton offers laser hair removal, Botox, RF microneedling, GLP-1 weight loss, and physician-supervised care. ~14 min drive.",
     driveTime: "~15 min drive",
@@ -380,7 +380,7 @@ Mount Baker residents also benefit from our medical wellness services. The Rani 
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Seward Park, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Seward Park, WA | Renton, WA Medspa",
     metaDescription:
       "Seward Park, Seattle residents: Rani Beauty Clinic in Renton is ~12 min away. HydraFacial, Botox, laser treatments, GLP-1 weight loss, and physician-supervised medical wellness.",
     driveTime: "~13 min drive",
@@ -400,7 +400,7 @@ Seward Park clients also value our medical wellness offerings. GLP-1 weight mana
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near Rainier Valley, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near Rainier Valley, WA | Renton, WA Medspa",
     metaDescription:
       "Rainier Valley, Seattle residents: Rani Beauty Clinic in Renton offers Botox, laser hair removal, HydraFacial, GLP-1 weight management, and physician-supervised wellness. ~12 min.",
     driveTime: "~13 min drive",
@@ -420,7 +420,7 @@ Our medical wellness services serve the Rainier Valley community with the same d
     state: "WA",
     region: "seattle",
     metaTitle:
-      "Medspa Near White Center, WA | Rani Beauty Clinic in Renton",
+      "Medspa Near White Center, WA | Renton, WA Medspa",
     metaDescription:
       "White Center residents: Rani Beauty Clinic in Renton offers laser hair removal, Botox, HydraFacial, GLP-1 weight management, and physician-supervised care. About 15 minutes away.",
     driveTime: "~15 min drive",
@@ -441,7 +441,7 @@ White Center residents also rely on our wellness services. GLP-1 weight manageme
     city: "Bothell",
     state: "WA",
     region: "north",
-    metaTitle: "Medspa Near Bothell, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Bothell, WA | Renton, WA Medspa",
     metaDescription:
       "Bothell, WA residents: Rani Beauty Clinic in Renton offers Botox, HydraFacial, laser hair removal, GLP-1 weight management, and physician-supervised medical wellness. ~30 min drive.",
     driveTime: "~30 min drive",
@@ -460,7 +460,7 @@ Our medical wellness services give Bothell residents another reason to make the 
     city: "Lynnwood",
     state: "WA",
     region: "north",
-    metaTitle: "Medspa Near Lynnwood, WA | Rani Beauty Clinic in Renton",
+    metaTitle: "Medspa Near Lynnwood, WA | Renton, WA Medspa",
     metaDescription:
       "Lynnwood, WA residents: Rani Beauty Clinic offers physician-supervised Botox, laser treatments, HydraFacial, RF microneedling, and GLP-1 weight management. About 35 min to Renton.",
     driveTime: "~30 min drive",

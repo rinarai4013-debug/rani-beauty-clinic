@@ -7,6 +7,7 @@ import { serviceVariations } from "@/data/services/service-variations";
 import { galleryPages } from "@/data/results/gallery";
 import { pillarGuides } from "@/data/guides/pillar-pages";
 import { blogPosts } from "@/data/blog/posts";
+import { skinConcerns } from "@/data/skin-concerns";
 
 const baseUrl = "https://ranibeautyclinic.com";
 
@@ -141,6 +142,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
     }));
 
+  // Skin concern pages
+  const concernPages: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/concerns`, priority: 0.8, changeFrequency: "monthly" },
+    ...skinConcerns.map((concern) => ({
+      url: `${baseUrl}/concerns/${concern.slug}`,
+      priority: 0.7 as const,
+      changeFrequency: "monthly" as const,
+    })),
+  ];
+
   return [
     ...staticPages,
     ...servicePages,
@@ -154,5 +165,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...wellnessVariationPages,
     ...galleryPageUrls,
     ...guidePageUrls,
+    ...concernPages,
   ];
 }

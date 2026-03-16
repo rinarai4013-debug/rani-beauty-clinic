@@ -320,11 +320,16 @@ export default function HomePage() {
 
       {/* 2. Hero Section — with background image */}
       <Hero
-        label="PHYSICIAN-SUPERVISED MEDSPA & WELLNESS"
+        label="PHYSICIAN-SUPERVISED MEDSPA IN RENTON · SERVING ALL OF KING COUNTY"
         title="Your Skin. Your Wellness. Our Expertise."
-        subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist"
+        subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist. Safe for all skin types."
         primaryCTA={{ text: "Book a Consultation", href: "#consultation" }}
-        secondaryCTA={{ text: "Explore Services", href: "/services" }}
+        secondaryCTA={{ text: "Free Phone Consult", href: clinicInfo.phoneTel }}
+        badges={[
+          "Board-Certified Neurologist Oversight",
+          "Open 7 Days a Week",
+          "All Skin Types Welcome",
+        ]}
         backgroundImage="/images/hero/hero-aesthetic.jpg"
         backgroundOverlay={60}
         stats={[

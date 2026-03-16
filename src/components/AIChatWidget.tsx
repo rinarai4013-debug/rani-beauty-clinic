@@ -1,0 +1,182 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, X, Send, Loader2, Sparkles } from 'lucide-react';
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export default function AIChatWidget() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: 'assistant',
+      content: "Hi! I'm Rani's AI concierge. I can help you learn about our treatments, pricing, or book a consultation. How can I help you today?",
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    if (isOpen) inputRef.current?.focus();
+  }, [isOpen]);
+
+  const sendMessage = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || isLoading) return;
+
+    const userMsg: ChatMessage = { role: 'user', content: trimmed };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: newMessages,
+          visitorInfo: {
+            page: typeof window !== 'undefined' ? window.location.pathname : '',
+          },
+        }),
+      });
+
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+
+      // If lead info was captured, fire to contact API
+      if (data.leadInfo?.captured) {
+        fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'Chat Visitor',
+            email: data.leadInfo.email || '',
+            phone: data.leadInfo.phone || '',
+            service: 'AI Chat Lead',
+            message: `Captured from AI chat. Last message: ${trimmed}`,
+          }),
+        }).catch(() => {});
+      }
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please call us at (425) 555-RANI or visit ranibeautyclinic.com to book." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {/* Chat Button */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-24 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-rani-gold shadow-lg shadow-rani-gold/30 transition-transform hover:scale-110 lg:bottom-6"
+          aria-label="Open chat"
+        >
+          <MessageCircle className="h-6 w-6 text-rani-navy" />
+        </button>
+      )}
+
+      {/* Chat Window */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-24 right-4 z-50 flex h-[500px] w-[340px] flex-col overflow-hidden rounded-2xl border border-rani-border bg-white shadow-2xl sm:w-[380px] lg:bottom-6 lg:right-6"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between bg-rani-navy px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-rani-gold/20">
+                  <Sparkles className="h-4 w-4 text-rani-gold" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white font-body">Rani AI Concierge</p>
+                  <p className="text-xs text-white/50 font-body">Typically replies instantly</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="rounded-lg p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Close chat"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm font-body leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-rani-navy text-white rounded-br-md'
+                        : 'bg-rani-cream text-rani-navy rounded-bl-md'
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl rounded-bl-md bg-rani-cream px-4 py-3">
+                    <div className="flex gap-1.5">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-rani-navy/30" style={{ animationDelay: '0ms' }} />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-rani-navy/30" style={{ animationDelay: '150ms' }} />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-rani-navy/30" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="border-t border-rani-border bg-white px-4 py-3">
+              <form
+                onSubmit={e => { e.preventDefault(); sendMessage(); }}
+                className="flex items-center gap-2"
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder="Ask about our treatments..."
+                  className="flex-1 rounded-xl border border-rani-border bg-rani-cream/50 px-4 py-2.5 text-sm font-body text-rani-navy outline-none placeholder:text-rani-muted/50 focus:border-rani-gold focus:ring-1 focus:ring-rani-gold/20"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-rani-gold text-rani-navy transition-all hover:bg-rani-gold/90 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

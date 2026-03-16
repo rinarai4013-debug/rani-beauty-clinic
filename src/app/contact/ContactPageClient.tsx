@@ -7,7 +7,50 @@ import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+
+const contactStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  name: clinicInfo.name,
+  url: clinicInfo.website,
+  telephone: clinicInfo.phone,
+  email: clinicInfo.email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: clinicInfo.address.street,
+    addressLocality: clinicInfo.address.city,
+    addressRegion: clinicInfo.address.state,
+    postalCode: clinicInfo.address.zip,
+    addressCountry: "US",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: clinicInfo.geo.latitude,
+    longitude: clinicInfo.geo.longitude,
+  },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    opens: "10:00",
+    closes: "19:00",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: clinicInfo.phone,
+    contactType: "customer service",
+    availableLanguage: ["English"],
+  },
+  priceRange: "$$$",
+  paymentAccepted: "Cash, Credit Card, Debit Card, HSA, Cherry Financing, PatientFi",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: clinicInfo.reviews.aggregateRating,
+    reviewCount: clinicInfo.reviews.reviewCount,
+    bestRating: 5,
+  },
+};
 
 const serviceOptions = [
   "Laser Hair Removal",
@@ -99,6 +142,7 @@ export default function ContactPageClient() {
 
   return (
     <>
+      <StructuredData data={contactStructuredData} />
       {/* Hero */}
       <Hero
         label="GET IN TOUCH"
