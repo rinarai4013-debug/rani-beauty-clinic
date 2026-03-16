@@ -1,0 +1,6 @@
+Date,Type,Amount,Payment Method,Service Name,Status,Is Financing,Financing Provider
+2026-03-14,Service Payment,250,Cherry Financing,Treatment Package,Completed,TRUE,Cherry
+2026-03-12,Service Payment,2200,Cherry Financing,Treatment Package,Completed,TRUE,Cherry
+2026-03-06,Service Payment,3200,Cherry Financing,Treatment Package,Completed,TRUE,Cherry
+2026-03-01,Service Payment,3200,Cherry Financing,Treatment Package,Completed,TRUE,Cherry
+2026-02-28,Service Payment,150,Cherry Financing,Treatment Package,Completed,TRUE,Cherry

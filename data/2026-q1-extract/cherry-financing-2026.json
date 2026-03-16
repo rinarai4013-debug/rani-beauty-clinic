@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Marites Jawili",
+    "phone": "(425) 999-1782",
+    "date": "2026-03-14",
+    "total_available": 250,
+    "pay_in_4_available": 250,
+    "status": "Checkout Complete",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "Prabhleen Kaur",
+    "phone": "(206) 773-7055",
+    "date": "2026-03-12",
+    "total_available": 2200,
+    "pay_in_4_available": 1500,
+    "status": "Checkout Complete",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "Lazon Campbell",
+    "phone": "(206) 530-0617",
+    "date": "2026-03-06",
+    "total_available": 1000,
+    "pay_in_4_available": 500,
+    "status": "Checkout Expired",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "Anne Barredo",
+    "phone": "(206) 291-7178",
+    "date": "2026-03-06",
+    "total_available": 3200,
+    "pay_in_4_available": 2500,
+    "status": "Checkout Complete",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "April Reyes",
+    "phone": "(206) 271-7667",
+    "date": "2026-03-01",
+    "total_available": 3200,
+    "pay_in_4_available": 2500,
+    "status": "Checkout Complete",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "Karilynn Gurule",
+    "phone": "(915) 867-9655",
+    "date": "2026-02-28",
+    "total_available": 150,
+    "pay_in_4_available": 150,
+    "status": "Checkout Complete",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "Tiyanna Rodgers",
+    "phone": "(713) 979-7900",
+    "date": "2026-02-27",
+    "total_available": 750,
+    "pay_in_4_available": 200,
+    "status": "Start Checkout",
+    "source": "Cherry Financing"
+  },
+  {
+    "name": "Cassandra Coleman",
+    "phone": "(623) 512-5886",
+    "date": "2026-02-26",
+    "total_available": 200,
+    "pay_in_4_available": 200,
+    "status": "Checkout Again",
+    "source": "Cherry Financing"
+  }
+]
