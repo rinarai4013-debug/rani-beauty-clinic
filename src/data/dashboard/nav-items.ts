@@ -6,7 +6,7 @@ export interface NavItem {
   icon: string; // Lucide icon name
   permission?: Permission;
   badge?: string;
-  group: 'overview' | 'revenue' | 'operations' | 'tools' | 'settings';
+  group: 'overview' | 'revenue' | 'operations' | 'intelligence' | 'tools' | 'settings';
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -65,6 +65,57 @@ export const NAV_ITEMS: NavItem[] = [
     group: 'operations',
   },
 
+  // Intelligence
+  {
+    label: 'Pricing AI',
+    href: '/dashboard/pricing',
+    icon: 'TrendingUp',
+    permission: 'view_revenue',
+    group: 'intelligence',
+  },
+  {
+    label: 'P&L Intelligence',
+    href: '/dashboard/pnl',
+    icon: 'BarChart2',
+    permission: 'view_finance',
+    group: 'intelligence',
+  },
+  {
+    label: 'Schedule Optimizer',
+    href: '/dashboard/schedule-optimizer',
+    icon: 'Zap',
+    permission: 'view_schedule',
+    group: 'intelligence',
+  },
+  {
+    label: 'Inventory',
+    href: '/dashboard/inventory-intel',
+    icon: 'Package',
+    permission: 'view_finance',
+    group: 'intelligence',
+  },
+  {
+    label: 'Social AI',
+    href: '/dashboard/social',
+    icon: 'PenSquare',
+    permission: 'view_revenue',
+    group: 'intelligence',
+  },
+  {
+    label: 'Meta Ads AI',
+    href: '/dashboard/meta-ads',
+    icon: 'Megaphone',
+    permission: 'view_revenue',
+    group: 'intelligence',
+  },
+  {
+    label: 'Consult Co-pilot',
+    href: '/dashboard/consult',
+    icon: 'MessageCircle',
+    permission: 'view_schedule',
+    group: 'intelligence',
+  },
+
   // Tools
   {
     label: 'Quick Entry',
@@ -94,6 +145,7 @@ export const NAV_GROUPS = [
   { key: 'overview', label: 'Overview' },
   { key: 'revenue', label: 'Revenue' },
   { key: 'operations', label: 'Operations' },
+  { key: 'intelligence', label: 'Intelligence' },
   { key: 'tools', label: 'Tools' },
   { key: 'settings', label: 'System' },
 ] as const;

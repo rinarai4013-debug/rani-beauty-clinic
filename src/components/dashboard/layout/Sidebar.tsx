@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Trophy, DollarSign, Filter, Calendar, Wallet,
   PenSquare, Settings, ChevronLeft, ChevronRight, Sparkles, Megaphone, Plug,
+  TrendingUp, BarChart2, Zap, Package, MessageCircle,
 } from 'lucide-react';
 import { NAV_ITEMS, NAV_GROUPS, type NavItem } from '@/data/dashboard/nav-items';
 import type { UserRole } from '@/types/auth';
@@ -14,7 +15,7 @@ import { hasPermission } from '@/lib/auth/roles';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, Trophy, DollarSign, Filter, Calendar, Wallet,
-  PenSquare, Settings, Megaphone, Plug,
+  PenSquare, Settings, Megaphone, Plug, TrendingUp, BarChart2, Zap, Package, MessageCircle,
 };
 
 interface SidebarProps {

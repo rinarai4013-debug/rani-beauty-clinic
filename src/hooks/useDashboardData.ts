@@ -89,3 +89,84 @@ export function useIntegrationStatus() {
     refreshInterval: 300000, // 5 min
   });
 }
+
+export function useClientProfile(id: string | null) {
+  return useDashboardData(id ? `/clients/${id}?full=true` : null, {
+    refreshInterval: 60000,
+  });
+}
+
+export function useClientChurn(id: string | null) {
+  return useDashboardData(id ? `/clients/${id}/churn` : null, {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useAtRiskClients() {
+  return useDashboardData('/clients/at-risk', {
+    refreshInterval: 120000, // 2 min
+  });
+}
+
+export function useClientRecommendations(id: string | null) {
+  return useDashboardData(id ? `/clients/${id}/recommend` : null, {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useNoShowRisk(date?: string) {
+  const dateParam = date || new Date().toISOString().split('T')[0];
+  return useDashboardData(`/schedule/no-show-risk?date=${dateParam}`, {
+    refreshInterval: 60000,
+  });
+}
+
+export function useRevenueAnomalies() {
+  return useDashboardData('/revenue/anomalies', {
+    refreshInterval: 120000, // 2 min
+  });
+}
+
+// ── Intelligence Engine Hooks ──
+
+export function usePricingAnalysis() {
+  return useDashboardData('/pricing', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function usePnL() {
+  return useDashboardData('/finance/pnl', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useScheduleOptimization() {
+  return useDashboardData('/schedule/optimize', {
+    refreshInterval: 120000, // 2 min
+  });
+}
+
+export function useInventoryIntelligence() {
+  return useDashboardData('/inventory', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useSocialPlan() {
+  return useDashboardData('/social', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useMetaAdsOptimizer() {
+  return useDashboardData('/meta-ads/optimize', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useConsultCopilot() {
+  return useDashboardData('/consult', {
+    refreshInterval: 300000, // 5 min
+  });
+}

@@ -75,11 +75,39 @@ These are the ACTUAL field names in the Client Intakes table. n8n workflows MUST
 - `/src/lib/auth/roles.ts` — RBAC permissions
 - `/src/lib/cache/index.ts` — TTL cache
 - `/src/lib/gamification/engine.ts` — Score calculator + boss levels
-- `/src/hooks/useDashboardData.ts` — SWR hooks for dashboard
+- `/src/hooks/useDashboardData.ts` — SWR hooks for dashboard (22 hooks)
 - `/src/types/dashboard.ts` — Dashboard TypeScript interfaces
 - `/src/types/gamification.ts` — Gamification types
 - `/src/types/auth.ts` — Auth types
 - `/src/data/dashboard/score-weights.ts` — Score weights + targets
+
+### Prediction & Intelligence Engines
+- `/src/lib/churn/engine.ts` — Churn prediction (5 factors: recency 40%, frequency 20%, monetary 15%, membership 15%, engagement 10%)
+- `/src/lib/predictions/no-show.ts` — No-show prediction (6 factors: history 35%, deposit 20%, lead time 15%, membership 10%, timing 10%, source 10%)
+- `/src/lib/predictions/revenue-anomaly.ts` — Revenue anomaly detection (5 methods: target deviation, rolling avg, DOW pattern, provider imbalance, financing spike)
+- `/src/lib/recommendations/engine.ts` — Next-best-treatment recommendations (5 strategies: pathway, category gaps, goal-based, timing/overdue, membership upsell)
+- `/src/lib/pricing/dynamic-engine.ts` — Dynamic pricing (6 strategies: demand, temporal, competitor, cost-plus, penetration, bundle)
+- `/src/lib/finance/pnl-engine.ts` — P&L intelligence (service cost ratios, margin analysis, cash flow projection, auto expense categorization)
+- `/src/lib/schedule/optimizer.ts` — Schedule optimizer (gap detection, conflict resolution, provider balance, revenue opportunities)
+- `/src/lib/inventory/auto-manager.ts` — Inventory auto-manager (reorder points, waste analysis, par levels, supplier management)
+- `/src/lib/social/auto-post-engine.ts` — Social media auto-post (weekly calendar, monthly themes, hashtag strategy, posting times, content scoring)
+- `/src/lib/ads/meta-ads-manager.ts` — Meta Ads AI manager (campaign analysis, ad copy generation, budget optimization, creative fatigue, funnel analysis)
+- `/src/lib/consult/copilot-engine.ts` — AI consult co-pilot (client briefing, treatment plans, objection handlers, cross-sell, closing strategies)
+
+### Communication Templates (n8n-callable)
+- `/src/lib/templates/post-treatment.ts` — 5-step follow-up sequence (immediate, 24h, 72h, 7-day, 30-day) with branded HTML emails
+- `/src/lib/templates/reactivation.ts` — 3-tier reactivation templates (lapsed-30, lapsed-60, lapsed-90) with auto-tier detection
+- `/src/lib/templates/pre-consult.ts` — 3-step pre-consult sequence (booking confirmation, 24h reminder, 2h reminder) with service-specific prep instructions
+
+### Dashboard Pages
+- `/src/app/(dashboard)/dashboard/clients/[id]/page.tsx` — 360° client profile (LTV, visits, churn risk, appointments, transactions, memberships, messages, reviews)
+- `/src/app/(dashboard)/dashboard/pricing/page.tsx` — Pricing Intelligence (price recommendations, smart packages, promotional strategies)
+- `/src/app/(dashboard)/dashboard/pnl/page.tsx` — P&L Intelligence (financial health scoring, revenue/expense breakdown, service profitability, cash flow chart)
+- `/src/app/(dashboard)/dashboard/schedule-optimizer/page.tsx` — Schedule Optimizer (gaps, conflicts, provider balance, revenue opportunities, daily summary)
+- `/src/app/(dashboard)/dashboard/inventory-intel/page.tsx` — Inventory Intelligence (alerts, reorder recommendations, waste analysis, usage table)
+- `/src/app/(dashboard)/dashboard/social/page.tsx` — Social Media AI (weekly calendar, monthly themes, hashtag strategy, posting times)
+- `/src/app/(dashboard)/dashboard/meta-ads/page.tsx` — Meta Ads AI Manager (campaigns, optimizations, ad copy variants, budget recs, funnel analysis)
+- `/src/app/(dashboard)/dashboard/consult/page.tsx` — AI Consult Co-pilot (client briefing, treatment plan, talking points, objection handlers, closing strategy)
 
 ## Environment Variables Required
 ```
@@ -105,37 +133,96 @@ When editing n8n workflows, use these EXACT Airtable field names:
 - AI Value field → `Treatment Value (AI)`
 - Processing status → `Processing Status` (single select: New/Processed/Responded)
 
-## API Routes (39 total)
-### Dashboard Routes (30)
+## API Routes (65 total)
+
+### Dashboard Routes (56)
 - `POST /api/dashboard/auth/login` — JWT login
 - `GET /api/dashboard/auth/me` — Current session
 - `GET /api/dashboard/kpis` — KPI cards (revenue, bookings, consults, leads)
 - `GET /api/dashboard/revenue` — Revenue breakdown by provider/service/category
 - `GET /api/dashboard/revenue/trends` — 30-day revenue trend
+- `GET /api/dashboard/revenue/anomalies` — Revenue anomaly detection (5 methods + health score + month-end projection)
 - `GET /api/dashboard/leads` — Lead funnel stages
 - `GET /api/dashboard/leads/stats` — Lead conversion stats
 - `GET /api/dashboard/schedule` — Today's appointments
 - `GET /api/dashboard/schedule/upcoming` — Next 7 days
+- `GET /api/dashboard/schedule/no-show-risk` — No-show risk scoring for all upcoming appointments
 - `GET /api/dashboard/alerts` — Active alerts
 - `PATCH /api/dashboard/alerts/[id]` — Dismiss/acknowledge alert
 - `GET /api/dashboard/gamification/score` — Clinic score from real metrics
 - `GET /api/dashboard/gamification/achievements` — Achievement list
 - `GET /api/dashboard/gamification/leaderboard` — Provider rankings
 - `GET /api/dashboard/clients` — Client list with filters
-- `GET /api/dashboard/clients/[id]` — Single client detail
+- `GET /api/dashboard/clients/[id]` — Single client detail (supports `?full=true` for 360° view with linked records)
+- `GET /api/dashboard/clients/[id]/churn` — Per-client churn prediction score
+- `GET /api/dashboard/clients/[id]/recommend` — AI next-best-treatment recommendations
+- `GET /api/dashboard/clients/at-risk` — All at-risk clients ranked by urgency
 - `GET /api/dashboard/providers` — Provider performance
 - `GET /api/dashboard/providers/[name]` — Single provider stats
 - `GET /api/dashboard/finance/expenses` — Expense tracking
 - `GET /api/dashboard/meta-ads` — Meta Ads performance (30-day)
-- 10x `POST /api/dashboard/entry/*` — Data entry forms (lead, sale, expense, etc.)
+- `GET /api/dashboard/integrations/mangomint` — Mangomint sync status
+- `GET /api/dashboard/integrations/square` — Square sync status
+- `GET /api/dashboard/integrations/jotform` — Jotform sync status
+- `GET /api/dashboard/integrations/sync-all` — All integration statuses
+- `GET /api/dashboard/plaid/link-token` — Plaid Link initialization
+- `POST /api/dashboard/plaid/exchange-token` — Plaid token exchange
+- `GET /api/dashboard/plaid/accounts` — Connected bank accounts
+- `POST /api/dashboard/plaid/sandbox-connect` — Sandbox connection
+- `POST /api/dashboard/plaid/disconnect` — Disconnect bank
+- `GET /api/dashboard/plaid/transactions` — Bank transactions
+- `POST /api/dashboard/plaid/transactions/sync` — Sync transactions
+- `GET /api/dashboard/plaid/transactions/matches` — Auto-match transactions to Airtable
+- `POST /api/dashboard/plaid/transactions/[id]/reconcile` — Reconcile a transaction
+- `GET /api/dashboard/plaid/summary` — Bank account summary
+- 10x `POST /api/dashboard/entry/*` — Data entry forms (lead, sale, expense, ceo-note, eod-recap, room-issue, review, inventory, staff-note, consult-notes)
+- `GET /api/dashboard/pricing` — Dynamic pricing analysis + recommendations
+- `GET /api/dashboard/finance/pnl` — P&L intelligence + financial health scoring
+- `GET /api/dashboard/schedule/optimize` — Schedule optimization (gaps, conflicts, balance)
+- `GET /api/dashboard/inventory` — Inventory intelligence (reorder, waste, par levels)
+- `GET /api/dashboard/social` — Social media content plan generation
+- `GET /api/dashboard/meta-ads/optimize` — Meta Ads AI optimization + ad copy variants
+- `GET|POST /api/dashboard/consult` — AI consult co-pilot (GET: sample, POST: custom client)
 
 ### AI Routes (3)
 - `POST /api/ai/recommend` — AI treatment recommender (3-tier Good/Better/Best plans)
-- `POST /api/ai/chat` — AI concierge chatbot (Claude Haiku, lead capture)
+- `POST /api/ai/chat` — AI concierge chatbot (Claude Haiku, lead capture, SMS opt-in)
 - `POST /api/ai/intake` — AI intake intelligence (risk flags, consult scripts)
 
-### Existing (1)
-- `POST /api/contact` — Contact form → Resend email + n8n webhook
+### Template Routes (3) — Called by n8n workflows
+- `POST /api/templates/post-treatment` — Rendered post-treatment follow-up templates (5-step sequence)
+- `POST /api/templates/reactivation` — Rendered reactivation campaign templates (3 tiers, auto-detects from daysSinceLastVisit)
+- `POST /api/templates/pre-consult` — Rendered pre-consult communication templates (3-step + service-specific prep)
+
+### Webhook & Utility Routes (3)
+- `POST /api/contact` — Contact form → Resend email + n8n webhook (includes SMS consent)
+- `POST /api/webhooks/mangomint` — Mangomint webhook receiver
+- `POST /api/indexnow` — IndexNow SEO submission
+
+## SWR Hooks (22 in useDashboardData.ts)
+- `useDashboardData<T>(endpoint, config)` — Base hook
+- `useKPIs(range)` — KPI cards (30s refresh)
+- `useRevenueData(range)` — Revenue breakdown (60s)
+- `useLeadData()` — Lead funnel (60s)
+- `useScheduleData()` — Today's schedule (30s)
+- `useAlerts()` — Active alerts (30s)
+- `useClinicScore()` — Gamification score (30s)
+- `useGamification()` — Achievements (60s)
+- `useLeaderboard()` — Provider rankings (120s)
+- `useIntegrationStatus()` — Integration sync (5min)
+- `useClientProfile(id)` — 360° client view (60s)
+- `useClientChurn(id)` — Client churn score (5min)
+- `useAtRiskClients()` — At-risk client list (2min)
+- `useClientRecommendations(id)` — Next-best-treatment recs (5min)
+- `useNoShowRisk(date?)` — Appointment no-show scores (60s)
+- `useRevenueAnomalies()` — Revenue anomaly detection (2min)
+- `usePricingAnalysis()` — Dynamic pricing intelligence (5min)
+- `usePnL()` — P&L financial intelligence (5min)
+- `useScheduleOptimization()` — Schedule optimization (2min)
+- `useInventoryIntelligence()` — Inventory auto-management (5min)
+- `useSocialPlan()` — Social media content plan (5min)
+- `useMetaAdsOptimizer()` — Meta Ads AI optimization (5min)
+- `useConsultCopilot()` — AI consult co-pilot (5min)
 
 ## n8n Workflows (19 total — all active at ranibeautyclinic.app.n8n.cloud)
 See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history.
@@ -159,11 +246,11 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 - `rtbIAVroFSGCQ7sK` WF8 — Reactivation Campaigns (Mon 10AM)
 - `5aNNtyyCLYTDr5n3` WF10 — Provider Performance (Mon 7AM)
 
-### Webhook-Triggered (5) — Awaiting external registration
-- `TpiezScNbp6BeGcv` WF3 — Booking Sync (`/webhook/booking-sync` — Mangomint)
+### Webhook-Triggered (5) — Mangomint URLs registered Mar 17
+- `TpiezScNbp6BeGcv` WF3 — Booking Sync (`/webhook/booking-sync` — Mangomint appointment.created)
 - `XgkCfHilKUeyF0dv` WF6 — Financing (`/webhook/financing-trigger` — Cherry/Stripe)
 - `Tis5GeSHkVsk7bys` W16 — Post-Consult Close (`/webhook/postconsult-close-trigger`)
-- `mo5nubnsK16sfDgG` W17 — Post-Treatment (`/webhook/post-treatment-trigger` — Mangomint)
+- `mo5nubnsK16sfDgG` W17 — Post-Treatment (`/webhook/post-treatment-trigger` — Mangomint appointment.completed)
 - `zHJCkAf0ehhTzOfY` W2 — Document Architect (`/webhook/pdf-generator-trigger`)
 
 ### Typeform-Triggered (1)
@@ -178,6 +265,94 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 - `weekly-revenue-report` — Friday 5 PM: Revenue executive summary
 - `daily-meta-ads-check` — Daily 9 AM: Ad performance framework + benchmarks
 
+## Intelligence Engine Reference
+
+### Churn Prediction (`/src/lib/churn/engine.ts`)
+- 5 weighted factors: recency (40%), frequency (20%), monetary (15%), membership (15%), engagement (10%)
+- Scores 0–100, classified as low/medium/high/critical
+- API: `GET /api/dashboard/clients/[id]/churn`
+- Bulk: `GET /api/dashboard/clients/at-risk` (all lapsed/churned clients ranked by urgency)
+
+### No-Show Prediction (`/src/lib/predictions/no-show.ts`)
+- 6 weighted factors: history (35%), deposit (20%), lead time (15%), membership (10%), timing (10%), source (10%)
+- Scores 0–100, classified as low/moderate/high
+- `quickNoShowScore()` for batch processing (schedule view)
+- API: `GET /api/dashboard/schedule/no-show-risk?date=YYYY-MM-DD`
+
+### Revenue Anomaly Detection (`/src/lib/predictions/revenue-anomaly.ts`)
+- 5 detection methods: target deviation, rolling average, DOW pattern, provider imbalance, financing spike
+- Returns: anomalies array, healthScore (0–100), summary, projectedMonthEnd
+- Thresholds: warning at -15% target, critical at -30%, spike at +50%
+- API: `GET /api/dashboard/revenue/anomalies`
+
+### Treatment Recommendations (`/src/lib/recommendations/engine.ts`)
+- 5 strategies: pathway continuation, category gap filling, goal-based, timing/overdue, membership upsell
+- Treatment pathway map (what follows each service)
+- Cross-sell category map, maintenance timing, price estimates
+- API: `GET /api/dashboard/clients/[id]/recommend`
+
+### Communication Templates (n8n-callable APIs)
+- **Post-Treatment:** 5-step sequence with branded HTML emails, service-specific aftercare links
+- **Reactivation:** 3-tier auto-detection (30/60/90 days lapsed), urgency-appropriate messaging
+- **Pre-Consult:** 3-step with service-specific prep instructions (laser, injectable, facial, wellness, body, consult categories), new client addons
+- All templates support variable substitution: `{{clientName}}`, `{{serviceName}}`, `{{providerName}}`, etc.
+
+### Dynamic Pricing Engine (`/src/lib/pricing/dynamic-engine.ts`)
+- 6 pricing strategies: demand-based, temporal, competitor-reactive, cost-plus, penetration, bundle
+- Seasonal multipliers, margin targets, service-specific pricing intelligence
+- API: `GET /api/dashboard/pricing`
+
+### P&L Intelligence (`/src/lib/finance/pnl-engine.ts`)
+- Auto expense categorization across 8 categories (product costs, labor, rent, marketing, equipment, insurance, supplies, admin)
+- Service cost ratio analysis (product cost %, labor %, overhead, profit margin)
+- 6-month cash flow projection with historical trending
+- Financial health scoring (0-100) across 5 components (revenue, margin, costs, cash flow, service mix)
+- API: `GET /api/dashboard/finance/pnl`
+
+### Schedule Optimizer (`/src/lib/schedule/optimizer.ts`)
+- Gap detection with revenue potential scoring and suggested services
+- Conflict detection (double booking, room conflict, equipment conflict, insufficient buffer, overtime)
+- Provider workload balancing (underloaded/balanced/overloaded)
+- Revenue opportunities (upgrade, addon, reschedule, fill_gap, waitlist)
+- Schedule efficiency score (0-100)
+- API: `GET /api/dashboard/schedule/optimize`
+
+### Inventory Auto-Manager (`/src/lib/inventory/auto-manager.ts`)
+- Reorder point calculation with lead time + safety stock
+- Waste analysis with expiration tracking and cost impact
+- Par level optimization based on usage patterns
+- Supplier performance comparison (price, reliability, lead time)
+- API: `GET /api/dashboard/inventory`
+
+### Social Media Auto-Post Engine (`/src/lib/social/auto-post-engine.ts`)
+- Weekly content calendar with day-specific themes (Motivation Monday, Transformation Tuesday, etc.)
+- Monthly themes with 4-week content rotation
+- Content scoring (0-100) based on engagement potential
+- Hashtag strategy: branded, location, industry, service-specific sets
+- Optimal posting times per platform (Instagram, GBP)
+- Categories: educational, before_after, promotional, behind_the_scenes, testimonial, seasonal, team_spotlight, service_highlight, wellness_tip, community
+- API: `GET /api/dashboard/social`
+
+### Meta Ads AI Manager (`/src/lib/ads/meta-ads-manager.ts`)
+- Campaign performance grading (excellent/good/average/poor/critical)
+- Ad copy variant generation with service-specific angles
+- Budget allocation optimization (scale/maintain/cut/pause)
+- Creative fatigue detection (frequency > 4.0, CTR decline)
+- Full funnel analysis: Impressions → Clicks → Leads → Bookings
+- Audience targeting insights with CPA comparison
+- Ad score (0-100) and projected ROAS
+- API: `GET /api/dashboard/meta-ads/optimize`
+
+### AI Consult Co-pilot (`/src/lib/consult/copilot-engine.ts`)
+- Pre-consult client intelligence briefing with segment classification (vip/regular/new/at_risk)
+- Treatment plan building with concern-to-service matching (8 services in DB)
+- Talking points organized by timing (opening/during/closing) and priority (must_say/should_say/nice_to_say)
+- 6 objection handlers with techniques (feel-felt-found, reframe, social proof, isolate, normalize, enable)
+- Cross-sell opportunity identification with conversion likelihood scoring
+- 5 closing strategies (assumptive, choice, urgency, value, trial) with financing and membership pitches
+- Follow-up plan (same day, next day, one week, if no book)
+- API: `GET|POST /api/dashboard/consult`
+
 ## Productization Notes (RaniOS → SaaS)
 
 ### What's Rani-specific vs Generic Med Spa
@@ -189,6 +364,8 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 | n8n workflows | Credentials, webhook URLs | All 19 workflow templates |
 | Scheduled tasks | Competitor list, location | Content engine, intel briefing, review monitor |
 | Chat widget | Clinic FAQs, phone number | Widget component, lead capture, chat API |
+| Prediction engines | Thresholds, targets | Churn, no-show, revenue anomaly, recommendations |
+| Communication templates | Brand voice, aftercare URLs | Template structure, sequence logic, variable system |
 
 ### Multi-Tenant Architecture Path
 1. Replace hardcoded Airtable base ID with per-tenant config
@@ -199,7 +376,11 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 
 ### Sellable Components
 - **AI Prompt Library** — 18 Claude prompts for med spa operations (intake analysis, treatment recs, consult scripts, reactivation messaging, review responses)
-- **Dashboard Template** — Gamified operations dashboard with RBAC, KPIs, real-time schedule, lead funnel
+- **Dashboard Template** — Gamified operations dashboard with RBAC, KPIs, real-time schedule, lead funnel, 360° client profiles + 7 intelligence pages
 - **Automation Suite** — 19 n8n workflow templates (intake→CRM, lead response, follow-up ladders, review requests)
-- **Content Engine** — Automated weekly content batch generation (IG, Reels, Stories, GBP posts)
+- **Content Engine** — Automated weekly content batch generation (IG, Reels, Stories, GBP posts) + Social AI dashboard
 - **Competitor Intelligence** — Automated weekly competitive scanning + briefing
+- **Prediction Suite** — Churn, no-show, revenue anomaly, treatment recommendations, dynamic pricing, P&L intelligence
+- **Communication Templates** — Pre-consult, post-treatment, and reactivation sequences with branded HTML emails
+- **Operations Intelligence** — Schedule optimizer, inventory auto-manager, meta ads AI manager, consult co-pilot
+- **Intelligence Dashboard Pages** — 7 full dashboard pages: Pricing AI, P&L, Schedule Optimizer, Inventory, Social AI, Meta Ads AI, Consult Co-pilot
