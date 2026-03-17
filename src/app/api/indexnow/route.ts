@@ -11,7 +11,7 @@ import { galleryPages } from "@/data/results/gallery";
 import { serviceVariations } from "@/data/services/service-variations";
 
 const INDEXNOW_KEY = "fef37905157843c4ae05afb82e58b988";
-const BASE_URL = "https://ranibeautyclinic.com";
+const BASE_URL = "https://www.ranibeautyclinic.com";
 
 function getAllUrls(): string[] {
   const urls: string[] = [];
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
   for (const batch of batches) {
     const payload = {
-      host: "ranibeautyclinic.com",
+      host: "www.ranibeautyclinic.com",
       key: INDEXNOW_KEY,
       keyLocation: `${BASE_URL}/${INDEXNOW_KEY}.txt`,
       urlList: batch,
