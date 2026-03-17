@@ -9,7 +9,7 @@ import { pillarGuides } from "@/data/guides/pillar-pages";
 import { blogPosts } from "@/data/blog/posts";
 import { skinConcerns } from "@/data/skin-concerns";
 
-const baseUrl = "https://ranibeautyclinic.com";
+const baseUrl = "https://www.ranibeautyclinic.com";
 
 const aestheticSlugs = [
   "laser-hair-removal",
@@ -52,6 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/team/dr-landfield`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/safety`, priority: 0.6, changeFrequency: "yearly" },
     { url: `${baseUrl}/technology`, priority: 0.6, changeFrequency: "yearly" },
+    { url: `${baseUrl}/the-reveal`, priority: 0.9, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy-policy`, priority: 0.3, changeFrequency: "yearly" },
     { url: `${baseUrl}/terms`, priority: 0.3, changeFrequency: "yearly" },
   ];
