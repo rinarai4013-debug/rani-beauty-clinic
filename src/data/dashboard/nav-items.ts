@@ -115,6 +115,20 @@ export const NAV_ITEMS: NavItem[] = [
     permission: 'view_schedule',
     group: 'intelligence',
   },
+  {
+    label: 'Knowledge Base',
+    href: '/dashboard/knowledge-base',
+    icon: 'BookOpen',
+    permission: 'view_executive',
+    group: 'intelligence',
+  },
+  {
+    label: 'Phone Agent',
+    href: '/dashboard/phone-agent',
+    icon: 'Phone',
+    permission: 'view_executive',
+    group: 'intelligence',
+  },
 
   // Tools
   {

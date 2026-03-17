@@ -77,7 +77,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     "@type": "BlogPosting",
     headline: post.title,
     description: post.metaDescription,
-    url: `https://ranibeautyclinic.com/blog/${post.slug}`,
+    url: `https://www.ranibeautyclinic.com/blog/${post.slug}`,
     inLanguage: "en-US",
     author: {
       "@type": "Person",
@@ -87,17 +87,17 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     publisher: {
       "@type": "Organization",
       name: "Rani Beauty Clinic",
-      url: "https://ranibeautyclinic.com",
+      url: "https://www.ranibeautyclinic.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://ranibeautyclinic.com/images/logo/logo-dark.png",
+        url: "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
       },
     },
     datePublished: post.date,
     articleSection: post.category,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://ranibeautyclinic.com/blog/${post.slug}`,
+      "@id": `https://www.ranibeautyclinic.com/blog/${post.slug}`,
     },
   };
 

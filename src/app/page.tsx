@@ -241,7 +241,7 @@ const structuredData = {
   "@context": "https://schema.org",
   "@type": "MedicalBusiness",
   name: "Rani Beauty Clinic",
-  image: "https://ranibeautyclinic.com/images/logo/logo-dark.png",
+  image: "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
   address: {
     "@type": "PostalAddress",
     streetAddress: "401 Olympia Ave NE, Suite 101",
@@ -251,7 +251,7 @@ const structuredData = {
     addressCountry: "US",
   },
   telephone: "+14255394440",
-  url: "https://ranibeautyclinic.com",
+  url: "https://www.ranibeautyclinic.com",
   openingHoursSpecification: {
     "@type": "OpeningHoursSpecification",
     dayOfWeek: [

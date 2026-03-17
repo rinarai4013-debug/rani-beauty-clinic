@@ -13,6 +13,9 @@ interface ContactFormData {
   preferredDate?: string;
   message?: string;
   honeypot?: string;
+  smsConsent?: boolean;
+  source?: string;
+  quizAnswers?: Record<string, string>;
 }
 
 /**
@@ -90,6 +93,8 @@ export async function POST(request: NextRequest) {
       service: body.service.trim(),
       preferredDate: body.preferredDate?.trim() || "",
       message: body.message?.trim() || "",
+      smsConsent: body.smsConsent ? "yes" : "no",
+      source: body.source || "website_contact_form",
       submittedAt: new Date().toISOString(),
     };
 

@@ -10,7 +10,7 @@ import { geoPages } from "@/data/locations/geo-pages";
 import { galleryPages } from "@/data/results/gallery";
 import { serviceVariations } from "@/data/services/service-variations";
 
-const baseUrl = "https://ranibeautyclinic.com";
+const baseUrl = "https://www.ranibeautyclinic.com";
 const now = new Date().toISOString();
 
 function escapeXml(str: string): string {

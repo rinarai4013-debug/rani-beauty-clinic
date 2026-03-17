@@ -18,8 +18,8 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: [
-      "https://ranibeautyclinic.com/sitemap.xml",
-      "https://ranibeautyclinic.com/feed.xml",
+      "https://www.ranibeautyclinic.com/sitemap.xml",
+      "https://www.ranibeautyclinic.com/feed.xml",
     ],
   };
 }

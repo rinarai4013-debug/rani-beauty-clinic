@@ -72,19 +72,19 @@ export default function ConcernPageClient({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://ranibeautyclinic.com",
+        item: "https://www.ranibeautyclinic.com",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Skin Concerns",
-        item: "https://ranibeautyclinic.com/concerns",
+        item: "https://www.ranibeautyclinic.com/concerns",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: concern.title,
-        item: `https://ranibeautyclinic.com/concerns/${concern.slug}`,
+        item: `https://www.ranibeautyclinic.com/concerns/${concern.slug}`,
       },
     ],
   };

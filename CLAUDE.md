@@ -20,6 +20,8 @@
 - **Intake Forms:** Typeform (form ID: Ecgz85JA)
 - **Client Portal:** Softr (treatment plan viewer)
 - **AI:** Anthropic Claude API
+- **Voice AI:** Vapi.ai (AI phone receptionist)
+- **Vector DB:** Pinecone (RAG knowledge base, text-embedding-3-small 1536d)
 - **Styling:** Tailwind CSS, Framer Motion, Recharts
 - **Auth:** JWT via jose (HS256), cookie-based sessions
 
@@ -75,7 +77,7 @@ These are the ACTUAL field names in the Client Intakes table. n8n workflows MUST
 - `/src/lib/auth/roles.ts` — RBAC permissions
 - `/src/lib/cache/index.ts` — TTL cache
 - `/src/lib/gamification/engine.ts` — Score calculator + boss levels
-- `/src/hooks/useDashboardData.ts` — SWR hooks for dashboard (22 hooks)
+- `/src/hooks/useDashboardData.ts` — SWR hooks for dashboard (25 hooks)
 - `/src/types/dashboard.ts` — Dashboard TypeScript interfaces
 - `/src/types/gamification.ts` — Gamification types
 - `/src/types/auth.ts` — Auth types
@@ -93,6 +95,8 @@ These are the ACTUAL field names in the Client Intakes table. n8n workflows MUST
 - `/src/lib/social/auto-post-engine.ts` — Social media auto-post (weekly calendar, monthly themes, hashtag strategy, posting times, content scoring)
 - `/src/lib/ads/meta-ads-manager.ts` — Meta Ads AI manager (campaign analysis, ad copy generation, budget optimization, creative fatigue, funnel analysis)
 - `/src/lib/consult/copilot-engine.ts` — AI consult co-pilot (client briefing, treatment plans, objection handlers, cross-sell, closing strategies)
+- `/src/lib/rag/knowledge-base.ts` — RAG knowledge base (12 Rani documents, semantic search, Pinecone vector integration, knowledge gap detection)
+- `/src/lib/phone/vapi-agent.ts` — Vapi AI phone agent (assistant config, call flows, analytics, escalation rules, brand voice system prompt)
 
 ### Communication Templates (n8n-callable)
 - `/src/lib/templates/post-treatment.ts` — 5-step follow-up sequence (immediate, 24h, 72h, 7-day, 30-day) with branded HTML emails
@@ -108,6 +112,8 @@ These are the ACTUAL field names in the Client Intakes table. n8n workflows MUST
 - `/src/app/(dashboard)/dashboard/social/page.tsx` — Social Media AI (weekly calendar, monthly themes, hashtag strategy, posting times)
 - `/src/app/(dashboard)/dashboard/meta-ads/page.tsx` — Meta Ads AI Manager (campaigns, optimizations, ad copy variants, budget recs, funnel analysis)
 - `/src/app/(dashboard)/dashboard/consult/page.tsx` — AI Consult Co-pilot (client briefing, treatment plan, talking points, objection handlers, closing strategy)
+- `/src/app/(dashboard)/dashboard/knowledge-base/page.tsx` — RAG Knowledge Base (coverage score, documents by category/service, knowledge gaps, Pinecone status)
+- `/src/app/(dashboard)/dashboard/phone-agent/page.tsx` — AI Phone Agent (call analytics, intents, peak times, call flows, performance metrics, Vapi config)
 
 ## Environment Variables Required
 ```
@@ -121,6 +127,9 @@ RESEND_API_KEY=
 CONTACT_EMAIL=info@ranibeautyclinic.com
 FROM_EMAIL=Rani Beauty Clinic <noreply@ranibeautyclinic.com>
 N8N_WEBHOOK_URL=
+PINECONE_API_KEY=
+VAPI_API_KEY=
+VAPI_ASSISTANT_ID=
 ```
 
 ## n8n Workflow Field Name Mapping
@@ -133,9 +142,9 @@ When editing n8n workflows, use these EXACT Airtable field names:
 - AI Value field → `Treatment Value (AI)`
 - Processing status → `Processing Status` (single select: New/Processed/Responded)
 
-## API Routes (65 total)
+## API Routes (67 total)
 
-### Dashboard Routes (56)
+### Dashboard Routes (58)
 - `POST /api/dashboard/auth/login` — JWT login
 - `GET /api/dashboard/auth/me` — Current session
 - `GET /api/dashboard/kpis` — KPI cards (revenue, bookings, consults, leads)
@@ -183,6 +192,8 @@ When editing n8n workflows, use these EXACT Airtable field names:
 - `GET /api/dashboard/social` — Social media content plan generation
 - `GET /api/dashboard/meta-ads/optimize` — Meta Ads AI optimization + ad copy variants
 - `GET|POST /api/dashboard/consult` — AI consult co-pilot (GET: sample, POST: custom client)
+- `GET /api/dashboard/knowledge-base` — RAG knowledge base stats + search (?q=query)
+- `GET /api/dashboard/phone-agent` — AI phone agent configuration + analytics
 
 ### AI Routes (3)
 - `POST /api/ai/recommend` — AI treatment recommender (3-tier Good/Better/Best plans)
@@ -199,7 +210,7 @@ When editing n8n workflows, use these EXACT Airtable field names:
 - `POST /api/webhooks/mangomint` — Mangomint webhook receiver
 - `POST /api/indexnow` — IndexNow SEO submission
 
-## SWR Hooks (22 in useDashboardData.ts)
+## SWR Hooks (25 in useDashboardData.ts)
 - `useDashboardData<T>(endpoint, config)` — Base hook
 - `useKPIs(range)` — KPI cards (30s refresh)
 - `useRevenueData(range)` — Revenue breakdown (60s)
@@ -223,6 +234,8 @@ When editing n8n workflows, use these EXACT Airtable field names:
 - `useSocialPlan()` — Social media content plan (5min)
 - `useMetaAdsOptimizer()` — Meta Ads AI optimization (5min)
 - `useConsultCopilot()` — AI consult co-pilot (5min)
+- `useKnowledgeBase()` — RAG knowledge base stats (5min)
+- `usePhoneAgent()` — AI phone agent config + analytics (5min)
 
 ## n8n Workflows (19 total — all active at ranibeautyclinic.app.n8n.cloud)
 See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history.
@@ -353,6 +366,28 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 - Follow-up plan (same day, next day, one week, if no book)
 - API: `GET|POST /api/dashboard/consult`
 
+### RAG Knowledge Base (`/src/lib/rag/knowledge-base.ts`)
+- 12 built-in Rani knowledge documents (treatment protocols, aftercare guides, FAQs, policies, product info)
+- Semantic search with keyword scoring and category filtering
+- RAG context builder for AI chat, consult co-pilot, and phone agent responses
+- Pinecone vector database integration (serverless, text-embedding-3-small 1536d)
+- Knowledge gap detection across 11 services × required coverage categories
+- Coverage score calculation (0-100)
+- Document chunking with overlap for embedding quality
+- API: `GET /api/dashboard/knowledge-base` (stats) or `?q=query` (semantic search)
+
+### Vapi AI Phone Agent (`/src/lib/phone/vapi-agent.ts`)
+- Custom Vapi assistant configuration with Rani brand voice and compliance
+- System prompt with full service catalog, pricing, hours, and call handling rules
+- 6 call flows: New Booking, Service Inquiry, Existing Appointment, General FAQ, After-Hours, Escalation
+- 8 escalation rules (medical emergency, adverse reaction, billing, complaint, etc.)
+- Voice: Deepgram aura-luna-en, Model: gpt-4o-mini, Transcriber: nova-2
+- Call analytics: volume, intents, peak times, booking conversion, satisfaction
+- Performance metrics: first response time, resolution rate, cost per call, sentiment
+- AI recommendations engine based on analytics patterns
+- Vapi API functions: syncAssistantToVapi(), getVapiCallLogs()
+- API: `GET /api/dashboard/phone-agent`
+
 ## Productization Notes (RaniOS → SaaS)
 
 ### What's Rani-specific vs Generic Med Spa
@@ -383,4 +418,6 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 - **Prediction Suite** — Churn, no-show, revenue anomaly, treatment recommendations, dynamic pricing, P&L intelligence
 - **Communication Templates** — Pre-consult, post-treatment, and reactivation sequences with branded HTML emails
 - **Operations Intelligence** — Schedule optimizer, inventory auto-manager, meta ads AI manager, consult co-pilot
-- **Intelligence Dashboard Pages** — 7 full dashboard pages: Pricing AI, P&L, Schedule Optimizer, Inventory, Social AI, Meta Ads AI, Consult Co-pilot
+- **RAG Knowledge Base** — Pinecone-powered semantic search, 12 treatment documents, knowledge gap detection, coverage scoring
+- **AI Phone Receptionist** — Vapi-powered voice AI agent, 6 call flows, booking conversion tracking, after-hours handling
+- **Intelligence Dashboard Pages** — 9 full dashboard pages: Pricing AI, P&L, Schedule Optimizer, Inventory, Social AI, Meta Ads AI, Consult Co-pilot, Knowledge Base, Phone Agent

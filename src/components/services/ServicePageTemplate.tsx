@@ -98,10 +98,10 @@ export default function ServicePageTemplate({
     })),
   };
 
-  const serviceUrl = `https://ranibeautyclinic.com${basePath}/${service.slug}`;
+  const serviceUrl = `https://www.ranibeautyclinic.com${basePath}/${service.slug}`;
   const serviceImage = serviceImageData?.image
-    ? `https://ranibeautyclinic.com${serviceImageData.image}`
-    : "https://ranibeautyclinic.com/images/logo/logo-dark.png";
+    ? `https://www.ranibeautyclinic.com${serviceImageData.image}`
+    : "https://www.ranibeautyclinic.com/images/logo/logo-dark.png";
 
   const serviceStructuredData = {
     "@context": "https://schema.org",
@@ -151,13 +151,13 @@ export default function ServicePageTemplate({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://ranibeautyclinic.com",
+        item: "https://www.ranibeautyclinic.com",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: service.isWellness ? "Medical Wellness" : "Services",
-        item: `https://ranibeautyclinic.com${basePath}`,
+        item: `https://www.ranibeautyclinic.com${basePath}`,
       },
       {
         "@type": "ListItem",

@@ -170,3 +170,15 @@ export function useConsultCopilot() {
     refreshInterval: 300000, // 5 min
   });
 }
+
+export function useKnowledgeBase() {
+  return useDashboardData('/knowledge-base', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function usePhoneAgent() {
+  return useDashboardData('/phone-agent', {
+    refreshInterval: 300000, // 5 min
+  });
+}

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "$99 Brazilian Laser Hair Removal + FREE Underarms | Rani Beauty Clinic",
     description:
       "As seen on Hulu — Full Brazilian laser hair removal + FREE underarm treatment for $99. Licensed medical professionals. Book now!",
-    url: "https://ranibeautyclinic.com/tv",
+    url: "https://www.ranibeautyclinic.com/tv",
     siteName: "Rani Beauty Clinic",
     type: "website",
   },

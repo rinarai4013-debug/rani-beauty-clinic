@@ -4,7 +4,7 @@ import { cache } from '@/lib/cache';
 
 // POST — receive Mangomint webhook events
 // Webhook URL to configure in Mangomint:
-// https://ranibeautyclinic.com/api/webhooks/mangomint
+// https://www.ranibeautyclinic.com/api/webhooks/mangomint
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
@@ -188,7 +188,7 @@ export async function GET() {
     status: 'ok',
     webhook: 'mangomint',
     configured: !!process.env.MANGOMINT_WEBHOOK_SECRET,
-    url: 'https://ranibeautyclinic.com/api/webhooks/mangomint',
+    url: 'https://www.ranibeautyclinic.com/api/webhooks/mangomint',
     supportedEvents: [
       'appointment.created',
       'appointment.updated',

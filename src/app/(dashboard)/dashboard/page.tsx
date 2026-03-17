@@ -7,6 +7,9 @@ import DailyWinsBanner from '@/components/dashboard/gamification/DailyWinsBanner
 import AttentionPanel from '@/components/dashboard/panels/AttentionPanel';
 import QuickActions from '@/components/dashboard/panels/QuickActions';
 import RecentActivity from '@/components/dashboard/panels/RecentActivity';
+import AtRiskClientsPanel from '@/components/dashboard/panels/AtRiskClientsPanel';
+import RevenueHealthPanel from '@/components/dashboard/panels/RevenueHealthPanel';
+import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
@@ -119,6 +122,13 @@ export default function ExecutiveHome() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AttentionPanel />
         <RecentActivity />
+      </div>
+
+      {/* Intelligence Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <RevenueHealthPanel />
+        <NoShowRiskPanel />
+        <AtRiskClientsPanel />
       </div>
 
       {/* Quick Actions */}

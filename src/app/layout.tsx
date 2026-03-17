@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ranibeautyclinic.com",
+    url: "https://www.ranibeautyclinic.com",
     siteName: "Rani Beauty Clinic",
     title: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
     description:
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  metadataBase: new URL("https://ranibeautyclinic.com"),
+  metadataBase: new URL("https://www.ranibeautyclinic.com"),
 };
 
 export default function RootLayout({

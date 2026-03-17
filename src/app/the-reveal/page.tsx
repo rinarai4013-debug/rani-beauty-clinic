@@ -12,7 +12,7 @@ export const metadata: Metadata = {
       "Our signature protocol for restoring skin firmness and quality after GLP-1 weight loss. Sofwave + Secret RF combination treatment in Renton, WA.",
   },
   alternates: {
-    canonical: "https://ranibeautyclinic.com/the-reveal",
+    canonical: "https://www.ranibeautyclinic.com/the-reveal",
   },
 };
 
@@ -35,7 +35,7 @@ const revealSchema = {
     {
       "@type": "MedicalBusiness",
       name: "Rani Beauty Clinic",
-      url: "https://ranibeautyclinic.com",
+      url: "https://www.ranibeautyclinic.com",
       telephone: "+14255394440",
       address: {
         "@type": "PostalAddress",

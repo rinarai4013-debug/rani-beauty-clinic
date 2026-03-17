@@ -56,6 +56,7 @@ export default function TreatmentQuiz() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [smsConsent, setSmsConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState("");
@@ -108,6 +109,7 @@ export default function TreatmentQuiz() {
           quizSteps[2].options.find((o) => o.value === answers[2])?.label || "",
       },
       source: "treatment-quiz",
+      smsConsent,
     };
 
     try {
@@ -275,6 +277,7 @@ export default function TreatmentQuiz() {
                   setName("");
                   setEmail("");
                   setPhone("");
+                  setSmsConsent(false);
                   setIsComplete(false);
                 }}
                 className="inline-flex items-center gap-2 rounded-full border border-white/20 px-7 py-3 font-body text-sm font-medium text-white/60 transition-all duration-300 hover:border-white/40 hover:text-white"
@@ -454,6 +457,19 @@ export default function TreatmentQuiz() {
                       className="w-full rounded-xl border-2 border-white/10 bg-white/5 px-5 py-3.5 font-body text-base text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-rani-gold focus:bg-white/10 focus:ring-0"
                     />
                   </div>
+
+                  {/* SMS Consent */}
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={smsConsent}
+                      onChange={(e) => setSmsConsent(e.target.checked)}
+                      className="mt-0.5 h-5 w-5 rounded border-2 border-white/20 bg-white/5 text-rani-gold accent-rani-gold focus:ring-rani-gold/30 cursor-pointer"
+                    />
+                    <span className="font-body text-sm text-white/50 group-hover:text-white/70 transition-colors leading-snug">
+                      I agree to receive appointment reminders and treatment updates via text message. Msg & data rates may apply.
+                    </span>
+                  </label>
 
                   {/* Error Message */}
                   {error && (

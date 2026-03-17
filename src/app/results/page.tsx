@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "View real before and after results from Rani Beauty Clinic patients. See transformations from laser hair removal, HydraFacial, RF microneedling, Botox, fillers, and more.",
   alternates: {
-    canonical: "https://ranibeautyclinic.com/results",
+    canonical: "https://www.ranibeautyclinic.com/results",
   },
 };
 

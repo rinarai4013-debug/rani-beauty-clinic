@@ -18,6 +18,7 @@ export default function AIChatWidget() {
     },
   ]);
   const [input, setInput] = useState('');
+  const [smsConsent, setSmsConsent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -66,6 +67,7 @@ export default function AIChatWidget() {
             phone: data.leadInfo.phone || '',
             service: 'AI Chat Lead',
             message: `Captured from AI chat. Last message: ${trimmed}`,
+            smsConsent,
           }),
         }).catch(() => {});
       }
@@ -151,8 +153,19 @@ export default function AIChatWidget() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
+            {/* SMS Consent + Input */}
             <div className="border-t border-rani-border bg-white px-4 py-3">
+              <label className="flex items-center gap-2 mb-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={smsConsent}
+                  onChange={e => setSmsConsent(e.target.checked)}
+                  className="h-3.5 w-3.5 rounded border-rani-border accent-rani-gold"
+                />
+                <span className="text-[11px] font-body text-rani-muted leading-tight">
+                  OK to text me appointment reminders
+                </span>
+              </label>
               <form
                 onSubmit={e => { e.preventDefault(); sendMessage(); }}
                 className="flex items-center gap-2"

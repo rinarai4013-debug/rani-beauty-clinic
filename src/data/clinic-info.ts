@@ -11,7 +11,7 @@ export const clinicInfo = {
   phone: "(425) 539-4440",
   phoneTel: "tel:+14255394440",
   email: "info@ranibeautyclinic.com",
-  website: "https://ranibeautyclinic.com",
+  website: "https://www.ranibeautyclinic.com",
   hours: {
     days: "Monday – Sunday",
     time: "10:00 AM – 7:00 PM",

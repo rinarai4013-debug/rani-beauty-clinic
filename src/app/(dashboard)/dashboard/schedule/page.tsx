@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Clock, User, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, User, MapPin, CheckCircle, XCircle, ShieldAlert } from 'lucide-react';
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
-import { useScheduleData } from '@/hooks/useDashboardData';
+import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
+import { useScheduleData, useNoShowRisk } from '@/hooks/useDashboardData';
 import type { AppointmentItem } from '@/types/dashboard';
 
 interface ScheduleData {
@@ -22,8 +23,18 @@ const STATUS_CONFIG: Record<string, { color: string; icon: React.ElementType; la
   scheduled: { color: 'text-rani-muted bg-rani-cream', icon: Clock, label: 'Scheduled' },
 };
 
+interface NoShowRiskItem {
+  appointmentId: string;
+  score: number;
+  level: 'low' | 'moderate' | 'high';
+}
+
 export default function SchedulePage() {
   const { data, isLoading } = useScheduleData() as { data: ScheduleData | undefined; isLoading: boolean };
+  const { data: noShowData } = useNoShowRisk();
+  const noShowMap = new Map<string, NoShowRiskItem>();
+  const noShowItems = (noShowData as { appointments?: NoShowRiskItem[] })?.appointments || [];
+  noShowItems.forEach(item => noShowMap.set(item.appointmentId, item));
 
   const appointments = data?.today || [];
   const stats = data?.stats || { totalSlots: 0, filledSlots: 0, openSlots: 16, noShows: 0, cancellations: 0 };
@@ -107,6 +118,19 @@ export default function SchedulePage() {
                       {apt.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{apt.room}</span>}
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{apt.duration}m</span>
                     </div>
+                    {/* No-Show Risk Badge */}
+                    {noShowMap.get(apt.id)?.level === 'high' && (
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-body font-semibold">
+                        <ShieldAlert className="w-2.5 h-2.5" />
+                        {noShowMap.get(apt.id)?.score}%
+                      </span>
+                    )}
+                    {noShowMap.get(apt.id)?.level === 'moderate' && (
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-body font-semibold">
+                        <ShieldAlert className="w-2.5 h-2.5" />
+                        {noShowMap.get(apt.id)?.score}%
+                      </span>
+                    )}
                     {apt.revenue > 0 && (
                       <span className="text-sm font-body font-semibold text-rani-navy">
                         ${apt.revenue.toLocaleString()}
@@ -138,6 +162,9 @@ export default function SchedulePage() {
               </div>
             )}
           </div>
+
+          {/* No-Show Risk Panel */}
+          <NoShowRiskPanel />
 
           <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
             <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider mb-4">

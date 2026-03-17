@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "From acne and aging skin to hyperpigmentation and unwanted hair — explore the skin concerns we treat at Rani Beauty Clinic in Renton, WA. Physician-supervised, all skin types.",
   alternates: {
-    canonical: "https://ranibeautyclinic.com/concerns",
+    canonical: "https://www.ranibeautyclinic.com/concerns",
   },
 };
 
