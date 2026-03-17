@@ -1,10 +1,17 @@
 import Airtable from 'airtable';
 
-const airtable = new Airtable({
-  apiKey: process.env.AIRTABLE_PAT,
-});
+// Lazy-initialized to avoid throwing during Next.js build (env vars unavailable at build time)
+let _base: ReturnType<InstanceType<typeof Airtable>['base']> | null = null;
 
-const base = airtable.base(process.env.AIRTABLE_BASE_ID!);
+function getBase() {
+  if (!_base) {
+    const airtable = new Airtable({
+      apiKey: process.env.AIRTABLE_PAT,
+    });
+    _base = airtable.base(process.env.AIRTABLE_BASE_ID!);
+  }
+  return _base;
+}
 
 // Rate limiting: Airtable allows 5 req/sec per base
 const queue: (() => void)[] = [];
@@ -31,18 +38,18 @@ export function rateLimitedQuery<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 export const Tables = {
-  clients: () => base('Clients'),
-  appointments: () => base('Appointments'),
-  transactions: () => base('Transactions'),
-  kpis: () => base('KPI Snapshots'),
-  alerts: () => base('Alerts'),
-  packages: () => base('Packages'),
-  memberships: () => base('Memberships'),
-  intakes: () => base('Client Intakes'),
-  reviews: () => base('Reviews'),
-  messagesLog: () => base('Messages Log'),
-  competitorIntel: () => base('Competitor Intelligence'),
-  intakeIntelligence: () => base('Intake Intelligence'),
+  clients: () => getBase()('Clients'),
+  appointments: () => getBase()('Appointments'),
+  transactions: () => getBase()('Transactions'),
+  kpis: () => getBase()('KPI Snapshots'),
+  alerts: () => getBase()('Alerts'),
+  packages: () => getBase()('Packages'),
+  memberships: () => getBase()('Memberships'),
+  intakes: () => getBase()('Client Intakes'),
+  reviews: () => getBase()('Reviews'),
+  messagesLog: () => getBase()('Messages Log'),
+  competitorIntel: () => getBase()('Competitor Intelligence'),
+  intakeIntelligence: () => getBase()('Intake Intelligence'),
 } as const;
 
 // Helper to fetch all records with pagination
