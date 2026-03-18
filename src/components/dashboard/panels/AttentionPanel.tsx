@@ -1,8 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AlertTriangle, AlertCircle, Info, X, ChevronRight } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info, X, CheckCircle } from 'lucide-react';
 import { useAlerts } from '@/hooks/useDashboardData';
+import { PanelSkeleton } from '@/components/dashboard/shared';
+import { InlineError } from '@/components/dashboard/shared';
 import type { AlertItem } from '@/types/dashboard';
 
 const SEVERITY_CONFIG = {
@@ -29,33 +31,24 @@ const SEVERITY_CONFIG = {
   },
 };
 
-// Mock alerts - replace with useAlerts() hook
-const MOCK_ALERTS: AlertItem[] = [
-  {
-    id: '1',
-    type: 'lead_volume',
-    severity: 'warning',
-    message: '3 leads unanswered for 2+ hours',
-    actionRecommended: 'Check lead queue and respond immediately',
-    status: 'active',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    type: 'show_rate',
-    severity: 'info',
-    message: 'Show rate at 75% this week (target: 85%)',
-    actionRecommended: 'Review reminder messages and confirmation process',
-    status: 'active',
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export default function AttentionPanel() {
-  const alerts = MOCK_ALERTS; // Replace with real data
+  const { data, isLoading, error, mutate } = useAlerts();
+  const alerts = ((data as { alerts?: AlertItem[] })?.alerts ?? []).filter(
+    (a: AlertItem) => a.status === 'active'
+  );
+
+  if (isLoading) return <PanelSkeleton rows={3} />;
+
+  if (error) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
+        <InlineError message="Failed to load alerts" onRetry={() => mutate()} />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-4 sm:p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-amber-500" />
@@ -63,18 +56,24 @@ export default function AttentionPanel() {
             Attention Needed
           </h3>
         </div>
-        <span className="px-2 py-0.5 bg-amber-100 rounded-full text-xs font-body font-semibold text-amber-700">
-          {alerts.length}
-        </span>
+        {alerts.length > 0 && (
+          <span className="px-2 py-0.5 bg-amber-100 rounded-full text-xs font-body font-semibold text-amber-700">
+            {alerts.length}
+          </span>
+        )}
       </div>
 
       {alerts.length === 0 ? (
-        <div className="text-center py-6">
-          <p className="text-sm font-body text-rani-muted">All clear! The orchestra is in tune.</p>
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-3">
+            <CheckCircle className="w-5 h-5 text-green-500" />
+          </div>
+          <p className="text-sm font-body font-medium text-rani-text">All clear!</p>
+          <p className="text-xs font-body text-rani-muted mt-1">No alerts require your attention right now.</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {alerts.map((alert, i) => {
+        <div className="space-y-3 max-h-80 overflow-y-auto">
+          {alerts.map((alert: AlertItem, i: number) => {
             const config = SEVERITY_CONFIG[alert.severity];
             const Icon = config.icon;
             return (
@@ -95,7 +94,7 @@ export default function AttentionPanel() {
                       {alert.actionRecommended}
                     </p>
                   </div>
-                  <button className="p-1 hover:bg-white/50 rounded text-rani-muted hover:text-rani-text transition-colors">
+                  <button className="p-1 hover:bg-white/50 rounded text-rani-muted hover:text-rani-text transition-colors flex-shrink-0">
                     <X className="w-3 h-3" />
                   </button>
                 </div>

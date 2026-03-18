@@ -2,11 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Sparkles, Calendar } from 'lucide-react';
+
+interface ChatAction {
+  type: 'book_now';
+  label: string;
+  url: string;
+}
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  actions?: ChatAction[];
 }
 
 export default function AIChatWidget() {
@@ -46,7 +53,7 @@ export default function AIChatWidget() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: newMessages,
+          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           visitorInfo: {
             page: typeof window !== 'undefined' ? window.location.pathname : '',
           },
@@ -54,7 +61,14 @@ export default function AIChatWidget() {
       });
 
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: data.reply,
+          actions: data.actions,
+        },
+      ]);
 
       // If lead info was captured, fire to contact API
       if (data.leadInfo?.captured) {
@@ -74,7 +88,7 @@ export default function AIChatWidget() {
     } catch {
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please call us at (425) 555-RANI or visit ranibeautyclinic.com to book." },
+        { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please call us at (425) 207-8870 or visit ranibeautyclinic.com to book." },
       ]);
     } finally {
       setIsLoading(false);
@@ -128,14 +142,33 @@ export default function AIChatWidget() {
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm font-body leading-relaxed ${
-                      msg.role === 'user'
-                        ? 'bg-rani-navy text-white rounded-br-md'
-                        : 'bg-rani-cream text-rani-navy rounded-bl-md'
-                    }`}
-                  >
-                    {msg.content}
+                  <div className="max-w-[85%]">
+                    <div
+                      className={`rounded-2xl px-4 py-2.5 text-sm font-body leading-relaxed ${
+                        msg.role === 'user'
+                          ? 'bg-rani-navy text-white rounded-br-md'
+                          : 'bg-rani-cream text-rani-navy rounded-bl-md'
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                    {/* Book Now CTA buttons */}
+                    {msg.actions && msg.actions.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {msg.actions.map((action, j) => (
+                          <a
+                            key={j}
+                            href={action.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-rani-gold px-4 py-2 text-xs font-semibold text-rani-navy font-body transition-all hover:bg-rani-gold/90 hover:shadow-md"
+                          >
+                            <Calendar className="h-3.5 w-3.5" />
+                            {action.label}
+                          </a>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

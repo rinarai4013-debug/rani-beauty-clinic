@@ -1,5 +1,6 @@
 import { Toaster } from 'react-hot-toast';
 import SoundProvider from '@/components/dashboard/sound/SoundProvider';
+import DashboardErrorBoundary from '@/components/dashboard/ErrorBoundary';
 
 export const metadata = {
   title: {
@@ -16,7 +17,9 @@ export default function DashboardRootLayout({
 }) {
   return (
     <SoundProvider>
-      {children}
+      <DashboardErrorBoundary>
+        {children}
+      </DashboardErrorBoundary>
       <Toaster
         position="top-right"
         toastOptions={{

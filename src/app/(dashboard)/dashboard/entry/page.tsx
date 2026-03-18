@@ -6,6 +6,7 @@ import {
   UserPlus, FileText, DollarSign, Receipt, Package, ClipboardList,
   Star, Moon, Wrench, Brain,
 } from 'lucide-react';
+import { DashboardErrorBoundary } from '@/components/dashboard/shared';
 
 const FORM_CARDS = [
   {
@@ -102,48 +103,50 @@ const item = {
 
 export default function EntryHubPage() {
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-heading text-rani-navy">Quick Entry Hub</h1>
-        <p className="text-sm font-body text-rani-muted mt-1">
-          Log data fast — everything feeds into your dashboard
-        </p>
-      </div>
+    <DashboardErrorBoundary pageName="Quick Entry">
+      <div className="space-y-6 sm:space-y-8">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Quick Entry Hub</h1>
+          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
+            Log data fast — everything feeds into your dashboard
+          </p>
+        </div>
 
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        {FORM_CARDS.map((card) => {
-          const Icon = card.icon;
-          return (
-            <motion.div key={card.label} variants={item}>
-              <Link href={card.href}>
-                <div className={`p-5 rounded-xl border-2 hover:shadow-md transition-all cursor-pointer group ${card.color}`}>
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/80 shadow-sm">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-body font-semibold text-rani-navy group-hover:text-rani-navy/80">
-                          {card.label}
-                        </span>
-                        <span className="text-lg">{card.emoji}</span>
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+        >
+          {FORM_CARDS.map((card) => {
+            const Icon = card.icon;
+            return (
+              <motion.div key={card.label} variants={item}>
+                <Link href={card.href}>
+                  <div className={`p-4 sm:p-5 rounded-xl border-2 hover:shadow-md transition-all cursor-pointer group ${card.color}`}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-white/80 shadow-sm flex-shrink-0">
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <p className="text-xs font-body text-rani-muted mt-1">
-                        {card.description}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-body font-semibold text-rani-navy group-hover:text-rani-navy/80">
+                            {card.label}
+                          </span>
+                          <span className="text-lg">{card.emoji}</span>
+                        </div>
+                        <p className="text-xs font-body text-rani-muted mt-1">
+                          {card.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          );
-        })}
-      </motion.div>
-    </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </DashboardErrorBoundary>
   );
 }

@@ -11,6 +11,7 @@ import AtRiskClientsPanel from '@/components/dashboard/panels/AtRiskClientsPanel
 import RevenueHealthPanel from '@/components/dashboard/panels/RevenueHealthPanel';
 import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
+import { DashboardErrorBoundary } from '@/components/dashboard/shared';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
 
@@ -32,107 +33,111 @@ export default function ExecutiveHome() {
   const kpis = data as KPIData | undefined;
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-heading text-rani-navy">Command Center</h1>
-        <p className="text-sm font-body text-rani-muted mt-1">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-        </p>
-      </div>
-
-      {/* Hero KPI Row */}
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
-      >
-        <motion.div variants={item}>
-          <KPICard
-            title="Revenue Today"
-            value={kpis?.revenue.today ?? 0}
-            prefix="$"
-            trend={{
-              value: 12.5,
-              direction: 'up',
-              label: 'vs yesterday',
-            }}
-            progress={{
-              current: kpis?.revenue.today ?? 0,
-              target: 4000,
-              label: 'of $4K daily goal',
-            }}
-            sparklineData={kpis?.revenue.trend ?? [800, 1200, 950, 1800, 2200, 3100, kpis?.revenue.today ?? 0]}
-            icon="dollar-sign"
-            size="hero"
-            loading={isLoading}
-          />
-        </motion.div>
-        <motion.div variants={item}>
-          <KPICard
-            title="Appointments"
-            value={kpis?.bookings.today ?? 0}
-            trend={{
-              value: 8,
-              direction: 'up',
-              label: 'vs last week',
-            }}
-            progress={{
-              current: kpis?.bookings.utilization ?? 0,
-              target: 100,
-              label: 'utilization',
-            }}
-            sparklineData={kpis?.bookings.trend ?? [5, 7, 6, 8, 9, 7, kpis?.bookings.today ?? 0]}
-            icon="calendar"
-            size="hero"
-            loading={isLoading}
-          />
-        </motion.div>
-        <motion.div variants={item}>
-          <KPICard
-            title="Consult Close Rate"
-            value={kpis?.consults.closeRate ?? 0}
-            suffix="%"
-            trend={{
-              value: 5,
-              direction: 'up',
-              label: 'vs last month',
-            }}
-            sparklineData={kpis?.consults.trend ?? [55, 60, 58, 65, 70, 62, kpis?.consults.closeRate ?? 0]}
-            icon="target"
-            size="hero"
-            loading={isLoading}
-          />
-        </motion.div>
-        <motion.div variants={item}>
-          <ClinicScoreMeter />
-        </motion.div>
-      </motion.div>
-
-      {/* Wins + Boss Level */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <DailyWinsBanner />
+    <DashboardErrorBoundary pageName="Command Center">
+      <div className="space-y-6 sm:space-y-8">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Command Center</h1>
+          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
         </div>
-        <BossLevelMilestone />
-      </div>
 
-      {/* Attention + Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AttentionPanel />
-        <RecentActivity />
-      </div>
+        {/* Hero KPI Row */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6"
+        >
+          <motion.div variants={item}>
+            <KPICard
+              title="Revenue Today"
+              value={kpis?.revenue.today ?? 0}
+              prefix="$"
+              trend={{
+                value: 12.5,
+                direction: 'up',
+                label: 'vs yesterday',
+              }}
+              progress={{
+                current: kpis?.revenue.today ?? 0,
+                target: 4000,
+                label: 'of $4K daily goal',
+              }}
+              sparklineData={kpis?.revenue.trend ?? [800, 1200, 950, 1800, 2200, 3100, kpis?.revenue.today ?? 0]}
+              icon="dollar-sign"
+              size="hero"
+              loading={isLoading}
+            />
+          </motion.div>
+          <motion.div variants={item}>
+            <KPICard
+              title="Appointments"
+              value={kpis?.bookings.today ?? 0}
+              trend={{
+                value: 8,
+                direction: 'up',
+                label: 'vs last week',
+              }}
+              progress={{
+                current: kpis?.bookings.utilization ?? 0,
+                target: 100,
+                label: 'utilization',
+              }}
+              sparklineData={kpis?.bookings.trend ?? [5, 7, 6, 8, 9, 7, kpis?.bookings.today ?? 0]}
+              icon="calendar"
+              size="hero"
+              loading={isLoading}
+            />
+          </motion.div>
+          <motion.div variants={item}>
+            <KPICard
+              title="Consult Close Rate"
+              value={kpis?.consults.closeRate ?? 0}
+              suffix="%"
+              trend={{
+                value: 5,
+                direction: 'up',
+                label: 'vs last month',
+              }}
+              sparklineData={kpis?.consults.trend ?? [55, 60, 58, 65, 70, 62, kpis?.consults.closeRate ?? 0]}
+              icon="target"
+              size="hero"
+              loading={isLoading}
+            />
+          </motion.div>
+          <motion.div variants={item}>
+            <ClinicScoreMeter />
+          </motion.div>
+        </motion.div>
 
-      {/* Intelligence Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RevenueHealthPanel />
-        <NoShowRiskPanel />
-        <AtRiskClientsPanel />
-      </div>
+        {/* Wins + Boss Level */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="lg:col-span-2">
+            <DailyWinsBanner />
+          </div>
+          <BossLevelMilestone />
+        </div>
 
-      {/* Quick Actions */}
-      <QuickActions />
-    </div>
+        {/* Attention + Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <AttentionPanel />
+          <RecentActivity />
+        </div>
+
+        {/* Intelligence Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <RevenueHealthPanel />
+          <NoShowRiskPanel />
+          <div className="md:col-span-2 lg:col-span-1">
+            <AtRiskClientsPanel />
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <QuickActions />
+      </div>
+    </DashboardErrorBoundary>
   );
 }

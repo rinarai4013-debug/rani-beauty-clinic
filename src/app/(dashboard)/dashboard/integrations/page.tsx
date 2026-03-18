@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { DashboardErrorBoundary } from '@/components/dashboard/shared';
 
 interface PlatformStatus {
   configured: boolean;
@@ -177,15 +178,16 @@ export default function IntegrationsPage() {
   const totalCount = integrations ? Object.keys(integrations).length : 5;
 
   return (
-    <div className="space-y-8">
+    <DashboardErrorBoundary pageName="Integrations">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-heading text-rani-navy flex items-center gap-2">
-            <Plug className="w-6 h-6 text-rani-gold" />
+          <h1 className="text-xl sm:text-2xl font-heading text-rani-navy flex items-center gap-2">
+            <Plug className="w-5 h-5 sm:w-6 sm:h-6 text-rani-gold" />
             Integrations
           </h1>
-          <p className="text-sm font-body text-rani-muted mt-1">
+          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
             Connect platforms to auto-sync live data into your dashboard
           </p>
         </div>
@@ -426,5 +428,6 @@ export default function IntegrationsPage() {
         </div>
       </div>
     </div>
+    </DashboardErrorBoundary>
   );
 }
