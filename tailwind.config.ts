@@ -11,7 +11,8 @@ const config: Config = {
       colors: {
         "rani-navy": "#0F1D2C",
         "rani-navy-light": "#1A2A3C",
-        "rani-gold": "#F3D6BE",
+        "rani-gold": "#C9A96E",
+        "rani-gold-dark": "#B8934A",
         "rani-gold-light": "#F8E5D5",
         "rani-cream": "#FAF8F5",
         "rani-text": "#2A2A2A",

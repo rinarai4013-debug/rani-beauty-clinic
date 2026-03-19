@@ -54,3 +54,11 @@ h1 {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Ensure minimum touch target sizes for accessibility */
+@media (pointer: coarse) {
+  a, button, [role="button"], input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

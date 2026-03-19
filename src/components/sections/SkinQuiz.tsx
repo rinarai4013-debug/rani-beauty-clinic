@@ -504,6 +504,11 @@ export default function SkinQuiz() {
           <div className="h-2 w-full overflow-hidden rounded-full bg-rani-border">
             <motion.div
               className="h-full rounded-full bg-rani-gold"
+              role="progressbar"
+              aria-label="Quiz progress"
+              aria-valuenow={Math.round(progress)}
+              aria-valuemin={0}
+              aria-valuemax={100}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4, ease: "easeInOut" }}

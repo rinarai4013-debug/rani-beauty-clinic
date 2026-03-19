@@ -241,6 +241,10 @@ export default function SocialProofToast() {
           {/* Subtle progress bar */}
           <motion.div
             className="absolute bottom-0 left-0 h-[2px] bg-[#C9A96E]/40 rounded-b-lg"
+            role="progressbar"
+            aria-label="Notification timer"
+            aria-valuemin={0}
+            aria-valuemax={100}
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: 8, ease: "linear" }}

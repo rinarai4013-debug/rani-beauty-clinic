@@ -14,32 +14,35 @@ import {
   Pill,
 } from "lucide-react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import TrustLogosBar from "@/components/sections/TrustLogosBar";
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import MeetTheTeam from "@/components/sections/MeetTheTeam";
-import BeforeAfterSlider from "@/components/sections/BeforeAfterSlider";
-import TreatmentQuiz from "@/components/sections/TreatmentQuiz";
-import ConsultationEmbed from "@/components/sections/ConsultationEmbed";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import StaggerChildren from "@/components/animations/StaggerChildren";
 import ServiceCard from "@/components/services/ServiceCard";
 import CTABanner from "@/components/sections/CTABanner";
-import MapSection from "@/components/sections/MapSection";
-import ReviewCarousel from "@/components/sections/ReviewCarousel";
-import BlogTeaser from "@/components/sections/BlogTeaser";
 import FAQ from "@/components/sections/FAQ";
-import PopularPackages from "@/components/sections/PopularPackages";
 import ProcessSteps from "@/components/sections/ProcessSteps";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
 import TrustBar from "@/components/sections/TrustBar";
-import WhyRaniComparison from "@/components/sections/WhyRaniComparison";
-import BeforeAfterGallery from "@/components/sections/BeforeAfterGallery";
 import { clinicInfo } from "@/data/clinic-info";
 import { serviceImages } from "@/data/service-images";
+
+// Dynamic imports for below-fold sections (reduces initial JS bundle)
+const BeforeAfterSlider = dynamic(() => import("@/components/sections/BeforeAfterSlider"), { ssr: false });
+const TreatmentQuiz = dynamic(() => import("@/components/sections/TreatmentQuiz"), { ssr: false });
+const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"), { ssr: false });
+const ReviewCarousel = dynamic(() => import("@/components/sections/ReviewCarousel"), { ssr: false });
+const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"), { ssr: false });
+const MapSection = dynamic(() => import("@/components/sections/MapSection"), { ssr: false });
+const BeforeAfterGallery = dynamic(() => import("@/components/sections/BeforeAfterGallery"), { ssr: false });
+const WhyRaniComparison = dynamic(() => import("@/components/sections/WhyRaniComparison"), { ssr: false });
+const BlogTeaser = dynamic(() => import("@/components/sections/BlogTeaser"), { ssr: false });
 
 const aestheticServices = [
   {

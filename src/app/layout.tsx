@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { fontVariables } from "@/lib/fonts";
 import SkipNav from "@/components/ui/SkipNav";
@@ -80,14 +79,6 @@ export default function RootLayout({
         {/* Google Fonts preconnects removed — fonts are now self-hosted via next/font */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <Analytics />
-        {/* Mangomint Online Booking Widget — enables overlay booking on ranibeautyclinic.com */}
-        <Script id="mangomint-config" strategy="afterInteractive">
-          {`window.Mangomint = window.Mangomint || {}; window.Mangomint.CompanyId = 876418;`}
-        </Script>
-        <Script
-          src="https://booking.mangomint.com/app.js"
-          strategy="afterInteractive"
-        />
       </head>
       <body className="font-body text-rani-text antialiased">
         <SkipNav />
