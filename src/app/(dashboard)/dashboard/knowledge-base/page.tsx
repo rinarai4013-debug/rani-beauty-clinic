@@ -42,7 +42,7 @@ const HEALTH_COLORS: Record<string, string> = {
 };
 
 export default function KnowledgeBasePage() {
-  const { data: raw, isLoading } = useDashboardData<KBResponse>('/api/dashboard/knowledge-base');
+  const { data: raw, isLoading, error, mutate } = useDashboardData<KBResponse>('/knowledge-base');
   const data = raw?.data;
 
   const totalDocs = data?.totalDocuments || 0;
@@ -65,7 +65,9 @@ export default function KnowledgeBasePage() {
         </div>
 
         {/* Hero KPIs */}
-        {isLoading ? (
+        {error ? (
+          <InlineError message="Failed to load knowledge base data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <KPIRowSkeleton />
         ) : hasNoData ? (
           <DashboardEmptyState

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 
 // Actual fields in the live Airtable Clients table
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     const filterOptions = statusFilter
-      ? { filterByFormula: `{Status} = '${statusFilter}'` }
+      ? { filterByFormula: `{Status} = '${sanitizeFormulaValue(statusFilter)}'` }
       : undefined;
 
     // Clients table has no "Is Test" field — pass skipTestFilter=true

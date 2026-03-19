@@ -13,6 +13,7 @@ export const TABLE_NAMES = {
   KPI_SNAPSHOTS: 'KPI Snapshots',
   ALERTS: 'Alerts',
   COMPETITOR_INTELLIGENCE: 'Competitor Intelligence',
+  TREATMENT_PLANS: 'Treatment Plans',
 } as const;
 
 // Key field names for each table (matching Airtable column names)
@@ -97,6 +98,7 @@ export const FIELDS = {
     actionRecommended: 'Action Recommended',
     status: 'Status',
     createdDate: 'Created Date',
+    notes: 'Notes', // Long Text — used for System Config storage (e.g. encrypted Plaid connection)
   },
   reviews: {
     platform: 'Platform',
@@ -114,6 +116,17 @@ export const FIELDS = {
     status: 'Status',
     startDate: 'Start Date',
     churnRiskScore: 'Churn Risk Score',
+  },
+  treatmentPlans: {
+    client: 'Client',              // Linked record to Clients
+    planTier: 'Plan Tier',         // Single select: Essential, Recommended, Platinum
+    planValue: 'Plan Value',       // Currency
+    servicesIncluded: 'Services Included', // Long text
+    planUrl: 'Plan URL',           // URL
+    status: 'Status',              // Single select: Sent, Viewed, Selected, Booked, Expired
+    createdDate: 'Created Date',   // Date
+    intakeRecordId: 'Intake Record ID', // Single-line text (for linking back)
+    clientName: 'Client Name',     // Single-line text (denormalized for easy access)
   },
   packages: {
     name: 'Package Name',

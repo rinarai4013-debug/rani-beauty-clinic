@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { analyzePricing, type PricingInput, type TransactionHistory, type ServicePricing } from '@/lib/pricing/dynamic-engine';
@@ -23,7 +24,10 @@ const RANI_SERVICES: ServicePricing[] = [
 export async function GET() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!hasPermission(session.role, 'view_revenue')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

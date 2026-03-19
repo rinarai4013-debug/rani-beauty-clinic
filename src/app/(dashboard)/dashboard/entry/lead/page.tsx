@@ -52,8 +52,19 @@ export default function AddLeadPage() {
   const [budget, setBudget] = useState('');
   const [notes, setNotes] = useState('');
 
+  const formatPhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('1')) return digits.slice(1);
+    return digits;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPhone = formatPhone(phone);
+    if (cleanPhone.length !== 10) {
+      toast.error('Phone number must be 10 digits');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const parts = fullName.trim().split(/\s+/);
@@ -62,7 +73,7 @@ export default function AddLeadPage() {
       const res = await fetch('/api/dashboard/entry/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, phone, email, source, campaign, interest, timing, budget, notes }),
+        body: JSON.stringify({ firstName, lastName, phone: cleanPhone, email, source, campaign, interest, timing, budget, notes }),
       });
       if (!res.ok) {
         const data = await res.json();

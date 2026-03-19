@@ -8,7 +8,7 @@ import {
   MessageSquare, CreditCard, Crown, AlertTriangle, Clock, TrendingUp,
 } from 'lucide-react';
 import RecommendationsPanel from '@/components/dashboard/panels/RecommendationsPanel';
-import { DashboardErrorBoundary, PanelSkeleton, KPIRowSkeleton, SkeletonBar } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, PanelSkeleton, KPIRowSkeleton, SkeletonBar, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 
 interface ClientAppointment {
@@ -52,9 +52,22 @@ function formatCurrency(amount: number): string {
 export default function ClientProfilePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { data: client, isLoading } = useDashboardData<ClientProfile>(
+  const { data: client, isLoading, error, mutate } = useDashboardData<ClientProfile>(
     id ? `/clients/${id}?full=true` : null, { refreshInterval: 60000 }
   );
+
+  if (error) {
+    return (
+      <DashboardErrorBoundary pageName="Client Profile">
+        <div className="space-y-6">
+          <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-body text-rani-muted hover:text-rani-navy transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+          <InlineError message="Failed to load client profile" onRetry={() => mutate()} />
+        </div>
+      </DashboardErrorBoundary>
+    );
+  }
 
   if (isLoading) {
     return (

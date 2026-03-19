@@ -73,6 +73,7 @@ export type AlertType =
   | 'provider_capacity'
   | 'financing'
   | 'system_error'
+  | 'follow_up'
   | 'custom';
 
 export interface RevenueData {

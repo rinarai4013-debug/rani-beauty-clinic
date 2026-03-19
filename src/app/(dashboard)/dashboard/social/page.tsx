@@ -45,7 +45,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default function SocialAIPage() {
-  const { data: raw, isLoading } = useSocialPlan() as { data: SocialResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = useSocialPlan() as { data: SocialResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const calendar = data?.weeklyCalendar || [];
@@ -74,8 +74,10 @@ export default function SocialAIPage() {
           <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">AI-generated weekly content calendar, hashtag strategy, and posting schedule</p>
         </div>
 
-        {/* Loading State */}
-        {isLoading ? (
+        {/* Error / Loading / Empty State */}
+        {error ? (
+          <InlineError message="Failed to load social content plan" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <>
             <KPIRowSkeleton count={4} />
             <PanelSkeleton rows={3} />

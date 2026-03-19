@@ -41,6 +41,16 @@ export default function AddExpensePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const today = new Date().toISOString().split('T')[0];
+    if (date > today) {
+      toast.error('Expense date cannot be in the future');
+      return;
+    }
+    const amt = parseFloat(amount) || 0;
+    if (amt <= 0) {
+      toast.error('Amount must be greater than $0');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/dashboard/entry/expense', {
@@ -83,7 +93,7 @@ export default function AddExpensePage() {
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField label="Date" required>
-          <FormInput type="date" value={date} onChange={e => setDate(e.target.value)} required />
+          <FormInput type="date" value={date} onChange={e => setDate(e.target.value)} required max={new Date().toISOString().split('T')[0]} />
         </FormField>
         <FormField label="Vendor" required>
           <FormInput placeholder="e.g. Olympia Pharmacy" value={vendor} onChange={e => setVendor(e.target.value)} required />

@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
+// Simple rate limiter: 10 requests per minute per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
 const SERVICES = [
   { name: 'Sofwave', category: 'Skin Tightening', price: '$2,750–$4,500', description: 'Non-invasive ultrasound skin tightening for face and body. FDA-cleared. No downtime.' },
   { name: 'HydraFacial', category: 'Facial', price: '$275', description: 'Signature cleansing, extraction, and hydration facial. Immediate glow.' },
@@ -22,6 +39,11 @@ const SERVICES = [
 ];
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { primaryGoal, experience, timeline, budget } = body;

@@ -64,6 +64,13 @@ export const NAV_ITEMS: NavItem[] = [
     permission: 'view_finance',
     group: 'operations',
   },
+  {
+    label: 'Reactivation',
+    href: '/dashboard/reactivation',
+    icon: 'UserMinus',
+    permission: 'view_clients',
+    group: 'operations',
+  },
 
   // Intelligence
   {

@@ -1,5 +1,13 @@
 import Airtable from 'airtable';
 
+// Validate env vars at module load time
+if (!process.env.AIRTABLE_PAT) {
+  console.error('[Airtable] AIRTABLE_PAT is missing. Airtable queries will fail.');
+}
+if (!process.env.AIRTABLE_BASE_ID) {
+  console.error('[Airtable] AIRTABLE_BASE_ID is missing. Airtable queries will fail.');
+}
+
 // Lazy-initialized to avoid throwing during Next.js build (env vars unavailable at build time)
 let _base: ReturnType<InstanceType<typeof Airtable>['base']> | null = null;
 
@@ -14,6 +22,8 @@ function getBase() {
 }
 
 // Rate limiting: Airtable allows 5 req/sec per base
+const MAX_QUEUE_SIZE = 100;
+const MAX_RETRIES = 3;
 const queue: (() => void)[] = [];
 let processing = false;
 
@@ -28,10 +38,47 @@ async function processQueue() {
   processing = false;
 }
 
+function getStatusCode(err: unknown): number | undefined {
+  if (err && typeof err === 'object' && 'statusCode' in err) {
+    return (err as { statusCode: number }).statusCode;
+  }
+  return undefined;
+}
+
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const status = getStatusCode(err);
+
+      if (status === 429 && attempt < MAX_RETRIES) {
+        console.warn(`[Airtable] Rate limited (429). Retry ${attempt}/${MAX_RETRIES} after 1s...`);
+        await new Promise((r) => setTimeout(r, 1000));
+        continue;
+      }
+
+      if (status && status >= 500 && status < 600 && attempt < MAX_RETRIES) {
+        console.warn(`[Airtable] Server error (${status}). Retry ${attempt}/${MAX_RETRIES} after 500ms...`);
+        await new Promise((r) => setTimeout(r, 500));
+        continue;
+      }
+
+      throw err;
+    }
+  }
+  // Unreachable, but satisfies TypeScript
+  throw new Error('[Airtable] Retry loop exited unexpectedly');
+}
+
 export function rateLimitedQuery<T>(fn: () => Promise<T>): Promise<T> {
+  if (queue.length >= MAX_QUEUE_SIZE) {
+    return Promise.reject(new Error('Airtable queue overflow'));
+  }
+
   return new Promise((resolve, reject) => {
     queue.push(() => {
-      fn().then(resolve).catch(reject);
+      withRetry(fn).then(resolve).catch(reject);
     });
     processQueue();
   });
@@ -50,6 +97,7 @@ export const Tables = {
   messagesLog: () => getBase()('Messages Log'),
   competitorIntel: () => getBase()('Competitor Intelligence'),
   intakeIntelligence: () => getBase()('Intake Intelligence'),
+  treatmentPlans: () => getBase()('Treatment Plans'),
 } as const;
 
 // Helper to fetch all records with pagination

@@ -1,9 +1,20 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import type { SessionPayload, UserRole } from '@/types/auth';
 
 const COOKIE_NAME = 'rani-session';
-const secret = new TextEncoder().encode(process.env.DASHBOARD_JWT_SECRET || 'dev-secret-change-me');
+
+if (!process.env.DASHBOARD_JWT_SECRET) {
+  throw new Error('DASHBOARD_JWT_SECRET is required');
+}
+const secret = new TextEncoder().encode(process.env.DASHBOARD_JWT_SECRET);
+
+const sessionPayloadSchema = z.object({
+  username: z.string().min(1),
+  role: z.enum(['ceo', 'frontdesk', 'provider', 'marketing', 'operations']),
+  displayName: z.string().min(1),
+});
 
 export async function createSession(username: string, role: UserRole, displayName: string): Promise<string> {
   const token = await new SignJWT({ username, role, displayName })
@@ -18,6 +29,8 @@ export async function createSession(username: string, role: UserRole, displayNam
 export async function verifySession(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secret);
+    const parsed = sessionPayloadSchema.safeParse(payload);
+    if (!parsed.success) return null;
     return payload as unknown as SessionPayload;
   } catch {
     return null;

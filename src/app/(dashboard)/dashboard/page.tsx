@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Clock } from 'lucide-react';
+import useSWR from 'swr';
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ClinicScoreMeter from '@/components/dashboard/gamification/ClinicScoreMeter';
 import DailyWinsBanner from '@/components/dashboard/gamification/DailyWinsBanner';
@@ -10,8 +13,10 @@ import RecentActivity from '@/components/dashboard/panels/RecentActivity';
 import AtRiskClientsPanel from '@/components/dashboard/panels/AtRiskClientsPanel';
 import RevenueHealthPanel from '@/components/dashboard/panels/RevenueHealthPanel';
 import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
+import SaveQueuePanel from '@/components/dashboard/panels/SaveQueuePanel';
+import FunnelHealthPanel from '@/components/dashboard/panels/FunnelHealthPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
-import { DashboardErrorBoundary } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, InlineError } from '@/components/dashboard/shared';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
 
@@ -28,22 +33,46 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+function useLastUpdated(data: unknown) {
+  const lastUpdatedRef = useRef<Date | null>(null);
+  useEffect(() => {
+    if (data) lastUpdatedRef.current = new Date();
+  }, [data]);
+  return lastUpdatedRef.current;
+}
+
+const authFetcher = (url: string) => fetch(url).then(r => r.ok ? r.json() : null);
+
 export default function ExecutiveHome() {
-  const { data, isLoading } = useKPIs('today');
+  const { data, isLoading, error, mutate } = useKPIs('today');
   const kpis = data as KPIData | undefined;
+  const lastUpdated = useLastUpdated(data);
+  const { data: authData } = useSWR('/api/dashboard/auth/me', authFetcher, { revalidateOnFocus: false });
+  const isCeo = authData?.user?.role === 'ceo';
 
   return (
     <DashboardErrorBoundary pageName="Command Center">
       <div className="space-y-6 sm:space-y-8">
         {/* Page Header */}
-        <div>
-          <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Command Center</h1>
-          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Command Center</h1>
+            <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
+          </div>
+          {lastUpdated && (
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-body text-rani-muted">
+              <Clock className="w-3 h-3" />
+              <span>Last updated {lastUpdated.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' })}</span>
+            </div>
+          )}
         </div>
 
         {/* Hero KPI Row */}
+        {error ? (
+          <InlineError message="Failed to load KPI data" onRetry={() => mutate()} />
+        ) : (
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -111,6 +140,10 @@ export default function ExecutiveHome() {
             <ClinicScoreMeter />
           </motion.div>
         </motion.div>
+        )}
+
+        {/* Save Queue */}
+        <SaveQueuePanel />
 
         {/* Wins + Boss Level */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -134,6 +167,9 @@ export default function ExecutiveHome() {
             <AtRiskClientsPanel />
           </div>
         </div>
+
+        {/* Funnel Health — CEO Only */}
+        {isCeo && <FunnelHealthPanel />}
 
         {/* Quick Actions */}
         <QuickActions />

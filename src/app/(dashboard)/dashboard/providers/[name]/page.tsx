@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
-import { DashboardErrorBoundary, PanelSkeleton, KPIRowSkeleton, SkeletonBar } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, PanelSkeleton, KPIRowSkeleton, SkeletonBar, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import { ArrowLeft, Calendar, Clock, Star, Users, Award, BarChart3 } from 'lucide-react';
 
@@ -35,9 +35,22 @@ export default function ProviderDetailPage() {
   const { name } = useParams<{ name: string }>();
   const router = useRouter();
   const decodedName = decodeURIComponent(name || '');
-  const { data: provider, isLoading } = useDashboardData<ProviderDetail>(
+  const { data: provider, isLoading, error, mutate } = useDashboardData<ProviderDetail>(
     name ? `/providers/${encodeURIComponent(decodedName)}` : null, { refreshInterval: 60000 }
   );
+
+  if (error) {
+    return (
+      <DashboardErrorBoundary pageName="Provider Detail">
+        <div className="space-y-6">
+          <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-body text-rani-muted hover:text-rani-navy transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+          <InlineError message="Failed to load provider data" onRetry={() => mutate()} />
+        </div>
+      </DashboardErrorBoundary>
+    );
+  }
 
   if (isLoading) {
     return (

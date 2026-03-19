@@ -31,7 +31,7 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 export default function MetaAdsAIPage() {
-  const { data: raw, isLoading } = useMetaAdsOptimizer() as { data: MetaAdsResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = useMetaAdsOptimizer() as { data: MetaAdsResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const summary = data?.performanceSummary;
@@ -56,8 +56,10 @@ export default function MetaAdsAIPage() {
           <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">AI-powered campaign optimization, budget allocation, and ad copy generation</p>
         </div>
 
-        {/* Loading State */}
-        {isLoading ? (
+        {/* Error / Loading / Empty State */}
+        {error ? (
+          <InlineError message="Failed to load Meta Ads data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <>
             <KPIRowSkeleton count={5} />
             <PanelSkeleton rows={4} />

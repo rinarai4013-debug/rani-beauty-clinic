@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import { logWebhookEvent } from '@/lib/logging/structured-logger';
 
 // POST — receive Mangomint webhook events
 // Webhook URL to configure in Mangomint:
@@ -8,25 +10,33 @@ import { cache } from '@/lib/cache';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const payload = JSON.parse(body);
 
-    // Optional: verify webhook signature
-    const signature = request.headers.get('x-mangomint-signature');
-    if (process.env.MANGOMINT_WEBHOOK_SECRET && signature) {
-      const crypto = await import('crypto');
-      const expected = crypto
-        .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
-        .update(body)
-        .digest('hex');
-      if (signature !== expected) {
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-      }
+    // MANDATORY: verify webhook signature
+    if (!process.env.MANGOMINT_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
     }
 
+    const signature = request.headers.get('x-mangomint-signature');
+    if (!signature) {
+      logWebhookEvent('mangomint', 'unknown', false, { error: 'Missing signature' });
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
+
+    const crypto = await import('crypto');
+    const expected = crypto
+      .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
+      .update(body)
+      .digest('hex');
+    if (signature !== expected) {
+      logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid signature' });
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const payload = JSON.parse(body);
     const event = payload.event || payload.type || 'unknown';
     const data = payload.data || payload;
 
-    console.log(`Mangomint webhook: ${event}`, JSON.stringify(data).substring(0, 200));
+    logWebhookEvent('mangomint', event, true, { dataPreview: JSON.stringify(data).substring(0, 200) });
 
     // Handle different event types
     switch (event) {
@@ -35,27 +45,63 @@ export async function POST(request: NextRequest) {
       case 'appointment.completed': {
         // Sync appointment to Airtable
         const apt = data;
+        const mangomintId = String(apt.id || '');
         const date = apt.startAt?.substring(0, 10) || apt.date || new Date().toISOString().substring(0, 10);
         const clientName = [apt.clientFirstName, apt.clientLastName].filter(Boolean).join(' ') || apt.clientName || 'Walk-in';
         const serviceName = apt.serviceName || apt.service?.name || 'Treatment';
 
+        const fields = {
+          Date: date,
+          Client: clientName,
+          Service: serviceName,
+          Provider: apt.staffName || apt.staff?.name || 'Rani',
+          Status: event === 'appointment.completed' ? 'Completed' : (apt.status || 'Scheduled'),
+          'Start Time': apt.startAt || '',
+          'End Time': apt.endAt || '',
+          Notes: apt.notes || '',
+          'MangoMint Appointment ID': mangomintId,
+        };
+
+        // For updates, search for existing record first
+        if (event === 'appointment.updated' && mangomintId) {
+          const existingId = await rateLimitedQuery(() =>
+            new Promise<string | null>((resolve) => {
+              Tables.appointments()
+                .select({
+                  filterByFormula: `{MangoMint Appointment ID} = "${sanitizeFormulaValue(mangomintId)}"`,
+                  maxRecords: 1,
+                  fields: ['MangoMint Appointment ID'],
+                })
+                .firstPage((err, records) => {
+                  if (err || !records || records.length === 0) resolve(null);
+                  else resolve(records[0].id);
+                });
+            })
+          );
+
+          if (existingId) {
+            await rateLimitedQuery(() =>
+              new Promise<void>((resolve, reject) => {
+                Tables.appointments().update(
+                  [{ id: existingId, fields }],
+                  { typecast: true },
+                  (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                  }
+                );
+              })
+            );
+            cache.invalidatePrefix('schedule');
+            cache.invalidatePrefix('kpi');
+            break;
+          }
+        }
+
         await rateLimitedQuery(() =>
           new Promise<void>((resolve, reject) => {
             Tables.appointments().create(
-              [
-                {
-                  fields: {
-                    Date: date,
-                    Client: clientName,
-                    Service: serviceName,
-                    Provider: apt.staffName || apt.staff?.name || 'Rani',
-                    Status: event === 'appointment.completed' ? 'Completed' : (apt.status || 'Scheduled'),
-                    'Start Time': apt.startAt || '',
-                    'End Time': apt.endAt || '',
-                    Notes: apt.notes || '',
-                  },
-                },
-              ],
+              [{ fields }],
               { typecast: true },
               (err) => {
                 if (err) reject(err);
@@ -87,49 +133,65 @@ export async function POST(request: NextRequest) {
 
         if (name) {
           // Check if client already exists by email
+          let existingRecordId: string | null = null;
           if (email) {
-            const existing = await rateLimitedQuery(() =>
-              new Promise<boolean>((resolve) => {
+            existingRecordId = await rateLimitedQuery(() =>
+              new Promise<string | null>((resolve) => {
                 Tables.clients()
                   .select({
-                    filterByFormula: `{Email} = "${email}"`,
+                    filterByFormula: `{Email} = "${sanitizeFormulaValue(email)}"`,
                     maxRecords: 1,
                     fields: ['Email'],
                   })
                   .firstPage((err, records) => {
-                    if (err || !records || records.length === 0) resolve(false);
-                    else resolve(true);
+                    if (err || !records || records.length === 0) resolve(null);
+                    else resolve(records[0].id);
                   });
               })
             );
 
-            if (existing && event === 'client.created') {
+            if (existingRecordId && event === 'client.created') {
               // Skip duplicate
               break;
             }
           }
 
-          await rateLimitedQuery(() =>
-            new Promise<void>((resolve, reject) => {
-              Tables.clients().create(
-                [
-                  {
-                    fields: {
-                      Client: name,
-                      Email: email,
-                      Phone: client.mobilePhone || client.phone || '',
-                      Status: 'Active',
-                    },
-                  },
-                ],
-                { typecast: true },
-                (err) => {
-                  if (err) reject(err);
-                  else resolve();
-                }
-              );
-            })
-          );
+          const clientFields = {
+            Client: name,
+            Email: email,
+            Phone: client.mobilePhone || client.phone || '',
+            Status: 'Active',
+          };
+
+          if (existingRecordId && event === 'client.updated') {
+            // Update existing record
+            await rateLimitedQuery(() =>
+              new Promise<void>((resolve, reject) => {
+                Tables.clients().update(
+                  [{ id: existingRecordId!, fields: clientFields }],
+                  { typecast: true },
+                  (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                  }
+                );
+              })
+            );
+          } else {
+            // Create new record
+            await rateLimitedQuery(() =>
+              new Promise<void>((resolve, reject) => {
+                Tables.clients().create(
+                  [{ fields: clientFields }],
+                  { typecast: true },
+                  (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                  }
+                );
+              })
+            );
+          }
         }
 
         cache.invalidatePrefix('clients');
@@ -174,7 +236,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true, event });
   } catch (error) {
-    console.error('Mangomint webhook error:', error);
+    logWebhookEvent('mangomint', 'processing', false, { error: String(error) });
     return NextResponse.json(
       { error: 'Webhook processing failed', details: String(error) },
       { status: 500 }

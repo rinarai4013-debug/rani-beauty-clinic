@@ -33,7 +33,7 @@ export async function GET(
     const messageIds = (record.fields['Messages Log'] as string[]) || [];
 
     // Fetch related data in parallel
-    const [appointments, transactions, memberships] = await Promise.all([
+    const [appointments, transactions, memberships, messages] = await Promise.all([
       appointmentIds.length > 0
         ? fetchAll<{ Date: string; Status: string }>(Tables.appointments(), {
             filterByFormula: `OR(${appointmentIds.slice(0, 50).map(aid => `RECORD_ID() = '${aid}'`).join(',')})`,
@@ -47,6 +47,11 @@ export async function GET(
       membershipIds.length > 0
         ? fetchAll<{ Status: string; Tier: string }>(Tables.memberships(), {
             filterByFormula: `OR(${membershipIds.map(mid => `RECORD_ID() = '${mid}'`).join(',')})`,
+          }).catch(() => [])
+        : Promise.resolve([]),
+      messageIds.length > 0
+        ? fetchAll<{ Date: string }>(Tables.messagesLog(), {
+            filterByFormula: `OR(${messageIds.slice(0, 50).map(mid => `RECORD_ID() = '${mid}'`).join(',')})`,
           }).catch(() => [])
         : Promise.resolve([]),
     ]);
@@ -69,9 +74,12 @@ export async function GET(
 
     const activeMembership = memberships.find(m => m.fields['Status'] === 'Active');
 
-    // Recent messages (last 30 days)
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const recentMessageCount = Math.min(messageIds.length, 3); // Approximate without fetching all
+    // Recent messages (last 30 days) — count from actual message records
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const recentMessageCount = messages.filter(m => {
+      const msgDate = m.fields['Date'] || '';
+      return msgDate >= thirtyDaysAgo;
+    }).length;
 
     const churnScore = predictChurn({
       daysSinceLastVisit,

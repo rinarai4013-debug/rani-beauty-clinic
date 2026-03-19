@@ -52,6 +52,6 @@ export function canAccessPage(role: UserRole, page: string): boolean {
     '/dashboard/entry': 'view_executive', // all roles can access some forms
   };
   const required = pagePermissions[page];
-  if (!required) return true;
+  if (!required) return false;
   return hasPermission(role, required);
 }

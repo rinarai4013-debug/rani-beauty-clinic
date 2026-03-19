@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import { plaidClient } from '@/lib/plaid/client';
 import { CountryCode, Products } from 'plaid';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 
 export async function POST() {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!hasPermission(session.role, 'manage_bank_connections')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
   try {
     const response = await plaidClient.linkTokenCreate({
       user: { client_user_id: 'rani-clinic-ceo' },

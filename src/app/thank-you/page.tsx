@@ -26,7 +26,7 @@ export default function ThankYouPage() {
           </h1>
 
           <p className="mt-4 font-body text-lg text-rani-text">
-            We've received your information. One of our aesthetic specialists
+            We&apos;ve received your information. One of our aesthetic specialists
             will text you within <strong>2 minutes</strong> with a personalized
             booking link.
           </p>
@@ -50,7 +50,7 @@ export default function ThankYouPage() {
                   2
                 </span>
                 <span className="font-body text-sm text-rani-text">
-                  You'll receive a text message with your booking link within
+                  You&apos;ll receive a text message with your booking link within
                   minutes
                 </span>
               </li>
@@ -59,7 +59,7 @@ export default function ThankYouPage() {
                   3
                 </span>
                 <span className="font-body text-sm text-rani-text">
-                  Choose your preferred date and time — we're open 7 days a week
+                  Choose your preferred date and time — we&apos;re open 7 days a week
                 </span>
               </li>
             </ul>
@@ -90,7 +90,7 @@ export default function ThankYouPage() {
           </div>
 
           <p className="mt-8 font-body text-xs text-rani-muted">
-            Didn't receive a text?{" "}
+            Didn&apos;t receive a text?{" "}
             <Link
               href="/contact"
               className="text-rani-navy underline hover:text-rani-gold"

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Volume2, VolumeX, Bell, Shield, Database, Palette, Building2, RefreshCw } from 'lucide-react';
 import { FormToggle } from '@/components/dashboard/forms';
 import PlaidLinkButton from '@/components/dashboard/plaid/PlaidLinkButton';
@@ -8,7 +9,32 @@ import { DashboardErrorBoundary } from '@/components/dashboard/shared';
 import { usePlaidConnection, triggerPlaidSync, disconnectBank } from '@/hooks/usePlaidData';
 import toast from 'react-hot-toast';
 
+const SETTINGS_KEY = 'rani-dashboard-settings';
+
+interface UserInfo {
+  username: string;
+  role: string;
+  displayName: string;
+}
+
+function loadSettings() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSettings(settings: Record<string, unknown>) {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch { /* ignore */ }
+}
+
 export default function SettingsPage() {
+  const router = useRouter();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [soundVolume, setSoundVolume] = useState(30);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -16,6 +42,42 @@ export default function SettingsPage() {
   const [compactMode, setCompactMode] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const saved = loadSettings();
+    if (saved) {
+      if (saved.soundEnabled !== undefined) setSoundEnabled(saved.soundEnabled);
+      if (saved.soundVolume !== undefined) setSoundVolume(saved.soundVolume);
+      if (saved.notificationsEnabled !== undefined) setNotificationsEnabled(saved.notificationsEnabled);
+      if (saved.celebrationsEnabled !== undefined) setCelebrationsEnabled(saved.celebrationsEnabled);
+      if (saved.compactMode !== undefined) setCompactMode(saved.compactMode);
+    }
+  }, []);
+
+  // Persist settings to localStorage on change
+  useEffect(() => {
+    saveSettings({ soundEnabled, soundVolume, notificationsEnabled, celebrationsEnabled, compactMode });
+  }, [soundEnabled, soundVolume, notificationsEnabled, celebrationsEnabled, compactMode]);
+
+  // Fetch user info from session
+  useEffect(() => {
+    fetch('/api/dashboard/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.user) setUserInfo(data.user); })
+      .catch(() => {});
+  }, []);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await fetch('/api/dashboard/auth/logout', { method: 'POST' });
+    } catch { /* ignore */ }
+    document.cookie = 'rani-session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    router.push('/dashboard/login');
+  };
 
   const { data: connectionData, mutate: mutateConnection } = usePlaidConnection();
   const isConnected = connectionData?.connection?.isConnected ?? false;
@@ -177,19 +239,23 @@ export default function SettingsPage() {
           <div className="space-y-3 text-sm font-body">
             <div className="flex justify-between py-2 border-b border-rani-border/50">
               <span className="text-rani-muted">Logged in as</span>
-              <span className="text-rani-navy font-medium">Rina (CEO)</span>
+              <span className="text-rani-navy font-medium">{userInfo ? `${userInfo.displayName} (${userInfo.role.toUpperCase()})` : '...'}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-rani-border/50">
               <span className="text-rani-muted">Role</span>
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-rani-gold/10 text-rani-gold">CEO</span>
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-rani-gold/10 text-rani-gold">{userInfo?.role?.toUpperCase() ?? '...'}</span>
             </div>
             <div className="flex justify-between py-2">
               <span className="text-rani-muted">Session</span>
               <span className="text-rani-navy font-medium">Active (24h)</span>
             </div>
           </div>
-          <button className="mt-4 px-4 py-2 text-sm font-body font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
-            Sign Out
+          <button
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="mt-4 px-4 py-2 text-sm font-body font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {signingOut ? 'Signing out...' : 'Sign Out'}
           </button>
         </div>
       </div>

@@ -262,6 +262,52 @@ function detectFinancingSpike(byPaymentMethod: { method: string; amount: number;
   return null;
 }
 
+function detectCategoryDrop(
+  byCategory: { category: string; revenue: number }[],
+  dailyRevenue: RevenueDataPoint[]
+): Anomaly | null {
+  if (byCategory.length === 0) return null;
+
+  // Build 30-day average per category from historical data
+  const categoryTotals = new Map<string, { total: number; days: number }>();
+  const last30 = dailyRevenue.slice(0, 30);
+  if (last30.length < 7) return null; // Not enough history
+
+  for (const dp of last30) {
+    if (!dp.category) continue;
+    const entry = categoryTotals.get(dp.category) || { total: 0, days: 0 };
+    entry.total += dp.amount;
+    entry.days++;
+    categoryTotals.set(dp.category, entry);
+  }
+
+  // Compare today's category mix vs 30-day daily average
+  for (const todayCat of byCategory) {
+    const historical = categoryTotals.get(todayCat.category);
+    if (!historical || historical.days < 3) continue;
+
+    const avgDaily = historical.total / last30.length;
+    if (avgDaily === 0) continue;
+
+    const deviation = ((todayCat.revenue - avgDaily) / avgDaily) * 100;
+
+    if (deviation <= THRESHOLDS.categoryDropThreshold) {
+      return {
+        type: 'category_drop',
+        severity: deviation <= -75 ? 'critical' : 'warning',
+        metric: `${todayCat.category} Revenue`,
+        actual: Math.round(todayCat.revenue),
+        expected: Math.round(avgDaily),
+        deviation: Math.round(deviation),
+        message: `${todayCat.category} revenue is ${Math.abs(Math.round(deviation))}% below the 30-day daily average ($${Math.round(avgDaily).toLocaleString()})`,
+        recommendation: `Review ${todayCat.category} bookings. Check for cancellations, provider availability, or marketing campaign changes.`,
+      };
+    }
+  }
+
+  return null;
+}
+
 // ── MAIN ENGINE ──
 
 export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
@@ -285,7 +331,13 @@ export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
     if (providerAnomaly) anomalies.push(providerAnomaly);
   }
 
-  // 5. Financing spike
+  // 5. Category drop
+  if (input.byCategory) {
+    const categoryAnomaly = detectCategoryDrop(input.byCategory, input.dailyRevenue);
+    if (categoryAnomaly) anomalies.push(categoryAnomaly);
+  }
+
+  // 6. Financing spike
   if (input.byPaymentMethod) {
     const financingAnomaly = detectFinancingSpike(input.byPaymentMethod);
     if (financingAnomaly) anomalies.push(financingAnomaly);

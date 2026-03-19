@@ -39,7 +39,7 @@ const PRIORITY_STYLES: Record<string, string> = {
 };
 
 export default function ConsultCopilotPage() {
-  const { data: raw, isLoading } = useConsultCopilot() as { data: ConsultResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = useConsultCopilot() as { data: ConsultResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const briefing = data?.clientBriefing;
@@ -67,7 +67,9 @@ export default function ConsultCopilotPage() {
         </div>
 
         {/* Hero KPIs */}
-        {isLoading ? (
+        {error ? (
+          <InlineError message="Failed to load consult data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <KPIRowSkeleton />
         ) : hasNoData ? (
           <DashboardEmptyState

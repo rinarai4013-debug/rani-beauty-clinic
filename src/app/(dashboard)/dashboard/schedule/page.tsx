@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, User, MapPin, CheckCircle, XCircle, ShieldAlert, Calendar } from 'lucide-react';
+import { Clock, User, MapPin, CheckCircle, XCircle, ShieldAlert, Calendar, Target } from 'lucide-react';
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
 import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
-import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton } from '@/components/dashboard/shared';
+import ConsultPrepSlideOver from '@/components/dashboard/panels/ConsultPrepSlideOver';
+import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import { useScheduleData, useNoShowRisk } from '@/hooks/useDashboardData';
 import type { AppointmentItem } from '@/types/dashboard';
@@ -32,7 +34,8 @@ interface NoShowRiskItem {
 }
 
 export default function SchedulePage() {
-  const { data, isLoading, error } = useScheduleData() as { data: ScheduleData | undefined; isLoading: boolean; error: unknown };
+  const [consultPrepApt, setConsultPrepApt] = useState<AppointmentItem | null>(null);
+  const { data, isLoading, error, mutate } = useScheduleData() as { data: ScheduleData | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const { data: noShowData } = useNoShowRisk();
   const noShowMap = new Map<string, NoShowRiskItem>();
   const noShowItems = (noShowData as { appointments?: NoShowRiskItem[] })?.appointments || [];
@@ -63,7 +66,9 @@ export default function SchedulePage() {
         </div>
 
         {/* KPIs */}
-        {isLoading ? (
+        {error ? (
+          <InlineError message="Failed to load schedule data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <KPIRowSkeleton />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
@@ -129,7 +134,18 @@ export default function SchedulePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs sm:text-sm font-body font-medium text-rani-navy truncate">{apt.clientName}</span>
-                          {apt.isConsult && <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-body font-semibold rounded flex-shrink-0">CONSULT</span>}
+                          {apt.isConsult && (
+                            <>
+                              <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-body font-semibold rounded flex-shrink-0">CONSULT</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setConsultPrepApt(apt); }}
+                                className="flex items-center gap-1 px-1.5 py-0.5 bg-rani-navy text-white text-[10px] font-body font-semibold rounded hover:bg-rani-navy-light transition-colors flex-shrink-0"
+                              >
+                                <Target className="w-2.5 h-2.5" />
+                                Prep
+                              </button>
+                            </>
+                          )}
                         </div>
                         <p className="text-[11px] sm:text-xs font-body text-rani-muted truncate">{apt.service}</p>
                       </div>
@@ -205,6 +221,12 @@ export default function SchedulePage() {
           </div>
         </div>
       </div>
+
+      {/* Consult Prep Slide-Over */}
+      <ConsultPrepSlideOver
+        appointment={consultPrepApt}
+        onClose={() => setConsultPrepApt(null)}
+      />
     </DashboardErrorBoundary>
   );
 }

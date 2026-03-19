@@ -5,7 +5,7 @@ import { TrendingUp, ArrowUpRight, ArrowDownRight, Package, Zap, Tag, Star, Gift
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressBar from '@/components/dashboard/charts/ProgressBar';
 import { usePricingAnalysis } from '@/hooks/useDashboardData';
-import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, TableSkeleton, SkeletonBar } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, TableSkeleton, SkeletonBar, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import type { DynamicPricingResult, PricingRecommendation, PackageRecommendation, PromotionalStrategy } from '@/lib/pricing/dynamic-engine';
 
@@ -41,7 +41,7 @@ export default function PricingIntelligencePage() {
 }
 
 function PricingIntelligenceContent() {
-  const { data: raw, isLoading } = usePricingAnalysis() as { data: PricingResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = usePricingAnalysis() as { data: PricingResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const recommendations = data?.priceRecommendations || [];
@@ -53,6 +53,11 @@ function PricingIntelligenceContent() {
 
   const increaseCount = recommendations.filter(r => r.priceChange > 0).length;
   const decreaseCount = recommendations.filter(r => r.priceChange < 0).length;
+
+  /* ─── Error State ──────────────────────────────────────────────── */
+  if (error) {
+    return <InlineError message="Failed to load pricing intelligence" onRetry={() => mutate()} />;
+  }
 
   /* ─── Loading State ─────────────────────────────────────────────── */
   if (isLoading) {

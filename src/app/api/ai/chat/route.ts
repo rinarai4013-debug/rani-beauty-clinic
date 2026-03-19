@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { buildRAGContext } from '@/lib/rag/knowledge-base';
+import { logEvent } from '@/lib/logging/structured-logger';
+
+// Simple rate limiter: 10 requests per minute per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
 
 const SYSTEM_PROMPT = `You are the AI concierge for Rani Beauty Clinic, a luxury physician-supervised medspa in Renton, WA. You embody the Rani brand: luxury, confident, clinically-assured.
 
@@ -63,6 +81,12 @@ function extractActions(reply: string): { cleanReply: string; actions: ChatActio
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (!checkRateLimit(ip)) {
+    logEvent('ai', 'warn', 'Chat rate limit hit', { ip });
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { messages, visitorInfo } = body;

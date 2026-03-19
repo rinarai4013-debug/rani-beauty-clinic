@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Flame, Award, Star } from 'lucide-react';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
-import { DashboardErrorBoundary, PanelSkeleton, SkeletonBar } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, PanelSkeleton, SkeletonBar, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import { useClinicScore, useGamification } from '@/hooks/useDashboardData';
 import { getCurrentLevel, getNextLevel, getLevelProgress } from '@/lib/gamification/levels';
@@ -26,8 +26,8 @@ const ICON_MAP: Record<string, string> = {
 };
 
 export default function LeaderboardPage() {
-  const { data: scoreData, isLoading: scoreLoading } = useClinicScore() as { data: ScoreData | undefined; isLoading: boolean };
-  const { data: achieveData, isLoading: achieveLoading } = useGamification() as { data: AchievementData | undefined; isLoading: boolean };
+  const { data: scoreData, isLoading: scoreLoading, error: scoreError, mutate: mutateScore } = useClinicScore() as { data: ScoreData | undefined; isLoading: boolean; error: unknown; mutate: () => void };
+  const { data: achieveData, isLoading: achieveLoading, error: achieveError, mutate: mutateAchieve } = useGamification() as { data: AchievementData | undefined; isLoading: boolean; error: unknown; mutate: () => void };
 
   const xp = scoreData?.xp ?? 0;
   const currentLevel = getCurrentLevel(xp);
@@ -39,6 +39,14 @@ export default function LeaderboardPage() {
   const bossProgress = scoreData?.bossProgress;
   const achievements = achieveData?.achievements || [];
   const breakdown = scoreData?.breakdown || {};
+
+  if (scoreError || achieveError) {
+    return (
+      <DashboardErrorBoundary pageName="Gamification Hub">
+        <InlineError message="Failed to load gamification data" onRetry={() => { mutateScore(); mutateAchieve(); }} />
+      </DashboardErrorBoundary>
+    );
+  }
 
   if (scoreLoading) {
     return (

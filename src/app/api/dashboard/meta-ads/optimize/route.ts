@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 import { analyzeMetaAds, type MetaAdsInput, type Campaign, type AdSet, type Ad } from '@/lib/ads/meta-ads-manager';
 
 // Rani's service ad data (static reference)
@@ -16,7 +17,10 @@ const RANI_SERVICE_AD_DATA = [
 export async function GET() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!hasPermission(session.role, 'view_revenue')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

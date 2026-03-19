@@ -270,16 +270,23 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
       const primaryCategory = sorted[0]?.category || 'Facial';
       const crossSells = CROSS_SELL[primaryCategory] || [];
       const relevant = crossSells.find(cs => {
-        const catMatch = PATHWAYS[cs.suggest]?.category;
-        return catMatch === gap;
+        // Exact match first, then fuzzy: check if any PATHWAYS key is contained in the suggest string
+        const exactCat = PATHWAYS[cs.suggest]?.category;
+        if (exactCat) return exactCat === gap;
+        const pathwayKey = Object.keys(PATHWAYS).find(key => cs.suggest.includes(key));
+        return pathwayKey ? PATHWAYS[pathwayKey].category === gap : false;
       });
       if (relevant) {
+        // Resolve to the canonical PATHWAYS key for consistent naming
+        const resolvedService = PATHWAYS[relevant.suggest]
+          ? relevant.suggest
+          : Object.keys(PATHWAYS).find(key => relevant.suggest.includes(key)) || relevant.suggest;
         recommendations.push({
-          service: relevant.suggest,
+          service: resolvedService,
           category: gap,
           reason: relevant.reason,
           urgency: 'consider',
-          estimatedPrice: relevant.price,
+          estimatedPrice: PRICE_MAP[resolvedService] || relevant.price,
           confidence: 50,
         });
       }

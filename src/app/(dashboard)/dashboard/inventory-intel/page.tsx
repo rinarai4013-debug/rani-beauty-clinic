@@ -39,7 +39,7 @@ const URGENCY_STYLES: Record<string, string> = {
 };
 
 export default function InventoryIntelligencePage() {
-  const { data: raw, isLoading } = useInventoryIntelligence() as { data: InventoryResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = useInventoryIntelligence() as { data: InventoryResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const alerts = data?.alerts || [];
@@ -68,8 +68,10 @@ export default function InventoryIntelligencePage() {
           <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">AI-powered stock management, reorder predictions, and waste reduction</p>
         </div>
 
-        {/* Loading State */}
-        {isLoading ? (
+        {/* Error / Loading / Empty State */}
+        {error ? (
+          <InlineError message="Failed to load inventory data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <>
             <KPIRowSkeleton count={5} />
             <PanelSkeleton rows={4} />

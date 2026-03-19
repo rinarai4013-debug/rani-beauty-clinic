@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { plaidClient } from '@/lib/plaid/client';
 import { updateStorage } from '@/lib/plaid/storage';
 import { Products, CountryCode } from 'plaid';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 
 /**
  * POST /api/dashboard/plaid/sandbox-connect
@@ -10,6 +12,10 @@ import { Products, CountryCode } from 'plaid';
  * DELETE THIS ROUTE BEFORE GOING TO PRODUCTION.
  */
 export async function POST() {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!hasPermission(session.role, 'manage_bank_connections')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
   if (process.env.PLAID_ENV !== 'sandbox') {
     return NextResponse.json({ error: 'Only available in sandbox mode' }, { status: 403 });
   }
@@ -58,8 +64,8 @@ export async function POST() {
       lastSynced: new Date().toISOString(),
     }));
 
-    // Store
-    updateStorage({
+    // Store (encrypted in Airtable)
+    await updateStorage({
       accessToken,
       itemId,
       institutionId: 'ins_109508',

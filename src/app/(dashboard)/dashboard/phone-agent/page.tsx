@@ -11,9 +11,16 @@ import { InlineError } from '@/components/dashboard/shared';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import type { PhoneAgentSetup, CallFlow, AgentRecommendation } from '@/lib/phone/vapi-agent';
 
+interface PhoneAgentResponseData extends Omit<PhoneAgentSetup, 'analytics' | 'performanceMetrics'> {
+  analytics: PhoneAgentSetup['analytics'] | null;
+  performanceMetrics: PhoneAgentSetup['performanceMetrics'] | null;
+  analyticsAvailable: boolean;
+  message?: string;
+}
+
 interface PhoneAgentResponse {
   success: boolean;
-  data: PhoneAgentSetup;
+  data: PhoneAgentResponseData;
 }
 
 const INTENT_COLORS: Record<string, string> = {
@@ -39,19 +46,19 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 };
 
 export default function PhoneAgentPage() {
-  const { data: raw, isLoading } = useDashboardData<PhoneAgentResponse>('/phone-agent');
+  const { data: raw, isLoading, error, mutate } = useDashboardData<PhoneAgentResponse>('/phone-agent');
   const data = raw?.data;
 
-  const analytics = data?.analytics;
-  const metrics = data?.performanceMetrics;
+  const analytics = data?.analytics ?? null;
+  const metrics = data?.performanceMetrics ?? null;
   const flows = data?.callFlows || [];
   const recs = data?.recommendations || [];
   const assistant = data?.assistantConfig;
+  const analyticsAvailable = data?.analyticsAvailable ?? false;
 
+  const hasAnalytics = analytics !== null;
   const totalCalls = analytics?.totalCalls || 0;
   const answered = analytics?.answeredCalls || 0;
-  const missed = analytics?.missedCalls || 0;
-  const avgDuration = analytics?.avgDuration || 0;
   const bookingConversion = analytics?.bookingConversion || 0;
   const satisfaction = analytics?.satisfaction || 0;
   const topIntents = analytics?.topIntents || [];
@@ -72,7 +79,9 @@ export default function PhoneAgentPage() {
         </div>
 
         {/* Hero KPIs */}
-        {isLoading ? (
+        {error ? (
+          <InlineError message="Failed to load phone agent data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <KPIRowSkeleton />
         ) : hasNoData ? (
           <DashboardEmptyState
@@ -82,12 +91,25 @@ export default function PhoneAgentPage() {
           />
         ) : (
           <>
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
-              <KPICard title="Total Calls" value={totalCalls} icon="phone" size="hero" />
-              <KPICard title="Answer Rate" value={answerRate} suffix="%" icon="check-circle" />
-              <KPICard title="Booking Conversion" value={bookingConversion} suffix="%" icon="trending-up" />
-              <KPICard title="Satisfaction" value={satisfaction} suffix="/100" icon="star" />
-            </div>
+            {/* Analytics Section — real data or empty state */}
+            {!hasAnalytics ? (
+              <DashboardEmptyState
+                icon="phone"
+                title={analyticsAvailable ? 'No call data yet' : 'Connect Vapi to see call analytics'}
+                description={
+                  analyticsAvailable
+                    ? 'Your Vapi API key is connected. Call analytics will appear here once calls are received.'
+                    : 'Add your VAPI_API_KEY environment variable to fetch real call logs, performance metrics, and booking conversion data.'
+                }
+              />
+            ) : (
+              <>
+                <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
+                  <KPICard title="Total Calls" value={totalCalls} icon="phone" size="hero" />
+                  <KPICard title="Answer Rate" value={answerRate} suffix="%" icon="check-circle" />
+                  <KPICard title="Booking Conversion" value={bookingConversion} suffix="%" icon="trending-up" />
+                  <KPICard title="Satisfaction" value={satisfaction} suffix="/100" icon="star" />
+                </div>
 
             {/* Performance Metrics + Call Volume by Day */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -255,6 +277,8 @@ export default function PhoneAgentPage() {
                 )}
               </div>
             </div>
+              </>
+            )}
 
             {/* Call Flows */}
             <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-4 sm:p-5">

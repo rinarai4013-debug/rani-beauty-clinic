@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 
 interface AppointmentFields {
@@ -73,12 +74,14 @@ export async function GET(
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
+    const safeProviderName = sanitizeFormulaValue(providerName);
+
     const [appointments, transactions] = await Promise.all([
       fetchAll<AppointmentFields>(Tables.appointments(), {
-        filterByFormula: `AND({Provider} = '${providerName}', IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'))`,
+        filterByFormula: `AND({Provider} = '${safeProviderName}', IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'))`,
       }),
       fetchAll<TransactionFields>(Tables.transactions(), {
-        filterByFormula: `AND({Provider} = '${providerName}', IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'), {Type} = 'Service')`,
+        filterByFormula: `AND({Provider} = '${safeProviderName}', IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'), {Type} = 'Service')`,
       }),
     ]);
 

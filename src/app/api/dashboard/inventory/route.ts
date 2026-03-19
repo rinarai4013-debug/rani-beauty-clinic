@@ -1,192 +1,193 @@
 import { NextResponse } from 'next/server';
-import { analyzeInventory, type InventoryInput } from '@/lib/inventory/auto-manager';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
+import { Tables, fetchAll } from '@/lib/airtable/client';
+import { cache, TTL } from '@/lib/cache';
+import { analyzeInventory, type InventoryInput, type InventoryItem, type InventoryCategory } from '@/lib/inventory/auto-manager';
+
+// Fields stored in the Alerts table by the entry/inventory form
+interface InventoryAlertFields {
+  'Type': string;
+  'Severity': string;
+  'Message': string;
+  'Action Recommended': string;
+  'Status': string;
+  'Created Date': string;
+}
+
+// Valid inventory categories from the auto-manager
+const VALID_CATEGORIES = new Set<InventoryCategory>([
+  'injectables', 'topicals', 'laser_consumables', 'facial_supplies',
+  'wellness_supplies', 'disposables', 'retail', 'office_supplies',
+]);
+
+/**
+ * Parse an inventory alert message back into structured data.
+ * Format: [Inventory {type}] {name} ({sku}) — {qty} units | {category} | {reason}
+ * or:     [Inventory {type}] {name} — {qty} units | {category} | {reason}
+ */
+function parseInventoryMessage(message: string): {
+  adjustmentType: string;
+  itemName: string;
+  sku: string;
+  quantity: number;
+  category: string;
+  reason: string;
+} | null {
+  const match = message.match(
+    /^\[Inventory (\w+)\]\s+(.+?)\s+—\s+(\d+)\s+units\s*\|\s*([^|]*)\s*\|\s*(.*)$/
+  );
+  if (!match) return null;
+
+  const [, adjustmentType, nameWithSku, qtyStr, category, reason] = match;
+  // Extract SKU if present: "Item Name (SKU123)" → name="Item Name", sku="SKU123"
+  const skuMatch = nameWithSku.match(/^(.+?)\s*\(([^)]+)\)$/);
+  const itemName = skuMatch ? skuMatch[1].trim() : nameWithSku.trim();
+  const sku = skuMatch ? skuMatch[2].trim() : '';
+
+  return {
+    adjustmentType,
+    itemName,
+    sku,
+    quantity: parseInt(qtyStr, 10),
+    category: category.trim(),
+    reason: reason.trim(),
+  };
+}
+
+/**
+ * Aggregate inventory alert records into InventoryItem objects.
+ * Multiple alerts for the same item (by name) are merged — adds increase stock,
+ * subtracts for removals/adjustments.
+ */
+function buildInventoryItems(
+  records: { id: string; fields: InventoryAlertFields }[]
+): InventoryItem[] {
+  const itemMap = new Map<string, {
+    name: string;
+    sku: string;
+    category: string;
+    totalQuantity: number;
+    latestDate: string;
+  }>();
+
+  for (const record of records) {
+    const parsed = parseInventoryMessage(record.fields['Message'] || '');
+    if (!parsed) continue;
+
+    const key = parsed.itemName.toLowerCase();
+    const existing = itemMap.get(key);
+
+    const delta = parsed.adjustmentType === 'remove' || parsed.adjustmentType === 'subtract'
+      ? -parsed.quantity
+      : parsed.quantity;
+
+    if (existing) {
+      existing.totalQuantity += delta;
+      // Keep the latest category/sku if present
+      if (parsed.category) existing.category = parsed.category;
+      if (parsed.sku) existing.sku = parsed.sku;
+      const recordDate = record.fields['Created Date'] || '';
+      if (recordDate > existing.latestDate) existing.latestDate = recordDate;
+    } else {
+      itemMap.set(key, {
+        name: parsed.itemName,
+        sku: parsed.sku,
+        category: parsed.category,
+        totalQuantity: Math.max(0, delta),
+        latestDate: record.fields['Created Date'] || '',
+      });
+    }
+  }
+
+  return Array.from(itemMap.entries()).map(([key, data]) => {
+    const category = VALID_CATEGORIES.has(data.category as InventoryCategory)
+      ? (data.category as InventoryCategory)
+      : 'disposables';
+
+    return {
+      id: data.sku || key.replace(/\s+/g, '-'),
+      name: data.name,
+      category,
+      currentStock: Math.max(0, data.totalQuantity),
+      unit: 'units',
+      unitCost: 0, // Not tracked in alert records
+      minStock: 5, // Default par level
+      maxStock: 20, // Default max
+      supplier: 'Unknown',
+      leadTimeDays: 5, // Default lead time
+    };
+  });
+}
 
 export async function GET() {
+  // Auth check
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  if (!hasPermission(session.role, 'view_executive')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  // Check cache
+  const cacheKey = 'inventory-intelligence';
+  const cached = cache.get<{ success: true; data: ReturnType<typeof analyzeInventory>; generatedAt: string }>(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   try {
-    // In production, pulls from Airtable inventory items + appointment consumption
-    const sampleInput: InventoryInput = {
-      items: [
-        {
-          id: 'botox-50u',
-          name: 'Botox (50-unit vial)',
-          category: 'injectables',
-          currentStock: 8,
-          unit: 'vials',
-          unitCost: 125,
-          expirationDate: '2026-06-15',
-          minStock: 5,
-          maxStock: 20,
-          supplier: 'Allergan',
-          leadTimeDays: 5,
-        },
-        {
-          id: 'juvederm-ultra',
-          name: 'Juvederm Ultra Plus (1ml)',
-          category: 'injectables',
-          currentStock: 3,
-          unit: 'syringes',
-          unitCost: 260,
-          expirationDate: '2026-12-01',
-          minStock: 5,
-          maxStock: 15,
-          supplier: 'Allergan',
-          leadTimeDays: 5,
-        },
-        {
-          id: 'hydrafacial-serum',
-          name: 'HydraFacial Serum Refill',
-          category: 'facial_supplies',
-          currentStock: 12,
-          unit: 'units',
-          unitCost: 45,
-          expirationDate: '2026-09-01',
-          minStock: 6,
-          maxStock: 24,
-          supplier: 'Edge Systems',
-          leadTimeDays: 7,
-        },
-        {
-          id: 'vi-peel-kit',
-          name: 'VI Peel Treatment Kit',
-          category: 'topicals',
-          currentStock: 6,
-          unit: 'kits',
-          unitCost: 85,
-          minStock: 4,
-          maxStock: 16,
-          supplier: 'VI Aesthetics',
-          leadTimeDays: 4,
-        },
-        {
-          id: 'rf-tip-sterile',
-          name: 'Secret Pro RF Tips (Sterile)',
-          category: 'laser_consumables',
-          currentStock: 2,
-          unit: 'tips',
-          unitCost: 150,
-          minStock: 5,
-          maxStock: 20,
-          supplier: 'Cutera',
-          leadTimeDays: 7,
-        },
-        {
-          id: 'numbing-cream',
-          name: 'BLT Numbing Cream (30g)',
-          category: 'topicals',
-          currentStock: 15,
-          unit: 'tubes',
-          unitCost: 18,
-          expirationDate: '2027-01-15',
-          minStock: 10,
-          maxStock: 30,
-          supplier: 'Pharmacy Compounding',
-          leadTimeDays: 3,
-        },
-        {
-          id: 'glp1-semaglutide',
-          name: 'Semaglutide (2.4mg/0.75ml)',
-          category: 'wellness_supplies',
-          currentStock: 10,
-          unit: 'vials',
-          unitCost: 180,
-          expirationDate: '2026-08-01',
-          minStock: 8,
-          maxStock: 25,
-          supplier: 'Empower Pharmacy',
-          leadTimeDays: 5,
-        },
-        {
-          id: 'nad-vial',
-          name: 'NAD+ Injection Vial (500mg)',
-          category: 'wellness_supplies',
-          currentStock: 6,
-          unit: 'vials',
-          unitCost: 45,
-          expirationDate: '2026-07-01',
-          minStock: 4,
-          maxStock: 12,
-          supplier: 'Empower Pharmacy',
-          leadTimeDays: 5,
-        },
-        {
-          id: 'b12-vial',
-          name: 'Methylcobalamin B12 (30ml)',
-          category: 'wellness_supplies',
-          currentStock: 8,
-          unit: 'vials',
-          unitCost: 12,
-          minStock: 5,
-          maxStock: 15,
-          supplier: 'Empower Pharmacy',
-          leadTimeDays: 5,
-        },
-        {
-          id: 'disposable-gloves',
-          name: 'Nitrile Gloves (Box of 100)',
-          category: 'disposables',
-          currentStock: 25,
-          unit: 'boxes',
-          unitCost: 8,
-          minStock: 10,
-          maxStock: 50,
-          supplier: 'Henry Schein',
-          leadTimeDays: 3,
-        },
-      ],
+    // Query Alerts table for inventory entries
+    // The entry/inventory form writes records with Message starting with "[Inventory"
+    const inventoryRecords = await fetchAll<InventoryAlertFields>(
+      Tables.alerts(),
+      {
+        filterByFormula: `SEARCH("[Inventory", {Message})`,
+        sort: [{ field: 'Created Date', direction: 'desc' }],
+      }
+    );
+
+    // No inventory data yet — return clear empty state
+    if (inventoryRecords.length === 0) {
+      const emptyResponse = {
+        success: true as const,
+        data: null,
+        message: 'No inventory data yet. Use the Entry > Inventory form to add items.',
+        generatedAt: new Date().toISOString(),
+      };
+      cache.set(cacheKey, emptyResponse, TTL.SLOW);
+      return NextResponse.json(emptyResponse);
+    }
+
+    // Transform alert records into InventoryItem format
+    const items = buildInventoryItems(inventoryRecords);
+
+    // If parsing yielded no valid items, treat as empty
+    if (items.length === 0) {
+      const emptyResponse = {
+        success: true as const,
+        data: null,
+        message: 'No inventory data yet. Use the Entry > Inventory form to add items.',
+        generatedAt: new Date().toISOString(),
+      };
+      cache.set(cacheKey, emptyResponse, TTL.SLOW);
+      return NextResponse.json(emptyResponse);
+    }
+
+    const inventoryInput: InventoryInput = {
+      items,
       appointments: [],
-      suppliers: [
-        {
-          name: 'Allergan',
-          items: ['botox-50u', 'juvederm-ultra'],
-          avgLeadDays: 5,
-          minOrderAmount: 1000,
-          bulkDiscountThreshold: 5000,
-          bulkDiscountPercent: 8,
-          reliability: 95,
-        },
-        {
-          name: 'Empower Pharmacy',
-          items: ['glp1-semaglutide', 'nad-vial', 'b12-vial'],
-          avgLeadDays: 5,
-          minOrderAmount: 500,
-          bulkDiscountThreshold: 3000,
-          bulkDiscountPercent: 10,
-          reliability: 90,
-        },
-        {
-          name: 'Cutera',
-          items: ['rf-tip-sterile'],
-          avgLeadDays: 7,
-          minOrderAmount: 750,
-          reliability: 92,
-        },
-        {
-          name: 'Edge Systems',
-          items: ['hydrafacial-serum'],
-          avgLeadDays: 7,
-          minOrderAmount: 300,
-          reliability: 88,
-        },
-        {
-          name: 'Henry Schein',
-          items: ['disposable-gloves'],
-          avgLeadDays: 3,
-          minOrderAmount: 100,
-          bulkDiscountThreshold: 500,
-          bulkDiscountPercent: 5,
-          reliability: 97,
-        },
-      ],
+      suppliers: [],
       orderHistory: [],
     };
 
-    const result = analyzeInventory(sampleInput);
+    const result = analyzeInventory(inventoryInput);
 
-    return NextResponse.json({
-      success: true,
+    const response = {
+      success: true as const,
       data: result,
       generatedAt: new Date().toISOString(),
-    });
+    };
+
+    cache.set(cacheKey, response, TTL.SLOW);
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Inventory analysis error:', error);
     return NextResponse.json(

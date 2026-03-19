@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { optimizeSchedule, type ScheduleInput, type AppointmentData } from '@/lib/schedule/optimizer';
@@ -7,7 +8,10 @@ import { optimizeSchedule, type ScheduleInput, type AppointmentData } from '@/li
 export async function GET() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!hasPermission(session.role, 'view_schedule')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

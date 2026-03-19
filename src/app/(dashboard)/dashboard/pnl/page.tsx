@@ -7,7 +7,7 @@ import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressBar from '@/components/dashboard/charts/ProgressBar';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
 import { usePnL } from '@/hooks/useDashboardData';
-import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, ChartSkeleton, TableSkeleton, SkeletonBar } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, ChartSkeleton, TableSkeleton, SkeletonBar, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import type { FinancialIntelligenceResult } from '@/lib/finance/pnl-engine';
 
@@ -35,7 +35,7 @@ export default function PnLPage() {
 }
 
 function PnLContent() {
-  const { data: raw, isLoading } = usePnL() as { data: PnLResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = usePnL() as { data: PnLResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const pnl = data?.pnl;
@@ -48,6 +48,11 @@ function PnLContent() {
 
   const revenueByCategory = pnl?.revenue?.byCategory || [];
   const opexByCategory = pnl?.operatingExpenses?.byCategory || [];
+
+  /* ─── Error State ──────────────────────────────────────────────── */
+  if (error) {
+    return <InlineError message="Failed to load P&L data" onRetry={() => mutate()} />;
+  }
 
   /* ─── Loading State ─────────────────────────────────────────────── */
   if (isLoading) {

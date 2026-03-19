@@ -6,7 +6,7 @@ import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressBar from '@/components/dashboard/charts/ProgressBar';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
 import { useScheduleOptimization } from '@/hooks/useDashboardData';
-import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, TableSkeleton, SkeletonBar } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, TableSkeleton, SkeletonBar, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import type { ScheduleOptimization } from '@/lib/schedule/optimizer';
 
@@ -38,7 +38,7 @@ export default function ScheduleOptimizerPage() {
 }
 
 function ScheduleOptimizerContent() {
-  const { data: raw, isLoading } = useScheduleOptimization() as { data: ScheduleResponse | undefined; isLoading: boolean };
+  const { data: raw, isLoading, error, mutate } = useScheduleOptimization() as { data: ScheduleResponse | undefined; isLoading: boolean; error: unknown; mutate: () => void };
   const data = raw?.data;
 
   const gaps = data?.gaps || [];
@@ -51,6 +51,11 @@ function ScheduleOptimizerContent() {
 
   const totalGapRevenue = gaps.reduce((sum, g) => sum + g.potentialRevenue, 0);
   const totalOpportunityRevenue = opportunities.reduce((sum, o) => sum + o.potentialRevenue, 0);
+
+  /* ─── Error State ──────────────────────────────────────────────── */
+  if (error) {
+    return <InlineError message="Failed to load schedule optimization" onRetry={() => mutate()} />;
+  }
 
   /* ─── Loading State ─────────────────────────────────────────────── */
   if (isLoading) {

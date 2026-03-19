@@ -3,9 +3,15 @@ import { plaidClient } from '@/lib/plaid/client';
 import { readStorage, updateStorage } from '@/lib/plaid/storage';
 import { cache, TTL } from '@/lib/cache';
 import type { PlaidAccount, PlaidConnectionState } from '@/types/plaid';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 
 export async function GET() {
-  const storage = readStorage();
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!hasPermission(session.role, 'manage_bank_connections')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  const storage = await readStorage();
 
   if (!storage.accessToken) {
     const connection: PlaidConnectionState = {
@@ -53,7 +59,7 @@ export async function GET() {
       }));
 
       cache.set(cacheKey, accounts, TTL.RELAXED);
-      updateStorage({ accounts });
+      await updateStorage({ accounts });
     } catch {
       // Fall back to stored accounts
       accounts = storage.accounts;

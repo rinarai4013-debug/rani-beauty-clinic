@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readStorage } from '@/lib/plaid/storage';
 import { CATEGORY_LABELS } from '@/lib/plaid/categories';
 import type { RaniExpenseCategory, BankFeedSummary } from '@/types/plaid';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 
 export async function GET(request: NextRequest) {
-  const storage = readStorage();
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!hasPermission(session.role, 'manage_bank_connections')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  const storage = await readStorage();
   const { searchParams } = new URL(request.url);
   const range = searchParams.get('range') || 'mtd';
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 // Mangomint Membership webhook receiver
 // Handles both Membership Started and Membership Canceled events
@@ -26,7 +27,27 @@ interface MembershipData {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.json();
+    // MANDATORY: verify webhook signature
+    if (!process.env.MANGOMINT_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    }
+
+    const body = await request.text();
+    const signature = request.headers.get('x-mangomint-signature');
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
+
+    const crypto = await import('crypto');
+    const expected = crypto
+      .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
+      .update(body)
+      .digest('hex');
+    if (signature !== expected) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const payload = JSON.parse(body);
     const membership: MembershipData = payload.data || payload;
     const eventType: string = payload.event || '';
     const isCancellation = eventType.includes('cancel') ||
@@ -47,7 +68,7 @@ export async function POST(request: NextRequest) {
         // Find existing membership record and update status
         try {
           const searchRes = await fetch(
-            `https://api.airtable.com/v0/${AIRTABLE_BASE}/Memberships?filterByFormula=AND({MangoMint Membership ID}="${membership.id}",{Status}="Active")&maxRecords=1`,
+            `https://api.airtable.com/v0/${AIRTABLE_BASE}/Memberships?filterByFormula=AND({MangoMint Membership ID}="${sanitizeFormulaValue(String(membership.id || ''))}",{Status}="Active")&maxRecords=1`,
             {
               headers: { Authorization: `Bearer ${AIRTABLE_PAT}` },
             }

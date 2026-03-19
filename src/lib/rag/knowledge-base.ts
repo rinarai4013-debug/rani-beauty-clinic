@@ -661,7 +661,8 @@ export async function initializePineconeIndex(config: PineconeConfig): Promise<{
 
 /**
  * Upsert documents into Pinecone as chunked vectors.
- * Uses simple hashing for embeddings (production would use OpenAI/Cohere embeddings).
+ * Uses OpenAI text-embedding-3-small for real embeddings.
+ * Requires OPENAI_API_KEY to be set; aborts if unavailable.
  */
 export async function upsertDocuments(
   config: PineconeConfig,
@@ -677,19 +678,27 @@ export async function upsertDocuments(
     for (const doc of documents) {
       const chunks = chunkDocument(doc.content);
 
-      const vectors = chunks.map((chunk, i) => ({
-        id: `${doc.id}_chunk_${i}`,
-        values: generateSimpleEmbedding(chunk),
-        metadata: {
-          documentId: doc.id,
-          chunkIndex: i,
-          category: doc.category,
-          service: doc.service || '',
-          title: doc.title,
-          tags: doc.tags.join(','),
-          content: chunk,
-        },
-      }));
+      const vectors = [];
+      for (let i = 0; i < chunks.length; i++) {
+        const embedding = await generateEmbedding(chunks[i]);
+        if (!embedding) {
+          console.error(`[RAG] Cannot upsert documents without embedding API key. Aborting upsert.`);
+          return { success: false, chunksUpserted: 0 };
+        }
+        vectors.push({
+          id: `${doc.id}_chunk_${i}`,
+          values: embedding,
+          metadata: {
+            documentId: doc.id,
+            chunkIndex: i,
+            category: doc.category,
+            service: doc.service || '',
+            title: doc.title,
+            tags: doc.tags.join(','),
+            content: chunks[i],
+          },
+        });
+      }
 
       // Batch upsert (Pinecone limit: 100 vectors per batch)
       for (let i = 0; i < vectors.length; i += 100) {
@@ -704,6 +713,78 @@ export async function upsertDocuments(
     console.error('Pinecone upsert error:', error);
     return { success: false, chunksUpserted: 0 };
   }
+}
+
+/**
+ * Search Pinecone vector database for semantically similar documents.
+ * Requires PINECONE_API_KEY and OPENAI_API_KEY environment variables.
+ */
+export async function searchPinecone(
+  query: string,
+  options: {
+    category?: DocumentCategory;
+    service?: string;
+    topK?: number;
+  } = {}
+): Promise<RAGContext> {
+  const { topK = TOP_K } = options;
+
+  const queryEmbedding = await generateEmbedding(query);
+  if (!queryEmbedding) {
+    throw new Error('Cannot generate query embedding — OPENAI_API_KEY not set');
+  }
+
+  const { Pinecone } = await import('@pinecone-database/pinecone');
+  const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+  const index = pc.index(INDEX_NAME);
+
+  const filter: Record<string, string> = {};
+  if (options.category) filter.category = options.category;
+  if (options.service) filter.service = options.service;
+
+  const queryResult = await index.query({
+    vector: queryEmbedding,
+    topK,
+    includeMetadata: true,
+    ...(Object.keys(filter).length > 0 ? { filter } : {}),
+  });
+
+  const results: SearchResult[] = (queryResult.matches || []).map(match => ({
+    document: {
+      id: (match.metadata?.documentId as string) || match.id,
+      title: (match.metadata?.title as string) || '',
+      content: (match.metadata?.content as string) || '',
+      category: (match.metadata?.category as DocumentCategory) || 'faq',
+      service: (match.metadata?.service as string) || undefined,
+      tags: ((match.metadata?.tags as string) || '').split(',').filter(Boolean),
+      source: 'manual' as const,
+      lastUpdated: new Date().toISOString(),
+      version: 1,
+      approved: true,
+    },
+    relevanceScore: Math.round((match.score || 0) * 100),
+    matchedChunk: (match.metadata?.content as string) || '',
+    chunkIndex: (match.metadata?.chunkIndex as number) || 0,
+  }));
+
+  let contextText = '';
+  const sources: { title: string; category: string }[] = [];
+
+  for (const result of results) {
+    const chunk = `### ${result.document.title}\n${result.matchedChunk}\n\n`;
+    if (contextText.length + chunk.length > 3000) break;
+    contextText += chunk;
+    sources.push({
+      title: result.document.title,
+      category: result.document.category,
+    });
+  }
+
+  const avgScore = results.length > 0
+    ? Math.round(results.reduce((s, r) => s + r.relevanceScore, 0) / results.length)
+    : 0;
+
+  return { query, results, contextText, confidence: avgScore, sources };
 }
 
 // ── HELPER FUNCTIONS ──
@@ -733,28 +814,43 @@ function chunkDocument(content: string): string[] {
   return chunks;
 }
 
-function generateSimpleEmbedding(text: string): number[] {
-  // Simple hash-based embedding for development
-  // Production would use OpenAI text-embedding-3-small or Cohere embed-v3
-  const embedding = new Array(EMBEDDING_DIMENSION).fill(0);
-  const words = text.toLowerCase().split(/\s+/);
-
-  words.forEach((word, i) => {
-    for (let j = 0; j < word.length; j++) {
-      const idx = (word.charCodeAt(j) * (i + 1) * (j + 1)) % EMBEDDING_DIMENSION;
-      embedding[idx] += 1 / words.length;
-    }
-  });
-
-  // Normalize
-  const magnitude = Math.sqrt(embedding.reduce((s, v) => s + v * v, 0));
-  if (magnitude > 0) {
-    for (let i = 0; i < embedding.length; i++) {
-      embedding[i] /= magnitude;
-    }
+/**
+ * Generate embeddings using OpenAI's text-embedding-3-small model.
+ * Falls back to null if no API key is available (caller should use keyword search instead).
+ */
+async function generateEmbedding(text: string): Promise<number[] | null> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.warn('[RAG] No OPENAI_API_KEY set — cannot generate embeddings. Falling back to keyword search.');
+    return null;
   }
 
-  return embedding;
+  try {
+    const response = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text,
+        dimensions: EMBEDDING_DIMENSION,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`[RAG] OpenAI embedding API error (${response.status}):`, errorBody);
+      return null;
+    }
+
+    const result = await response.json();
+    return result.data?.[0]?.embedding ?? null;
+  } catch (error) {
+    console.error('[RAG] Failed to generate embedding:', error);
+    return null;
+  }
 }
 
 function detectKnowledgeGaps(docs: KnowledgeDocument[]): KnowledgeGap[] {

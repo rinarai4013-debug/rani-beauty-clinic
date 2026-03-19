@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { generateFinancialIntelligence, type FinanceInput, type RevenueEntry, type ExpenseEntry } from '@/lib/finance/pnl-engine';
@@ -7,7 +8,10 @@ import { generateFinancialIntelligence, type FinanceInput, type RevenueEntry, ty
 export async function GET() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!hasPermission(session.role, 'view_finance')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {
@@ -40,6 +44,7 @@ export async function GET() {
       const provider = (rec.fields[FIELDS.transactions.provider] as string) || 'Unknown';
       const paymentMethod = ((rec.fields[FIELDS.transactions.paymentMethod] as string) || 'card').toLowerCase();
       const isFinancing = !!(rec.fields[FIELDS.transactions.isFinancing]);
+      const clientIds = (rec.fields['Client'] as string[]) || [];
 
       // Determine if this is an expense or revenue
       const isExpense = amount < 0 || type.toLowerCase().includes('expense') || type.toLowerCase().includes('refund');
@@ -69,6 +74,7 @@ export async function GET() {
           provider,
           paymentMethod: mappedPaymentMethod,
           clientType: 'returning', // Default; we don't store client type on transactions
+          clientId: clientIds[0],
         });
       }
     }

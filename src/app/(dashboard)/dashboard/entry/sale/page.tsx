@@ -50,9 +50,11 @@ export default function ManualSalePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const amt = parseFloat(amount) || 0;
+    const serviceName = service || category;
+    if (!confirm(`Log sale of $${amt.toLocaleString()} for ${serviceName}?`)) return;
     setIsSubmitting(true);
     try {
-      const amt = parseFloat(amount) || 0;
       const res = await fetch('/api/dashboard/entry/sale', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -73,7 +75,7 @@ export default function ManualSalePage() {
         const data = await res.json();
         throw new Error(data.error || 'Failed to log sale');
       }
-      toast.success(`Sale logged! $${amt.toLocaleString()} +${Math.round(amt / 10)} XP`);
+      toast.success(`Sale logged! $${parseFloat(amount).toLocaleString()} +${Math.round((parseFloat(amount) || 0) / 10)} XP`);
       setClientName(''); setService(''); setCategory(''); setProvider('');
       setAmount(''); setPaymentMethod(''); setDiscount(''); setIsFinancing(false); setNotes('');
       setBankTransactionId(null);

@@ -5,9 +5,15 @@ import { categorizeTransaction } from '@/lib/plaid/categories';
 import { cache } from '@/lib/cache';
 import type { PlaidTransaction } from '@/types/plaid';
 import type { RemovedTransaction, TransactionsSyncRequestOptions } from 'plaid';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 
 export async function POST() {
-  const storage = readStorage();
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!hasPermission(session.role, 'manage_bank_connections')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  const storage = await readStorage();
 
   if (!storage.accessToken) {
     return NextResponse.json({ error: 'Not connected' }, { status: 400 });
@@ -99,7 +105,7 @@ export async function POST() {
 
     const now = new Date().toISOString();
 
-    updateStorage({
+    await updateStorage({
       cursor,
       transactions,
       lastSyncedAt: now,

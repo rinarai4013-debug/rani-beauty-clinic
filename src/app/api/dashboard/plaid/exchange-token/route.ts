@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { plaidClient } from '@/lib/plaid/client';
 import { updateStorage } from '@/lib/plaid/storage';
+import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
 
 export async function POST(request: NextRequest) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!hasPermission(session.role, 'manage_bank_connections')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
   try {
     const { publicToken, metadata } = await request.json();
 
@@ -41,8 +47,8 @@ export async function POST(request: NextRequest) {
       lastSynced: new Date().toISOString(),
     }));
 
-    // Store everything
-    updateStorage({
+    // Store everything (encrypted in Airtable)
+    await updateStorage({
       accessToken,
       itemId,
       institutionId: metadata?.institution?.institution_id || null,

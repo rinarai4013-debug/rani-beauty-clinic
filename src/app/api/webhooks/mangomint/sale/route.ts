@@ -30,7 +30,27 @@ interface SaleData {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.json();
+    // MANDATORY: verify webhook signature
+    if (!process.env.MANGOMINT_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    }
+
+    const body = await request.text();
+    const signature = request.headers.get('x-mangomint-signature');
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
+
+    const crypto = await import('crypto');
+    const expected = crypto
+      .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
+      .update(body)
+      .digest('hex');
+    if (signature !== expected) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const payload = JSON.parse(body);
     const sale: SaleData = payload.data || payload;
 
     console.log('[Mangomint Sale Webhook] Received:', JSON.stringify({

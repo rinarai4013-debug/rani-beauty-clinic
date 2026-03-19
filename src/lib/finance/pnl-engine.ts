@@ -34,6 +34,7 @@ export interface RevenueEntry {
   provider: string;
   paymentMethod: 'cash' | 'card' | 'financing' | 'membership' | 'package';
   clientType: 'new' | 'returning' | 'member';
+  clientId?: string;
 }
 
 export interface ExpenseEntry {
@@ -501,7 +502,11 @@ function calculateKPIs(input: FinanceInput, pnl: ProfitLossStatement): Financial
   const newClientRevenue = input.revenue
     .filter(r => r.clientType === 'new')
     .reduce((sum, r) => sum + r.amount, 0);
-  const uniqueClients = new Set(input.revenue.map(r => `${r.service}-${r.date}`)).size;
+  const uniqueClients = new Set(
+    input.revenue
+      .filter(r => r.clientId)
+      .map(r => r.clientId)
+  ).size || input.revenue.length; // Fallback to transaction count if no clientIds
 
   const fixedCosts = input.monthlyFixedCosts || (pnl.operatingExpenses.total * 0.7); // 70% fixed
   const breakEvenDaily = fixedCosts / 30;

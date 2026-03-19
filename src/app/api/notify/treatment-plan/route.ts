@@ -1,20 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Tables, createRecord, fetchFirst } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import { cache } from '@/lib/cache';
+
+interface TreatmentPlanCreateFields {
+  'Client'?: string[];
+  'Plan Tier'?: string;
+  'Plan Value'?: number;
+  'Services Included'?: string;
+  'Plan URL'?: string;
+  'Status'?: string;
+  'Created Date'?: string;
+  'Intake Record ID'?: string;
+  'Client Name'?: string;
+}
+
+interface AlertCreateFields {
+  'Type': string;
+  'Severity': string;
+  'Message': string;
+  'Action Recommended': string;
+  'Status': string;
+  'Created Date': string;
+}
+
+interface IntakeFields {
+  'Treatment Value (AI)'?: string;
+  'Program Plan (AI)'?: string;
+  'Cost Breakdown (AI)'?: string;
+}
+
+interface ClientFields {
+  'Client'?: string;
+  'Email'?: string;
+}
 
 /**
  * Treatment Plan Notification API
  * Called by n8n after intake AI processing completes.
  * Sends email (via Resend) and optional SMS (via Twilio) with the treatment plan link.
+ * Also persists the treatment plan record and creates a follow-up alert.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { intakeRecordId, clientEmail, clientPhone, clientName } = await request.json();
+    const {
+      intakeRecordId,
+      clientEmail,
+      clientPhone,
+      clientName,
+      // Optional fields for plan persistence — can be passed from n8n or inferred
+      planTier,
+      planValue,
+      servicesIncluded,
+    } = await request.json();
 
     if (!intakeRecordId || !clientName) {
       return NextResponse.json({ error: 'intakeRecordId and clientName are required' }, { status: 400 });
     }
 
     const planUrl = `https://www.ranibeautyclinic.com/plan/${intakeRecordId}`;
-    const results = { email: false, sms: false, planUrl };
+    const results: { email: boolean; sms: boolean; planUrl: string; planRecordId: string | null } = {
+      email: false,
+      sms: false,
+      planUrl,
+      planRecordId: null,
+    };
 
     // Send email via Resend
     if (clientEmail && process.env.RESEND_API_KEY) {
@@ -86,6 +136,93 @@ export async function POST(request: NextRequest) {
       } catch (e) {
         console.error('Log error:', e);
       }
+    }
+
+    // Persist the treatment plan record to Airtable
+    try {
+      // Resolve plan tier, value, and services from passed data or intake record
+      let resolvedTier = planTier || 'Recommended';
+      let resolvedValue = planValue || 0;
+      let resolvedServices = servicesIncluded || '';
+
+      // If not passed explicitly, try to extract from the intake record
+      if (!planValue || !servicesIncluded) {
+        try {
+          const intakeRecords = await fetchFirst<IntakeFields>(
+            Tables.intakes(),
+            1,
+            { filterByFormula: `RECORD_ID() = "${sanitizeFormulaValue(intakeRecordId)}"` },
+            true
+          );
+          if (intakeRecords.length > 0) {
+            const intake = intakeRecords[0].fields;
+            if (!resolvedValue && intake['Treatment Value (AI)']) {
+              const match = intake['Treatment Value (AI)']?.match(/\$[\d,]+/);
+              resolvedValue = match ? parseInt(match[0].replace(/[$,]/g, ''), 10) : 0;
+            }
+            if (!resolvedServices) {
+              resolvedServices = intake['Program Plan (AI)'] || intake['Cost Breakdown (AI)'] || '';
+            }
+          }
+        } catch (intakeErr) {
+          console.error('Failed to fetch intake for plan persistence:', intakeErr);
+        }
+      }
+
+      // Try to find the client record by email
+      let clientRecordId: string | null = null;
+      if (clientEmail) {
+        try {
+          const clients = await fetchFirst<ClientFields>(
+            Tables.clients(),
+            1,
+            { filterByFormula: `{Email} = "${sanitizeFormulaValue(clientEmail)}"` },
+            true
+          );
+          if (clients.length > 0) {
+            clientRecordId = clients[0].id;
+          }
+        } catch {
+          // Client lookup is best-effort
+        }
+      }
+
+      const planFields: Partial<TreatmentPlanCreateFields> = {
+        'Plan Tier': resolvedTier,
+        'Plan Value': resolvedValue,
+        'Services Included': resolvedServices,
+        'Plan URL': planUrl,
+        'Status': 'Sent',
+        'Created Date': new Date().toISOString(),
+        'Intake Record ID': intakeRecordId,
+        'Client Name': clientName,
+      };
+
+      if (clientRecordId) {
+        planFields['Client'] = [clientRecordId];
+      }
+
+      results.planRecordId = await createRecord<TreatmentPlanCreateFields>(
+        Tables.treatmentPlans(),
+        planFields
+      );
+
+      // Create a follow-up alert
+      await createRecord<AlertCreateFields>(Tables.alerts(), {
+        'Type': 'follow_up',
+        'Severity': 'warning',
+        'Message': `${clientName} received a ${resolvedTier} treatment plan ($${resolvedValue.toLocaleString()}) — follow up if not booked`,
+        'Action Recommended': `Follow up with ${clientName} about their ${resolvedTier} plan. Call or text to answer questions and help them book.`,
+        'Status': 'active',
+        'Created Date': new Date().toISOString(),
+      });
+
+      // Invalidate caches
+      cache.invalidatePrefix('treatment-plans');
+      cache.invalidate('alerts');
+    } catch (persistErr) {
+      console.error('Failed to persist treatment plan:', persistErr);
+      // Don't fail the notification if persistence fails
     }
 
     return NextResponse.json({ success: true, ...results });

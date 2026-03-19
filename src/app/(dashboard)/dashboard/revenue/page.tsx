@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressBar from '@/components/dashboard/charts/ProgressBar';
-import { DashboardErrorBoundary, KPIRowSkeleton, ChartSkeleton } from '@/components/dashboard/shared';
+import { DashboardErrorBoundary, KPIRowSkeleton, ChartSkeleton, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
 import { useRevenueData } from '@/hooks/useDashboardData';
 import type { DateRange, RevenueData } from '@/types/dashboard';
@@ -21,7 +21,7 @@ const PIE_COLORS = ['#F3D6BE', '#0F1D2C', '#C9A96E', '#3B82F6', '#10B981', '#EF4
 
 export default function RevenueDashboard() {
   const [range, setRange] = useState<DateRange>('wtd');
-  const { data, isLoading } = useRevenueData(range) as { data: RevenueData | undefined; isLoading: boolean };
+  const { data, isLoading, error, mutate } = useRevenueData(range) as { data: RevenueData | undefined; isLoading: boolean; error: unknown; mutate: () => void };
 
   const summary = data?.summary || { gross: 0, net: 0, deposits: 0, refunds: 0, outstanding: 0, revenuePerHour: 0, revenuePerVisit: 0 };
   const dailyData = (data?.daily || []).map(d => ({
@@ -67,7 +67,9 @@ export default function RevenueDashboard() {
         </div>
 
         {/* Hero KPIs */}
-        {isLoading ? (
+        {error ? (
+          <InlineError message="Failed to load revenue data" onRetry={() => mutate()} />
+        ) : isLoading ? (
           <KPIRowSkeleton />
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">

@@ -182,3 +182,16 @@ export function usePhoneAgent() {
     refreshInterval: 300000, // 5 min
   });
 }
+
+export function useFunnelHealth() {
+  return useDashboardData('/funnel-health', {
+    revalidateOnFocus: false,
+    refreshInterval: 0, // Manual refresh only
+  });
+}
+
+export function useReactivationList() {
+  return useDashboardData('/reactivation', {
+    refreshInterval: 300000, // 5 min
+  });
+}
