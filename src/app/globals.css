@@ -62,3 +62,45 @@ h1 {
     min-width: 44px;
   }
 }
+
+/* =====================================================
+   Hero CSS animations — no JavaScript needed for LCP
+   ===================================================== */
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hero-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-scale-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.animate-hero-fade-in {
+  animation: hero-fade-in 0.6s ease-out both;
+}
+
+.animate-hero-slide-up {
+  animation: hero-slide-up 0.6s ease-out both;
+}
+
+.animate-hero-scale-x {
+  animation: hero-scale-x 0.4s ease-out both;
+  animation-delay: 0.1s;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-fade-in,
+  .animate-hero-slide-up,
+  .animate-hero-scale-x {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

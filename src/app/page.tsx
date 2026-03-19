@@ -1,12 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-import {
-  Brain,
-  Zap,
-  Heart,
-  Clock,
-} from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
@@ -14,6 +5,8 @@ import SectionLabel from "@/components/ui/SectionLabel";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
+import CSSFadeIn from "@/components/animations/CSSFadeIn";
+import WhyRaniCards from "@/components/sections/WhyRaniCards";
 import { clinicInfo } from "@/data/clinic-info";
 import { serviceImages } from "@/data/service-images";
 
@@ -22,7 +15,7 @@ const SectionSkeleton = ({ height = "h-96" }: { height?: string }) => (
   <div className={`${height} w-full animate-pulse bg-rani-cream`} />
 );
 
-// Above-fold components loaded dynamically with SSR (still render on server but split the bundle)
+// Above-fold components — SSR true (rendered on server, bundle split)
 const TrustLogosBar = dynamic(() => import("@/components/sections/TrustLogosBar"), {
   loading: () => <div className="h-16 animate-pulse border-y border-rani-border bg-white" />,
 });
@@ -35,8 +28,6 @@ const ServiceCategoryPanels = dynamic(() => import("@/components/sections/Servic
   ssr: false,
   loading: () => <SectionSkeleton height="h-[500px]" />,
 });
-const FadeInOnScroll = dynamic(() => import("@/components/animations/FadeInOnScroll"), { ssr: false });
-const StaggerChildren = dynamic(() => import("@/components/animations/StaggerChildren"), { ssr: false });
 const ServiceCard = dynamic(() => import("@/components/services/ServiceCard"), { ssr: false });
 const MeetTheTeam = dynamic(() => import("@/components/sections/MeetTheTeam"), {
   ssr: false,
@@ -157,29 +148,6 @@ const wellnessServices = [
     href: "/wellness/nad-injections",
     image: serviceImages["nad-injections"]?.image,
     hoverImage: serviceImages["nad-injections"]?.hoverImage,
-  },
-];
-
-const whyRani = [
-  {
-    icon: Brain,
-    title: "Neurologist-Led",
-    description: "Medical director oversight on all treatments",
-  },
-  {
-    icon: Zap,
-    title: "Proven Technology",
-    description: "Candela GentleMax Pro Plus & Cutera Secret Pro",
-  },
-  {
-    icon: Heart,
-    title: "Full Spectrum",
-    description: "Aesthetics + medical wellness under one roof",
-  },
-  {
-    icon: Clock,
-    title: "Open 7 Days",
-    description: "Convenient scheduling for every lifestyle",
   },
 ];
 
@@ -371,7 +339,7 @@ export default function HomePage() {
 
       {/* 1. Announcement Bar — now in Navbar */}
 
-      {/* 2. Hero Section — with background image */}
+      {/* 2. Hero Section — server-rendered with CSS animations for fast LCP */}
       <Hero
         label="RENTON'S #1 PHYSICIAN-SUPERVISED MEDSPA · SERVING ALL OF KING COUNTY"
         title="The Only Medspa Where a Neurologist Oversees Every Treatment."
@@ -398,7 +366,7 @@ export default function HomePage() {
       {/* 3. Trust Logos Bar */}
       <TrustLogosBar />
 
-      {/* 3.5 Trust Signals Bar — Physician Supervised, 2181+ Clients, etc. */}
+      {/* 3.5 Trust Signals Bar */}
       <TrustBar />
 
       {/* 4. Service Category Panels */}
@@ -407,52 +375,52 @@ export default function HomePage() {
       {/* 5. Services Overview — With Images */}
       <section className="bg-rani-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <FadeInOnScroll>
+          <CSSFadeIn>
             <SectionLabel label="OUR SERVICES" />
             <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
               Treatments Tailored to You
             </h2>
-          </FadeInOnScroll>
+          </CSSFadeIn>
 
           {/* Aesthetic Services */}
           <div className="mt-12">
-            <FadeInOnScroll>
+            <CSSFadeIn>
               <h3 className="mb-6 text-center font-body text-xl font-semibold text-rani-navy">
                 Aesthetic Services
               </h3>
-            </FadeInOnScroll>
-            <StaggerChildren className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            </CSSFadeIn>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {aestheticServices.map((service) => (
                 <ServiceCard key={service.href} {...service} />
               ))}
-            </StaggerChildren>
+            </div>
           </div>
 
           {/* Medical Wellness */}
           <div className="mt-16">
-            <FadeInOnScroll>
+            <CSSFadeIn>
               <h3 className="mb-6 text-center font-body text-xl font-semibold text-rani-navy">
                 Medical Wellness
               </h3>
-            </FadeInOnScroll>
-            <StaggerChildren className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            </CSSFadeIn>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {wellnessServices.map((service) => (
                 <ServiceCard key={service.href} {...service} />
               ))}
-            </StaggerChildren>
+            </div>
           </div>
 
-          <FadeInOnScroll delay={0.4}>
+          <CSSFadeIn delay={200}>
             <div className="mt-12 text-center">
               <Button href="/services" icon>
                 View All Services
               </Button>
             </div>
-          </FadeInOnScroll>
+          </CSSFadeIn>
         </div>
       </section>
 
-      {/* 6. Meet The Founders — Real founder photos */}
+      {/* 6. Meet The Founders */}
       <MeetTheTeam />
 
       {/* 6b. What to Expect — Process Steps */}
@@ -462,7 +430,7 @@ export default function HomePage() {
       <section className="bg-rani-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <FadeInOnScroll direction="left">
+            <CSSFadeIn>
               <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-cream to-white">
                 <Image
                   src="/images/team/dr-landfield.webp"
@@ -473,9 +441,9 @@ export default function HomePage() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
-            </FadeInOnScroll>
+            </CSSFadeIn>
 
-            <FadeInOnScroll direction="right">
+            <CSSFadeIn delay={200}>
               <div>
                 <SectionLabel
                   label="MEDICAL EXPERTISE"
@@ -506,7 +474,7 @@ export default function HomePage() {
                   </Button>
                 </div>
               </div>
-            </FadeInOnScroll>
+            </CSSFadeIn>
           </div>
         </div>
       </section>
@@ -514,43 +482,18 @@ export default function HomePage() {
       {/* 8. Why Rani Section */}
       <section className="bg-rani-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <FadeInOnScroll>
+          <CSSFadeIn>
             <SectionLabel label="WHY CHOOSE US" />
             <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
               The Rani Difference
             </h2>
-          </FadeInOnScroll>
+          </CSSFadeIn>
 
-          <StaggerChildren className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {whyRani.map((item) => (
-              <motion.div
-                key={item.title}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: {
-                    opacity: 1,
-                    y: 0,
-                    transition: { duration: 0.6, ease: "easeOut" },
-                  },
-                }}
-                className="text-center"
-              >
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
-                  <item.icon size={28} className="text-rani-gold" />
-                </div>
-                <h3 className="mt-4 font-body text-lg font-bold text-rani-navy">
-                  {item.title}
-                </h3>
-                <p className="mt-2 font-body text-sm text-rani-muted">
-                  {item.description}
-                </p>
-              </motion.div>
-            ))}
-          </StaggerChildren>
+          <WhyRaniCards />
         </div>
       </section>
 
-      {/* 9. Before & After Slider — Real patient results */}
+      {/* 9. Before & After Slider */}
       <BeforeAfterSlider />
 
       {/* 10. Reviews/Testimonials */}
@@ -559,19 +502,19 @@ export default function HomePage() {
       {/* 10b. Why Rani — Comparison Strip */}
       <WhyRaniComparison />
 
-      {/* 10c. Before & After Gallery — Swipeable results */}
+      {/* 10c. Before & After Gallery */}
       <BeforeAfterGallery />
 
       {/* 10d. Popular Packages */}
       <PopularPackages />
 
-      {/* 11. Treatment Quiz — Email Capture / Lead Magnet */}
+      {/* 11. Treatment Quiz */}
       <TreatmentQuiz />
 
       {/* 12. Blog Teaser */}
       <BlogTeaser posts={blogPosts} />
 
-      {/* 13. Consultation Embed — Typeform on-site */}
+      {/* 13. Consultation Embed */}
       <ConsultationEmbed />
 
       {/* 13b. FAQ Section */}

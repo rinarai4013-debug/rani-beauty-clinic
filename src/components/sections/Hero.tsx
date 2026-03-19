@@ -1,7 +1,4 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 
@@ -30,6 +27,10 @@ interface HeroProps {
   layout?: "full" | "split";
 }
 
+/**
+ * Server-rendered Hero component with CSS-only animations.
+ * No Framer Motion, no "use client" — text is visible in initial HTML for fast LCP.
+ */
 export default function Hero({
   label,
   title,
@@ -91,64 +92,50 @@ export default function Hero({
       <div className="relative mx-auto max-w-7xl px-6">
         <div className={layout === "split" ? "max-w-xl" : "max-w-3xl"}>
           {label && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0 }}
-              className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold mb-4"
+            <p
+              className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold mb-4 animate-hero-fade-in"
             >
               {label}
-            </motion.p>
+            </p>
           )}
 
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="mb-6 h-0.5 w-[60px] origin-center bg-rani-gold"
+          <div
+            className="mb-6 h-0.5 w-[60px] origin-left bg-rani-gold animate-hero-scale-x"
           />
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className={`font-heading text-4xl font-bold leading-tight md:text-5xl lg:text-6xl ${textColor}`}
+          <h1
+            className={`font-heading text-4xl font-bold leading-tight md:text-5xl lg:text-6xl ${textColor} animate-hero-slide-up`}
+            style={{ animationDelay: "0.2s" }}
           >
             {title}
-          </motion.h1>
+          </h1>
 
           {subtitle && (
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
+            <p
               className={`mt-6 max-w-xl font-body text-lg leading-relaxed ${
                 dark ? "text-gray-300" : "text-rani-muted"
-              }`}
+              } animate-hero-slide-up`}
+              style={{ animationDelay: "0.4s" }}
             >
               {subtitle}
-            </motion.p>
+            </p>
           )}
 
           {badge && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="mt-4"
+            <div
+              className="mt-4 animate-hero-slide-up"
+              style={{ animationDelay: "0.4s" }}
             >
               <Badge icon="shield" variant={dark ? "dark" : "light"}>
                 {badge}
               </Badge>
-            </motion.div>
+            </div>
           )}
 
           {(primaryCTA || secondaryCTA) && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="mt-8 flex flex-wrap gap-4"
+            <div
+              className="mt-8 flex flex-wrap gap-4 animate-hero-slide-up"
+              style={{ animationDelay: "0.6s" }}
             >
               {primaryCTA && (
                 <Button
@@ -168,32 +155,28 @@ export default function Hero({
                   {secondaryCTA.text}
                 </Button>
               )}
-            </motion.div>
+            </div>
           )}
 
           {badges && badges.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1 }}
-              className="mt-8 flex flex-wrap gap-3"
+            <div
+              className="mt-8 flex flex-wrap gap-3 animate-hero-fade-in"
+              style={{ animationDelay: "0.8s" }}
             >
               {badges.map((b) => (
                 <Badge key={b} variant={dark ? "dark" : "light"} icon="check">
                   {b}
                 </Badge>
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
 
         {/* Stats Bar */}
         {stats && stats.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="mt-12 grid grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4"
+          <div
+            className="mt-12 grid grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4 animate-hero-slide-up"
+            style={{ animationDelay: "1s" }}
           >
             {stats.map((stat) => (
               <div key={stat.label}>
@@ -205,7 +188,7 @@ export default function Hero({
                 </p>
               </div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </section>
