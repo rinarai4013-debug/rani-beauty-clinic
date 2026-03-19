@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+Sitemap: https://www.ranibeautyclinic.com/sitemap.xml
