@@ -238,7 +238,15 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.airtable.com https://graph.facebook.com https://api.resend.com",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://booking.mangomint.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.clarity.ms",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://api.airtable.com https://graph.facebook.com https://api.resend.com https://www.google-analytics.com https://region1.google-analytics.com https://booking.mangomint.com https://api.anthropic.com https://www.clarity.ms",
+              "frame-src 'self' https://booking.mangomint.com https://www.google.com https://form.typeform.com",
+            ].join("; "),
           },
           {
             key: "Strict-Transport-Security",
