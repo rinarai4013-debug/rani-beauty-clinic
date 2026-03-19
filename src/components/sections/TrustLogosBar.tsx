@@ -1,7 +1,5 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Shield, Award, Clock, Star, Heart } from "lucide-react";
+import CSSFadeIn from "@/components/animations/CSSFadeIn";
 
 const trustItems = [
   { icon: Shield, text: "Neurologist-Supervised" },
@@ -15,13 +13,7 @@ export default function TrustLogosBar() {
   return (
     <section className="border-y border-rani-border bg-white py-6">
       <div className="mx-auto max-w-7xl px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4"
-        >
+        <CSSFadeIn className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
           {trustItems.map((item) => (
             <div
               key={item.text}
@@ -33,7 +25,7 @@ export default function TrustLogosBar() {
               </span>
             </div>
           ))}
-        </motion.div>
+        </CSSFadeIn>
       </div>
     </section>
   );
