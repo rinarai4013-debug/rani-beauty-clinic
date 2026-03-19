@@ -6,11 +6,11 @@ export default function Analytics() {
 
   return (
     <>
-      {/* Google Tag Manager */}
+      {/* Google Tag Manager — lazyOnload to reduce TBT */}
       {gtm && (
         <Script
           id="gtm-script"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -53,10 +53,10 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         />
       )}
 
-      {/* Mangomint Online Booking Overlay */}
+      {/* Mangomint Online Booking Overlay — lazyOnload since user must click before it's needed */}
       <Script
         id="mangomint-booking"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `window.Mangomint = window.Mangomint || {};
 window.Mangomint.CompanyId = ${clinicInfo.booking.companyId};`,
@@ -65,7 +65,7 @@ window.Mangomint.CompanyId = ${clinicInfo.booking.companyId};`,
       <Script
         id="mangomint-booking-sdk"
         src="https://booking.mangomint.com/app.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
 
       {/* Meta Pixel */}

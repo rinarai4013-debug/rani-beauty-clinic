@@ -6,43 +6,90 @@ import {
   Zap,
   Heart,
   Clock,
-  Syringe,
-  Droplets,
-  Sparkles,
-  Scale,
-  Activity,
-  Pill,
 } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
-import TrustLogosBar from "@/components/sections/TrustLogosBar";
-import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
-import MeetTheTeam from "@/components/sections/MeetTheTeam";
 import SectionLabel from "@/components/ui/SectionLabel";
-import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
-import StaggerChildren from "@/components/animations/StaggerChildren";
-import ServiceCard from "@/components/services/ServiceCard";
-import CTABanner from "@/components/sections/CTABanner";
-import FAQ from "@/components/sections/FAQ";
-import ProcessSteps from "@/components/sections/ProcessSteps";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
-import TrustBar from "@/components/sections/TrustBar";
 import { clinicInfo } from "@/data/clinic-info";
 import { serviceImages } from "@/data/service-images";
 
-// Dynamic imports for below-fold sections (reduces initial JS bundle)
-const BeforeAfterSlider = dynamic(() => import("@/components/sections/BeforeAfterSlider"), { ssr: false });
-const TreatmentQuiz = dynamic(() => import("@/components/sections/TreatmentQuiz"), { ssr: false });
-const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"), { ssr: false });
-const ReviewCarousel = dynamic(() => import("@/components/sections/ReviewCarousel"), { ssr: false });
-const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"), { ssr: false });
-const MapSection = dynamic(() => import("@/components/sections/MapSection"), { ssr: false });
-const BeforeAfterGallery = dynamic(() => import("@/components/sections/BeforeAfterGallery"), { ssr: false });
-const WhyRaniComparison = dynamic(() => import("@/components/sections/WhyRaniComparison"), { ssr: false });
-const BlogTeaser = dynamic(() => import("@/components/sections/BlogTeaser"), { ssr: false });
+// Lightweight skeleton for loading states
+const SectionSkeleton = ({ height = "h-96" }: { height?: string }) => (
+  <div className={`${height} w-full animate-pulse bg-rani-cream`} />
+);
+
+// Above-fold components loaded dynamically with SSR (still render on server but split the bundle)
+const TrustLogosBar = dynamic(() => import("@/components/sections/TrustLogosBar"), {
+  loading: () => <div className="h-16 animate-pulse border-y border-rani-border bg-white" />,
+});
+const TrustBar = dynamic(() => import("@/components/sections/TrustBar"), {
+  loading: () => <div className="h-12 animate-pulse bg-rani-navy" />,
+});
+
+// Below-fold sections — ssr: false to eliminate their JS from the initial bundle
+const ServiceCategoryPanels = dynamic(() => import("@/components/sections/ServiceCategoryPanels"), {
+  ssr: false,
+  loading: () => <SectionSkeleton height="h-[500px]" />,
+});
+const FadeInOnScroll = dynamic(() => import("@/components/animations/FadeInOnScroll"), { ssr: false });
+const StaggerChildren = dynamic(() => import("@/components/animations/StaggerChildren"), { ssr: false });
+const ServiceCard = dynamic(() => import("@/components/services/ServiceCard"), { ssr: false });
+const MeetTheTeam = dynamic(() => import("@/components/sections/MeetTheTeam"), {
+  ssr: false,
+  loading: () => <SectionSkeleton height="h-[500px]" />,
+});
+const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"), {
+  ssr: false,
+  loading: () => <SectionSkeleton height="h-80" />,
+});
+const BeforeAfterSlider = dynamic(() => import("@/components/sections/BeforeAfterSlider"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const TreatmentQuiz = dynamic(() => import("@/components/sections/TreatmentQuiz"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const ReviewCarousel = dynamic(() => import("@/components/sections/ReviewCarousel"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const MapSection = dynamic(() => import("@/components/sections/MapSection"), {
+  ssr: false,
+  loading: () => <SectionSkeleton height="h-80" />,
+});
+const BeforeAfterGallery = dynamic(() => import("@/components/sections/BeforeAfterGallery"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const WhyRaniComparison = dynamic(() => import("@/components/sections/WhyRaniComparison"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const BlogTeaser = dynamic(() => import("@/components/sections/BlogTeaser"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const FAQ = dynamic(() => import("@/components/sections/FAQ"), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const CTABanner = dynamic(() => import("@/components/sections/CTABanner"), {
+  ssr: false,
+  loading: () => <div className="h-64 animate-pulse bg-rani-navy" />,
+});
 
 const aestheticServices = [
   {
@@ -326,11 +373,11 @@ export default function HomePage() {
 
       {/* 2. Hero Section — with background image */}
       <Hero
-        label="PHYSICIAN-SUPERVISED MEDSPA IN RENTON · SERVING ALL OF KING COUNTY"
-        title="Your Skin. Your Wellness. Our Expertise."
-        subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist. Safe for all skin types."
-        primaryCTA={{ text: "Book a Consultation", href: "#consultation" }}
-        secondaryCTA={{ text: "Free Phone Consult", href: clinicInfo.phoneTel }}
+        label="RENTON'S #1 PHYSICIAN-SUPERVISED MEDSPA · SERVING ALL OF KING COUNTY"
+        title="The Only Medspa Where a Neurologist Oversees Every Treatment."
+        subtitle="Most medspas are run by estheticians. Rani is supervised by Dr. Alexander Landfield — a board-certified neurologist who brings hospital-grade precision to every Botox injection, laser session, and wellness protocol. That's why 2,181+ clients trust us with their skin."
+        primaryCTA={{ text: "Book Your Free Consultation", href: "#consultation" }}
+        secondaryCTA={{ text: "Call Now — (425) 539-4440", href: clinicInfo.phoneTel }}
         badges={[
           "Board-Certified Neurologist Oversight",
           "Open 7 Days a Week",
@@ -340,9 +387,9 @@ export default function HomePage() {
         backgroundOverlay={60}
         stats={[
           { value: "4.9", label: "Google Rating" },
-          { value: "127+", label: "5-Star Reviews" },
+          { value: "2,181+", label: "Clients Treated" },
           { value: "7", label: "Days Open" },
-          { value: "13K+", label: "Treatments Performed" },
+          { value: "13K+", label: "Treatments Done" },
         ]}
         dark
         fullHeight
