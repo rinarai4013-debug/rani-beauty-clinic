@@ -103,9 +103,9 @@ export default function Hero({
             className="mb-6 h-0.5 w-[60px] origin-left bg-rani-gold animate-hero-scale-x"
           />
 
+          {/* h1 + subtitle are NOT animated — they must be visible instantly for LCP */}
           <h1
-            className={`font-heading text-4xl font-bold leading-tight md:text-5xl lg:text-6xl ${textColor} animate-hero-slide-up`}
-            style={{ animationDelay: "0.2s" }}
+            className={`font-heading text-4xl font-bold leading-tight md:text-5xl lg:text-6xl ${textColor}`}
           >
             {title}
           </h1>
@@ -114,8 +114,7 @@ export default function Hero({
             <p
               className={`mt-6 max-w-xl font-body text-lg leading-relaxed ${
                 dark ? "text-gray-300" : "text-rani-muted"
-              } animate-hero-slide-up`}
-              style={{ animationDelay: "0.4s" }}
+              }`}
             >
               {subtitle}
             </p>
