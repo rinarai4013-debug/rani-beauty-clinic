@@ -97,7 +97,7 @@ const CHUNK_SIZE = 500; // characters per chunk
 const CHUNK_OVERLAP = 50; // overlap between chunks
 const TOP_K = 5; // default number of results
 const INDEX_NAME = 'rani-knowledge-base';
-const EMBEDDING_DIMENSION = 1536; // text-embedding-3-small
+const EMBEDDING_DIMENSION = 1536; // OpenAI text-embedding-3-small default; Voyage voyage-3-lite uses 1024 (auto-detected)
 
 // Coverage requirements per service
 const REQUIRED_COVERAGE: Record<string, DocumentCategory[]> = {
@@ -661,8 +661,8 @@ export async function initializePineconeIndex(config: PineconeConfig): Promise<{
 
 /**
  * Upsert documents into Pinecone as chunked vectors.
- * Uses OpenAI text-embedding-3-small for real embeddings.
- * Requires OPENAI_API_KEY to be set; aborts if unavailable.
+ * Uses Voyage AI / OpenAI for real embeddings.
+ * Requires VOYAGE_API_KEY or OPENAI_API_KEY to be set; aborts if unavailable.
  */
 export async function upsertDocuments(
   config: PineconeConfig,
@@ -717,7 +717,7 @@ export async function upsertDocuments(
 
 /**
  * Search Pinecone vector database for semantically similar documents.
- * Requires PINECONE_API_KEY and OPENAI_API_KEY environment variables.
+ * Requires PINECONE_API_KEY and VOYAGE_API_KEY or OPENAI_API_KEY environment variables.
  */
 export async function searchPinecone(
   query: string,
@@ -731,7 +731,7 @@ export async function searchPinecone(
 
   const queryEmbedding = await generateEmbedding(query);
   if (!queryEmbedding) {
-    throw new Error('Cannot generate query embedding — OPENAI_API_KEY not set');
+    throw new Error('Cannot generate query embedding — VOYAGE_API_KEY or OPENAI_API_KEY not set');
   }
 
   const { Pinecone } = await import('@pinecone-database/pinecone');
@@ -815,40 +815,59 @@ function chunkDocument(content: string): string[] {
 }
 
 /**
- * Generate embeddings using OpenAI's text-embedding-3-small model.
- * Falls back to null if no API key is available (caller should use keyword search instead).
+ * Generate embeddings using Voyage AI / OpenAI.
+ * Prefers Voyage AI (voyage-3-lite, 1024d) when VOYAGE_API_KEY is set.
+ * Falls back to OpenAI (text-embedding-3-small, 1536d) if only OPENAI_API_KEY is available.
+ * Returns null if no API key is available (caller should use keyword search instead).
  */
 async function generateEmbedding(text: string): Promise<number[] | null> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    console.warn('[RAG] No OPENAI_API_KEY set — cannot generate embeddings. Falling back to keyword search.');
+  const voyageApiKey = process.env.VOYAGE_API_KEY;
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+
+  if (!voyageApiKey && !openaiApiKey) {
+    console.warn('[RAG] No VOYAGE_API_KEY or OPENAI_API_KEY set — cannot generate embeddings. Falling back to keyword search.');
     return null;
   }
 
+  // Determine which provider to use (Voyage AI preferred)
+  const useVoyage = !!voyageApiKey;
+  const apiKey = useVoyage ? voyageApiKey! : openaiApiKey!;
+  const apiUrl = useVoyage
+    ? 'https://api.voyageai.com/v1/embeddings'
+    : 'https://api.openai.com/v1/embeddings';
+  const model = useVoyage ? 'voyage-3-lite' : 'text-embedding-3-small';
+  const provider = useVoyage ? 'Voyage AI' : 'OpenAI';
+
   try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
+    const requestBody: Record<string, unknown> = {
+      model,
+      input: text,
+    };
+
+    // OpenAI supports explicit dimensions parameter; Voyage voyage-3-lite returns 1024d natively
+    if (!useVoyage) {
+      requestBody.dimensions = EMBEDDING_DIMENSION;
+    }
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text,
-        dimensions: EMBEDDING_DIMENSION,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error(`[RAG] OpenAI embedding API error (${response.status}):`, errorBody);
+      console.error(`[RAG] ${provider} embedding API error (${response.status}):`, errorBody);
       return null;
     }
 
     const result = await response.json();
     return result.data?.[0]?.embedding ?? null;
   } catch (error) {
-    console.error('[RAG] Failed to generate embedding:', error);
+    console.error(`[RAG] Failed to generate embedding via ${provider}:`, error);
     return null;
   }
 }

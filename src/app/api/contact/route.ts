@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { logEvent } from "@/lib/logging/structured-logger";
 
 const CLINIC_EMAIL = process.env.CONTACT_EMAIL || "info@ranibeautyclinic.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Rani Beauty Clinic <noreply@ranibeautyclinic.com>";
@@ -42,6 +44,14 @@ async function notifyN8N(data: Record<string, string>) {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 5 submissions per minute per IP
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('contact', ip, RATE_LIMITS.FORM);
+  if (!allowed) {
+    logEvent('api', 'warn', 'Contact form rate limited', { ip });
+    return rateLimitResponse(resetIn);
+  }
+
   try {
     const body: ContactFormData = await request.json();
 
@@ -151,9 +161,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Fire-and-forget: notify N8N automation workflows
-    // This feeds the lead into WF2 (Immediate Lead Response) → Twilio SMS,
-    // WF2b (No-Booking Follow-Up Ladder), and the Airtable CRM pipeline
     notifyN8N(sanitizedData);
+
+    logEvent('api', 'info', 'Contact form submission', {
+      service: sanitizedData.service,
+      source: sanitizedData.source,
+      hasSmsConsent: sanitizedData.smsConsent === 'yes',
+    });
 
     return NextResponse.json(
       {
@@ -164,6 +178,9 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    logEvent('api', 'error', 'Contact form error', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     console.error("Contact form error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred. Please try again or call us directly." },
