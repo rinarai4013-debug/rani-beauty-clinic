@@ -562,7 +562,13 @@ function buildPackagesFromAI(plan: PlanData): TreatmentPackage[] {
   }
 
   const platinumTotal = platinumItems.reduce((s, i) => s + i.total, 0);
-  const platinumPrice = Math.round(platinumTotal * 0.85); // 15% package discount
+  // Apply discount but ensure Platinum is always MORE than Recommended
+  const minPlatinumPrice = Math.round(recommendedPrice * 1.25); // At least 25% above Recommended
+  let platinumPrice = Math.round(platinumTotal * 0.87); // 13% package discount
+  if (platinumPrice < minPlatinumPrice) {
+    platinumPrice = minPlatinumPrice;
+  }
+  const platinumSavings = platinumTotal - platinumPrice;
 
   const countSessions = (items: LineItem[]) => items.filter(i => i.unitPrice > 0).reduce((s, i) => s + i.qty, 0);
 
@@ -594,7 +600,7 @@ function buildPackagesFromAI(plan: PlanData): TreatmentPackage[] {
       sessions: countSessions(platinumItems),
       lineItems: platinumItems,
       extras: ['Priority scheduling', 'Dedicated treatment coordinator', 'Medical-grade skincare protocol', 'Progress tracking'],
-      savings: `Save $${(platinumTotal - platinumPrice).toLocaleString()}`,
+      savings: platinumSavings > 0 ? `Save $${platinumSavings.toLocaleString()}` : undefined,
       monthlyPayment: Math.round(platinumPrice / 18) || 299,
     },
   ];
