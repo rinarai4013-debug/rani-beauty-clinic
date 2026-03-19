@@ -35,6 +35,9 @@ import ProcessSteps from "@/components/sections/ProcessSteps";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
+import TrustBar from "@/components/sections/TrustBar";
+import WhyRaniComparison from "@/components/sections/WhyRaniComparison";
+import BeforeAfterGallery from "@/components/sections/BeforeAfterGallery";
 import { clinicInfo } from "@/data/clinic-info";
 import { serviceImages } from "@/data/service-images";
 
@@ -345,6 +348,9 @@ export default function HomePage() {
       {/* 3. Trust Logos Bar */}
       <TrustLogosBar />
 
+      {/* 3.5 Trust Signals Bar — Physician Supervised, 2181+ Clients, etc. */}
+      <TrustBar />
+
       {/* 4. Service Category Panels */}
       <ServiceCategoryPanels />
 
@@ -500,7 +506,13 @@ export default function HomePage() {
       {/* 10. Reviews/Testimonials */}
       <ReviewCarousel reviews={reviews} />
 
-      {/* 10b. Popular Packages */}
+      {/* 10b. Why Rani — Comparison Strip */}
+      <WhyRaniComparison />
+
+      {/* 10c. Before & After Gallery — Swipeable results */}
+      <BeforeAfterGallery />
+
+      {/* 10d. Popular Packages */}
       <PopularPackages />
 
       {/* 11. Treatment Quiz — Email Capture / Lead Magnet */}
