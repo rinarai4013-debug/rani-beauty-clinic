@@ -88,9 +88,9 @@ export function HomepageSchema() {
 
   const localBusiness = {
     "@context": "https://schema.org",
+    ...CLINIC_BASE,
     "@type": ["LocalBusiness", "MedicalBusiness"],
     "@id": `${clinicInfo.website}/#localbusiness`,
-    ...CLINIC_BASE,
     description:
       "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+, hormone therapy and more.",
     medicalSpecialty: "Dermatology",
