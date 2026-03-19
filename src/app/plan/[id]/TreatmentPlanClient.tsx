@@ -2030,25 +2030,25 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
           >
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               <div className="flex-shrink-0 w-28 h-28 rounded-2xl bg-gradient-to-br from-[#C9A96E]/20 to-[#0F1D2C]/5 flex items-center justify-center">
-                <User className="w-12 h-12 text-[#C9A96E]/60" />
+                <Sparkles className="w-12 h-12 text-[#C9A96E]/60" />
               </div>
 
               <div className="text-center md:text-left">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#C9A96E] mb-1">
-                  Your Treatment Architect
+                  Why Rani Beauty Clinic
                 </p>
-                <h3 className="font-heading text-xl text-[#0F1D2C]">Dr. Rani</h3>
+                <h3 className="font-heading text-xl text-[#0F1D2C]">Rani Beauty Clinic</h3>
                 <p className="text-sm text-[#0F1D2C]/50 mt-0.5 mb-4">
-                  Medical Director &bull; Board-Certified Physician
+                  Physician-Supervised Medical Aesthetics &bull; Renton, WA
                 </p>
                 <p className="text-sm text-[#0F1D2C]/65 leading-relaxed max-w-lg">
-                  As a physician-supervised medical aesthetics specialist, Dr. Rani combines clinical
-                  expertise with an artistic eye to create natural, transformative results. Every treatment
-                  plan is crafted with precision, safety, and your unique goals in mind.
+                  With seven years of experience and over 10,000 successful treatments and transformations,
+                  our physician-supervised team delivers natural, lasting results. Every treatment plan is
+                  crafted with clinical precision, advanced technology, and your unique goals in mind.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-3">
-                  {['Physician-Supervised', 'Advanced Certifications', 'Personalized Care'].map(
+                  {['7+ Years Experience', '10,000+ Transformations', 'Physician-Supervised', 'All Skin Types'].map(
                     (badge) => (
                       <span
                         key={badge}
