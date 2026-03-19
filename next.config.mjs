@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-const WP_ORIGIN =
-  process.env.WORDPRESS_ORIGIN || "https://wp.ranibeautyclinic.com";
 
 const nextConfig = {
   images: {
@@ -157,93 +155,71 @@ const nextConfig = {
         destination: "/blog/how-to-choose-medspa",
         permanent: true,
       },
+
+      // --- Catch-all WordPress artifact paths → homepage ---
+      // These were causing 404 errors in Google Search Console
+      {
+        source: "/wp-content/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/wp-includes/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/wp-admin/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/wp-login.php",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/xmlrpc.php",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/wp-cron.php",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/shop/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/cart/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/checkout/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/my-account/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/product/:path*",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
 
   // ================================================================
-  // REWRITES — Proxy WordPress pages through Next.js
-  // Next.js pages always win; unmatched URLs fall through to WordPress
+  // REWRITES — removed WordPress proxy (site is fully on Vercel now)
+  // WordPress rewrites were causing 502 errors and GSC indexing issues
   // ================================================================
-  async rewrites() {
-    return {
-      // beforeFiles: checked BEFORE Next.js routes (use sparingly)
-      beforeFiles: [],
-
-      // afterFiles: checked AFTER Next.js routes
-      // If Next.js has a matching page, it wins. If not, proxy to WordPress.
-      afterFiles: [
-        // --- WooCommerce pages ---
-        { source: "/shop", destination: `${WP_ORIGIN}/shop` },
-        { source: "/shop/:path*", destination: `${WP_ORIGIN}/shop/:path*` },
-        { source: "/cart", destination: `${WP_ORIGIN}/cart` },
-        { source: "/cart/:path*", destination: `${WP_ORIGIN}/cart/:path*` },
-        { source: "/checkout", destination: `${WP_ORIGIN}/checkout` },
-        {
-          source: "/checkout/:path*",
-          destination: `${WP_ORIGIN}/checkout/:path*`,
-        },
-        { source: "/my-account", destination: `${WP_ORIGIN}/my-account` },
-        {
-          source: "/my-account/:path*",
-          destination: `${WP_ORIGIN}/my-account/:path*`,
-        },
-
-        // --- WooCommerce product pages ---
-        {
-          source: "/product/:slug*",
-          destination: `${WP_ORIGIN}/product/:slug*`,
-        },
-
-        // --- WordPress assets (CSS, JS, images, fonts) ---
-        {
-          source: "/wp-content/:path*",
-          destination: `${WP_ORIGIN}/wp-content/:path*`,
-        },
-        {
-          source: "/wp-includes/:path*",
-          destination: `${WP_ORIGIN}/wp-includes/:path*`,
-        },
-
-        // --- WordPress admin panel ---
-        {
-          source: "/wp-admin/:path*",
-          destination: `${WP_ORIGIN}/wp-admin/:path*`,
-        },
-        {
-          source: "/wp-login.php",
-          destination: `${WP_ORIGIN}/wp-login.php`,
-        },
-
-        // --- WordPress REST API & AJAX (WooCommerce depends on these) ---
-        {
-          source: "/wp-json/:path*",
-          destination: `${WP_ORIGIN}/wp-json/:path*`,
-        },
-        {
-          source: "/wp-admin/admin-ajax.php",
-          destination: `${WP_ORIGIN}/wp-admin/admin-ajax.php`,
-        },
-
-        // --- WordPress cron (for scheduled tasks) ---
-        {
-          source: "/wp-cron.php",
-          destination: `${WP_ORIGIN}/wp-cron.php`,
-        },
-
-        // --- WordPress XML-RPC ---
-        {
-          source: "/xmlrpc.php",
-          destination: `${WP_ORIGIN}/xmlrpc.php`,
-        },
-      ],
-
-      // fallback: catches ANY URL not matched by Next.js or afterFiles
-      // Safety net — unknown WordPress pages still work
-      fallback: [
-        { source: "/:path*", destination: `${WP_ORIGIN}/:path*` },
-      ],
-    };
-  },
 
   // ================================================================
   // HEADERS — Security and performance

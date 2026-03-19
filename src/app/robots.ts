@@ -6,15 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/api/",
-          "/wp-admin/",
-          "/wp-login.php",
-          "/cart/",
-          "/checkout/",
-          "/my-account/",
-          "/xmlrpc.php",
-        ],
+        disallow: ["/api/"],
       },
     ],
     sitemap: [
