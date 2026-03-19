@@ -53,6 +53,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/safety`, priority: 0.6, changeFrequency: "yearly" },
     { url: `${baseUrl}/technology`, priority: 0.6, changeFrequency: "yearly" },
     { url: `${baseUrl}/the-reveal`, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/quiz`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/membership`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy-policy`, priority: 0.3, changeFrequency: "yearly" },
     { url: `${baseUrl}/terms`, priority: 0.3, changeFrequency: "yearly" },
   ];

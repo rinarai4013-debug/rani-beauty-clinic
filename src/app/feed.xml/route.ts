@@ -51,6 +51,8 @@ export async function GET() {
   entries.push(entry(`${baseUrl}/compare`, "Treatment Comparisons"));
   entries.push(entry(`${baseUrl}/technology`, "Our Technology"));
   entries.push(entry(`${baseUrl}/safety`, "Safety Standards"));
+  entries.push(entry(`${baseUrl}/quiz`, "Find Your Perfect Treatment — Skin Quiz"));
+  entries.push(entry(`${baseUrl}/membership`, "The Glow Membership — Monthly Medspa Plans"));
 
   // Aesthetic services
   for (const svc of aestheticServices) {

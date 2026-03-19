@@ -343,6 +343,7 @@ export default function SkinQuiz() {
           name: lead.firstName.trim(),
           email: lead.email.trim(),
           phone: lead.phone.trim() || undefined,
+          service: concern ? concerns.find((c) => c.key === concern)?.label || "Skin Quiz" : "Skin Quiz",
           source: "skin-quiz",
           quizAnswers: {
             concern,

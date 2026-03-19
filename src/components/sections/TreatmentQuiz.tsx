@@ -96,13 +96,14 @@ export default function TreatmentQuiz() {
     setError("");
     setIsSubmitting(true);
 
+    const primaryGoal = quizSteps[0].options.find((o) => o.value === answers[0])?.label || "General Consultation";
     const payload = {
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim() || undefined,
+      service: primaryGoal,
       quizAnswers: {
-        primaryGoal:
-          quizSteps[0].options.find((o) => o.value === answers[0])?.label || "",
+        primaryGoal,
         experience:
           quizSteps[1].options.find((o) => o.value === answers[1])?.label || "",
         timeline:
