@@ -38,6 +38,13 @@ export default function AIChatWidget() {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
+  // Listen for the custom event dispatched by MobileCTA to open the chat
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true);
+    window.addEventListener("rani:open-chat", handleOpenChat);
+    return () => window.removeEventListener("rani:open-chat", handleOpenChat);
+  }, []);
+
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;

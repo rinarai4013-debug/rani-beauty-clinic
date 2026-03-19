@@ -45,3 +45,12 @@ h1 {
 ::-webkit-scrollbar-thumb:hover {
   background: #0F1D2C;
 }
+
+/* Utility: hide scrollbar while keeping scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
