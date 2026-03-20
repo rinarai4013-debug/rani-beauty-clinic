@@ -187,7 +187,6 @@ export const pillarGuides: PillarGuide[] = [
       { id: "getting-started", heading: "Getting Started", content: "Your wellness journey at Rani Beauty Clinic begins with a comprehensive consultation. During this visit, we review your health history, current medications, lifestyle factors, and wellness goals. We recommend comprehensive blood work to establish baseline levels and identify any deficiencies or imbalances. Based on your consultation and lab results, Dr. Landfield creates a personalized wellness protocol tailored to your specific needs. This may include a single therapy or a combination of treatments designed to work together. We schedule regular follow-ups to track your progress, adjust dosing, and evolve your protocol as your health improves and goals change." },
     ],
     relatedServices: [
-      { slug: "peptide-therapy", title: "Peptide Therapy", category: "wellness" },
       { slug: "nad-injections", title: "NAD+ Injections", category: "wellness" },
       { slug: "vitamin-injections", title: "Vitamin Injections", category: "wellness" },
     ],

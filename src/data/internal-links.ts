@@ -37,7 +37,7 @@ const COST_TO_SERVICE: Record<string, { slug: string; basePath: string }> = {
   "sofwave-cost": { slug: "sofwave", basePath: "/services" },
   "scar-reduction-cost": { slug: "scar-reduction", basePath: "/services" },
   "glp1-cost": { slug: "glp1-weight-management", basePath: "/wellness" },
-  "peptide-therapy-cost": { slug: "peptide-therapy", basePath: "/wellness" },
+  "peptide-therapy-cost": { slug: "nad-injections", basePath: "/wellness" },
   "nad-injections-cost": { slug: "nad-injections", basePath: "/wellness" },
   "hormone-therapy-cost": { slug: "hormone-therapy", basePath: "/wellness" },
   "vitamin-injections-cost": { slug: "vitamin-injections", basePath: "/wellness" },

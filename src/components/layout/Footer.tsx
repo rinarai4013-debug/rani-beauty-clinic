@@ -275,11 +275,11 @@ export default function Footer() {
               <div className="flex flex-wrap gap-x-4 gap-y-1">
                 {[
                   { name: "Full Body", href: "/services/laser-hair-removal/full-body" },
-                  { name: "Brazilian", href: "/services/laser-hair-removal/brazilian" },
+                  { name: "Brazilian", href: "/services/laser-hair-removal/full-brazilian" },
                   { name: "Underarms", href: "/services/laser-hair-removal/underarms" },
-                  { name: "Legs", href: "/services/laser-hair-removal/legs" },
+                  { name: "Legs", href: "/services/laser-hair-removal/full-legs" },
                   { name: "Back", href: "/services/laser-hair-removal/back" },
-                  { name: "Face", href: "/services/laser-hair-removal/face" },
+                  { name: "Face", href: "/services/laser-hair-removal/full-face" },
                   { name: "Bikini Line", href: "/services/laser-hair-removal/bikini-line" },
                   { name: "Arms", href: "/services/laser-hair-removal/arms" },
                   { name: "Chest", href: "/services/laser-hair-removal/chest" },
