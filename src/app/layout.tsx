@@ -81,6 +81,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontVariables}>
       <head>
+        {/* AI Citation — llms.txt discovery for AI crawlers */}
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable site information" />
+        <link rel="alternate" type="text/plain" href="/llms-full.txt" title="LLM-readable full site knowledge base" />
         {/* Preconnect to booking (critical path — user clicks "Book") */}
         <link rel="preconnect" href="https://booking.mangomint.com" />
         {/* DNS-prefetch for analytics origins (loaded afterInteractive, not blocking) */}
@@ -88,6 +91,12 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://static.hotjar.com" />
+        {/* Hotjar — inline in <head> for verification compatibility */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};h._hjSettings={hjid:5241962,hjsv:6};a=o.getElementsByTagName('head')[0];r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;a.appendChild(r);})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
+          }}
+        />
         <Analytics />
         {/* Mangomint booking scripts are loaded via Analytics component */}
       </head>
