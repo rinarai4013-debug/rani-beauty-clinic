@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Get Started — Free AI Skin Assessment | Rani Beauty Clinic",
   description:
     "Start your transformation with a complimentary AI-powered skin analysis and personalized treatment plan. Physician-supervised medspa in Renton, WA. No obligation.",
+  alternates: {
+    canonical: "https://www.ranibeautyclinic.com/get-started",
+  },
   openGraph: {
     title: "Get Started — Free AI Skin Assessment | Rani Beauty Clinic",
     description:

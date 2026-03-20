@@ -23,6 +23,13 @@ export const metadata: Metadata = {
       "FDA-approved medical devices for laser, RF microneedling, skin tightening, and more at Rani Beauty Clinic.",
     type: "website",
     url: `${clinicInfo.website}/technology`,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic Technology" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Technology | Rani Beauty Clinic",
+    description:
+      "FDA-approved Candela GentleMax Pro Plus, Cutera Secret Pro, Sofwave, HydraFacial MD, and AI skin analysis.",
   },
 };
 

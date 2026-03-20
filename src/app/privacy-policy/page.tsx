@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Privacy Policy | Rani Beauty Clinic",
   description:
     "Read the privacy policy of Rani Beauty Clinic in Renton, WA. Learn how we collect, use, and protect your personal and health information.",
+  alternates: {
+    canonical: `${clinicInfo.website}/privacy-policy`,
+  },
   openGraph: {
     title: "Privacy Policy | Rani Beauty Clinic",
     description:

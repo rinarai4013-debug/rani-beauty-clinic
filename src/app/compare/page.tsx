@@ -13,6 +13,15 @@ export const metadata: Metadata = {
   title: "Treatment Comparisons | Rani Beauty Clinic",
   description:
     "Compare popular aesthetic treatments and medical wellness programs side by side. Make informed decisions about Botox vs Dysport, Semaglutide vs Tirzepatide, and more.",
+  alternates: {
+    canonical: "https://www.ranibeautyclinic.com/compare",
+  },
+  openGraph: {
+    title: "Treatment Comparisons | Rani Beauty Clinic",
+    description:
+      "Compare popular aesthetic treatments and medical wellness programs side by side. Botox vs Dysport, Semaglutide vs Tirzepatide, and more.",
+    url: "https://www.ranibeautyclinic.com/compare",
+  },
 };
 
 export default function ComparePage() {

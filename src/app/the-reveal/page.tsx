@@ -10,6 +10,14 @@ export const metadata: Metadata = {
     title: "The Reveal | Post-GLP-1 Skin Restoration | Rani Beauty Clinic",
     description:
       "Our signature protocol for restoring skin firmness and quality after GLP-1 weight loss. Sofwave + Secret RF combination treatment in Renton, WA.",
+    url: "https://www.ranibeautyclinic.com/the-reveal",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "The Reveal — Post-GLP-1 Skin Restoration" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Reveal | Post-GLP-1 Skin Restoration | Rani Beauty Clinic",
+    description:
+      "Signature Sofwave + Secret RF protocol for restoring skin firmness after GLP-1 weight loss in Renton, WA.",
   },
   alternates: {
     canonical: "https://www.ranibeautyclinic.com/the-reveal",

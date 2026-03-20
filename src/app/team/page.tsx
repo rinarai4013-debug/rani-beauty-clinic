@@ -24,6 +24,13 @@ export const metadata: Metadata = {
       "Meet the experts behind Rani Beauty Clinic — physician-supervised aesthetic and wellness treatments in Renton, WA.",
     type: "website",
     url: `${clinicInfo.website}/team`,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic Team" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Team | Rani Beauty Clinic",
+    description:
+      "Meet the physician-supervised team at Rani Beauty Clinic — board-certified Medical Director and expert aestheticians.",
   },
 };
 

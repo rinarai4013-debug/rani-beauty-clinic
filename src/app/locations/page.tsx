@@ -24,6 +24,13 @@ export const metadata: Metadata = {
       "Serving 40+ cities and neighborhoods across King County from our central Renton location. Physician-supervised aesthetic and medical wellness treatments.",
     type: "website",
     url: `${clinicInfo.website}/locations`,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic — Areas We Serve" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Areas We Serve | Rani Beauty Clinic",
+    description:
+      "Serving 40+ cities across King County from our central Renton location. Physician-supervised treatments.",
   },
 };
 

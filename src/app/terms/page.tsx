@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Terms of Service | Rani Beauty Clinic",
   description:
     "Read the terms of service for Rani Beauty Clinic in Renton, WA. Understand your rights and responsibilities when using our aesthetic and medical wellness services.",
+  alternates: {
+    canonical: `${clinicInfo.website}/terms`,
+  },
   openGraph: {
     title: "Terms of Service | Rani Beauty Clinic",
     description:

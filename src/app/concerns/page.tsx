@@ -14,6 +14,19 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://www.ranibeautyclinic.com/concerns",
   },
+  openGraph: {
+    title: "Skin Concerns We Treat | Rani Beauty Clinic",
+    description:
+      "Acne, aging, hyperpigmentation, unwanted hair & more — physician-supervised treatments for all skin types in Renton, WA.",
+    url: "https://www.ranibeautyclinic.com/concerns",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic — Skin Concerns" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Skin Concerns We Treat | Rani Beauty Clinic",
+    description:
+      "Acne, aging, hyperpigmentation, unwanted hair & more — physician-supervised treatments for all skin types.",
+  },
 };
 
 export default function ConcernsPage() {

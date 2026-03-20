@@ -23,6 +23,13 @@ export const metadata: Metadata = {
       "Physician-supervised care with FDA-approved devices and evidence-based protocols at Rani Beauty Clinic in Renton, WA.",
     type: "website",
     url: `${clinicInfo.website}/safety`,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic Safety Standards" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Safety Standards | Rani Beauty Clinic",
+    description:
+      "Physician-supervised care with FDA-approved devices and evidence-based protocols in Renton, WA.",
   },
 };
 

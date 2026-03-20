@@ -37,31 +37,36 @@ const wellnessSlugs = [
 // Blog slugs are now dynamically pulled from the data
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date().toISOString();
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, priority: 1.0, changeFrequency: "weekly" },
-    { url: `${baseUrl}/about`, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/services`, priority: 0.9, changeFrequency: "weekly" },
-    { url: `${baseUrl}/wellness`, priority: 0.9, changeFrequency: "weekly" },
-    { url: `${baseUrl}/blog`, priority: 0.8, changeFrequency: "weekly" },
-    { url: `${baseUrl}/pricing`, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/contact`, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/results`, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/locations`, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${baseUrl}/team`, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/team/dr-landfield`, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/safety`, priority: 0.6, changeFrequency: "yearly" },
-    { url: `${baseUrl}/technology`, priority: 0.6, changeFrequency: "yearly" },
-    { url: `${baseUrl}/the-reveal`, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${baseUrl}/quiz`, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/membership`, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/privacy-policy`, priority: 0.3, changeFrequency: "yearly" },
-    { url: `${baseUrl}/terms`, priority: 0.3, changeFrequency: "yearly" },
+    { url: baseUrl, lastModified: now, priority: 1.0, changeFrequency: "weekly" },
+    { url: `${baseUrl}/about`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/services`, lastModified: now, priority: 0.9, changeFrequency: "weekly" },
+    { url: `${baseUrl}/wellness`, lastModified: now, priority: 0.9, changeFrequency: "weekly" },
+    { url: `${baseUrl}/blog`, lastModified: now, priority: 0.8, changeFrequency: "weekly" },
+    { url: `${baseUrl}/pricing`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/contact`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/results`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/locations`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/membership`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/quiz`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/compare`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/team`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/team/dr-landfield`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/safety`, lastModified: now, priority: 0.6, changeFrequency: "yearly" },
+    { url: `${baseUrl}/technology`, lastModified: now, priority: 0.6, changeFrequency: "yearly" },
+    { url: `${baseUrl}/the-reveal`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/get-started`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/privacy-policy`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
+    { url: `${baseUrl}/terms`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
   ];
 
   // Aesthetic service pages
   const servicePages: MetadataRoute.Sitemap = aestheticSlugs.map((slug) => ({
     url: `${baseUrl}/services/${slug}`,
+    lastModified: now,
     priority: 0.8,
     changeFrequency: "monthly",
   }));
@@ -69,6 +74,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Wellness service pages
   const wellnessPages: MetadataRoute.Sitemap = wellnessSlugs.map((slug) => ({
     url: `${baseUrl}/wellness/${slug}`,
+    lastModified: now,
     priority: 0.8,
     changeFrequency: "monthly",
   }));
@@ -76,6 +82,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Blog pages (dynamic from all posts)
   const blogPageUrls: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: now,
     priority: 0.7,
     changeFrequency: "monthly",
   }));
@@ -83,6 +90,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Gallery pages
   const galleryPageUrls: MetadataRoute.Sitemap = galleryPages.map((page) => ({
     url: `${baseUrl}/results/${page.slug}`,
+    lastModified: now,
     priority: 0.6,
     changeFrequency: "monthly",
   }));
@@ -90,6 +98,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Pillar guide pages
   const guidePageUrls: MetadataRoute.Sitemap = pillarGuides.map((guide) => ({
     url: `${baseUrl}/guides/${guide.slug}`,
+    lastModified: now,
     priority: 0.8,
     changeFrequency: "monthly",
   }));
@@ -97,6 +106,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Geo location pages (48 cities/neighborhoods)
   const locationPages: MetadataRoute.Sitemap = geoPages.map((page) => ({
     url: `${baseUrl}/locations/${page.slug}`,
+    lastModified: now,
     priority: 0.7,
     changeFrequency: "monthly",
   }));
@@ -107,6 +117,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const svc of allServiceSlugs) {
       geoServicePages.push({
         url: `${baseUrl}/locations/${geo.slug}/${svc}`,
+        lastModified: now,
         priority: 0.6,
         changeFrequency: "monthly",
       });
@@ -116,6 +127,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Cost/pricing pages
   const costPageUrls: MetadataRoute.Sitemap = costPages.map((page) => ({
     url: `${baseUrl}/cost/${page.slug}`,
+    lastModified: now,
     priority: 0.7,
     changeFrequency: "monthly",
   }));
@@ -123,6 +135,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Comparison pages
   const comparisonPageUrls: MetadataRoute.Sitemap = comparisonPages.map((page) => ({
     url: `${baseUrl}/compare/${page.slug}`,
+    lastModified: now,
     priority: 0.7,
     changeFrequency: "monthly",
   }));
@@ -132,6 +145,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((v) => v.category === "aesthetic")
     .map((v) => ({
       url: `${baseUrl}/services/${v.parentSlug}/${v.slug}`,
+      lastModified: now,
       priority: 0.6,
       changeFrequency: "monthly",
     }));
@@ -141,15 +155,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((v) => v.category === "wellness")
     .map((v) => ({
       url: `${baseUrl}/wellness/${v.parentSlug}/${v.slug}`,
+      lastModified: now,
       priority: 0.6,
       changeFrequency: "monthly",
     }));
 
   // Skin concern pages
   const concernPages: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/concerns`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/concerns`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
     ...skinConcerns.map((concern) => ({
       url: `${baseUrl}/concerns/${concern.slug}`,
+      lastModified: now,
       priority: 0.7 as const,
       changeFrequency: "monthly" as const,
     })),

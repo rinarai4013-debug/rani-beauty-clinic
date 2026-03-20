@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 
@@ -27,10 +30,6 @@ interface HeroProps {
   layout?: "full" | "split";
 }
 
-/**
- * Server-rendered Hero component with CSS-only animations.
- * No Framer Motion, no "use client" — text is visible in initial HTML for fast LCP.
- */
 export default function Hero({
   label,
   title,
@@ -62,10 +61,9 @@ export default function Hero({
         <div className="absolute inset-0">
           <Image
             src={backgroundImage}
-            alt=""
+            alt={`${title} — Rani Beauty Clinic`}
             fill
             priority
-            fetchPriority="high"
             className="object-cover"
             sizes="100vw"
             quality={85}
@@ -92,49 +90,64 @@ export default function Hero({
       <div className="relative mx-auto max-w-7xl px-6">
         <div className={layout === "split" ? "max-w-xl" : "max-w-3xl"}>
           {label && (
-            <p
-              className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold mb-4 animate-hero-fade-in"
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0 }}
+              className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold mb-4"
             >
               {label}
-            </p>
+            </motion.p>
           )}
 
-          <div
-            className="mb-6 h-0.5 w-[60px] origin-left bg-rani-gold animate-hero-scale-x"
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mb-6 h-0.5 w-[60px] origin-center bg-rani-gold"
           />
 
-          {/* h1 + subtitle are NOT animated — they must be visible instantly for LCP */}
-          <h1
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             className={`font-heading text-4xl font-bold leading-tight md:text-5xl lg:text-6xl ${textColor}`}
           >
             {title}
-          </h1>
+          </motion.h1>
 
           {subtitle && (
-            <p
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
               className={`mt-6 max-w-xl font-body text-lg leading-relaxed ${
                 dark ? "text-gray-300" : "text-rani-muted"
               }`}
             >
               {subtitle}
-            </p>
+            </motion.p>
           )}
 
           {badge && (
-            <div
-              className="mt-4 animate-hero-slide-up"
-              style={{ animationDelay: "0.4s" }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="mt-4"
             >
               <Badge icon="shield" variant={dark ? "dark" : "light"}>
                 {badge}
               </Badge>
-            </div>
+            </motion.div>
           )}
 
           {(primaryCTA || secondaryCTA) && (
-            <div
-              className="mt-8 flex flex-wrap gap-4 animate-hero-slide-up"
-              style={{ animationDelay: "0.6s" }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="mt-8 flex flex-wrap gap-4"
             >
               {primaryCTA && (
                 <Button
@@ -154,28 +167,32 @@ export default function Hero({
                   {secondaryCTA.text}
                 </Button>
               )}
-            </div>
+            </motion.div>
           )}
 
           {badges && badges.length > 0 && (
-            <div
-              className="mt-8 flex flex-wrap gap-3 animate-hero-fade-in"
-              style={{ animationDelay: "0.8s" }}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
+              className="mt-8 flex flex-wrap gap-3"
             >
               {badges.map((b) => (
                 <Badge key={b} variant={dark ? "dark" : "light"} icon="check">
                   {b}
                 </Badge>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
 
         {/* Stats Bar */}
         {stats && stats.length > 0 && (
-          <div
-            className="mt-12 grid grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4 animate-hero-slide-up"
-            style={{ animationDelay: "1s" }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            className="mt-12 grid grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4"
           >
             {stats.map((stat) => (
               <div key={stat.label}>
@@ -187,7 +204,7 @@ export default function Hero({
                 </p>
               </div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </section>
