@@ -57,6 +57,7 @@ const envSchema = z.object({
   // Voice AI
   VAPI_API_KEY: z.string().optional().default(''),
   VAPI_ASSISTANT_ID: z.string().optional().default(''),
+  ELEVENLABS_VOICE_ID: z.string().optional().default(''),
 
   // Ads
   META_ACCESS_TOKEN: z.string().optional().default(''),
@@ -116,6 +117,7 @@ export const hasFeature = {
   pinecone: () => Boolean(env.PINECONE_API_KEY),
   embeddings: () => Boolean(env.VOYAGE_API_KEY || env.OPENAI_API_KEY),
   vapi: () => Boolean(env.VAPI_API_KEY && env.VAPI_ASSISTANT_ID),
+  voiceClone: () => Boolean(env.ELEVENLABS_VOICE_ID),
   metaAds: () => Boolean(env.META_ACCESS_TOKEN && env.META_AD_ACCOUNT_ID),
   n8n: () => Boolean(env.N8N_WEBHOOK_URL),
 } as const;

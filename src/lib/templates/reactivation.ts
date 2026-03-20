@@ -38,24 +38,24 @@ function fill(template: string, vars: ReactivationVars): string {
 
 // ── LAPSED 30 DAYS ──
 const LAPSED_30: ReactivationTemplate = {
-  sms: `Hi {{firstName}}! It's been about a month since we last saw you at Rani Beauty Clinic. We'd love to see you again! Book your next visit and keep your results going strong: {{bookingUrl}}`,
-  emailSubject: `We miss you, {{firstName}}!`,
+  sms: `hi beautiful ✨ it's been a little while since your last visit and we just wanted to check in! your {{lastService}} results are probably ready for a refresh 💛 we'd love to see you — {{bookingUrl}} 🤍`,
+  emailSubject: `checking in, {{firstName}} ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 32px; text-align: center;">
-    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">We Miss You!</h1>
+    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">just checking in ✨</h1>
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
-    <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">hi beautiful! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      It's been about a month since your last visit for {{lastService}}, and we wanted to check in. Consistency is the secret to getting the best results from your treatments.
+      it's been a little while since your last visit for {{lastService}} and we just wanted to check in! your results are probably ready for a refresh ✨
     </p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We'd love to see you again and help you continue your transformation journey.
+      we'd love to see you and help you continue your glow journey 💛
     </p>
     <div style="text-align: center; margin: 28px 0;">
       <a href="{{bookingUrl}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
-        Book Your Next Visit
+        Book Your Next Visit 🤍
       </a>
     </div>
   </div>
@@ -67,28 +67,28 @@ const LAPSED_30: ReactivationTemplate = {
 
 // ── LAPSED 60 DAYS ──
 const LAPSED_60: ReactivationTemplate = {
-  sms: `{{firstName}}, it's been 2 months since we last saw you! We have exciting new treatments and offerings. Come see what's new — we'd love to welcome you back: {{bookingUrl}}`,
-  emailSubject: `{{firstName}}, come see what's new at Rani`,
+  sms: `hey angel! 💛 we've been thinking about you! it's been about two months and we have some amazing new things happening at the clinic ✨ come see what's new — your skin will thank you 🤍 {{bookingUrl}}`,
+  emailSubject: `we've been thinking about you, {{firstName}} 💛`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 32px; text-align: center;">
-    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">A Lot Has Changed</h1>
-    <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 14px;">And we want you to experience it</p>
+    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">so much is happening ✨</h1>
+    <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 14px;">and we want you to experience it</p>
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
-    <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">hey angel! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      It's been about two months since your {{lastService}}, and a lot has happened at Rani Beauty Clinic! We've added new treatments, upgraded our technology, and have some incredible new offerings we think you'll love.
+      it's been about two months since your {{lastService}}, and we have some amazing new things happening at Rani ✨ we'd love for you to come see what's new — your skin will thank you!
     </p>
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #C9A96E;">
-      <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 8px;">Welcome Back Special</p>
+      <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 8px;">complimentary skin consultation ✨</p>
       <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;">
-        Book a complimentary skin consultation and let us create an updated treatment plan tailored to your current goals.
+        let us create an updated treatment plan tailored to your current goals — on us 💛
       </p>
     </div>
     <div style="text-align: center; margin: 28px 0;">
       <a href="{{bookingUrl}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
-        Book Free Consultation
+        Book Your Consultation 🤍
       </a>
     </div>
   </div>
@@ -100,35 +100,35 @@ const LAPSED_60: ReactivationTemplate = {
 
 // ── LAPSED 90 DAYS ──
 const LAPSED_90: ReactivationTemplate = {
-  sms: `{{firstName}}, we haven't seen you in a while and we miss you at Rani! We'd love to welcome you back with a special offer. Call or text us: {{clinicPhone}} or book online: {{bookingUrl}}`,
-  emailSubject: `We'd love to welcome you back, {{firstName}}`,
+  sms: `hi gorgeous! ✨ it's been a while and we want you to know — whenever you're ready, we're here 💛 we'd love to do a complimentary skin assessment to see where your glow journey is at 🤍 {{bookingUrl}}`,
+  emailSubject: `whenever you're ready, we're here ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 32px; text-align: center;">
-    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">We'd Love to See You Again</h1>
+    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">we're here for you ✨</h1>
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
-    <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">hi gorgeous! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      It's been a little while since you visited us, and we genuinely miss having you at Rani. Whatever your reason for stepping away, we want you to know that we're here whenever you're ready.
+      it's been a while and we just want you to know — whenever you're ready, we're here ✨ no pressure at all.
     </p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We'd love to offer you a fresh start with a complimentary consultation to reassess your goals and create a new treatment plan that works for where you are today.
+      we'd love to do a complimentary skin assessment to see where your glow journey is at and what would be perfect for you right now 🤍
     </p>
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #C9A96E;">
-      <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 8px;">Your Welcome Back Package</p>
+      <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 8px;">your glow refresh ✨</p>
       <ul style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
-        <li>Complimentary skin consultation</li>
-        <li>Updated treatment plan</li>
-        <li>Exclusive returning client pricing</li>
+        <li>complimentary skin assessment</li>
+        <li>updated glow journey plan</li>
+        <li>exclusive returning angel pricing 💛</li>
       </ul>
     </div>
     <div style="text-align: center; margin: 28px 0;">
       <a href="{{bookingUrl}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
-        Book Your Comeback Visit
+        Book Your Glow Refresh 🤍
       </a>
       <p style="margin: 12px 0 0; color: #888; font-size: 13px;">
-        Or call us directly: <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a>
+        or call us anytime: <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a>
       </p>
     </div>
   </div>

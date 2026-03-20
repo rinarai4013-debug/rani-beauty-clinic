@@ -109,18 +109,18 @@ function formatPrepListHTML(category: string): string {
 // ── TEMPLATES ──
 
 const BOOKING_CONFIRMATION: Template = {
-  sms: `Hi {{firstName}}! Your {{serviceName}} consultation at Rani Beauty Clinic is confirmed for {{appointmentDate}} at {{appointmentTime}} with {{providerName}}. We're located at {{clinicAddress}}. Questions? Text us or call {{clinicPhone}}. See you soon!`,
-  emailSubject: `Confirmed: Your {{serviceName}} Consultation on {{appointmentDate}}`,
+  sms: `hi beautiful! ✨ your appointment is confirmed for {{appointmentDate}} at {{appointmentTime}}! we are SO excited to see you 💛 we're at {{clinicAddress}}. questions? text us or call {{clinicPhone}} 🤍`,
+  emailSubject: `you're booked, {{firstName}}! ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 32px; text-align: center;">
-    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">You're Booked!</h1>
-    <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 14px;">Your consultation is confirmed</p>
+    <h1 style="color: #C9A96E; margin: 0; font-size: 28px; font-family: 'Playfair Display', Georgia, serif;">you're booked! ✨</h1>
+    <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 14px;">we are SO excited to see you 💛</p>
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
-    <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">hi beautiful! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We're looking forward to seeing you! Here are your appointment details:
+      your appointment is confirmed and we can't wait to see you! here are your details ✨
     </p>
 
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0;">
@@ -155,7 +155,7 @@ const BOOKING_CONFIRMATION: Template = {
     </div>
 
     <p style="color: #333; font-size: 14px; line-height: 1.6;">
-      Need to reschedule? Call us at <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a> or reply to this email.
+      need to reschedule? just call us at <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a> or reply to this email 🤍
     </p>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
@@ -165,33 +165,34 @@ const BOOKING_CONFIRMATION: Template = {
 };
 
 const REMINDER_24H: Template = {
-  sms: `Hi {{firstName}}! Reminder: your {{serviceName}} consultation is TOMORROW ({{appointmentDate}}) at {{appointmentTime}} with {{providerName}} at Rani Beauty Clinic.\n\nTo prepare:\n{{prepList}}\n\nDirections: {{mapsLink}}\n\nSee you tomorrow!`,
-  emailSubject: `Tomorrow: Your {{serviceName}} Appointment at Rani`,
+  sms: `hey angel! 💛 just a friendly reminder — your {{serviceName}} appointment is tomorrow at {{appointmentTime}} ✨ remember to:\n{{prepList}}\nand we'll have everything ready for you! can't wait! 🤍`,
+  emailSubject: `see you tomorrow, {{firstName}}! ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 28px; text-align: center;">
-    <h1 style="color: #C9A96E; margin: 0; font-size: 24px; font-family: 'Playfair Display', Georgia, serif;">See You Tomorrow!</h1>
+    <h1 style="color: #C9A96E; margin: 0; font-size: 24px; font-family: 'Playfair Display', Georgia, serif;">see you tomorrow! ✨</h1>
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
-    <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">hey angel! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      Just a friendly reminder that your <strong>{{serviceName}}</strong> appointment is tomorrow at <strong>{{appointmentTime}}</strong> with {{providerName}}.
+      just a friendly reminder — your <strong>{{serviceName}}</strong> appointment is tomorrow at <strong>{{appointmentTime}}</strong> with {{providerName}} ✨ we'll have everything ready for you!
     </p>
 
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #C9A96E;">
-      <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 12px;">How to Prepare</p>
+      <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 12px;">how to prepare ✨</p>
       <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
         {{prepListHTML}}
       </ul>
     </div>
 
     <div style="background-color: #f9f9f9; border-radius: 8px; padding: 16px; margin: 16px 0;">
-      <p style="color: #0F1D2C; font-size: 13px; font-weight: 600; margin: 0 0 4px;">Parking & Directions</p>
+      <p style="color: #0F1D2C; font-size: 13px; font-weight: 600; margin: 0 0 4px;">parking &amp; directions 💛</p>
       <p style="color: #555; font-size: 13px; margin: 0; line-height: 1.5;">
-        Free parking available in the lot directly in front of our building.
-        <a href="{{mapsLink}}" style="color: #C9A96E;">Get Directions</a>
+        free parking available in the lot directly in front of our building.
+        <a href="{{mapsLink}}" style="color: #C9A96E;">get directions</a>
       </p>
     </div>
+    <p style="color: #333; font-size: 14px; line-height: 1.6; text-align: center;">can't wait to see you! 🤍</p>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 12px;">Rani Beauty Clinic &middot; {{clinicAddress}}</p>
@@ -200,24 +201,25 @@ const REMINDER_24H: Template = {
 };
 
 const REMINDER_2H: Template = {
-  sms: `Hi {{firstName}}! Just a quick reminder — your {{serviceName}} appointment with {{providerName}} at Rani Beauty Clinic is in 2 hours ({{appointmentTime}}). We're at {{clinicAddress}}. Free parking in front. See you soon!`,
-  emailSubject: `Starting Soon: Your Appointment at {{appointmentTime}}`,
+  sms: `hi gorgeous! ✨ see you in 2 hours! we're all set and ready for you 💛 free parking right in front of our building at {{clinicAddress}}. see you soon beautiful! 🤍`,
+  emailSubject: `see you in 2 hours! ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 28px; text-align: center;">
-    <h1 style="color: #C9A96E; margin: 0; font-size: 24px; font-family: 'Playfair Display', Georgia, serif;">Almost Time!</h1>
+    <h1 style="color: #C9A96E; margin: 0; font-size: 24px; font-family: 'Playfair Display', Georgia, serif;">see you soon! ✨</h1>
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
-    <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
+    <p style="color: #333; font-size: 16px; line-height: 1.6;">hi gorgeous! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      Your <strong>{{serviceName}}</strong> appointment with {{providerName}} starts at <strong>{{appointmentTime}}</strong> — that's in about 2 hours!
+      your <strong>{{serviceName}}</strong> appointment with {{providerName}} is in about 2 hours ✨ we're all set and ready for you!
     </p>
     <div style="text-align: center; margin: 24px 0;">
       <a href="{{mapsLink}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
-        Get Directions
+        Get Directions 💛
       </a>
     </div>
-    <p style="color: #888; font-size: 13px; text-align: center;">Free parking available in front of our building</p>
+    <p style="color: #888; font-size: 13px; text-align: center;">free parking available right in front of our building 🤍</p>
+    <p style="color: #333; font-size: 14px; line-height: 1.6; text-align: center;">see you soon beautiful! ✨</p>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 12px;">{{clinicAddress}} &middot; {{clinicPhone}}</p>

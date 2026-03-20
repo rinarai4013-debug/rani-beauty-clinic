@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Calendar, DollarSign, UserPlus, Star, Bell, FileText, Award, Inbox } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils/formatters';
 import { PanelSkeleton } from '@/components/dashboard/shared';
+import { useDashboardData } from '@/hooks/useDashboardData';
 import type { ActivityItem } from '@/types/dashboard';
 
 const ACTIVITY_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
@@ -16,19 +17,9 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ElementType; color: string }>
   achievement: { icon: Award, color: 'text-rani-gold bg-rani-gold/10' },
 };
 
-// Mock activities - replace with real API data
-const MOCK_ACTIVITIES: ActivityItem[] = [
-  { id: '1', type: 'payment', title: 'Payment received', description: 'Sarah M. — RF Microneedling Full Face — $750', timestamp: new Date(Date.now() - 300000).toISOString() },
-  { id: '2', type: 'booking', title: 'New booking', description: 'Jennifer L. — Hydrafacial Signature — Tomorrow 2PM', timestamp: new Date(Date.now() - 900000).toISOString() },
-  { id: '3', type: 'lead', title: 'New lead', description: 'Amanda K. — Interested in GLP-1 Weight Loss', timestamp: new Date(Date.now() - 1800000).toISOString() },
-  { id: '4', type: 'review', title: '5-star review', description: '"Rina is absolutely amazing! Best facial ever..."', timestamp: new Date(Date.now() - 3600000).toISOString() },
-  { id: '5', type: 'achievement', title: 'Achievement unlocked', description: 'Speed Demon — All leads responded under 2 min', timestamp: new Date(Date.now() - 7200000).toISOString() },
-];
-
 export default function RecentActivity() {
-  // TODO: Replace with real SWR hook when API endpoint is ready
-  const activities = MOCK_ACTIVITIES;
-  const isLoading = false;
+  const { data, isLoading } = useDashboardData<{ activities: ActivityItem[] }>('/activity', { refreshInterval: 30000 });
+  const activities = data?.activities ?? [];
 
   if (isLoading) return <PanelSkeleton rows={5} />;
 

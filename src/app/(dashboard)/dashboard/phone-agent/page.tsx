@@ -1,7 +1,9 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, PhoneIncoming, PhoneMissed, Clock, TrendingUp, AlertTriangle, Star, ArrowRight, Mic, Brain, Shield } from 'lucide-react';
+import { Phone, PhoneIncoming, PhoneMissed, Clock, TrendingUp, AlertTriangle, Star, ArrowRight, Mic, Brain, Shield, RefreshCw } from 'lucide-react';
+import toast from 'react-hot-toast';
 import KPICard from '@/components/dashboard/cards/KPICard';
 import ProgressBar from '@/components/dashboard/charts/ProgressBar';
 import ProgressRing from '@/components/dashboard/charts/ProgressRing';
@@ -56,6 +58,30 @@ export default function PhoneAgentPage() {
   const assistant = data?.assistantConfig;
   const analyticsAvailable = data?.analyticsAvailable ?? false;
 
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch('/api/dashboard/phone-agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sync' }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        toast.success(result.message || 'Vapi assistant synced successfully');
+        mutate();
+      } else {
+        toast.error(result.error || 'Sync failed');
+      }
+    } catch {
+      toast.error('Failed to sync — check your connection');
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [mutate]);
+
   const hasAnalytics = analytics !== null;
   const totalCalls = analytics?.totalCalls || 0;
   const answered = analytics?.answeredCalls || 0;
@@ -73,9 +99,30 @@ export default function PhoneAgentPage() {
     <DashboardErrorBoundary pageName="AI Phone Agent">
       <div className="space-y-6 sm:space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">AI Phone Agent</h1>
-          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Vapi-powered AI receptionist — handles calls, books appointments, and answers questions 24/7</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">AI Phone Agent</h1>
+            <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Vapi-powered AI receptionist — handles calls, books appointments, and answers questions 24/7</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Vapi connection status */}
+            <span className="inline-flex items-center gap-1.5 text-xs font-body font-medium">
+              {analyticsAvailable ? (
+                <><span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Vapi Connected</>
+              ) : (
+                <><span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> Vapi Not Configured</>
+              )}
+            </span>
+            {/* Sync button */}
+            <button
+              onClick={handleSync}
+              disabled={isSyncing}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-body font-semibold rounded-lg bg-rani-navy text-white hover:bg-rani-navy/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Syncing...' : 'Sync to Vapi'}
+            </button>
+          </div>
         </div>
 
         {/* Hero KPIs */}
