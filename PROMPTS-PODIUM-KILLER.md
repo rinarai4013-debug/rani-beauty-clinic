@@ -1,6 +1,21 @@
-# RaniOS — Podium Killer Prompts
+# RaniOS — Podium Killer + Seven-Figure System Prompts
 # Save $19,200/year ($1,600/mo × 12) while building something 10x better
 # These prompts turn RaniOS into a seven-figure revenue engine
+#
+# BRAND VOICE: See RANI-VOICE-BIBLE.md for complete guide
+# VOICE CLONE: See VOICE-CLONE-RECORDING-SCRIPT.md for ElevenLabs setup
+#
+# NEW PROMPTS (Brand Voice + Gamification + Birthday + Rebooking):
+# Prompt A: Rani Voice Engine — bake your personality into every AI
+# Prompt B: Client Gamification — Glow Points, tiers, achievements
+# Prompt C: Birthday Gift + Organic Review Collection
+# Prompt D: Smart Rebooking — "You're Due" system
+# Prompt E: Vapi Voice Clone — AI sounds like YOU
+# Prompt F: Client Glow Portal — gamified client journey page
+# Prompt G: Unified Message Hub — replaces Podium inbox
+#
+# EXISTING PROMPTS (Infrastructure):
+# Prompt 1-6: Original Podium replacement infrastructure
 
 ---
 
@@ -11,12 +26,16 @@ You already have 60% of this built. These prompts fill the gaps AND add features
 Podium doesn't offer (AI consult copilot, churn prediction, revenue intelligence).
 
 **What you're building:**
-1. Unified Command Center (messaging inbox + review hub)
-2. Text-to-Pay & SMS Payment Links
-3. AI Review Engine (request + respond automatically)
-4. Inbound SMS + Conversation Threading
-5. Smart Rebooking Engine (the money maker)
-6. Client Lifecycle Revenue Optimizer
+1. Rani Voice Engine (YOUR personality in every AI system)
+2. Client Gamification (Glow Points, 5 tiers, streaks, achievements)
+3. Birthday Gift System ($199 Signature HydraFacial)
+4. Smart Rebooking ("you're due" — not "we miss you")
+5. Voice Clone (AI phone literally sounds like you)
+6. Client Glow Portal (shareable gamified journey page)
+7. Unified Message Hub (replaces Podium inbox)
+8. Text-to-Pay & SMS Payment Links
+9. AI Review Engine (organic, non-cringey)
+10. Client Lifecycle Revenue Optimizer
 
 **Revenue impact at ONE location:**
 - 15% more rebookings from smart follow-ups = +$180K/year
@@ -24,7 +43,8 @@ Podium doesn't offer (AI consult copilot, churn prediction, revenue intelligence
 - 20% reduction in no-shows = +$45K recovered revenue
 - Text-to-pay faster collections = +$30K cash flow improvement
 - AI upsell recommendations = +$90K from higher AOV
-- **Total: ~$400K+ additional revenue per year**
+- Client gamification retention boost = +$50K from LTV increase
+- **Total: ~$450K+ additional revenue per year**
 
 ---
 
