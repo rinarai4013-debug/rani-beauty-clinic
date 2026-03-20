@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -56,10 +55,11 @@ export default function ServiceCategoryPanels() {
                 <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
                   <Image
                     src={cat.image}
-                    alt={cat.title}
+                    alt={`${cat.title} treatments at Rani Beauty Clinic`}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    loading="lazy"
                   />
                   {/* Dark gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-rani-navy via-rani-navy/40 to-transparent" />

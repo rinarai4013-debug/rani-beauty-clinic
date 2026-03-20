@@ -77,10 +77,11 @@ function SliderCard({ pair }: { pair: BeforeAfterPair }) {
       {/* After image (full) */}
       <Image
         src={pair.after}
-        alt={`${pair.label} - After`}
+        alt={`${pair.label} treatment results — after photo at Rani Beauty Clinic`}
         fill
         className="object-cover"
         sizes="(max-width: 768px) 100vw, 50vw"
+        loading="lazy"
         draggable={false}
       />
 
@@ -91,10 +92,11 @@ function SliderCard({ pair }: { pair: BeforeAfterPair }) {
       >
         <Image
           src={pair.before}
-          alt={`${pair.label} - Before`}
+          alt={`${pair.label} treatment results — before photo at Rani Beauty Clinic`}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
+          loading="lazy"
           draggable={false}
         />
       </div>
@@ -181,10 +183,11 @@ export default function BeforeAfterSlider({
               <div className="relative aspect-square overflow-hidden rounded-xl">
                 <Image
                   src={item.src}
-                  alt={item.label}
+                  alt={`${item.label} treatment results at Rani Beauty Clinic`}
                   fill
                   className="object-cover transition-transform duration-300 hover:scale-105"
                   sizes="(max-width: 768px) 50vw, 25vw"
+                  loading="lazy"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-rani-navy/70 to-transparent p-3">
                   <p className="font-body text-xs font-semibold text-white">

@@ -45,16 +45,17 @@ export default function ServiceCard({
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-rani-cream">
               <Image
                 src={image}
-                alt={title}
+                alt={`${title} treatment at Rani Beauty Clinic Renton`}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                loading="lazy"
               />
               {/* Hover image overlay */}
               {hoverImage && (
                 <Image
                   src={hoverImage}
-                  alt={title}
+                  alt={`${title} treatment at Rani Beauty Clinic Renton`}
                   fill
                   className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

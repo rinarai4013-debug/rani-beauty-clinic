@@ -148,7 +148,8 @@ export default function GalleryPage({ params }: PageProps) {
                 <div className="aspect-square overflow-hidden rounded-xl border border-rani-gold/10 bg-white">
                   <Image
                     src={src}
-                    alt={`${page.title} result ${i + 1}`}
+                    alt={`${page.title} patient transformation result ${i + 1} — Rani Beauty Clinic`}
+                    loading="lazy"
                     width={600}
                     height={600}
                     className="h-full w-full object-cover"
