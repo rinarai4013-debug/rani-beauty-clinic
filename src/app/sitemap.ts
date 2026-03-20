@@ -8,6 +8,13 @@ import { galleryPages } from "@/data/results/gallery";
 import { pillarGuides } from "@/data/guides/pillar-pages";
 import { blogPosts } from "@/data/blog/posts";
 import { skinConcerns } from "@/data/skin-concerns";
+import { aftercarePages } from "@/data/seo/aftercare-pages";
+import { preparationPages } from "@/data/seo/preparation-pages";
+import { demographicPages } from "@/data/seo/demographic-pages";
+import { sideEffectsPages } from "@/data/seo/side-effects-pages";
+import { worthItPages } from "@/data/seo/worth-it-pages";
+import { firstTimePages } from "@/data/seo/first-time-pages";
+import { resultsTimelinePages } from "@/data/seo/results-timeline-pages";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
 
@@ -59,6 +66,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/technology`, lastModified: now, priority: 0.6, changeFrequency: "yearly" },
     { url: `${baseUrl}/the-reveal`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
     { url: `${baseUrl}/get-started`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/knowledge`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy-policy`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
     { url: `${baseUrl}/terms`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
   ];
@@ -171,6 +179,62 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ];
 
+  // Aftercare guide pages
+  const aftercarePageUrls: MetadataRoute.Sitemap = aftercarePages.map((page) => ({
+    url: `${baseUrl}/aftercare/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Preparation guide pages
+  const preparationPageUrls: MetadataRoute.Sitemap = preparationPages.map((page) => ({
+    url: `${baseUrl}/preparation/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Demographic treatment pages
+  const demographicPageUrls: MetadataRoute.Sitemap = demographicPages.map((page) => ({
+    url: `${baseUrl}/treatments-for/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Side effects pages
+  const sideEffectsPageUrls: MetadataRoute.Sitemap = sideEffectsPages.map((page) => ({
+    url: `${baseUrl}/side-effects/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Worth-it decision pages
+  const worthItPageUrls: MetadataRoute.Sitemap = worthItPages.map((page) => ({
+    url: `${baseUrl}/worth-it/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // First-time experience pages
+  const firstTimePageUrls: MetadataRoute.Sitemap = firstTimePages.map((page) => ({
+    url: `${baseUrl}/first-time/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Results timeline pages
+  const resultsTimelinePageUrls: MetadataRoute.Sitemap = resultsTimelinePages.map((page) => ({
+    url: `${baseUrl}/results-timeline/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
   return [
     ...staticPages,
     ...servicePages,
@@ -185,5 +249,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...galleryPageUrls,
     ...guidePageUrls,
     ...concernPages,
+    ...aftercarePageUrls,
+    ...preparationPageUrls,
+    ...demographicPageUrls,
+    ...sideEffectsPageUrls,
+    ...worthItPageUrls,
+    ...firstTimePageUrls,
+    ...resultsTimelinePageUrls,
   ];
 }

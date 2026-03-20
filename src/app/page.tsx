@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import TrustLogosBar from "@/components/sections/TrustLogosBar";
 import StructuredData from "@/components/seo/StructuredData";
-import TrustBar from "@/components/sections/TrustBar";
+import { HomepageSchema, AICitationSchemas } from "@/components/seo/EnhancedSchemas";
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 
@@ -11,6 +11,7 @@ import HomeServicesOverview from "@/components/sections/HomeServicesOverview";
 
 // Below-fold sections — dynamically imported to reduce initial JS bundle.
 // Each loads only when React renders it (after hydration), cutting ~80KB from first load.
+const TrustBar = dynamic(() => import("@/components/sections/TrustBar"));
 const MeetTheTeam = dynamic(() => import("@/components/sections/MeetTheTeam"));
 const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
 const DoctorIntro = dynamic(() => import("@/components/sections/DoctorIntro"));
@@ -134,84 +135,57 @@ const blogPosts = [
   },
 ];
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "MedicalBusiness",
-  name: "Rani Beauty Clinic",
-  image: "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "401 Olympia Ave NE, Suite 101",
-    addressLocality: "Renton",
-    addressRegion: "WA",
-    postalCode: "98056",
-    addressCountry: "US",
+// Homepage FAQ items — duplicated here for schema markup (visual FAQ is rendered client-side)
+const homepageFaqs = [
+  {
+    question: "What makes Rani Beauty Clinic different from other medspas?",
+    answer:
+      "Every medical treatment at Rani is supervised by Dr. Alexander Landfield, a board-certified neurologist. His expertise in neuroscience and muscle anatomy means more precise injections, safer protocols, and better outcomes. We also combine aesthetics and medical wellness under one roof, so your care is truly comprehensive.",
   },
-  telephone: "+14255394440",
-  url: "https://www.ranibeautyclinic.com",
-  openingHoursSpecification: {
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ],
-    opens: "10:00",
-    closes: "19:00",
+  {
+    question: "How does the consultation deposit work?",
+    answer:
+      "Your consultation requires a $150 deposit to secure your appointment. The great news is that this deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
   },
-  priceRange: "$$$",
-  founder: { "@type": "Person", name: "Raj" },
-  employee: {
-    "@type": "Physician",
-    name: "Dr. Alexander Landfield",
-    medicalSpecialty: "Neurology",
-    jobTitle: "Medical Director",
+  {
+    question: "How do I know which treatment is right for me?",
+    answer:
+      "That's exactly what your consultation is for. We evaluate your skin type, concerns, medical history, and goals to recommend the most effective plan. You can also take our Treatment Quiz on this page for a quick preliminary recommendation.",
   },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 47.4856,
-    longitude: -122.2031,
+  {
+    question: "Is laser hair removal painful?",
+    answer:
+      "Our Candela GentleMax Pro Plus uses an integrated cooling system that makes treatments virtually pain-free. Most patients describe it as a light snapping sensation. The dual-wavelength technology is safe for all skin types, including darker skin tones.",
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "127",
-    bestRating: "5",
-    worstRating: "1",
+  {
+    question: "What is GLP-1 weight management and am I a candidate?",
+    answer:
+      "GLP-1 programs use FDA-approved medications like Semaglutide and Tirzepatide to support weight loss alongside lifestyle changes. Candidates typically have a BMI of 27+ with a weight-related condition, or 30+. We include comprehensive blood work and physician monitoring in every program.",
   },
-  areaServed: [
-    { "@type": "City", name: "Renton" },
-    { "@type": "City", name: "Bellevue" },
-    { "@type": "City", name: "Kent" },
-    { "@type": "City", name: "Tukwila" },
-    { "@type": "City", name: "Newcastle" },
-    { "@type": "City", name: "Mercer Island" },
-    { "@type": "City", name: "Auburn" },
-    { "@type": "City", name: "Federal Way" },
-    { "@type": "City", name: "Kirkland" },
-    { "@type": "City", name: "Redmond" },
-    { "@type": "City", name: "Issaquah" },
-    { "@type": "City", name: "Sammamish" },
-    { "@type": "City", name: "Burien" },
-    { "@type": "City", name: "SeaTac" },
-    { "@type": "City", name: "Covington" },
-    { "@type": "City", name: "Maple Valley" },
-    { "@type": "City", name: "Des Moines" },
-    { "@type": "City", name: "Woodinville" },
-    { "@type": "City", name: "Bothell" },
-    { "@type": "AdministrativeArea", name: "King County" },
-    { "@type": "AdministrativeArea", name: "South Seattle" },
-  ],
-};
+  {
+    question: "How soon will I see results?",
+    answer:
+      "It depends on the treatment. HydraFacial gives an immediate glow. Botox takes 3-7 days to show full effect. RF microneedling results build over 3-6 months as collagen regenerates. During your consultation, we'll set realistic expectations for your specific treatment plan.",
+  },
+  {
+    question: "Do you accept insurance or HSA/FSA?",
+    answer:
+      "While most aesthetic treatments are not covered by insurance, we do accept HSA and FSA cards for eligible medical wellness services. We also offer flexible financing options to make treatments accessible.",
+  },
+  {
+    question: "What are your hours and do I need an appointment?",
+    answer:
+      "We're open 7 days a week, Monday through Sunday, 10 AM to 7 PM. While appointments are recommended to ensure availability, we do our best to accommodate walk-ins when possible. Book online or call us at (425) 539-4440.",
+  },
+];
 
 export default function HomePage() {
   return (
     <>
-      <StructuredData data={structuredData} />
+      {/* AI Citation Optimized Schema — Organization, LocalBusiness, WebSite */}
+      <HomepageSchema />
+      {/* Speakable, Reviews, FAQ, ServiceList schemas for AI citation */}
+      <AICitationSchemas reviews={reviews} faqs={homepageFaqs} />
 
       {/* 1. Hero Section — LCP element, eagerly loaded with priority image */}
       <Hero
