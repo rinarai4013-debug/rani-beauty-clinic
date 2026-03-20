@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import PricingPageClient from "./PricingPageClient";
 
 export const metadata: Metadata = {
-  title: "Pricing & Packages",
+  title: "Pricing & Packages — Aesthetic Treatments",
   description:
-    "View pricing for aesthetic treatments, medical wellness programs, and membership packages at Rani Beauty Clinic in Renton, WA. HSA/FSA accepted. Financing available through Cherry and PatientFi.",
+    "View pricing for aesthetic treatments, wellness programs, and memberships at Rani Beauty Clinic in Renton, WA. HSA/FSA accepted. Financing available.",
   alternates: {
     canonical: "https://www.ranibeautyclinic.com/pricing",
   },

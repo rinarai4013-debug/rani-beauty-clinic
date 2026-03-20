@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ResultsPageClient from "./ResultsPageClient";
 
 export const metadata: Metadata = {
-  title: "Before & After Results",
+  title: "Before & After Results — Real Patient Photos",
   description:
     "View real before and after results from Rani Beauty Clinic patients. See transformations from laser hair removal, HydraFacial, RF microneedling, Botox, fillers, and more.",
   alternates: {

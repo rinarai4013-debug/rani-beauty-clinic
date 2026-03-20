@@ -11,14 +11,14 @@ export default function ConsultationEmbed() {
   useEffect(() => {
     // Load Typeform embed script
     const script = document.createElement("script");
-    script.src = "//embed.typeform.com/next/embed.js";
+    script.src = "https://embed.typeform.com/next/embed.js";
     script.async = true;
     document.body.appendChild(script);
 
     return () => {
       // Clean up script on unmount
       const existingScript = document.querySelector(
-        'script[src="//embed.typeform.com/next/embed.js"]'
+        'script[src="https://embed.typeform.com/next/embed.js"]'
       );
       if (existingScript) {
         existingScript.remove();

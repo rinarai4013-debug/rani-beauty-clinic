@@ -3,7 +3,7 @@ import TheRevealClient from "./TheRevealClient";
 import StructuredData from "@/components/seo/StructuredData";
 
 export const metadata: Metadata = {
-  title: "The Reveal | Post-GLP-1 Skin Restoration Protocol | Rani Beauty Clinic",
+  title: "The Reveal — Post-GLP-1 Skin Restoration",
   description:
     "The Reveal is Rani Beauty Clinic's signature skin restoration protocol for GLP-1 patients. Combining Sofwave + Secret RF to address skin laxity after weight loss. Book your Reveal Assessment today.",
   openGraph: {

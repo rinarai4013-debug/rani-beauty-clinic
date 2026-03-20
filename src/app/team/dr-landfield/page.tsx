@@ -12,7 +12,7 @@ import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 
 export const metadata: Metadata = {
-  title: "Dr. Alexander Landfield | Medical Director | Board-Certified Neurologist",
+  title: "Dr. Alexander Landfield — Medical Director",
   description:
     "Meet Dr. Alexander Landfield, board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA. Learn about his expertise in aesthetic medicine and physician-supervised treatments.",
   alternates: {
