@@ -59,6 +59,7 @@ export const clinicInfo = {
   analytics: {
     ga4: "G-4YXJ90MXGG",
     gtm: "GTM-MPS3MPNG",
+    // Set your Meta Pixel ID here, e.g., '123456789012345'
     metaPixel: "",
     clarity: "vnjnfo8pn5",
   },

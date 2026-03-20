@@ -1,17 +1,24 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import "./globals.css";
+/* Script import removed — all third-party scripts are now loaded via the Analytics component */
 import { fontVariables } from "@/lib/fonts";
 import SkipNav from "@/components/ui/SkipNav";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import MobileCTA from "@/components/layout/MobileCTA";
 import ScrollProgress from "@/components/layout/ScrollProgress";
-import ScrollToTop from "@/components/layout/ScrollToTop";
-import ExitIntentPopup from "@/components/sections/ExitIntentPopup";
 import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
 import ConditionalPublicLayout from "@/components/layout/ConditionalPublicLayout";
-import AIChatWidget from "@/components/AIChatWidget";
-import SocialProofToast from "@/components/sections/SocialProofToast";
+
+// Dynamic imports — these are non-critical, below-fold or interaction-triggered components.
+// Loading them lazily reduces the initial JS bundle by ~60KB+ (framer-motion chunks, chat widget, etc.)
+const MobileCTA = dynamic(() => import("@/components/layout/MobileCTA"), { ssr: false });
+const ScrollToTop = dynamic(() => import("@/components/layout/ScrollToTop"), { ssr: false });
+const ExitIntentPopup = dynamic(() => import("@/components/sections/ExitIntentPopup"), { ssr: false });
+const AIChatWidget = dynamic(() => import("@/components/AIChatWidget"), { ssr: false });
+const SocialProofToast = dynamic(() => import("@/components/sections/SocialProofToast"), { ssr: false });
+const BehavioralTracker = dynamic(() => import("@/components/analytics/BehavioralTracker"), { ssr: false });
+const AnalyticsTracker = dynamic(() => import("@/components/analytics/AnalyticsTracker"), { ssr: false });
 
 export const metadata: Metadata = {
   title: {
@@ -74,11 +81,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontVariables}>
       <head>
-        {/* Preconnect to critical third-party origins */}
+        {/* Preconnect to booking (critical path — user clicks "Book") */}
         <link rel="preconnect" href="https://booking.mangomint.com" />
-        {/* Google Fonts preconnects removed — fonts are now self-hosted via next/font */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        {/* DNS-prefetch for analytics origins (loaded afterInteractive, not blocking) */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.clarity.ms" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <Analytics />
+        {/* Mangomint booking scripts are loaded via Analytics component */}
       </head>
       <body className="font-body text-rani-text antialiased">
         <SkipNav />
@@ -95,6 +105,8 @@ export default function RootLayout({
           <ExitIntentPopup />
           <SocialProofToast />
           <AIChatWidget />
+          <BehavioralTracker />
+          <AnalyticsTracker />
         </ConditionalPublicLayout>
       </body>
     </html>

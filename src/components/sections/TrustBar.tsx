@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { Stethoscope, Users, Star, Clock, Heart } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -9,9 +10,13 @@ import type { LucideIcon } from "lucide-react";
 interface TrustItem {
   icon: LucideIcon;
   label: string;
+  /** If set, triggers a count-up animation from 0 to this value */
   numericValue?: number;
+  /** Suffix appended after the number, e.g. "+" or "★" */
   numericSuffix?: string;
+  /** Prefix before the number, e.g. "" */
   numericPrefix?: string;
+  /** Whether the number has a decimal (e.g., 4.9) */
   isDecimal?: boolean;
 }
 
@@ -63,6 +68,7 @@ function useCountUp(
     function tick(now: number) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic for a satisfying deceleration
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(eased * target);
 
@@ -98,13 +104,12 @@ function TrustItemDisplay({
   });
 
   return (
-    <div
-      className="flex shrink-0 items-center gap-3 px-5 py-2 transition-all duration-500 ease-out"
-      style={{
-        opacity: isInView ? 1 : 0,
-        transform: isInView ? "translateY(0)" : "translateY(12px)",
-        transitionDelay: `${index * 80}ms`,
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="flex shrink-0 items-center gap-3 px-5 py-2"
     >
       <item.icon size={22} className="shrink-0 text-[#C9A96E]" />
       <span className="whitespace-nowrap font-body text-sm font-medium text-white">
@@ -119,7 +124,7 @@ function TrustItemDisplay({
           item.label
         )}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -127,23 +132,12 @@ function TrustItemDisplay({
 
 export default function TrustBar() {
   const ref = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsInView(true);
-      },
-      { rootMargin: "-40px" }
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+  const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
     <section ref={ref} className="bg-rani-navy py-4">
       <div className="mx-auto max-w-7xl px-4">
+        {/* Scrollable container — no visible scrollbar */}
         <div className="scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto md:justify-center">
           {trustItems.map((item, i) => (
             <TrustItemDisplay

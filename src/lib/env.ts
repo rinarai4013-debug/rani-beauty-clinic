@@ -33,7 +33,9 @@ const envSchema = z.object({
 
   // Payments
   STRIPE_SECRET_KEY: z.string().optional().default(''),
+  STRIPE_WEBHOOK_SECRET: z.string().optional().default(''),
   CHERRY_API_KEY: z.string().optional().default(''),
+  CHERRY_WEBHOOK_SECRET: z.string().optional().default(''),
 
   // Booking
   MANGOMINT_WEBHOOK_SECRET: z.string().optional().default(''),
@@ -109,6 +111,7 @@ export const hasFeature = {
         env.TWILIO_FROM_NUMBER
     ),
   stripe: () => Boolean(env.STRIPE_SECRET_KEY),
+  cherry: () => Boolean(env.CHERRY_API_KEY),
   plaid: () => Boolean(env.PLAID_CLIENT_ID && env.PLAID_SECRET),
   pinecone: () => Boolean(env.PINECONE_API_KEY),
   embeddings: () => Boolean(env.VOYAGE_API_KEY || env.OPENAI_API_KEY),

@@ -4,6 +4,7 @@ import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
 import Button from "@/components/ui/Button";
 import { clinicInfo } from "@/data/clinic-info";
+import { trackCTAClick, trackPhoneClick } from "@/lib/analytics/events";
 
 interface CTABannerProps {
   label?: string;
@@ -51,10 +52,15 @@ export default function CTABanner({
             <Button
               href={clinicInfo.consultation.url}
               className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
+              onClick={() => trackCTAClick('Book Your Consultation', 'cta_banner', clinicInfo.consultation.url)}
             >
               Book Your Consultation
             </Button>
-            <Button variant="secondary" href={clinicInfo.phoneTel}>
+            <Button
+              variant="secondary"
+              href={clinicInfo.phoneTel}
+              onClick={() => trackPhoneClick('cta_banner')}
+            >
               Free Phone Consult
             </Button>
           </div>

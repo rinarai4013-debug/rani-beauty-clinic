@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Star } from "lucide-react";
 
 // ── Data pools for generating realistic notifications ──────────────────────
@@ -80,6 +81,7 @@ function generateNotifications(count: number): Notification[] {
     const service = pickRandom(SERVICES, rng);
 
     if (roll < 0.45) {
+      // Booking notification
       notifications.push({
         id: i,
         type: "booking",
@@ -87,6 +89,7 @@ function generateNotifications(count: number): Notification[] {
         detail: randomMinutes(rng),
       });
     } else if (roll < 0.75) {
+      // Session completion notification
       const sessionNum = Math.floor(rng() * 5) + 2;
       const ordinal =
         sessionNum === 2 ? "2nd" : sessionNum === 3 ? "3rd" : `${sessionNum}th`;
@@ -97,6 +100,7 @@ function generateNotifications(count: number): Notification[] {
         detail: randomMinutes(rng),
       });
     } else {
+      // Review notification
       const quote = pickRandom(REVIEW_QUOTES, rng);
       notifications.push({
         id: i,
@@ -117,10 +121,10 @@ export default function SocialProofToast() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const progressRef = useRef<HTMLDivElement>(null);
 
   const advance = useCallback(() => {
     setIsVisible(false);
+    // Wait for exit animation then show next
     setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % notifications.length);
       setIsVisible(true);
@@ -130,31 +134,24 @@ export default function SocialProofToast() {
   // Initial delay before first toast appears
   useEffect(() => {
     if (dismissed) return;
+
     const showTimer = setTimeout(() => {
       setIsVisible(true);
     }, 6000);
+
     return () => clearTimeout(showTimer);
   }, [dismissed]);
 
   // Auto-rotate every 8 seconds
   useEffect(() => {
     if (dismissed || !isVisible) return;
+
     const rotateTimer = setInterval(() => {
       advance();
     }, 8000);
+
     return () => clearInterval(rotateTimer);
   }, [dismissed, isVisible, advance]);
-
-  // Animate progress bar with CSS
-  useEffect(() => {
-    if (!progressRef.current || !isVisible) return;
-    const el = progressRef.current;
-    el.style.width = "0%";
-    // Force reflow
-    void el.offsetWidth;
-    el.style.transition = "width 8s linear";
-    el.style.width = "100%";
-  }, [isVisible, currentIndex]);
 
   if (dismissed) return null;
 
@@ -208,46 +205,48 @@ export default function SocialProofToast() {
   };
 
   return (
-    <div
-      className={`fixed bottom-20 left-4 z-40 max-w-[340px] rounded-lg border-l-4 border-l-[#C9A96E] bg-[#FAF8F5] p-4 shadow-lg transition-all duration-350 ease-out lg:bottom-6 ${
-        isVisible
-          ? "opacity-100 translate-y-0 scale-100"
-          : "opacity-0 translate-y-4 scale-[0.97] pointer-events-none"
-      }`}
-      role="status"
-      aria-live="polite"
-    >
-      {/* Dismiss button */}
-      <button
-        onClick={() => setDismissed(true)}
-        className="absolute right-2 top-2 rounded p-1 text-rani-muted hover:text-rani-navy transition-colors"
-        aria-label="Dismiss notifications"
-      >
-        <X size={14} />
-      </button>
+    <AnimatePresence mode="wait">
+      {isVisible && (
+        <motion.div
+          key={notification.id}
+          initial={{ opacity: 0, y: 24, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.97 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="fixed bottom-20 left-4 z-40 max-w-[340px] rounded-lg border-l-4 border-l-[#C9A96E] bg-[#FAF8F5] p-4 shadow-lg lg:bottom-6"
+          role="status"
+          aria-live="polite"
+        >
+          {/* Dismiss button */}
+          <button
+            onClick={() => setDismissed(true)}
+            className="absolute right-2 top-2 rounded p-1 text-rani-muted hover:text-rani-navy transition-colors"
+            aria-label="Dismiss notifications"
+          >
+            <X size={14} />
+          </button>
 
-      <div className="flex items-start gap-3 pr-5">
-        {iconForType(notification.type)}
-        <div className="min-w-0">
-          <p className="font-body text-sm leading-snug text-rani-navy">
-            {notification.message}
-          </p>
-          <p className="mt-1 font-body text-xs text-rani-muted">
-            {notification.detail}
-          </p>
-        </div>
-      </div>
+          <div className="flex items-start gap-3 pr-5">
+            {iconForType(notification.type)}
+            <div className="min-w-0">
+              <p className="font-body text-sm leading-snug text-rani-navy">
+                {notification.message}
+              </p>
+              <p className="mt-1 font-body text-xs text-rani-muted">
+                {notification.detail}
+              </p>
+            </div>
+          </div>
 
-      {/* Progress bar — CSS transition */}
-      <div
-        ref={progressRef}
-        className="absolute bottom-0 left-0 h-[2px] bg-[#C9A96E]/40 rounded-b-lg"
-        role="progressbar"
-        aria-label="Notification timer"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        style={{ width: "0%" }}
-      />
-    </div>
+          {/* Subtle progress bar */}
+          <motion.div
+            className="absolute bottom-0 left-0 h-[2px] bg-[#C9A96E]/40 rounded-b-lg"
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 8, ease: "linear" }}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

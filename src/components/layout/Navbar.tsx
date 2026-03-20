@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Menu, X, ChevronDown, Sparkles } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
 
@@ -115,6 +116,7 @@ export default function Navbar() {
               width={220}
               height={28}
               className="h-7 w-auto md:h-8"
+              priority
             />
           </Link>
 
@@ -138,37 +140,41 @@ export default function Navbar() {
                   <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-rani-gold transition-all duration-300 group-hover:w-full" />
                 </Link>
 
-                {/* Mega Menu — CSS-only animation */}
+                {/* Mega Menu */}
                 {link.megaMenu && (
-                  <div
-                    className={`absolute left-1/2 top-full pt-4 -translate-x-1/2 transition-all duration-200 ${
-                      activeMega === link.name
-                        ? "opacity-100 translate-y-0 pointer-events-auto"
-                        : "opacity-0 translate-y-2 pointer-events-none"
-                    }`}
-                  >
-                    <div className="w-[480px] rounded-xl border-t-[3px] border-t-rani-gold bg-rani-navy p-6 shadow-2xl">
-                      <div className="grid grid-cols-1 gap-1">
-                        {(link.name === "Services"
-                          ? aestheticLinks
-                          : wellnessLinks
-                        ).map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="group flex flex-col rounded-lg px-4 py-2.5 transition-colors hover:bg-white/5"
-                          >
-                            <span className="font-body text-sm font-semibold text-white group-hover:text-rani-gold transition-colors">
-                              {item.name}
-                            </span>
-                            <span className="font-body text-xs text-white/50">
-                              {item.desc}
-                            </span>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <AnimatePresence>
+                    {activeMega === link.name && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute left-1/2 top-full pt-4 -translate-x-1/2"
+                      >
+                        <div className="w-[480px] rounded-xl border-t-[3px] border-t-rani-gold bg-rani-navy p-6 shadow-2xl">
+                          <div className="grid grid-cols-1 gap-1">
+                            {(link.name === "Services"
+                              ? aestheticLinks
+                              : wellnessLinks
+                            ).map((item) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                className="group flex flex-col rounded-lg px-4 py-2.5 transition-colors hover:bg-white/5"
+                              >
+                                <span className="font-body text-sm font-semibold text-white group-hover:text-rani-gold transition-colors">
+                                  {item.name}
+                                </span>
+                                <span className="font-body text-xs text-white/50">
+                                  {item.desc}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 )}
               </div>
             ))}
@@ -202,66 +208,66 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay — CSS transitions instead of Framer Motion */}
-      <div
-        className={`fixed inset-0 z-40 bg-rani-navy flex flex-col items-center justify-center transition-all duration-300 ${
-          mobileOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <div className="mb-8">
-          <Image
-            src="/images/logo/logo-light.png"
-            alt="Rani Beauty Clinic"
-            width={250}
-            height={31}
-            className="h-8 w-auto"
-          />
-        </div>
-
-        <nav className="flex flex-col items-center gap-1">
-          {navLinks.map((link, i) => (
-            <div
-              key={link.name}
-              className="transition-all duration-300 ease-out"
-              style={{
-                opacity: mobileOpen ? 1 : 0,
-                transform: mobileOpen ? "translateY(0)" : "translateY(20px)",
-                transitionDelay: mobileOpen ? `${i * 50}ms` : "0ms",
-              }}
-            >
-              <Link
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block px-8 py-3 font-body text-xl font-semibold text-white transition-colors hover:text-rani-gold"
-              >
-                {link.name}
-              </Link>
-              {i < navLinks.length - 1 && (
-                <div className="mx-auto h-px w-12 bg-rani-gold/20" />
-              )}
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-rani-navy flex flex-col items-center justify-center"
+          >
+            <div className="mb-8">
+              <Image
+                src="/images/logo/logo-light.png"
+                alt="Rani Beauty Clinic"
+                width={250}
+                height={31}
+                className="h-8 w-auto"
+              />
             </div>
-          ))}
-        </nav>
 
-        <div className="mt-8 flex flex-col items-center gap-4">
-          <a
-            href={clinicInfo.phoneTel}
-            className="flex items-center gap-2 font-body text-lg font-semibold text-rani-gold"
-          >
-            <Phone size={18} />
-            {clinicInfo.phone}
-          </a>
-          <a
-            href={clinicInfo.booking.url}
-            onClick={() => setMobileOpen(false)}
-            className="rounded-lg bg-rani-gold px-8 py-3 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy"
-          >
-            Book Now
-          </a>
-        </div>
-      </div>
+            <nav className="flex flex-col items-center gap-1">
+              {navLinks.map((link, i) => (
+                <motion.div
+                  key={link.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.3 }}
+                >
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-8 py-3 font-body text-xl font-semibold text-white transition-colors hover:text-rani-gold"
+                  >
+                    {link.name}
+                  </Link>
+                  {i < navLinks.length - 1 && (
+                    <div className="mx-auto h-px w-12 bg-rani-gold/20" />
+                  )}
+                </motion.div>
+              ))}
+            </nav>
+
+            <div className="mt-8 flex flex-col items-center gap-4">
+              <a
+                href={clinicInfo.phoneTel}
+                className="flex items-center gap-2 font-body text-lg font-semibold text-rani-gold"
+              >
+                <Phone size={18} />
+                {clinicInfo.phone}
+              </a>
+              <a
+                href={clinicInfo.booking.url}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg bg-rani-gold px-8 py-3 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy"
+              >
+                Book Now
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

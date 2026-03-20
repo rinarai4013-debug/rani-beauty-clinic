@@ -1,0 +1,55 @@
+# Rani Beauty Clinic — Cursor Rules
+
+## Project
+Luxury medical aesthetics clinic website + AI-powered operations dashboard.
+Live at ranibeautyclinic.com (Vercel). Next.js 14 App Router, TypeScript, Tailwind CSS.
+
+## Critical Rules
+- Rani does IM INJECTIONS only. NEVER use the word "infusion." Always say "injection."
+- Brand voice: luxury, confident, clinically-assured. Educational + aspirational. Never discount-first. "Transformation journey" not "treatment list."
+- Use `@/*` path alias (maps to `./src/*`)
+- All data fetching goes through Airtable (`src/lib/airtable/`) — never direct DB calls
+- Dashboard API routes live in `src/app/api/dashboard/`
+- Auth uses JWT via jose (HS256), cookie-based sessions (`src/lib/auth/`)
+- Rate limit Airtable to 4.7 req/sec (use `src/lib/cache/` for TTL caching)
+
+## Stack
+- Framework: Next.js 14.2 (App Router)
+- Styling: Tailwind CSS with custom theme (rani-navy #0F1D2C, rani-gold #F3D6BE, rani-cream #FAF8F5)
+- Fonts: Playfair Display (headings), Montserrat (body)
+- Animation: Framer Motion
+- Charts: Recharts
+- Icons: Lucide React
+- State: SWR for data fetching (25 hooks in `src/hooks/useDashboardData.ts`)
+- AI: Anthropic Claude API (`@anthropic-ai/sdk`)
+
+## Architecture
+- `src/app/` — Pages and API routes (App Router)
+- `src/app/(dashboard)/` — Protected dashboard (RBAC, 5 roles)
+- `src/app/api/dashboard/` — 58 dashboard API endpoints
+- `src/components/` — React components (dashboard/, layout/, sections/, services/, ui/)
+- `src/lib/` — Intelligence engines and integrations
+- `src/data/` — Static data (services, blog, locations)
+- `src/hooks/` — SWR data hooks
+- `src/types/` — TypeScript interfaces
+
+## Intelligence Engines (src/lib/)
+- Churn prediction, no-show prediction, revenue anomaly detection
+- Treatment recommendations, dynamic pricing, P&L intelligence
+- Schedule optimizer, inventory auto-manager
+- AI consult co-pilot, RAG knowledge base
+
+## Integrations
+- Booking: Mangomint (CompanyID: 876418)
+- Payments: Square (POS), Stripe (checkout)
+- Email: Resend | SMS: Twilio | Voice: Vapi.ai
+- Database: Airtable (12 tables)
+- Vector DB: Pinecone (RAG)
+
+## Code Style
+- TypeScript strict mode
+- Functional components only
+- Server components by default, 'use client' only when needed
+- Prefer named exports
+- Use Tailwind utilities, avoid inline styles
+- Error boundaries for dashboard sections

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackAnalyticsEvent } from "@/lib/analytics/events";
 import {
   ArrowRight,
   ArrowLeft,
@@ -289,6 +290,15 @@ export default function SkinQuiz() {
   const [showResults, setShowResults] = useState(false);
 
   const progress = ((step + 1) / TOTAL_STEPS) * 100;
+  const quizStartFired = useRef(false);
+
+  // Fire quiz_started on first render
+  useEffect(() => {
+    if (!quizStartFired.current) {
+      quizStartFired.current = true;
+      trackAnalyticsEvent('quiz_started', {});
+    }
+  }, []);
 
   const canProceed = useCallback(() => {
     switch (step) {
@@ -310,6 +320,16 @@ export default function SkinQuiz() {
   const goNext = () => {
     if (!canProceed()) return;
     setDirection(1);
+
+    // Track step completion
+    const stepNames = ['concern', 'skin_type', 'budget', 'timeline', 'contact_info'];
+    const answers = [concern, skinType, budget, timeline, 'form'];
+    trackAnalyticsEvent('quiz_step_completed', {
+      step_number: step + 1,
+      step_name: stepNames[step],
+      answer: String(answers[step] || ''),
+    });
+
     if (step < TOTAL_STEPS - 1) {
       setStep((s) => s + 1);
     }
@@ -343,7 +363,6 @@ export default function SkinQuiz() {
           name: lead.firstName.trim(),
           email: lead.email.trim(),
           phone: lead.phone.trim() || undefined,
-          service: concern ? concerns.find((c) => c.key === concern)?.label || "Skin Quiz" : "Skin Quiz",
           source: "skin-quiz",
           quizAnswers: {
             concern,
@@ -358,6 +377,17 @@ export default function SkinQuiz() {
     } finally {
       setIsSubmitting(false);
       setShowResults(true);
+
+      // Track quiz completion + lead
+      trackAnalyticsEvent('quiz_completed', {
+        result_type: concern || '',
+        recommended_services: concern ? Object.values(getRecommendations(concern)).map((r: RecommendationTier) => r.treatment).join(', ') : '',
+      });
+      trackAnalyticsEvent('lead_submitted', {
+        form_type: 'skin_quiz',
+        service_interest: concern || '',
+        lead_source: 'quiz',
+      });
     }
   };
 
@@ -505,11 +535,6 @@ export default function SkinQuiz() {
           <div className="h-2 w-full overflow-hidden rounded-full bg-rani-border">
             <motion.div
               className="h-full rounded-full bg-rani-gold"
-              role="progressbar"
-              aria-label="Quiz progress"
-              aria-valuenow={Math.round(progress)}
-              aria-valuemin={0}
-              aria-valuemax={100}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4, ease: "easeInOut" }}

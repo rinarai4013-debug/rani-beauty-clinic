@@ -1,155 +1,31 @@
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
-import SectionLabel from "@/components/ui/SectionLabel";
-import Button from "@/components/ui/Button";
-import Badge from "@/components/ui/Badge";
+import TrustLogosBar from "@/components/sections/TrustLogosBar";
 import StructuredData from "@/components/seo/StructuredData";
-import CSSFadeIn from "@/components/animations/CSSFadeIn";
-import WhyRaniCards from "@/components/sections/WhyRaniCards";
+import TrustBar from "@/components/sections/TrustBar";
+import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
-import { serviceImages } from "@/data/service-images";
 
-// Lightweight skeleton for loading states
-const SectionSkeleton = ({ height = "h-96" }: { height?: string }) => (
-  <div className={`${height} w-full animate-pulse bg-rani-cream`} />
-);
+// Above-fold client components (eagerly loaded — visible on initial viewport)
+import HomeServicesOverview from "@/components/sections/HomeServicesOverview";
 
-// Above-fold components — SSR true (rendered on server, bundle split)
-const TrustLogosBar = dynamic(() => import("@/components/sections/TrustLogosBar"), {
-  loading: () => <div className="h-16 animate-pulse border-y border-rani-border bg-white" />,
-});
-const TrustBar = dynamic(() => import("@/components/sections/TrustBar"), {
-  loading: () => <div className="h-12 animate-pulse bg-rani-navy" />,
-});
-
-// Below-fold sections — ssr: false to eliminate their JS from the initial bundle
-const ServiceCategoryPanels = dynamic(() => import("@/components/sections/ServiceCategoryPanels"), {
-  ssr: false,
-  loading: () => <SectionSkeleton height="h-[500px]" />,
-});
-const ServiceCard = dynamic(() => import("@/components/services/ServiceCard"), { ssr: false });
-const MeetTheTeam = dynamic(() => import("@/components/sections/MeetTheTeam"), {
-  ssr: false,
-  loading: () => <SectionSkeleton height="h-[500px]" />,
-});
-const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"), {
-  ssr: false,
-  loading: () => <SectionSkeleton height="h-80" />,
-});
-const BeforeAfterSlider = dynamic(() => import("@/components/sections/BeforeAfterSlider"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const TreatmentQuiz = dynamic(() => import("@/components/sections/TreatmentQuiz"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const ReviewCarousel = dynamic(() => import("@/components/sections/ReviewCarousel"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const MapSection = dynamic(() => import("@/components/sections/MapSection"), {
-  ssr: false,
-  loading: () => <SectionSkeleton height="h-80" />,
-});
-const BeforeAfterGallery = dynamic(() => import("@/components/sections/BeforeAfterGallery"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const WhyRaniComparison = dynamic(() => import("@/components/sections/WhyRaniComparison"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const BlogTeaser = dynamic(() => import("@/components/sections/BlogTeaser"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const FAQ = dynamic(() => import("@/components/sections/FAQ"), {
-  ssr: false,
-  loading: () => <SectionSkeleton />,
-});
-const CTABanner = dynamic(() => import("@/components/sections/CTABanner"), {
-  ssr: false,
-  loading: () => <div className="h-64 animate-pulse bg-rani-navy" />,
-});
-
-const aestheticServices = [
-  {
-    title: "Laser Hair Removal",
-    description:
-      "Pain-free treatments with the Candela GentleMax Pro Plus. Safe for all skin types.",
-    icon: "Zap",
-    href: "/services/laser-hair-removal",
-    image: serviceImages["laser-hair-removal"]?.image,
-    hoverImage: serviceImages["laser-hair-removal"]?.hoverImage,
-  },
-  {
-    title: "HydraFacial MD",
-    description:
-      "Deep cleanse, extract, and hydrate in one session. Immediate glow, zero downtime.",
-    icon: "Droplets",
-    href: "/services/hydrafacial",
-    image: serviceImages["hydrafacial"]?.image,
-    hoverImage: serviceImages["hydrafacial"]?.hoverImage,
-  },
-  {
-    title: "RF Microneedling",
-    description:
-      "Cutera Secret Pro collagen stimulation for tighter, smoother skin.",
-    icon: "Sparkles",
-    href: "/services/rf-microneedling",
-    image: serviceImages["rf-microneedling"]?.image,
-    hoverImage: serviceImages["rf-microneedling"]?.hoverImage,
-  },
-  {
-    title: "Botox & Dysport",
-    description:
-      "Neurologist-supervised injections for natural, refreshed results.",
-    icon: "Syringe",
-    href: "/services/botox-dysport",
-    image: serviceImages["botox-dysport"]?.image,
-    hoverImage: serviceImages["botox-dysport"]?.hoverImage,
-  },
-];
-
-const wellnessServices = [
-  {
-    title: "GLP-1 Weight Management",
-    description:
-      "Physician-supervised Semaglutide and Tirzepatide programs with in-house blood work.",
-    icon: "Scale",
-    href: "/wellness/glp1-weight-management",
-    image: serviceImages["glp1-weight-management"]?.image,
-    hoverImage: serviceImages["glp1-weight-management"]?.hoverImage,
-  },
-  {
-    title: "Hormone Therapy",
-    description:
-      "Bioidentical HRT for men and women. Comprehensive blood panels included.",
-    icon: "Activity",
-    href: "/wellness/hormone-therapy",
-    image: serviceImages["hormone-therapy"]?.image,
-    hoverImage: serviceImages["hormone-therapy"]?.hoverImage,
-  },
-  {
-    title: "NAD+ Injections",
-    description:
-      "Boost cellular energy, brain function, and recovery with quick subcutaneous injections.",
-    icon: "Brain",
-    href: "/wellness/nad-injections",
-    image: serviceImages["nad-injections"]?.image,
-    hoverImage: serviceImages["nad-injections"]?.hoverImage,
-  },
-];
+// Below-fold sections — dynamically imported to reduce initial JS bundle.
+// Each loads only when React renders it (after hydration), cutting ~80KB from first load.
+const MeetTheTeam = dynamic(() => import("@/components/sections/MeetTheTeam"));
+const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
+const DoctorIntro = dynamic(() => import("@/components/sections/DoctorIntro"));
+const WhyRaniCards = dynamic(() => import("@/components/sections/WhyRaniCards"));
+const BeforeAfterSlider = dynamic(() => import("@/components/sections/BeforeAfterSlider"));
+const ReviewCarousel = dynamic(() => import("@/components/sections/ReviewCarousel"));
+const WhyRaniComparison = dynamic(() => import("@/components/sections/WhyRaniComparison"));
+const BeforeAfterGallery = dynamic(() => import("@/components/sections/BeforeAfterGallery"));
+const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"));
+const TreatmentQuiz = dynamic(() => import("@/components/sections/TreatmentQuiz"));
+const BlogTeaser = dynamic(() => import("@/components/sections/BlogTeaser"));
+const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"));
+const FAQ = dynamic(() => import("@/components/sections/FAQ"));
+const CTABanner = dynamic(() => import("@/components/sections/CTABanner"));
+const MapSection = dynamic(() => import("@/components/sections/MapSection"));
 
 const reviews = [
   {
@@ -337,15 +213,13 @@ export default function HomePage() {
     <>
       <StructuredData data={structuredData} />
 
-      {/* 1. Announcement Bar — now in Navbar */}
-
-      {/* 2. Hero Section — server-rendered with CSS animations for fast LCP */}
+      {/* 1. Hero Section — LCP element, eagerly loaded with priority image */}
       <Hero
-        label="RENTON'S #1 PHYSICIAN-SUPERVISED MEDSPA · SERVING ALL OF KING COUNTY"
-        title="The Only Medspa Where a Neurologist Oversees Every Treatment."
-        subtitle="Most medspas are run by estheticians. Rani is supervised by Dr. Alexander Landfield — a board-certified neurologist who brings hospital-grade precision to every Botox injection, laser session, and wellness protocol. That's why 2,181+ clients trust us with their skin."
-        primaryCTA={{ text: "Book Your Free Consultation", href: "#consultation" }}
-        secondaryCTA={{ text: "Call Now — (425) 539-4440", href: clinicInfo.phoneTel }}
+        label="PHYSICIAN-SUPERVISED MEDSPA IN RENTON · SERVING ALL OF KING COUNTY"
+        title="Your Skin. Your Wellness. Our Expertise."
+        subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist. Safe for all skin types."
+        primaryCTA={{ text: "Book a Consultation", href: "#consultation" }}
+        secondaryCTA={{ text: "Free Phone Consult", href: clinicInfo.phoneTel }}
         badges={[
           "Board-Certified Neurologist Oversight",
           "Open 7 Days a Week",
@@ -355,175 +229,69 @@ export default function HomePage() {
         backgroundOverlay={60}
         stats={[
           { value: "4.9", label: "Google Rating" },
-          { value: "2,181+", label: "Clients Treated" },
+          { value: "127+", label: "5-Star Reviews" },
           { value: "7", label: "Days Open" },
-          { value: "13K+", label: "Treatments Done" },
+          { value: "13K+", label: "Treatments Performed" },
         ]}
         dark
         fullHeight
       />
 
-      {/* 3. Trust Logos Bar */}
+      {/* 2. Trust Logos Bar */}
       <TrustLogosBar />
 
-      {/* 3.5 Trust Signals Bar */}
+      {/* 3. Trust Signals Bar */}
       <TrustBar />
 
       {/* 4. Service Category Panels */}
       <ServiceCategoryPanels />
 
-      {/* 5. Services Overview — With Images */}
-      <section className="bg-rani-cream py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <CSSFadeIn>
-            <SectionLabel label="OUR SERVICES" />
-            <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-              Treatments Tailored to You
-            </h2>
-          </CSSFadeIn>
-
-          {/* Aesthetic Services */}
-          <div className="mt-12">
-            <CSSFadeIn>
-              <h3 className="mb-6 text-center font-body text-xl font-semibold text-rani-navy">
-                Aesthetic Services
-              </h3>
-            </CSSFadeIn>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {aestheticServices.map((service) => (
-                <ServiceCard key={service.href} {...service} />
-              ))}
-            </div>
-          </div>
-
-          {/* Medical Wellness */}
-          <div className="mt-16">
-            <CSSFadeIn>
-              <h3 className="mb-6 text-center font-body text-xl font-semibold text-rani-navy">
-                Medical Wellness
-              </h3>
-            </CSSFadeIn>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {wellnessServices.map((service) => (
-                <ServiceCard key={service.href} {...service} />
-              ))}
-            </div>
-          </div>
-
-          <CSSFadeIn delay={200}>
-            <div className="mt-12 text-center">
-              <Button href="/services" icon>
-                View All Services
-              </Button>
-            </div>
-          </CSSFadeIn>
-        </div>
-      </section>
+      {/* 5. Services Overview */}
+      <HomeServicesOverview />
 
       {/* 6. Meet The Founders */}
       <MeetTheTeam />
 
-      {/* 6b. What to Expect — Process Steps */}
+      {/* 7. What to Expect */}
       <ProcessSteps />
 
-      {/* 7. Dr. Landfield Introduction */}
-      <section className="bg-rani-cream py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <CSSFadeIn>
-              <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-cream to-white">
-                <Image
-                  src="/images/team/dr-landfield.webp"
-                  alt="Dr. Alexander Landfield — Board-Certified Neurologist & Medical Director of Rani Beauty Clinic"
-                  width={600}
-                  height={750}
-                  className="h-full w-full object-cover object-top"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
-            </CSSFadeIn>
+      {/* 8. Dr. Landfield Introduction */}
+      <DoctorIntro />
 
-            <CSSFadeIn delay={200}>
-              <div>
-                <SectionLabel
-                  label="MEDICAL EXPERTISE"
-                  className="!items-start"
-                />
-                <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
-                  Physician-Supervised Care
-                </h2>
-                <p className="mt-6 font-body text-base text-rani-text leading-relaxed">
-                  Every medical treatment at Rani Beauty Clinic is performed under
-                  the supervision of Dr. Alexander Landfield, a board-certified
-                  neurologist. His expertise in neuroscience and muscle anatomy
-                  brings a level of clinical precision that sets Rani apart.
-                </p>
-                <p className="mt-4 font-body text-base text-rani-text leading-relaxed">
-                  From neurotoxin injections to hormone optimization, your safety
-                  and results are in expert hands. Dr. Landfield&apos;s deep
-                  understanding of the nervous system enables more precise
-                  treatments and better outcomes for every patient.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Badge icon="shield">Board-Certified Neurologist</Badge>
-                  <Badge icon="check">Medical Director</Badge>
-                </div>
-                <div className="mt-8">
-                  <Button variant="ghost" href="/about">
-                    Meet Dr. Landfield
-                  </Button>
-                </div>
-              </div>
-            </CSSFadeIn>
-          </div>
-        </div>
-      </section>
+      {/* 9. Why Rani Section */}
+      <WhyRaniCards />
 
-      {/* 8. Why Rani Section */}
-      <section className="bg-rani-cream py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <CSSFadeIn>
-            <SectionLabel label="WHY CHOOSE US" />
-            <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-              The Rani Difference
-            </h2>
-          </CSSFadeIn>
-
-          <WhyRaniCards />
-        </div>
-      </section>
-
-      {/* 9. Before & After Slider */}
+      {/* 10. Before & After Slider */}
       <BeforeAfterSlider />
 
-      {/* 10. Reviews/Testimonials */}
+      {/* 11. Reviews/Testimonials */}
       <ReviewCarousel reviews={reviews} />
 
-      {/* 10b. Why Rani — Comparison Strip */}
+      {/* 12. Why Rani — Comparison Strip */}
       <WhyRaniComparison />
 
-      {/* 10c. Before & After Gallery */}
+      {/* 13. Before & After Gallery */}
       <BeforeAfterGallery />
 
-      {/* 10d. Popular Packages */}
+      {/* 14. Popular Packages */}
       <PopularPackages />
 
-      {/* 11. Treatment Quiz */}
+      {/* 15. Treatment Quiz */}
       <TreatmentQuiz />
 
-      {/* 12. Blog Teaser */}
+      {/* 16. Blog Teaser */}
       <BlogTeaser posts={blogPosts} />
 
-      {/* 13. Consultation Embed */}
+      {/* 17. Consultation Embed */}
       <ConsultationEmbed />
 
-      {/* 13b. FAQ Section */}
+      {/* 18. FAQ Section */}
       <FAQ />
 
-      {/* 14. CTA Banner */}
+      {/* 19. CTA Banner */}
       <CTABanner />
 
-      {/* 15. Map & Location */}
+      {/* 20. Map & Location */}
       <MapSection />
     </>
   );

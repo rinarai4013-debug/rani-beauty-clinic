@@ -21,7 +21,6 @@ export default function ScrollProgress() {
       className="scroll-progress"
       style={{ width: `${progress}%` }}
       role="progressbar"
-      aria-label="Page scroll progress"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
       aria-valuemax={100}

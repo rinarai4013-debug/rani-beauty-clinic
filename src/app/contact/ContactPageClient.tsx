@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { trackAnalyticsEvent } from "@/lib/analytics/events";
 import { MapPin, Phone, Clock, Mail, CheckCircle } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -119,6 +120,12 @@ export default function ContactPageClient() {
       }
 
       setIsSubmitted(true);
+      trackAnalyticsEvent('contact_form_submitted', { source: 'contact_page' });
+      trackAnalyticsEvent('lead_submitted', {
+        form_type: 'contact_form',
+        service_interest: formData.service || '',
+        lead_source: 'contact_page',
+      });
       setFormData({
         name: "",
         email: "",

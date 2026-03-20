@@ -6,11 +6,11 @@ export default function Analytics() {
 
   return (
     <>
-      {/* Google Tag Manager — lazyOnload to reduce TBT */}
+      {/* Google Tag Manager */}
       {gtm && (
         <Script
           id="gtm-script"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       {clarity && (
         <Script
           id="microsoft-clarity"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(c,l,a,r,i,t,y){
 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -53,10 +53,10 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         />
       )}
 
-      {/* Mangomint Online Booking Overlay — lazyOnload since user must click before it's needed */}
+      {/* Mangomint Online Booking Overlay */}
       <Script
         id="mangomint-booking"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `window.Mangomint = window.Mangomint || {};
 window.Mangomint.CompanyId = ${clinicInfo.booking.companyId};`,
@@ -65,14 +65,14 @@ window.Mangomint.CompanyId = ${clinicInfo.booking.companyId};`,
       <Script
         id="mangomint-booking-sdk"
         src="https://booking.mangomint.com/app.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
 
       {/* Meta Pixel */}
       {metaPixel && (
         <Script
           id="meta-pixel"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
