@@ -15,6 +15,9 @@ import { sideEffectsPages } from "@/data/seo/side-effects-pages";
 import { worthItPages } from "@/data/seo/worth-it-pages";
 import { firstTimePages } from "@/data/seo/first-time-pages";
 import { resultsTimelinePages } from "@/data/seo/results-timeline-pages";
+import { seasonalPages } from "@/data/seo/seasonal-pages";
+import { financingPages } from "@/data/seo/financing-pages";
+import { bodyAreaPages } from "@/data/seo/body-area-pages";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
 
@@ -67,6 +70,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/the-reveal`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
     { url: `${baseUrl}/get-started`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/knowledge`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/faq`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/team/providers`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy-policy`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
     { url: `${baseUrl}/terms`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
   ];
@@ -235,6 +240,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
   }));
 
+  // Seasonal treatment pages
+  const seasonalPageUrls: MetadataRoute.Sitemap = seasonalPages.map((page) => ({
+    url: `${baseUrl}/seasonal/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Financing info pages
+  const financingPageUrls: MetadataRoute.Sitemap = financingPages.map((page) => ({
+    url: `${baseUrl}/financing/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Body area treatment pages
+  const bodyAreaPageUrls: MetadataRoute.Sitemap = bodyAreaPages.map((page) => ({
+    url: `${baseUrl}/treatment-areas/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
   return [
     ...staticPages,
     ...servicePages,
@@ -256,5 +285,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...worthItPageUrls,
     ...firstTimePageUrls,
     ...resultsTimelinePageUrls,
+    ...seasonalPageUrls,
+    ...financingPageUrls,
+    ...bodyAreaPageUrls,
   ];
 }

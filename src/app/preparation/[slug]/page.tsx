@@ -4,6 +4,7 @@ import Link from "next/link";
 import { preparationPages } from "@/data/seo/preparation-pages";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+import RelatedPages from "@/components/seo/RelatedPages";
 
 export function generateStaticParams() {
   return preparationPages.map((page) => ({ slug: page.slug }));
@@ -215,8 +216,11 @@ export default function PreparationPage({
           </div>
         </section>
 
+        {/* Related Pages */}
+        <RelatedPages serviceSlug={page.serviceSlug} currentPath={`/preparation/${page.slug}`} />
+
         {/* CTA */}
-        <section className="rounded-xl bg-rani-navy p-8 text-center text-white">
+        <section className="mt-10 rounded-xl bg-rani-navy p-8 text-center text-white">
           <h2 className="font-heading text-2xl font-bold">
             Ready to Book Your {page.treatment}?
           </h2>

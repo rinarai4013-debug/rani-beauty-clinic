@@ -4,6 +4,7 @@ import Link from "next/link";
 import { aftercarePages } from "@/data/seo/aftercare-pages";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+import RelatedPages from "@/components/seo/RelatedPages";
 
 export function generateStaticParams() {
   return aftercarePages.map((page) => ({ slug: page.slug }));
@@ -240,8 +241,11 @@ export default function AftercarePage({
           </div>
         </section>
 
+        {/* Related Pages */}
+        <RelatedPages serviceSlug={page.serviceSlug} currentPath={`/aftercare/${page.slug}`} />
+
         {/* CTA */}
-        <section className="rounded-xl bg-rani-navy p-8 text-center text-white">
+        <section className="mt-10 rounded-xl bg-rani-navy p-8 text-center text-white">
           <h2 className="font-heading text-2xl font-bold">
             Questions About Your {page.treatment} Recovery?
           </h2>

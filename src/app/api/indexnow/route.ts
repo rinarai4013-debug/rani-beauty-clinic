@@ -16,6 +16,9 @@ import { sideEffectsPages } from "@/data/seo/side-effects-pages";
 import { worthItPages } from "@/data/seo/worth-it-pages";
 import { firstTimePages } from "@/data/seo/first-time-pages";
 import { resultsTimelinePages } from "@/data/seo/results-timeline-pages";
+import { seasonalPages } from "@/data/seo/seasonal-pages";
+import { financingPages } from "@/data/seo/financing-pages";
+import { bodyAreaPages } from "@/data/seo/body-area-pages";
 
 const INDEXNOW_KEY = "fef37905157843c4ae05afb82e58b988";
 const BASE_URL = "https://www.ranibeautyclinic.com";
@@ -73,6 +76,11 @@ function getAllUrls(): string[] {
   worthItPages.forEach((p) => urls.push(`${BASE_URL}/worth-it/${p.slug}`));
   firstTimePages.forEach((p) => urls.push(`${BASE_URL}/first-time/${p.slug}`));
   resultsTimelinePages.forEach((p) => urls.push(`${BASE_URL}/results-timeline/${p.slug}`));
+  seasonalPages.forEach((p) => urls.push(`${BASE_URL}/seasonal/${p.slug}`));
+  financingPages.forEach((p) => urls.push(`${BASE_URL}/financing/${p.slug}`));
+  bodyAreaPages.forEach((p) => urls.push(`${BASE_URL}/treatment-areas/${p.slug}`));
+  urls.push(`${BASE_URL}/faq`);
+  urls.push(`${BASE_URL}/team/providers`);
 
   return urls;
 }

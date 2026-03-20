@@ -4,6 +4,7 @@ import Link from "next/link";
 import { worthItPages } from "@/data/seo/worth-it-pages";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+import RelatedPages from "@/components/seo/RelatedPages";
 
 export function generateStaticParams() {
   return worthItPages.map((page) => ({ slug: page.slug }));
@@ -219,8 +220,11 @@ export default function WorthItPage({
           </div>
         </section>
 
+        {/* Related Pages */}
+        <RelatedPages serviceSlug={page.serviceSlug} currentPath={`/worth-it/${page.slug}`} />
+
         {/* CTA */}
-        <section className="rounded-xl bg-rani-navy p-8 text-center text-white">
+        <section className="mt-10 rounded-xl bg-rani-navy p-8 text-center text-white">
           <h2 className="font-heading text-2xl font-bold">
             Ready to Try {page.treatment}?
           </h2>
