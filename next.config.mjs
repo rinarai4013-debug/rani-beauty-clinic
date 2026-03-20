@@ -297,6 +297,11 @@ const nextConfig = {
         destination: "/blog",
         permanent: true,
       },
+      {
+        source: "/world-aids-day-designated-on-1-december",
+        destination: "/blog",
+        permanent: true,
+      },
     ];
   },
 
