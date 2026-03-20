@@ -9,6 +9,13 @@ import { pillarGuides } from "@/data/guides/pillar-pages";
 import { geoPages } from "@/data/locations/geo-pages";
 import { galleryPages } from "@/data/results/gallery";
 import { serviceVariations } from "@/data/services/service-variations";
+import { aftercarePages } from "@/data/seo/aftercare-pages";
+import { preparationPages } from "@/data/seo/preparation-pages";
+import { demographicPages } from "@/data/seo/demographic-pages";
+import { sideEffectsPages } from "@/data/seo/side-effects-pages";
+import { worthItPages } from "@/data/seo/worth-it-pages";
+import { firstTimePages } from "@/data/seo/first-time-pages";
+import { resultsTimelinePages } from "@/data/seo/results-timeline-pages";
 
 const INDEXNOW_KEY = "fef37905157843c4ae05afb82e58b988";
 const BASE_URL = "https://www.ranibeautyclinic.com";
@@ -56,6 +63,16 @@ function getAllUrls(): string[] {
 
   // Geo location pages
   geoPages.forEach((g) => urls.push(`${BASE_URL}/locations/${g.slug}`));
+
+  // SEO programmatic pages
+  urls.push(`${BASE_URL}/knowledge`);
+  aftercarePages.forEach((p) => urls.push(`${BASE_URL}/aftercare/${p.slug}`));
+  preparationPages.forEach((p) => urls.push(`${BASE_URL}/preparation/${p.slug}`));
+  demographicPages.forEach((p) => urls.push(`${BASE_URL}/treatments-for/${p.slug}`));
+  sideEffectsPages.forEach((p) => urls.push(`${BASE_URL}/side-effects/${p.slug}`));
+  worthItPages.forEach((p) => urls.push(`${BASE_URL}/worth-it/${p.slug}`));
+  firstTimePages.forEach((p) => urls.push(`${BASE_URL}/first-time/${p.slug}`));
+  resultsTimelinePages.forEach((p) => urls.push(`${BASE_URL}/results-timeline/${p.slug}`));
 
   return urls;
 }
