@@ -47,26 +47,25 @@ export function generateMetadata({ params }: PageProps): Metadata {
   };
 }
 
-const aestheticServices = [
-  { name: "Laser Hair Removal", href: "/services/laser-hair-removal" },
-  { name: "HydraFacial MD", href: "/services/hydrafacial" },
-  { name: "RF Microneedling", href: "/services/rf-microneedling" },
-  { name: "BioRePeel", href: "/services/biorepeel" },
-  { name: "Botox & Dysport", href: "/services/botox-dysport" },
-  { name: "Dermal Fillers", href: "/services/dermal-fillers" },
-  { name: "Red Light Therapy", href: "/services/red-light-therapy" },
-  { name: "Laser Acne Facial", href: "/services/laser-acne-facial" },
-  { name: "Chemical Peels", href: "/services/chemical-peels" },
-  { name: "AI Skin Analysis", href: "/services/ai-skin-analysis" },
+const aestheticServiceSlugs = [
+  { name: "Laser Hair Removal", slug: "laser-hair-removal" },
+  { name: "HydraFacial MD", slug: "hydrafacial" },
+  { name: "RF Microneedling", slug: "rf-microneedling" },
+  { name: "BioRePeel", slug: "biorepeel" },
+  { name: "Botox & Dysport", slug: "botox-dysport" },
+  { name: "Dermal Fillers", slug: "dermal-fillers" },
+  { name: "Red Light Therapy", slug: "red-light-therapy" },
+  { name: "Laser Acne Facial", slug: "laser-acne-facial" },
+  { name: "Chemical Peels", slug: "chemical-peels" },
+  { name: "AI Skin Analysis", slug: "ai-skin-analysis" },
 ];
 
-const wellnessServices = [
-  { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
-  { name: "Peptide Therapy", href: "/wellness/peptide-therapy" },
-  { name: "NAD+ Injections", href: "/wellness/nad-injections" },
-  { name: "Vitamin Injections", href: "/wellness/vitamin-injections" },
-  { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
-  { name: "Blood Work", href: "/wellness/blood-work" },
+const wellnessServiceSlugs = [
+  { name: "GLP-1 Weight Management", slug: "glp1-weight-management" },
+  { name: "NAD+ Injections", slug: "nad-injections" },
+  { name: "Vitamin Injections", slug: "vitamin-injections" },
+  { name: "Hormone Therapy", slug: "hormone-therapy" },
+  { name: "Blood Work", slug: "blood-work" },
 ];
 
 export default function LocationPage({ params }: PageProps) {
@@ -200,9 +199,9 @@ export default function LocationPage({ params }: PageProps) {
                 <h3 className="font-body text-xl font-bold text-rani-navy mb-2">Aesthetic Services</h3>
                 <div className="h-0.5 w-10 bg-rani-gold mb-6" />
                 <ul className="space-y-3">
-                  {aestheticServices.map((service) => (
-                    <li key={service.href}>
-                      <Link href={service.href} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
+                  {aestheticServiceSlugs.map((service) => (
+                    <li key={service.slug}>
+                      <Link href={`/locations/${page.slug}/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
                         <ChevronRight size={14} className="text-rani-gold transition-transform group-hover:translate-x-1" />
                         <span>{service.name}</span>
                       </Link>
@@ -217,9 +216,9 @@ export default function LocationPage({ params }: PageProps) {
                 <h3 className="font-body text-xl font-bold text-rani-navy mb-2">Medical Wellness</h3>
                 <div className="h-0.5 w-10 bg-rani-gold mb-6" />
                 <ul className="space-y-3">
-                  {wellnessServices.map((service) => (
-                    <li key={service.href}>
-                      <Link href={service.href} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
+                  {wellnessServiceSlugs.map((service) => (
+                    <li key={service.slug}>
+                      <Link href={`/locations/${page.slug}/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
                         <ChevronRight size={14} className="text-rani-gold transition-transform group-hover:translate-x-1" />
                         <span>{service.name}</span>
                       </Link>

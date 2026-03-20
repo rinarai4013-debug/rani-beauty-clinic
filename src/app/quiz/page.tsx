@@ -31,5 +31,10 @@ export const metadata: Metadata = {
 };
 
 export default function QuizPage() {
-  return <SkinQuiz />;
+  return (
+    <>
+      <h1 className="sr-only">Find Your Perfect Treatment — Skin Quiz</h1>
+      <SkinQuiz />
+    </>
+  );
 }

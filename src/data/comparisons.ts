@@ -1392,6 +1392,6 @@ export const comparisonPages: ComparisonPage[] = [
           "Most patients notice improved sleep quality within the first 2-4 weeks of peptide therapy. Benefits like improved body composition, skin quality, energy, and recovery typically become noticeable over 3-6 months of consistent use. Peptide therapy is most effective as an ongoing wellness protocol rather than a short-term treatment.",
       },
     ],
-    relatedServiceA: "/wellness/peptide-therapy",
+    relatedServiceA: "/wellness/nad-injections",
   },
 ];

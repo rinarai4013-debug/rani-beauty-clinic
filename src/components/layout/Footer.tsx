@@ -18,7 +18,6 @@ const aestheticLinks = [
 
 const wellnessLinks = [
   { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
-  { name: "Peptide Therapy", href: "/wellness/peptide-therapy" },
   { name: "NAD+ Injections", href: "/wellness/nad-injections" },
   { name: "Vitamin Injections", href: "/wellness/vitamin-injections" },
   { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
@@ -233,6 +232,73 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Links & Laser Hair Removal Areas */}
+      <div className="border-t border-rani-gold/10">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Quick Links
+              </h3>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {[
+                  { name: "Get Started", href: "/get-started" },
+                  { name: "Skin Quiz", href: "/quiz" },
+                  { name: "Membership", href: "/membership" },
+                  { name: "The Reveal", href: "/the-reveal" },
+                  { name: "Safety Standards", href: "/safety" },
+                  { name: "Our Technology", href: "/technology" },
+                  { name: "Meet Dr. Landfield", href: "/team/dr-landfield" },
+                  { name: "Results Gallery", href: "/results" },
+                  { name: "Blog", href: "/blog" },
+                  { name: "Contact", href: "/contact" },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Laser Hair Removal Areas
+              </h3>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {[
+                  { name: "Full Body", href: "/services/laser-hair-removal/full-body" },
+                  { name: "Brazilian", href: "/services/laser-hair-removal/brazilian" },
+                  { name: "Underarms", href: "/services/laser-hair-removal/underarms" },
+                  { name: "Legs", href: "/services/laser-hair-removal/legs" },
+                  { name: "Back", href: "/services/laser-hair-removal/back" },
+                  { name: "Face", href: "/services/laser-hair-removal/face" },
+                  { name: "Bikini Line", href: "/services/laser-hair-removal/bikini-line" },
+                  { name: "Arms", href: "/services/laser-hair-removal/arms" },
+                  { name: "Chest", href: "/services/laser-hair-removal/chest" },
+                  { name: "Shoulders", href: "/services/laser-hair-removal/shoulders" },
+                  { name: "Stomach", href: "/services/laser-hair-removal/stomach" },
+                  { name: "Neck", href: "/services/laser-hair-removal/neck" },
+                  { name: "Upper Lip", href: "/services/laser-hair-removal/upper-lip" },
+                  { name: "Chin", href: "/services/laser-hair-removal/chin" },
+                  { name: "Feet & Toes", href: "/services/laser-hair-removal/feet-and-toes" },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>

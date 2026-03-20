@@ -15,7 +15,6 @@ export const allServiceSlugs = [
   "sofwave",
   "scar-reduction",
   "glp1-weight-management",
-  "peptide-therapy",
   "nad-injections",
   "vitamin-injections",
   "hormone-therapy",
@@ -340,27 +339,6 @@ export const serviceDirectory: Record<ServiceSlug, ServiceInfo> = {
         question: "Do I need blood work before starting GLP-1?",
         answer:
           "Yes. We require baseline blood work to ensure GLP-1 medication is safe for you. This includes metabolic panel, thyroid function, and other markers. All blood work is done conveniently in our clinic.",
-      },
-    ],
-  },
-  "peptide-therapy": {
-    slug: "peptide-therapy",
-    name: "Peptide Therapy",
-    shortDescription:
-      "Targeted bioactive peptide protocols including BPC-157, GHK-Cu, TB-500, and AOD-9604 for recovery, anti-aging, gut health, and performance optimization.",
-    category: "wellness",
-    keyBenefits: [
-      "Targeted support for recovery, sleep, and vitality",
-      "Multiple peptide options for different goals",
-      "Physician-supervised cycling protocols",
-      "Subcutaneous injections for convenient self-administration",
-    ],
-    priceRange: "$299 - $699/month",
-    faqs: [
-      {
-        question: "What are the most popular peptides?",
-        answer:
-          "BPC-157 is popular for gut health and tissue healing, GHK-Cu for skin and hair rejuvenation, TB-500 for injury recovery, and AOD-9604 for targeted fat loss. We customize protocols based on your specific goals.",
       },
     ],
   },

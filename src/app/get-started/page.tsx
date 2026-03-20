@@ -8,12 +8,12 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const SERVICES = [
-  { name: 'Botox & Fillers', price: 'From $300', desc: 'Wrinkle relaxation and volume restoration for a naturally refreshed look', icon: '\u{1F489}', href: '/services/botox' },
+  { name: 'Botox & Fillers', price: 'From $300', desc: 'Wrinkle relaxation and volume restoration for a naturally refreshed look', icon: '\u{1F489}', href: '/services/botox-dysport' },
   { name: 'HydraFacial', price: '$275', desc: 'Deep-cleansing, hydrating facial for instant glow and clarity', icon: '\u2728', href: '/services/hydrafacial' },
   { name: 'Sofwave', price: 'From $2,750', desc: 'Non-invasive ultrasound skin tightening and lifting', icon: '\u{1F52C}', href: '/services/sofwave' },
   { name: 'RF Microneedling', price: 'From $495', desc: 'Collagen stimulation for acne scars, texture, and tightening', icon: '\u{1F3AF}', href: '/services/rf-microneedling' },
   { name: 'Laser Hair Removal', price: 'Packages from $800', desc: 'Permanent hair reduction for all skin tones', icon: '\u26A1', href: '/services/laser-hair-removal' },
-  { name: 'GLP-1 Weight Loss', price: '$399-599/mo', desc: 'Physician-supervised medical weight loss program', icon: '\u{1F4AA}', href: '/services/glp-1-weight-loss' },
+  { name: 'GLP-1 Weight Loss', price: '$399-599/mo', desc: 'Physician-supervised medical weight loss program', icon: '\u{1F4AA}', href: '/wellness/glp1-weight-management' },
 ];
 
 const TRUST_POINTS = [

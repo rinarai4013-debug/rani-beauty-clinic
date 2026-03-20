@@ -237,7 +237,7 @@ export function getAllPostTreatmentTemplates(vars: TemplateVars) {
 // ── SERVICE-SPECIFIC AFTERCARE LINKS ──
 
 export const AFTERCARE_LINKS: Record<string, string> = {
-  'Botox': 'https://www.ranibeautyclinic.com/services/botox#aftercare',
+  'Botox': 'https://www.ranibeautyclinic.com/services/botox-dysport#aftercare',
   'Filler': 'https://www.ranibeautyclinic.com/services/dermal-fillers#aftercare',
   'HydraFacial': 'https://www.ranibeautyclinic.com/services/hydrafacial#aftercare',
   'Laser Hair Removal': 'https://www.ranibeautyclinic.com/services/laser-hair-removal#aftercare',

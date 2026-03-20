@@ -40,7 +40,6 @@ const supervisedServices = [
   { name: "Laser Hair Removal", href: "/services/laser-hair-removal" },
   { name: "RF Microneedling", href: "/services/rf-microneedling" },
   { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
-  { name: "Peptide Therapy", href: "/wellness/peptide-therapy" },
   { name: "NAD+ Injections", href: "/wellness/nad-injections" },
   { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
   { name: "Blood Work & Lab Panels", href: "/wellness/blood-work" },
