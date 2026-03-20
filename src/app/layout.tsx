@@ -87,6 +87,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://static.hotjar.com" />
         <Analytics />
         {/* Mangomint booking scripts are loaded via Analytics component */}
       </head>

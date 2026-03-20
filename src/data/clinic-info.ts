@@ -61,5 +61,6 @@ export const clinicInfo = {
     gtm: "GTM-MPS3MPNG",
     metaPixel: "769852657929598",
     clarity: "vnjnfo8pn5",
+    hotjar: "5241962",
   },
 };
