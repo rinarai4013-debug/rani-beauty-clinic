@@ -14,7 +14,7 @@ import { geoPages } from "@/data/locations/geo-pages";
 export const metadata: Metadata = {
   title: "Areas We Serve — Greater Seattle & King County",
   description:
-    "Rani Beauty Clinic in Renton serves all of King County including Bellevue, Kent, Kirkland, Redmond, Issaquah, Auburn, Federal Way, Seattle neighborhoods, and more. Physician-supervised medspa.",
+    "Rani Beauty Clinic in Renton serves King County including Bellevue, Kent, Kirkland, Redmond, Auburn, Federal Way, and Seattle. Book today.",
   alternates: {
     canonical: `${clinicInfo.website}/locations`,
   },

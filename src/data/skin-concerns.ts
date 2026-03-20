@@ -124,7 +124,7 @@ export const skinConcerns: SkinConcern[] = [
     title: "Aging Skin & Wrinkles",
     metaTitle: "Anti-Aging Treatments in Renton, WA | Wrinkle Reduction",
     metaDescription:
-      "Advanced anti-aging treatments in Renton, WA. Botox, dermal fillers, Sofwave skin tightening, RF microneedling, and HydraFacial. Physician-supervised, all skin types.",
+      "Advanced anti-aging treatments in Renton, WA. Botox, fillers, Sofwave, RF microneedling, and HydraFacial. All skin types welcome.",
     heroDescription:
       "Turn back the clock with physician-supervised anti-aging treatments. From fine lines and wrinkles to volume loss and skin laxity, our advanced technology and expert injectables deliver natural-looking rejuvenation.",
     overview:
@@ -323,7 +323,7 @@ export const skinConcerns: SkinConcern[] = [
     title: "Skin Laxity & Sagging",
     metaTitle: "Skin Tightening in Renton, WA | Non-Invasive Lifting",
     metaDescription:
-      "Non-invasive skin tightening in Renton, WA. Sofwave ultrasound, RF microneedling, and collagen-stimulating treatments for sagging skin. Physician-supervised, no surgery required.",
+      "Non-invasive skin tightening in Renton, WA. Sofwave ultrasound, RF microneedling, and collagen treatments for sagging skin. No surgery.",
     heroDescription:
       "Restore firmness and lift without surgery. Our physician-supervised skin tightening treatments use Sofwave ultrasound, RF microneedling, and collagen-stimulating technology to turn back the clock on sagging skin.",
     overview:
@@ -561,7 +561,7 @@ export const skinConcerns: SkinConcern[] = [
     title: "Body Contouring & Weight Management",
     metaTitle: "Weight Loss & Body Contouring in Renton, WA | GLP-1 Programs",
     metaDescription:
-      "Physician-supervised weight management in Renton, WA. GLP-1 programs (Semaglutide, Tirzepatide), vitamin injections, and NAD+ therapy. Medical support for lasting results.",
+      "Physician-supervised weight management in Renton, WA. GLP-1 programs (Semaglutide, Tirzepatide), vitamin injections, and NAD+ therapy.",
     heroDescription:
       "Achieve your body goals with physician-supervised weight management. Our GLP-1 programs (Semaglutide and Tirzepatide), combined with metabolic support and wellness injections, provide a medical approach to sustainable weight loss.",
     overview:
@@ -656,7 +656,7 @@ export const skinConcerns: SkinConcern[] = [
     title: "Sun Damage & Photoaging",
     metaTitle: "Sun Damage Treatment in Renton, WA | Photoaging Reversal",
     metaDescription:
-      "Reverse sun damage with physician-supervised treatments in Renton, WA. Chemical peels, laser treatments, HydraFacial, and RF microneedling for sun spots and photoaging.",
+      "Reverse sun damage with treatments in Renton, WA. Chemical peels, laser, HydraFacial, and RF microneedling for sun spots and photoaging.",
     heroDescription:
       "Undo years of sun damage with advanced physician-supervised treatments. From sun spots and uneven tone to textural changes and premature wrinkles, our multi-modal approach restores healthy, youthful skin.",
     overview:

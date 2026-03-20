@@ -35,6 +35,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: guide.metaDescription,
       type: "article",
       url: `${clinicInfo.website}/guides/${params.slug}`,
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${guide.metaTitle} — Rani Beauty Clinic` }],
     },
   };
 }

@@ -23,7 +23,7 @@ export const comparisonPages: ComparisonPage[] = [
     treatmentB: "Dysport",
     metaTitle: "Botox vs Dysport: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Botox vs Dysport side by side. Learn key differences in onset time, spread, cost, and results to find the best wrinkle treatment for you at Rani Beauty Clinic.",
+      "Compare Botox vs Dysport side by side. Key differences in onset time, spread, cost, and results at Rani Beauty Clinic in Renton, WA.",
     intro:
       "Botox and Dysport are both botulinum toxin type A injectables used to smooth dynamic wrinkles, but they differ in formulation, diffusion, and onset time. Understanding the differences helps you and your provider choose the right option for your treatment goals.",
     comparisonTable: [
@@ -119,7 +119,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "Semaglutide vs Tirzepatide: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Semaglutide vs Tirzepatide for weight loss. Learn about effectiveness, side effects, cost, and which GLP-1 medication may be right for you at Rani Beauty Clinic.",
+      "Compare Semaglutide vs Tirzepatide for weight loss. Effectiveness, side effects, cost, and which GLP-1 is right for you.",
     intro:
       "Semaglutide and Tirzepatide are both GLP-1 receptor agonists used for medical weight management, but Tirzepatide also targets GIP receptors for a dual-action approach. Both have shown significant results in clinical trials, making the choice between them an important conversation with your provider.",
     comparisonTable: [
@@ -306,7 +306,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "RF Microneedling vs Sofwave: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare RF Microneedling vs Sofwave for skin tightening. Learn about treatment differences, downtime, results, and which collagen-boosting option suits your needs.",
+      "Compare RF Microneedling vs Sofwave for skin tightening. Treatment differences, downtime, results, and which option suits your needs.",
     intro:
       "RF Microneedling and Sofwave are both advanced collagen-stimulating treatments for skin tightening and rejuvenation, but they use different energy technologies. RF Microneedling delivers radiofrequency energy through tiny needles, while Sofwave uses focused ultrasound energy without breaking the skin surface.",
     comparisonTable: [
@@ -397,7 +397,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "BioRePeel vs VI Peel: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare BioRePeel vs VI Peel for skin rejuvenation. Learn about the differences in peeling process, downtime, results, and which chemical peel is best for your skin.",
+      "Compare BioRePeel vs VI Peel for skin rejuvenation. Differences in peeling process, downtime, results, and which peel is best for you.",
     intro:
       "BioRePeel and VI Peel are both professional-grade chemical peels that improve skin tone, texture, and clarity, but they use different formulations and peeling mechanisms. BioRePeel is a biphasic TCA peel with minimal visible peeling, while VI Peel is a medium-depth blend designed for more dramatic resurfacing.",
     comparisonTable: [
@@ -579,7 +579,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "Laser Hair Removal vs Electrolysis: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Laser Hair Removal vs Electrolysis for permanent hair reduction. Learn about speed, cost, pain level, and which method works best for your hair and skin type.",
+      "Compare Laser Hair Removal vs Electrolysis for permanent hair reduction. Speed, cost, pain, and which method works best for you.",
     intro:
       "Laser hair removal and electrolysis are both methods for long-term hair reduction, but they use different technologies and are suited to different situations. Laser covers large areas quickly using light energy, while electrolysis treats individual follicles one at a time using electrical current for true permanent removal.",
     comparisonTable: [
@@ -670,7 +670,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "Botox vs Dermal Fillers: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Botox vs Dermal Fillers for facial rejuvenation. Learn when to use muscle relaxers vs volume restoration and which injectable addresses your specific concerns.",
+      "Compare Botox vs Dermal Fillers for facial rejuvenation. When to use muscle relaxers vs volume restoration and which is right for you.",
     intro:
       "Botox and dermal fillers are both injectable treatments but address different types of aging concerns. Botox relaxes muscles that cause dynamic wrinkles, while dermal fillers add volume to restore fullness and smooth static lines. Many patients benefit from both as part of a comprehensive facial rejuvenation plan.",
     comparisonTable: [
@@ -853,7 +853,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "Semaglutide vs Liraglutide: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Semaglutide vs Liraglutide for weight loss. Learn about dosing frequency, effectiveness, side effects, and which GLP-1 medication is right for your goals.",
+      "Compare Semaglutide vs Liraglutide for weight loss. Dosing frequency, effectiveness, side effects, and which GLP-1 is right for you.",
     intro:
       "Semaglutide and Liraglutide are both GLP-1 receptor agonists used for weight management, but they differ in dosing frequency, potency, and average weight loss outcomes. Semaglutide is the newer generation with once-weekly dosing, while Liraglutide requires daily injections and was the first GLP-1 approved for weight loss.",
     comparisonTable: [
@@ -943,7 +943,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "RF Microneedling vs Traditional Microneedling: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare RF Microneedling vs Traditional Microneedling for skin rejuvenation. Learn about the added benefits of radiofrequency energy, results, and which treatment fits you.",
+      "Compare RF Microneedling vs Traditional Microneedling. Added benefits of radiofrequency energy, results, and which treatment fits you.",
     intro:
       "RF Microneedling and traditional microneedling both use tiny needles to create controlled micro-injuries that stimulate collagen production. The key difference is that RF Microneedling adds radiofrequency energy delivered through the needles, providing deeper tissue remodeling and more dramatic tightening results.",
     comparisonTable: [
@@ -1033,7 +1033,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "BioRePeel vs PRX-T33: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare BioRePeel vs PRX-T33 for no-peel skin rejuvenation. Learn how these biostimulating treatments differ in formulation, results, and which is best for your skin.",
+      "Compare BioRePeel vs PRX-T33 for no-peel skin rejuvenation. How these biostimulating treatments differ and which is best for you.",
     intro:
       "BioRePeel and PRX-T33 are both innovative biostimulating treatments that rejuvenate the skin without traditional peeling or significant downtime. BioRePeel is a biphasic TCA-based peel with exfoliating action, while PRX-T33 is a non-peeling biorevitalizer that stimulates collagen through a unique TCA and hydrogen peroxide combination.",
     comparisonTable: [
@@ -1123,7 +1123,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "HydraFacial vs Regular Facial: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare HydraFacial vs Regular Facial treatments. Learn why HydraFacial's patented technology delivers superior results and whether it's worth the investment over a spa facial.",
+      "Compare HydraFacial vs Regular Facial. Why HydraFacial's patented technology delivers superior results and if it's worth the investment.",
     intro:
       "HydraFacial and regular facials both aim to improve skin health, but they differ significantly in technology, consistency, and results. HydraFacial uses patented Vortex-Fusion technology for a standardized, clinical-grade treatment, while regular facials vary widely depending on the esthetician's technique, products, and training.",
     comparisonTable: [
@@ -1214,7 +1214,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "Sofwave vs Ultherapy: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Sofwave vs Ultherapy for non-surgical skin tightening and lifting. Learn about pain, downtime, results, and which ultrasound technology is right for you.",
+      "Compare Sofwave vs Ultherapy for non-surgical skin tightening. Pain, downtime, results, and which ultrasound technology is right for you.",
     intro:
       "Sofwave and Ultherapy are both non-invasive ultrasound-based treatments for skin tightening and lifting, but they differ in the depth of energy delivery, comfort level, and treatment experience. Sofwave uses Synchronous Ultrasound Parallel Beam technology, while Ultherapy uses microfocused ultrasound with visualization.",
     comparisonTable: [
@@ -1305,7 +1305,7 @@ export const comparisonPages: ComparisonPage[] = [
     metaTitle:
       "Peptide Therapy vs HGH Therapy: Which Is Right for You? | Rani Beauty Clinic",
     metaDescription:
-      "Compare Peptide Therapy vs HGH Therapy for anti-aging and wellness. Learn about safety, effectiveness, cost, and why peptides offer a safer alternative to synthetic HGH.",
+      "Compare Peptide Therapy vs HGH for anti-aging. Safety, effectiveness, cost, and why peptides offer a safer alternative to synthetic HGH.",
     intro:
       "Peptide therapy and HGH (Human Growth Hormone) therapy both aim to optimize growth hormone levels for anti-aging and wellness benefits, but they work through fundamentally different mechanisms. Peptide therapy stimulates your body's natural growth hormone production, while HGH therapy directly replaces growth hormone with a synthetic version.",
     comparisonTable: [

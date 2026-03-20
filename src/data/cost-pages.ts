@@ -19,7 +19,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Laser Hair Removal Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does laser hair removal cost? Sessions start at $79 at Rani Beauty Clinic in Renton, WA. See full pricing for all body areas, packages, and financing options.",
+      "How much does laser hair removal cost? Sessions start at $79 at Rani Beauty Clinic in Renton, WA. See pricing for all body areas and packages.",
     heroTitle: "How Much Does Laser Hair Removal Cost?",
     intro:
       "At Rani Beauty Clinic, we believe in transparent pricing so you can plan your laser hair removal treatments with confidence. Sessions start at $79 for small areas like the upper lip or chin and range up to $1,199 for a full-body treatment using our Candela GentleMax Pro Plus laser. Multi-session packages offer significant savings for optimal results.",
@@ -70,7 +70,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "HydraFacial Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does a HydraFacial cost? Treatments start at $99 at Rani Beauty Clinic in Renton, WA. Signature HydraFacial $225 ($199 for members). View all options and add-ons.",
+      "How much does a HydraFacial cost? Treatments start at $99 at Rani Beauty Clinic in Renton, WA. Signature $225 ($199 for members). View options.",
     heroTitle: "How Much Does a HydraFacial Cost?",
     intro:
       "HydraFacial pricing at Rani Beauty Clinic ranges from $99 for an Express Facial to $575 for a Keravive scalp treatment. Our Signature HydraFacial is $225 per session, with members enjoying a reduced rate of $199. We also offer several add-ons so you can customize your facial experience.",
@@ -220,7 +220,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Dermal Fillers Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much do dermal fillers cost? Fillers start at $600 per syringe at Rani Beauty Clinic in Renton, WA. See pricing by area and product, plus financing options.",
+      "How much do dermal fillers cost? Fillers start at $600/syringe at Rani Beauty Clinic in Renton, WA. See pricing by area and product.",
     heroTitle: "How Much Do Dermal Fillers Cost?",
     intro:
       "Dermal filler pricing at Rani Beauty Clinic depends on the type of filler used and the number of syringes needed to achieve your goals. We carry a full range of premium hyaluronic acid fillers and provide personalized treatment plans with clear pricing during your consultation.",
@@ -359,7 +359,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Sofwave Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does Sofwave cost? Treatments start at $1,150 for a brow lift at Rani Beauty Clinic in Renton, WA. See full pricing for face and neck skin tightening.",
+      "How much does Sofwave cost? Treatments start at $1,150 at Rani Beauty Clinic in Renton, WA. See pricing for face and neck skin tightening.",
     heroTitle: "How Much Does Sofwave Cost?",
     intro:
       "Sofwave is a next-generation ultrasound skin tightening device that lifts and firms without surgery or downtime. At Rani Beauty Clinic, Sofwave treatments start at $1,150 for a brow lift and range up to $3,999 for a comprehensive full face and neck treatment. Results develop over 3-6 months and can last 1-2 years.",
@@ -501,7 +501,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Semaglutide Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does semaglutide cost? Monthly treatments start at $349 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and save with our Transform Package.",
+      "How much does semaglutide cost? Monthly treatments start at $349 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and packages.",
     heroTitle: "How Much Does Semaglutide Cost?",
     intro:
       "Semaglutide is our most popular GLP-1 medication for medical weight loss. At Rani Beauty Clinic, semaglutide starts at $349/month for the initial dose and increases gradually as your dosage is escalated over the first several months. Our Transform Package ($1,199 for 3 months) bundles semaglutide with labs, lipo shots, and consultations for the best value.",
@@ -547,7 +547,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Tirzepatide Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does tirzepatide cost? Monthly treatments start at $449 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and save with our Ultimate Package.",
+      "How much does tirzepatide cost? Monthly treatments start at $449 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and packages.",
     heroTitle: "How Much Does Tirzepatide Cost?",
     intro:
       "Tirzepatide is the most powerful GLP-1 medication we offer for medical weight loss, targeting both GIP and GLP-1 receptors for enhanced results. At Rani Beauty Clinic, tirzepatide starts at $449/month and scales with dosage increases. Our Ultimate Package ($1,499 for 3 months) bundles tirzepatide with labs, lipo shots, B12, and body composition analysis.",
@@ -593,7 +593,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Peptide Therapy Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does peptide therapy cost? Monthly programs start at $199 at Rani Beauty Clinic in Renton, WA. Sermorelin, BPC-157, PT-141, and more. See full pricing.",
+      "How much does peptide therapy cost? Programs start at $199/month at Rani Beauty Clinic in Renton, WA. BPC-157, PT-141, and more.",
     heroTitle: "How Much Does Peptide Therapy Cost?",
     intro:
       "Peptide therapy at Rani Beauty Clinic is customized to your wellness goals. Monthly peptide programs range from $199 to $349 depending on the specific peptide and protocol. We offer targeted peptides for anti-aging, tissue repair, sexual wellness, and growth hormone optimization, all supervised by our medical team.",
@@ -683,7 +683,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Hormone Therapy Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does hormone therapy cost? HRT programs start at $49/month at Rani Beauty Clinic in Renton, WA. Female and male hormone optimization with lab monitoring.",
+      "How much does hormone therapy cost? HRT starts at $49/month at Rani Beauty Clinic in Renton, WA. Male and female hormone optimization.",
     heroTitle: "How Much Does Hormone Therapy Cost?",
     intro:
       "Hormone replacement therapy (HRT) at Rani Beauty Clinic is tailored to your unique hormonal profile. Monthly programs range from $49 for supplemental hormones to $299 for comprehensive HRT protocols. All programs include physician oversight and are supported by in-house blood work to ensure safe and effective treatment.",
@@ -735,7 +735,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Testosterone Therapy Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does testosterone therapy cost? TRT starts at $199/month at Rani Beauty Clinic in Renton, WA. Male hormone optimization with physician oversight and in-house labs.",
+      "How much does testosterone therapy cost? TRT starts at $199/month at Rani Beauty Clinic in Renton, WA. Physician-supervised with in-house labs.",
     heroTitle: "How Much Does Testosterone Therapy Cost?",
     intro:
       "Testosterone replacement therapy (TRT) at Rani Beauty Clinic is designed for men experiencing symptoms of low testosterone. Monthly TRT costs range from $199 to $299 using high-quality compounded testosterone cypionate from Olympia pharmacy. Our program includes physician supervision, dose optimization, and regular lab monitoring.",
@@ -785,7 +785,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Vitamin Injections Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much do vitamin injections cost? B12 shots start at $25 at Rani Beauty Clinic in Renton, WA. See pricing for B12, lipo-B, biotin, and glutathione injections.",
+      "How much do vitamin injections cost? B12 shots start at $25 at Rani Beauty Clinic in Renton, WA. B12, lipo-B, biotin, and glutathione pricing.",
     heroTitle: "How Much Do Vitamin Injections Cost?",
     intro:
       "Vitamin injections at Rani Beauty Clinic are an affordable way to boost your energy, metabolism, and overall wellness. Individual shots start at just $25 for vitamin B12 and range up to $149 for NAD+. Many clients add vitamin injections to their regular wellness visits for a quick pick-me-up that delivers nutrients directly into the body for maximum absorption.",
@@ -830,7 +830,7 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Blood Work Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does blood work cost? Lab panels start at $49 at Rani Beauty Clinic in Renton, WA. In-house blood draw, hormone panels, metabolic panels, and wellness screening.",
+      "How much does blood work cost? Lab panels start at $49 at Rani Beauty Clinic in Renton, WA. Hormone panels, metabolic panels, and wellness screening.",
     heroTitle: "How Much Does Blood Work Cost?",
     intro:
       "Rani Beauty Clinic offers in-house blood work with fast turnaround and transparent pricing. Individual lab tests start at $49, and comprehensive panels range up to $249. Whether you need labs for a GLP-1 program, hormone therapy, or general wellness screening, we make it easy to get tested without a separate trip to a lab facility.",

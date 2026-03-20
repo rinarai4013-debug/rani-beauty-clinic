@@ -42,6 +42,7 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
       url: `${clinicInfo.website}/blog/${post.slug}`,
       publishedTime: post.date,
       authors: [post.author],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${post.metaTitle} — Rani Beauty Clinic` }],
     },
   };
 }

@@ -27,7 +27,7 @@ export const wellnessServices: WellnessService[] = [
     metaTitle:
       "GLP-1 Weight Management in Renton, WA | Semaglutide & Tirzepatide | Rani Beauty Clinic",
     metaDescription:
-      "Achieve lasting weight loss with physician-supervised Semaglutide and Tirzepatide at Rani Beauty Clinic in Renton, WA. In-house blood work, custom dosing, and The Rani Protocol. Call (425) 539-4440.",
+      "Physician-supervised Semaglutide and Tirzepatide at Rani Beauty Clinic in Renton, WA. In-house blood work, custom dosing. Book today.",
     heroDescription:
       "Transform your relationship with weight through science-backed GLP-1 therapy. The Rani Protocol combines FDA-approved medications — Semaglutide and Tirzepatide — with in-house blood work, physician supervision by Dr. Alexander Landfield, and personalized support to help you achieve meaningful, sustainable weight loss.",
     whatIsIt: `GLP-1 (glucagon-like peptide-1) receptor agonists represent one of the most significant breakthroughs in weight management medicine. At Rani Beauty Clinic, we offer both Semaglutide and Tirzepatide — two FDA-approved medications that have demonstrated remarkable efficacy in clinical trials, helping patients achieve 15–22% total body weight loss on average when combined with lifestyle modifications.
@@ -134,7 +134,7 @@ The Rani Protocol is our comprehensive, physician-supervised approach to GLP-1 w
     metaTitle:
       "Peptide Therapy in Renton, WA | BPC-157, CJC-1295 | Rani Beauty Clinic",
     metaDescription:
-      "Optimize recovery, anti-aging, and cognitive performance with physician-supervised peptide therapy at Rani Beauty Clinic in Renton, WA. BPC-157, CJC-1295, and more. Call (425) 539-4440.",
+      "Physician-supervised peptide therapy at Rani Beauty Clinic in Renton, WA. BPC-157, CJC-1295, and more for recovery and anti-aging. Book today.",
     heroDescription:
       "Unlock your body's potential for healing, recovery, and optimization with targeted peptide therapy. Under the medical supervision of Dr. Alexander Landfield, our board-certified neurologist and Medical Director, we design customized peptide protocols to support recovery, anti-aging, cognitive performance, and cellular vitality.",
     whatIsIt: `Peptides are short chains of amino acids — the building blocks of proteins — that serve as signaling molecules in the body. They bind to specific receptors on cell surfaces to trigger targeted biological responses, effectively acting as molecular messengers that direct cellular activity. Peptide therapy harnesses these naturally occurring signaling pathways to optimize healing, recovery, hormonal balance, cognitive function, and aging at the cellular level.
@@ -243,7 +243,7 @@ What distinguishes medical peptide therapy from over-the-counter supplements is 
     metaTitle:
       "NAD+ Injections in Renton, WA | Cellular Energy & Anti-Aging | Rani Beauty Clinic",
     metaDescription:
-      "Boost cellular energy and fight aging with quick NAD+ subcutaneous injections at Rani Beauty Clinic in Renton, WA. $149 per shot. Physician-supervised. Book today.",
+      "NAD+ subcutaneous injections at Rani Beauty Clinic in Renton, WA. Boost cellular energy and fight aging. $149/shot. Book today.",
     heroDescription:
       "Recharge at the cellular level — fast. NAD+ (nicotinamide adenine dinucleotide) is essential for energy production, DNA repair, and healthy aging in every cell of your body. Our physician-supervised subcutaneous NAD+ injections deliver this vital coenzyme directly into your system in minutes, supporting brain health, cellular energy, and longevity without the time commitment of an IV drip.",
     whatIsIt: `NAD+ (nicotinamide adenine dinucleotide) is a coenzyme found in every living cell and is essential for life. It plays a central role in cellular energy production (converting nutrients into ATP in the mitochondria), DNA repair, gene expression regulation, cell signaling, and maintaining the health of the immune and nervous systems. NAD+ is also a critical substrate for sirtuins — a family of proteins often called "longevity genes" — that regulate cellular aging, inflammation, and stress resistance.
@@ -345,7 +345,7 @@ NAD+ subcutaneous injections at Rani Beauty Clinic deliver NAD+ directly into th
     metaTitle:
       "Vitamin Injections in Renton, WA | B12, D3, Glutathione | Rani Beauty Clinic",
     metaDescription:
-      "Boost your energy and wellness with vitamin injections at Rani Beauty Clinic in Renton, WA. B12, D3, Biotin, Glutathione, Lipo-B and more. Quick, effective, physician-supervised. Book now.",
+      "Vitamin injections at Rani Beauty Clinic in Renton, WA. B12, D3, Biotin, Glutathione, Lipo-B and more. Quick and effective. Book now.",
     heroDescription:
       "Give your body the building blocks it needs — delivered directly where they count. Our physician-supervised vitamin injection menu includes B12, D3, Biotin, Glutathione, and our signature Lipo-B formula, providing rapid nutrient absorption that oral supplements simply cannot match.",
     whatIsIt: `Vitamin injections deliver essential vitamins, minerals, amino acids, and antioxidants directly into the muscle (intramuscular/IM) or bloodstream (intravenous/IV), bypassing the digestive system for significantly higher absorption rates compared to oral supplements. For many nutrients, oral bioavailability is limited by factors like stomach acid degradation, intestinal absorption capacity, and first-pass liver metabolism — meaning only a fraction of what you swallow actually reaches your cells. Injectable delivery ensures that 100% of the administered dose is available to your body.
@@ -442,7 +442,7 @@ Each injection takes just minutes and can be administered as a standalone wellne
     metaTitle:
       "Hormone Therapy in Renton, WA | HRT for Men & Women | Rani Beauty Clinic",
     metaDescription:
-      "Restore hormonal balance with physician-supervised HRT at Rani Beauty Clinic in Renton, WA. Bioidentical hormones, in-house blood work, and The Rani Hormone Protocol. Call (425) 539-4440.",
+      "Physician-supervised HRT at Rani Beauty Clinic in Renton, WA. Bioidentical hormones, in-house blood work, and custom protocols. Book today.",
     heroDescription:
       "Reclaim your vitality, clarity, and well-being with expertly managed hormone therapy. The Rani Hormone Protocol provides comprehensive, physician-supervised hormone replacement for both men and women — featuring bioidentical options, in-house blood work, and personalized protocols designed by our medical team under the direction of Dr. Alexander Landfield.",
     whatIsIt: `Hormone therapy (also called hormone replacement therapy or HRT) is the medical management of hormonal imbalances or age-related hormonal decline through the precise supplementation of hormones that your body no longer produces in optimal quantities. As we age, the production of key hormones — including testosterone, estrogen, progesterone, DHEA, and thyroid hormones — naturally declines, often producing symptoms that significantly impact quality of life: persistent fatigue, weight gain, mood changes, decreased libido, brain fog, muscle loss, poor sleep, hot flashes, night sweats, and more.
@@ -548,7 +548,7 @@ Our approach to hormone therapy is not one-size-fits-all. Hormonal balance is a 
     metaTitle:
       "Blood Work & Lab Services in Renton, WA | Rani Beauty Clinic",
     metaDescription:
-      "Get comprehensive blood work and lab panels at Rani Beauty Clinic in Renton, WA. In-house draws reviewed by Dr. Landfield. Foundation for GLP-1, HRT, and wellness programs. Call (425) 539-4440.",
+      "Comprehensive blood work and lab panels at Rani Beauty Clinic in Renton, WA. In-house draws reviewed by Dr. Landfield. Book today.",
     heroDescription:
       "Your wellness journey starts with data. Our in-house blood work services provide comprehensive lab panels drawn right here in our clinic and reviewed personally by Dr. Alexander Landfield, our board-certified Medical Director. No separate lab visits, no guesswork — just actionable health insights that form the foundation of your personalized treatment plan.",
     whatIsIt: `Blood work is the cornerstone of evidence-based wellness. At Rani Beauty Clinic, we offer comprehensive in-house blood draw services so you never need to visit a separate lab or quest for your results through impersonal portals. Our phlebotomy-trained medical staff draws your blood right here in our clinic, and every set of results is reviewed personally by Dr. Alexander Landfield, our board-certified neurologist and Medical Director.

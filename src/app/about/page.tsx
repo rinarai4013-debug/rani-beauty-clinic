@@ -4,7 +4,7 @@ import AboutPageClient from "./AboutPageClient";
 export const metadata: Metadata = {
   title: "About Us — Woman-Owned Medspa in Renton",
   description:
-    "Learn about Rani Beauty Clinic — a woman-owned, physician-supervised medspa in Renton, WA. Meet our Medical Director Dr. Alexander Landfield, board-certified neurologist, and our expert team.",
+    "Rani Beauty Clinic is a woman-owned, physician-supervised medspa in Renton, WA. Meet our board-certified Medical Director and expert team.",
   alternates: {
     canonical: "https://www.ranibeautyclinic.com/about",
   },

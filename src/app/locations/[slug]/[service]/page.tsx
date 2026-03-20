@@ -54,6 +54,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: meta.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/locations/${geo.slug}/${serviceInfo.slug}`,
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${serviceInfo.name} near ${geo.city} — Rani Beauty Clinic` }],
     },
   };
 }
