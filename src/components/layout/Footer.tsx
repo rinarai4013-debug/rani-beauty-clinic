@@ -18,6 +18,7 @@ const aestheticLinks = [
 
 const wellnessLinks = [
   { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
+  { name: "Peptide Therapy", href: "/wellness/peptide-therapy" },
   { name: "NAD+ Injections", href: "/wellness/nad-injections" },
   { name: "Vitamin Injections", href: "/wellness/vitamin-injections" },
   { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
@@ -179,6 +180,19 @@ export default function Footer() {
                   { name: "HydraFacial Cost", href: "/cost/hydrafacial-cost" },
                   { name: "Semaglutide Cost", href: "/cost/semaglutide-cost" },
                   { name: "Dermal Fillers Cost", href: "/cost/dermal-fillers-cost" },
+                  { name: "RF Microneedling Cost", href: "/cost/rf-microneedling-cost" },
+                  { name: "Chemical Peels Cost", href: "/cost/chemical-peels-cost" },
+                  { name: "BioRePeel Cost", href: "/cost/biorepeel-cost" },
+                  { name: "Sofwave Cost", href: "/cost/sofwave-cost" },
+                  { name: "Scar Reduction Cost", href: "/cost/scar-reduction-cost" },
+                  { name: "GLP-1 Cost", href: "/cost/glp1-cost" },
+                  { name: "Tirzepatide Cost", href: "/cost/tirzepatide-cost" },
+                  { name: "Peptide Therapy Cost", href: "/cost/peptide-therapy-cost" },
+                  { name: "NAD+ Cost", href: "/cost/nad-injections-cost" },
+                  { name: "Hormone Therapy Cost", href: "/cost/hormone-therapy-cost" },
+                  { name: "Testosterone Cost", href: "/cost/testosterone-cost" },
+                  { name: "Vitamin Injections Cost", href: "/cost/vitamin-injections-cost" },
+                  { name: "Blood Work Cost", href: "/cost/blood-work-cost" },
                   { name: "All Pricing", href: "/pricing" },
                 ].map((link) => (
                   <li key={link.href}>
@@ -200,6 +214,16 @@ export default function Footer() {
                   { name: "HydraFacial vs Chemical Peel", href: "/compare/hydrafacial-vs-chemical-peel" },
                   { name: "RF Microneedling vs Sofwave", href: "/compare/rf-microneedling-vs-sofwave" },
                   { name: "Laser vs Electrolysis", href: "/compare/laser-hair-removal-vs-electrolysis" },
+                  { name: "BioRePeel vs VI Peel", href: "/compare/biorepeel-vs-vi-peel" },
+                  { name: "Laser vs Waxing", href: "/compare/laser-hair-removal-vs-waxing" },
+                  { name: "Botox vs Fillers", href: "/compare/botox-vs-dermal-fillers" },
+                  { name: "NAD+ vs B12", href: "/compare/nad-vs-vitamin-b12" },
+                  { name: "Semaglutide vs Liraglutide", href: "/compare/semaglutide-vs-liraglutide" },
+                  { name: "RF vs Traditional Microneedling", href: "/compare/rf-microneedling-vs-traditional-microneedling" },
+                  { name: "BioRePeel vs PRX-T33", href: "/compare/biorepeel-vs-prx-t33" },
+                  { name: "HydraFacial vs Regular Facial", href: "/compare/hydrafacial-vs-regular-facial" },
+                  { name: "Sofwave vs Ultherapy", href: "/compare/sofwave-vs-ultherapy" },
+                  { name: "Peptides vs HGH", href: "/compare/peptide-therapy-vs-hgh" },
                   { name: "All Comparisons", href: "/compare" },
                 ].map((link) => (
                   <li key={link.href}>
@@ -210,6 +234,42 @@ export default function Footer() {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Skin Concerns */}
+      <div className="border-t border-rani-gold/10">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+            Skin Concerns We Treat
+          </h3>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {[
+              { name: "Acne & Breakouts", href: "/concerns/acne" },
+              { name: "Aging Skin", href: "/concerns/aging-skin" },
+              { name: "Hyperpigmentation", href: "/concerns/hyperpigmentation" },
+              { name: "Skin Tightening", href: "/concerns/skin-laxity" },
+              { name: "Unwanted Hair", href: "/concerns/unwanted-hair" },
+              { name: "Dull Skin", href: "/concerns/dull-skin" },
+              { name: "Sun Damage", href: "/concerns/sun-damage" },
+              { name: "Large Pores", href: "/concerns/large-pores" },
+              { name: "Body Contouring", href: "/concerns/body-contouring" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold"
+              >
+                {link.name}
+              </Link>
+            ))}
+            <Link
+              href="/concerns"
+              className="font-body text-xs text-rani-gold transition-colors hover:text-rani-gold-light"
+            >
+              All concerns →
+            </Link>
           </div>
         </div>
       </div>

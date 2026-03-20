@@ -213,6 +213,90 @@ const nextConfig = {
         destination: "/",
         permanent: true,
       },
+
+      // --- Additional WordPress artifact paths (found in GSC) ---
+      {
+        source: "/wp-json/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/product-category/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/product-tag/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/author/:path*",
+        destination: "/about",
+        permanent: true,
+      },
+      {
+        source: "/tag/:path*",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/feed/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/comments/feed/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/wp-sitemap:path*",
+        destination: "/sitemap.xml",
+        permanent: true,
+      },
+      {
+        source: "/wp-:slug.php",
+        destination: "/",
+        permanent: true,
+      },
+
+      // --- Old WordPress blog posts (GSC: Crawled not indexed / Duplicate canonical) ---
+      {
+        source: "/liposuction-what-it-is-surgery-recovery-results",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/after-aesthetic-treatment-what-matters-most",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/how-to-keep-your-skin-hydrated-with-10-simple-tips",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/best-skin-treatments-for-tight-and-glowing-skin",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/top-5-benefits-of-laser-facial-resurfacing-rejuvenation",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/having-overw-eight-and-depression-can",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/more-than-80-clinical-trials-launch-to-test-coronavirus-3",
+        destination: "/blog",
+        permanent: true,
+      },
     ];
   },
 
@@ -227,30 +311,32 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: "/(.*)",
         headers: [
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-XSS-Protection", value: "1; mode=block" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(self)",
+            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
           },
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://booking.mangomint.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.clarity.ms",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://booking.mangomint.com https://www.clarity.ms https://patient.withcherry.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "font-src 'self' data:",
-              "connect-src 'self' https://api.airtable.com https://graph.facebook.com https://api.resend.com https://www.google-analytics.com https://region1.google-analytics.com https://booking.mangomint.com https://api.anthropic.com https://www.clarity.ms",
-              "frame-src 'self' https://booking.mangomint.com https://www.google.com https://form.typeform.com",
+              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com https://connect.facebook.net https://api.stripe.com https://booking.mangomint.com https://www.clarity.ms https://patient.withcherry.com https://api.airtable.com https://graph.facebook.com https://api.resend.com",
+              "frame-src https://booking.mangomint.com https://js.stripe.com https://patient.withcherry.com",
+              "worker-src 'self' blob:",
             ].join("; "),
-          },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
           },
         ],
       },

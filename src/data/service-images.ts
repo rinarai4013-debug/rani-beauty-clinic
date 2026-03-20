@@ -192,7 +192,7 @@ export const variationImages: Record<string, ServiceImageEntry> = {
   },
   "laser-hair-removal/feet-and-toes": {
     image: "/images/services/laserhairremovals/feettoes.jpeg",
-    hoverImage: "/images/services/laserhairremovals/feettoes2.jpeg.png",
+    hoverImage: "/images/services/laserhairremovals/feettoes2.png",
     category: "body",
   },
 

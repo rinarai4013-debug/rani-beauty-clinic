@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Middleware: Trailing-slash normalization + domain canonicalization
+ * Middleware: Domain canonicalization + trailing-slash normalization + edge headers
  *
  * 1. Redirects non-www to www (SEO canonical domain)
  * 2. 301-redirects trailing-slash URLs to non-trailing-slash form
+ * 3. Adds performance/CORS headers for API routes
  */
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
   const hostname = request.headers.get("host") || "";
 
   // --- Domain canonicalization: non-www → www ---
@@ -21,13 +22,59 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  // Skip static files, API routes, Next.js internals
+  // --- Subdomain canonicalization: offers.* → www ---
+  // Legacy WordPress subdomain — redirect everything to main site
   if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.includes(".")
+    hostname === "offers.ranibeautyclinic.com" ||
+    hostname.startsWith("offers.")
   ) {
+    const url = request.nextUrl.clone();
+    url.host = "www.ranibeautyclinic.com";
+    url.protocol = "https";
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url, 301);
+  }
+
+  // Skip static files, Next.js internals
+  if (pathname.startsWith("/_next") || pathname.includes(".")) {
     return NextResponse.next();
+  }
+
+  // --- Strip WordPress query parameters (cause noindex/duplicate issues in GSC) ---
+  const wpParams = ["replytocom", "s", "remove_item", "_wpnonce", "add-to-cart", "page_id"];
+  const hasWpParam = wpParams.some((p) => searchParams.has(p));
+  if (hasWpParam) {
+    const url = request.nextUrl.clone();
+    wpParams.forEach((p) => url.searchParams.delete(p));
+    if (!url.searchParams.toString()) {
+      url.search = "";
+    }
+    return NextResponse.redirect(url, 301);
+  }
+
+  // API routes: add timing and CORS headers
+  if (pathname.startsWith("/api")) {
+    const response = NextResponse.next();
+
+    // Performance monitoring
+    response.headers.set("X-Response-Time", Date.now().toString());
+    response.headers.set("X-Powered-By", "RaniOS");
+
+    // CORS for webhook endpoints
+    if (pathname.startsWith("/api/webhooks/")) {
+      response.headers.set("Access-Control-Allow-Origin", "*");
+      response.headers.set(
+        "Access-Control-Allow-Methods",
+        "POST, GET, OPTIONS"
+      );
+      response.headers.set(
+        "Access-Control-Allow-Headers",
+        "Content-Type, stripe-signature, x-mangomint-signature, x-cherry-signature"
+      );
+    }
+
+    return response;
   }
 
   // Strip trailing slashes for all paths (SEO canonical form)
