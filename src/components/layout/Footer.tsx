@@ -18,6 +18,7 @@ const aestheticLinks = [
 
 const wellnessLinks = [
   { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
+  { name: "Peptide Therapy", href: "/wellness/peptide-therapy" },
   { name: "NAD+ Injections", href: "/wellness/nad-injections" },
   { name: "Vitamin Injections", href: "/wellness/vitamin-injections" },
   { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
@@ -257,6 +258,9 @@ export default function Footer() {
                   { name: "Results Gallery", href: "/results" },
                   { name: "Blog", href: "/blog" },
                   { name: "Contact", href: "/contact" },
+                  { name: "FAQ", href: "/faq" },
+                  { name: "Our Providers", href: "/team/providers" },
+                  { name: "Knowledge Base", href: "/knowledge" },
                 ].map((link) => (
                   <Link
                     key={link.href}

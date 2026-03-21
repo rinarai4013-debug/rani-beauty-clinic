@@ -58,6 +58,8 @@ const aestheticServiceSlugs = [
   { name: "Laser Acne Facial", slug: "laser-acne-facial" },
   { name: "Chemical Peels", slug: "chemical-peels" },
   { name: "AI Skin Analysis", slug: "ai-skin-analysis" },
+  { name: "Sofwave", slug: "sofwave" },
+  { name: "Scar Reduction", slug: "scar-reduction" },
 ];
 
 const wellnessServiceSlugs = [
