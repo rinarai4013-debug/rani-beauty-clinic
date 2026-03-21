@@ -18,7 +18,6 @@ const aestheticLinks = [
 
 const wellnessLinks = [
   { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
-  { name: "Peptide Therapy", href: "/wellness/peptide-therapy" },
   { name: "NAD+ Injections", href: "/wellness/nad-injections" },
   { name: "Vitamin Injections", href: "/wellness/vitamin-injections" },
   { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
