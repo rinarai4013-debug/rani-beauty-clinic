@@ -343,6 +343,157 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Treatment Areas */}
+      <div className="border-t border-rani-gold/10">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Botox Treatment Areas
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Forehead Lines", href: "/treatment-areas/botox-forehead-lines" },
+                  { name: "Crow's Feet", href: "/treatment-areas/botox-crows-feet" },
+                  { name: "Frown Lines", href: "/treatment-areas/botox-frown-lines" },
+                  { name: "Lip Flip", href: "/treatment-areas/botox-lip-flip" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Filler Treatment Areas
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Lip Filler", href: "/treatment-areas/fillers-lips" },
+                  { name: "Cheek Filler", href: "/treatment-areas/fillers-cheeks" },
+                  { name: "Jawline Filler", href: "/treatment-areas/fillers-jawline" },
+                  { name: "Under-Eye Filler", href: "/treatment-areas/fillers-under-eyes" },
+                  { name: "Nasolabial Folds", href: "/treatment-areas/fillers-nasolabial-folds" },
+                  { name: "RF Microneedling Face", href: "/treatment-areas/rf-microneedling-face-neck" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Laser Hair Removal Areas
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Brazilian", href: "/treatment-areas/laser-hair-removal-brazilian" },
+                  { name: "Underarms", href: "/treatment-areas/laser-hair-removal-underarms" },
+                  { name: "Full Legs", href: "/treatment-areas/laser-hair-removal-full-legs" },
+                  { name: "Back & Chest", href: "/treatment-areas/laser-hair-removal-back-chest" },
+                  { name: "Face", href: "/treatment-areas/laser-hair-removal-face" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Treatments For & Seasonal */}
+      <div className="border-t border-rani-gold/10">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Treatments For
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Men", href: "/treatments-for/medspa-treatments-for-men" },
+                  { name: "Dark Skin Tones", href: "/treatments-for/treatments-for-dark-skin-tones" },
+                  { name: "Over 40", href: "/treatments-for/anti-aging-treatments-over-40" },
+                  { name: "Pre-Wedding", href: "/treatments-for/pre-wedding-beauty-treatments" },
+                  { name: "Athletes", href: "/treatments-for/treatments-for-athletes" },
+                  { name: "Summer Skincare", href: "/treatments-for/summer-skincare-treatments" },
+                  { name: "Postpartum", href: "/treatments-for/postpartum-beauty-wellness" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Seasonal Treatments
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Summer Skincare", href: "/seasonal/best-summer-skincare-treatments" },
+                  { name: "Winter Skincare", href: "/seasonal/best-winter-skincare-treatments" },
+                  { name: "Spring Refresh", href: "/seasonal/spring-skin-refresh-treatments" },
+                  { name: "Fall Prep", href: "/seasonal/fall-skincare-prep" },
+                  { name: "Holiday Glow", href: "/seasonal/holiday-glow-treatments" },
+                  { name: "New Year", href: "/seasonal/new-year-new-skin" },
+                  { name: "Pre-Wedding Timeline", href: "/seasonal/pre-wedding-beauty-timeline" },
+                  { name: "Back-to-School", href: "/seasonal/back-to-school-skincare" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-3">
+                Aftercare & Financing
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { name: "Laser Aftercare", href: "/aftercare/laser-hair-removal-aftercare" },
+                  { name: "Botox Aftercare", href: "/aftercare/botox-aftercare" },
+                  { name: "HydraFacial Aftercare", href: "/aftercare/hydrafacial-aftercare" },
+                  { name: "RF Microneedling Aftercare", href: "/aftercare/rf-microneedling-aftercare" },
+                  { name: "Filler Aftercare", href: "/aftercare/dermal-fillers-aftercare" },
+                  { name: "Chemical Peel Aftercare", href: "/aftercare/chemical-peels-aftercare" },
+                  { name: "NAD+ Aftercare", href: "/aftercare/nad-injections-aftercare" },
+                  { name: "GLP-1 Aftercare", href: "/aftercare/glp1-aftercare" },
+                  { name: "Sofwave Aftercare", href: "/aftercare/sofwave-aftercare" },
+                  { name: "Financing Options", href: "/financing/how-to-finance-medspa-treatments" },
+                  { name: "Cherry Financing", href: "/financing/cherry-financing-guide" },
+                  { name: "Payment Plans", href: "/financing/medspa-payment-plans-renton" },
+                  { name: "Tax Deductible?", href: "/financing/are-medspa-treatments-tax-deductible" },
+                  { name: "Membership vs Pay-Per-Visit", href: "/financing/medspa-membership-vs-pay-per-visit" },
+                  { name: "Botox & Filler Costs", href: "/financing/cost-of-botox-fillers-seattle-area" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="font-body text-xs text-gray-400 transition-colors hover:text-rani-gold">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Areas We Serve */}
       <div className="border-t border-rani-gold/10">
         <div className="mx-auto max-w-7xl px-6 py-8">

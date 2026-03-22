@@ -433,8 +433,8 @@ export function generateGeoServiceMeta(
   serviceInfo: ServiceInfo
 ) {
   return {
-    metaTitle: `${serviceInfo.name} Near ${cityName}, WA | Rani Beauty Clinic`,
-    metaDescription: `${serviceInfo.name} for ${cityName}, WA residents at Rani Beauty Clinic in Renton. ${serviceInfo.shortDescription.slice(0, 80)}. Book today!`,
+    metaTitle: `${serviceInfo.name} Near ${cityName}, WA | Rani Clinic`,
+    metaDescription: `${serviceInfo.name} for ${cityName}, WA at Rani Beauty Clinic in Renton. ${serviceInfo.shortDescription.slice(0, 60)}. Book today!`,
   };
 }
 

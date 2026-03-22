@@ -21,8 +21,8 @@ export const aftercarePages: AftercarePage[] = [
     treatment: "Laser Hair Removal",
     serviceSlug: "laser-hair-removal",
     basePath: "services",
-    metaTitle: "Laser Hair Removal Aftercare Guide | What to Do After Treatment",
-    metaDescription: "Complete laser hair removal aftercare guide: what to do immediately after treatment, how to care for your skin, what to avoid, and when to expect results. Expert tips from Rani Beauty Clinic.",
+    metaTitle: "Laser Hair Removal Aftercare | Post-Treatment Care",
+    metaDescription: "Laser hair removal aftercare guide: what to do after treatment, how to care for your skin, what to avoid & when to expect results. Tips from Rani Clinic.",
     heroDescription: "Your laser hair removal session is complete — now proper aftercare ensures the best results. Follow this physician-approved aftercare guide from Rani Beauty Clinic to protect your skin, minimize side effects, and maximize permanent hair reduction.",
     immediateAftercare: [
       "Apply the soothing aloe-based gel provided by your clinician to the treated area",
@@ -82,7 +82,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "botox-dysport",
     basePath: "services",
     metaTitle: "Botox Aftercare Guide | What to Do After Botox Injections",
-    metaDescription: "Expert Botox aftercare instructions: what to do after Botox injections, activities to avoid, when results appear, and tips for longer-lasting results. Neurologist-supervised care.",
+    metaDescription: "Botox aftercare: what to do after injections, activities to avoid, when results appear & tips for longer-lasting results. Rani Beauty Clinic.",
     heroDescription: "Your Botox treatment is complete — now follow these neurologist-approved aftercare instructions from Rani Beauty Clinic to ensure optimal results, minimize bruising, and maximize the longevity of your treatment.",
     immediateAftercare: [
       "Stay upright for at least 4 hours after treatment — do not lie down or bend forward",
@@ -144,7 +144,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "hydrafacial",
     basePath: "services",
     metaTitle: "HydraFacial Aftercare Guide | Post-Treatment Care Tips",
-    metaDescription: "HydraFacial aftercare guide: what to do after your HydraFacial, skincare tips, when to wear sunscreen, and how to maintain your glow. Expert advice from Rani Beauty Clinic.",
+    metaDescription: "HydraFacial aftercare: what to do after treatment, skincare tips, sunscreen guidance & how to maintain your glow. Expert advice from Rani Clinic.",
     heroDescription: "Your HydraFacial is complete and your skin is glowing — follow these simple aftercare steps to extend your results and keep your skin looking radiant for weeks.",
     immediateAftercare: [
       "Enjoy your immediate glow — HydraFacial results are visible right away",
@@ -199,7 +199,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "rf-microneedling",
     basePath: "services",
     metaTitle: "RF Microneedling Aftercare Guide | Post-Treatment Recovery Tips",
-    metaDescription: "RF microneedling aftercare instructions: recovery timeline, skincare dos and don'ts, when redness fades, and how to maximize collagen production. Rani Beauty Clinic.",
+    metaDescription: "RF microneedling aftercare: recovery timeline, skincare dos and don'ts, when redness fades & how to maximize collagen. Rani Beauty Clinic.",
     heroDescription: "RF microneedling stimulates powerful collagen remodeling beneath the skin's surface. Follow this aftercare guide to support your skin's healing process and maximize your results over the coming weeks and months.",
     immediateAftercare: [
       "Expect redness, swelling, and warmth similar to a moderate sunburn — this is normal",
@@ -257,7 +257,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "glp1-weight-management",
     basePath: "wellness",
     metaTitle: "GLP-1 (Semaglutide/Tirzepatide) Aftercare Guide | What to Expect",
-    metaDescription: "GLP-1 weight management aftercare: managing side effects, injection site care, diet tips, what to expect week by week, and when to contact your doctor. Physician-supervised guide.",
+    metaDescription: "GLP-1 aftercare: managing side effects, injection site care, diet tips, what to expect week by week & when to contact your doctor. Rani Clinic.",
     heroDescription: "Starting your GLP-1 weight management program is a significant step toward better health. This physician-approved guide covers what to expect, how to manage common side effects, and how to maximize your results with lifestyle adjustments.",
     immediateAftercare: [
       "Apply gentle pressure to the injection site with a clean cotton ball if there is any bleeding",
@@ -319,7 +319,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "dermal-fillers",
     basePath: "services",
     metaTitle: "Dermal Filler Aftercare Guide | Post-Injection Care Instructions",
-    metaDescription: "Dermal filler aftercare guide: managing swelling, bruising tips, what to avoid after lip or cheek fillers, and timeline for final results. Neurologist-supervised care at Rani Beauty Clinic.",
+    metaDescription: "Dermal filler aftercare: managing swelling, bruising tips, what to avoid after fillers & timeline for final results. Physician-supervised at Rani Clinic.",
     heroDescription: "Your dermal filler treatment is complete — follow these neurologist-approved aftercare instructions to minimize bruising, reduce swelling, and ensure beautiful, natural-looking results.",
     immediateAftercare: [
       "Expect swelling, tenderness, and possible redness at injection sites — this is normal",
@@ -438,7 +438,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "nad-injections",
     basePath: "wellness",
     metaTitle: "NAD+ Injection Aftercare Guide | What to Expect After NAD+",
-    metaDescription: "NAD+ injection aftercare: what to expect after your intramuscular NAD+ injection, side effects, hydration tips, and how to maximize cellular benefits. Physician-supervised at Rani Beauty Clinic.",
+    metaDescription: "NAD+ injection aftercare: what to expect after treatment, side effects, hydration tips & how to maximize cellular benefits. Rani Beauty Clinic.",
     heroDescription: "Your NAD+ injection is supporting cellular repair and energy production at the molecular level. Follow these simple aftercare steps to maximize the benefits of your treatment.",
     immediateAftercare: [
       "A small bandage may be placed over the injection site — leave it on for 1–2 hours",
@@ -489,7 +489,7 @@ export const aftercarePages: AftercarePage[] = [
     serviceSlug: "sofwave",
     basePath: "services",
     metaTitle: "Sofwave Aftercare Guide | What to Expect After Skin Tightening",
-    metaDescription: "Sofwave aftercare guide: recovery timeline, skincare tips after ultrasound skin tightening, when to see results, and how to maximize collagen production. Rani Beauty Clinic.",
+    metaDescription: "Sofwave aftercare: recovery timeline, skincare tips after skin tightening, when to see results & how to maximize collagen. Rani Beauty Clinic.",
     heroDescription: "Your Sofwave treatment has initiated a collagen-building process deep within your skin. Follow this guide to support your body's natural tightening response and achieve optimal results.",
     immediateAftercare: [
       "Mild redness and slight swelling are normal and typically resolve within a few hours",

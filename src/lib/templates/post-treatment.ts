@@ -241,7 +241,7 @@ export const AFTERCARE_LINKS: Record<string, string> = {
   'Filler': 'https://www.ranibeautyclinic.com/services/dermal-fillers#aftercare',
   'HydraFacial': 'https://www.ranibeautyclinic.com/services/hydrafacial#aftercare',
   'Laser Hair Removal': 'https://www.ranibeautyclinic.com/services/laser-hair-removal#aftercare',
-  'PicoWay': 'https://www.ranibeautyclinic.com/services/picoway#aftercare',
+  'PicoWay': 'https://www.ranibeautyclinic.com/services/laser-hair-removal#aftercare',
   'RF Microneedling': 'https://www.ranibeautyclinic.com/services/rf-microneedling#aftercare',
   'VI Peel': 'https://www.ranibeautyclinic.com/services/vi-peel#aftercare',
   'PRX-T33': 'https://www.ranibeautyclinic.com/services/prx-t33#aftercare',
