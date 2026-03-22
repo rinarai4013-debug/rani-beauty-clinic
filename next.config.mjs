@@ -302,6 +302,12 @@ const nextConfig = {
         destination: "/blog",
         permanent: true,
       },
+
+      // --- WooCommerce pages (GSC: 404) ---
+      { source: "/cart", destination: "/", permanent: true },
+      { source: "/checkout/:path*", destination: "/", permanent: true },
+      { source: "/my-account/:path*", destination: "/", permanent: true },
+      { source: "/shop/:path*", destination: "/", permanent: true },
     ];
   },
 

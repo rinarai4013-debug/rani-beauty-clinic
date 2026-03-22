@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
   }
 
   // --- Strip WordPress query parameters (cause noindex/duplicate issues in GSC) ---
-  const wpParams = ["replytocom", "s", "remove_item", "_wpnonce", "add-to-cart", "page_id"];
+  const wpParams = ["replytocom", "s", "remove_item", "_wpnonce", "add-to-cart", "page_id", "format"];
   const hasWpParam = wpParams.some((p) => searchParams.has(p));
   if (hasWpParam) {
     const url = request.nextUrl.clone();
