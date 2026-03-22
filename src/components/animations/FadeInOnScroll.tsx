@@ -30,7 +30,7 @@ export default function FadeInOnScroll({
     <motion.div
       initial={{ opacity: 0, ...directionOffset[direction] }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "200px" }}
       transition={{ duration, delay, ease: "easeOut" }}
       className={className}
     >

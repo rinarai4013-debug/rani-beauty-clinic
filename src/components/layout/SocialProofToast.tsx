@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star } from "lucide-react";
 
@@ -71,7 +71,7 @@ function randomMinutes(rng: () => number): string {
 // ── Generate a pool of notifications ────────────────────────────────────────
 
 function generateNotifications(count: number): Notification[] {
-  const rng = seededRandom(42);
+  const rng = seededRandom(Date.now() % 100000);
   const notifications: Notification[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -117,8 +117,8 @@ function generateNotifications(count: number): Notification[] {
 // ── Component ───────────────────────────────────────────────────────────────
 
 export default function SocialProofToast() {
-  const notifications = useMemo(() => generateNotifications(20), []);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [notifications] = useState(() => generateNotifications(20));
+  const [currentIndex, setCurrentIndex] = useState(() => Math.floor(Math.random() * 20));
   const [dismissed, setDismissed] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
