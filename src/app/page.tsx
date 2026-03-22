@@ -140,7 +140,7 @@ export default function HomePage() {
           "4.9 Google Rating",
           "Open 7 Days",
         ]}
-        backgroundImage="/images/team/co-founder.jpg"
+        backgroundImage="/images/hero/facility.jpg"
         backgroundOverlay={0}
         layout="split"
         dark
