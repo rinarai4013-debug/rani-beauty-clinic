@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageSquare, ClipboardCheck, Sparkles, CalendarHeart } from "lucide-react";
+import { MessageSquare, ClipboardCheck, Sparkles } from "lucide-react";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
 
@@ -9,41 +9,34 @@ const steps = [
   {
     icon: MessageSquare,
     number: "01",
-    title: "Book a Consultation",
+    title: "Consult",
     description:
-      "Schedule your visit online or by phone. Your $150 deposit applies toward any treatment or product.",
+      "We learn your goals, assess your skin, and run in-house labs if needed. Your $150 deposit applies toward treatment.",
   },
   {
     icon: ClipboardCheck,
     number: "02",
-    title: "Personalized Assessment",
+    title: "Customize",
     description:
-      "Our medical team evaluates your skin, health, and goals. If needed, we run in-house labs for a complete picture.",
+      "Your treatment plan is designed for your unique anatomy, skin type, and goals — reviewed by our Medical Director.",
   },
   {
     icon: Sparkles,
     number: "03",
-    title: "Your Treatment Plan",
+    title: "Transform",
     description:
-      "We create a customized roadmap with transparent pricing. Every plan is reviewed by our Medical Director.",
-  },
-  {
-    icon: CalendarHeart,
-    number: "04",
-    title: "Ongoing Care",
-    description:
-      "Follow-up visits, progress tracking, and plan adjustments. We're your long-term partner in skin and wellness.",
+      "Experience visible results with ongoing support, progress tracking, and plan adjustments along the way.",
   },
 ];
 
 export default function ProcessSteps() {
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <FadeInOnScroll>
           <SectionLabel label="YOUR JOURNEY" />
           <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-            What to Expect
+            Your Path to Results
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
             From your first call to lasting results — here&apos;s how we take care
@@ -51,7 +44,7 @@ export default function ProcessSteps() {
           </p>
         </FadeInOnScroll>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3 lg:grid-cols-3">
           {steps.map((step, i) => (
             <FadeInOnScroll key={step.number} delay={i * 0.12}>
               <motion.div

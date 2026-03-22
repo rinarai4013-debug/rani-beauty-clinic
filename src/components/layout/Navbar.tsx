@@ -4,38 +4,65 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Menu, X, ChevronDown, Sparkles } from "lucide-react";
+import { Phone, Menu, X, ChevronDown } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
 
-const aestheticLinks = [
-  { name: "Laser Hair Removal", href: "/services/laser-hair-removal", desc: "Pain-free with Candela GentleMax Pro Plus" },
-  { name: "HydraFacial MD", href: "/services/hydrafacial", desc: "Deep cleanse, extract & hydrate" },
-  { name: "RF Microneedling", href: "/services/rf-microneedling", desc: "Cutera Secret Pro collagen stimulation" },
-  { name: "BioRePeel", href: "/services/biorepeel", desc: "Zero-downtime bi-phasic peel" },
-  { name: "Botox & Dysport", href: "/services/botox-dysport", desc: "Neurologist-supervised injections" },
-  { name: "Dermal Fillers", href: "/services/dermal-fillers", desc: "FDA-approved volume restoration" },
-  { name: "Red Light Therapy", href: "/services/red-light-therapy", desc: "Full body cellular rejuvenation" },
-  { name: "Laser Acne Facial", href: "/services/laser-acne-facial", desc: "Target acne at the source" },
-  { name: "Chemical Peels", href: "/services/chemical-peels", desc: "Medical-grade skin renewal" },
-  { name: "AI Skin Analysis", href: "/services/ai-skin-analysis", desc: "Personalized treatment roadmap" },
-  { name: "Skin Concerns", href: "/concerns", desc: "Acne, aging, pigmentation & more" },
+// ── Mega Menu Data (4-column layout) ─────────────────────────────────────────
+
+const megaMenuColumns = [
+  {
+    title: "Face & Skin",
+    links: [
+      { name: "HydraFacial MD", href: "/services/hydrafacial" },
+      { name: "Chemical Peels", href: "/services/chemical-peels" },
+      { name: "RF Microneedling", href: "/services/rf-microneedling" },
+      { name: "Laser Facials", href: "/services/laser-acne-facial" },
+      { name: "BioRePeel", href: "/services/biorepeel" },
+    ],
+  },
+  {
+    title: "Injectables",
+    links: [
+      { name: "Botox & Dysport", href: "/services/botox-dysport" },
+      { name: "Dermal Fillers", href: "/services/dermal-fillers" },
+    ],
+  },
+  {
+    title: "Body & Laser",
+    links: [
+      { name: "Laser Hair Removal", href: "/services/laser-hair-removal" },
+      { name: "Sofwave", href: "/services/sofwave" },
+      { name: "Red Light Therapy", href: "/services/red-light-therapy" },
+    ],
+  },
+  {
+    title: "Medical Wellness",
+    links: [
+      { name: "GLP-1 Weight Loss", href: "/wellness/glp1-weight-management" },
+      { name: "NAD+ Injections", href: "/wellness/nad-injections" },
+      { name: "Hormone Therapy", href: "/wellness/hormone-therapy" },
+      { name: "Vitamin Injections", href: "/wellness/vitamin-injections" },
+      { name: "Blood Work", href: "/wellness/blood-work" },
+    ],
+  },
 ];
 
-const wellnessLinks = [
-  { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management", desc: "Semaglutide & Tirzepatide programs" },
-  { name: "NAD+ Injections", href: "/wellness/nad-injections", desc: "Anti-aging & brain health" },
-  { name: "Vitamin Injections", href: "/wellness/vitamin-injections", desc: "B12, D3, Glutathione & more" },
-  { name: "Hormone Therapy", href: "/wellness/hormone-therapy", desc: "HRT for men & women" },
-  { name: "Blood Work", href: "/wellness/blood-work", desc: "In-house comprehensive panels" },
-];
+// ── Nav Links (5 items, title case) ──────────────────────────────────────────
 
 const navLinks = [
-  { name: "Home", href: "/" },
   { name: "Services", href: "/services", megaMenu: true },
-  { name: "Medical Wellness", href: "/wellness", megaMenu: true },
-  { name: "About", href: "/about" },
   { name: "Results", href: "/results" },
-  { name: "Blog", href: "/blog" },
+  { name: "About", href: "/about" },
+  { name: "Pricing", href: "/pricing" },
+  { name: "Contact", href: "/contact" },
+];
+
+// Mobile nav gets a few more items
+const mobileNavLinks = [
+  { name: "Services", href: "/services" },
+  { name: "Wellness", href: "/wellness" },
+  { name: "Results", href: "/results" },
+  { name: "About", href: "/about" },
   { name: "Pricing", href: "/pricing" },
   { name: "Contact", href: "/contact" },
 ];
@@ -43,7 +70,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeMega, setActiveMega] = useState<string | null>(null);
+  const [megaOpen, setMegaOpen] = useState(false);
   const [announcementVisible, setAnnouncementVisible] = useState(true);
 
   useEffect(() => {
@@ -64,112 +91,118 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Announcement Bar */}
+      {/* ── Announcement Bar (Navy, minimal) ─────────────────────────────── */}
       <div
-        className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
-          showAnnouncement ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-200 ${
+          showAnnouncement
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
-        <div className="bg-rani-gold px-4 py-2.5 text-center font-body text-sm font-medium text-rani-navy">
-          <div className="mx-auto flex max-w-7xl items-center justify-center gap-3">
-            <Sparkles size={14} className="shrink-0" />
-            <span className="hidden sm:inline">Free Phone Consultation Available — Or Book In-Person ($150 deposit applies to treatment)</span>
-            <span className="sm:hidden">Free Phone Consultation Available</span>
-            <a
-              href={clinicInfo.phoneTel}
-              className="inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70 sm:hidden"
-            >
-              Call Now &rarr;
-            </a>
-            <a
-              href={clinicInfo.consultation.url}
-              className="hidden sm:inline-flex items-center gap-1 font-bold underline underline-offset-2 transition-colors hover:text-rani-navy/70"
-            >
-              Reserve Your Spot &rarr;
-            </a>
-          </div>
+        <div className="bg-rani-navy border-b border-white/5 px-4 py-2 text-center">
+          <span className="font-body text-[13px] text-white/70">
+            Complimentary phone consultations available
+          </span>
           <button
             onClick={() => setAnnouncementVisible(false)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 transition-colors hover:bg-rani-navy/10"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white/70"
             aria-label="Dismiss announcement"
           >
-            <X size={14} />
+            <X size={12} />
           </button>
         </div>
       </div>
 
+      {/* ── Main Nav ─────────────────────────────────────────────────────── */}
       <nav
         className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
-          showAnnouncement ? "top-[40px]" : "top-0"
+          showAnnouncement ? "top-[36px]" : "top-0"
         } ${
           scrolled
-            ? "bg-rani-navy/95 backdrop-blur-md h-16 shadow-lg"
+            ? "bg-rani-navy/98 border-b border-rani-gold/10 h-16"
             : "bg-transparent h-20"
         }`}
       >
         <div className="mx-auto flex h-full items-center justify-between px-6 2xl:max-w-[1400px]">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 mr-16">
+          <Link
+            href="/"
+            className="flex items-center gap-3 shrink-0 mr-12"
+          >
             <Image
               src="/images/logo/logo-light.png"
               alt="Rani Beauty Clinic"
-              width={220}
-              height={28}
+              width={260}
+              height={32}
               className="h-7 w-auto md:h-8"
               priority
             />
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden items-center gap-5 lg:flex flex-1 justify-center">
+          {/* Desktop Nav (5 items, title case) */}
+          <div className="hidden items-center gap-6 lg:flex flex-1 justify-center">
             {navLinks.map((link) => (
               <div
                 key={link.name}
                 className="relative"
                 onMouseEnter={() =>
-                  link.megaMenu ? setActiveMega(link.name) : setActiveMega(null)
+                  link.megaMenu ? setMegaOpen(true) : setMegaOpen(false)
                 }
-                onMouseLeave={() => setActiveMega(null)}
+                onMouseLeave={() => setMegaOpen(false)}
               >
                 <Link
                   href={link.href}
-                  className="group relative flex items-center gap-1 font-body text-[13px] font-semibold uppercase tracking-wider text-white/90 transition-colors hover:text-white whitespace-nowrap"
+                  className="group relative flex items-center gap-1 font-body text-sm font-medium text-white/90 transition-colors hover:text-white whitespace-nowrap"
                 >
                   {link.name}
-                  {link.megaMenu && <ChevronDown size={14} className="opacity-60" />}
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-rani-gold transition-all duration-300 group-hover:w-full" />
+                  {link.megaMenu && (
+                    <ChevronDown size={14} className="opacity-60" />
+                  )}
+                  <span className="absolute -bottom-1 left-0 h-[1.5px] w-0 bg-rani-gold transition-all duration-300 group-hover:w-full" />
                 </Link>
 
-                {/* Mega Menu */}
+                {/* ── Mega Menu (720px, 4-column) ──────────────────────── */}
                 {link.megaMenu && (
                   <AnimatePresence>
-                    {activeMega === link.name && (
+                    {megaOpen && (
                       <motion.div
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.25 }}
                         className="absolute left-1/2 top-full pt-4 -translate-x-1/2"
                       >
-                        <div className="w-[480px] rounded-xl border-t-[3px] border-t-rani-gold bg-rani-navy p-6 shadow-2xl">
-                          <div className="grid grid-cols-1 gap-1">
-                            {(link.name === "Services"
-                              ? aestheticLinks
-                              : wellnessLinks
-                            ).map((item) => (
-                              <Link
-                                key={item.href}
-                                href={item.href}
-                                className="group flex flex-col rounded-lg px-4 py-2.5 transition-colors hover:bg-white/5"
-                              >
-                                <span className="font-body text-sm font-semibold text-white group-hover:text-rani-gold transition-colors">
-                                  {item.name}
-                                </span>
-                                <span className="font-body text-xs text-white/50">
-                                  {item.desc}
-                                </span>
-                              </Link>
+                        <div className="w-[720px] rounded-xl border-t-[3px] border-t-rani-gold bg-rani-navy p-8 shadow-2xl">
+                          <div className="grid grid-cols-4 gap-6">
+                            {megaMenuColumns.map((col) => (
+                              <div key={col.title}>
+                                <h4 className="mb-3 font-body text-xs font-bold uppercase tracking-wider text-rani-gold/80">
+                                  {col.title}
+                                </h4>
+                                <div className="space-y-1">
+                                  {col.links.map((item) => (
+                                    <Link
+                                      key={item.href}
+                                      href={item.href}
+                                      className="block rounded-lg px-3 py-2 font-body text-[13px] font-medium text-white/80 transition-colors hover:bg-white/5 hover:text-rani-gold"
+                                    >
+                                      {item.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
                             ))}
+                          </div>
+
+                          {/* Quiz link */}
+                          <div className="mt-6 border-t border-white/10 pt-4">
+                            <Link
+                              href="/quiz"
+                              className="flex items-center gap-2 font-body text-sm font-semibold text-rani-gold transition-colors hover:text-rani-gold-light"
+                            >
+                              Not sure where to start? Take our 60-second quiz
+                              &rarr;
+                            </Link>
                           </div>
                         </div>
                       </motion.div>
@@ -180,35 +213,47 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right side — Phone + Book Now */}
-          <div className="hidden items-center gap-8 lg:flex shrink-0 ml-10">
+          {/* Right side — Phone + Book Now (desktop) */}
+          <div className="hidden items-center gap-6 lg:flex shrink-0 ml-10">
             <a
               href={clinicInfo.phoneTel}
-              className="flex items-center gap-2.5 font-body text-sm font-semibold text-white/90 transition-colors hover:text-rani-gold whitespace-nowrap tracking-wide"
+              className="flex items-center gap-2 font-body text-sm font-medium text-white/80 transition-colors hover:text-rani-gold whitespace-nowrap"
             >
-              <Phone size={16} />
+              <Phone size={15} />
               {clinicInfo.phone}
             </a>
             <a
               href={clinicInfo.booking.url}
-              className="rounded-lg bg-rani-gold px-10 py-3 font-body text-sm font-semibold uppercase tracking-widest text-rani-navy transition-all duration-300 hover:bg-rani-gold-light hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(243,214,190,0.3)] whitespace-nowrap"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-rani-gold px-8 py-2.5 font-body text-sm font-semibold text-rani-navy transition-all duration-200 hover:bg-rani-gold-light hover:shadow-lg whitespace-nowrap"
             >
               Book Now
             </a>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden text-white p-2"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile: Book pill + hamburger */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <a
+              href={clinicInfo.booking.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-rani-gold px-4 py-1.5 font-body text-xs font-bold text-rani-navy transition-colors hover:bg-rani-gold-light"
+            >
+              Book
+            </a>
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="text-white p-2"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* ── Mobile Menu Overlay ───────────────────────────────────────────── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -228,23 +273,20 @@ export default function Navbar() {
             </div>
 
             <nav className="flex flex-col items-center gap-1">
-              {navLinks.map((link, i) => (
+              {mobileNavLinks.map((link, i) => (
                 <motion.div
                   key={link.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.3 }}
+                  transition={{ delay: i * 0.05, duration: 0.2 }}
                 >
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="block px-8 py-3 font-body text-xl font-semibold text-white transition-colors hover:text-rani-gold"
+                    className="block px-8 py-4 font-body text-xl font-semibold text-white transition-colors hover:text-rani-gold"
                   >
                     {link.name}
                   </Link>
-                  {i < navLinks.length - 1 && (
-                    <div className="mx-auto h-px w-12 bg-rani-gold/20" />
-                  )}
                 </motion.div>
               ))}
             </nav>
@@ -252,17 +294,19 @@ export default function Navbar() {
             <div className="mt-8 flex flex-col items-center gap-4">
               <a
                 href={clinicInfo.phoneTel}
-                className="flex items-center gap-2 font-body text-lg font-semibold text-rani-gold"
+                className="flex items-center gap-2 font-body text-base font-semibold text-rani-gold"
               >
                 <Phone size={18} />
                 {clinicInfo.phone}
               </a>
               <a
                 href={clinicInfo.booking.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg bg-rani-gold px-8 py-3 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy"
+                className="rounded-full bg-rani-gold px-8 py-3 font-body text-sm font-bold uppercase tracking-wider text-rani-navy transition-colors hover:bg-rani-gold-light"
               >
-                Book Now
+                Book Your Consultation
               </a>
             </div>
           </motion.div>

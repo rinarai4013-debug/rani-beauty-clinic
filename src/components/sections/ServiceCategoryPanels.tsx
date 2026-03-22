@@ -44,11 +44,11 @@ export default function ServiceCategoryPanels() {
         <FadeInOnScroll>
           <SectionLabel label="TREATMENT CATEGORIES" />
           <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-            Explore Our Services
+            Find Your Treatment
           </h2>
         </FadeInOnScroll>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {categories.map((cat, i) => (
             <FadeInOnScroll key={cat.title} delay={i * 0.1}>
               <Link href={cat.href} className="group block">

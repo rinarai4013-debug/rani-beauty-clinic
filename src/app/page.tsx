@@ -1,32 +1,19 @@
 import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
-import TrustLogosBar from "@/components/sections/TrustLogosBar";
+import TrustStrip from "@/components/sections/TrustStrip";
 import StructuredData from "@/components/seo/StructuredData";
 import { HomepageSchema, AICitationSchemas } from "@/components/seo/EnhancedSchemas";
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 
-// Above-fold client components (eagerly loaded — visible on initial viewport)
-import HomeServicesOverview from "@/components/sections/HomeServicesOverview";
-
 // Below-fold sections — dynamically imported to reduce initial JS bundle.
-// Each loads only when React renders it (after hydration), cutting ~80KB from first load.
-const TrustBar = dynamic(() => import("@/components/sections/TrustBar"));
-const MeetTheTeam = dynamic(() => import("@/components/sections/MeetTheTeam"));
-const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
-const DoctorIntro = dynamic(() => import("@/components/sections/DoctorIntro"));
-const WhyRaniCards = dynamic(() => import("@/components/sections/WhyRaniCards"));
-const BeforeAfterSlider = dynamic(() => import("@/components/sections/BeforeAfterSlider"));
-const ReviewCarousel = dynamic(() => import("@/components/sections/ReviewCarousel"));
-const WhyRaniComparison = dynamic(() => import("@/components/sections/WhyRaniComparison"));
-const BeforeAfterGallery = dynamic(() => import("@/components/sections/BeforeAfterGallery"));
+const ResultsShowcase = dynamic(() => import("@/components/sections/ResultsShowcase"));
+const CredibilitySection = dynamic(() => import("@/components/sections/CredibilitySection"));
+const QuizCTA = dynamic(() => import("@/components/sections/QuizCTA"));
 const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"));
-const TreatmentQuiz = dynamic(() => import("@/components/sections/TreatmentQuiz"));
-const BlogTeaser = dynamic(() => import("@/components/sections/BlogTeaser"));
-const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"));
+const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
+const ConsultationCTA = dynamic(() => import("@/components/sections/ConsultationCTA"));
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
-const CTABanner = dynamic(() => import("@/components/sections/CTABanner"));
-const MapSection = dynamic(() => import("@/components/sections/MapSection"));
 
 const reviews = [
   {
@@ -103,39 +90,6 @@ const reviews = [
   },
 ];
 
-const blogPosts = [
-  {
-    slug: "what-is-glp1-weight-management",
-    title:
-      "GLP-1 Weight Management: What Semaglutide and Tirzepatide Can Do That Diet Alone Cannot",
-    excerpt:
-      "Discover how GLP-1 receptor agonists work, who qualifies, and what to expect from a physician-supervised weight management program.",
-    date: "March 1, 2026",
-    author: "Dr. Alexander Landfield",
-    category: "Medical Wellness",
-  },
-  {
-    slug: "why-neurologist-for-botox",
-    title:
-      "Why Having a Neurologist Oversee Your Botox Makes a Difference",
-    excerpt:
-      "Botox is a neurotoxin — learn why neurological expertise leads to more precise placement, better results, and enhanced safety.",
-    date: "February 20, 2026",
-    author: "Rani Beauty Clinic Team",
-    category: "Aesthetic Treatments",
-  },
-  {
-    slug: "pain-free-laser-hair-removal-guide",
-    title: "Your Complete Guide to Pain-Free Laser Hair Removal in 2026",
-    excerpt:
-      "Everything you need to know about the Candela GentleMax Pro Plus, the gold standard in pain-free laser hair removal technology.",
-    date: "February 10, 2026",
-    author: "Rani Beauty Clinic Team",
-    category: "Aesthetic Treatments",
-  },
-];
-
-// Homepage FAQ items — duplicated here for schema markup (visual FAQ is rendered client-side)
 const homepageFaqs = [
   {
     question: "What makes Rani Beauty Clinic different from other medspas?",
@@ -145,12 +99,12 @@ const homepageFaqs = [
   {
     question: "How does the consultation deposit work?",
     answer:
-      "Your consultation requires a $150 deposit to secure your appointment. The great news is that this deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
+      "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
   },
   {
     question: "How do I know which treatment is right for me?",
     answer:
-      "That's exactly what your consultation is for. We evaluate your skin type, concerns, medical history, and goals to recommend the most effective plan. You can also take our Treatment Quiz on this page for a quick preliminary recommendation.",
+      "That's exactly what your consultation is for. We evaluate your skin type, concerns, medical history, and goals to recommend the most effective plan. You can also take our Treatment Quiz for a quick preliminary recommendation.",
   },
   {
     question: "Is laser hair removal painful?",
@@ -158,115 +112,67 @@ const homepageFaqs = [
       "Our Candela GentleMax Pro Plus uses an integrated cooling system that makes treatments virtually pain-free. Most patients describe it as a light snapping sensation. The dual-wavelength technology is safe for all skin types, including darker skin tones.",
   },
   {
-    question: "What is GLP-1 weight management and am I a candidate?",
-    answer:
-      "GLP-1 programs use FDA-approved medications like Semaglutide and Tirzepatide to support weight loss alongside lifestyle changes. Candidates typically have a BMI of 27+ with a weight-related condition, or 30+. We include comprehensive blood work and physician monitoring in every program.",
-  },
-  {
     question: "How soon will I see results?",
     answer:
       "It depends on the treatment. HydraFacial gives an immediate glow. Botox takes 3-7 days to show full effect. RF microneedling results build over 3-6 months as collagen regenerates. During your consultation, we'll set realistic expectations for your specific treatment plan.",
-  },
-  {
-    question: "Do you accept insurance or HSA/FSA?",
-    answer:
-      "While most aesthetic treatments are not covered by insurance, we do accept HSA and FSA cards for eligible medical wellness services. We also offer flexible financing options to make treatments accessible.",
-  },
-  {
-    question: "What are your hours and do I need an appointment?",
-    answer:
-      "We're open 7 days a week, Monday through Sunday, 10 AM to 7 PM. While appointments are recommended to ensure availability, we do our best to accommodate walk-ins when possible. Book online or call us at (425) 539-4440.",
   },
 ];
 
 export default function HomePage() {
   return (
     <>
-      {/* AI Citation Optimized Schema — Organization, LocalBusiness, WebSite */}
+      {/* Schema Markup */}
       <HomepageSchema />
-      {/* Speakable, Reviews, FAQ, ServiceList schemas for AI citation */}
       <AICitationSchemas reviews={reviews} faqs={homepageFaqs} />
 
-      {/* 1. Hero Section — LCP element, eagerly loaded with priority image */}
+      {/* 1. Hero — Cinematic Split Layout */}
       <Hero
-        label="PHYSICIAN-SUPERVISED MEDSPA IN RENTON · SERVING ALL OF KING COUNTY"
-        title="Your Skin. Your Wellness. Our Expertise."
-        subtitle="Advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist. Safe for all skin types."
-        primaryCTA={{ text: "Book a Consultation", href: "#consultation" }}
-        secondaryCTA={{ text: "Free Phone Consult", href: clinicInfo.phoneTel }}
+        label="PHYSICIAN-SUPERVISED MEDSPA"
+        title="Physician-Supervised Beauty. Personally Designed."
+        subtitle="Expert-led treatments for skin, body, and wellness — designed by a neurologist-led team."
+        primaryCTA={{
+          text: "Book Your Consultation",
+          href: clinicInfo.booking.url,
+          target: "_blank",
+        }}
         badges={[
-          "Board-Certified Neurologist Oversight",
-          "Open 7 Days a Week",
-          "All Skin Types Welcome",
+          "Board-Certified Neurologist",
+          "4.9 Google Rating",
+          "Open 7 Days",
         ]}
         backgroundImage="/images/hero/hero-aesthetic.jpg"
-        backgroundOverlay={60}
-        stats={[
-          { value: "4.9", label: "Google Rating" },
-          { value: "127+", label: "5-Star Reviews" },
-          { value: "7", label: "Days Open" },
-          { value: "13K+", label: "Treatments Performed" },
-        ]}
+        backgroundOverlay={0}
+        layout="split"
         dark
         fullHeight
       />
 
-      {/* 2. Trust Logos Bar */}
-      <TrustLogosBar />
+      {/* 2. Trust Credential Strip */}
+      <TrustStrip />
 
-      {/* 3. Trust Signals Bar */}
-      <TrustBar />
-
-      {/* 4. Service Category Panels */}
+      {/* 3. Service Categories */}
       <ServiceCategoryPanels />
 
-      {/* 5. Services Overview */}
-      <HomeServicesOverview />
+      {/* 4. Results Showcase (B/A + Testimonials) */}
+      <ResultsShowcase reviews={reviews} />
 
-      {/* 6. Meet The Founders */}
-      <MeetTheTeam />
+      {/* 5. Founders + Medical Director */}
+      <CredibilitySection />
 
-      {/* 7. What to Expect */}
-      <ProcessSteps />
+      {/* 6. Quiz CTA */}
+      <QuizCTA />
 
-      {/* 8. Dr. Landfield Introduction */}
-      <DoctorIntro />
-
-      {/* 9. Why Rani Section */}
-      <WhyRaniCards />
-
-      {/* 10. Before & After Slider */}
-      <BeforeAfterSlider />
-
-      {/* 11. Reviews/Testimonials */}
-      <ReviewCarousel reviews={reviews} />
-
-      {/* 12. Why Rani — Comparison Strip */}
-      <WhyRaniComparison />
-
-      {/* 13. Before & After Gallery */}
-      <BeforeAfterGallery />
-
-      {/* 14. Popular Packages */}
+      {/* 7. Signature Packages */}
       <PopularPackages />
 
-      {/* 15. Treatment Quiz */}
-      <TreatmentQuiz />
+      {/* 8. Your Path to Results */}
+      <ProcessSteps />
 
-      {/* 16. Blog Teaser */}
-      <BlogTeaser posts={blogPosts} />
+      {/* 9. Consultation CTA */}
+      <ConsultationCTA />
 
-      {/* 17. Consultation Embed */}
-      <ConsultationEmbed />
-
-      {/* 18. FAQ Section */}
+      {/* 10. FAQ */}
       <FAQ />
-
-      {/* 19. CTA Banner */}
-      <CTABanner />
-
-      {/* 20. Map & Location */}
-      <MapSection />
     </>
   );
 }

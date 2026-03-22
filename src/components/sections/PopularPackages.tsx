@@ -8,47 +8,44 @@ import Button from "@/components/ui/Button";
 
 const packages = [
   {
-    name: "The Glow Package",
+    name: "The First Glow",
     tagline: "Most Popular",
     icon: Sparkles,
+    description: "For those seeking their first visible glow.",
     treatments: [
       "HydraFacial MD Signature",
       "LED Red Light Therapy Add-On",
       "AI Skin Analysis",
     ],
     price: "$299",
-    originalPrice: "$425",
-    savings: "Save $126",
     href: "/pricing",
-    featured: true,
+    featured: false,
   },
   {
-    name: "Anti-Aging Essentials",
-    tagline: "Best Value",
+    name: "Precision Anti-Aging",
+    tagline: "Signature",
     icon: Star,
+    description: "For those who want visible, lasting anti-aging results.",
     treatments: [
       "Botox (1 Area)",
       "HydraFacial Express",
       "Complimentary Follow-Up",
     ],
     price: "$449",
-    originalPrice: "$575",
-    savings: "Save $126",
     href: "/pricing",
-    featured: false,
+    featured: true,
   },
   {
-    name: "Wellness Kickstart",
-    tagline: "New Patient Favorite",
+    name: "The Full Picture",
+    tagline: "Curated",
     icon: TrendingUp,
+    description: "For those seeking whole-body wellness from the inside out.",
     treatments: [
       "Comprehensive Blood Panel",
       "GLP-1 First Month Supply",
       "Physician Consultation",
     ],
     price: "$499",
-    originalPrice: "$649",
-    savings: "Save $150",
     href: "/pricing",
     featured: false,
   },
@@ -56,33 +53,32 @@ const packages = [
 
 export default function PopularPackages() {
   return (
-    <section className="bg-white py-16 md:py-20">
+    <section className="bg-rani-cream py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <FadeInOnScroll>
-          <SectionLabel label="VALUE PACKAGES" />
-          <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-            Popular Treatment Packages
+          <SectionLabel label="CURATED PACKAGES" />
+          <h2 className="mt-6 text-center font-heading text-3xl font-bold text-rani-navy md:text-4xl">
+            Signature Experiences, Curated for You
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
-            Curated by our medical team. Save when you bundle treatments for
-            optimal results.
+          <p className="mx-auto mt-3 text-center font-body text-sm font-semibold text-rani-gold">
+            127+ five-star reviews
           </p>
         </FadeInOnScroll>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-[1fr_1.1fr_1fr] md:items-start">
           {packages.map((pkg, i) => (
             <FadeInOnScroll key={pkg.name} delay={i * 0.15}>
               <motion.div
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.3 }}
-                className={`relative flex h-full flex-col overflow-hidden rounded-xl border-2 bg-white p-8 transition-shadow duration-300 hover:shadow-lg ${
+                className={`relative flex h-full flex-col overflow-hidden rounded-2xl border-2 bg-white p-8 transition-shadow duration-300 hover:shadow-lg ${
                   pkg.featured
-                    ? "border-rani-gold shadow-md"
+                    ? "border-rani-gold shadow-lg"
                     : "border-rani-border"
                 }`}
               >
                 {pkg.featured && (
-                  <div className="absolute right-0 top-0 rounded-bl-lg bg-rani-gold px-3 py-1">
+                  <div className="absolute right-0 top-0 rounded-bl-xl bg-rani-gold px-4 py-1.5">
                     <span className="font-body text-xs font-bold text-rani-navy">
                       {pkg.tagline}
                     </span>
@@ -105,7 +101,7 @@ export default function PopularPackages() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-body text-lg font-bold text-rani-navy">
+                    <h3 className="font-heading text-lg font-bold text-rani-navy">
                       {pkg.name}
                     </h3>
                     {!pkg.featured && (
@@ -115,6 +111,10 @@ export default function PopularPackages() {
                     )}
                   </div>
                 </div>
+
+                <p className="mt-4 font-body text-sm text-rani-muted leading-relaxed">
+                  {pkg.description}
+                </p>
 
                 <ul className="mt-6 flex-1 space-y-3">
                   {pkg.treatments.map((treatment) => (
@@ -143,16 +143,8 @@ export default function PopularPackages() {
                 </ul>
 
                 <div className="mt-6 border-t border-rani-border pt-6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-body text-3xl font-bold text-rani-navy">
-                      {pkg.price}
-                    </span>
-                    <span className="font-body text-sm text-rani-muted line-through">
-                      {pkg.originalPrice}
-                    </span>
-                  </div>
-                  <span className="mt-1 inline-block rounded-full bg-green-50 px-2 py-0.5 font-body text-xs font-semibold text-green-700">
-                    {pkg.savings}
+                  <span className="font-heading text-3xl font-bold text-rani-navy">
+                    {pkg.price}
                   </span>
                 </div>
 
@@ -166,7 +158,7 @@ export default function PopularPackages() {
                     }`}
                     variant={pkg.featured ? "primary" : "ghost"}
                   >
-                    View Package
+                    {pkg.featured ? "Start This Journey" : "Learn More"}
                   </Button>
                 </div>
               </motion.div>

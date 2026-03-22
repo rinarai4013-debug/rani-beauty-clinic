@@ -20,12 +20,12 @@ const faqItems: FAQItem[] = [
   {
     question: "How does the consultation deposit work?",
     answer:
-      "Your consultation requires a $150 deposit to secure your appointment. The great news is that this deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
+      "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
   },
   {
     question: "How do I know which treatment is right for me?",
     answer:
-      "That's exactly what your consultation is for. We evaluate your skin type, concerns, medical history, and goals to recommend the most effective plan. You can also take our Treatment Quiz on this page for a quick preliminary recommendation.",
+      "That's exactly what your consultation is for. We evaluate your skin type, concerns, medical history, and goals to recommend the most effective plan. You can also take our Treatment Quiz for a quick preliminary recommendation.",
   },
   {
     question: "Is laser hair removal painful?",
@@ -33,24 +33,9 @@ const faqItems: FAQItem[] = [
       "Our Candela GentleMax Pro Plus uses an integrated cooling system that makes treatments virtually pain-free. Most patients describe it as a light snapping sensation. The dual-wavelength technology is safe for all skin types, including darker skin tones.",
   },
   {
-    question: "What is GLP-1 weight management and am I a candidate?",
-    answer:
-      "GLP-1 programs use FDA-approved medications like Semaglutide and Tirzepatide to support weight loss alongside lifestyle changes. Candidates typically have a BMI of 27+ with a weight-related condition, or 30+. We include comprehensive blood work and physician monitoring in every program.",
-  },
-  {
     question: "How soon will I see results?",
     answer:
       "It depends on the treatment. HydraFacial gives an immediate glow. Botox takes 3-7 days to show full effect. RF microneedling results build over 3-6 months as collagen regenerates. During your consultation, we'll set realistic expectations for your specific treatment plan.",
-  },
-  {
-    question: "Do you accept insurance or HSA/FSA?",
-    answer:
-      "While most aesthetic treatments are not covered by insurance, we do accept HSA and FSA cards for eligible medical wellness services. We also offer flexible financing options to make treatments accessible.",
-  },
-  {
-    question: "What are your hours and do I need an appointment?",
-    answer:
-      "We're open 7 days a week, Monday through Sunday, 10 AM to 7 PM. While appointments are recommended to ensure availability, we do our best to accommodate walk-ins when possible. Book online or call us at (425) 539-4440.",
   },
 ];
 
@@ -104,23 +89,40 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section className="bg-rani-cream py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
-        <FadeInOnScroll>
-          <SectionLabel label="FAQ" />
-          <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
-            Frequently Asked Questions
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
-            Everything you need to know before your first visit.
-          </p>
-        </FadeInOnScroll>
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-16 lg:grid-cols-[1fr_1.8fr]">
+          {/* Left: heading */}
+          <FadeInOnScroll>
+            <div className="mb-8 lg:mb-0">
+              <SectionLabel label="FAQ" className="!items-start" />
+              <h2 className="mt-6 font-heading text-3xl font-bold text-rani-navy md:text-4xl">
+                Common Questions
+              </h2>
+              <p className="mt-4 font-body text-sm text-rani-muted">
+                Can&apos;t find your answer?
+              </p>
+              <div className="mt-4 flex flex-col gap-2">
+                <a
+                  href="/faq"
+                  className="font-body text-sm font-semibold text-rani-gold hover:text-rani-gold-light transition-colors"
+                >
+                  See All FAQs &rarr;
+                </a>
+                <a
+                  href="tel:+14255394440"
+                  className="font-body text-sm font-semibold text-rani-gold hover:text-rani-gold-light transition-colors"
+                >
+                  Call Us &rarr;
+                </a>
+              </div>
+            </div>
+          </FadeInOnScroll>
 
-        <div className="mx-auto mt-12 grid max-w-6xl grid-cols-1 gap-x-12 lg:grid-cols-2">
-          {/* Left column */}
+          {/* Right: accordion */}
           <FadeInOnScroll delay={0.1}>
             <div className="rounded-xl border border-rani-border bg-white px-6">
-              {faqItems.slice(0, 4).map((item, i) => (
+              {faqItems.map((item, i) => (
                 <FAQAccordionItem
                   key={i}
                   item={item}
@@ -130,25 +132,6 @@ export default function FAQ() {
                   }
                 />
               ))}
-            </div>
-          </FadeInOnScroll>
-
-          {/* Right column */}
-          <FadeInOnScroll delay={0.2}>
-            <div className="mt-6 rounded-xl border border-rani-border bg-white px-6 lg:mt-0">
-              {faqItems.slice(4).map((item, i) => {
-                const idx = i + 4;
-                return (
-                  <FAQAccordionItem
-                    key={idx}
-                    item={item}
-                    isOpen={openIndex === idx}
-                    onToggle={() =>
-                      setOpenIndex(openIndex === idx ? null : idx)
-                    }
-                  />
-                );
-              })}
             </div>
           </FadeInOnScroll>
         </div>
