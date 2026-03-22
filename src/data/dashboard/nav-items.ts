@@ -136,8 +136,38 @@ export const NAV_ITEMS: NavItem[] = [
     permission: 'view_executive',
     group: 'intelligence',
   },
+  {
+    label: 'Competitor Intel',
+    href: '/dashboard/competitor-intel',
+    icon: 'Radar',
+    permission: 'view_executive',
+    group: 'intelligence',
+  },
+  {
+    label: 'Reviews',
+    href: '/dashboard/reviews',
+    icon: 'Star',
+    permission: 'view_executive',
+    group: 'intelligence',
+  },
+
+  // Operations — Alerts
+  {
+    label: 'Alerts',
+    href: '/dashboard/alerts',
+    icon: 'Bell',
+    permission: 'view_executive',
+    group: 'operations',
+  },
 
   // Tools
+  {
+    label: 'Plan Builder',
+    href: '/dashboard/plan-builder',
+    icon: 'FileText',
+    permission: 'entry_plan_builder',
+    group: 'tools',
+  },
   {
     label: 'Quick Entry',
     href: '/dashboard/entry',

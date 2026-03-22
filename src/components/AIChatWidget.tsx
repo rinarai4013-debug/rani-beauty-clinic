@@ -95,7 +95,7 @@ export default function AIChatWidget() {
     } catch {
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please call us at (425) 207-8870 or visit ranibeautyclinic.com to book." },
+        { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please call us at (425) 539-4440 or visit ranibeautyclinic.com to book." },
       ]);
     } finally {
       setIsLoading(false);

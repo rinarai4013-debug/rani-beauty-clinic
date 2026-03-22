@@ -13,7 +13,7 @@ export interface TreatmentPlanNotifyVars {
   planUrl: string;
 }
 
-const CLINIC_PHONE = '(425) 207-8870';
+const CLINIC_PHONE = '(425) 539-4440';
 const CLINIC_ADDRESS = '401 Olympia Ave NE #101, Renton, WA 98056';
 
 /**
@@ -147,7 +147,7 @@ export function getTreatmentPlanReadyEmail(vars: TreatmentPlanNotifyVars): strin
                 Questions? We are here to help.
               </p>
               <p style="margin: 0 0 4px;">
-                <a href="tel:+14252078870" style="color: #C9A96E; text-decoration: none; font-size: 16px; font-weight: 700;">
+                <a href="tel:+14255394440" style="color: #C9A96E; text-decoration: none; font-size: 16px; font-weight: 700;">
                   ${CLINIC_PHONE}
                 </a>
               </p>

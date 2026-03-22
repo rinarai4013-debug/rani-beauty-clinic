@@ -150,8 +150,8 @@ export default function GetStartedPage() {
               className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
               Start Your Free Assessment <ChevronRight className="w-5 h-5" />
             </a>
-            <a href="tel:+14252078870" className="inline-flex items-center gap-2 text-rani-navy font-body font-medium hover:text-rani-gold transition-colors">
-              <Phone className="w-4 h-4" /> Or call (425) 207-8870
+            <a href="tel:+14255394440" className="inline-flex items-center gap-2 text-rani-navy font-body font-medium hover:text-rani-gold transition-colors">
+              <Phone className="w-4 h-4" /> Or call (425) 539-4440
             </a>
           </motion.div>
         </motion.div>

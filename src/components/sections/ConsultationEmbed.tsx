@@ -1,78 +1,41 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
-import Badge from "@/components/ui/Badge";
+
+// Lazy-load the wizard to keep initial page bundle small
+const ConsultationWizard = dynamic(
+  () => import("@/components/consultation/ConsultationWizard"),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center py-24">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#C9A96E] border-t-transparent" />
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 export default function ConsultationEmbed() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Load Typeform embed script
-    const script = document.createElement("script");
-    script.src = "https://embed.typeform.com/next/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      // Clean up script on unmount
-      const existingScript = document.querySelector(
-        'script[src="https://embed.typeform.com/next/embed.js"]'
-      );
-      if (existingScript) {
-        existingScript.remove();
-      }
-    };
-  }, []);
-
   return (
     <section className="bg-rani-cream py-16 md:py-20" id="consultation">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-          {/* Left: Content */}
-          <FadeInOnScroll direction="left">
-            <div>
-              <SectionLabel label="CONSULTATION" className="!items-start" />
-              <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
-                Book Your Consultation
-              </h2>
-              <p className="mt-6 font-body text-base leading-relaxed text-rani-text">
-                Every journey at Rani Beauty Clinic begins with a personalized
-                consultation. Your $150 deposit secures your appointment and
-                applies directly toward any treatment or product — so nothing
-                goes to waste.
-              </p>
-              <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
-                Fill out the form and we&apos;ll reach out within 24 hours to
-                schedule your visit. Your consultation includes a full skin
-                assessment and personalized treatment roadmap under the
-                guidance of our board-certified Medical Director.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Badge icon="check">$150 Applies to Treatment</Badge>
-                <Badge icon="shield">Physician-Supervised</Badge>
-                <Badge icon="clock">Response Within 24 Hours</Badge>
-              </div>
-            </div>
-          </FadeInOnScroll>
+        <FadeInOnScroll direction="up">
+          <div className="text-center mb-10">
+            <SectionLabel label="CONSULTATION" />
+            <h2 className="mt-6 font-heading text-3xl font-bold text-rani-navy md:text-4xl lg:text-5xl">
+              Start Your Glow Journey
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto font-body text-base leading-relaxed text-rani-text">
+              Take 3 minutes to tell us about your goals — we&apos;ll craft a
+              personalized treatment roadmap just for you. Your $150 deposit
+              applies directly toward any treatment.
+            </p>
+          </div>
+        </FadeInOnScroll>
 
-          {/* Right: Typeform Embed */}
-          <FadeInOnScroll direction="right">
-            <div
-              ref={containerRef}
-              className="overflow-hidden rounded-xl border border-rani-gold/20 bg-white shadow-sm"
-            >
-              <div
-                data-tf-widget="Ecgz85JA"
-                data-tf-opacity="100"
-                data-tf-inline-on-mobile
-                data-tf-iframe-props="title=Consultation Request"
-                style={{ width: "100%", height: "500px" }}
-              />
-            </div>
-          </FadeInOnScroll>
-        </div>
+        <ConsultationWizard />
       </div>
     </section>
   );

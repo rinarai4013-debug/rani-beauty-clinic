@@ -1,31 +1,19 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, TrendingUp, Star, Calendar, DollarSign, Award } from 'lucide-react';
-
-const ICON_MAP: Record<string, React.ElementType> = {
-  revenue: DollarSign,
-  booking: Calendar,
-  review: Star,
-  achievement: Award,
-  milestone: TrendingUp,
-  streak: Sparkles,
-};
-
-// Mock wins - in production these come from the gamification API
-const MOCK_WINS = [
-  { id: '1', type: 'revenue', label: '$2,450 collected', emoji: '💰', timestamp: '10:30 AM' },
-  { id: '2', type: 'booking', label: '3 new bookings', emoji: '📅', timestamp: '11:15 AM' },
-  { id: '3', type: 'review', label: '5-star Google review', emoji: '⭐', timestamp: '12:00 PM' },
-  { id: '4', type: 'achievement', label: 'Speed Demon unlocked', emoji: '⚡', timestamp: '1:30 PM' },
-];
+import { Sparkles } from 'lucide-react';
+import { useDashboardData } from '@/hooks/useDashboardData';
+import type { WinToday } from '@/types/gamification';
 
 interface DailyWinsBannerProps {
   className?: string;
 }
 
 export default function DailyWinsBanner({ className = '' }: DailyWinsBannerProps) {
-  const wins = MOCK_WINS; // Replace with useGamification() hook data
+  const { data, isLoading } = useDashboardData<{ wins: WinToday[] }>('/gamification/wins', {
+    refreshInterval: 30000,
+  });
+  const wins = data?.wins ?? [];
 
   return (
     <div className={`bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5 ${className}`}>
@@ -39,8 +27,14 @@ export default function DailyWinsBanner({ className = '' }: DailyWinsBannerProps
         </span>
       </div>
 
-      {wins.length === 0 ? (
-        <p className="text-sm font-body text-rani-muted italic">No wins yet today. Let&apos;s get it!</p>
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-10 bg-rani-cream/50 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : wins.length === 0 ? (
+        <p className="text-sm font-body text-rani-muted italic">No wins yet today &mdash; let&apos;s get it!</p>
       ) : (
         <div className="space-y-2">
           {wins.map((win, i) => (

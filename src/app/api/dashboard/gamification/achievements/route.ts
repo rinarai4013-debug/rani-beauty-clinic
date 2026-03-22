@@ -3,6 +3,9 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { ACHIEVEMENTS as DAILY_ACHIEVEMENTS, checkAchievements } from '@/data/dashboard/achievement-definitions';
+import { getCurrentLevel } from '@/lib/gamification/levels';
+import type { DailyMetrics } from '@/types/gamification';
 
 interface TransactionFields {
   'Date': string;
@@ -12,7 +15,11 @@ interface TransactionFields {
 }
 
 interface AppointmentFields {
+  'Service Name': string;
+  'Provider': string;
   'Date': string;
+  'Time': string;
+  'Duration': number;
   'Status': string;
   'Is Consult': boolean;
   'Consult Outcome': string;
@@ -23,116 +30,14 @@ interface ReviewFields {
   'Review Date': string;
 }
 
-// Static achievement definitions
-const ACHIEVEMENTS = [
-  {
-    id: 'first-sale',
-    name: 'First Sale',
-    description: 'Record your first completed transaction',
-    icon: 'trophy',
-    category: 'revenue' as const,
-    rarity: 'common' as const,
-    xp: 50,
-  },
-  {
-    id: 'revenue-1k',
-    name: 'Thousand Club',
-    description: 'Reach $1,000 in monthly revenue',
-    icon: 'dollar-sign',
-    category: 'revenue' as const,
-    rarity: 'common' as const,
-    xp: 100,
-  },
-  {
-    id: 'revenue-10k',
-    name: 'Five Figure Flow',
-    description: 'Reach $10,000 in monthly revenue',
-    icon: 'trending-up',
-    category: 'revenue' as const,
-    rarity: 'rare' as const,
-    xp: 250,
-  },
-  {
-    id: 'revenue-50k',
-    name: 'Revenue Royalty',
-    description: 'Reach $50,000 in monthly revenue',
-    icon: 'crown',
-    category: 'revenue' as const,
-    rarity: 'epic' as const,
-    xp: 500,
-  },
-  {
-    id: 'revenue-100k',
-    name: 'Six Figure Sovereign',
-    description: 'Reach $100,000 in monthly revenue',
-    icon: 'gem',
-    category: 'revenue' as const,
-    rarity: 'legendary' as const,
-    xp: 1000,
-  },
-  {
-    id: 'bookings-10',
-    name: 'Getting Busy',
-    description: 'Complete 10 appointments in a month',
-    icon: 'calendar',
-    category: 'bookings' as const,
-    rarity: 'common' as const,
-    xp: 75,
-  },
-  {
-    id: 'bookings-50',
-    name: 'Fully Booked',
-    description: 'Complete 50 appointments in a month',
-    icon: 'calendar-check',
-    category: 'bookings' as const,
-    rarity: 'rare' as const,
-    xp: 200,
-  },
-  {
-    id: 'bookings-100',
-    name: 'Century Mark',
-    description: 'Complete 100 appointments in a month',
-    icon: 'star',
-    category: 'bookings' as const,
-    rarity: 'epic' as const,
-    xp: 400,
-  },
-  {
-    id: 'consult-closer',
-    name: 'Consult Closer',
-    description: 'Close 5 consults in a month',
-    icon: 'handshake',
-    category: 'sales' as const,
-    rarity: 'rare' as const,
-    xp: 200,
-  },
-  {
-    id: 'five-star',
-    name: 'Five Star Day',
-    description: 'Receive a 5-star review',
-    icon: 'star',
-    category: 'reviews' as const,
-    rarity: 'common' as const,
-    xp: 100,
-  },
-  {
-    id: 'review-streak',
-    name: 'Review Magnet',
-    description: 'Receive 5 five-star reviews in a month',
-    icon: 'stars',
-    category: 'reviews' as const,
-    rarity: 'rare' as const,
-    xp: 300,
-  },
-  {
-    id: 'perfect-ops',
-    name: 'Perfect Operations',
-    description: 'Zero no-shows or cancellations in a week',
-    icon: 'check-circle',
-    category: 'operations' as const,
-    rarity: 'rare' as const,
-    xp: 150,
-  },
+// Monthly milestone achievements (supplementary to daily achievements)
+const MONTHLY_MILESTONES = [
+  { id: 'revenue-1k', name: 'Thousand Club', description: 'Reach $1,000 in monthly revenue', icon: '💵', category: 'revenue' as const, rarity: 'common' as const, xpReward: 100 },
+  { id: 'revenue-10k', name: 'Five Figure Flow', description: '$10,000 monthly revenue', icon: '💰', category: 'revenue' as const, rarity: 'rare' as const, xpReward: 250 },
+  { id: 'revenue-50k', name: 'Revenue Royalty', description: '$50,000 monthly revenue', icon: '👑', category: 'revenue' as const, rarity: 'epic' as const, xpReward: 500 },
+  { id: 'revenue-100k', name: 'Six Figure Sovereign', description: '$100,000 monthly revenue', icon: '💎', category: 'revenue' as const, rarity: 'legendary' as const, xpReward: 1000 },
+  { id: 'bookings-50', name: 'Fully Booked', description: '50 appointments in a month', icon: '📅', category: 'bookings' as const, rarity: 'rare' as const, xpReward: 200 },
+  { id: 'bookings-100', name: 'Century Mark', description: '100 appointments in a month', icon: '🌟', category: 'bookings' as const, rarity: 'epic' as const, xpReward: 400 },
 ];
 
 export async function GET() {
@@ -150,12 +55,19 @@ export async function GET() {
       return NextResponse.json(cached);
     }
 
+    const today = new Date().toISOString().split('T')[0];
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    // Fetch this month's data for achievement checks
-    const [transactions, appointments, reviews] = await Promise.all([
+    // Fetch today's data for daily achievement checks + monthly data for milestones
+    const [todayAppts, todayTxns, monthTxns, monthAppts, monthReviews] = await Promise.all([
+      fetchAll<AppointmentFields>(Tables.appointments(), {
+        filterByFormula: `{Date} = '${today}'`,
+      }),
+      fetchAll<TransactionFields>(Tables.transactions(), {
+        filterByFormula: `AND({Date} = '${today}', {Type} = 'Service')`,
+      }),
       fetchAll<TransactionFields>(Tables.transactions(), {
         filterByFormula: `AND(IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'), {Type} = 'Service', {Status} = 'Completed')`,
       }),
@@ -167,56 +79,97 @@ export async function GET() {
       }),
     ]);
 
-    const monthlyRevenue = transactions.reduce((sum, t) => sum + (t.fields['Amount'] || 0), 0);
-    const completedAppts = appointments.filter((a) => a.fields['Status'] === 'completed').length;
-    const consultsClosed = appointments.filter(
-      (a) =>
-        a.fields['Is Consult'] &&
-        (a.fields['Consult Outcome'] === 'Booked' || a.fields['Consult Outcome'] === 'Closed')
-    ).length;
-    const fiveStarReviews = reviews.filter((r) => r.fields['Star Rating'] === 5).length;
-    const noShows = appointments.filter((a) => a.fields['Status'] === 'no_show').length;
-    const cancellations = appointments.filter((a) => a.fields['Status'] === 'cancelled').length;
+    // Build DailyMetrics from today's data (same pattern as score route)
+    const revenue = todayTxns
+      .filter((t) => t.fields['Status'] === 'Completed')
+      .reduce((sum, t) => sum + (t.fields['Amount'] || 0), 0);
 
-    // Check each achievement
-    const achievementChecks: Record<string, boolean> = {
-      'first-sale': transactions.length > 0,
-      'revenue-1k': monthlyRevenue >= 1000,
-      'revenue-10k': monthlyRevenue >= 10000,
-      'revenue-50k': monthlyRevenue >= 50000,
-      'revenue-100k': monthlyRevenue >= 100000,
-      'bookings-10': completedAppts >= 10,
-      'bookings-50': completedAppts >= 50,
-      'bookings-100': completedAppts >= 100,
-      'consult-closer': consultsClosed >= 5,
-      'five-star': fiveStarReviews >= 1,
-      'review-streak': fiveStarReviews >= 5,
-      'perfect-ops': appointments.length > 0 && noShows === 0 && cancellations === 0,
+    const bookedMinutes = todayAppts.reduce((sum, a) => sum + (a.fields['Duration'] || 0), 0);
+    const completedAppts = todayAppts.filter((a) => a.fields['Status'] === 'completed');
+    const consultAppts = todayAppts.filter((a) => a.fields['Is Consult']);
+    const consultsClosed = consultAppts.filter(
+      (a) => a.fields['Consult Outcome'] === 'Booked' || a.fields['Consult Outcome'] === 'Closed'
+    ).length;
+
+    const noShows = todayAppts.filter((a) => a.fields['Status'] === 'no_show').length;
+    const cancellations = todayAppts.filter((a) => a.fields['Status'] === 'cancelled').length;
+
+    const metrics: DailyMetrics = {
+      revenue,
+      revenueTarget: 4000,
+      bookedHours: bookedMinutes / 60,
+      availableHours: 16,
+      consultsClosed,
+      consultsCompleted: consultAppts.length,
+      patientsRebooked: completedAppts.length,
+      patientsSeen: completedAppts.length,
+      reviewsReceived: 0,
+      followUpsCompleted: 0,
+      followUpsDue: 0,
+      onTimeStarts: todayAppts.length,
+      totalAppointments: todayAppts.length,
+      noShows,
+      cancellations,
     };
 
-    const achievements = ACHIEVEMENTS.map((a) => ({
+    // Check daily achievements using the canonical definitions
+    const earnedDailyAchievements = checkAchievements(metrics);
+    const earnedDailyIds = new Set(earnedDailyAchievements.map((a) => a.id));
+
+    // Build daily achievement responses
+    const dailyAchievementResults = DAILY_ACHIEVEMENTS.map((a) => ({
       id: a.id,
       name: a.name,
       description: a.description,
       icon: a.icon,
       category: a.category,
       rarity: a.rarity,
-      earned: achievementChecks[a.id] || false,
-      dateEarned: achievementChecks[a.id] ? now.toISOString() : undefined,
+      xpReward: a.xpReward,
+      type: 'daily' as const,
+      earned: earnedDailyIds.has(a.id),
+      dateEarned: earnedDailyIds.has(a.id) ? now.toISOString() : undefined,
     }));
 
-    const earnedXP = ACHIEVEMENTS.filter((a) => achievementChecks[a.id]).reduce(
-      (sum, a) => sum + a.xp,
-      0
-    );
+    // Check monthly milestones
+    const monthlyRevenue = monthTxns.reduce((sum, t) => sum + (t.fields['Amount'] || 0), 0);
+    const monthlyCompletedAppts = monthAppts.filter((a) => a.fields['Status'] === 'completed').length;
 
-    // Simple level calculation: 1 level per 500 XP
-    const level = Math.floor(earnedXP / 500) + 1;
+    const monthlyChecks: Record<string, boolean> = {
+      'revenue-1k': monthlyRevenue >= 1000,
+      'revenue-10k': monthlyRevenue >= 10000,
+      'revenue-50k': monthlyRevenue >= 50000,
+      'revenue-100k': monthlyRevenue >= 100000,
+      'bookings-50': monthlyCompletedAppts >= 50,
+      'bookings-100': monthlyCompletedAppts >= 100,
+    };
+
+    const monthlyAchievementResults = MONTHLY_MILESTONES.map((a) => ({
+      id: a.id,
+      name: a.name,
+      description: a.description,
+      icon: a.icon,
+      category: a.category,
+      rarity: a.rarity,
+      xpReward: a.xpReward,
+      type: 'monthly' as const,
+      earned: monthlyChecks[a.id] || false,
+      dateEarned: monthlyChecks[a.id] ? now.toISOString() : undefined,
+    }));
+
+    // Merge all achievements
+    const achievements = [...dailyAchievementResults, ...monthlyAchievementResults];
+
+    // Calculate total XP from all earned achievements
+    const totalXP = achievements
+      .filter((a) => a.earned)
+      .reduce((sum, a) => sum + a.xpReward, 0);
+
+    const level = getCurrentLevel(totalXP);
 
     const data = {
       achievements,
-      totalXP: earnedXP,
-      level,
+      totalXP,
+      level: level.level,
     };
 
     cache.set('gamification-achievements', data, TTL.STANDARD);

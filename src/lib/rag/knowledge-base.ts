@@ -284,7 +284,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
     A: Monday-Friday 9AM-6PM, Saturday 10AM-4PM. Closed Sundays. Extended hours available by appointment.
 
     Q: Do you offer free consultations?
-    A: Yes! All consultations are complimentary. Book online or call (425) 207-8870.
+    A: Yes! All consultations are complimentary. Book online or call (425) 539-4440.
 
     Q: What forms of payment do you accept?
     A: We accept all major credit cards, cash, and Cherry financing (0% APR plans available). HSA/FSA cards accepted for eligible treatments.
@@ -344,7 +344,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
 
     Exceptions: Emergency situations will be handled on a case-by-case basis. First-time clients receive one courtesy waiver.
 
-    How to cancel/reschedule: Call (425) 207-8870, text us, or rebook through your Mangomint client portal.
+    How to cancel/reschedule: Call (425) 539-4440, text us, or rebook through your Mangomint client portal.
 
     Deposits: Some high-value treatments (Sofwave, laser packages) require a deposit at booking. Deposits are applied to your treatment cost. Deposits are non-refundable for no-shows.
 

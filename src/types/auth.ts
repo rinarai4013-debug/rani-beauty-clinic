@@ -47,4 +47,5 @@ export type Permission =
   | 'entry_ceo_note'
   | 'manage_settings'
   | 'manage_bank_connections'
-  | 'dismiss_alerts';
+  | 'dismiss_alerts'
+  | 'entry_plan_builder';

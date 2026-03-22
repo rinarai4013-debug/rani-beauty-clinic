@@ -208,7 +208,7 @@ export function configurePhoneAgent(
   const config: PhoneAgentConfig = {
     assistantId: process.env.VAPI_ASSISTANT_ID || '',
     clinicName: 'Rani Beauty Clinic',
-    clinicPhone: '(425) 207-8870',
+    clinicPhone: '(425) 539-4440',
     clinicAddress: '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
     clinicHours: RANI_HOURS,
     providers: RANI_PROVIDERS,

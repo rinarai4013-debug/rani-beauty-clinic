@@ -3,6 +3,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { trackAnalyticsEvent } from '@/lib/analytics/events';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
+
+const PhotoSimulationEmbed = dynamic(
+  () => import('@/components/photo-simulation/PhotoSimulationEmbed'),
+  { ssr: false, loading: () => null }
+);
 import {
   Sparkles,
   Star,
@@ -501,6 +507,11 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
   const [plan, setPlan] = useState<PlanData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [requiresCode, setRequiresCode] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [isExpired, setIsExpired] = useState(false);
+  const [expiredMessage, setExpiredMessage] = useState('');
 
   const trackEvent = (action: string, tier?: string, value?: number) => {
     fetch(`/api/plan/${planId}/track`, {
@@ -509,7 +520,6 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
       body: JSON.stringify({ action, tier, timestamp: new Date().toISOString() }),
     }).catch(() => {});
 
-    // Fire to GA4 + Meta Pixel + GTM
     const eventMap: Record<string, Parameters<typeof trackAnalyticsEvent>[0]> = {
       viewed: 'plan_viewed',
       selected_tier: 'plan_tier_selected',
@@ -522,24 +532,58 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
     }
   };
 
-  useEffect(() => {
-    async function fetchPlan() {
-      try {
-        const res = await fetch(`/api/plan/${planId}`);
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || 'Failed to load plan');
-        }
-        const data = await res.json();
-        setPlan(data.plan);
-        trackEvent('viewed');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Something went wrong');
-      } finally {
+  const fetchPlanWithCode = async (code?: string) => {
+    setLoading(true);
+    setCodeError('');
+    try {
+      const codeParam = code || accessCode;
+      const url = codeParam
+        ? `/api/plan/${planId}?code=${encodeURIComponent(codeParam)}`
+        : `/api/plan/${planId}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (res.status === 403 && data.error === 'ACCESS_CODE_REQUIRED') {
+        setRequiresCode(true);
         setLoading(false);
+        // Check URL for code param (from email link)
+        const urlCode = new URLSearchParams(window.location.search).get('code');
+        if (urlCode && !code) {
+          setAccessCode(urlCode);
+          fetchPlanWithCode(urlCode);
+          return;
+        }
+        return;
       }
+
+      if (res.status === 410 && data.error === 'PLAN_EXPIRED') {
+        setIsExpired(true);
+        setExpiredMessage(data.message || 'This treatment plan has expired.');
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        if (res.status === 403) {
+          setCodeError('Invalid access code. Please check and try again.');
+          setLoading(false);
+          return;
+        }
+        throw new Error(data.error || 'Failed to load plan');
+      }
+
+      setPlan(data.plan);
+      setRequiresCode(false);
+      trackEvent('viewed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setLoading(false);
     }
-    fetchPlan();
+  };
+
+  useEffect(() => {
+    fetchPlanWithCode();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [planId]);
 
@@ -565,6 +609,88 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
     );
   }
 
+  // ─── Access Code Gate ───
+  if (requiresCode) {
+    return (
+      <div className="min-h-screen bg-[#F8F6F1] flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full text-center space-y-6"
+        >
+          <div className="mx-auto w-16 h-16 rounded-full bg-[#C9A96E]/10 flex items-center justify-center">
+            <Shield className="w-8 h-8 text-[#C9A96E]" />
+          </div>
+          <h1 className="font-heading text-2xl text-[#0F1D2C]">Enter Your Access Code</h1>
+          <p className="text-[#0F1D2C]/60 text-sm leading-relaxed">
+            Your treatment plan is protected. Enter the 6-digit code from your email or text message.
+          </p>
+          <div className="space-y-3">
+            <input
+              type="text"
+              maxLength={6}
+              value={accessCode}
+              onChange={(e) => setAccessCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              onKeyDown={(e) => { if (e.key === 'Enter' && accessCode.length === 6) fetchPlanWithCode(); }}
+              placeholder="000000"
+              className="w-full text-center text-2xl tracking-[0.5em] font-mono px-4 py-4 border-2 border-[#C9A96E]/30 rounded-xl bg-white focus:border-[#C9A96E] focus:ring-2 focus:ring-[#C9A96E]/20 outline-none transition-colors text-[#0F1D2C]"
+            />
+            {codeError && (
+              <p className="text-red-500 text-sm">{codeError}</p>
+            )}
+            <button
+              onClick={() => fetchPlanWithCode()}
+              disabled={accessCode.length !== 6 || loading}
+              className="w-full px-6 py-3 bg-[#0F1D2C] text-white rounded-xl font-semibold tracking-wide hover:bg-[#1A2A3C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Verifying...' : 'View My Plan'}
+            </button>
+          </div>
+          <p className="text-[#0F1D2C]/40 text-xs">
+            Didn&apos;t receive a code? Call us at{' '}
+            <a href="tel:+14255394440" className="text-[#C9A96E] hover:underline">(425) 539-4440</a>
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ─── Expired State ───
+  if (isExpired) {
+    return (
+      <div className="min-h-screen bg-[#F8F6F1] flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md text-center space-y-6"
+        >
+          <div className="mx-auto w-16 h-16 rounded-full bg-[#0F1D2C]/5 flex items-center justify-center">
+            <Clock className="w-8 h-8 text-[#0F1D2C]/40" />
+          </div>
+          <h1 className="font-heading text-2xl text-[#0F1D2C]">Plan Expired</h1>
+          <p className="text-[#0F1D2C]/60 text-sm leading-relaxed">
+            {expiredMessage || 'This treatment plan link has expired for your security. Contact us to receive a refreshed plan.'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="tel:+14255394440"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#0F1D2C] text-white rounded-lg text-sm font-semibold tracking-wide hover:bg-[#1A2A3C] transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              Call (425) 539-4440
+            </a>
+            <a
+              href="https://booking.mangomint.com/876418"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#C9A96E]/30 text-[#0F1D2C] rounded-lg text-sm font-semibold hover:border-[#C9A96E] transition-colors"
+            >
+              Book New Consultation
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   // ─── Error State ───
   if (error || !plan) {
     return (
@@ -578,11 +704,11 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
             {error || 'We could not locate this treatment plan. Please check your link or contact us for assistance.'}
           </p>
           <a
-            href="tel:+14252078870"
+            href="tel:+14255394440"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F1D2C] text-white rounded-lg text-sm font-semibold tracking-wide hover:bg-[#1A2A3C] transition-colors"
           >
             <Phone className="w-4 h-4" />
-            Call Us: (425) 207-8870
+            Call Us: (425) 539-4440
           </a>
         </div>
       </div>
@@ -734,6 +860,46 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
                 within the first 90 days.
               </p>
             </div>
+          </motion.div>
+        </section>
+
+        <SectionDivider />
+
+        {/* ═══════════════════════════════════════════════════════════
+           PHOTO SIMULATION — Projected Results Visualization
+           ═══════════════════════════════════════════════════════════ */}
+        <section className="max-w-4xl mx-auto px-6 py-12 md:py-16 print-avoid-break no-print">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="text-center mb-10"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#C9A96E] mb-3">
+              Visualize Your Transformation
+            </p>
+            <h2 className="font-heading text-2xl md:text-3xl text-[#0F1D2C]">
+              See Your Projected Results
+            </h2>
+            <p className="mt-3 text-sm text-[#0F1D2C]/50 max-w-lg mx-auto">
+              Upload a photo to see an illustrative preview of how your recommended treatments could enhance your appearance.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={scaleIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0.15}
+            className="bg-white rounded-2xl shadow-sm border border-[#C9A96E]/10 p-6 md:p-10"
+          >
+            <PhotoSimulationEmbed
+              treatmentInterests={plan.treatmentInterests}
+              skinConcerns={plan.skinConcerns}
+            />
           </motion.div>
         </section>
 
@@ -1459,11 +1625,11 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
                 </p>
                 <div className="space-y-3">
                   <a
-                    href="tel:+14252078870"
+                    href="tel:+14255394440"
                     className="flex items-center gap-2.5 text-sm text-white/70 hover:text-[#C9A96E] transition-colors"
                   >
                     <Phone className="w-4 h-4" />
-                    (425) 207-8870
+                    (425) 539-4440
                   </a>
                   <a
                     href="mailto:info@ranibeautyclinic.com"

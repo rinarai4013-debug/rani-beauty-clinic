@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchAll, createRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { calculateClinicScore } from '@/lib/gamification/engine';
+import type { DailyMetrics } from '@/types/gamification';
 
 // POST — Daily KPI snapshot creation
 // Triggered by n8n or Vercel Cron with CRON_SECRET auth
@@ -162,7 +164,37 @@ export async function POST(request: NextRequest) {
         ) / 10
       : 0;
 
-    // 4. Create KPI Snapshot record
+    // 4. Calculate daily clinic score for streak tracking
+    const bookedMinutes = appointments.reduce(
+      (sum, a) => sum + Number(a.fields['Duration'] || 0), 0
+    );
+    const completedApptsForScore = appointments.filter(
+      (a) => String(a.fields[FIELDS.appointments.status] || '') === 'completed'
+    );
+
+    const dailyMetrics: DailyMetrics = {
+      revenue: todayRevenue,
+      revenueTarget: 4000,
+      bookedHours: bookedMinutes / 60,
+      availableHours: 16,
+      consultsClosed: closedConsults,
+      consultsCompleted: consultsCompleted,
+      patientsRebooked: completedApptsForScore.length,
+      patientsSeen: completedApptsForScore.length,
+      reviewsReceived,
+      followUpsCompleted: 0,
+      followUpsDue: 0,
+      onTimeStarts: totalBookings,
+      totalAppointments: totalBookings,
+      noShows: totalNoShows,
+      cancellations: appointments.filter(
+        (a) => ['cancelled', 'Cancelled'].includes(String(a.fields[FIELDS.appointments.status] || ''))
+      ).length,
+    };
+
+    const { total: dailyScore } = calculateClinicScore(dailyMetrics);
+
+    // 5. Create KPI Snapshot record
     const kpiFields = {
       [FIELDS.kpiSnapshots.date]: today,
       [FIELDS.kpiSnapshots.period]: 'Daily',
@@ -181,6 +213,7 @@ export async function POST(request: NextRequest) {
       [FIELDS.kpiSnapshots.reviewsReceived]: reviewsReceived,
       [FIELDS.kpiSnapshots.averageRating]: averageRating,
       [FIELDS.kpiSnapshots.revenueByProviderJSON]: JSON.stringify(revenueByProvider),
+      'Daily Score': dailyScore,
     };
 
     const snapshotId = await createRecord(Tables.kpis(), kpiFields);
@@ -205,6 +238,7 @@ export async function POST(request: NextRequest) {
         reviewsReceived,
         averageRating,
         revenueByProvider,
+        dailyScore,
       },
     });
   } catch (error) {

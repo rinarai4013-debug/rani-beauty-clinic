@@ -8,16 +8,19 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'entry_lead', 'entry_consult_notes', 'entry_sale', 'entry_expense', 'entry_inventory',
     'entry_staff_note', 'entry_review', 'entry_eod_recap', 'entry_room_issue', 'entry_ceo_note',
     'manage_bank_connections',
+    'entry_plan_builder',
   ],
   frontdesk: [
     'view_executive', 'view_leads', 'view_leads_full', 'view_schedule', 'view_schedule_full',
     'view_leaderboard', 'view_clients', 'dismiss_alerts',
     'entry_lead', 'entry_consult_notes', 'entry_sale', 'entry_review', 'entry_eod_recap',
+    'entry_plan_builder',
   ],
   provider: [
     'view_executive', 'view_revenue', 'view_schedule', 'view_leaderboard',
     'view_clients', 'view_providers',
     'entry_consult_notes', 'entry_review', 'entry_room_issue',
+    'entry_plan_builder',
   ],
   marketing: [
     'view_executive', 'view_revenue', 'view_leads', 'view_leads_full',
@@ -50,6 +53,7 @@ export function canAccessPage(role: UserRole, page: string): boolean {
     '/dashboard/leaderboard': 'view_leaderboard',
     '/dashboard/settings': 'view_settings',
     '/dashboard/entry': 'view_executive', // all roles can access some forms
+    '/dashboard/plan-builder': 'entry_plan_builder',
   };
   const required = pagePermissions[page];
   if (!required) return false;

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json({
-        reply: "Thank you for your interest in Rani Beauty Clinic! I'm currently offline, but our team would love to help you. Please call us at (425) 207-8870 or book a consultation at ranibeautyclinic.com.",
+        reply: "Thank you for your interest in Rani Beauty Clinic! I'm currently offline, but our team would love to help you. Please call us at (425) 539-4440 or book a consultation at ranibeautyclinic.com.",
         actions: [{ type: 'book_now', label: 'Book Now', url: 'https://ranibeautyclinic.com/#booking' }],
         source: 'fallback',
       });
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('AI chat error:', error);
     return NextResponse.json({
-      reply: "I apologize, I'm having a moment! Please reach out to us directly at ranibeautyclinic.com or call (425) 207-8870. We'd love to help you.",
+      reply: "I apologize, I'm having a moment! Please reach out to us directly at ranibeautyclinic.com or call (425) 539-4440. We'd love to help you.",
       actions: [{ type: 'book_now', label: 'Book Now', url: 'https://ranibeautyclinic.com/#booking' }],
       source: 'error',
     });

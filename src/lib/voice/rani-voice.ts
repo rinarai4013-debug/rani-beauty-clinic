@@ -146,7 +146,7 @@ Rules:
 
 ## CLINIC INFORMATION
 - Location: 401 Olympia Ave NE #101, Renton, WA 98056
-- Phone: (425) 207-8870
+- Phone: (425) 539-4440
 - Website: ranibeautyclinic.com
 - Hours: Mon-Fri 9AM-6PM, Sat 10AM-4PM, Sun Closed
 - Booking: https://ranibeautyclinic.com/#booking

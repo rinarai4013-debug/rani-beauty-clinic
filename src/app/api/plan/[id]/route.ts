@@ -1,7 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import crypto from 'crypto';
 
-// Intake fields from the Client Intakes table
+// ─── Rate Limiting ──────────────────────────────────────────────────
+const viewAttempts = new Map<string, { count: number; resetAt: number }>();
+const RATE_WINDOW = 60_000; // 1 minute
+const MAX_VIEWS = 10; // 10 views per minute per IP
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = viewAttempts.get(ip);
+
+  // Cleanup old entries periodically
+  if (viewAttempts.size > 500) {
+    for (const [k, v] of viewAttempts) {
+      if (now > v.resetAt) viewAttempts.delete(k);
+    }
+  }
+
+  if (!entry || now > entry.resetAt) {
+    viewAttempts.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
+    return false;
+  }
+
+  if (entry.count >= MAX_VIEWS) return true;
+  entry.count++;
+  return false;
+}
+
+// ─── Access Code Generation ─────────────────────────────────────────
+// Generates a deterministic 6-digit access code from record ID + secret
+function generateAccessCode(recordId: string): string {
+  const secret = process.env.DASHBOARD_JWT_SECRET || 'rani-plan-access-2026';
+  const hash = crypto.createHmac('sha256', secret).update(recordId).digest('hex');
+  // Take first 6 digits from hash
+  const numericHash = parseInt(hash.slice(0, 8), 16);
+  return String(numericHash % 1000000).padStart(6, '0');
+}
+
+// ─── Plan Expiry Check ──────────────────────────────────────────────
+const PLAN_EXPIRY_DAYS = 7;
+
+function isPlanExpired(createdDate: string | undefined): boolean {
+  if (!createdDate) return false; // If no date, allow access (backward compat)
+  const created = new Date(createdDate);
+  if (isNaN(created.getTime())) return false;
+  const now = new Date();
+  const diffMs = now.getTime() - created.getTime();
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+  return diffDays > PLAN_EXPIRY_DAYS;
+}
+
+// ─── Types ──────────────────────────────────────────────────────────
+
 interface IntakeFields {
   'First Name'?: string;
   'Last Name'?: string;
@@ -21,10 +73,10 @@ interface IntakeFields {
   'Suggested Next Step (AI)'?: string;
   'Treatment Value (AI)'?: string;
   'Processing Status'?: string;
+  'Created Date'?: string;
   'Intake Intelligence'?: string[];
 }
 
-// Intelligence fields from the Intake Intelligence table
 interface IntelligenceFields {
   'Intake Summary (AI)'?: string;
   'Program Plan (AI)'?: string;
@@ -37,29 +89,54 @@ interface IntelligenceFields {
   'Client Intakes'?: string[];
 }
 
+// ─── GET Handler ────────────────────────────────────────────────────
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || request.headers.get('x-real-ip')
+      || 'unknown';
 
-    if (!id) {
-      return NextResponse.json({ error: 'Plan ID is required' }, { status: 400 });
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again in a moment.' },
+        { status: 429 }
+      );
     }
 
-    // Fetch the intake record by Airtable record ID
+    const { id } = params;
+
+    if (!id || !/^rec[a-zA-Z0-9]{10,}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
+    }
+
+    // ── Access Code Verification ──
+    const url = new URL(request.url);
+    const providedCode = url.searchParams.get('code');
+    const expectedCode = generateAccessCode(id);
+
+    if (providedCode !== expectedCode) {
+      return NextResponse.json(
+        { error: 'ACCESS_CODE_REQUIRED', requiresCode: true },
+        { status: 403 }
+      );
+    }
+
+    // ── Fetch Record ──
+    const sanitizedId = sanitizeFormulaValue(id);
     let intakeRecord: { id: string; fields: IntakeFields } | null = null;
 
     try {
       const record = await Tables.intakes().find(id);
       intakeRecord = { id: record.id, fields: record.fields as unknown as IntakeFields };
     } catch {
-      // If direct ID lookup fails, try searching by a formula
       const records = await fetchFirst<IntakeFields>(
         Tables.intakes(),
         1,
-        { filterByFormula: `RECORD_ID() = '${id}'` },
+        { filterByFormula: `RECORD_ID() = '${sanitizedId}'` },
         true
       );
       if (records.length > 0) {
@@ -73,7 +150,20 @@ export async function GET(
 
     const intake = intakeRecord.fields;
 
-    // Try to fetch linked Intake Intelligence record
+    // ── Expiry Check ──
+    const createdDate = intake['Created Date'];
+    if (isPlanExpired(createdDate)) {
+      return NextResponse.json(
+        {
+          error: 'PLAN_EXPIRED',
+          message: 'This treatment plan has expired. Please contact us at (425) 539-4440 for a refreshed plan.',
+          expiredAt: createdDate,
+        },
+        { status: 410 }
+      );
+    }
+
+    // ── Fetch Intelligence ──
     let intelligence: IntelligenceFields | null = null;
     const intelligenceIds = intake['Intake Intelligence'];
 
@@ -86,14 +176,13 @@ export async function GET(
       }
     }
 
-    // If no linked intelligence, try finding by searching
     if (!intelligence) {
       try {
         const intelRecords = await fetchFirst<IntelligenceFields>(
           Tables.intakeIntelligence(),
           1,
           {
-            filterByFormula: `FIND("${id}", ARRAYJOIN({Client Intakes}))`,
+            filterByFormula: `FIND("${sanitizedId}", ARRAYJOIN({Client Intakes}))`,
           },
           true
         );
@@ -105,33 +194,32 @@ export async function GET(
       }
     }
 
-    // Build the full name from available fields
+    // ── Build Response (strip sensitive fields) ──
     const firstName = intake['First Name'] || '';
     const lastName = intake['Last Name'] || '';
     const fullName = intake['Full Name'] || `${firstName} ${lastName}`.trim() || 'Valued Client';
 
-    // Normalize array/string fields
     const normalizeField = (val: string | string[] | undefined): string[] => {
       if (!val) return [];
       if (Array.isArray(val)) return val;
       return val.split(',').map((s) => s.trim()).filter(Boolean);
     };
 
-    // Build response
+    // Only expose what the client needs — NO email, NO phone in response
     const plan = {
       id: intakeRecord.id,
       clientName: fullName,
       firstName: firstName || fullName.split(' ')[0],
-      email: intake['Email'] || '',
-      phone: intake['Phone Number'] || intake['Phone'] || '',
+      // Redacted: email and phone NOT sent to client-facing plan page
+      email: '',
+      phone: '',
       skinConcerns: normalizeField(intake['Top Skin Concerns']),
       targetAreas: normalizeField(intake['Target Areas']),
       treatmentInterests: normalizeField(intake['Treatment Interests']),
       skinType: intake['Skin Type'] || '',
-      treatmentHistory: intake['Cosmetic Treatment History'] || '',
+      treatmentHistory: '', // Redacted from public view
       processingStatus: intake['Processing Status'] || 'New',
 
-      // AI Intelligence fields — may come from intake or intelligence table
       intakeSummary:
         intelligence?.['Intake Summary (AI)'] ||
         intake['Intake Summary (AI)'] ||
@@ -157,15 +245,18 @@ export async function GET(
         intake['Treatment Value (AI)'] ||
         null,
 
-      // Scores
       skinHealthScore: intelligence?.['Skin Health Score'] || null,
       projectedScore: intelligence?.['Projected Score'] || null,
 
-      // Intelligence status
       intelligenceReady: !!intelligence || !!(
         intake['Intake Summary (AI)'] ||
         intake['Program Plan (AI)']
       ),
+
+      // Expiry info for client display
+      expiresAt: createdDate
+        ? new Date(new Date(createdDate).getTime() + PLAN_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
+        : null,
     };
 
     return NextResponse.json({ plan });

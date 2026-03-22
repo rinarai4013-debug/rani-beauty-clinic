@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     // Send SMS via Twilio (if configured)
     if (clientPhone && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
       try {
-        const smsBody = `Hi ${clientName.split(' ')[0]}! Your personalized treatment plan from Rani Beauty Clinic is ready: ${planUrl} Questions? Call (425) 207-8870`;
+        const smsBody = `Hi ${clientName.split(' ')[0]}! Your personalized treatment plan from Rani Beauty Clinic is ready: ${planUrl} Questions? Call (425) 539-4440`;
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`;
         const auth = Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64');
         
@@ -268,12 +268,12 @@ function buildEmailHtml(name: string, planUrl: string): string {
 <div style="text-align:center">
 <a href="${planUrl}" class="cta">View My Treatment Plan</a>
 </div>
-<p style="color:#999;font-size:13px;text-align:center">Questions? Call us at <a href="tel:+14252078870" style="color:#C9A96E">(425) 207-8870</a></p>
+<p style="color:#999;font-size:13px;text-align:center">Questions? Call us at <a href="tel:+14255394440" style="color:#C9A96E">(425) 539-4440</a></p>
 </div>
 <div class="footer">
 <p>Rani Beauty Clinic</p>
 <p>401 Olympia Ave NE #101, Renton, WA 98056</p>
-<p>(425) 207-8870 · ranibeautyclinic.com</p>
+<p>(425) 539-4440 · ranibeautyclinic.com</p>
 </div>
 </div>
 </div>

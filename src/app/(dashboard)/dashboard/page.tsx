@@ -16,6 +16,8 @@ import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
 import SaveQueuePanel from '@/components/dashboard/panels/SaveQueuePanel';
 import FunnelHealthPanel from '@/components/dashboard/panels/FunnelHealthPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
+import MorningBriefing from '@/components/dashboard/gamification/MorningBriefing';
+import DailyChallenges from '@/components/dashboard/gamification/DailyChallenges';
 import { DashboardErrorBoundary, InlineError } from '@/components/dashboard/shared';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
@@ -68,6 +70,9 @@ export default function ExecutiveHome() {
             </div>
           )}
         </div>
+
+        {/* Morning Briefing */}
+        <MorningBriefing />
 
         {/* Hero KPI Row */}
         {error ? (
@@ -145,11 +150,10 @@ export default function ExecutiveHome() {
         {/* Save Queue */}
         <SaveQueuePanel />
 
-        {/* Wins + Boss Level */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="lg:col-span-2">
-            <DailyWinsBanner />
-          </div>
+        {/* Wins + Challenges + Boss Level */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <DailyWinsBanner />
+          <DailyChallenges />
           <BossLevelMilestone />
         </div>
 

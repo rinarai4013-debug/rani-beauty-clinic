@@ -47,12 +47,13 @@ function makePlan(overrides: Partial<PlanData> = {}): PlanData {
    ═══════════════════════════════════════════════════════════════ */
 
 describe('parseCostBreakdown', () => {
-  it('parses a simple "Service — $275" line', () => {
+  it('parses a simple "Service — $XXX" line', () => {
     const result = parseCostBreakdown('HydraFacial Signature — $275');
     expect(result.length).toBeGreaterThanOrEqual(1);
     const item = result[0];
     expect(item.name).toMatch(/hydrafacial/i);
-    expect(item.pricePerSession).toBe(275);
+    // Catalog price ($225) takes precedence over text price when matched
+    expect(item.pricePerSession).toBe(225);
   });
 
   it('parses "Service (x3) — $1,485" with quantity', () => {
@@ -115,13 +116,13 @@ describe('matchService', () => {
   it('matches exact catalog key', () => {
     const result = matchService('hydrafacial');
     expect(result).not.toBeNull();
-    expect(result!.catalog.price).toBe(275);
+    expect(result!.catalog.price).toBe(225);
   });
 
   it('fuzzy matches "RF Micro-needling" to "rf microneedling"', () => {
     const result = matchService('RF Microneedling treatment for face');
     expect(result).not.toBeNull();
-    expect(result!.catalog.category).toBe('Skin Renewal');
+    expect(result!.catalog.category).toBe('RF Microneedling');
   });
 
   it('fuzzy matches "Botox Injections" to "botox"', () => {
@@ -136,10 +137,10 @@ describe('matchService', () => {
     expect(result).toBeNull();
   });
 
-  it('is case insensitive', () => {
+  it('is case-insensitive', () => {
     const result = matchService('HYDRAFACIAL');
     expect(result).not.toBeNull();
-    expect(result!.catalog.price).toBe(275);
+    expect(result!.catalog.price).toBe(225);
   });
 
   it('prefers longer catalog key matches', () => {
@@ -358,12 +359,12 @@ describe('buildFallbackPackages', () => {
    ═══════════════════════════════════════════════════════════════ */
 
 describe('SERVICE_CATALOG', () => {
-  it('contains hydrafacial at $275', () => {
-    expect(SERVICE_CATALOG['hydrafacial'].price).toBe(275);
+  it('contains hydrafacial at $225', () => {
+    expect(SERVICE_CATALOG['hydrafacial'].price).toBe(225);
   });
 
-  it('contains sofwave at $2750', () => {
-    expect(SERVICE_CATALOG['sofwave'].price).toBe(2750);
+  it('contains sofwave at $2250', () => {
+    expect(SERVICE_CATALOG['sofwave'].price).toBe(2250);
   });
 
   it('has more than 30 service entries', () => {

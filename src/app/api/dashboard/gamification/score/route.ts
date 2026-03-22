@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { calculateClinicScore, getCurrentBossLevel } from '@/lib/gamification/engine';
+import { getCurrentLevel } from '@/lib/gamification/levels';
 import type { DailyMetrics } from '@/types/gamification';
 
 interface AppointmentFields {
@@ -97,13 +98,42 @@ export async function GET() {
     const monthlyRevenue = monthTxns.reduce((sum, t) => sum + (t.fields['Amount'] || 0), 0);
     const bossProgress = getCurrentBossLevel(monthlyRevenue);
 
+    // Calculate streak from KPI Snapshots
+    let streak = 0;
+    try {
+      const snapshots = await fetchAll<{ 'Date': string; 'Daily Score': number }>(Tables.kpis(), {
+        filterByFormula: `AND({Date} != '', {Daily Score} >= 0)`,
+        sort: [{ field: 'Date', direction: 'desc' }],
+        maxRecords: 30,
+      });
+
+      // Count consecutive days with score >= 80
+      for (const snap of snapshots) {
+        const score = snap.fields['Daily Score'];
+        if (score !== undefined && score >= 80) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+    } catch (e) {
+      // KPI snapshots might not have Daily Score field yet — that's okay
+      console.warn('Streak calculation skipped:', e);
+      streak = 0;
+    }
+
+    // Quick XP estimate from monthly revenue + appointments
+    const xpFromRevenue = Math.floor(monthlyRevenue / 10); // $10 = 1 XP
+    const xpFromAppointments = todayAppts.length * 10;
+    const estimatedXP = xpFromRevenue + xpFromAppointments;
+
     const data = {
       total,
       breakdown,
       status,
-      streak: 0,
-      xp: 0,
-      level: 1,
+      streak,
+      xp: estimatedXP,
+      level: getCurrentLevel(estimatedXP).level,
       bossProgress: {
         current: bossProgress.current,
         progress: Math.round(bossProgress.progress),

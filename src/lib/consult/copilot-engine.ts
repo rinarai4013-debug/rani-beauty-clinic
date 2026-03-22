@@ -145,88 +145,118 @@ interface ServiceDetail {
   financingEligible: boolean;
 }
 
-const SERVICE_DB: Record<string, ServiceDetail> = {
+// Extended service details for consult copilot (results, downtime, crossSells)
+// Pricing/duration/sessions now sourced from unified catalog
+import { UNIFIED_CATALOG, type UnifiedService } from '@/data/services/unified-catalog';
+
+const SERVICE_DETAILS: Record<string, Omit<ServiceDetail, 'price' | 'duration' | 'sessions' | 'financingEligible'> & { catalogId?: string }> = {
   'HydraFacial': {
-    price: 225,
-    duration: 60,
-    sessions: 1,
     results: 'Immediate glow, smoother texture, reduced pore size',
     downtime: 'None — can wear makeup same day',
     concerns: ['dull skin', 'congested pores', 'uneven texture', 'dehydration', 'fine lines'],
-    crossSells: ['VI Peel', 'LED Light Therapy', 'Dermaplane'],
-    financingEligible: false,
+    crossSells: ['VI Peel', 'Dermaplaning Add-On', 'Red Light Therapy Add-On'],
+    catalogId: 'hydrafacial-signature',
   },
   'Botox': {
-    price: 400,
-    duration: 30,
-    sessions: 1,
     results: 'Visible in 3-7 days, full effect at 2 weeks, lasts 3-4 months',
     downtime: 'None — minor redness for 30 min',
-    concerns: ['forehead lines', 'crow\'s feet', "frown lines", 'brow lift', 'preventative aging'],
+    concerns: ['forehead lines', 'crow\'s feet', 'frown lines', 'brow lift', 'preventative aging'],
     crossSells: ['Fillers', 'HydraFacial', 'Skincare'],
-    financingEligible: true,
   },
   'Fillers': {
-    price: 650,
-    duration: 45,
-    sessions: 1,
     results: 'Immediate volume, natural-looking enhancement, lasts 9-18 months',
     downtime: 'Mild swelling 1-3 days',
     concerns: ['lip volume', 'cheek definition', 'nasolabial folds', 'jawline', 'under-eye hollows'],
-    crossSells: ['Botox', 'PRP', 'Skincare'],
-    financingEligible: true,
+    crossSells: ['Botox', 'HydraFacial', 'Skincare'],
   },
   'VI Peel': {
-    price: 325,
-    duration: 30,
-    sessions: 3,
     results: 'Visible peeling days 3-5, new skin by day 7, series for optimal results',
     downtime: '5-7 days peeling, no social downtime after day 3',
     concerns: ['acne', 'hyperpigmentation', 'sun damage', 'melasma', 'uneven tone'],
-    crossSells: ['HydraFacial', 'Skincare', 'SPF'],
-    financingEligible: false,
+    crossSells: ['HydraFacial', 'Medical-Grade Skincare Kit', 'PRX-T33'],
+    catalogId: 'vi-peel',
   },
   'RF Microneedling': {
-    price: 495,
-    duration: 60,
-    sessions: 3,
     results: 'Progressive improvement over 3-6 months, collagen remodeling',
     downtime: '2-3 days redness, can wear makeup after 24 hours',
     concerns: ['acne scars', 'fine lines', 'skin laxity', 'pore size', 'stretch marks'],
-    crossSells: ['PRP', 'HydraFacial', 'Growth Factors'],
-    financingEligible: true,
+    crossSells: ['HydraFacial', 'PRX-T33', 'Sofwave'],
+    catalogId: 'rf-micro-face',
   },
   'Laser Hair Removal': {
-    price: 225,
-    duration: 25,
-    sessions: 6,
     results: '80-90% permanent reduction after full series',
     downtime: 'Mild redness 24 hours',
     concerns: ['unwanted hair', 'ingrown hairs', 'shaving irritation', 'smooth skin'],
-    crossSells: ['Body Treatments', 'HydraFacial'],
-    financingEligible: true,
+    crossSells: ['HydraFacial', 'BioRePeel'],
+    catalogId: 'lhr-full-brazilian',
   },
   'Sofwave': {
-    price: 2750,
-    duration: 45,
-    sessions: 1,
     results: 'Gradual tightening over 3-6 months, peak results at 12 weeks',
     downtime: 'None to minimal — mild swelling 24-48 hours',
     concerns: ['skin tightening', 'jowls', 'neck laxity', 'brow lift', 'non-surgical facelift'],
     crossSells: ['Botox', 'Fillers', 'HydraFacial'],
-    financingEligible: true,
+    catalogId: 'sofwave-full-face',
   },
   'GLP-1': {
-    price: 499,
-    duration: 15,
-    sessions: 12,
     results: '15-20% body weight loss over 6-12 months',
     downtime: 'None',
     concerns: ['weight loss', 'obesity', 'metabolic health', 'body composition'],
-    crossSells: ['B12 Injection', 'NAD+', 'Body Treatments'],
-    financingEligible: true,
+    crossSells: ['Vitamin B12 Injection', 'NAD+ Injection', 'Body Composition Analysis'],
+    catalogId: 'glp1-semaglutide-m1',
+  },
+  'ND:Yag Laser Facial': {
+    results: 'Clearer skin in 1-2 weeks, full results after series of 3',
+    downtime: '24-48 hours mild redness',
+    concerns: ['acne', 'rosacea', 'sun damage', 'fine lines', 'acne scarring'],
+    crossSells: ['HydraFacial', 'VI Peel', 'PRX-T33'],
+    catalogId: 'laser-facial-ndyag',
+  },
+  'PRX-T33': {
+    results: 'Immediate glow, progressive collagen stimulation over 2-4 weeks',
+    downtime: 'None — no peeling, no social downtime',
+    concerns: ['dull skin', 'aging', 'hyperpigmentation', 'acne scars', 'stretch marks'],
+    crossSells: ['HydraFacial', 'RF Microneedling', 'Tretinoin'],
+    catalogId: 'prx-t33',
+  },
+  'BioRePeel': {
+    results: 'Instant radiance, progressive improvement over 7-10 days',
+    downtime: 'None — zero downtime peel',
+    concerns: ['dull skin', 'acne', 'aging', 'large pores', 'uneven texture'],
+    crossSells: ['HydraFacial', 'VI Peel', 'Medical-Grade Skincare Kit'],
+    catalogId: 'biorepeel-face',
+  },
+  'NAD+ Injection': {
+    results: 'Energy boost within hours, cognitive clarity, cellular repair',
+    downtime: 'None',
+    concerns: ['fatigue', 'brain fog', 'aging', 'recovery', 'longevity'],
+    crossSells: ['Vitamin B12 Injection', 'Glutathione Injection', 'Sermorelin'],
+    catalogId: 'nad-injection',
   },
 };
+
+// Build SERVICE_DB by merging catalog pricing with copilot details
+const SERVICE_DB: Record<string, ServiceDetail> = {};
+
+for (const [name, details] of Object.entries(SERVICE_DETAILS)) {
+  const catalogEntry = details.catalogId
+    ? UNIFIED_CATALOG.find((s: UnifiedService) => s.id === details.catalogId)
+    : undefined;
+
+  if (details.catalogId && !catalogEntry) {
+    console.warn(`[copilot-engine] Catalog ID not found: "${details.catalogId}" for "${name}". Using fallback pricing.`);
+  }
+
+  SERVICE_DB[name] = {
+    price: catalogEntry?.price ?? (name === 'Botox' ? 350 : name === 'Fillers' ? 650 : 225),
+    duration: catalogEntry?.duration ?? 30,
+    sessions: catalogEntry?.sessions ?? 1,
+    financingEligible: catalogEntry?.financingEligible ?? false,
+    results: details.results,
+    downtime: details.downtime,
+    concerns: details.concerns,
+    crossSells: details.crossSells,
+  };
+}
 
 // ── OBJECTION TEMPLATES ──
 

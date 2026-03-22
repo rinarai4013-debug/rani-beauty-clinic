@@ -68,54 +68,12 @@ export interface TreatmentPackage {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Service Catalog
+   Service Catalog — Unified source from data/services/unified-catalog.ts
    ═══════════════════════════════════════════════════════════════ */
 
-export const SERVICE_CATALOG: Record<string, { price: number; duration: string; category: string }> = {
-  'sofwave': { price: 2750, duration: '60 min', category: 'Skin Tightening' },
-  'sofwave full face': { price: 2750, duration: '60 min', category: 'Skin Tightening' },
-  'sofwave full face + neck': { price: 4500, duration: '90 min', category: 'Skin Tightening' },
-  'hydrafacial': { price: 275, duration: '60 min', category: 'Facial' },
-  'hydrafacial signature': { price: 275, duration: '60 min', category: 'Facial' },
-  'hydrafacial platinum': { price: 350, duration: '75 min', category: 'Facial' },
-  'rf microneedling': { price: 495, duration: '75 min', category: 'Skin Renewal' },
-  'rf microneedling face': { price: 495, duration: '75 min', category: 'Skin Renewal' },
-  'rf microneedling face + neck': { price: 650, duration: '90 min', category: 'Skin Renewal' },
-  'vi peel': { price: 395, duration: '45 min', category: 'Chemical Peel' },
-  'vi peel purify': { price: 395, duration: '45 min', category: 'Chemical Peel' },
-  'vi peel precision plus': { price: 450, duration: '45 min', category: 'Chemical Peel' },
-  'prx-t33': { price: 495, duration: '30 min', category: 'Biorevitalization' },
-  'prx': { price: 495, duration: '30 min', category: 'Biorevitalization' },
-  'picoway': { price: 450, duration: '45 min', category: 'Laser' },
-  'picoway laser': { price: 450, duration: '45 min', category: 'Laser' },
-  'botox': { price: 350, duration: '30 min', category: 'Injectables' },
-  'dermal fillers': { price: 650, duration: '45 min', category: 'Injectables' },
-  'filler': { price: 650, duration: '45 min', category: 'Injectables' },
-  'laser hair removal': { price: 225, duration: '30 min', category: 'Laser' },
-  'glp-1': { price: 499, duration: '30 min', category: 'Wellness' },
-  'glp-1 program': { price: 499, duration: '30 min', category: 'Wellness' },
-  'vitamin d3': { price: 50, duration: '15 min', category: 'Wellness' },
-  'vitamin injection': { price: 50, duration: '15 min', category: 'Wellness' },
-  'b12': { price: 35, duration: '15 min', category: 'Wellness' },
-  'b12 injection': { price: 35, duration: '15 min', category: 'Wellness' },
-  'nad+': { price: 250, duration: '30 min', category: 'Wellness' },
-  'nad+ injection': { price: 250, duration: '30 min', category: 'Wellness' },
-  'glutathione': { price: 100, duration: '15 min', category: 'Wellness' },
-  'glutathione mega': { price: 100, duration: '15 min', category: 'Wellness' },
-  'tri-immune': { price: 75, duration: '15 min', category: 'Wellness' },
-  'tri-immune boost': { price: 75, duration: '15 min', category: 'Wellness' },
-  'tretinoin': { price: 99, duration: '—', category: 'Rx Skincare' },
-  'tretinoin 0.05%': { price: 99, duration: '—', category: 'Rx Skincare' },
-  'medical-grade skincare kit': { price: 195, duration: '—', category: 'Skincare' },
-  'skincare kit': { price: 195, duration: '—', category: 'Skincare' },
-  'rx skincare protocol': { price: 99, duration: '—', category: 'Rx Skincare' },
-  'glow stack': { price: 75, duration: '15 min', category: 'Wellness' },
-  'glow stack vitamins': { price: 75, duration: '15 min', category: 'Wellness' },
-  'folix hair restoration': { price: 500, duration: '60 min', category: 'Hair' },
-  'consultation': { price: 0, duration: '30 min', category: 'Consultation' },
-  'skin consultation': { price: 0, duration: '30 min', category: 'Consultation' },
-  'dermaplaning': { price: 150, duration: '30 min', category: 'Facial' },
-};
+import { buildLegacyCatalog } from '@/data/services/unified-catalog';
+
+export const SERVICE_CATALOG: Record<string, { price: number; duration: string; category: string }> = buildLegacyCatalog();
 
 /** Match a treatment name from AI text to our catalog */
 export function matchService(text: string): { key: string; catalog: { price: number; duration: string; category: string } } | null {
