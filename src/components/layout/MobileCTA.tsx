@@ -77,7 +77,7 @@ export default function MobileCTA() {
               }}
             >
               <a
-                href="https://booking.mangomint.com/876418"
+                href="https://booking.mangomint.com/ranibeautyclinic1"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => {

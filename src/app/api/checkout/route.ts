@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!stripeKey) {
       // Fallback to Mangomint booking if Stripe not configured
       return NextResponse.json({
-        url: 'https://booking.mangomint.com/876418',
+        url: 'https://booking.mangomint.com/ranibeautyclinic1',
         fallback: true,
       });
     }

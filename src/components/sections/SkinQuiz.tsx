@@ -475,7 +475,7 @@ export default function SkinQuiz() {
                   </div>
 
                   <a
-                    href="https://booking.mangomint.com/876418"
+                    href="https://booking.mangomint.com/ranibeautyclinic1"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg py-3 font-body text-sm font-semibold uppercase tracking-wider transition-all duration-300 ${

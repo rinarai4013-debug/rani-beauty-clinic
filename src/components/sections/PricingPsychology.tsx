@@ -160,7 +160,7 @@ export function CompareAndSave({
   subtitle = "See why packages deliver better value.",
   items,
   packageLabel = "Package Price",
-  bookingUrl = "https://booking.mangomint.com/876418",
+  bookingUrl = "https://booking.mangomint.com/ranibeautyclinic1",
   className = "",
 }: CompareAndSaveProps) {
   const totalIndividual = items.reduce((sum, it) => sum + it.individualPrice, 0);

@@ -13,7 +13,7 @@ const quickLinks = [
   { label: "Contact", href: "/contact" },
   {
     label: "Book Consultation",
-    href: "https://booking.mangomint.com/876418",
+    href: "https://booking.mangomint.com/ranibeautyclinic1",
     external: true,
   },
 ];

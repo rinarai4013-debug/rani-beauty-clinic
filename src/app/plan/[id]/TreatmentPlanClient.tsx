@@ -680,7 +680,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
               Call (425) 539-4440
             </a>
             <a
-              href="https://booking.mangomint.com/876418"
+              href="https://booking.mangomint.com/ranibeautyclinic1"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#C9A96E]/30 text-[#0F1D2C] rounded-lg text-sm font-semibold hover:border-[#C9A96E] transition-colors"
             >
               Book New Consultation
@@ -717,7 +717,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
 
   const currentScore = plan.skinHealthScore ?? 62;
   const projectedScore = plan.projectedScore ?? 89;
-  const mangomintBookingUrl = 'https://booking.mangomint.com/876418';
+  const mangomintBookingUrl = 'https://booking.mangomint.com/ranibeautyclinic1';
   const cherryFinancingUrl = 'https://patient.withcherry.com/apply/rani-beauty-clinic';
 
   return (

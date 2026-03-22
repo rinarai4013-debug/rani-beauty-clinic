@@ -13,6 +13,7 @@ const QuizCTA = dynamic(() => import("@/components/sections/QuizCTA"));
 const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"));
 const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
 const ConsultationCTA = dynamic(() => import("@/components/sections/ConsultationCTA"));
+const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"));
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
 
 const reviews = [
@@ -168,10 +169,13 @@ export default function HomePage() {
       {/* 8. Your Path to Results */}
       <ProcessSteps />
 
-      {/* 9. Consultation CTA */}
+      {/* 9. Consultation Wizard */}
+      <ConsultationEmbed />
+
+      {/* 10. Consultation CTA (quick book) */}
       <ConsultationCTA />
 
-      {/* 10. FAQ */}
+      {/* 11. FAQ */}
       <FAQ />
     </>
   );
