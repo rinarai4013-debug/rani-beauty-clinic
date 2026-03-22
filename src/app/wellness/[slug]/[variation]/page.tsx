@@ -11,6 +11,7 @@ import StructuredData from "@/components/seo/StructuredData";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 import { serviceVariations } from "@/data/services/service-variations";
+import ServicePageTracker from "@/components/analytics/ServicePageTracker";
 
 interface PageProps {
   params: { slug: string; variation: string };
@@ -93,6 +94,7 @@ export default function WellnessVariationPage({ params }: PageProps) {
 
   return (
     <>
+      <ServicePageTracker serviceName={variation.title} serviceCategory="wellness" />
       <StructuredData data={faqSchema} />
       <BreadcrumbSchema items={breadcrumbs} />
 

@@ -12,6 +12,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+import { useServicePageTracking } from "@/lib/analytics/hooks";
 import { motion } from "framer-motion";
 import { staggerItem } from "@/components/animations/StaggerChildren";
 import { getServiceImage } from "@/data/service-images";
@@ -78,6 +79,8 @@ export default function ServicePageTemplate({
   service,
   allServices,
 }: ServicePageTemplateProps) {
+  useServicePageTracking(service.title, service.isWellness ? "wellness" : "aesthetic");
+
   const relatedServices = allServices.filter((s) =>
     service.relatedSlugs.includes(s.slug)
   );
