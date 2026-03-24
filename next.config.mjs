@@ -261,6 +261,19 @@ const nextConfig = {
         permanent: true,
       },
 
+      // --- WordPress structural paths (GSC: Page with redirect / Crawled not indexed) ---
+      { source: "/about-us", destination: "/about", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+      { source: "/category/:path*", destination: "/blog", permanent: true },
+      { source: "/2024/:path*", destination: "/blog", permanent: true },
+      { source: "/service_category/:path*", destination: "/services", permanent: true },
+      { source: "/cmsms_doctor/:path*", destination: "/about", permanent: true },
+      { source: "/memberships", destination: "/pricing", permanent: true },
+      { source: "/memberships-copy", destination: "/pricing", permanent: true },
+      { source: "/rani-beauty-academy", destination: "/about", permanent: true },
+      { source: "/offers-ranibeautyclinic-com", destination: "/", permanent: true },
+      { source: "/locations.kml", destination: "/", permanent: true },
+
       // --- Old WordPress blog posts (GSC: Crawled not indexed / Duplicate canonical) ---
       {
         source: "/liposuction-what-it-is-surgery-recovery-results",
@@ -299,6 +312,31 @@ const nextConfig = {
       },
       {
         source: "/world-aids-day-designated-on-1-december",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/world-aids-day-designated-on-1-december-2",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/more-than-80-clinical-trials-launch-to-test-coronavirus",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/more-than-80-clinical-trials-launch-to-test-coronavirus-2",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/what-are-some-of-the-most-common-problems",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/8-ways-to-maintain-a-youthful-appearance",
         destination: "/blog",
         permanent: true,
       },

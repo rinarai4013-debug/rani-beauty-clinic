@@ -88,6 +88,15 @@ export default function robots(): MetadataRoute.Robots {
           "/comments/feed/",
           "/author/",
           "/tag/",
+          "/category/",
+          // WordPress custom post types
+          "/service_category/",
+          "/cmsms_doctor/",
+          // WordPress dynamic parameters (additional)
+          "/*?templately_library=*",
+          "/*?wc-ajax=*",
+          "/*?post_type=*",
+          "/*?p=*",
         ],
       },
     ],
