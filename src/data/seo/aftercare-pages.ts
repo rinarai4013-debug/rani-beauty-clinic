@@ -198,7 +198,7 @@ export const aftercarePages: AftercarePage[] = [
     treatment: "RF Microneedling",
     serviceSlug: "rf-microneedling",
     basePath: "services",
-    metaTitle: "RF Microneedling Aftercare Guide | Post-Treatment Recovery Tips",
+    metaTitle: "RF Microneedling Aftercare | Recovery Guide",
     metaDescription: "RF microneedling aftercare: recovery timeline, skincare dos and don'ts, when redness fades & how to maximize collagen. Rani Beauty Clinic.",
     heroDescription: "RF microneedling stimulates powerful collagen remodeling beneath the skin's surface. Follow this aftercare guide to support your skin's healing process and maximize your results over the coming weeks and months.",
     immediateAftercare: [

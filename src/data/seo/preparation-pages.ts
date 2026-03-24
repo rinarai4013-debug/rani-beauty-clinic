@@ -21,7 +21,7 @@ export const preparationPages: PreparationPage[] = [
     serviceSlug: "laser-hair-removal",
     basePath: "services",
     metaTitle: "How to Prepare for Laser Hair Removal | Pre-Treatment Guide",
-    metaDescription: "Complete laser hair removal preparation guide: what to do before your session, shaving instructions, medications to avoid, and what to expect at your appointment. Rani Beauty Clinic.",
+    metaDescription: "Laser hair removal prep guide: shaving instructions, medications to avoid, and what to expect at your appointment. Rani Clinic.",
     heroDescription: "Proper preparation ensures the safest, most effective laser hair removal results. Follow this guide from Rani Beauty Clinic to get ready for your session with the Candela GentleMax Pro Plus.",
     weeksBeforeSteps: [
       "Avoid sun exposure and tanning beds for at least 2 weeks before treatment — tanned skin increases burn risk",
@@ -68,8 +68,8 @@ export const preparationPages: PreparationPage[] = [
     treatment: "Botox & Dysport",
     serviceSlug: "botox-dysport",
     basePath: "services",
-    metaTitle: "How to Prepare for Botox | Pre-Treatment Guide for Best Results",
-    metaDescription: "How to prepare for Botox injections: medications to avoid, skincare adjustments, what to expect at your appointment, and tips for minimizing bruising. Neurologist-supervised at Rani Beauty Clinic.",
+    metaTitle: "How to Prepare for Botox | Pre-Treatment Guide",
+    metaDescription: "Botox prep guide: medications to avoid, skincare adjustments, what to expect, and bruising prevention tips. Rani Beauty Clinic.",
     heroDescription: "Proper preparation before your Botox or Dysport treatment minimizes bruising and helps you achieve the most natural-looking results. Follow this neurologist-approved guide from Rani Beauty Clinic.",
     weeksBeforeSteps: [
       "Stop taking blood-thinning supplements 7 days before: fish oil, vitamin E, ginkgo biloba, garlic supplements, St. John's Wort",
@@ -154,8 +154,8 @@ export const preparationPages: PreparationPage[] = [
     treatment: "GLP-1 Weight Management",
     serviceSlug: "glp1-weight-management",
     basePath: "wellness",
-    metaTitle: "How to Prepare for GLP-1 Treatment | Starting Semaglutide or Tirzepatide",
-    metaDescription: "Starting GLP-1 weight management? Complete preparation guide: required blood work, dietary changes, what to expect at your first appointment. Physician-supervised at Rani Beauty Clinic.",
+    metaTitle: "How to Prepare for GLP-1 | Pre-Treatment Guide",
+    metaDescription: "Starting GLP-1 weight management? Preparation guide: required blood work, dietary changes, and what to expect. Rani Beauty Clinic.",
     heroDescription: "Starting a GLP-1 weight management program is a transformative decision. This guide covers everything you need to know before your first injection, including required blood work, dietary preparation, and what to expect.",
     weeksBeforeSteps: [
       "Complete your comprehensive blood panel at Rani Beauty Clinic (or bring recent lab results from the past 30 days)",
@@ -290,8 +290,8 @@ export const preparationPages: PreparationPage[] = [
     treatment: "Chemical Peels",
     serviceSlug: "chemical-peels",
     basePath: "services",
-    metaTitle: "How to Prepare for a Chemical Peel | Pre-Treatment Skincare Guide",
-    metaDescription: "Chemical peel preparation guide: skincare products to stop, sun avoidance timeline, what to expect at your appointment. Expert guidance from Rani Beauty Clinic in Renton, WA.",
+    metaTitle: "How to Prepare for a Chemical Peel | Guide",
+    metaDescription: "Chemical peel prep: skincare products to stop, sun avoidance timeline, and what to expect at your appointment. Rani Beauty Clinic.",
     heroDescription: "Proper skin preparation before a chemical peel optimizes penetration, improves results, and reduces the risk of complications. Follow this guide to get the best possible outcome from your peel.",
     weeksBeforeSteps: [
       "Your clinician may recommend a pre-peel skincare regimen (retinoids, hydroquinone) 2–4 weeks before for enhanced results",
@@ -332,7 +332,7 @@ export const preparationPages: PreparationPage[] = [
     treatment: "Sofwave",
     serviceSlug: "sofwave",
     basePath: "services",
-    metaTitle: "How to Prepare for Sofwave | Pre-Treatment Guide for Skin Tightening",
+    metaTitle: "How to Prepare for Sofwave | Pre-Treatment Guide",
     metaDescription: "Sofwave skin tightening preparation: what to do before your ultrasound treatment, skincare adjustments, and what to expect. Expert guide from Rani Beauty Clinic.",
     heroDescription: "Sofwave requires minimal preparation compared to other skin tightening treatments. Follow these simple steps to ensure the best possible results from your SUPERB ultrasound session.",
     weeksBeforeSteps: [

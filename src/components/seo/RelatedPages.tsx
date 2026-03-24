@@ -82,7 +82,6 @@ const treatmentLinkMap: Record<string, RelatedLink[]> = {
   "nad-injections": [
     { title: "NAD+ Injection Aftercare", href: "/aftercare/nad-injections-aftercare", description: "Post-injection care instructions" },
     { title: "NAD+ Injection Side Effects", href: "/side-effects/nad-injection-side-effects", description: "What to expect after treatment" },
-    { title: "First Time NAD+ Injections", href: "/first-time/first-time-biorepeel-what-to-expect", description: "Complete first-timer guide" },
   ],
   "red-light-therapy": [
     { title: "Is Red Light Therapy Worth It?", href: "/worth-it/is-red-light-therapy-worth-it", description: "Honest assessment and benefits" },

@@ -24,7 +24,7 @@ export const aestheticServices: AestheticService[] = [
       "Permanent hair reduction for all skin types using the Candela GentleMax Pro Plus with dual-wavelength technology and integrated air cooling for a virtually pain-free experience.",
     icon: "Zap",
     metaTitle:
-      "Laser Hair Removal in Renton, WA | Candela GentleMax Pro Plus | Rani Beauty Clinic",
+      "Laser Hair Removal Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Pain-free laser hair removal for all skin types at Rani Beauty Clinic in Renton, WA. Candela GentleMax Pro Plus with dual wavelengths. Book today.",
     heroDescription:
@@ -226,7 +226,7 @@ The HydraFacial is consistently ranked as the most popular non-invasive aestheti
       "The Cutera Secret Pro delivers radiofrequency energy through precision microneedles to stimulate deep collagen remodeling, tighten skin, and reduce scars, wrinkles, and stretch marks.",
     icon: "Focus",
     metaTitle:
-      "RF Microneedling in Renton, WA | Cutera Secret Pro | Rani Beauty Clinic",
+      "RF Microneedling Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Cutera Secret Pro RF Microneedling at Rani Beauty Clinic in Renton, WA. Stimulate collagen, tighten skin, and reduce scars. Book now.",
     heroDescription:
@@ -333,7 +333,7 @@ The Secret Pro features adjustable needle depth from 0.5mm to 4.0mm and customiz
       "BioRePeel is an innovative bi-phasic TCA 35% peel that delivers deep exfoliation, bio-stimulation, and skin revitalization with zero downtime and no visible peeling.",
     icon: "Sparkles",
     metaTitle:
-      "BioRePeel Treatment in Renton, WA | Zero Downtime Peel | Rani Beauty Clinic",
+      "BioRePeel Treatment Renton WA | Rani Beauty Clinic",
     metaDescription:
       "BioRePeel TCA 35% peel with zero downtime at Rani Beauty Clinic in Renton, WA. Deep exfoliation without visible peeling. Book today.",
     heroDescription:
@@ -434,7 +434,7 @@ What makes BioRePeel revolutionary is that it achieves the clinical results of a
       "Expert neurotoxin injections by a team led by Dr. Alexander Landfield, a board-certified neurologist, for natural-looking wrinkle reduction and preventative aging treatment.",
     icon: "Syringe",
     metaTitle:
-      "Botox & Dysport in Renton, WA | Neurologist-Supervised | Rani Beauty Clinic",
+      "Botox & Dysport Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Botox and Dysport injections supervised by a board-certified neurologist at Rani Beauty Clinic in Renton, WA. Natural results. Book today.",
     heroDescription:
@@ -535,7 +535,7 @@ Both Botox and Dysport work by the same mechanism — blocking the release of ac
       "FDA-approved hyaluronic acid fillers to restore volume, smooth lines, and enhance facial contours with natural-looking results under expert physician supervision.",
     icon: "Heart",
     metaTitle:
-      "Dermal Fillers in Renton, WA | HA Fillers | Rani Beauty Clinic",
+      "Dermal Fillers Renton WA | Rani Beauty Clinic",
     metaDescription:
       "FDA-approved hyaluronic acid dermal fillers at Rani Beauty Clinic in Renton, WA. Restore volume and enhance contours. Book now.",
     heroDescription:
@@ -636,7 +636,7 @@ Different HA fillers are formulated with varying densities, particle sizes, and 
       "Full-body red and near-infrared light therapy panels that boost cellular energy (ATP) production to accelerate healing, reduce inflammation, and promote skin rejuvenation at the cellular level.",
     icon: "Sun",
     metaTitle:
-      "Red Light Therapy in Renton, WA | Full Body Panels | Rani Beauty Clinic",
+      "Red Light Therapy Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Full-body red light therapy at Rani Beauty Clinic in Renton, WA. Boost cellular energy, reduce inflammation, and promote healing. Book today.",
     heroDescription:
@@ -737,7 +737,7 @@ Our full-body panels provide comprehensive coverage, allowing you to treat large
       "A targeted laser treatment that destroys acne-causing bacteria, reduces inflammation, minimizes active breakouts, and addresses acne scarring for clearer, healthier skin.",
     icon: "Shield",
     metaTitle:
-      "Laser Acne Facial in Renton, WA | Acne Treatment | Rani Beauty Clinic",
+      "Laser Acne Facial Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Laser acne facial at Rani Beauty Clinic in Renton, WA. Clear active acne and reduce scarring by targeting bacteria and inflammation. Book now.",
     heroDescription:
@@ -839,7 +839,7 @@ This treatment is designed for both active acne and post-acne concerns. Whether 
       "Medical-grade chemical peels in light, medium, and deep formulations that accelerate cell turnover, improve skin texture, and treat hyperpigmentation, acne, and aging concerns.",
     icon: "Layers",
     metaTitle:
-      "Medical-Grade Chemical Peels in Renton, WA | Rani Beauty Clinic",
+      "Chemical Peels Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Medical-grade chemical peels at Rani Beauty Clinic in Renton, WA. Light, medium, and deep options for acne, aging, and hyperpigmentation. Book now.",
     heroDescription:
@@ -940,7 +940,7 @@ The depth and intensity of a chemical peel determines both the degree of improve
       "Advanced AI-powered skin imaging technology that provides a comprehensive, objective assessment of your skin health, enabling truly personalized treatment plans.",
     icon: "ScanFace",
     metaTitle:
-      "AI Skin Analysis in Renton, WA | Personalized Treatment Plans | Rani Beauty Clinic",
+      "AI Skin Analysis Renton WA | Rani Beauty Clinic",
     metaDescription:
       "AI-powered skin analysis at Rani Beauty Clinic in Renton, WA. Objective imaging reveals hidden damage and guides your treatment plan. Book now.",
     heroDescription:
@@ -1041,7 +1041,7 @@ This technology transforms the consultation experience from subjective observati
       "Non-invasive ultrasound skin tightening and lifting that stimulates new collagen production for a naturally lifted, firmer appearance — no surgery, no downtime.",
     icon: "Waves",
     metaTitle:
-      "Sofwave Skin Tightening in Renton, WA | Post-GLP-1 & Anti-Aging | Rani Beauty Clinic",
+      "Sofwave Skin Tightening Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Sofwave SUPERB ultrasound skin tightening at Rani Beauty Clinic in Renton, WA. FDA-cleared for face, neck, and body. Ideal for post-GLP-1. Book today.",
     heroDescription:
@@ -1165,7 +1165,7 @@ At Rani Beauty Clinic, Sofwave is also a foundational component of The Reveal �
       "Advanced laser and RF microneedling treatments to visibly reduce acne scars, surgical scars, and stretch marks — restoring smoother, more even skin texture.",
     icon: "Eraser",
     metaTitle:
-      "Scar Reduction & Revision in Renton, WA | Laser & RF Microneedling | Rani Beauty Clinic",
+      "Scar Reduction Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Advanced scar reduction with laser and RF microneedling at Rani Beauty Clinic in Renton, WA. Treat acne scars, surgical scars, and stretch marks. Book today.",
     heroDescription:

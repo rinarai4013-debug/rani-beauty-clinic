@@ -22,7 +22,7 @@ export const seasonalPages: SeasonalPage[] = [
     title: "Best Summer Skincare Treatments",
     season: "summer",
     metaTitle: "Best Summer Skincare Treatments | Renton, WA Medspa",
-    metaDescription: "Top summer skincare treatments in Renton, WA: HydraFacial, red light therapy, laser hair removal, and vitamin injections. Physician-supervised at Rani Beauty Clinic.",
+    metaDescription: "Top summer skincare treatments in Renton, WA: HydraFacial, red light therapy, laser hair removal. Physician-supervised at Rani Clinic.",
     heroDescription: "Summer demands a specialized approach to skincare. Increased UV exposure, humidity, and sweat challenge even the most diligent routines. At Rani Beauty Clinic, we offer physician-supervised summer treatments that protect, hydrate, and rejuvenate your skin — without the photosensitivity risks of aggressive procedures.",
     whyThisSeason: "Summer intensifies UV damage, accelerates dehydration, and causes sweat-related breakouts that dull your complexion. Certain treatments — like aggressive chemical peels and ablative lasers — carry higher risks during peak sun months. Our summer protocols focus on hydration, antioxidant protection, and sun-safe treatments that keep your skin radiant without photosensitivity. Starting the right summer regimen now prevents the premature aging and pigmentation damage that appears months later.",
     recommendedTreatments: [
@@ -54,7 +54,7 @@ export const seasonalPages: SeasonalPage[] = [
     title: "Best Winter Skincare Treatments",
     season: "winter",
     metaTitle: "Best Winter Skincare Treatments | Renton, WA Medspa",
-    metaDescription: "Top winter skincare treatments in Renton, WA: chemical peels, RF microneedling, Sofwave, laser resurfacing, and deep hydration. Physician-supervised at Rani Beauty Clinic.",
+    metaDescription: "Top winter skincare treatments in Renton, WA: chemical peels, RF microneedling, Sofwave, and deep hydration. Physician-supervised at Rani Clinic.",
     heroDescription: "Winter is the optimal season for your most transformative skincare treatments. With reduced UV exposure and shorter days, your skin can heal faster and results last longer. At Rani Beauty Clinic, we leverage winter's advantages to deliver the resurfacing, tightening, and rejuvenation treatments that set you up for a radiant year ahead.",
     whyThisSeason: "Winter offers the lowest UV index of the year in the Pacific Northwest, making it the ideal time for treatments that increase photosensitivity — chemical peels, laser resurfacing, and aggressive skin renewal procedures. Cold, dry air also strips moisture from your skin, creating the need for deep hydration treatments. By investing in intensive treatments now, you build a foundation of collagen, clarity, and tone that carries you beautifully through spring and summer.",
     recommendedTreatments: [
@@ -62,7 +62,7 @@ export const seasonalPages: SeasonalPage[] = [
       { name: "RF Microneedling", slug: "rf-microneedling", basePath: "services", whyNow: "Stimulate deep collagen production during winter when your skin is least exposed to UV damage. The micro-injuries heal optimally in cooler temperatures, and results build over 3-6 months — timing perfectly for spring radiance." },
       { name: "Sofwave Skin Tightening", slug: "sofwave", basePath: "services", whyNow: "Non-invasive ultrasound tightening that stimulates collagen deep below the surface. Start in winter and enjoy progressively firmer, lifted skin through spring and summer as collagen remodels over 3-6 months." },
       { name: "HydraFacial MD", slug: "hydrafacial", basePath: "services", whyNow: "Winter air is harsh on skin. Monthly HydraFacials combat dryness, flaking, and dullness caused by cold weather and indoor heating. The deep hydration and antioxidant infusion keeps winter skin glowing." },
-      { name: "PicoWay Laser", slug: "picoway", basePath: "services", whyNow: "Target sun spots, melasma, and pigmentation damage accumulated from summer. Winter's reduced UV exposure allows the treated skin to heal without additional sun damage, maximizing pigment clearance results." },
+      { name: "Laser Acne Facial", slug: "laser-acne-facial", basePath: "services", whyNow: "Target sun spots, melasma, and pigmentation damage accumulated from summer. Winter's reduced UV exposure allows the treated skin to heal without additional sun damage, maximizing pigment clearance results." },
     ],
     skincareTips: [
       "Switch to a richer, cream-based moisturizer to combat cold-air dehydration and indoor heating dryness",
@@ -86,7 +86,7 @@ export const seasonalPages: SeasonalPage[] = [
     title: "Spring Skin Refresh Treatments",
     season: "spring",
     metaTitle: "Spring Skin Refresh Treatments | Renton, WA Medspa",
-    metaDescription: "Refresh your skin this spring with HydraFacial, Botox, laser hair removal, and vitamin injections. Physician-supervised spring treatments at Rani Beauty Clinic in Renton, WA.",
+    metaDescription: "Refresh your skin this spring with HydraFacial, Botox, laser hair removal. Physician-supervised treatments at Rani Clinic in Renton, WA.",
     heroDescription: "Spring is the season of renewal — and your skin deserves to emerge from winter looking fresh, bright, and rejuvenated. At Rani Beauty Clinic, our spring refresh protocols address winter dullness, dehydration, and early sun damage to prepare your skin for the warmer months ahead.",
     whyThisSeason: "After months of cold air, indoor heating, and reduced sunlight, your skin needs a strategic reset. Spring is the transitional window to address winter damage — dryness, dullness, rough texture — while preparing for increased UV exposure ahead. It is also the ideal time to start multi-session treatments like laser hair removal so you are summer-ready. The moderate UV levels in Pacific Northwest spring allow a wider range of treatment options than peak summer.",
     recommendedTreatments: [
@@ -118,12 +118,12 @@ export const seasonalPages: SeasonalPage[] = [
     title: "Fall Skincare Prep Treatments",
     season: "fall",
     metaTitle: "Fall Skincare Prep Treatments | Renton, WA Medspa",
-    metaDescription: "Prepare your skin for fall and winter with chemical peels, RF microneedling, pigment correction, and deep hydration treatments. Physician-supervised at Rani Beauty Clinic.",
+    metaDescription: "Prepare your skin for fall with chemical peels, RF microneedling, pigment correction, and deep hydration. Physician-supervised at Rani Clinic.",
     heroDescription: "Fall is the ideal time to repair summer damage and prepare your skin for the colder months ahead. At Rani Beauty Clinic, our fall protocols focus on reversing UV damage, rebuilding collagen, and establishing a treatment plan that will have your skin looking its absolute best through winter and beyond.",
     whyThisSeason: "Summer takes a toll on your skin — UV damage, dehydration, hyperpigmentation, and collagen breakdown accumulate even with diligent sun protection. Fall is your window to address that damage before winter compounds it with dryness and dullness. As UV levels drop in the Pacific Northwest, you can safely resume more intensive treatments like chemical peels, laser pigment correction, and deep resurfacing. Fall is also the strategic time to begin collagen-building treatments that will deliver peak results by spring.",
     recommendedTreatments: [
       { name: "Chemical Peels (VI Peel)", slug: "chemical-peels", basePath: "services", whyNow: "Fall's declining UV makes it safe to resume chemical peels. Reverse summer hyperpigmentation, sun spots, and uneven texture with a peel series that clears and renews your complexion over the coming months." },
-      { name: "PicoWay Laser", slug: "picoway", basePath: "services", whyNow: "Target the sun spots, freckles, and pigmentation that summer left behind. PicoWay's ultra-short pulses shatter pigment with minimal downtime, and fall's lower UV reduces re-pigmentation risk." },
+      { name: "Laser Acne Facial", slug: "laser-acne-facial", basePath: "services", whyNow: "Target the sun spots, freckles, and pigmentation that summer left behind. Advanced laser technology shatters pigment with minimal downtime, and fall's lower UV reduces re-pigmentation risk." },
       { name: "RF Microneedling", slug: "rf-microneedling", basePath: "services", whyNow: "Rebuild the collagen that summer UV degraded. Starting RF microneedling in fall gives your skin 3-6 months of collagen remodeling — delivering peak firmness and texture improvement by spring." },
       { name: "HydraFacial MD", slug: "hydrafacial", basePath: "services", whyNow: "Transition your skin from summer to fall with deep hydration and pore cleansing. Removes residual sunscreen and environmental buildup while preparing your moisture barrier for colder weather ahead." },
       { name: "NAD+ Injections", slug: "nad-injections", basePath: "wellness", whyNow: "Counteract summer's oxidative stress at the cellular level. NAD+ supports DNA repair, cellular energy, and recovery — helping your body repair the internal damage that UV exposure causes beyond the skin." },
@@ -182,7 +182,7 @@ export const seasonalPages: SeasonalPage[] = [
     title: "New Year, New Skin Treatments",
     season: "winter",
     metaTitle: "New Year New Skin Treatments | Renton, WA Medspa",
-    metaDescription: "Start the new year with transformative skincare: chemical peels, RF microneedling, GLP-1 weight loss, Botox, and wellness injections. Physician-supervised at Rani Beauty Clinic.",
+    metaDescription: "Start the new year with chemical peels, RF microneedling, GLP-1 weight loss, Botox, and wellness injections. Rani Beauty Clinic.",
     heroDescription: "A new year is the perfect time to invest in yourself. At Rani Beauty Clinic, we help you build a comprehensive skin and wellness plan that delivers visible, lasting results. Whether you are starting your first treatment or leveling up your existing routine, January is the month to commit to the best version of yourself.",
     whyThisSeason: "January offers a powerful combination: the motivation of a fresh start, the lowest UV exposure of the year for safe intensive treatments, and months of healing time before summer. Many patients use the new year to establish a consistent treatment regimen for the first time, address concerns they have been putting off, or commit to wellness goals like weight management. Starting now means your results compound month after month, building toward peak radiance by spring and summer.",
     recommendedTreatments: [
@@ -248,7 +248,7 @@ export const seasonalPages: SeasonalPage[] = [
     title: "Back-to-School Skincare Treatments",
     season: "fall",
     metaTitle: "Back-to-School Skincare Treatments | Renton Medspa",
-    metaDescription: "Back-to-school skincare treatments for teens and parents: acne solutions, HydraFacial, laser hair removal, and vitamin injections. Physician-supervised at Rani Beauty Clinic.",
+    metaDescription: "Back-to-school skincare for teens and parents: acne solutions, HydraFacial, laser hair removal. Physician-supervised at Rani Clinic.",
     heroDescription: "The back-to-school season is a fresh start — and your skin should reflect that confidence. At Rani Beauty Clinic, we offer physician-supervised treatments for teens dealing with acne and skin concerns, as well as parents ready to invest in their own skincare now that summer schedules wind down.",
     whyThisSeason: "Back-to-school season marks a transition from summer's relaxed pace to structured routines — making it the ideal time to establish healthy skincare habits. Teens returning to school want clear, confident skin free from summer breakouts and sun damage. Parents, with school routines resuming, finally have time to prioritize their own skincare and wellness treatments they postponed during busy summer months. Fall's lower UV also opens the door to more intensive corrective treatments.",
     recommendedTreatments: [

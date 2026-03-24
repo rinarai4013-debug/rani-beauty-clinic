@@ -25,7 +25,7 @@ export const wellnessServices: WellnessService[] = [
       "Physician-supervised weight management with Semaglutide and Tirzepatide, featuring The Rani Protocol — a comprehensive program with in-house blood work, custom dosing, and ongoing medical support.",
     icon: "Scale",
     metaTitle:
-      "GLP-1 Weight Management in Renton, WA | Semaglutide & Tirzepatide | Rani Beauty Clinic",
+      "GLP-1 Weight Management Renton WA | Rani Clinic",
     metaDescription:
       "Physician-supervised Semaglutide and Tirzepatide at Rani Beauty Clinic in Renton, WA. In-house blood work, custom dosing. Book today.",
     heroDescription:
@@ -132,7 +132,7 @@ The Rani Protocol is our comprehensive, physician-supervised approach to GLP-1 w
       "Targeted peptide protocols including BPC-157 and CJC-1295 for accelerated recovery, anti-aging, cognitive enhancement, and optimized cellular function under physician supervision.",
     icon: "Dna",
     metaTitle:
-      "Peptide Therapy in Renton, WA | BPC-157, CJC-1295 | Rani Beauty Clinic",
+      "Peptide Therapy Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Physician-supervised peptide therapy at Rani Beauty Clinic in Renton, WA. BPC-157, CJC-1295, and more for recovery and anti-aging. Book today.",
     heroDescription:
@@ -241,7 +241,7 @@ What distinguishes medical peptide therapy from over-the-counter supplements is 
       "Quick subcutaneous NAD+ injections that restore cellular energy, support brain health, enhance DNA repair, and combat aging at the molecular level — no IV required.",
     icon: "Battery",
     metaTitle:
-      "NAD+ Injections in Renton, WA | Cellular Energy & Anti-Aging | Rani Beauty Clinic",
+      "NAD+ Injections Renton WA | Rani Beauty Clinic",
     metaDescription:
       "NAD+ subcutaneous injections at Rani Beauty Clinic in Renton, WA. Boost cellular energy and fight aging. $149/shot. Book today.",
     heroDescription:
@@ -343,7 +343,7 @@ NAD+ subcutaneous injections at Rani Beauty Clinic deliver NAD+ directly into th
       "A comprehensive menu of intramuscular vitamin and nutrient injections — including B12, D3, Biotin, Glutathione, and Lipo-B — for rapid absorption and targeted nutritional support.",
     icon: "Pill",
     metaTitle:
-      "Vitamin Injections in Renton, WA | B12, D3, Glutathione | Rani Beauty Clinic",
+      "Vitamin Injections Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Vitamin injections at Rani Beauty Clinic in Renton, WA. B12, D3, Biotin, Glutathione, Lipo-B and more. Quick and effective. Book now.",
     heroDescription:
@@ -440,7 +440,7 @@ Each injection takes just minutes and can be administered as a standalone wellne
       "Comprehensive male and female hormone replacement therapy (HRT) with bioidentical options, The Rani Hormone Protocol, in-house blood work, and ongoing physician supervision.",
     icon: "Activity",
     metaTitle:
-      "Hormone Therapy in Renton, WA | HRT for Men & Women | Rani Beauty Clinic",
+      "Hormone Therapy Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Physician-supervised HRT at Rani Beauty Clinic in Renton, WA. Bioidentical hormones, in-house blood work, and custom protocols. Book today.",
     heroDescription:
@@ -546,7 +546,7 @@ Our approach to hormone therapy is not one-size-fits-all. Hormonal balance is a 
       "Convenient in-house blood draws with comprehensive panels reviewed personally by Dr. Alexander Landfield, providing the foundation for data-driven wellness and treatment planning.",
     icon: "TestTube",
     metaTitle:
-      "Blood Work & Lab Services in Renton, WA | Rani Beauty Clinic",
+      "Blood Work & Labs Renton WA | Rani Beauty Clinic",
     metaDescription:
       "Comprehensive blood work and lab panels at Rani Beauty Clinic in Renton, WA. In-house draws reviewed by Dr. Landfield. Book today.",
     heroDescription:

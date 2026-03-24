@@ -33,6 +33,23 @@ const nextConfig = {
         permanent: true,
       },
 
+      // --- Internal broken-link redirects (Ahrefs 404 fixes) ---
+      {
+        source: "/services/picoway",
+        destination: "/services/laser-acne-facial",
+        permanent: true,
+      },
+      {
+        source: "/services/botox",
+        destination: "/services/botox-dysport",
+        permanent: true,
+      },
+      {
+        source: "/aftercare/nad-injection-aftercare",
+        destination: "/aftercare/nad-injections-aftercare",
+        permanent: true,
+      },
+
       // --- WordPress-only services → closest Next.js equivalent ---
       {
         source: "/services/skin-tag-removal/:path*",
