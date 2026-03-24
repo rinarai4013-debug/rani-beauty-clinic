@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchAll, createRecord, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { calculateClinicScore } from '@/lib/gamification/engine';
+import { getSession } from '@/lib/auth/session';
 import type { DailyMetrics } from '@/types/gamification';
 
 interface AppointmentFields {
@@ -26,11 +27,14 @@ interface TransactionFields {
 // Called by n8n daily (WF9) or manually. Auth via CRON_SECRET.
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Auth: valid dashboard session OR CRON_SECRET in Authorization header
+    const session = await getSession();
+    if (!session) {
+      const authHeader = request.headers.get('authorization');
+      const cronSecret = process.env.CRON_SECRET;
+      if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const today = new Date().toISOString().split('T')[0];

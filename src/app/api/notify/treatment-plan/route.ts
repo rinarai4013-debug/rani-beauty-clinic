@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Tables, createRecord, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache } from '@/lib/cache';
+import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { getSession } from '@/lib/auth/session';
 
 interface TreatmentPlanCreateFields {
   'Client'?: string[];
@@ -42,6 +44,21 @@ interface ClientFields {
  * Also persists the treatment plan record and creates a follow-up alert.
  */
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('notify-treatment-plan', ip, RATE_LIMITS.WEBHOOK);
+  if (!allowed) return rateLimitResponse(resetIn);
+
+  // Auth: valid dashboard session OR n8n webhook secret
+  const secret = request.headers.get('x-webhook-secret');
+  const n8nKey = process.env.N8N_API_KEY;
+  const session = await getSession();
+  if (!session) {
+    if (n8nKey && secret !== n8nKey) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
   try {
     const {
       intakeRecordId,

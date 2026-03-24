@@ -53,6 +53,16 @@ export const clinicInfo = {
     url: "https://07l76i25tvv.typeform.com/to/Ecgz85JA",
     provider: "Typeform",
   },
+  financing: {
+    patientfi: {
+      applyUrl: "https://app.patientfi.com/v2/rani-beauty-clinic/apply",
+      provider: "PatientFi",
+    },
+    cherry: {
+      applyUrl: "https://patient.withcherry.com/apply/rani-beauty-clinic",
+      provider: "Cherry",
+    },
+  },
   n8n: {
     baseUrl: "https://ranibeautyclinic.app.n8n.cloud",
   },

@@ -4,6 +4,7 @@ import {
   getAllMembershipPitchTemplates,
   type MembershipPitchVars,
 } from '@/lib/templates/membership-pitch';
+import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * POST /api/templates/membership-pitch
@@ -24,6 +25,18 @@ import {
  * }
  */
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('templates-membership-pitch', ip, RATE_LIMITS.WEBHOOK);
+  if (!allowed) return rateLimitResponse(resetIn);
+
+  // n8n webhook secret check
+  const secret = request.headers.get('x-webhook-secret');
+  const n8nKey = process.env.N8N_API_KEY;
+  if (n8nKey && secret !== n8nKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 

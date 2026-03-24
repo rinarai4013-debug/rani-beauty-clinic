@@ -235,8 +235,12 @@ export const pricingData = {
 
   paymentInfo: {
     hsaFsaAccepted: true,
-    financingProviders: ["Cherry", "PatientFi"],
+    financingProviders: ["PatientFi", "Cherry"],
+    financingUrls: {
+      patientfi: "https://app.patientfi.com/v2/rani-beauty-clinic/apply",
+      cherry: "https://patient.withcherry.com/apply/rani-beauty-clinic",
+    },
     financingNote:
-      "We accept HSA and FSA cards for eligible treatments. Flexible financing is available through Cherry and PatientFi — apply in-clinic or online with no impact to your credit score.",
+      "We accept HSA and FSA cards for eligible treatments. Flexible financing is available through PatientFi and Cherry — apply in-clinic or online with no impact to your credit score.",
   },
 };

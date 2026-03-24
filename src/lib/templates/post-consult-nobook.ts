@@ -34,6 +34,7 @@ const BOOKING_URL = 'https://www.ranibeautyclinic.com/contact';
 const CLINIC_PHONE = '(425) 207-8883';
 const CLINIC_ADDRESS = '401 Olympia Ave NE #101, Renton, WA 98056';
 const CHERRY_URL = 'https://www.withcherry.com';
+const PATIENTFI_URL = 'https://app.patientfi.com/v2/rani-beauty-clinic/apply';
 
 function fill(template: string, vars: PostConsultNoBookVars): string {
   return template
@@ -48,13 +49,14 @@ function fill(template: string, vars: PostConsultNoBookVars): string {
     .replace(/{{bookingUrl}}/g, BOOKING_URL)
     .replace(/{{clinicPhone}}/g, CLINIC_PHONE)
     .replace(/{{clinicAddress}}/g, CLINIC_ADDRESS)
-    .replace(/{{cherryUrl}}/g, CHERRY_URL);
+    .replace(/{{cherryUrl}}/g, CHERRY_URL)
+    .replace(/{{patientfiUrl}}/g, PATIENTFI_URL);
 }
 
 // ── EMAIL 1: 48H — RECAP + FINANCING ──
 
 const EMAIL_1_RECAP_FINANCING: Template = {
-  sms: `Hi {{firstName}}, it was wonderful meeting you at Rani! We wanted to follow up on your {{treatmentName}} consultation with {{providerName}}. Did you know we offer 0% APR financing through Cherry? Starting at {{monthlyPayment}}. Questions? Text us anytime or book: {{bookingUrl}}`,
+  sms: `Hi {{firstName}}, it was wonderful meeting you at Rani! We wanted to follow up on your {{treatmentName}} consultation with {{providerName}}. Did you know we offer 0% APR financing? Starting at {{monthlyPayment}}. Apply: {{patientfiUrl}} Questions? Text us anytime or book: {{bookingUrl}}`,
   emailSubject: `Following Up on Your {{treatmentName}} Consultation, {{firstName}}`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -89,7 +91,7 @@ const EMAIL_1_RECAP_FINANCING: Template = {
     <div style="background-color: #fff8e7; border: 1px solid #C9A96E33; border-radius: 12px; padding: 24px; margin: 24px 0;">
       <p style="color: #0F1D2C; font-size: 16px; font-weight: 600; margin: 0 0 12px; font-family: 'Playfair Display', Georgia, serif;">Flexible Financing Available</p>
       <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 12px;">
-        We partner with <strong>Cherry</strong> to offer flexible payment plans that fit your budget:
+        We partner with <strong>PatientFi</strong> and <strong>Cherry</strong> to offer flexible payment plans that fit your budget:
       </p>
       <ul style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
         <li><strong>0% APR financing</strong> available on qualifying plans</li>
@@ -97,6 +99,10 @@ const EMAIL_1_RECAP_FINANCING: Template = {
         <li>Quick approval — check your rate in 30 seconds with no impact to your credit score</li>
         <li>No hidden fees, no surprises</li>
       </ul>
+      <div style="margin-top: 16px; text-align: center;">
+        <a href="{{patientfiUrl}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; margin-right: 8px;">Apply with PatientFi</a>
+        <a href="{{cherryUrl}}" style="display: inline-block; border: 1px solid #C9A96E; color: #C9A96E; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;">Apply with Cherry</a>
+      </div>
     </div>
 
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
@@ -199,7 +205,7 @@ const EMAIL_3_PERSONAL_FOLLOWUP: Template = {
       <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 12px;">Here's what I can offer to make it easier:</p>
       <ul style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
         <li>A second consultation at no charge if you'd like to discuss anything further</li>
-        <li>0% APR financing through Cherry — starting at {{monthlyPayment}}</li>
+        <li>0% APR financing through PatientFi or Cherry — starting at {{monthlyPayment}}</li>
         <li>Priority scheduling to get you the appointment time that works best</li>
       </ul>
     </div>

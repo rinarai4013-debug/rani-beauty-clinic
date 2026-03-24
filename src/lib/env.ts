@@ -36,6 +36,8 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(''),
   CHERRY_API_KEY: z.string().optional().default(''),
   CHERRY_WEBHOOK_SECRET: z.string().optional().default(''),
+  PATIENTFI_API_KEY: z.string().optional().default(''),
+  PATIENTFI_WEBHOOK_SECRET: z.string().optional().default(''),
 
   // Booking
   MANGOMINT_WEBHOOK_SECRET: z.string().optional().default(''),
@@ -72,6 +74,14 @@ const envSchema = z.object({
 
   // Dashboard users JSON
   DASHBOARD_USERS: z.string().optional().default('{}'),
+
+  // Security / Automation secrets
+  CRON_SECRET: z.string().optional().default(''),
+  N8N_API_KEY: z.string().optional().default(''),
+
+  // External services
+  REPLICATE_API_TOKEN: z.string().optional().default(''),
+  HTML2PDF_API_KEY: z.string().optional().default(''),
 });
 
 /* ── Parse & export ─────────────────────────────────────────── */
@@ -113,6 +123,7 @@ export const hasFeature = {
     ),
   stripe: () => Boolean(env.STRIPE_SECRET_KEY),
   cherry: () => Boolean(env.CHERRY_API_KEY),
+  patientfi: () => Boolean(env.PATIENTFI_API_KEY),
   plaid: () => Boolean(env.PLAID_CLIENT_ID && env.PLAID_SECRET),
   pinecone: () => Boolean(env.PINECONE_API_KEY),
   embeddings: () => Boolean(env.VOYAGE_API_KEY || env.OPENAI_API_KEY),

@@ -4,12 +4,25 @@ import {
   generateAftercareHTML,
   generateConsultSummaryHTML,
 } from '@/lib/templates/pdf-templates';
+import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 // POST /api/templates/pdf
 // Called by n8n W2 (Document Architect) to generate branded HTML for PDF conversion
 // Returns HTML that n8n converts to PDF via Google Docs or Puppeteer
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('templates-pdf', ip, RATE_LIMITS.WEBHOOK);
+  if (!allowed) return rateLimitResponse(resetIn);
+
+  // n8n webhook secret check
+  const secret = request.headers.get('x-webhook-secret');
+  const n8nKey = process.env.N8N_API_KEY;
+  if (n8nKey && secret !== n8nKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { templateType, ...data } = body;

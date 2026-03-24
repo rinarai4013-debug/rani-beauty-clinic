@@ -126,7 +126,7 @@ export default function GetStartedPage() {
               Treatments from <span className="text-rani-gold">$89/month</span>
             </motion.h2>
             <motion.p variants={fadeUp} className="text-base font-body text-white/60 mb-2">
-              0% APR financing through Cherry · Instant approval · No hard credit check
+              0% APR financing through PatientFi &amp; Cherry · Instant approval · No hard credit check
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 mt-6">
               {['Afterpay', 'Cherry', 'PatientFi', 'HSA/FSA'].map((method) => (

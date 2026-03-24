@@ -719,6 +719,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
   const projectedScore = plan.projectedScore ?? 89;
   const mangomintBookingUrl = 'https://booking.mangomint.com/ranibeautyclinic1';
   const cherryFinancingUrl = 'https://patient.withcherry.com/apply/rani-beauty-clinic';
+  const patientfiUrl = 'https://app.patientfi.com/v2/rani-beauty-clinic/apply';
 
   return (
     <>
@@ -1264,19 +1265,33 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
                       Book Consultation
                     </a>
 
-                    {/* Cherry Financing */}
-                    <a
-                      href={cherryFinancingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent('financing_click', pkg.tier)}
-                      className="block text-center py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider border border-[#C9A96E]/30 text-[#C9A96E] hover:bg-[#C9A96E]/5 transition-all duration-300"
-                    >
-                      <span className="flex items-center justify-center gap-1.5">
-                        <CreditCard className="w-3.5 h-3.5" />
-                        Apply for 0% Financing
-                      </span>
-                    </a>
+                    {/* Financing Options */}
+                    <div className="flex gap-2">
+                      <a
+                        href={patientfiUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('financing_click_patientfi', pkg.tier)}
+                        className="flex-1 block text-center py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider border border-[#C9A96E]/30 text-[#C9A96E] hover:bg-[#C9A96E]/5 transition-all duration-300"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <CreditCard className="w-3.5 h-3.5" />
+                          PatientFi
+                        </span>
+                      </a>
+                      <a
+                        href={cherryFinancingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('financing_click_cherry', pkg.tier)}
+                        className="flex-1 block text-center py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider border border-[#C9A96E]/30 text-[#C9A96E] hover:bg-[#C9A96E]/5 transition-all duration-300"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <CreditCard className="w-3.5 h-3.5" />
+                          Cherry
+                        </span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -1437,16 +1452,26 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
                 </div>
               </div>
 
-              <div className="mt-6 text-center">
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={patientfiUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent('financing_apply_patientfi')}
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-[#C9A96E] text-[#0F1D2C] rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-[#B8964F] transition-all duration-300"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Apply with PatientFi
+                </a>
                 <a
                   href={cherryFinancingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackEvent('financing_apply')}
-                  className="inline-flex items-center gap-2 px-8 py-3 bg-[#C9A96E] text-[#0F1D2C] rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-[#B8964F] transition-all duration-300"
+                  onClick={() => trackEvent('financing_apply_cherry')}
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-[#C9A96E]/30 text-white/80 rounded-lg text-sm font-semibold uppercase tracking-wider hover:border-[#C9A96E] hover:text-white transition-all duration-300"
                 >
                   <CreditCard className="w-4 h-4" />
-                  Check Your Rate — No Impact to Credit
+                  Apply with Cherry
                 </a>
               </div>
             </div>
@@ -1502,14 +1527,24 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
                 </a>
 
                 <a
-                  href={cherryFinancingUrl}
+                  href={patientfiUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackEvent('financing_apply')}
+                  onClick={() => trackEvent('financing_apply_patientfi')}
                   className="inline-flex items-center gap-2 px-8 py-4 border-2 border-[#C9A96E]/30 text-[#0F1D2C] rounded-xl text-sm font-semibold uppercase tracking-wider hover:border-[#C9A96E] hover:bg-[#C9A96E]/5 transition-all duration-300"
                 >
                   <CreditCard className="w-4 h-4 text-[#C9A96E]" />
-                  Apply for Financing
+                  Apply with PatientFi
+                </a>
+                <a
+                  href={cherryFinancingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent('financing_apply_cherry')}
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-[#C9A96E]/20 text-[#0F1D2C]/60 rounded-xl text-xs font-semibold uppercase tracking-wider hover:border-[#C9A96E]/40 hover:text-[#0F1D2C] transition-all duration-300"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  Or Apply with Cherry
                 </a>
               </div>
 
