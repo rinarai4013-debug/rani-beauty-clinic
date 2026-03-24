@@ -22,7 +22,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   }
 
   return {
-    title: concern.metaTitle,
+    title: { absolute: concern.metaTitle },
     description: concern.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/concerns/${concern.slug}`,

@@ -17,7 +17,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   const page = financingPages.find((p) => p.slug === params.slug);
   if (!page) return { title: "Not Found" };
   return {
-    title: page.metaTitle,
+    title: { absolute: page.metaTitle },
     description: page.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/financing/${page.slug}`,

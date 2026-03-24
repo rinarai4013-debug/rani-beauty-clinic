@@ -30,7 +30,7 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
   }
 
   return {
-    title: post.metaTitle,
+    title: { absolute: post.metaTitle },
     description: post.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/blog/${post.slug}`,

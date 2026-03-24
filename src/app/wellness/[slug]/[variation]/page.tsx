@@ -38,7 +38,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   }
 
   return {
-    title: variation.metaTitle,
+    title: { absolute: variation.metaTitle },
     description: variation.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/wellness/${params.slug}/${params.variation}`,

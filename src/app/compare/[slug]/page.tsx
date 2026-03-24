@@ -31,7 +31,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   }
 
   return {
-    title: page.metaTitle,
+    title: { absolute: page.metaTitle },
     description: page.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/compare/${page.slug}`,

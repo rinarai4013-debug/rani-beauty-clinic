@@ -44,7 +44,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   const meta = generateGeoServiceMeta(geo.city, serviceInfo);
 
   return {
-    title: meta.metaTitle,
+    title: { absolute: meta.metaTitle },
     description: meta.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/locations/${geo.slug}/${serviceInfo.slug}`,

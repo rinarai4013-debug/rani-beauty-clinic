@@ -25,7 +25,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   if (!guide) return { title: "Guide Not Found | Rani Beauty Clinic" };
 
   return {
-    title: guide.metaTitle,
+    title: { absolute: guide.metaTitle },
     description: guide.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/guides/${params.slug}`,

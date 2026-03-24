@@ -24,7 +24,7 @@ export function generateMetadata({
   const service = aestheticServices.find((s) => s.slug === params.slug);
   if (!service) return { title: "Service Not Found" };
   return {
-    title: service.metaTitle,
+    title: { absolute: service.metaTitle },
     description: service.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/services/${service.slug}`,
