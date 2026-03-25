@@ -205,6 +205,9 @@ export default function Footer() {
                   { name: "Our Providers", href: "/team/providers" },
                   { name: "Knowledge Base", href: "/knowledge" },
                   { name: "Results Gallery", href: "/results" },
+                  { name: "Botox Cost Calculator", href: "/tools/botox-cost-calculator" },
+                  { name: "Treatment Finder Quiz", href: "/tools/treatment-finder" },
+                  { name: "Press & Media", href: "/press" },
                 ].map((l) => (<li key={l.href}><Link href={l.href} className="font-body text-xs text-gray-500 transition-colors hover:text-rani-gold">{l.name}</Link></li>))}
               </ul>
             </div>

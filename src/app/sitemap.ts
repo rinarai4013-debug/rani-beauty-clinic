@@ -72,6 +72,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/knowledge`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/faq`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
     { url: `${baseUrl}/team/providers`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/tools/botox-cost-calculator`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/tools/treatment-finder`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/press`, lastModified: now, priority: 0.6, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy-policy`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
     { url: `${baseUrl}/terms`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
   ];

@@ -7,6 +7,7 @@ import { comparisonPages } from "@/data/comparisons";
 import { skinConcerns } from "@/data/skin-concerns";
 import { pillarGuides } from "@/data/guides/pillar-pages";
 import { geoPages } from "@/data/locations/geo-pages";
+import { allServiceSlugs } from "@/data/locations/geo-service-data";
 import { galleryPages } from "@/data/results/gallery";
 import { serviceVariations } from "@/data/services/service-variations";
 import { aftercarePages } from "@/data/seo/aftercare-pages";
@@ -67,6 +68,11 @@ function getAllUrls(): string[] {
   // Geo location pages
   geoPages.forEach((g) => urls.push(`${BASE_URL}/locations/${g.slug}`));
 
+  // Geo-service combo pages (48 locations × 17 services = 816 pages)
+  geoPages.forEach((g) => {
+    allServiceSlugs.forEach((s) => urls.push(`${BASE_URL}/locations/${g.slug}/${s}`));
+  });
+
   // SEO programmatic pages
   urls.push(`${BASE_URL}/knowledge`);
   aftercarePages.forEach((p) => urls.push(`${BASE_URL}/aftercare/${p.slug}`));
@@ -81,6 +87,9 @@ function getAllUrls(): string[] {
   bodyAreaPages.forEach((p) => urls.push(`${BASE_URL}/treatment-areas/${p.slug}`));
   urls.push(`${BASE_URL}/faq`);
   urls.push(`${BASE_URL}/team/providers`);
+  urls.push(`${BASE_URL}/tools/botox-cost-calculator`);
+  urls.push(`${BASE_URL}/tools/treatment-finder`);
+  urls.push(`${BASE_URL}/press`);
 
   return urls;
 }
