@@ -61,7 +61,7 @@ export default function Footer() {
           </div>
 
           {/* Column 2: Navigate */}
-          <div>
+          <nav aria-label="Footer navigation">
             <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">
               Navigate
             </h3>
@@ -77,10 +77,10 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Column 3: Services */}
-          <div>
+          <nav aria-label="Services">
             <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">
               Services
             </h3>
@@ -96,7 +96,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Column 4: Contact */}
           <div>
@@ -105,7 +105,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <MapPin size={16} className="mt-0.5 shrink-0 text-rani-gold" />
+                <MapPin size={16} className="mt-0.5 shrink-0 text-rani-gold" aria-hidden="true" />
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicInfo.address.full)}`}
                   target="_blank"
@@ -119,7 +119,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Phone size={16} className="shrink-0 text-rani-gold" />
+                <Phone size={16} className="shrink-0 text-rani-gold" aria-hidden="true" />
                 <a
                   href={clinicInfo.phoneTel}
                   className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold"
@@ -128,7 +128,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Mail size={16} className="shrink-0 text-rani-gold" />
+                <Mail size={16} className="shrink-0 text-rani-gold" aria-hidden="true" />
                 <a
                   href="mailto:info@ranibeautyclinic.com"
                   className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold"
@@ -137,7 +137,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Clock size={16} className="shrink-0 text-rani-gold" />
+                <Clock size={16} className="shrink-0 text-rani-gold" aria-hidden="true" />
                 <span className="font-body text-sm text-gray-300">
                   Mon–Sun, 10am–7pm
                 </span>

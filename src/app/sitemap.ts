@@ -18,6 +18,12 @@ import { resultsTimelinePages } from "@/data/seo/results-timeline-pages";
 import { seasonalPages } from "@/data/seo/seasonal-pages";
 import { financingPages } from "@/data/seo/financing-pages";
 import { bodyAreaPages } from "@/data/seo/body-area-pages";
+import { menPages } from "@/data/seo/men-pages";
+import { agePages } from "@/data/seo/age-pages";
+import { combinationPages } from "@/data/seo/combination-pages";
+import { vsPages } from "@/data/seo/vs-pages";
+import { pnwCities } from "@/data/locations/pnw-cities";
+import { serviceGeoEntries } from "@/data/locations/service-geo";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
 
@@ -267,6 +273,54 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
   }));
 
+  // Men's treatment guide pages
+  const menPageUrls: MetadataRoute.Sitemap = menPages.map((page) => ({
+    url: `${baseUrl}/men/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Age-specific treatment pages
+  const agePageUrls: MetadataRoute.Sitemap = agePages.map((page) => ({
+    url: `${baseUrl}/age/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Treatment combination pages
+  const combinationPageUrls: MetadataRoute.Sitemap = combinationPages.map((page) => ({
+    url: `${baseUrl}/combinations/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Treatment comparison (vs) pages
+  const vsPageUrls: MetadataRoute.Sitemap = vsPages.map((page) => ({
+    url: `${baseUrl}/vs/${page.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Near [city] geo pages (50 PNW cities)
+  const nearCityPages: MetadataRoute.Sitemap = pnwCities.map((city) => ({
+    url: `${baseUrl}/near/${city.slug}`,
+    lastModified: now,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  // Near [city]/[service] geo-service pages (50 cities x 10 services = 500 pages)
+  const nearServicePages: MetadataRoute.Sitemap = serviceGeoEntries.map((entry) => ({
+    url: `${baseUrl}/near/${entry.citySlug}/${entry.serviceSlug}`,
+    lastModified: now,
+    priority: 0.6,
+    changeFrequency: "monthly",
+  }));
+
   return [
     ...staticPages,
     ...servicePages,
@@ -274,6 +328,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...blogPageUrls,
     ...locationPages,
     ...geoServicePages,
+    ...nearCityPages,
+    ...nearServicePages,
     ...costPageUrls,
     ...comparisonPageUrls,
     ...aestheticVariationPages,
@@ -291,5 +347,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...seasonalPageUrls,
     ...financingPageUrls,
     ...bodyAreaPageUrls,
+    ...menPageUrls,
+    ...agePageUrls,
+    ...combinationPageUrls,
+    ...vsPageUrls,
   ];
 }
