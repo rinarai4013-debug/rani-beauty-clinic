@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path((?!api).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "ranibeautyclinic.com"
+        }
+      ],
+      "destination": "https://www.ranibeautyclinic.com/:path",
+      "permanent": true
+    }
+  ]
+}
