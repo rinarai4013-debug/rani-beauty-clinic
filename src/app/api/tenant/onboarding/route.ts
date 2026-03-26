@@ -61,7 +61,7 @@ export async function GET() {
 // ─── POST: Submit Step or Action ────────────────────────────────────────────
 
 // @ts-ignore - schema validation done manually
-const onboardingPostSchema = z.union('action', [
+const onboardingPostSchema = z.union([
   // Step submission
   z.object({
     action: z.undefined().optional(),
@@ -82,6 +82,7 @@ const onboardingPostSchema = z.union('action', [
     ownerEmail: z.string().email(),
     ownerName: z.string().min(1),
   }),
+]);
 
 export async function POST(request: NextRequest) {
   try {
