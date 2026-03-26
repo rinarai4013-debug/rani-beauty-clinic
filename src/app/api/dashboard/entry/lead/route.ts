@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       'Email': body.email || '',
       'Phone': body.phone || '',
     };
-    // Only set Status if a valid option — Airtable may reject new select options
+    // Only set Status if a valid option - Airtable may reject new select options
     // Add 'New Lead' as an option in your Airtable Status field for proper lead funnel tracking
     const recordId = await createRecord(Tables.clients(), fields);
 

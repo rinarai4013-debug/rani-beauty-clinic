@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import AboutPageClient from "./AboutPageClient";
 
 export const metadata: Metadata = {
-  title: "About Us — Woman-Owned Medspa in Renton",
+  title: "About Us - Woman-Owned Medspa in Renton",
   description:
     "Rani Beauty Clinic is a woman-owned, physician-supervised medspa in Renton, WA. Meet our board-certified Medical Director and expert team.",
   alternates: {

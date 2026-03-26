@@ -53,7 +53,7 @@ export default function PhaseDropZone({
       const data = JSON.parse(raw) as { id: string; phase: number; index: number };
 
       if (data.phase === phase.id) {
-        // Reorder within same phase — find drop target index
+        // Reorder within same phase - find drop target index
         const dropTarget = (e.target as HTMLElement).closest('[data-service-index]');
         const toIndex = dropTarget
           ? parseInt(dropTarget.getAttribute('data-service-index') || '0', 10)

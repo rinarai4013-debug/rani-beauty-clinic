@@ -101,7 +101,7 @@ export default function Step7PhotoUpload({
         const resized = await Promise.all(toProcess.map(resizeImage));
         onUpdate('photos', [...photos, ...resized]);
       } catch {
-        // Silently fail resize — use originals
+        // Silently fail resize - use originals
         onUpdate('photos', [...photos, ...toProcess]);
       } finally {
         setProcessing(false);

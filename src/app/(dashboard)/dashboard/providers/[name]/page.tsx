@@ -22,7 +22,7 @@ function formatCurrency(n: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 }
 function formatDate(dateStr: string): string {
-  if (!dateStr) return '—';
+  if (!dateStr) return ' - ';
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 

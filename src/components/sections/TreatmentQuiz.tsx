@@ -140,7 +140,7 @@ export default function TreatmentQuiz() {
           setAiRecommendation(aiData.recommendation);
         }
       } catch {
-        // AI recommendation is optional — continue without it
+        // AI recommendation is optional - continue without it
       }
 
       setIsComplete(true);
@@ -241,7 +241,7 @@ export default function TreatmentQuiz() {
                         <ul className="space-y-1">
                           {(plan.services as Array<{ name: string; price: string; why: string }>).map((s, i) => (
                             <li key={i} className="text-sm font-body text-white/60">
-                              <span className="text-white/80">{s.name}</span> ({s.price}) — {s.why}
+                              <span className="text-white/80">{s.name}</span> ({s.price}) - {s.why}
                             </li>
                           ))}
                         </ul>

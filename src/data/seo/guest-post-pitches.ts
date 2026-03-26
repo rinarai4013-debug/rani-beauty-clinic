@@ -11,7 +11,7 @@ export interface GuestPostPitch {
 export const guestPostPitches: GuestPostPitch[] = [
   {
     targetPublication: "Beauty and skincare blogs (e.g., Byrdie, Allure contributor blogs, Into The Gloss)",
-    subjectLine: "Guest Post Pitch: The Science Behind RF Microneedling — What Happens Beneath the Surface",
+    subjectLine: "Guest Post Pitch: The Science Behind RF Microneedling - What Happens Beneath the Surface",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA. I'd love to contribute a guest article explaining the science behind RF microneedling in a way that's accessible to your readers without oversimplifying the clinical mechanisms.
@@ -47,7 +47,7 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Health and medical publications (e.g., Healthline contributor network, WebMD blogs, health-focused outlets)",
-    subjectLine: "Guest Post Pitch: Why Physician Supervision Matters in Medical Aesthetics — A Neurologist's Perspective",
+    subjectLine: "Guest Post Pitch: Why Physician Supervision Matters in Medical Aesthetics - A Neurologist's Perspective",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist serving as Medical Director of Rani Beauty Clinic in Renton, WA. I'd like to propose a guest article addressing a critical patient safety topic: the importance of physician supervision in medical aesthetics.
@@ -83,14 +83,14 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Wellness and health blogs (e.g., Well+Good, Healthish, MindBodyGreen)",
-    subjectLine: "Guest Post Pitch: GLP-1 Medications for Weight Management — A Neurologist's Clinical Perspective",
+    subjectLine: "Guest Post Pitch: GLP-1 Medications for Weight Management - A Neurologist's Clinical Perspective",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA, where I oversee our physician-supervised GLP-1 weight management program.
 
 GLP-1 receptor agonist medications have dominated health media, but much of the coverage leans toward hype or fear without grounding in clinical context. I'd like to contribute a guest article that provides your readers with a balanced, medically informed perspective on how GLP-1 medications work, who they're appropriate for, and what responsible medical supervision of these protocols looks like.
 
-As a neurologist, I bring a unique lens to this topic — understanding the neurological pathways involved in appetite regulation and how GLP-1 agonists interact with those systems. The piece would be approximately 1,200 words, evidence-based, and written for a general wellness audience.
+As a neurologist, I bring a unique lens to this topic - understanding the neurological pathways involved in appetite regulation and how GLP-1 agonists interact with those systems. The piece would be approximately 1,200 words, evidence-based, and written for a general wellness audience.
 
 Would love to discuss how this could fit your editorial lineup.
 
@@ -119,12 +119,12 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Tech and beauty crossover blogs (e.g., The Verge wellness section, Glossy, Beauty Independent)",
-    subjectLine: "Guest Post Pitch: The Future of AI in Skincare — How Clinics Are Using Machine Learning for Diagnosis",
+    subjectLine: "Guest Post Pitch: The Future of AI in Skincare - How Clinics Are Using Machine Learning for Diagnosis",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, Medical Director of Rani Beauty Clinic in Renton, WA, where we've integrated AI-powered skin analysis technology into our clinical practice.
 
-I'd like to contribute a guest article exploring how artificial intelligence is transforming skincare consultation and treatment planning. Rather than speculative futurism, this piece would be grounded in our firsthand experience deploying AI diagnostics in a clinical medspa setting — what the technology actually measures, how it compares to traditional assessment methods, and where the real opportunities and limitations lie.
+I'd like to contribute a guest article exploring how artificial intelligence is transforming skincare consultation and treatment planning. Rather than speculative futurism, this piece would be grounded in our firsthand experience deploying AI diagnostics in a clinical medspa setting - what the technology actually measures, how it compares to traditional assessment methods, and where the real opportunities and limitations lie.
 
 Your readers at the intersection of technology and beauty would benefit from an insider perspective on how AI is being used today, not just where it might go tomorrow. Approximately 1,200 words, with practical insights from live clinical deployment.
 
@@ -135,7 +135,7 @@ Dr. Alexander Landfield
 Medical Director, Rani Beauty Clinic`,
     proposedTitle: "The Future of AI in Skincare: How Machine Learning Is Changing the Way Clinics Assess Your Skin",
     outline: [
-      "Introduction: AI Has Arrived in Aesthetic Medicine — Here's What That Actually Means",
+      "Introduction: AI Has Arrived in Aesthetic Medicine - Here's What That Actually Means",
       "How AI Skin Analysis Works: Imaging, Data Processing, and Pattern Recognition",
       "What AI Measures That the Human Eye Might Miss",
       "From Data to Treatment Plan: How Clinicians Use AI Insights in Practice",
@@ -155,12 +155,12 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Lifestyle publications (e.g., Cosmopolitan, Refinery29, PureWow)",
-    subjectLine: "Guest Post Pitch: Botox Myths Debunked — A Board-Certified Neurologist Separates Fact from Fiction",
+    subjectLine: "Guest Post Pitch: Botox Myths Debunked - A Board-Certified Neurologist Separates Fact from Fiction",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA. As a neurologist, I have specialized training in the neuromuscular mechanisms that Botox targets, giving me a clinical perspective that most aesthetic content doesn't offer.
 
-I'd like to contribute a guest article debunking the most persistent Botox myths — from the "frozen face" fear to misconceptions about toxicity and long-term effects. The piece would be informative, conversational, and grounded in neuroscience, making it accessible and genuinely useful for your readers who are curious about Botox but held back by misinformation.
+I'd like to contribute a guest article debunking the most persistent Botox myths - from the "frozen face" fear to misconceptions about toxicity and long-term effects. The piece would be informative, conversational, and grounded in neuroscience, making it accessible and genuinely useful for your readers who are curious about Botox but held back by misinformation.
 
 Approximately 1,200 words, written to educate without being clinical or dry. I can speak to both the science and the patient experience from our practice.
 
@@ -176,7 +176,7 @@ Medical Director, Rani Beauty Clinic`,
       "Myth 2: Botox Is Dangerous Because It's a Toxin",
       "Myth 3: If You Start Botox, You Can Never Stop",
       "Myth 4: Botox Is Only for Older People with Deep Wrinkles",
-      "Myth 5: Any Provider Can Safely Administer Botox — Credentials Don't Matter",
+      "Myth 5: Any Provider Can Safely Administer Botox - Credentials Don't Matter",
       "The Bottom Line: What a Neurologist Wants Every Patient to Know Before Botox",
     ],
     authorBio: "Dr. Alexander Landfield is a board-certified neurologist and Medical Director of Rani Beauty Clinic, a physician-supervised luxury medspa in Renton, WA. His neurological expertise informs precise, safe Botox administration and comprehensive aesthetic treatment planning. Learn more at ranibeautyclinic.com.",
@@ -191,7 +191,7 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Consumer advice and wellness blogs (e.g., Consumer Reports health section, Verywell Health, Real Simple)",
-    subjectLine: "Guest Post Pitch: How to Choose a Safe Medspa — A Medical Director's Guide for Patients",
+    subjectLine: "Guest Post Pitch: How to Choose a Safe Medspa - A Medical Director's Guide for Patients",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA. I'd like to pitch a consumer education article on how to evaluate and choose a safe, reputable medspa.
@@ -227,7 +227,7 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Anti-aging and skincare authority blogs (e.g., NewBeauty, RealSelf, Zwivel)",
-    subjectLine: "Guest Post Pitch: Non-Invasive Skin Tightening — What the Clinical Evidence Actually Shows",
+    subjectLine: "Guest Post Pitch: Non-Invasive Skin Tightening - What the Clinical Evidence Actually Shows",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA, where we offer multiple non-invasive skin tightening technologies including Sofwave SUPERB and RF microneedling.
@@ -263,12 +263,12 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Men's health and lifestyle publications (e.g., Men's Health, GQ wellness, Esquire grooming)",
-    subjectLine: "Guest Post Pitch: The Rise of Male Aesthetics — Why More Men Are Visiting Medspas",
+    subjectLine: "Guest Post Pitch: The Rise of Male Aesthetics - Why More Men Are Visiting Medspas",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA. I'd like to pitch a guest article on the growing trend of men seeking aesthetic treatments at medspas.
 
-Male patients now represent one of the fastest-growing demographics in medical aesthetics, yet most content about medspa treatments is still written for a female audience. My article would address the male reader directly — covering the most popular treatments men are choosing (Botox, laser hair removal, skin tightening), what the experience is actually like, and why the stigma around men's aesthetics is fading.
+Male patients now represent one of the fastest-growing demographics in medical aesthetics, yet most content about medspa treatments is still written for a female audience. My article would address the male reader directly - covering the most popular treatments men are choosing (Botox, laser hair removal, skin tightening), what the experience is actually like, and why the stigma around men's aesthetics is fading.
 
 I'd bring a clinical perspective to complement the cultural angle, explaining how treatment protocols are adapted for male anatomy and skin characteristics. Approximately 1,200 words, written in a straightforward, no-fluff tone appropriate for a male readership.
 
@@ -277,9 +277,9 @@ Let me know if this fits your editorial lineup.
 Best regards,
 Dr. Alexander Landfield
 Medical Director, Rani Beauty Clinic`,
-    proposedTitle: "The Rise of Male Aesthetics: Why More Men Are Booking Medspa Treatments — and What to Expect",
+    proposedTitle: "The Rise of Male Aesthetics: Why More Men Are Booking Medspa Treatments - and What to Expect",
     outline: [
-      "Introduction: Male Aesthetics Is No Longer a Niche — The Numbers Behind the Trend",
+      "Introduction: Male Aesthetics Is No Longer a Niche - The Numbers Behind the Trend",
       "The Most Popular Treatments Men Are Choosing and Why",
       "Botox for Men: How Treatment Differs from the Female Approach",
       "Laser Hair Removal for Men: What to Know About Treating Larger Body Areas",
@@ -299,12 +299,12 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Wellness and self-care blogs (e.g., Healthline, Everyday Health, Shape)",
-    subjectLine: "Guest Post Pitch: Understanding Your Skin Type — A Medical Approach to Personalized Skincare",
+    subjectLine: "Guest Post Pitch: Understanding Your Skin Type - A Medical Approach to Personalized Skincare",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA, where we use AI-powered skin analysis alongside clinical evaluation to build personalized treatment plans.
 
-I'd like to contribute a guest article that helps your readers understand their skin type from a medical perspective rather than a marketing one. Most skin type content online relies on outdated categorizations or oversimplified quizzes. My article would explain how clinicians actually assess skin — including the Fitzpatrick scale, barrier function, sebaceous activity, and sensitivity markers — and translate that into practical guidance readers can use.
+I'd like to contribute a guest article that helps your readers understand their skin type from a medical perspective rather than a marketing one. Most skin type content online relies on outdated categorizations or oversimplified quizzes. My article would explain how clinicians actually assess skin - including the Fitzpatrick scale, barrier function, sebaceous activity, and sensitivity markers - and translate that into practical guidance readers can use.
 
 This is a genuinely educational piece designed to empower readers with knowledge they can apply whether they visit a medspa or simply want to make better product choices. Approximately 1,200 words.
 
@@ -335,7 +335,7 @@ Medical Director, Rani Beauty Clinic`,
   },
   {
     targetPublication: "Beauty authority and aesthetic treatment sites (e.g., NewBeauty, Allure, Harper's Bazaar beauty)",
-    subjectLine: "Guest Post Pitch: Combining Aesthetic Treatments for Optimal Results — A Physician's Protocol Guide",
+    subjectLine: "Guest Post Pitch: Combining Aesthetic Treatments for Optimal Results - A Physician's Protocol Guide",
     pitchEmail: `Hi [Editor Name],
 
 I'm Dr. Alexander Landfield, a board-certified neurologist and Medical Director of Rani Beauty Clinic in Renton, WA. I'd like to pitch a guest article on the strategic combination of aesthetic treatments for superior outcomes.

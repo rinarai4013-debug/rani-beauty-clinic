@@ -12,7 +12,7 @@ import { clinicInfo } from "@/data/clinic-info";
 import { geoPages } from "@/data/locations/geo-pages";
 
 export const metadata: Metadata = {
-  title: "Areas We Serve — Greater Seattle & King County",
+  title: "Areas We Serve - Greater Seattle & King County",
   description:
     "Rani Beauty Clinic in Renton serves King County including Bellevue, Kent, Kirkland, Redmond, Auburn, Federal Way, and Seattle. Book today.",
   alternates: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
       "Serving 40+ cities and neighborhoods across King County from our central Renton location. Physician-supervised aesthetic and medical wellness treatments.",
     type: "website",
     url: `${clinicInfo.website}/locations`,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic — Areas We Serve" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic - Areas We Serve" }],
   },
   twitter: {
     card: "summary_large_image",

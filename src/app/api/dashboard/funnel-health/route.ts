@@ -51,7 +51,7 @@ export async function GET() {
       step: 1,
       name: 'Airtable Connection',
       status: records.length > 0 ? 'pass' : 'warn',
-      message: records.length > 0 ? 'Connected — fetched 1 record from Clients' : 'Connected but Clients table is empty',
+      message: records.length > 0 ? 'Connected - fetched 1 record from Clients' : 'Connected but Clients table is empty',
     });
   } catch (err) {
     steps.push({
@@ -120,7 +120,7 @@ export async function GET() {
         name: 'Treatment Plans',
         status: hasSummary ? 'pass' : 'warn',
         message: hasSummary
-          ? 'Treatment plan route operational — recent intake has AI summary'
+          ? 'Treatment plan route operational - recent intake has AI summary'
           : 'Recent intake missing AI summary',
       });
     } else {
@@ -223,7 +223,7 @@ export async function GET() {
     });
   }
 
-  // Step 8: n8n Workflows — check primary webhook
+  // Step 8: n8n Workflows - check primary webhook
   const n8nUrl = process.env.N8N_WEBHOOK_URL;
   if (n8nUrl) {
     try {
@@ -257,10 +257,10 @@ export async function GET() {
       try {
         const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
         const reachable = res.ok || res.status === 405 || res.status === 200;
-        console.log(`[Funnel Health] n8n webhook ${url} — status ${res.status} (${reachable ? 'reachable' : 'error'})`);
+        console.log(`[Funnel Health] n8n webhook ${url} - status ${res.status} (${reachable ? 'reachable' : 'error'})`);
         return { url, reachable };
       } catch (err) {
-        console.log(`[Funnel Health] n8n webhook ${url} — unreachable: ${err instanceof Error ? err.message : 'Unknown'}`);
+        console.log(`[Funnel Health] n8n webhook ${url} - unreachable: ${err instanceof Error ? err.message : 'Unknown'}`);
         return { url, reachable: false };
       }
     })

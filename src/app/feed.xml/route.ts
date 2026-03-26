@@ -36,7 +36,7 @@ export async function GET() {
   const entries: string[] = [];
 
   // Static pages (high priority)
-  entries.push(entry(`${baseUrl}`, "Rani Beauty Clinic — Premier Medspa & Wellness in Renton, WA"));
+  entries.push(entry(`${baseUrl}`, "Rani Beauty Clinic - Premier Medspa & Wellness in Renton, WA"));
   entries.push(entry(`${baseUrl}/services`, "Aesthetic Services"));
   entries.push(entry(`${baseUrl}/wellness`, "Medical Wellness Services"));
   entries.push(entry(`${baseUrl}/about`, "About Rani Beauty Clinic"));

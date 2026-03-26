@@ -1,0 +1,7 @@
+{
+  "type": "membership-pitch",
+  "trigger": "third_appointment_completed",
+  "delayAfterTrigger": "3 days after third appointment",
+  "message": "Hi {{first_name}}, since you've been a regular at Rani, have you considered our membership? Members enjoy exclusive pricing, monthly treatment credits, and priority booking. Ask us about it at your next visit or learn more: {{membership_link}}",
+  "characterCount": 256
+}

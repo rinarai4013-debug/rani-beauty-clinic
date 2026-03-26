@@ -1,0 +1,7 @@
+{
+  "type": "glp1-weekly-checkin",
+  "trigger": "glp1_program_active",
+  "delayAfterTrigger": "Weekly on injection day",
+  "message": "Hi {{first_name}}, it's your weekly GLP-1 check-in from Rani. How are you feeling this week? Any side effects or questions? Remember to stay hydrated and prioritize protein intake. Text us anytime if you need support.",
+  "characterCount": 224
+}

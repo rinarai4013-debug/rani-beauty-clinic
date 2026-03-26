@@ -1,13 +1,13 @@
 /**
  * Reactivation Campaign Templates
  *
- * Used by n8n WF8 (Reactivation Campaigns — Monday 10AM) to send
+ * Used by n8n WF8 (Reactivation Campaigns - Monday 10AM) to send
  * personalized win-back messages to lapsed clients.
  *
  * Three tiers based on lapse duration:
- * 1. Lapsed 30 — Gentle nudge, lowest urgency
- * 2. Lapsed 60 — More compelling offer
- * 3. Lapsed 90 — Last chance, strongest offer
+ * 1. Lapsed 30 - Gentle nudge, lowest urgency
+ * 2. Lapsed 60 - More compelling offer
+ * 3. Lapsed 90 - Last chance, strongest offer
  */
 
 export interface ReactivationVars {
@@ -38,7 +38,7 @@ function fill(template: string, vars: ReactivationVars): string {
 
 // ── LAPSED 30 DAYS ──
 const LAPSED_30: ReactivationTemplate = {
-  sms: `hi beautiful ✨ it's been a little while since your last visit and we just wanted to check in! your {{lastService}} results are probably ready for a refresh 💛 we'd love to see you — {{bookingUrl}} 🤍`,
+  sms: `hi beautiful ✨ it's been a little while since your last visit and we just wanted to check in! your {{lastService}} results are probably ready for a refresh 💛 we'd love to see you - {{bookingUrl}} 🤍`,
   emailSubject: `checking in, {{firstName}} ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -67,7 +67,7 @@ const LAPSED_30: ReactivationTemplate = {
 
 // ── LAPSED 60 DAYS ──
 const LAPSED_60: ReactivationTemplate = {
-  sms: `hey angel! 💛 we've been thinking about you! it's been about two months and we have some amazing new things happening at the clinic ✨ come see what's new — your skin will thank you 🤍 {{bookingUrl}}`,
+  sms: `hey angel! 💛 we've been thinking about you! it's been about two months and we have some amazing new things happening at the clinic ✨ come see what's new - your skin will thank you 🤍 {{bookingUrl}}`,
   emailSubject: `we've been thinking about you, {{firstName}} 💛`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -78,12 +78,12 @@ const LAPSED_60: ReactivationTemplate = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">hey angel! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      it's been about two months since your {{lastService}}, and we have some amazing new things happening at Rani ✨ we'd love for you to come see what's new — your skin will thank you!
+      it's been about two months since your {{lastService}}, and we have some amazing new things happening at Rani ✨ we'd love for you to come see what's new - your skin will thank you!
     </p>
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #C9A96E;">
       <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 8px;">complimentary skin consultation ✨</p>
       <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;">
-        let us create an updated treatment plan tailored to your current goals — on us 💛
+        let us create an updated treatment plan tailored to your current goals - on us 💛
       </p>
     </div>
     <div style="text-align: center; margin: 28px 0;">
@@ -100,7 +100,7 @@ const LAPSED_60: ReactivationTemplate = {
 
 // ── LAPSED 90 DAYS ──
 const LAPSED_90: ReactivationTemplate = {
-  sms: `hi gorgeous! ✨ it's been a while and we want you to know — whenever you're ready, we're here 💛 we'd love to do a complimentary skin assessment to see where your glow journey is at 🤍 {{bookingUrl}}`,
+  sms: `hi gorgeous! ✨ it's been a while and we want you to know - whenever you're ready, we're here 💛 we'd love to do a complimentary skin assessment to see where your glow journey is at 🤍 {{bookingUrl}}`,
   emailSubject: `whenever you're ready, we're here ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -110,7 +110,7 @@ const LAPSED_90: ReactivationTemplate = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">hi gorgeous! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      it's been a while and we just want you to know — whenever you're ready, we're here ✨ no pressure at all.
+      it's been a while and we just want you to know - whenever you're ready, we're here ✨ no pressure at all.
     </p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
       we'd love to do a complimentary skin assessment to see where your glow journey is at and what would be perfect for you right now 🤍

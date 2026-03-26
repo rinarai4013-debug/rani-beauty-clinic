@@ -364,18 +364,18 @@ function createContentItem(params: ContentItemParams): ContentItem {
     testimonial: `"I cannot believe the difference!" Another happy Rani client after their ${service.name} treatment. With ${input.clinicStats.reviewCount}+ 5-star reviews, our results speak for themselves.`,
     seasonal: `${seasonal.theme} is here! ${seasonal.hooks[Math.floor(Math.random() * seasonal.hooks.length)]}. Start with ${service.name} and let your glow do the talking.`,
     team_spotlight: `Meet the team behind your glow. At Rani Beauty Clinic, every treatment is overseen by a physician and delivered by experienced, certified providers.`,
-    service_highlight: `${service.name} explained: ${service.educationalPoints[0] || `A revolutionary treatment that delivers visible results.`}\n\nDuration: ${service.price > 1000 ? '45-90' : '15-60'} minutes | Results: Immediate to progressive\n\nBook your appointment today.`,
+    service_highlight: `${service.name} explained: ${service.educationalPoints[0] || `An effective treatment that delivers visible results.`}\n\nDuration: ${service.price > 1000 ? '45-90' : '15-60'} minutes | Results: Immediate to progressive\n\nBook your appointment today.`,
     wellness_tip: `Your wellness journey starts from within. ${service.name} supports your body's natural processes for lasting health and vitality.\n\nAt Rani, we believe beauty starts with wellness.`,
     community: `We are proud to serve the Renton community. From ${input.clinicStats.totalClients.toLocaleString()}+ clients to ${input.clinicStats.membershipCount} Angel Glow members, Rani Beauty Clinic is your partner in confidence.`,
   };
 
   const ctas: Record<ContentCategory, string> = {
-    educational: 'Learn more — Link in bio',
-    before_after: 'Book your transformation — Link in bio',
+    educational: 'Learn more - Link in bio',
+    before_after: 'Book your transformation - Link in bio',
     promotional: 'Book now before spots fill up',
     behind_the_scenes: 'Book your next visit',
-    testimonial: 'Join our happy clients — Book today',
-    seasonal: 'Limited availability — Book now',
+    testimonial: 'Join our happy clients - Book today',
+    seasonal: 'Limited availability - Book now',
     team_spotlight: 'Meet us at your next appointment',
     service_highlight: 'Book your consultation today',
     wellness_tip: 'Start your wellness journey',
@@ -653,7 +653,7 @@ function generateSocialInsights(input: SocialInput): string[] {
   const topService = input.services.sort((a, b) => b.popularity - a.popularity)[0];
   if (topService) {
     insights.push(
-      `${topService.name} is your most popular service — create 2-3 pieces of content around it weekly for maximum engagement.`
+      `${topService.name} is your most popular service - create 2-3 pieces of content around it weekly for maximum engagement.`
     );
   }
 
@@ -672,7 +672,7 @@ function generateSocialInsights(input: SocialInput): string[] {
 
   if (input.clinicStats.membershipCount > 20) {
     insights.push(
-      `Highlight your ${input.clinicStats.membershipCount} Angel Glow members in content — membership social proof drives 25% higher conversion.`
+      `Highlight your ${input.clinicStats.membershipCount} Angel Glow members in content - membership social proof drives 25% higher conversion.`
     );
   }
 

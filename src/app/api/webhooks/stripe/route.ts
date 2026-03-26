@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
@@ -6,10 +7,11 @@ import { cache } from '@/lib/cache';
 import { env, hasFeature } from '@/lib/env';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { captureWebhookEvent, captureCheckoutEvent } from '@/lib/sentry-utils';
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// POST — receive Stripe webhook events
+// POST - receive Stripe webhook events
 // Webhook URL to configure in Stripe Dashboard:
 // https://www.ranibeautyclinic.com/api/webhooks/stripe
 export async function POST(request: NextRequest) {
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
                       'Payment Method': 'Stripe',
                       Type: 'Deposit',
                       Date: new Date().toISOString(),
-                      Notes: `Treatment plan deposit — ${tier} tier`,
+                      Notes: `Treatment plan deposit - ${tier} tier`,
                       Status: 'Completed',
                       'Stripe Session ID': session.id,
                     },
@@ -158,7 +160,7 @@ export async function POST(request: NextRequest) {
                     fields: {
                       Type: 'Abandoned Checkout',
                       Severity: 'warning',
-                      Message: `Abandoned checkout — ${clientName} (${tier} tier, Plan: ${planId})`,
+                      Message: `Abandoned checkout - ${clientName} (${tier} tier, Plan: ${planId})`,
                       Status: 'Active',
                       'Created Date': new Date().toISOString(),
                     },
@@ -209,7 +211,7 @@ export async function POST(request: NextRequest) {
                     fields: {
                       Type: 'Payment Failed',
                       Severity: 'warning',
-                      Message: `Payment failed — ${error?.message || 'Unknown error'} (${paymentIntent.id})`,
+                      Message: `Payment failed - ${error?.message || 'Unknown error'} (${paymentIntent.id})`,
                       Status: 'Active',
                       'Created Date': new Date().toISOString(),
                     },
@@ -289,7 +291,7 @@ export async function POST(request: NextRequest) {
                     fields: {
                       Type: 'Refund Processed',
                       Severity: 'info',
-                      Message: `Charge refunded — $${((charge.amount_refunded || 0) / 100).toFixed(2)} (${charge.id})`,
+                      Message: `Charge refunded - $${((charge.amount_refunded || 0) / 100).toFixed(2)} (${charge.id})`,
                       Status: 'Active',
                       'Created Date': new Date().toISOString(),
                     },
@@ -317,28 +319,21 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled Stripe event: ${event.type}`);
+        logWebhookEvent('stripe', event.type, true, { note: 'Unhandled event type' });
     }
 
+    captureWebhookEvent('stripe', event.type, true);
     return NextResponse.json({ received: true, event: event.type });
   } catch (error) {
+    Sentry.captureException(error, { tags: { route: 'webhook-stripe', event: event.type } });
+    captureWebhookEvent('stripe', event.type, false, { error: String(error) });
     logWebhookEvent('stripe', event.type, false, { error: String(error) });
-    // Always return 200 for valid signatures — Stripe retries on non-2xx
+    // Always return 200 for valid signatures - Stripe retries on non-2xx
     return NextResponse.json({ received: true, event: event.type, error: 'Processing error' });
   }
 }
 
-// GET — health check for webhook endpoint
+// GET - reject non-POST requests (no health check info exposed)
 export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    webhook: 'stripe',
-    configured: Boolean(env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
-    events: [
-      'checkout.session.completed',
-      'checkout.session.expired',
-      'payment_intent.payment_failed',
-      'charge.refunded',
-    ],
-  });
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
 }

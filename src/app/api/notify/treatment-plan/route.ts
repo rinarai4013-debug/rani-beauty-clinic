@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       clientEmail,
       clientPhone,
       clientName,
-      // Optional fields for plan persistence — can be passed from n8n or inferred
+      // Optional fields for plan persistence - can be passed from n8n or inferred
       planTier,
       planValue,
       servicesIncluded,
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
       await createRecord<AlertCreateFields>(Tables.alerts(), {
         'Type': 'follow_up',
         'Severity': 'warning',
-        'Message': `${clientName} received a ${resolvedTier} treatment plan ($${resolvedValue.toLocaleString()}) — follow up if not booked`,
+        'Message': `${clientName} received a ${resolvedTier} treatment plan ($${resolvedValue.toLocaleString()}) - follow up if not booked`,
         'Action Recommended': `Follow up with ${clientName} about their ${resolvedTier} plan. Call or text to answer questions and help them book.`,
         'Status': 'active',
         'Created Date': new Date().toISOString(),

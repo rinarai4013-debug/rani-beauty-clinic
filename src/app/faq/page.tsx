@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Frequently Asked Questions | Rani Beauty Clinic",
     description:
-      "Answers to the most-searched medspa questions — Botox, fillers, laser hair removal, HydraFacial, RF microneedling, GLP-1, and more. Physician-supervised in Renton, WA.",
+      "Answers to the most-searched medspa questions - Botox, fillers, laser hair removal, HydraFacial, RF microneedling, GLP-1, and more. Physician-supervised in Renton, WA.",
     type: "website",
     url: `${clinicInfo.website}/faq`,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic FAQ" }],
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Frequently Asked Questions | Rani Beauty Clinic",
     description:
-      "Get expert answers to your medspa questions — Botox, fillers, laser, HydraFacial, and more.",
+      "Get expert answers to your medspa questions - Botox, fillers, laser, HydraFacial, and more.",
   },
 };
 
@@ -194,7 +194,7 @@ const standaloneFaqs: { category: string; question: string; answer: string }[] =
     category: "General",
     question: "Is there downtime after treatments?",
     answer:
-      "Downtime varies by treatment. Botox and HydraFacial have zero downtime — you can return to normal activities immediately. Laser hair removal and chemical peels may involve mild redness for 24 to 48 hours. RF microneedling typically requires 1 to 3 days of social downtime as the skin heals. Our team will provide detailed aftercare instructions and realistic expectations for every treatment.",
+      "Downtime varies by treatment. Botox and HydraFacial have zero downtime - you can return to normal activities immediately. Laser hair removal and chemical peels may involve mild redness for 24 to 48 hours. RF microneedling typically requires 1 to 3 days of social downtime as the skin heals. Our team will provide detailed aftercare instructions and realistic expectations for every treatment.",
   },
   {
     category: "General",
@@ -261,7 +261,7 @@ const categoryIcons: Record<string, typeof HelpCircle> = {
   "General": MessageCircleQuestion,
 };
 
-// Build categorized FAQ map — deduplicate by question text
+// Build categorized FAQ map - deduplicate by question text
 function buildCategorizedFaqs() {
   const seen = new Set<string>();
   const map: Record<string, FAQ[]> = {};

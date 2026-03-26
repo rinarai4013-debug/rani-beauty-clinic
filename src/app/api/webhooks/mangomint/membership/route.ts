@@ -43,7 +43,9 @@ export async function POST(request: NextRequest) {
       .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
       .update(body)
       .digest('hex');
-    if (signature !== expected) {
+    const sigBuf = Buffer.from(signature, 'utf8');
+    const expBuf = Buffer.from(expected, 'utf8');
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
@@ -54,9 +56,9 @@ export async function POST(request: NextRequest) {
       membership.status === 'canceled' ||
       !!membership.cancel_date;
 
+    // Log membership event without PII (HIPAA compliance)
     console.log(`[Mangomint Membership Webhook] ${isCancellation ? 'CANCELED' : 'STARTED'}:`, JSON.stringify({
       membershipId: membership.id,
-      clientName: membership.client_name,
       tier: membership.membership_name || membership.membership_tier,
       price: membership.price,
       timestamp: new Date().toISOString(),
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest) {
           // Alert is best-effort
         }
       } else {
-        // New membership — create record
+        // New membership - create record
         const fields: Record<string, unknown> = {
           'Tier': membership.membership_name || membership.membership_tier || 'Unknown',
           'Monthly Price': membership.price || 0,

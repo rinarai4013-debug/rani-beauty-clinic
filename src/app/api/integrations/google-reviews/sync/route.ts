@@ -53,7 +53,7 @@ function generateReviewDate(unixTimestamp: number): string {
   return new Date(unixTimestamp * 1000).toISOString().split('T')[0];
 }
 
-// POST — sync Google reviews to Airtable Reviews table
+// POST - sync Google reviews to Airtable Reviews table
 export async function POST(request: NextRequest) {
   try {
     // Auth: session or cron secret
@@ -157,13 +157,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Google Reviews sync error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to sync Google reviews', details: String(error) },
+      { success: false, error: 'Failed to sync Google reviews' },
       { status: 500 }
     );
   }
 }
 
-// GET — check Google Reviews sync status
+// GET - check Google Reviews sync status
 export async function GET() {
   try {
     const session = await getSession();

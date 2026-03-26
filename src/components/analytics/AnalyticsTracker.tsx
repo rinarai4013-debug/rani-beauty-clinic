@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AnalyticsTracker — Supplementary passive tracking.
+ * AnalyticsTracker - Supplementary passive tracking.
  *
  * Covers gaps NOT handled by BehavioralTracker:
  * - Time on page milestones (30s, 60s, 120s, 300s)

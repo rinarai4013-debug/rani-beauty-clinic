@@ -26,7 +26,7 @@ interface UseInViewOptions {
 }
 
 /**
- * useInView — performant scroll-triggered visibility detection.
+ * useInView - performant scroll-triggered visibility detection.
  *
  * Uses the native `IntersectionObserver` API (no Framer Motion overhead)
  * which is ideal when you have many elements on a page that need

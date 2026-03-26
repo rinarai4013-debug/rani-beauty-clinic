@@ -436,4 +436,714 @@ export const financingPages: FinancingPage[] = [
       },
     ],
   },
+  {
+    slug: "how-to-finance-botox-treatments",
+    title: "How to Finance Botox Treatments",
+    metaTitle: "How to Finance Botox | Payment Plans & Cost Guide 2026",
+    metaDescription:
+      "Learn how to finance Botox treatments at Rani Beauty Clinic in Renton, WA. Cherry payment plans, HSA/FSA options, membership savings, and cost breakdowns.",
+    heroDescription:
+      "Botox is one of the most effective anti-aging treatments available, and it should be accessible to everyone committed to looking and feeling their best. At Rani Beauty Clinic, we offer multiple payment options to make physician-supervised Botox treatments fit comfortably within your budget. Whether you prefer monthly financing through Cherry, pre-tax savings with your HSA or FSA, or ongoing value through our membership program, our team will help you invest in your appearance without financial stress.",
+    sections: [
+      {
+        heading: "Botox Cost Breakdown at Rani Beauty Clinic",
+        content:
+          "Botox is priced per unit, with most patients requiring between 20 and 60 units per session depending on the number of treatment areas. A typical session treating forehead lines and frown lines uses 20 to 40 units, while adding crow's feet requires an additional 12 to 24 units per side. Total session costs generally range from $240 to $900 based on the number of areas treated and individual anatomy. Male patients typically require 20 to 30 percent more units due to stronger facial musculature. Every Botox treatment at Rani Beauty Clinic is supervised by Dr. Alexander Landfield, Board-Certified Neurologist, ensuring precise dosing and natural results.",
+      },
+      {
+        heading: "Cherry Financing for Botox",
+        content:
+          "Cherry makes Botox treatments immediately accessible with monthly payment plans. A $600 Botox session could be split into 6 monthly payments of approximately $100, or 12 monthly payments of approximately $50. Applications take under 60 seconds with no hard credit check, and you receive an instant approval decision. Cherry plans can cover individual sessions or multi-session treatment plans, so you can lock in your full-year Botox maintenance with a single financing plan. For regular Botox clients who treat every 3 to 4 months, an annual plan through Cherry can cover all four sessions.",
+      },
+      {
+        heading: "Membership Savings on Botox",
+        content:
+          "For clients who plan to maintain Botox every 3 to 4 months, our membership program delivers significant annual savings. Members enjoy reduced per-unit pricing on all neurotoxin treatments, plus priority booking and complimentary add-on services. Over the course of a year with quarterly Botox treatments, membership clients typically save 20 to 30 percent compared to pay-per-visit pricing. Membership also gives you a built-in treatment rhythm that keeps your results consistent and prevents the return of deep expression lines.",
+      },
+      {
+        heading: "HSA and FSA Considerations for Botox",
+        content:
+          "Botox for cosmetic wrinkle reduction typically does not qualify for HSA or FSA payment. However, when Botox is prescribed for a qualifying medical condition such as TMJ, chronic migraines, or hyperhidrosis under the supervision of Dr. Landfield, it may be eligible for pre-tax payment. If you have a documented medical condition that Botox can address, our team can provide the necessary documentation for your benefits provider. We always recommend checking with your plan administrator for coverage confirmation.",
+      },
+      {
+        heading: "Return on Investment: Why Botox Is Worth the Investment",
+        content:
+          "When you consider the cost of Botox relative to the alternatives, it represents excellent value. Topical anti-aging products can cost $100 to $300 per month with modest results, while a single Botox session delivers dramatic, visible improvement for 3 to 4 months. Over a year, maintaining Botox typically costs $1,200 to $3,600 depending on the number of areas treated, which is competitive with high-end skincare regimens and delivers far more consistent results. Additionally, starting Botox early serves as a preventative measure, reducing the need for more expensive corrective treatments later.",
+      },
+    ],
+    keyTakeaways: [
+      "Botox sessions at Rani typically range from $240 to $900 depending on areas treated and units required",
+      "Cherry financing can split a Botox session into monthly payments starting as low as $50 per month",
+      "Membership clients save 20 to 30 percent on Botox annually compared to pay-per-visit pricing",
+      "Medical Botox for TMJ, migraines, or hyperhidrosis may qualify for HSA or FSA payment",
+      "Annual Botox maintenance costs $1,200 to $3,600, which is competitive with premium skincare regimens",
+      "Complimentary consultations include personalized unit estimates and payment option planning",
+    ],
+    faqs: [
+      {
+        question: "How much does Botox cost per session?",
+        answer:
+          "At Rani Beauty Clinic, Botox sessions typically range from $240 to $900 depending on the number of areas treated and units required. A forehead and frown line treatment uses 20 to 40 units, while a full-face treatment covering forehead, frown lines, and crow's feet may require 40 to 60 units. Your provider will give you an exact quote during your complimentary consultation.",
+      },
+      {
+        question: "Can I finance Botox with Cherry?",
+        answer:
+          "Yes. Cherry financing is available for all Botox treatments at Rani Beauty Clinic. You can split your session cost into monthly payments over 3, 6, 12, or 24 months. Approval takes under 60 seconds with no hard credit check on your score.",
+      },
+      {
+        question: "Is Botox covered by insurance or HSA?",
+        answer:
+          "Cosmetic Botox for wrinkle reduction is not typically covered by insurance or HSA/FSA. However, Botox prescribed for medical conditions such as chronic migraines, TMJ, or excessive sweating under physician supervision may qualify. Dr. Landfield can assess whether your condition meets medical necessity criteria.",
+      },
+      {
+        question: "How much does Botox cost per year?",
+        answer:
+          "Most clients maintain Botox every 3 to 4 months, which means 3 to 4 sessions per year. Annual costs typically range from $1,200 to $3,600 depending on the number of treatment areas. Membership pricing and multi-session plans can reduce this cost by 20 to 30 percent.",
+      },
+      {
+        question: "Do men pay more for Botox than women?",
+        answer:
+          "Men typically require 20 to 30 percent more Botox units than women because male facial muscles are thicker and stronger. This means male Botox sessions generally cost more per visit, though the results and duration are comparable. Cherry financing and membership savings are available to all clients regardless of gender.",
+      },
+    ],
+  },
+  {
+    slug: "how-to-finance-sofwave-skin-tightening",
+    title: "How to Finance Sofwave Skin Tightening",
+    metaTitle: "How to Finance Sofwave | Payment Plans & Cost Guide",
+    metaDescription:
+      "Finance Sofwave skin tightening at Rani Beauty Clinic. Cherry monthly payments, HSA/FSA options, and ROI analysis. Physician-supervised in Renton, WA.",
+    heroDescription:
+      "Sofwave represents one of the most advanced non-invasive skin tightening technologies available, delivering results that rival surgical options at a fraction of the cost and downtime. At Rani Beauty Clinic, we understand that a Sofwave investment of $2,750 to $4,500 deserves thoughtful financial planning. Our financing options through Cherry, HSA/FSA acceptance, and membership benefits ensure this transformative treatment fits within your budget.",
+    sections: [
+      {
+        heading: "Sofwave Cost Breakdown",
+        content:
+          "Sofwave skin tightening at Rani Beauty Clinic ranges from $2,750 for a single treatment area to $4,500 for a comprehensive full-face and neck treatment. Unlike many aesthetic treatments that require multiple sessions, Sofwave delivers visible results from a single session with continued improvement over 3 to 6 months. This makes the cost-per-result calculation extremely favorable compared to treatments requiring 4 to 6 sessions at $495 to $850 each. Sofwave results last 12 months or longer, and annual maintenance sessions preserve and build upon your initial investment.",
+      },
+      {
+        heading: "Cherry Financing for Sofwave",
+        content:
+          "Cherry financing makes Sofwave accessible through predictable monthly payments. A $2,750 Sofwave treatment could be split into 12 monthly payments of approximately $230, or 24 monthly payments of approximately $115. A comprehensive $4,500 treatment could be financed at approximately $375 per month over 12 months or $188 per month over 24 months. The application takes under 60 seconds with no hard credit check, and you can apply before your appointment to know your options in advance. Cherry plans for Sofwave are among our most popular because clients appreciate knowing their monthly commitment before scheduling.",
+      },
+      {
+        heading: "Sofwave vs. Surgical Facelift: The Financial Comparison",
+        content:
+          "A surgical facelift in the Seattle area typically costs $12,000 to $25,000 when accounting for surgeon fees, anesthesia, facility charges, and recovery time off work. Sofwave at $2,750 to $4,500 delivers meaningful lifting and tightening at a fraction of the surgical cost, with no anesthesia, no incisions, and zero downtime. Even with annual maintenance sessions, a 5-year Sofwave plan costs significantly less than a single surgical facelift while allowing you to maintain natural, gradual improvement. For many clients, Sofwave provides the tightening they need without ever requiring surgery.",
+      },
+      {
+        heading: "Combining Sofwave with Other Treatments",
+        content:
+          "Many clients maximize their Sofwave results by combining it with complementary treatments. A Sofwave plus RF Microneedling combination addresses both deep tightening and surface texture. Adding Botox creates a comprehensive anti-aging approach. These combination plans can be financed together through a single Cherry plan, often providing better value than financing each treatment separately. Your provider will create a comprehensive treatment plan during your consultation with a single financing estimate.",
+      },
+      {
+        heading: "Return on Investment: Sofwave Long-Term Value",
+        content:
+          "Sofwave delivers exceptional long-term value when you consider results longevity and maintenance costs. A single session produces results lasting 12 months or longer, with collagen remodeling continuing for up to 6 months after treatment. Annual maintenance sessions preserve your results and continue to build collagen over time. Compared to a lifetime of monthly serum and cream purchases that may cost $100 to $300 per month with minimal lifting capability, Sofwave provides clinically measurable tightening. Over 5 years, Sofwave maintenance is a predictable, worthwhile investment in your appearance.",
+      },
+    ],
+    keyTakeaways: [
+      "Sofwave ranges from $2,750 to $4,500 depending on treatment areas at Rani Beauty Clinic",
+      "Cherry financing can split Sofwave into payments as low as $115 per month over 24 months",
+      "A single Sofwave session costs a fraction of a surgical facelift ($12,000 to $25,000) with zero downtime",
+      "Results last 12 months or longer, with collagen remodeling continuing for 3 to 6 months post-treatment",
+      "Combination treatment plans covering Sofwave plus other services can be financed together",
+      "Complimentary consultations include personalized cost estimates and Cherry pre-approval",
+    ],
+    faqs: [
+      {
+        question: "How much does Sofwave cost at Rani Beauty Clinic?",
+        answer:
+          "Sofwave treatments at Rani Beauty Clinic range from $2,750 for a single area to $4,500 for a comprehensive full-face and neck treatment. Your exact cost depends on the treatment areas and your provider's recommendation based on your goals and skin assessment.",
+      },
+      {
+        question: "Can I finance Sofwave with monthly payments?",
+        answer:
+          "Yes. Cherry financing allows you to split your Sofwave investment into monthly payments over 3, 6, 12, or 24 months. A $2,750 treatment could be approximately $230 per month over 12 months. Approval takes under 60 seconds with no hard credit check.",
+      },
+      {
+        question: "Is Sofwave cheaper than a facelift?",
+        answer:
+          "Significantly. A surgical facelift in the Seattle area costs $12,000 to $25,000 plus recovery time off work. Sofwave at $2,750 to $4,500 delivers non-invasive tightening with no downtime. Even with annual maintenance, Sofwave costs a fraction of surgery over a 5-year period.",
+      },
+      {
+        question: "How often do I need Sofwave treatments?",
+        answer:
+          "Most clients see optimal results from a single session, with maintenance treatments recommended every 12 to 18 months. This makes the annual investment predictable and manageable. Some clients combine their annual Sofwave maintenance with other treatments for comprehensive care.",
+      },
+      {
+        question: "Does insurance cover Sofwave?",
+        answer:
+          "Sofwave is considered an elective aesthetic treatment and is not covered by health insurance. However, Cherry financing, membership savings, and HSA/FSA accounts for qualifying treatments help make Sofwave accessible. Our team will walk you through all available payment options during your consultation.",
+      },
+    ],
+  },
+  {
+    slug: "rf-microneedling-payment-plans",
+    title: "RF Microneedling Payment Plans",
+    metaTitle: "RF Microneedling Payment Plans | Finance Your Treatment",
+    metaDescription:
+      "Affordable RF microneedling payment plans at Rani Beauty Clinic. Cherry financing, package pricing, and membership savings. Physician-supervised in Renton, WA.",
+    heroDescription:
+      "RF Microneedling delivers transformative results for skin texture, scarring, and overall skin quality, and our flexible payment options ensure you can complete your full treatment series for optimal results. At Rani Beauty Clinic, RF Microneedling sessions range from $495 to $850, with most treatment plans requiring 3 to 4 sessions. Cherry financing, treatment packages, and membership pricing make your complete treatment plan affordable.",
+    sections: [
+      {
+        heading: "RF Microneedling Cost Breakdown",
+        content:
+          "Individual RF Microneedling sessions at Rani Beauty Clinic range from $495 for a standard facial treatment to $850 for extended treatments covering the face, neck, and decolletage. Optimal results require a series of 3 to 4 sessions spaced 4 to 6 weeks apart, bringing the total investment for a complete treatment plan to approximately $1,485 to $3,400. After completing the initial series, annual maintenance sessions of 1 to 2 treatments preserve and build upon your results. Every RF Microneedling treatment is performed under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist.",
+      },
+      {
+        heading: "Package Pricing for RF Microneedling Series",
+        content:
+          "Since RF Microneedling delivers the best results as a series, our treatment packages offer reduced per-session pricing when you commit to your full treatment plan upfront. Package pricing provides built-in savings compared to paying for individual sessions, and packages can be combined with Cherry financing for maximum flexibility. This means you can lock in package savings while spreading the cost into manageable monthly payments. Ask your provider about current package availability during your consultation.",
+      },
+      {
+        heading: "Cherry Financing for Your RF Microneedling Series",
+        content:
+          "Cherry financing allows you to spread your entire RF Microneedling series into monthly payments. A 3-session package at approximately $1,400 could be financed at roughly $117 per month over 12 months or $233 per month over 6 months. A comprehensive 4-session series at approximately $2,800 could be split into approximately $233 per month over 12 months. Cherry approval takes under 60 seconds with no hard credit check, and you can finance your complete treatment plan in a single application.",
+      },
+      {
+        heading: "RF Microneedling vs. Alternative Treatments: Value Comparison",
+        content:
+          "RF Microneedling offers exceptional value compared to alternative skin resurfacing treatments. Traditional microneedling without radiofrequency energy costs less per session but requires more sessions and delivers less dramatic results. Fractional laser resurfacing can cost $1,000 to $2,000 per session with significant downtime. A surgical facelift for skin quality improvement starts at $12,000 or more. RF Microneedling occupies the value sweet spot: physician-supervised results with moderate investment, minimal downtime, and long-lasting collagen remodeling.",
+      },
+      {
+        heading: "Maximizing Your RF Microneedling Investment",
+        content:
+          "To get the most value from your RF Microneedling investment, complete the full recommended series. Partial series deliver partial results, while completing 3 to 4 sessions produces the compounding collagen remodeling that creates lasting improvement. Combine your series with a medical-grade skincare routine for enhanced results. Our membership program includes reduced pricing on RF Microneedling sessions, complimentary add-ons, and priority booking for series appointments. Annual maintenance treatments after your initial series protect your investment and continue to improve skin quality over time.",
+      },
+    ],
+    keyTakeaways: [
+      "RF Microneedling sessions range from $495 to $850, with complete series totaling $1,485 to $3,400",
+      "Treatment packages offer reduced per-session pricing for the recommended 3 to 4 session series",
+      "Cherry financing can split a complete series into payments as low as $117 per month",
+      "RF Microneedling offers superior value compared to fractional laser or surgical alternatives",
+      "Completing the full series is essential for optimal collagen remodeling and lasting results",
+      "Membership pricing provides additional annual savings for ongoing maintenance treatments",
+    ],
+    faqs: [
+      {
+        question: "How much does a full RF Microneedling series cost?",
+        answer:
+          "A complete RF Microneedling series of 3 to 4 sessions at Rani Beauty Clinic ranges from approximately $1,485 to $3,400 depending on treatment areas. Package pricing and membership discounts can reduce the total investment. Your provider will recommend the optimal number of sessions during your consultation.",
+      },
+      {
+        question: "Can I finance RF Microneedling treatments?",
+        answer:
+          "Yes. Cherry financing is available for individual sessions, series packages, or comprehensive treatment plans that include RF Microneedling. You can finance your complete series with one application, making monthly payments over 3 to 24 months.",
+      },
+      {
+        question: "Is one RF Microneedling session enough?",
+        answer:
+          "While you will see improvement after a single session, the best results come from a complete series of 3 to 4 sessions. Each session builds upon the collagen remodeling from the previous treatment, creating compounding improvement in skin texture, tone, and firmness.",
+      },
+      {
+        question: "Does RF Microneedling qualify for HSA or FSA?",
+        answer:
+          "RF Microneedling for cosmetic purposes typically does not qualify for HSA or FSA. When performed for certain medical skin conditions under physician direction, it may be eligible. Our team can provide documentation for your benefits provider if applicable.",
+      },
+      {
+        question: "Is RF Microneedling worth the investment compared to regular facials?",
+        answer:
+          "RF Microneedling produces significantly deeper, longer-lasting results than regular facials. While a monthly facial costs $150 to $275 per session ($1,800 to $3,300 per year) for surface-level improvement, an RF Microneedling series creates structural collagen changes that last months. The long-term cost-per-result is substantially lower.",
+      },
+    ],
+  },
+  {
+    slug: "laser-hair-removal-financing-options",
+    title: "Laser Hair Removal Financing Options",
+    metaTitle: "Laser Hair Removal Financing | Payment Plans Guide",
+    metaDescription:
+      "Finance laser hair removal at Rani Beauty Clinic. Monthly payment plans, package savings, and long-term cost comparison vs. shaving and waxing. Renton, WA.",
+    heroDescription:
+      "Laser hair removal is one of the smartest long-term investments in personal grooming, ultimately costing less than a lifetime of shaving and waxing. At Rani Beauty Clinic, our flexible financing options make it easy to start your laser hair removal journey without a large upfront commitment. With Cherry payment plans, treatment packages, and membership savings, permanent hair reduction is more accessible than ever.",
+    sections: [
+      {
+        heading: "Laser Hair Removal Cost Breakdown by Area",
+        content:
+          "Laser hair removal pricing depends on the treatment area size. Small areas such as the upper lip, chin, or underarms are the most affordable per session. Medium areas including the bikini line, lower legs, and forearms fall in the mid-range. Large areas such as full legs, full back, or chest represent the highest per-session cost but often deliver the greatest long-term savings versus ongoing hair removal. Most areas require 6 to 8 sessions spaced 4 to 6 weeks apart for optimal results, with maintenance sessions once or twice per year after completing the initial series.",
+      },
+      {
+        heading: "Package Savings for Laser Hair Removal",
+        content:
+          "Since laser hair removal requires multiple sessions, our package pricing offers significant savings compared to paying per session. Pre-paid packages for 6 sessions reduce the per-session cost and ensure you commit to the full treatment plan needed for lasting results. Packages are available for individual areas or can be bundled for multiple treatment areas at an even greater value. For example, treating underarms, bikini, and lower legs together as a package delivers more savings than purchasing each area separately.",
+      },
+      {
+        heading: "Cherry Financing for Laser Hair Removal",
+        content:
+          "Cherry financing allows you to start your laser hair removal journey immediately and pay over time. Whether you are treating a single area or investing in a comprehensive multi-area plan, Cherry can spread the cost into predictable monthly payments. A 6-session underarm package could be financed at a modest monthly payment, while a comprehensive multi-area package could be spread over 12 to 24 months for comfortable monthly installments. No hard credit check, and approval takes under 60 seconds.",
+      },
+      {
+        heading: "Laser Hair Removal vs. Shaving and Waxing: The Lifetime Cost",
+        content:
+          "The financial case for laser hair removal becomes compelling when you compare it to a lifetime of alternative hair removal. Shaving supplies including razors, shaving cream, and replacement blades cost $200 to $600 per year. Professional waxing for common areas costs $1,200 to $3,000 or more per year depending on areas and frequency. Over 20 years, that is $4,000 to $12,000 in shaving costs or $24,000 to $60,000 in waxing costs. A complete laser hair removal series breaks even with shaving within 2 to 4 years and with waxing within 1 to 2 years, with minimal cost thereafter.",
+      },
+      {
+        heading: "Making Laser Hair Removal Accessible",
+        content:
+          "At Rani Beauty Clinic, we use the Candela GentleMax Pro Plus with dual-wavelength technology safe for all skin types, which means our pricing reflects medical-grade equipment and physician supervision. We believe this standard of care should be accessible, which is why we offer treatment packages, Cherry financing, and membership pricing. Start with a complimentary consultation to receive a personalized treatment plan with exact pricing for your target areas and a financing estimate that fits your monthly budget.",
+      },
+    ],
+    keyTakeaways: [
+      "Laser hair removal packages offer significant per-session savings versus paying individually",
+      "Cherry financing spreads laser hair removal costs into manageable monthly payments with no hard credit check",
+      "Laser breaks even with shaving costs within 2 to 4 years and with waxing within 1 to 2 years",
+      "Over 20 years, laser saves $4,000 to $60,000 compared to shaving and waxing respectively",
+      "Multi-area packages (underarms plus bikini plus legs) deliver the best per-area value",
+      "The Candela GentleMax Pro Plus treats all skin types safely with dual-wavelength technology",
+    ],
+    faqs: [
+      {
+        question: "How much does a full laser hair removal package cost?",
+        answer:
+          "Package pricing depends on the treatment area and number of sessions. Small area packages (underarms, upper lip) are the most affordable, while comprehensive multi-area packages represent the best overall value. Schedule a complimentary consultation for personalized pricing based on your target areas.",
+      },
+      {
+        question: "Can I finance laser hair removal monthly?",
+        answer:
+          "Yes. Cherry financing allows you to spread your laser hair removal package into monthly payments over 3 to 24 months. You can finance a single area or a comprehensive multi-area treatment plan with one application. Approval is instant with no hard credit check.",
+      },
+      {
+        question: "Is laser hair removal cheaper than waxing long-term?",
+        answer:
+          "Significantly. Professional waxing for common areas costs $1,200 to $3,000 or more per year. A complete laser hair removal series typically breaks even with waxing costs within 1 to 2 years, with minimal maintenance cost thereafter. Over a decade or more, the savings are substantial.",
+      },
+      {
+        question: "How many laser hair removal sessions will I need?",
+        answer:
+          "Most clients need 6 to 8 sessions spaced 4 to 6 weeks apart for optimal results, followed by 1 to 2 maintenance sessions per year. Hair color, skin type, and treatment area affect the exact number. Your provider will estimate your total sessions during your consultation.",
+      },
+      {
+        question: "Can I treat multiple areas on a single financing plan?",
+        answer:
+          "Absolutely. You can combine multiple treatment areas into a single Cherry financing plan. Many clients finance a comprehensive package covering 2 to 4 body areas together, which often provides both per-area savings and convenient single-payment tracking.",
+      },
+    ],
+  },
+  {
+    slug: "hydrafacial-cost-and-payment-options",
+    title: "HydraFacial Cost and Payment Options",
+    metaTitle: "HydraFacial Cost & Payment Options | Financing Guide",
+    metaDescription:
+      "HydraFacial pricing and payment options at Rani Beauty Clinic. Monthly memberships, Cherry financing, and value comparison. Physician-supervised in Renton, WA.",
+    heroDescription:
+      "HydraFacial is one of the most popular facial treatments in the world, delivering immediate visible improvement with zero downtime. At Rani Beauty Clinic, our signature HydraFacial is priced at $275, and our membership program makes monthly facials more affordable than ever. With multiple payment options available, maintaining your best skin has never been more accessible.",
+    sections: [
+      {
+        heading: "HydraFacial Pricing at Rani Beauty Clinic",
+        content:
+          "Our signature HydraFacial is priced at $275 and includes the full cleanse, exfoliation, extraction, and hydration protocol. Add-on boosters targeting specific concerns such as brightening, anti-aging, or acne are available to customize your treatment. Enhanced HydraFacial packages that include LED light therapy, lymphatic drainage, or additional boosters are available at a higher price point. Every HydraFacial at Rani is performed by trained aestheticians under physician supervision.",
+      },
+      {
+        heading: "Membership: The Best Value for Regular HydraFacials",
+        content:
+          "For clients who want to maintain monthly HydraFacials, our membership program delivers the best per-treatment value. Members enjoy reduced pricing on HydraFacial sessions, plus complimentary add-on services and priority booking. A client receiving monthly HydraFacials through our membership program saves substantially compared to paying the per-visit rate 12 times per year. Membership is the most popular payment option among our regular HydraFacial clients because the savings are immediate and consistent.",
+      },
+      {
+        heading: "HydraFacial vs. Traditional Facials: Value Comparison",
+        content:
+          "Traditional facials at high-end spas in the Seattle area typically range from $150 to $350 per session, with results lasting 1 to 2 weeks. HydraFacial at $275 uses patented Vortex-Fusion technology that delivers deeper cleansing, more effective extraction, and longer-lasting hydration than manual facials. The clinical-grade results from HydraFacial maintain visible improvement for 4 to 6 weeks, meaning fewer treatments per year for better results. When you factor in results duration, HydraFacial offers superior value per treatment dollar.",
+      },
+      {
+        heading: "Cherry Financing for HydraFacial Packages",
+        content:
+          "While individual HydraFacials are affordable enough for most clients to pay per visit, Cherry financing is ideal for clients who want to pre-purchase a multi-session package or combine HydraFacial with other treatments. A 6-month HydraFacial package plus add-ons could be financed into small monthly payments, ensuring you never miss your monthly skin maintenance appointment. Cherry is also useful for combining HydraFacial with treatments like Botox or RF Microneedling into a comprehensive plan.",
+      },
+      {
+        heading: "Building Your Annual HydraFacial Plan",
+        content:
+          "The most effective skincare routine includes regular professional treatments. We recommend monthly HydraFacials for optimal skin maintenance, which represents 12 sessions per year. Through membership pricing, this annual investment delivers consistently clear, hydrated, and radiant skin. Many clients supplement their HydraFacial routine with quarterly Botox and annual RF Microneedling or Sofwave for a complete anti-aging strategy. Your provider will help you build a 12-month treatment plan with clear cost projections during your consultation.",
+      },
+    ],
+    keyTakeaways: [
+      "Signature HydraFacial at Rani Beauty Clinic is priced at $275 per session",
+      "Membership pricing delivers the best value for clients maintaining monthly HydraFacials",
+      "HydraFacial results last 4 to 6 weeks, offering better value per treatment dollar than traditional facials",
+      "Cherry financing is available for multi-session packages or combination treatment plans",
+      "Customizable add-on boosters allow you to target specific skin concerns each visit",
+      "Complimentary consultations help you build a personalized annual treatment plan with clear cost projections",
+    ],
+    faqs: [
+      {
+        question: "How much does a HydraFacial cost at Rani Beauty Clinic?",
+        answer:
+          "Our signature HydraFacial is $275. Enhanced versions with additional boosters, LED therapy, or lymphatic drainage are available at higher price points. Your aesthetician will recommend the right protocol for your skin during your appointment.",
+      },
+      {
+        question: "Is a membership worth it for HydraFacials?",
+        answer:
+          "If you plan to get HydraFacials monthly or even bi-monthly, membership delivers significant annual savings. Members enjoy reduced per-treatment pricing plus complimentary add-ons and priority booking. Your provider can calculate the exact annual savings during your consultation.",
+      },
+      {
+        question: "How often should I get a HydraFacial?",
+        answer:
+          "We recommend monthly HydraFacials for optimal skin maintenance. Results from a single treatment last 4 to 6 weeks. Monthly sessions maintain consistent clarity, hydration, and glow while addressing seasonal skin changes throughout the year.",
+      },
+      {
+        question: "Can I combine HydraFacial with other treatments?",
+        answer:
+          "Absolutely. HydraFacial pairs well with Botox, LED red light therapy, and chemical peels. Many clients combine monthly HydraFacials with quarterly Botox for a comprehensive approach. These combination plans can be financed together through Cherry.",
+      },
+      {
+        question: "Is HydraFacial better than a drugstore skincare routine?",
+        answer:
+          "HydraFacial delivers clinical-grade results that over-the-counter products cannot match. The patented Vortex-Fusion technology extracts impurities and infuses medical-grade serums deep into the skin. While home skincare is important for daily maintenance, monthly HydraFacials provide professional-level cleansing and treatment that enhances your entire routine.",
+      },
+    ],
+  },
+  {
+    slug: "glp1-weight-loss-financing",
+    title: "GLP-1 Weight Loss Program Financing",
+    metaTitle: "GLP-1 Weight Loss Financing | Monthly Payment Options",
+    metaDescription:
+      "Finance your GLP-1 weight loss program at Rani Beauty Clinic. Semaglutide and Tirzepatide payment plans, insurance considerations, and cost breakdowns. Renton, WA.",
+    heroDescription:
+      "GLP-1 weight management programs with Semaglutide or Tirzepatide represent a significant investment in your health, and our flexible payment options ensure you can commit to the full program duration needed for lasting results. At Rani Beauty Clinic, physician-supervised GLP-1 programs range from $399 to $599 per month, and we offer multiple ways to make this transformative treatment fit your budget.",
+    sections: [
+      {
+        heading: "GLP-1 Program Cost Structure",
+        content:
+          "Physician-supervised GLP-1 weight management at Rani Beauty Clinic is structured as a monthly program ranging from $399 to $599 per month. This includes the medication, comprehensive blood work and monitoring, dosage adjustments, and ongoing physician oversight by Dr. Alexander Landfield. The total investment depends on your treatment duration, which typically ranges from 6 to 12 months for most patients. Some patients continue on maintenance dosing beyond the initial program for sustained results.",
+      },
+      {
+        heading: "Cherry Financing for GLP-1 Programs",
+        content:
+          "Cherry financing allows you to spread the cost of your GLP-1 program beyond the monthly treatment fee. While GLP-1 programs are already structured as monthly payments, Cherry can be used to finance the initial blood work, consultation, and multi-month program commitment at a reduced rate. This is particularly useful for clients who want to pre-pay for a 6-month or 12-month program at a discounted rate while spreading that discounted total over comfortable monthly installments.",
+      },
+      {
+        heading: "GLP-1 vs. Alternative Weight Loss: Cost Comparison",
+        content:
+          "When evaluating the cost of a GLP-1 program, consider it against alternatives. Commercial diet programs cost $200 to $500 per month with average weight loss of 5 to 10 pounds. Personal training at $400 to $1,200 per month addresses fitness but may not overcome metabolic barriers. Bariatric surgery ranges from $15,000 to $35,000 with significant recovery time. A physician-supervised GLP-1 program at $399 to $599 per month delivers clinically significant weight loss with full medical oversight, no surgery, and no downtime, making it one of the most cost-effective medical weight loss options available.",
+      },
+      {
+        heading: "Insurance and HSA/FSA Considerations for GLP-1",
+        content:
+          "GLP-1 medications prescribed for weight management through our clinic are self-pay programs. However, some patients with documented diabetes or metabolic conditions may have separate insurance coverage for GLP-1 medications through their pharmacy benefit. HSA and FSA accounts may cover physician-supervised weight loss programs when deemed medically necessary, and our team provides the documentation needed for your benefits provider. We recommend checking with your plan administrator regarding coverage for medically supervised weight management.",
+      },
+      {
+        heading: "The Long-Term Value of GLP-1 Weight Management",
+        content:
+          "The financial value of achieving and maintaining a healthy weight extends far beyond the program cost. Obesity-related healthcare expenses average $1,500 to $3,000 or more per year in additional medical costs. Weight loss reduces the risk of type 2 diabetes, cardiovascular disease, sleep apnea, and joint problems, each of which carries significant treatment costs. When viewed as a medical investment, a GLP-1 program often pays for itself through reduced long-term healthcare expenses and improved quality of life.",
+      },
+    ],
+    keyTakeaways: [
+      "GLP-1 programs at Rani Beauty Clinic range from $399 to $599 per month with full physician supervision",
+      "Programs include medication, blood work, monitoring, and dosage adjustments",
+      "Cherry financing available for pre-paid multi-month programs at discounted rates",
+      "GLP-1 costs a fraction of bariatric surgery ($15,000 to $35,000) with no downtime or surgical risk",
+      "HSA and FSA may cover medically necessary physician-supervised weight loss programs",
+      "Weight loss reduces obesity-related healthcare costs averaging $1,500 to $3,000 or more per year",
+    ],
+    faqs: [
+      {
+        question: "How much does the GLP-1 program cost per month?",
+        answer:
+          "Physician-supervised GLP-1 programs at Rani Beauty Clinic range from $399 to $599 per month, which includes the medication, comprehensive blood work, physician monitoring, and dosage management. Your exact monthly cost depends on the medication and dosage prescribed.",
+      },
+      {
+        question: "Can I use my HSA or FSA for GLP-1 weight loss?",
+        answer:
+          "HSA and FSA may cover physician-supervised weight management programs when deemed medically necessary. Our team provides documentation including physician oversight records and medical necessity justification for your benefits provider. We recommend checking with your plan administrator for specific coverage details.",
+      },
+      {
+        question: "Is GLP-1 cheaper than bariatric surgery?",
+        answer:
+          "Significantly. Bariatric surgery ranges from $15,000 to $35,000 plus recovery time. A 12-month GLP-1 program at Rani Beauty Clinic costs a fraction of that with no surgery, no anesthesia, and no downtime. GLP-1 is also reversible, allowing you to adjust or stop the program at any time.",
+      },
+      {
+        question: "How long will I need to be on the GLP-1 program?",
+        answer:
+          "Most patients are on the program for 6 to 12 months depending on their weight loss goals. Some patients continue on a lower maintenance dose beyond the initial program. Your physician will recommend the optimal duration based on your progress and metabolic health markers.",
+      },
+      {
+        question: "Does insurance cover GLP-1 for weight loss?",
+        answer:
+          "Our GLP-1 program is a self-pay service. However, patients with documented diabetes or metabolic conditions may have separate pharmacy coverage for GLP-1 medications through their insurance. Our team can provide diagnostic documentation if your physician determines it is appropriate.",
+      },
+    ],
+  },
+  {
+    slug: "chemical-peel-financing-guide",
+    title: "Chemical Peel Financing Guide",
+    metaTitle: "Chemical Peel Financing | Payment Plans & Cost Guide",
+    metaDescription:
+      "Finance chemical peel treatments at Rani Beauty Clinic. VI Peel and BioRePeel pricing, series packages, and Cherry payment plans. Renton, WA.",
+    heroDescription:
+      "Chemical peels are among the most effective treatments for hyperpigmentation, acne, fine lines, and overall skin renewal, and completing a full series delivers the most dramatic results. At Rani Beauty Clinic, chemical peels are priced competitively, and our financing options ensure you can commit to the complete treatment plan your provider recommends.",
+    sections: [
+      {
+        heading: "Chemical Peel Cost Breakdown",
+        content:
+          "Chemical peel pricing at Rani Beauty Clinic varies based on the type and strength of peel selected for your skin concerns. The VI Peel, our most popular option, is priced at $395 per session and targets hyperpigmentation, acne, and fine lines. BioRePeel at $495 provides biorevitalization with minimal downtime. Peel strength and formulation are selected by your provider based on your skin type, concerns, and goals. Many clients benefit from a series of 3 to 4 peels spaced 4 to 6 weeks apart for maximum improvement.",
+      },
+      {
+        heading: "Series Packages for Chemical Peels",
+        content:
+          "Chemical peels deliver cumulative improvement with each session, which is why a series of 3 to 4 treatments is often recommended. Our package pricing reduces the per-session cost when you commit to a full series. A 3-session VI Peel package, for example, provides per-session savings compared to individual treatments. Packages ensure you follow through on the complete treatment plan for the best possible outcome, whether you are targeting stubborn pigmentation, acne scarring, or overall skin rejuvenation.",
+      },
+      {
+        heading: "Cherry Financing for Chemical Peel Series",
+        content:
+          "Cherry financing is ideal for clients investing in a multi-session chemical peel series. A 3-session VI Peel package at approximately $1,100 to $1,200 could be financed at roughly $100 per month over 12 months. Cherry allows you to lock in package pricing while spreading the cost into comfortable monthly payments. The application takes under 60 seconds with no hard credit check. You can also finance a combination plan that includes chemical peels alongside other treatments.",
+      },
+      {
+        heading: "Chemical Peels vs. Over-the-Counter Alternatives",
+        content:
+          "Professional chemical peels at a physician-supervised clinic deliver results that at-home peel products cannot match. Over-the-counter peel pads and serums contain significantly lower concentrations of active ingredients and cannot penetrate as deeply. A single professional VI Peel produces more visible improvement than months of at-home peel products that cost $30 to $80 each. When you factor in the cost of purchasing monthly at-home products ($360 to $960 per year) versus 3 to 4 professional peels, the professional approach delivers superior results at a comparable annual investment.",
+      },
+      {
+        heading: "Maintaining Chemical Peel Results",
+        content:
+          "After completing your initial peel series, maintenance treatments every 2 to 3 months keep your results looking their best. Many clients transition to a quarterly peel schedule as part of their ongoing skincare routine. Combining maintenance peels with monthly HydraFacials creates a comprehensive approach to skin clarity and radiance. Our membership program offers reduced pricing on maintenance peels, making your long-term investment more predictable.",
+      },
+    ],
+    keyTakeaways: [
+      "VI Peel at $395 and BioRePeel at $495 are our most popular chemical peel options",
+      "Series packages of 3 to 4 peels reduce the per-session cost for optimal results",
+      "Cherry financing can spread a peel series into payments as low as $100 per month",
+      "Professional peels deliver results that over-the-counter products cannot match at a comparable annual cost",
+      "Maintenance peels every 2 to 3 months preserve your investment and sustain results",
+      "Combination plans with HydraFacial and other treatments can be financed together through Cherry",
+    ],
+    faqs: [
+      {
+        question: "How much does a VI Peel cost at Rani Beauty Clinic?",
+        answer:
+          "The VI Peel is priced at $395 per session at Rani Beauty Clinic. Series packages are available at a reduced per-session rate for clients committing to the recommended 3 to 4 treatment plan. Your provider will recommend the right peel type and treatment plan during your consultation.",
+      },
+      {
+        question: "How many chemical peels do I need?",
+        answer:
+          "Most clients see optimal results from a series of 3 to 4 peels spaced 4 to 6 weeks apart. Stubborn hyperpigmentation or acne scarring may benefit from additional sessions. After the initial series, maintenance peels every 2 to 3 months preserve your results.",
+      },
+      {
+        question: "Can I finance a chemical peel series?",
+        answer:
+          "Yes. Cherry financing allows you to spread a multi-session peel package into manageable monthly payments. A 3-session package can typically be financed at approximately $100 per month. Approval takes under 60 seconds.",
+      },
+      {
+        question: "Which chemical peel is right for my skin?",
+        answer:
+          "Peel selection depends on your skin type, concerns, and goals. The VI Peel is excellent for hyperpigmentation, acne, and fine lines across all skin types. BioRePeel provides biorevitalization with minimal downtime. Your provider will recommend the optimal formulation during your consultation.",
+      },
+      {
+        question: "Are chemical peels covered by HSA or FSA?",
+        answer:
+          "Chemical peels for cosmetic improvement typically do not qualify for HSA or FSA. When prescribed for a medical skin condition such as severe acne or precancerous lesions, they may be eligible. Our team can provide documentation if your treatment qualifies as medically necessary.",
+      },
+    ],
+  },
+  {
+    slug: "peptide-therapy-cost-and-financing",
+    title: "Peptide Therapy Cost and Financing",
+    metaTitle: "Peptide Therapy Cost & Financing | Payment Plans Guide",
+    metaDescription:
+      "Peptide therapy pricing and financing options at Rani Beauty Clinic. Monthly IM injection plans, Cherry financing, and HSA/FSA considerations. Renton, WA.",
+    heroDescription:
+      "Peptide therapy is one of the most exciting frontiers in regenerative wellness, and our flexible payment options ensure you can commit to the treatment duration needed for meaningful results. At Rani Beauty Clinic, peptide therapy IM injections are physician-supervised and priced to deliver accessible, ongoing wellness optimization. Cherry financing, membership savings, and HSA/FSA considerations help make peptide protocols fit your budget.",
+    sections: [
+      {
+        heading: "Peptide Therapy Cost Structure",
+        content:
+          "Peptide therapy at Rani Beauty Clinic is administered as IM injections under physician supervision. Pricing varies based on the specific peptide protocol prescribed for your goals, which may target recovery, anti-aging, immune function, sleep quality, or body composition. Your treatment plan is personalized by Dr. Alexander Landfield based on your bloodwork results, health history, and wellness objectives. Most peptide protocols run for 8 to 12 weeks initially, with ongoing maintenance protocols available for sustained benefits.",
+      },
+      {
+        heading: "Membership Value for Ongoing Peptide Therapy",
+        content:
+          "Clients who incorporate peptide therapy into their ongoing wellness routine benefit most from our membership program. Members receive reduced pricing on peptide injections alongside discounts on other wellness services including NAD+ injections, vitamin injections, and hormone therapy. For clients maintaining weekly or bi-weekly peptide protocols, membership savings compound significantly over the course of a treatment cycle. Membership also includes priority booking, which ensures your injection schedule stays consistent.",
+      },
+      {
+        heading: "Cherry Financing for Peptide Protocols",
+        content:
+          "Cherry financing allows you to pre-pay for a multi-week peptide protocol at a package rate while spreading the total into monthly payments. This is particularly advantageous for initial 8 to 12 week protocols where committing to the complete cycle delivers the best results. Cherry approval takes under 60 seconds with no hard credit check, and you can combine peptide therapy financing with other wellness treatments in a single application.",
+      },
+      {
+        heading: "HSA and FSA for Peptide Therapy",
+        content:
+          "Peptide therapy prescribed for a documented medical condition under physician supervision may qualify for HSA or FSA payment. Peptides used for therapeutic purposes such as injury recovery, immune support, or physician-prescribed anti-aging protocols can fall under the umbrella of medically necessary treatments. Dr. Landfield provides comprehensive documentation including medical justification for your benefits provider. We recommend confirming eligibility with your plan administrator before beginning treatment.",
+      },
+      {
+        heading: "Peptide Therapy ROI: The Wellness Investment",
+        content:
+          "The return on investment for peptide therapy extends across multiple dimensions of health and performance. Enhanced recovery means fewer sick days and better athletic performance. Improved sleep quality reduces the need for sleep medications and supplements. Optimized immune function can reduce annual healthcare expenses. Better body composition supports long-term metabolic health. While peptide therapy requires an ongoing investment, the compounding wellness benefits often exceed the cost when measured against the alternative of declining health markers and reactive medical care.",
+      },
+    ],
+    keyTakeaways: [
+      "Peptide therapy is administered as physician-supervised IM injections with personalized protocols",
+      "Most initial protocols run 8 to 12 weeks with ongoing maintenance options for sustained benefits",
+      "Membership pricing delivers compounding savings for clients on ongoing peptide protocols",
+      "Cherry financing can cover a complete multi-week protocol with comfortable monthly payments",
+      "HSA and FSA may cover peptide therapy when prescribed for a documented medical condition",
+      "Peptide therapy ROI extends across recovery, sleep, immunity, and body composition",
+    ],
+    faqs: [
+      {
+        question: "How much does peptide therapy cost?",
+        answer:
+          "Peptide therapy pricing at Rani Beauty Clinic depends on the specific peptide protocol prescribed for your goals. Treatment plans are personalized based on bloodwork and health assessment. Schedule a consultation to receive a personalized protocol recommendation with clear cost estimates.",
+      },
+      {
+        question: "Can I finance peptide therapy with Cherry?",
+        answer:
+          "Yes. Cherry financing can cover a complete peptide protocol, allowing you to spread the cost into monthly payments. You can also combine peptide therapy financing with other wellness services in a single Cherry application.",
+      },
+      {
+        question: "How long do I need to be on peptide therapy?",
+        answer:
+          "Initial protocols typically run 8 to 12 weeks. Many patients continue with maintenance protocols after the initial cycle for sustained benefits. Your physician will recommend the optimal duration and frequency based on your response and goals.",
+      },
+      {
+        question: "Is peptide therapy covered by insurance?",
+        answer:
+          "Peptide therapy at our clinic is a self-pay service. However, HSA and FSA accounts may cover physician-supervised peptide protocols when documented as medically necessary. We provide complete documentation for your benefits provider.",
+      },
+      {
+        question: "Can I combine peptide therapy with other wellness treatments?",
+        answer:
+          "Absolutely. Peptide therapy is often combined with NAD+ injections, vitamin therapy, and hormone optimization for a comprehensive wellness protocol. These combination plans can be financed together and membership pricing applies to all services.",
+      },
+    ],
+  },
+  {
+    slug: "hormone-therapy-financing-options",
+    title: "Hormone Replacement Therapy Financing Options",
+    metaTitle: "HRT Financing Options | Hormone Therapy Payment Plans",
+    metaDescription:
+      "Finance hormone replacement therapy at Rani Beauty Clinic. Monthly HRT program costs, Cherry payment plans, HSA/FSA eligibility, and insurance considerations.",
+    heroDescription:
+      "Hormone replacement therapy is a long-term investment in your vitality, and our flexible payment options ensure you can maintain consistent treatment for optimal results. At Rani Beauty Clinic, physician-supervised HRT programs include comprehensive bloodwork, personalized protocols, and ongoing monitoring. Cherry financing, membership savings, and HSA/FSA options help make hormone optimization accessible.",
+    sections: [
+      {
+        heading: "HRT Program Cost Structure",
+        content:
+          "Hormone replacement therapy at Rani Beauty Clinic is structured as an ongoing program that includes initial comprehensive bloodwork, physician evaluation and protocol design, hormone medications, follow-up bloodwork to monitor levels, and regular physician consultations for dosage optimization. Monthly costs depend on the specific hormones prescribed, dosage, and monitoring frequency. Programs are personalized by Dr. Alexander Landfield to address your specific hormonal profile and symptoms.",
+      },
+      {
+        heading: "Cherry Financing for HRT",
+        content:
+          "Cherry financing is particularly useful for the initial phase of hormone therapy, which typically includes comprehensive bloodwork panels, initial consultation, and the first several months of treatment. By financing the startup costs, you can begin treatment immediately and spread the initial investment over several months while establishing your treatment routine. Ongoing monthly hormone therapy costs are structured as a predictable monthly program fee.",
+      },
+      {
+        heading: "HSA, FSA, and Insurance Considerations",
+        content:
+          "Hormone replacement therapy prescribed for a documented hormonal deficiency or medical condition may qualify for HSA and FSA payment. This includes testosterone replacement for documented low testosterone, estrogen and progesterone therapy for menopausal symptoms, thyroid hormone optimization, and other physician-prescribed hormonal treatments. Dr. Landfield provides comprehensive documentation including bloodwork results, diagnosis, and medical necessity justification. Some commercial insurance plans may cover hormone therapy or the associated bloodwork when ordered for medical indications.",
+      },
+      {
+        heading: "HRT vs. Symptom-by-Symptom Treatment: Cost Comparison",
+        content:
+          "Many patients spend years treating individual symptoms of hormonal imbalance without addressing the root cause. Sleep medications, energy supplements, mood management, weight loss attempts, and libido treatments each carry their own costs. Monthly spending on supplements alone can reach $100 to $300 or more. A comprehensive HRT program that addresses the underlying hormonal imbalance often replaces the need for multiple symptom-specific treatments, making it more cost-effective in total. Additionally, optimized hormones support better health outcomes that reduce long-term medical expenses.",
+      },
+      {
+        heading: "The Long-Term Value of Hormone Optimization",
+        content:
+          "Hormone optimization delivers value across every dimension of health and quality of life. Proper hormone levels support bone density, cardiovascular health, cognitive function, body composition, sleep quality, and emotional well-being. The cost of not treating hormonal imbalance includes decreased productivity, increased healthcare utilization, and diminished quality of life. When viewed as a comprehensive wellness investment, HRT provides substantial return through improved daily functioning and long-term health protection.",
+      },
+    ],
+    keyTakeaways: [
+      "HRT programs include bloodwork, physician oversight, medications, and ongoing monitoring",
+      "Cherry financing covers initial startup costs including comprehensive bloodwork and first months of treatment",
+      "HSA and FSA may cover HRT when prescribed for documented hormonal deficiencies or medical conditions",
+      "HRT often replaces multiple symptom-specific treatments, potentially reducing total monthly wellness spending",
+      "Comprehensive documentation provided for insurance, HSA, and FSA claims",
+      "Hormone optimization supports bone density, cardiovascular health, cognition, and quality of life",
+    ],
+    faqs: [
+      {
+        question: "How much does hormone therapy cost per month?",
+        answer:
+          "Monthly HRT costs at Rani Beauty Clinic depend on the specific hormones prescribed, dosage, and monitoring frequency. Programs are personalized based on your bloodwork and symptoms. Schedule a consultation for a comprehensive evaluation and personalized cost estimate.",
+      },
+      {
+        question: "Does insurance cover hormone therapy?",
+        answer:
+          "Some insurance plans cover hormone therapy or associated bloodwork when prescribed for documented medical conditions. Our clinic is a self-pay practice, but we provide comprehensive documentation that you can submit to your insurance for potential reimbursement.",
+      },
+      {
+        question: "Can I use my HSA or FSA for hormone therapy?",
+        answer:
+          "Yes, hormone therapy prescribed for documented hormonal deficiencies is commonly eligible for HSA and FSA payment. This includes associated bloodwork, physician consultations, and medications. We provide detailed documentation for your benefits provider.",
+      },
+      {
+        question: "How long will I need hormone therapy?",
+        answer:
+          "HRT is typically an ongoing treatment. Most patients begin seeing improvement within 4 to 8 weeks and continue treatment to maintain optimal hormone levels. Your physician will regularly review your bloodwork and adjust your protocol as needed. Some patients may eventually reduce or discontinue treatment based on their health goals.",
+      },
+      {
+        question: "Can I finance the initial bloodwork separately?",
+        answer:
+          "Yes. Cherry financing can cover your initial bloodwork panels and consultation along with the first phase of treatment. This allows you to begin the diagnostic process immediately without a large upfront payment.",
+      },
+    ],
+  },
+  {
+    slug: "nad-injection-cost-and-financing",
+    title: "NAD+ Injection Cost and Financing",
+    metaTitle: "NAD+ Injection Cost & Financing | Payment Plans Guide",
+    metaDescription:
+      "NAD+ IM injection pricing and financing at Rani Beauty Clinic. Cherry payment plans, membership savings, and wellness package options. Renton, WA.",
+    heroDescription:
+      "NAD+ injections are one of the most sought-after wellness treatments for energy, cognitive performance, and cellular health. At Rani Beauty Clinic, physician-supervised NAD+ IM injections range from $150 to $500 per session, and our flexible payment options make consistent NAD+ therapy accessible for long-term wellness optimization.",
+    sections: [
+      {
+        heading: "NAD+ Injection Pricing",
+        content:
+          "NAD+ IM injections at Rani Beauty Clinic are priced from $150 for standard doses to $500 for high-dose protocols. Your dosing is personalized by Dr. Alexander Landfield based on your wellness goals, health status, and response to treatment. Many clients begin with higher loading doses and transition to lower maintenance doses over time. NAD+ is administered as an intramuscular injection, which is faster and more convenient than IV administration, with no extended infusion time required.",
+      },
+      {
+        heading: "NAD+ Treatment Schedules and Total Investment",
+        content:
+          "The optimal NAD+ treatment schedule depends on your goals. Performance-focused clients often maintain weekly injections, while wellness-maintenance clients may opt for bi-weekly or monthly sessions. A client receiving weekly standard-dose NAD+ injections would invest approximately $600 to $2,000 per month depending on dosing. Bi-weekly schedules reduce this to roughly $300 to $1,000 per month. Loading phases may involve more frequent sessions initially, followed by a transition to a maintenance schedule.",
+      },
+      {
+        heading: "Membership Savings for Regular NAD+ Clients",
+        content:
+          "NAD+ therapy delivers the best results with consistent, ongoing treatment. Our membership program provides reduced pricing on NAD+ injections along with benefits across all wellness services. For clients maintaining weekly or bi-weekly NAD+ protocols, membership savings are substantial over the course of a year. Members also receive priority booking for injection appointments, complimentary wellness add-ons, and exclusive pricing on combination protocols.",
+      },
+      {
+        heading: "Cherry Financing for NAD+ Protocols",
+        content:
+          "Cherry financing allows you to pre-pay for a multi-session NAD+ protocol at a package rate while spreading the total into comfortable monthly payments. A 3-month NAD+ protocol can be financed with one application, locking in package pricing while keeping monthly costs predictable. Cherry approval takes under 60 seconds with no hard credit check. This is ideal for clients starting a loading phase who want to commit to the full protocol without managing individual session payments.",
+      },
+      {
+        heading: "NAD+ ROI: The Cellular Health Investment",
+        content:
+          "NAD+ is a coenzyme essential to cellular energy production, DNA repair, and longevity pathways. Declining NAD+ levels are associated with aging, fatigue, cognitive decline, and reduced metabolic function. By maintaining optimal NAD+ levels through regular IM injections, you invest in fundamental cellular health that supports every system in your body. Many clients report improved energy, mental clarity, athletic recovery, and sleep quality. When measured against the cost of energy supplements, nootropics, and the productivity lost to fatigue, NAD+ therapy often delivers superior value.",
+      },
+    ],
+    keyTakeaways: [
+      "NAD+ IM injections range from $150 to $500 per session depending on dosing protocol",
+      "IM injection delivery is faster and more convenient than IV administration with no extended infusion time",
+      "Membership pricing delivers significant annual savings for clients on regular NAD+ protocols",
+      "Cherry financing covers multi-session protocols with comfortable monthly payments",
+      "NAD+ supports cellular energy, DNA repair, cognitive function, and athletic recovery",
+      "Treatment schedules range from weekly to monthly depending on individual wellness goals",
+    ],
+    faqs: [
+      {
+        question: "How much does an NAD+ injection cost?",
+        answer:
+          "NAD+ IM injections at Rani Beauty Clinic range from $150 for standard doses to $500 for high-dose protocols. Your dosing is personalized based on your wellness goals and physician recommendations. Membership and package pricing reduce the per-session cost for ongoing treatment.",
+      },
+      {
+        question: "How often should I get NAD+ injections?",
+        answer:
+          "Treatment frequency depends on your goals. Performance-focused clients often maintain weekly injections, while wellness-maintenance clients may opt for bi-weekly or monthly sessions. Your physician will recommend a schedule based on your initial assessment and response to treatment.",
+      },
+      {
+        question: "Can I finance an NAD+ protocol?",
+        answer:
+          "Yes. Cherry financing allows you to pre-pay for a multi-session NAD+ protocol with monthly payments over 3 to 24 months. You can combine NAD+ financing with other wellness services in a single application.",
+      },
+      {
+        question: "Why IM injection instead of IV for NAD+?",
+        answer:
+          "NAD+ IM injections are faster and more convenient than IV administration. IV NAD+ typically requires 2 to 4 hours of infusion time per session and can cause significant flushing and discomfort. IM injections take minutes, are well-tolerated, and deliver NAD+ effectively without the time commitment of IV protocols.",
+      },
+      {
+        question: "Is NAD+ therapy covered by HSA or FSA?",
+        answer:
+          "NAD+ therapy prescribed for a documented medical condition under physician supervision may qualify for HSA or FSA. Wellness-focused NAD+ protocols typically do not qualify. Our team provides documentation for your benefits provider if your treatment meets medical necessity criteria.",
+      },
+    ],
+  },
 ];

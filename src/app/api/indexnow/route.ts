@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
   });
 }
 
-// GET endpoint — returns the IndexNow key for verification
+// GET endpoint - returns the IndexNow key for verification
 export async function GET() {
   return new NextResponse(INDEXNOW_KEY, {
     headers: { "Content-Type": "text/plain" },

@@ -1,0 +1,7 @@
+{
+  "type": "winback-45day",
+  "trigger": "no_appointment_booked",
+  "delayAfterTrigger": "45 days since last appointment",
+  "message": "Hi {{first_name}}, we haven't seen you at Rani in a while and wanted to check in. Whether you're ready to rebook or just have questions about your next steps, we're here. Book anytime: {{booking_link}} or text us back.",
+  "characterCount": 233
+}

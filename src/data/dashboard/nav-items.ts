@@ -51,6 +51,14 @@ export const NAV_ITEMS: NavItem[] = [
 
   // Operations
   {
+    label: 'GLP-1 Program',
+    href: '/dashboard/glp1',
+    icon: 'TrendingUp',
+    permission: 'view_revenue',
+    badge: 'New',
+    group: 'operations',
+  },
+  {
     label: 'Schedule',
     href: '/dashboard/schedule',
     icon: 'Calendar',
@@ -151,7 +159,7 @@ export const NAV_ITEMS: NavItem[] = [
     group: 'intelligence',
   },
 
-  // Operations — Alerts
+  // Operations - Alerts
   {
     label: 'Alerts',
     href: '/dashboard/alerts',

@@ -162,7 +162,7 @@ function buildRoadmapFromAI(plan: PlanData): Phase[] {
         treatmentName = treatmentName.replace(/^Phase\s*\d+\s*/i, '').trim();
         treatmentName = treatmentName.replace(/^(introduces|deploys|utilizes|begins|starts|initiates|applies|combines|features|includes|delivers|provides|targets)\s+/i, '').trim();
         // Remove verbose qualifiers
-        treatmentName = treatmentName.replace(/\s+specifically\s+calibrated\s+for\s+/i, ' — ').trim();
+        treatmentName = treatmentName.replace(/\s+specifically\s+calibrated\s+for\s+/i, ' - ').trim();
         if (treatmentName.length > 80) {
           // Try to extract just the service name (first sentence or up to first comma/parenthesis)
           const shortMatch = treatmentName.match(/^([^,(]+)/);
@@ -230,7 +230,7 @@ function buildRoadmapFromAI(plan: PlanData): Phase[] {
       return {
         phase: i + 1,
         title: phaseNames[i] || `Phase ${i + 1}`,
-        duration: chunk.length > 1 ? `${chunk[0].week} – ${chunk[chunk.length - 1].week}` : chunk[0].week,
+        duration: chunk.length > 1 ? `${chunk[0].week} - ${chunk[chunk.length - 1].week}` : chunk[0].week,
         description: 'Targeted treatments designed for your specific goals.',
         icon: phaseIcons[i % phaseIcons.length],
         appointments,
@@ -238,10 +238,10 @@ function buildRoadmapFromAI(plan: PlanData): Phase[] {
     });
   }
 
-  // Final fallback — build from packages/treatments found
+  // Final fallback - build from packages/treatments found
   const parsedTreatments = parseCostBreakdown(plan.costBreakdown);
   const treatmentNames = parsedTreatments.length > 0
-    ? parsedTreatments.map(t => `${t.name}${t.sessions > 1 ? ` — Session 1 of ${t.sessions}` : ''}`)
+    ? parsedTreatments.map(t => `${t.name}${t.sessions > 1 ? ` - Session 1 of ${t.sessions}` : ''}`)
     : ['Comprehensive Consultation + First Treatment'];
 
   return [
@@ -418,7 +418,7 @@ function SectionDivider() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   AI Plan Summary — Structured display of program plan
+   AI Plan Summary - Structured display of program plan
    ═══════════════════════════════════════════════════════════════ */
 
 function PlanSummary({ plan }: { plan: PlanData }) {
@@ -474,13 +474,13 @@ function PlanSummary({ plan }: { plan: PlanData }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-[#C9A96E]/10">
         <div className="text-center p-4 rounded-xl bg-[#F8F6F1]">
           <p className="font-heading text-2xl text-[#0F1D2C]">
-            {totalValue > 0 ? `$${totalValue.toLocaleString()}` : '—'}
+            {totalValue > 0 ? `$${totalValue.toLocaleString()}` : ' - '}
           </p>
           <p className="text-[10px] uppercase tracking-widest text-[#0F1D2C]/40 mt-1">Plan Value</p>
         </div>
         <div className="text-center p-4 rounded-xl bg-[#F8F6F1]">
           <p className="font-heading text-2xl text-[#0F1D2C]">
-            {totalSessions > 0 ? totalSessions : parsedTreatments.length > 0 ? parsedTreatments.length : '—'}
+            {totalSessions > 0 ? totalSessions : parsedTreatments.length > 0 ? parsedTreatments.length : ' - '}
           </p>
           <p className="text-[10px] uppercase tracking-widest text-[#0F1D2C]/40 mt-1">Sessions</p>
         </div>
@@ -867,7 +867,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
         <SectionDivider />
 
         {/* ═══════════════════════════════════════════════════════════
-           PHOTO SIMULATION — Projected Results Visualization
+           PHOTO SIMULATION - Projected Results Visualization
            ═══════════════════════════════════════════════════════════ */}
         <section className="max-w-4xl mx-auto px-6 py-12 md:py-16 print-avoid-break no-print">
           <motion.div
@@ -993,7 +993,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
         <SectionDivider />
 
         {/* ═══════════════════════════════════════════════════════════
-           YOUR TREATMENT PLAN (AI Program Plan — PARSED)
+           YOUR TREATMENT PLAN (AI Program Plan - PARSED)
            ═══════════════════════════════════════════════════════════ */}
         <section className="max-w-4xl mx-auto px-6 py-12 print-break print-avoid-break">
           <motion.div
@@ -1045,7 +1045,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
         <SectionDivider />
 
         {/* ═══════════════════════════════════════════════════════════
-           TREATMENT ROADMAP — Appointment Schedule
+           TREATMENT ROADMAP - Appointment Schedule
            ═══════════════════════════════════════════════════════════ */}
         <section className="max-w-4xl mx-auto px-6 py-12 print-break print-avoid-break">
           <motion.div
@@ -1063,7 +1063,7 @@ export default function TreatmentPlanClient({ planId }: { planId: string }) {
               Treatment Roadmap
             </h2>
             <p className="mt-3 text-sm text-[#0F1D2C]/50 max-w-lg mx-auto">
-              Your personalized appointment schedule. Dates are suggested starting points — we&apos;ll confirm exact times when you book.
+              Your personalized appointment schedule. Dates are suggested starting points - we&apos;ll confirm exact times when you book.
             </p>
           </motion.div>
 

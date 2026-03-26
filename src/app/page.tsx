@@ -6,7 +6,7 @@ import { HomepageSchema, AICitationSchemas } from "@/components/seo/EnhancedSche
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 
-// Below-fold sections — dynamically imported to reduce initial JS bundle.
+// Below-fold sections - dynamically imported to reduce initial JS bundle.
 const ResultsShowcase = dynamic(() => import("@/components/sections/ResultsShowcase"));
 const CredibilitySection = dynamic(() => import("@/components/sections/CredibilitySection"));
 const QuizCTA = dynamic(() => import("@/components/sections/QuizCTA"));
@@ -29,7 +29,7 @@ const reviews = [
     id: 2,
     name: "Jennifer L.",
     rating: 5,
-    text: "Knowing that a board-certified neurologist oversees the Botox treatments gave me so much confidence. My results look completely natural — refreshed, not frozen. The staff is incredibly professional and warm.",
+    text: "Knowing that a board-certified neurologist oversees the Botox treatments gave me so much confidence. My results look completely natural - refreshed, not frozen. The staff is incredibly professional and warm.",
     treatment: "Botox",
     date: "December 2025",
   },
@@ -53,7 +53,7 @@ const reviews = [
     id: 5,
     name: "Michelle T.",
     rating: 5,
-    text: "The RF microneedling results have been amazing for my acne scars. The team was upfront about expectations and timeline, and they were right — after three sessions, my skin texture is dramatically smoother. Worth every penny.",
+    text: "The RF microneedling results have been amazing for my acne scars. The team was upfront about expectations and timeline, and they were right - after three sessions, my skin texture is dramatically smoother. Worth every penny.",
     treatment: "RF Microneedling",
     date: "March 2026",
   },
@@ -61,7 +61,7 @@ const reviews = [
     id: 6,
     name: "Angela W.",
     rating: 5,
-    text: "I was hesitant about fillers but the team walked me through every step. The fact that a neurologist oversees the process made me feel completely safe. The results are so subtle and natural — my friends just say I look rested.",
+    text: "I was hesitant about fillers but the team walked me through every step. The fact that a neurologist oversees the process made me feel completely safe. The results are so subtle and natural - my friends just say I look rested.",
     treatment: "Dermal Fillers",
     date: "January 2026",
   },
@@ -77,7 +77,7 @@ const reviews = [
     id: 8,
     name: "Lisa K.",
     rating: 5,
-    text: "Open 7 days a week is a game-changer for my schedule. I come in for my chemical peel on Sundays and it fits perfectly into my routine. The team remembers my preferences and my skin has never been clearer.",
+    text: "Open 7 days a week makes all the difference for my schedule. I come in for my chemical peel on Sundays and it fits perfectly into my routine. The team remembers my preferences and my skin has never been clearer.",
     treatment: "Chemical Peels",
     date: "March 2026",
   },
@@ -100,7 +100,7 @@ const homepageFaqs = [
   {
     question: "How does the consultation deposit work?",
     answer:
-      "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
+      "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose - so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
   },
   {
     question: "How do I know which treatment is right for me?",
@@ -126,11 +126,11 @@ export default function HomePage() {
       <HomepageSchema />
       <AICitationSchemas reviews={reviews} faqs={homepageFaqs} />
 
-      {/* 1. Hero — Cinematic Split Layout */}
+      {/* 1. Hero - Cinematic Split Layout */}
       <Hero
         label="PHYSICIAN-SUPERVISED MEDSPA"
         title="Physician-Supervised Beauty. Personally Designed."
-        subtitle="Expert-led treatments for skin, body, and wellness — designed by a neurologist-led team."
+        subtitle="Expert-led treatments for skin, body, and wellness - designed by a neurologist-led team."
         primaryCTA={{
           text: "Book Your Consultation",
           href: clinicInfo.booking.url,

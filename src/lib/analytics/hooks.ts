@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Analytics Hooks — Supplementary tracking hooks.
+ * Analytics Hooks - Supplementary tracking hooks.
  *
  * NOTE: Scroll depth, CTA clicks, rage clicks, hesitation, section attention,
  * intent scoring, and booking widget detection are already handled by
@@ -17,7 +17,7 @@ import { useEffect, useRef } from 'react';
 import { trackAnalyticsEvent } from './events';
 
 /* ──────────────────────────────────────────────────────────────
-   useTimeOnPage — fires time_on_page at 30s, 60s, 120s, 300s
+   useTimeOnPage - fires time_on_page at 30s, 60s, 120s, 300s
    Uses visibility API to pause when tab is hidden.
    Not covered by BehavioralTracker.
    ────────────────────────────────────────────────────────────── */
@@ -64,7 +64,7 @@ export function useTimeOnPage() {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   usePhoneLinkTracking — auto-tracks tel: link clicks
+   usePhoneLinkTracking - auto-tracks tel: link clicks
    BehavioralTracker tracks CTA clicks generically but doesn't
    fire a dedicated phone_click event with phone_number param.
    ────────────────────────────────────────────────────────────── */
@@ -95,7 +95,7 @@ export function usePhoneLinkTracking() {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   useServicePageTracking — auto-fires service_page_view
+   useServicePageTracking - auto-fires service_page_view
    Call on any /services/[slug] or /wellness/[slug] page.
    ────────────────────────────────────────────────────────────── */
 

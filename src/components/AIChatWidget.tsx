@@ -119,6 +119,9 @@ export default function AIChatWidget() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            role="dialog"
+            aria-modal="false"
+            aria-label="AI Chat"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -146,7 +149,7 @@ export default function AIChatWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" aria-live="polite" aria-relevant="additions">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[85%]">
@@ -210,7 +213,9 @@ export default function AIChatWidget() {
                 onSubmit={e => { e.preventDefault(); sendMessage(); }}
                 className="flex items-center gap-2"
               >
+                <label htmlFor="rani-chat-input" className="sr-only">Type your message</label>
                 <input
+                  id="rani-chat-input"
                   ref={inputRef}
                   type="text"
                   value={input}
@@ -223,7 +228,8 @@ export default function AIChatWidget() {
                   disabled={!input.trim() || isLoading}
                   className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-rani-gold text-rani-navy transition-all hover:bg-rani-gold/90 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" aria-hidden="true" />}
+                  <span className="sr-only">{isLoading ? 'Sending...' : 'Send message'}</span>
                 </button>
               </form>
             </div>

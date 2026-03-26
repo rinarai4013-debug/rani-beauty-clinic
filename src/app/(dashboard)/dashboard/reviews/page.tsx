@@ -226,7 +226,7 @@ function ReviewsContent() {
                     <span className="text-[10px] text-rani-muted">
                       {review.date
                         ? new Date(review.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                        : '—'}
+                        : ' - '}
                     </span>
                   </div>
                 </div>

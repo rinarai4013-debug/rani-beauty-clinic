@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       ? { filterByFormula: `{Status} = '${sanitizeFormulaValue(statusFilter)}'` }
       : undefined;
 
-    // Clients table has no "Is Test" field — pass skipTestFilter=true
+    // Clients table has no "Is Test" field - pass skipTestFilter=true
     const records = await fetchAll<ClientFields>(Tables.clients(), filterOptions, true);
 
     const clients = records.map((r) => {

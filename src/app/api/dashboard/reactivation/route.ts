@@ -79,9 +79,9 @@ function getSuggestedOffer(lastService: string): string {
   const matched = matchService(lastService);
   if (matched && PATHWAYS[matched]) {
     const next = PATHWAYS[matched].find(s => s !== matched) || PATHWAYS[matched][0];
-    return `Book a ${next} — perfect follow-up to your ${matched}`;
+    return `Book a ${next} - perfect follow-up to your ${matched}`;
   }
-  return 'Book a HydraFacial — our most popular treatment to get you back on track';
+  return 'Book a HydraFacial - our most popular treatment to get you back on track';
 }
 
 export type ReactivationSegment =
@@ -193,14 +193,14 @@ export async function GET() {
         .filter(a => a.fields.Status === 'Completed' || a.fields.Status === 'Show')
         .sort((a, b) => (b.fields.Date || '').localeCompare(a.fields.Date || ''));
 
-      if (appointments.length === 0) continue; // No completed appointments — skip
+      if (appointments.length === 0) continue; // No completed appointments - skip
 
       const lastAppt = appointments[0];
       const lastVisitDate = lastAppt.fields.Date;
       if (!lastVisitDate) continue;
 
       const daysSince = Math.floor((now - new Date(lastVisitDate).getTime()) / DAY_MS);
-      if (daysSince < 14) continue; // Too recent — not lapsed
+      if (daysSince < 14) continue; // Too recent - not lapsed
 
       // Calculate total spend from transactions
       const totalSpend = txnIds
@@ -335,7 +335,7 @@ export async function POST(request: NextRequest) {
       'Date': new Date().toISOString().split('T')[0],
       'Channel': channel || 'SMS',
       'Direction': 'Outbound',
-      'Subject': subject || `Reactivation — ${clientName}`,
+      'Subject': subject || `Reactivation - ${clientName}`,
       'Body': messageBody,
       'Clients': [clientId],
     });

@@ -94,7 +94,7 @@ function AlertsContent() {
         mutate();
       }
     } catch {
-      // Silently fail — alert stays visible
+      // Silently fail - alert stays visible
     } finally {
       setDismissingIds(prev => {
         const next = new Set(prev);
@@ -255,7 +255,7 @@ function AlertsContent() {
                           <span className="font-semibold text-rani-navy">
                             {typeof alert.metricValue === 'number'
                               ? alert.metricValue.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                              : '—'}
+                              : ' - '}
                           </span>
                         </div>
                         {alert.thresholdValue !== undefined && (

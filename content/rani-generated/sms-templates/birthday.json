@@ -1,0 +1,7 @@
+{
+  "type": "birthday",
+  "trigger": "patient_birthday",
+  "delayAfterTrigger": "9:00 AM on birthday",
+  "message": "Happy Birthday, {{first_name}}! From all of us at Rani Beauty Clinic. We have a special birthday gift waiting for you. Check your email for details, or book your birthday treatment: {{booking_link}} Cheers to you!",
+  "characterCount": 221
+}

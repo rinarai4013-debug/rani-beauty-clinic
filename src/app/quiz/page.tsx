@@ -18,7 +18,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Rani Beauty Clinic — Find Your Perfect Treatment",
+        alt: "Rani Beauty Clinic - Find Your Perfect Treatment",
       },
     ],
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 export default function QuizPage() {
   return (
     <>
-      <h1 className="sr-only">Find Your Perfect Treatment — Skin Quiz</h1>
+      <h1 className="sr-only">Find Your Perfect Treatment - Skin Quiz</h1>
       <SkinQuiz />
     </>
   );

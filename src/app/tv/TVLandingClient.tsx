@@ -135,11 +135,11 @@ export default function TVLandingClient() {
           email: formData.email,
           phone: formData.phone,
           service: formData.service || "TV Landing Page Lead",
-          message: `Hulu TV ad lead — interested in: ${formData.service || "General inquiry"}`,
+          message: `Hulu TV ad lead - interested in: ${formData.service || "General inquiry"}`,
         }),
       });
     } catch {
-      // Non-blocking — still show success even if API fails
+      // Non-blocking - still show success even if API fails
     }
     setSubmitted(true);
   }

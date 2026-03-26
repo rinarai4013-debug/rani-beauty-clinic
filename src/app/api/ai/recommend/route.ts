@@ -19,12 +19,12 @@ function checkRateLimit(ip: string): boolean {
 }
 
 const SERVICES = [
-  { name: 'Sofwave', category: 'Skin Tightening', price: '$2,750–$4,500', description: 'Non-invasive ultrasound skin tightening for face and body. FDA-cleared. No downtime.' },
+  { name: 'Sofwave', category: 'Skin Tightening', price: '$2,750-$4,500', description: 'Non-invasive ultrasound skin tightening for face and body. FDA-cleared. No downtime.' },
   { name: 'HydraFacial', category: 'Facial', price: '$275', description: 'Signature cleansing, extraction, and hydration facial. Immediate glow.' },
   { name: 'PRX-T33', category: 'Biorevitalization', price: '$495', description: 'No-needle biorevitalization for skin renewal. Stimulates collagen without peeling.' },
   { name: 'VI Peel', category: 'Chemical Peel', price: '$395', description: 'Medical-grade chemical peel for pigmentation, acne, and anti-aging.' },
-  { name: 'PicoWay', category: 'Laser', price: '$350–$600', description: 'Advanced laser for pigment removal, tattoo removal, and skin revitalization.' },
-  { name: 'RF Microneedling', category: 'Skin Renewal', price: '$495–$850', description: 'Radiofrequency microneedling for scars, pores, and skin tightening.' },
+  { name: 'PicoWay', category: 'Laser', price: '$350-$600', description: 'Advanced laser for pigment removal, tattoo removal, and skin revitalization.' },
+  { name: 'RF Microneedling', category: 'Skin Renewal', price: '$495-$850', description: 'Radiofrequency microneedling for scars, pores, and skin tightening.' },
   { name: 'Laser Hair Removal', category: 'Laser', price: 'Packages from $800', description: 'Permanent hair reduction for all skin types.' },
   { name: 'Botox', category: 'Injectable', price: 'Varies', description: 'Neurotoxin for wrinkle prevention and smoothing. Quick, minimal downtime.' },
   { name: 'Dermal Fillers', category: 'Injectable', price: 'Varies', description: 'Hyaluronic acid fillers for volume restoration and contouring.' },
@@ -32,8 +32,8 @@ const SERVICES = [
   { name: 'Tri-Immune Injection', category: 'Wellness', price: '$75', description: 'Glutathione + Vitamin C + Zinc IM injection for immune support.' },
   { name: 'Glutathione Injection', category: 'Wellness', price: '$100', description: 'Master antioxidant IM injection for skin brightening and detox.' },
   { name: 'B12 Injection', category: 'Wellness', price: '$35', description: 'Energy-boosting IM injection.' },
-  { name: 'NAD+ Injection', category: 'Wellness', price: '$150–$500', description: 'Anti-aging IM injection for cellular repair and energy.' },
-  { name: 'GLP-1 Weight Loss', category: 'Weight Management', price: '$399–$599/mo', description: 'Physician-supervised GLP-1 weight management program.' },
+  { name: 'NAD+ Injection', category: 'Wellness', price: '$150-$500', description: 'Anti-aging IM injection for cellular repair and energy.' },
+  { name: 'GLP-1 Weight Loss', category: 'Weight Management', price: '$399-$599/mo', description: 'Physician-supervised GLP-1 weight management program.' },
   { name: 'Tretinoin Rx Skincare', category: 'Skincare', price: '$99/mo', description: 'Prescription-strength retinoid for anti-aging and acne.' },
   { name: 'Folix Hair Restoration', category: 'Hair', price: 'Varies', description: 'Advanced hair restoration treatment.' },
 ];
@@ -76,7 +76,7 @@ CLIENT QUIZ ANSWERS:
 - Budget Preference: ${budget || 'Not specified'}
 
 AVAILABLE SERVICES:
-${SERVICES.map(s => `- ${s.name} (${s.category}): ${s.price} — ${s.description}`).join('\n')}
+${SERVICES.map(s => `- ${s.name} (${s.category}): ${s.price} - ${s.description}`).join('\n')}
 
 IMPORTANT RULES:
 - Rani does IM INJECTIONS only. NEVER say "infusion." Always say "injection."
@@ -157,9 +157,9 @@ function getStaticRecommendation(goal: string, experience: string, timeline: str
     });
 
   return {
-    good: { title: 'Essential Glow', services: mapServices(plan.good), totalEstimate: 'From $275', timeline: '1–2 weeks' },
-    better: { title: 'Complete Transformation', services: mapServices(plan.better), totalEstimate: 'From $770', timeline: '4–6 weeks' },
-    best: { title: 'Ultimate Experience', services: mapServices(plan.best), totalEstimate: 'From $3,500', timeline: '8–12 weeks' },
+    good: { title: 'Essential Glow', services: mapServices(plan.good), totalEstimate: 'From $275', timeline: '1-2 weeks' },
+    better: { title: 'Complete Transformation', services: mapServices(plan.better), totalEstimate: 'From $770', timeline: '4-6 weeks' },
+    best: { title: 'Ultimate Experience', services: mapServices(plan.best), totalEstimate: 'From $3,500', timeline: '8-12 weeks' },
     personalNote: 'Your skin journey is unique, and we\'re here to guide you every step of the way. Book a complimentary consultation to create your personalized plan with our expert team.',
   };
 }

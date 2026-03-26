@@ -101,7 +101,7 @@ function PnLContent() {
       </div>
 
       {/* Hero KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-5 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-6">
         <KPICard title="Total Revenue" value={kpis?.totalRevenue || 0} prefix="$" icon="dollar-sign" size="hero" />
         <KPICard title="Net Income" value={Math.abs(kpis?.netIncome || 0)} prefix={kpis?.netIncome && kpis.netIncome >= 0 ? '$' : '-$'} icon="dollar-sign" />
         <KPICard title="Gross Margin" value={kpis?.grossMargin || 0} suffix="%" icon="percent" />
@@ -137,7 +137,7 @@ function PnLContent() {
             <div className="flex-shrink-0">
               <ProgressRing value={healthScore.overall} size={120} strokeWidth={10} />
             </div>
-            <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full">
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 w-full">
               {Object.entries(healthScore.components).map(([key, value]) => {
                 const info = HEALTH_LABELS[key] || { icon: Activity, color: 'text-gray-600' };
                 const Icon = info.icon;
@@ -338,7 +338,7 @@ function PnLContent() {
 
       {/* KPI Grid */}
       {kpis && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
           <div className="bg-white/80 rounded-xl border border-rani-border p-3 sm:p-4 text-center">
             <div className="text-[10px] sm:text-xs font-body text-rani-muted uppercase truncate">Avg Ticket</div>
             <div className="text-base sm:text-lg font-heading text-rani-navy mt-1">${kpis.avgTicketSize}</div>

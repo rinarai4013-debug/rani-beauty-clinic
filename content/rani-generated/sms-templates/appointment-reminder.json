@@ -1,0 +1,7 @@
+{
+  "type": "appointment-reminder",
+  "trigger": "upcoming_appointment",
+  "delayAfterTrigger": "24 hours before appointment",
+  "message": "Hi {{first_name}}, this is Rani Beauty Clinic. Just a reminder that your {{treatment_name}} appointment is tomorrow at {{appointment_time}}. Please arrive 5 minutes early. If you need to reschedule, reply here or call us at {{clinic_phone}}. We look forward to seeing you!",
+  "characterCount": 289
+}

@@ -144,7 +144,7 @@ export default function Step2PersonalInfo({
           name="phone"
           type="tel"
           placeholder="(425) 555-1234"
-          hint="For appointment reminders only — we never spam"
+          hint="For appointment reminders only - we never spam"
           value={formData.phone}
           error={errors.phone}
           onChange={(v) => onUpdate('phone', v)}

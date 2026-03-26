@@ -1,0 +1,110 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npx next build
+        env:
+          AIRTABLE_PAT: ${{ secrets.AIRTABLE_PAT }}
+          AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+          DASHBOARD_JWT_SECRET: ${{ secrets.DASHBOARD_JWT_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://ranibeautyclinic.com
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: .lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Post Lighthouse scores as PR comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = ${{ steps.lighthouse.outputs.manifest }};
+            const links = ${{ steps.lighthouse.outputs.links }};
+
+            const pages = [
+              { name: 'Home', path: '/' },
+              { name: 'Services', path: '/services' },
+              { name: 'About', path: '/about' },
+              { name: 'Contact', path: '/contact' },
+              { name: 'Blog', path: '/blog' },
+            ];
+
+            let comment = '## Lighthouse Results\n\n';
+            let hasFailing = false;
+
+            if (results && results.length > 0) {
+              comment += '| Page | Performance | Accessibility | Best Practices | SEO | Report |\n';
+              comment += '|------|-------------|---------------|----------------|-----|--------|\n';
+
+              results.forEach((result, i) => {
+                const page = pages[i] || { name: 'Unknown', path: '' };
+                const perf = Math.round(result.summary.performance * 100);
+                const a11y = Math.round(result.summary.accessibility * 100);
+                const bp = Math.round(result.summary['best-practices'] * 100);
+                const seo = Math.round(result.summary.seo * 100);
+                const link = links[result.url] || '';
+
+                const perfIcon = perf >= 90 ? '🟢' : perf >= 80 ? '🟡' : '🔴';
+                if (perf < 80) hasFailing = true;
+
+                comment += `| ${page.name} | ${perfIcon} ${perf} | ${a11y} | ${bp} | ${seo} | [View](${link}) |\n`;
+              });
+            } else {
+              comment += '_Lighthouse results not available._\n';
+            }
+
+            if (hasFailing) {
+              comment += '\n> **Warning:** One or more pages scored below 80 on mobile performance.\n';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment,
+            });
+
+      - name: Fail if performance below threshold
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = ${{ steps.lighthouse.outputs.manifest }};
+            if (!results) {
+              core.setFailed('No Lighthouse results available');
+              return;
+            }
+            for (const result of results) {
+              const perf = Math.round(result.summary.performance * 100);
+              if (perf < 80) {
+                core.setFailed(`Mobile performance score ${perf} is below threshold of 80 for ${result.url}`);
+              }
+            }

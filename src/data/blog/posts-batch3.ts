@@ -387,7 +387,7 @@ Dermatologists are medical doctors who specialize in diagnosing and treating dis
 
 Med spas, on the other hand, specialize in cosmetic and aesthetic treatments designed to enhance your appearance. Services like Botox, dermal fillers, laser hair removal, HydraFacials, chemical peels, microneedling, and body contouring are the primary focus of a quality med spa. At Rani Beauty Clinic in Renton, WA, we provide these services under the oversight of our board-certified medical director, Dr. Alexander Landfield, ensuring that every cosmetic treatment is performed with the same rigor and safety standards you would expect in a medical setting.
 
-In many cases, patients benefit from seeing both providers. Your dermatologist manages your skin health, while your med spa team enhances your appearance and helps you achieve your aesthetic goals. When choosing a med spa, make sure it is physician-supervised and staffed by licensed professionals. At Rani Beauty Clinic, we are happy to coordinate with your dermatologist to ensure your care is seamless. Call (425) 539-4440 for a consultation.`,
+In many cases, patients benefit from seeing both providers. Your dermatologist manages your skin health, while your med spa team enhances your appearance and helps you achieve your aesthetic goals. When choosing a med spa, make sure it is physician-supervised and staffed by licensed professionals. At Rani Beauty Clinic, we are happy to coordinate with your dermatologist to ensure your care is well-coordinated. Call (425) 539-4440 for a consultation.`,
     faqs: [
       {
         question: "Should I see a dermatologist or a med spa for acne scars?",
@@ -787,7 +787,7 @@ Insurance coverage for GLP-1 medications depends on several factors, including y
 
 Even when insurance does not cover GLP-1 medications for weight loss, there are options to make treatment more affordable. Manufacturer savings programs and coupons can significantly reduce out-of-pocket costs for eligible patients. Some patients also use compounding pharmacies, which can provide these medications at a lower price point, though it is important to work with a physician-supervised program that ensures quality and proper dosing. At Rani Beauty Clinic, Dr. Landfield works with each patient to identify the most cost-effective pathway to treatment.
 
-We also offer financing options through Afterpay, Cherry, and PatientFi to help patients manage the cost of their weight management programs. Our team can help you navigate insurance questions and explore all available options during your consultation. The most important first step is a medical evaluation to determine if GLP-1 therapy is appropriate for you. Call (425) 539-4440 to schedule a consultation and discuss your options.`,
+We also offer financing options through Afterpay, Cherry, and PatientFi to help patients manage the cost of their weight management programs. Our team can help you with insurance questions and explore all available options during your consultation. The most important first step is a medical evaluation to determine if GLP-1 therapy is appropriate for you. Call (425) 539-4440 to schedule a consultation and discuss your options.`,
     faqs: [
       {
         question: "Does my insurance cover Semaglutide for weight loss?",
@@ -890,7 +890,7 @@ Our Total Body Transformation begins with a thorough consultation where we asses
 
 Skin rejuvenation is another key component. Weight loss and aging can leave skin looking dull, loose, or textured. Our team addresses these concerns with treatments like microneedling with PRP for collagen stimulation, HydraFacials for hydration and glow, chemical peels for resurfacing, and Botox or fillers for facial rejuvenation. NAD+ IV therapy can support your cellular health, energy levels, and mental clarity throughout the process.
 
-The advantage of doing everything at one clinic is seamless coordination. Your medical team understands your full picture, from your weight management progress to your skin treatments, and can adjust the plan as you progress. There is no need to visit multiple providers or repeat your history at different offices. Call (425) 539-4440 to schedule your Total Body Transformation consultation at Rani Beauty Clinic. We are open seven days a week.`,
+The advantage of doing everything at one clinic is smooth coordination. Your medical team understands your full picture, from your weight management progress to your skin treatments, and can adjust the plan as you progress. There is no need to visit multiple providers or repeat your history at different offices. Call (425) 539-4440 to schedule your Total Body Transformation consultation at Rani Beauty Clinic. We are open seven days a week.`,
     faqs: [
       {
         question: "What does a Total Body Transformation include?",

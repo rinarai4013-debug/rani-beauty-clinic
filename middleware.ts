@@ -53,24 +53,33 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  // API routes: add timing and CORS headers
+  // API routes: add CORS headers (restricted by route type)
   if (pathname.startsWith("/api")) {
     const response = NextResponse.next();
 
-    // Performance monitoring
-    response.headers.set("X-Response-Time", Date.now().toString());
-    response.headers.set("X-Powered-By", "RaniOS");
-
-    // CORS for webhook endpoints
+    // Webhook routes (server-to-server) — no CORS headers needed
     if (pathname.startsWith("/api/webhooks/")) {
-      response.headers.set("Access-Control-Allow-Origin", "*");
       response.headers.set(
         "Access-Control-Allow-Methods",
-        "POST, GET, OPTIONS"
+        "POST, OPTIONS"
       );
       response.headers.set(
         "Access-Control-Allow-Headers",
         "Content-Type, stripe-signature, x-mangomint-signature, x-cherry-signature"
+      );
+      // No Access-Control-Allow-Origin — webhooks are server-to-server
+    } else {
+      // All other API routes: restrict CORS to own origin only
+      const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || "https://ranibeautyclinic.com";
+      response.headers.set("Access-Control-Allow-Origin", allowedOrigin);
+      response.headers.set("Access-Control-Allow-Credentials", "true");
+      response.headers.set(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, DELETE, OPTIONS"
+      );
+      response.headers.set(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
       );
     }
 

@@ -54,7 +54,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: meta.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/locations/${geo.slug}/${serviceInfo.slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${serviceInfo.name} near ${geo.city} — Rani Beauty Clinic` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${serviceInfo.name} near ${geo.city} - Rani Beauty Clinic` }],
     },
   };
 }
@@ -260,7 +260,7 @@ export default function GeoServicePage({ params }: PageProps) {
             {content.technology && (
               <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
                 At {clinicInfo.name}, we use the{" "}
-                <strong>{content.technology}</strong> — ensuring {geo.city}{" "}
+                <strong>{content.technology}</strong> - ensuring {geo.city}{" "}
                 residents receive the same caliber of treatment available at top
                 clinics nationwide.
               </p>

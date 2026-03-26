@@ -96,7 +96,7 @@ export async function GET() {
         id: t.id,
         type: 'payment',
         title: 'Payment received',
-        description: `${f['Provider'] || 'Unknown'} — ${f['Service Name'] || 'Service'} — $${f['Amount'] || 0}`,
+        description: `${f['Provider'] || 'Unknown'} - ${f['Service Name'] || 'Service'} - $${f['Amount'] || 0}`,
         timestamp: f['Date'] ? new Date(f['Date']).toISOString() : new Date().toISOString(),
       });
     }
@@ -108,7 +108,7 @@ export async function GET() {
         id: a.id,
         type: 'booking',
         title: 'New booking',
-        description: `${f['Service Name'] || 'Appointment'} — ${f['Date'] || ''} ${f['Time'] || ''}`.trim(),
+        description: `${f['Service Name'] || 'Appointment'} - ${f['Date'] || ''} ${f['Time'] || ''}`.trim(),
         timestamp: f['Date'] ? new Date(f['Date']).toISOString() : new Date().toISOString(),
       });
     }
@@ -135,7 +135,7 @@ export async function GET() {
         id: r.id,
         type: 'review',
         title: `${stars}-star review`,
-        description: `${reviewer}${snippet ? ` — "${snippet}..."` : ''}`,
+        description: `${reviewer}${snippet ? ` - "${snippet}..."` : ''}`,
         timestamp: f['Review Date'] ? new Date(f['Review Date']).toISOString() : new Date().toISOString(),
       });
     }

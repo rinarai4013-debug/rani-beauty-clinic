@@ -1,0 +1,7 @@
+{
+  "type": "post-treatment-checkin",
+  "trigger": "appointment_completed",
+  "delayAfterTrigger": "48 hours after appointment",
+  "message": "Hi {{first_name}}, it's Rani Beauty Clinic checking in after your {{treatment_name}} treatment. How are you feeling? If you have any questions about your recovery or aftercare, don't hesitate to text us here. We're here for you.",
+  "characterCount": 243
+}

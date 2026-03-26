@@ -574,7 +574,7 @@ export default function ConsultationWizard() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STEP COMPONENTS (co-located — internal to wizard)
+// STEP COMPONENTS (co-located - internal to wizard)
 // ═══════════════════════════════════════════════════════════════════
 
 /** Step 0: Welcome */
@@ -692,7 +692,7 @@ function StepConcerns({
       <StepHeader
         icon={HeartPulse}
         title="What Are Your Concerns?"
-        subtitle="Select all that apply — we'll tailor recommendations to address each one."
+        subtitle="Select all that apply - we'll tailor recommendations to address each one."
       />
 
       {/* Concern chips */}
@@ -787,7 +787,7 @@ function StepInterests({
       <StepHeader
         icon={ClipboardList}
         title="Treatments That Interest You"
-        subtitle="Select any treatments you're curious about. Don't worry — no commitment."
+        subtitle="Select any treatments you're curious about. Don't worry - no commitment."
       />
 
       {/* Recommended badge */}
@@ -1012,7 +1012,7 @@ function StepGoals({
           <textarea
             value={(formData.goals as string) || ''}
             onChange={(e) => setField('goals', e.target.value)}
-            placeholder="Describe what you'd like to achieve — e.g., clearer skin, more youthful appearance, smoother texture, confidence for an upcoming event..."
+            placeholder="Describe what you'd like to achieve - e.g., clearer skin, more youthful appearance, smoother texture, confidence for an upcoming event..."
             rows={4}
             className="w-full px-4 py-3 rounded-xl border border-[#0F1D2C]/10 bg-[#F8F6F1]/50 font-body text-sm text-[#0F1D2C] placeholder:text-[#0F1D2C]/30 focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/30 focus:border-[#C9A96E] transition-all resize-none"
           />
@@ -1084,7 +1084,7 @@ function StepPhotos({
       <StepHeader
         icon={Camera}
         title="Upload Photos"
-        subtitle="Optional — photos help our team provide more accurate recommendations."
+        subtitle="Optional - photos help our team provide more accurate recommendations."
       />
 
       <div className="mt-6">

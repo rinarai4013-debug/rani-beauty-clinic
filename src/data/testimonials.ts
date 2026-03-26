@@ -28,7 +28,7 @@ export const testimonials: Testimonial[] = [
     id: 2,
     name: "Jennifer L.",
     rating: 5,
-    text: "Having a board-certified neurologist administer my Botox makes all the difference. Dr. Landfield's understanding of facial anatomy is unmatched — my results look completely natural. Friends keep telling me I look refreshed, but nobody can pinpoint why.",
+    text: "Having a board-certified neurologist administer my Botox makes all the difference. Dr. Landfield's understanding of facial anatomy is unmatched - my results look completely natural. Friends keep telling me I look refreshed, but nobody can pinpoint why.",
     treatment: "Botox",
     treatmentSlug: "botox-dysport",
     date: "December 2025",

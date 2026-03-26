@@ -1,0 +1,7 @@
+{
+  "type": "winback-90day",
+  "trigger": "no_appointment_booked",
+  "delayAfterTrigger": "90 days since last appointment",
+  "message": "Hi {{first_name}}, it's been 3 months since your last visit to Rani. We'd love to welcome you back. A lot can change in 90 days and we have new treatments to share with you. Book your return visit: {{booking_link}} We've missed you!",
+  "characterCount": 241
+}

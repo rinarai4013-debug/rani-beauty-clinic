@@ -7,20 +7,20 @@
  * Triggered by n8n WF2b (No-Booking Follow-Up Ladder).
  *
  * Sequence:
- * 1. Immediate (0h) — "Your Personalized Treatment Plan is Ready"
- * 2. 24 hours   — "What [Treatment] Can Do For You" (educational)
- * 3. 72 hours   — "Limited-Time: Complimentary Consultation" (urgency)
- * 4. 7 days     — "Real Results from Clients Like You" (social proof)
- * 5. 14 days    — "We Saved Your Treatment Plan" (last chance)
+ * 1. Immediate (0h) - "Your Personalized Treatment Plan is Ready"
+ * 2. 24 hours   - "What [Treatment] Can Do For You" (educational)
+ * 3. 72 hours   - "Limited-Time: Complimentary Consultation" (urgency)
+ * 4. 7 days     - "Real Results from Clients Like You" (social proof)
+ * 5. 14 days    - "We Saved Your Treatment Plan" (last chance)
  *
- * IMPORTANT: Never use the word "infusion" — always say "injection."
+ * IMPORTANT: Never use the word "infusion" - always say "injection."
  */
 
 export interface IntakeFollowUpVars {
   firstName: string;
   treatmentName: string;        // primary recommended treatment
   treatmentPlan: string;        // AI-generated plan summary
-  costEstimate: string;         // e.g. "$2,750–$4,500"
+  costEstimate: string;         // e.g. "$2,750-$4,500"
   suggestedNextStep: string;    // e.g. "Book a complimentary consultation"
   intakeDate: string;           // date they submitted the form
   concerns: string;             // primary concern from intake
@@ -50,7 +50,7 @@ function fill(template: string, vars: IntakeFollowUpVars): string {
     .replace(/{{clinicAddress}}/g, CLINIC_ADDRESS);
 }
 
-// ── EMAIL 1: IMMEDIATE — TREATMENT PLAN READY ──
+// ── EMAIL 1: IMMEDIATE - TREATMENT PLAN READY ──
 
 const EMAIL_1_PLAN_READY: Template = {
   sms: `Hi {{firstName}}! Thank you for sharing your goals with Rani Beauty Clinic. Your personalized treatment plan for {{treatmentName}} is ready. Book your complimentary consultation to review it in person: {{bookingUrl}}`,
@@ -86,7 +86,7 @@ const EMAIL_1_PLAN_READY: Template = {
     </div>
 
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We'd love to walk you through everything in person during a complimentary consultation. This is a no-pressure conversation — just an opportunity to ask questions and see the clinic.
+      We'd love to walk you through everything in person during a complimentary consultation. This is a no-pressure conversation - just an opportunity to ask questions and see the clinic.
     </p>
 
     <div style="text-align: center; margin: 28px 0;">
@@ -106,7 +106,7 @@ const EMAIL_1_PLAN_READY: Template = {
 </div>`,
 };
 
-// ── EMAIL 2: 24H — EDUCATIONAL ──
+// ── EMAIL 2: 24H - EDUCATIONAL ──
 
 const EMAIL_2_EDUCATIONAL: Template = {
   sms: `Hi {{firstName}}, curious about what {{treatmentName}} can do for you? We put together some answers to the questions we hear most. Read more and book your free consult: {{bookingUrl}}`,
@@ -132,7 +132,7 @@ const EMAIL_2_EDUCATIONAL: Template = {
       <div style="border-bottom: 1px solid #eee; padding: 16px 0;">
         <p style="color: #0F1D2C; font-size: 15px; font-weight: 600; margin: 0 0 8px;">When will I see results?</p>
         <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0;">
-          Many clients notice visible improvement within the first few sessions. Optimal results develop progressively as your skin responds to treatment — this is a transformation journey, not a one-time fix.
+          Many clients notice visible improvement within the first few sessions. Optimal results develop progressively as your skin responds to treatment - this is a transformation journey, not a one-time fix.
         </p>
       </div>
       <div style="padding: 16px 0;">
@@ -155,10 +155,10 @@ const EMAIL_2_EDUCATIONAL: Template = {
 </div>`,
 };
 
-// ── EMAIL 3: 72H — URGENCY / COMPLIMENTARY CONSULT ──
+// ── EMAIL 3: 72H - URGENCY / COMPLIMENTARY CONSULT ──
 
 const EMAIL_3_URGENCY: Template = {
-  sms: `{{firstName}}, we're offering complimentary consultations this week for new clients. This is the perfect time to discuss your {{treatmentName}} treatment plan with our team — no obligation. Book now: {{bookingUrl}}`,
+  sms: `{{firstName}}, we're offering complimentary consultations this week for new clients. This is the perfect time to discuss your {{treatmentName}} treatment plan with our team - no obligation. Book now: {{bookingUrl}}`,
   emailSubject: `Limited-Time: Complimentary Consultation for {{firstName}}`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -169,7 +169,7 @@ const EMAIL_3_URGENCY: Template = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We know taking the first step can feel like a big decision. That's why we want to make it as easy as possible — we're offering a <strong>complimentary consultation</strong> so you can meet our team, tour the clinic, and review your personalized treatment plan in person.
+      We know taking the first step can feel like a big decision. That's why we want to make it as easy as possible - we're offering a <strong>complimentary consultation</strong> so you can meet our team, tour the clinic, and review your personalized treatment plan in person.
     </p>
 
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
@@ -178,7 +178,7 @@ const EMAIL_3_URGENCY: Template = {
         <li>One-on-one consultation with our provider</li>
         <li>Review of your personalized {{treatmentName}} plan</li>
         <li>Honest answers to all your questions</li>
-        <li>Zero pressure — only proceed if it feels right</li>
+        <li>Zero pressure - only proceed if it feels right</li>
       </ul>
     </div>
 
@@ -199,7 +199,7 @@ const EMAIL_3_URGENCY: Template = {
 </div>`,
 };
 
-// ── EMAIL 4: 7 DAYS — SOCIAL PROOF ──
+// ── EMAIL 4: 7 DAYS - SOCIAL PROOF ──
 
 const EMAIL_4_SOCIAL_PROOF: Template = {
   sms: `{{firstName}}, clients just like you are seeing incredible results with {{treatmentName}} at Rani. See what they're saying and book your consultation: {{bookingUrl}}`,
@@ -212,16 +212,16 @@ const EMAIL_4_SOCIAL_PROOF: Template = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We understand that choosing a clinic for {{treatmentName}} is a big decision. We want you to feel confident — here's what other clients have to say about their experience at Rani Beauty Clinic.
+      We understand that choosing a clinic for {{treatmentName}} is a big decision. We want you to feel confident - here's what other clients have to say about their experience at Rani Beauty Clinic.
     </p>
 
     <div style="margin: 24px 0;">
       <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 16px 0;">
         <p style="font-size: 32px; margin: 0 0 8px;">&#11088;&#11088;&#11088;&#11088;&#11088;</p>
         <p style="color: #333; font-size: 14px; line-height: 1.6; font-style: italic; margin: 0 0 12px;">
-          "The team at Rani made me feel so comfortable from the very first consultation. My results have been incredible — I only wish I'd started sooner!"
+          "The team at Rani made me feel so comfortable from the very first consultation. My results have been incredible - I only wish I'd started sooner!"
         </p>
-        <p style="color: #888; font-size: 13px; margin: 0;">— Verified Google Review</p>
+        <p style="color: #888; font-size: 13px; margin: 0;"> -  Verified Google Review</p>
       </div>
 
       <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 16px 0;">
@@ -229,7 +229,7 @@ const EMAIL_4_SOCIAL_PROOF: Template = {
         <p style="color: #333; font-size: 14px; line-height: 1.6; font-style: italic; margin: 0 0 12px;">
           "Professional, knowledgeable, and genuinely caring. Rani Beauty Clinic is a hidden gem in Renton. The results speak for themselves."
         </p>
-        <p style="color: #888; font-size: 13px; margin: 0;">— Verified Google Review</p>
+        <p style="color: #888; font-size: 13px; margin: 0;"> -  Verified Google Review</p>
       </div>
     </div>
 
@@ -250,7 +250,7 @@ const EMAIL_4_SOCIAL_PROOF: Template = {
 </div>`,
 };
 
-// ── EMAIL 5: 14 DAYS — LAST CHANCE ──
+// ── EMAIL 5: 14 DAYS - LAST CHANCE ──
 
 const EMAIL_5_LAST_CHANCE: Template = {
   sms: `{{firstName}}, we've saved your personalized {{treatmentName}} treatment plan at Rani. Whenever you're ready, we're here. Book your free consultation: {{bookingUrl}}`,
@@ -285,7 +285,7 @@ const EMAIL_5_LAST_CHANCE: Template = {
     </div>
 
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      We understand that the timing may not have been right. There's absolutely no rush. But when you're ready, we'd love to welcome you in for a conversation — no commitment, no pressure.
+      We understand that the timing may not have been right. There's absolutely no rush. But when you're ready, we'd love to welcome you in for a conversation - no commitment, no pressure.
     </p>
 
     <p style="color: #333; font-size: 16px; line-height: 1.6;">

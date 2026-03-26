@@ -23,7 +23,7 @@ interface TransactionFields {
   'Status': string;
 }
 
-// POST — Calculate and store today's clinic score in a KPI Snapshot
+// POST - Calculate and store today's clinic score in a KPI Snapshot
 // Called by n8n daily (WF9) or manually. Auth via CRON_SECRET.
 export async function POST(request: NextRequest) {
   try {

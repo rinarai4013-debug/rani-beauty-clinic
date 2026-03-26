@@ -18,7 +18,7 @@ import {
  * - Report template (structure for weekly reports)
  *
  * Query params:
- *   ?week=2026-03-17  — generates a report template for that week
+ *   ?week=2026-03-17  - generates a report template for that week
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

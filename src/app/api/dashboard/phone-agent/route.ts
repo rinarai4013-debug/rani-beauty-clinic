@@ -34,7 +34,7 @@ export async function GET() {
     const vapiApiKey = process.env.VAPI_API_KEY;
 
     if (vapiApiKey) {
-      // Real Vapi integration — fetch actual call logs
+      // Real Vapi integration - fetch actual call logs
       const logsResult = await getVapiCallLogs(vapiApiKey);
 
       if (logsResult.success && logsResult.calls.length > 0) {
@@ -62,7 +62,7 @@ export async function GET() {
       return NextResponse.json(response);
     }
 
-    // No VAPI_API_KEY — return config only, no analytics
+    // No VAPI_API_KEY - return config only, no analytics
     const response = buildResponse({
       ...setup,
       analytics: null,

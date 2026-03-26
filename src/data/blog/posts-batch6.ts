@@ -159,7 +159,7 @@ When you combine these two pathways, you are essentially giving your fibroblasts
 
 Furthermore, the treatment depths complement each other. While there is some overlap in the mid-dermis, RF microneedling can target shallower depths (0.5mm to 1.5mm) for superficial skin quality improvement that ultrasound does not reach, while also treating at depths up to 3.5mm. The combination ensures that no layer of the dermis is left unstimulated.
 
-At Rani Beauty Clinic, we leverage this scientific rationale in our Reveal protocol for post-weight-loss patients. The combination of Secret RF and Sofwave produces results that are greater than the sum of their parts. If you are interested in the most comprehensive non-surgical skin tightening approach available, schedule a consultation to learn how this combination can work for your specific skin concerns.`,
+At Rani Beauty Clinic, we apply this scientific rationale in our Reveal protocol for post-weight-loss patients. The combination of Secret RF and Sofwave produces results that are greater than the sum of their parts. If you are interested in the most comprehensive non-surgical skin tightening approach available, schedule a consultation to learn how this combination can work for your specific skin concerns.`,
     faqs: [
       {
         question: "Is combining RF microneedling and ultrasound safe?",
@@ -364,7 +364,7 @@ To schedule your Reveal Assessment, call (425) 539-4440 or book through our webs
     title: "Non-Surgical Skin Tightening: Every Option Ranked and Explained",
     metaTitle: "Non-Surgical Skin Tightening Options Ranked | Rani Beauty Clinic",
     metaDescription: "Compare every non-surgical skin tightening option: ultrasound, radiofrequency, microneedling, laser, and more. Learn which works best for your concerns.",
-    excerpt: "From ultrasound to radiofrequency to microneedling, the non-surgical skin tightening landscape is crowded. Here is an honest ranking of every major option.",
+    excerpt: "From ultrasound to radiofrequency to microneedling, the non-surgical skin tightening space is crowded. Here is an honest ranking of every major option.",
     date: "June 1, 2026",
     author: "Dr. Alexander Landfield",
     authorCredentials: "Board-Certified Neurologist & Medical Director",

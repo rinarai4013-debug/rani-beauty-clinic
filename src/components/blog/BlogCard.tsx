@@ -26,7 +26,7 @@ export default function BlogCard({
         <div className="relative h-52 overflow-hidden bg-rani-navy">
           <Image
             src={getCategoryImage(category)}
-            alt={`${title} — ${category}`}
+            alt={`${title} - ${category}`}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

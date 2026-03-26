@@ -1,4 +1,4 @@
-// Google Business Profile Posts — 30-day content calendar for Rani Beauty Clinic
+// Google Business Profile Posts - 30-day content calendar for Rani Beauty Clinic
 // Post one per day. Rotate through service highlights, education, seasonal, trust, and engagement.
 
 export interface GBPPost {
@@ -17,12 +17,12 @@ export const gbpPosts: GBPPost[] = [
   {
     day: 1,
     type: "product",
-    title: "Botox at Rani Beauty Clinic — Physician-Supervised Precision",
+    title: "Botox at Rani Beauty Clinic - Physician-Supervised Precision",
     body: `Botox remains one of the most effective ways to soften fine lines and prevent new wrinkles from forming. At Rani Beauty Clinic in Renton, every Botox treatment is performed under the supervision of our Medical Director, Dr. Alexander Landfield, a board-certified neurologist with deep expertise in neurotoxin science.
 
 We take a conservative, anatomy-driven approach. Our injectors map your facial muscles before placing a single unit, ensuring natural movement is preserved while targeted lines are smoothed. Whether you want to address crow's feet, forehead lines, or the "11s" between your brows, we customize every session to your unique facial structure.
 
-New guests receive a complimentary consultation where we discuss your goals, review your medical history, and build a personalized treatment plan. No cookie-cutter protocols here — just expert care designed around you.
+New guests receive a complimentary consultation where we discuss your goals, review your medical history, and build a personalized treatment plan. No cookie-cutter protocols here - just expert care designed around you.
 
 Results typically appear within 3 to 5 days and last 3 to 4 months. Many of our patients schedule maintenance appointments quarterly to maintain their refreshed, youthful look year-round.
 
@@ -34,7 +34,7 @@ Ready to see what physician-supervised Botox can do for you? Book your consultat
   {
     day: 4,
     type: "product",
-    title: "Advanced Laser Treatments — Renton's Premier Aesthetic Destination",
+    title: "Advanced Laser Treatments - Renton's Premier Aesthetic Destination",
     body: `Laser technology has transformed what is possible in aesthetic medicine, and Rani Beauty Clinic brings Renton access to some of the most advanced laser systems available today. From pigmentation correction and sun damage reversal to skin resurfacing and vascular treatments, our laser suite addresses a wide range of concerns with precision and minimal downtime.
 
 Our team evaluates your skin type, tone, and treatment goals before recommending a specific laser protocol. This careful assessment ensures optimal results and safety for every skin type. We use calibrated settings backed by clinical data, never a one-size-fits-all approach.
@@ -51,7 +51,7 @@ Schedule a skin assessment and discover which laser treatment is right for your 
   {
     day: 7,
     type: "product",
-    title: "HydraFacial — Deep Cleansing, Instant Glow, Zero Downtime",
+    title: "HydraFacial - Deep Cleansing, Instant Glow, Zero Downtime",
     body: `The HydraFacial is one of our most popular treatments at Rani Beauty Clinic, and for good reason. This multi-step facial cleanses, exfoliates, extracts, and hydrates your skin in a single session, delivering an immediate and visible glow with absolutely no downtime.
 
 Unlike traditional facials that can leave skin red and irritated, the HydraFacial uses patented vortex technology to gently remove impurities while simultaneously infusing nourishing serums deep into your skin. The result is clean, hydrated, plump skin that looks refreshed from the moment you leave our Renton clinic.
@@ -68,7 +68,7 @@ Treatment takes approximately 30 to 45 minutes, and you can return to your day i
   {
     day: 10,
     type: "product",
-    title: "Dermal Fillers — Restore Volume with Natural-Looking Results",
+    title: "Dermal Fillers - Restore Volume with Natural-Looking Results",
     body: `As we age, our faces naturally lose volume in areas like the cheeks, temples, and lips. Dermal fillers offer a non-surgical way to restore that youthful fullness and contour, and at Rani Beauty Clinic, we specialize in results that look completely natural.
 
 Our injectors use hyaluronic acid-based fillers to add subtle volume exactly where it is needed. Whether you want to define your jawline, soften nasolabial folds, enhance your lips, or lift your cheeks, we take a layered approach that builds dimension without ever looking overdone.
@@ -85,7 +85,7 @@ If you are curious about fillers but unsure where to start, our complimentary co
   {
     day: 13,
     type: "product",
-    title: "Sofwave — Non-Invasive Skin Tightening Without Surgery",
+    title: "Sofwave - Non-Invasive Skin Tightening Without Surgery",
     body: `Sofwave is changing the game for patients who want firmer, tighter skin without going under the knife. This FDA-cleared device uses Synchronous Ultrasound Parallel Beam technology to stimulate collagen production deep within the skin, delivering a lifting and tightening effect that continues to improve over the weeks following treatment.
 
 At Rani Beauty Clinic, we are proud to offer Sofwave as part of our advanced non-invasive treatment menu. It is ideal for patients experiencing mild to moderate skin laxity in the face, neck, or brow area. Many of our guests describe it as the treatment that gave them back the definition they thought only surgery could restore.
@@ -102,7 +102,7 @@ Sofwave pairs beautifully with other treatments in our clinic, including Botox a
   {
     day: 16,
     type: "product",
-    title: "RF Microneedling — Resurface, Tighten, and Transform Your Skin",
+    title: "RF Microneedling - Resurface, Tighten, and Transform Your Skin",
     body: `Radiofrequency microneedling combines two powerful technologies into one treatment, delivering controlled micro-injuries with ultrafine needles while simultaneously emitting RF energy deep into the dermis. The result is accelerated collagen remodeling, tighter skin, smoother texture, and reduced scarring.
 
 At Rani Beauty Clinic, our RF microneedling treatments are customized to address your specific concerns. Whether you are dealing with acne scars, enlarged pores, fine lines, or overall skin laxity, we adjust needle depth and energy levels to target your unique skin needs.
@@ -121,7 +121,7 @@ Discover what RF microneedling can do for your skin. Book a consultation at Rani
   {
     day: 19,
     type: "product",
-    title: "Chemical Peels — Reveal Brighter, Smoother Skin From Within",
+    title: "Chemical Peels - Reveal Brighter, Smoother Skin From Within",
     body: `Chemical peels are one of the most time-tested treatments in aesthetic medicine, and at Rani Beauty Clinic, we offer a range of professional-grade peels tailored to your skin type and goals. From gentle brightening peels to deeper resurfacing treatments, every protocol is designed to reveal healthier, more luminous skin.
 
 A chemical peel works by applying a carefully formulated solution that removes damaged outer layers of skin, stimulating cellular turnover and revealing the fresher, smoother skin beneath. This process improves the appearance of fine lines, uneven tone, sun damage, acne scarring, and dullness.
@@ -140,7 +140,7 @@ Book your peel consultation and start your journey to radiant skin.`,
   {
     day: 22,
     type: "product",
-    title: "GLP-1 Weight Management — Medically Supervised Support at Rani",
+    title: "GLP-1 Weight Management - Medically Supervised Support at Rani",
     body: `Weight management is deeply personal, and at Rani Beauty Clinic we believe it deserves the same clinical rigor and compassionate care as any aesthetic treatment. Our GLP-1 program provides medically supervised weight management using FDA-approved GLP-1 receptor agonist medications, overseen by our Medical Director, Dr. Alexander Landfield.
 
 GLP-1 medications work by mimicking a natural hormone that regulates appetite and blood sugar. They help reduce cravings, promote satiety, and support sustainable weight loss when combined with lifestyle modifications. Our program includes an initial medical evaluation, ongoing monitoring, and personalized dosing to ensure safety and effectiveness.
@@ -157,7 +157,7 @@ If you have been considering medically supervised weight management, we invite y
   {
     day: 25,
     type: "product",
-    title: "NAD+ IM Injections — Cellular Energy and Recovery at Rani",
+    title: "NAD+ IM Injections - Cellular Energy and Recovery at Rani",
     body: `NAD+ is a coenzyme found in every living cell, essential for energy production, DNA repair, and cellular metabolism. As we age, our NAD+ levels naturally decline, which can contribute to fatigue, brain fog, slower recovery, and accelerated aging. NAD+ IM injections offer a direct and efficient way to replenish this vital molecule.
 
 At Rani Beauty Clinic, our NAD+ IM injection protocol is designed for patients seeking enhanced energy, improved mental clarity, and overall cellular rejuvenation. Unlike oral supplements that lose potency through the digestive process, IM injections deliver NAD+ directly into the muscle for rapid absorption and bioavailability.
@@ -174,7 +174,7 @@ Sessions are quick, typically taking just a few minutes, and can be easily integ
   {
     day: 28,
     type: "product",
-    title: "Red Light Therapy — Heal, Rejuvenate, and Glow at Rani",
+    title: "Red Light Therapy - Heal, Rejuvenate, and Glow at Rani",
     body: `Red light therapy uses specific wavelengths of light to penetrate the skin and stimulate cellular activity at the mitochondrial level. The result is enhanced collagen production, reduced inflammation, accelerated wound healing, and an overall improvement in skin tone and texture.
 
 At Rani Beauty Clinic, we incorporate red light therapy as both a standalone treatment and a powerful complement to other procedures. After microneedling, chemical peels, or laser treatments, red light therapy can help speed recovery and amplify results. On its own, it delivers a gentle boost to skin health that accumulates with regular sessions.
@@ -236,10 +236,10 @@ Schedule your age-appropriate skin consultation today.`,
   {
     day: 14,
     type: "update",
-    title: "Sun Protection Is the Best Anti-Aging Treatment — Here Is Why",
+    title: "Sun Protection Is the Best Anti-Aging Treatment - Here Is Why",
     body: `If there is one thing every dermatologist and aesthetic professional agrees on, it is this: sun protection is the single most impactful thing you can do for your skin. At Rani Beauty Clinic, we make sun protection education a core part of every patient consultation.
 
-Ultraviolet radiation from the sun is responsible for up to 90 percent of visible skin aging. That includes fine lines, wrinkles, dark spots, loss of elasticity, and uneven skin tone. Even brief, incidental exposure — walking to your car, sitting near a window — adds up over time and accelerates these changes.
+Ultraviolet radiation from the sun is responsible for up to 90 percent of visible skin aging. That includes fine lines, wrinkles, dark spots, loss of elasticity, and uneven skin tone. Even brief, incidental exposure - walking to your car, sitting near a window - adds up over time and accelerates these changes.
 
 Here is what effective sun protection looks like. Apply a broad-spectrum SPF 30 or higher every morning, regardless of the weather or season. Reapply every two hours if you are spending extended time outdoors. Look for formulations that contain zinc oxide or titanium dioxide for physical protection, or newer chemical filters that offer lightweight, cosmetically elegant coverage.
 
@@ -276,8 +276,8 @@ Start prioritizing hydration today. Your skin will thank you.`,
   {
     day: 26,
     type: "update",
-    title: "Wellness From the Inside Out — The Role of IM Injections",
-    body: `At Rani Beauty Clinic, we believe that true beauty starts with internal health. That is why we offer a curated menu of IM injections designed to support your body at the cellular level — from energy and immunity to recovery and radiance.
+    title: "Wellness From the Inside Out - The Role of IM Injections",
+    body: `At Rani Beauty Clinic, we believe that true beauty starts with internal health. That is why we offer a curated menu of IM injections designed to support your body at the cellular level - from energy and immunity to recovery and radiance.
 
 IM injections deliver vitamins, minerals, and other essential nutrients directly into the muscle, bypassing the digestive system for superior absorption. This means your body gets more of what it needs, faster and more efficiently than oral supplements alone.
 
@@ -300,7 +300,7 @@ Schedule a wellness consultation and discover which IM injections are right for 
   {
     day: 3,
     type: "event",
-    title: "Spring Skin Reset — Repair Winter Damage and Refresh Your Glow",
+    title: "Spring Skin Reset - Repair Winter Damage and Refresh Your Glow",
     body: `Winter is tough on skin. Cold air, dry indoor heating, and reduced sun exposure leave most people with dull, dehydrated, and uneven skin by the time spring arrives. At Rani Beauty Clinic, we see this every year, and we have the perfect solution: our spring skin reset approach.
 
 The transition from winter to spring is an ideal time to shed the season's damage and prepare your skin for the warmer months ahead. A professional chemical peel or HydraFacial removes the layer of dead, dull cells that accumulated over winter, revealing brighter, smoother skin underneath.
@@ -321,7 +321,7 @@ Book your spring consultation today.`,
   {
     day: 9,
     type: "event",
-    title: "Get Summer-Ready — Prep Your Skin Now for the Best Season Yet",
+    title: "Get Summer-Ready - Prep Your Skin Now for the Best Season Yet",
     body: `Summer is right around the corner, and the best time to start preparing your skin is now. At Rani Beauty Clinic, we recommend beginning your summer prep 4 to 8 weeks before the season starts so your treatments have time to deliver full results.
 
 Laser treatments and chemical peels are most effective when performed before peak sun exposure. These treatments increase photosensitivity temporarily, so scheduling them in spring allows your skin to heal completely before you are spending more time outdoors.
@@ -340,7 +340,7 @@ Summer confidence starts with spring preparation. Schedule your pre-summer consu
   {
     day: 15,
     type: "event",
-    title: "Summer Skin Protection — Keep Your Glow While Staying Safe in the Sun",
+    title: "Summer Skin Protection - Keep Your Glow While Staying Safe in the Sun",
     body: `Summer brings longer days, outdoor activities, and increased UV exposure, making skin protection more important than ever. At Rani Beauty Clinic, we want you to enjoy the season while keeping your skin healthy and your treatment results intact.
 
 The foundation of summer skin care is consistent, thorough sun protection. Apply a broad-spectrum SPF 30 or higher every morning. If you are swimming, sweating, or spending extended time outdoors, reapply every two hours. Water-resistant formulas are essential for beach days and outdoor workouts.
@@ -361,7 +361,7 @@ Need summer skincare guidance? Book a quick consultation with our team.`,
   {
     day: 21,
     type: "event",
-    title: "Fall Skin Revival — The Best Season for Transformative Treatments",
+    title: "Fall Skin Revival - The Best Season for Transformative Treatments",
     body: `Fall is the golden season for aesthetic treatments. With reduced UV intensity and cooler temperatures, your skin can heal optimally, making this the perfect time for more intensive procedures that deliver dramatic results.
 
 At Rani Beauty Clinic, we see fall as an opportunity to address concerns that required caution during the summer months. Laser resurfacing, deeper chemical peels, and aggressive pigmentation correction protocols are all ideal for the fall season when your sun exposure is naturally lower and more controllable.
@@ -380,7 +380,7 @@ Do not let the best treatment season pass you by. Schedule your fall skin reviva
   {
     day: 27,
     type: "event",
-    title: "Holiday Glow-Up — Look Your Best for Every Gathering This Season",
+    title: "Holiday Glow-Up - Look Your Best for Every Gathering This Season",
     body: `The holiday season brings a calendar full of parties, family gatherings, and photo opportunities. At Rani Beauty Clinic, we help our patients look and feel their most confident for every occasion.
 
 Planning ahead is key to holiday beauty. We recommend scheduling your treatments with the following timeline in mind. Botox should be done at least 2 weeks before your first event to ensure full results and natural settling. Fillers need 1 to 2 weeks to integrate smoothly. And any resurfacing treatment should be completed 3 to 4 weeks prior to allow complete healing.
@@ -404,7 +404,7 @@ Start planning your holiday glow-up now. Book your appointment and let us help y
   {
     day: 5,
     type: "update",
-    title: "Physician-Supervised Care — What Sets Rani Beauty Clinic Apart",
+    title: "Physician-Supervised Care - What Sets Rani Beauty Clinic Apart",
     body: `At Rani Beauty Clinic, every treatment we perform is backed by physician-level oversight. Our Medical Director, Dr. Alexander Landfield, is a board-certified neurologist who brings exceptional clinical expertise to our aesthetic practice. His background in neuroscience provides a unique advantage, particularly for neurotoxin treatments like Botox, where understanding nerve and muscle function is paramount.
 
 Physician supervision means more than having a doctor's name on the door. It means that every treatment protocol is reviewed and approved by Dr. Landfield. It means that our practitioners follow evidence-based guidelines and receive ongoing training. It means that your safety and outcomes are held to the highest medical standard.
@@ -423,7 +423,7 @@ Experience the difference physician-supervised aesthetic care makes. Schedule yo
   {
     day: 11,
     type: "update",
-    title: "Our Technology — Advanced Equipment for Superior Results",
+    title: "Our Technology - Advanced Equipment for Superior Results",
     body: `The quality of your results depends not only on the skill of your provider but also on the technology they use. At Rani Beauty Clinic, we invest in the most advanced, FDA-cleared devices available to ensure every treatment delivers exceptional outcomes.
 
 Our technology suite includes state-of-the-art laser systems for skin resurfacing, pigmentation correction, and vascular treatments. We use Sofwave for non-invasive skin tightening, harnessing Synchronous Ultrasound Parallel Beam technology to stimulate deep collagen production. Our RF microneedling device combines radiofrequency energy with precision microneedling for unmatched skin texture improvement.
@@ -434,7 +434,7 @@ But technology alone is not enough. Every device in our clinic is operated by tr
 
 We also stay current with emerging technologies and clinical research. When new devices or techniques are proven safe and effective through peer-reviewed studies, we evaluate them for potential addition to our treatment menu.
 
-At Rani, cutting-edge technology and personalized care work together to deliver results that exceed expectations. Discover our full range of advanced treatments and see the technology difference for yourself.`,
+At Rani, advanced technology and personalized care work together to deliver results that exceed expectations. Discover our full range of advanced treatments and see the technology difference for yourself.`,
     callToAction: "LEARN_MORE",
     ctaUrl: "https://www.ranibeautyclinic.com/services",
     category: "trust-signal",
@@ -442,7 +442,7 @@ At Rani, cutting-edge technology and personalized care work together to deliver 
   {
     day: 17,
     type: "update",
-    title: "Your Safety Is Our Priority — Clinical Standards at Rani",
+    title: "Your Safety Is Our Priority - Clinical Standards at Rani",
     body: `At Rani Beauty Clinic, we hold ourselves to the highest safety standards in every aspect of our practice. From the products we use to the protocols we follow, patient safety is never compromised.
 
 All injectable products used at Rani are FDA-approved and sourced directly from authorized manufacturers. We never use gray-market or counterfeit products. Every vial is verified, tracked, and stored according to manufacturer specifications to ensure potency and sterility.
@@ -463,10 +463,10 @@ Your confidence in our care matters deeply to us. Learn more about our commitmen
   {
     day: 23,
     type: "update",
-    title: "Real Results — Why Consistency and Expertise Matter",
+    title: "Real Results - Why Consistency and Expertise Matter",
     body: `The most beautiful aesthetic results come from two things: expert practitioners and consistent care. At Rani Beauty Clinic, we combine both to help our patients achieve outcomes they genuinely love.
 
-We have seen it time and again — patients who commit to a thoughtful, long-term treatment plan see dramatically better results than those seeking one-time quick fixes. That is why we invest significant time in our initial consultations, understanding not just what you want to improve today, but where you want to be six months, a year, and five years from now.
+We have seen it time and again - patients who commit to a thoughtful, long-term treatment plan see dramatically better results than those seeking one-time quick fixes. That is why we invest significant time in our initial consultations, understanding not just what you want to improve today, but where you want to be six months, a year, and five years from now.
 
 Our approach is rooted in clinical expertise. Every treatment recommendation is based on an assessment of your skin type, facial anatomy, lifestyle, and aesthetic goals. We consider how different treatments interact and complement each other, building protocols that deliver cumulative improvement over time.
 
@@ -484,10 +484,10 @@ Schedule your consultation and see what consistent, expert care can do.`,
   {
     day: 29,
     type: "update",
-    title: "What Our Patients Say — Building Trust Through Experience",
+    title: "What Our Patients Say - Building Trust Through Experience",
     body: `Nothing speaks louder than the experiences of real patients. At Rani Beauty Clinic, we are proud of the relationships we build and the results we deliver, and our patient reviews reflect that commitment.
 
-Our patients consistently highlight several themes in their feedback. They appreciate the thorough consultations where we take time to listen to their concerns and explain treatment options in plain, honest language. They value the physician-supervised environment that gives them confidence in the safety and quality of their care. And they love the results — natural, refreshed, and true to their individual beauty.
+Our patients consistently highlight several themes in their feedback. They appreciate the thorough consultations where we take time to listen to their concerns and explain treatment options in plain, honest language. They value the physician-supervised environment that gives them confidence in the safety and quality of their care. And they love the results - natural, refreshed, and true to their individual beauty.
 
 Many of our patients discovered Rani Beauty Clinic through referrals from friends and family, which we consider the highest compliment. When someone trusts us enough to recommend our services to the people they care about, it reinforces our commitment to excellence in every interaction.
 
@@ -506,7 +506,7 @@ If you have been considering aesthetic treatment but want to feel confident abou
   {
     day: 6,
     type: "update",
-    title: "Meet the Team — The Experts Behind Your Rani Experience",
+    title: "Meet the Team - The Experts Behind Your Rani Experience",
     body: `Behind every exceptional treatment at Rani Beauty Clinic is a team of dedicated professionals who are passionate about aesthetic medicine and genuinely care about your results. Today, we want to give you a glimpse into the people who make Rani special.
 
 Our Medical Director, Dr. Alexander Landfield, brings a unique perspective to aesthetic medicine. As a board-certified neurologist, he has an unparalleled understanding of the neuromuscular system, which is especially valuable for neurotoxin treatments. His clinical oversight ensures that every protocol at Rani meets the highest medical standards.
@@ -525,7 +525,7 @@ We would love for you to come meet our team in person. Schedule a consultation a
   {
     day: 12,
     type: "update",
-    title: "Behind the Scenes — What Goes Into Preparing Your Treatment",
+    title: "Behind the Scenes - What Goes Into Preparing Your Treatment",
     body: `Have you ever wondered what happens before your treatment at Rani Beauty Clinic? There is a lot more that goes into your appointment than what you see in the treatment room, and we want to pull back the curtain to show you the care and preparation behind every session.
 
 Before you arrive, your practitioner reviews your patient file, including your medical history, previous treatments, treatment plan notes, and any specific preferences you have communicated. This review ensures continuity of care and allows your provider to walk into the room fully prepared.
@@ -546,10 +546,10 @@ This is the standard of care you deserve, and it is the standard we deliver ever
   {
     day: 18,
     type: "update",
-    title: "Your First Visit — What to Expect at Rani Beauty Clinic",
+    title: "Your First Visit - What to Expect at Rani Beauty Clinic",
     body: `If you have been thinking about visiting Rani Beauty Clinic but are not sure what to expect, this post is for you. We know that trying a new clinic can feel uncertain, and we want you to feel completely prepared and at ease from the moment you walk through our door.
 
-Your experience begins before you even arrive. After booking, you will receive a welcome communication with any pre-appointment instructions relevant to your treatment. If you are coming for a consultation, there is nothing special you need to do to prepare — just come as you are.
+Your experience begins before you even arrive. After booking, you will receive a welcome communication with any pre-appointment instructions relevant to your treatment. If you are coming for a consultation, there is nothing special you need to do to prepare - just come as you are.
 
 When you arrive at our Renton clinic at 401 Olympia Ave NE, Suite 101, our front desk team will greet you warmly and guide you through a brief check-in process. First-time patients complete a medical history form that helps our practitioners understand your health background and identify any considerations for treatment.
 
@@ -565,14 +565,14 @@ We look forward to welcoming you. Book your first visit today and experience the
   {
     day: 24,
     type: "update",
-    title: "FAQ of the Week — How Long Does Botox Take to Work?",
+    title: "FAQ of the Week - How Long Does Botox Take to Work?",
     body: `One of the most frequently asked questions at Rani Beauty Clinic is about Botox timing. Patients want to know: how long after my treatment will I see results? It is a great question, and understanding the timeline helps you plan treatments around important events.
 
 After your Botox injection, the neurotoxin begins binding to nerve receptors in the targeted muscles. However, this process takes time. Most patients begin noticing the effects within 3 to 5 days after treatment. The muscles gradually relax, and you will see lines and wrinkles start to soften.
 
 Full results typically develop over 10 to 14 days. This is when the neurotoxin has reached peak effect and the treated muscles are at their most relaxed state. We always tell our patients to wait the full two weeks before evaluating their results.
 
-This timeline is why we recommend scheduling Botox at least 2 weeks before any important event — a wedding, reunion, vacation, or holiday gathering. This ensures your results have fully settled and look completely natural in person and in photos.
+This timeline is why we recommend scheduling Botox at least 2 weeks before any important event - a wedding, reunion, vacation, or holiday gathering. This ensures your results have fully settled and look completely natural in person and in photos.
 
 Results generally last 3 to 4 months, though this can vary based on individual factors like muscle strength, metabolism, and dosage. Some patients who maintain regular Botox appointments find that their results begin lasting longer over time as the treated muscles become conditioned.
 
@@ -586,12 +586,12 @@ Have a question you want us to answer? Let us know and it might be featured in o
   {
     day: 30,
     type: "update",
-    title: "Myth-Busting — Botox Does NOT Freeze Your Face",
+    title: "Myth-Busting - Botox Does NOT Freeze Your Face",
     body: `One of the most persistent myths in aesthetic medicine is that Botox will leave you with a frozen, expressionless face. At Rani Beauty Clinic, we hear this concern regularly, and we want to set the record straight.
 
 When Botox is administered correctly by an experienced, skilled injector, the result is a softening of targeted lines and wrinkles while preserving natural facial movement and expression. You should still be able to smile, frown, raise your eyebrows, and show emotion. The goal is to look refreshed, not restricted.
 
-The "frozen" look that some people associate with Botox is almost always the result of over-treatment — too many units placed in too many areas, or treatment by an injector who does not take facial anatomy into account. At Rani, we take a conservative, anatomy-driven approach. We start with careful assessment and use the minimum effective dose to achieve natural-looking results.
+The "frozen" look that some people associate with Botox is almost always the result of over-treatment - too many units placed in too many areas, or treatment by an injector who does not take facial anatomy into account. At Rani, we take a conservative, anatomy-driven approach. We start with careful assessment and use the minimum effective dose to achieve natural-looking results.
 
 Our Medical Director, Dr. Alexander Landfield, is a board-certified neurologist, which means he has an expert-level understanding of how nerves and muscles interact. This knowledge directly informs our Botox protocols, ensuring precise placement that relaxes targeted muscles without affecting surrounding areas.
 

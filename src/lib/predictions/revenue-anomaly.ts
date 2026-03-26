@@ -5,12 +5,12 @@
  * Runs via n8n daily scheduled task and surfaces in the dashboard.
  *
  * Detection methods:
- * 1. Target deviation — Revenue vs daily/weekly/monthly target
- * 2. Rolling average — Today vs 7-day rolling average
- * 3. Day-of-week pattern — Compare to same-day historical average
- * 4. Provider imbalance — One provider carrying disproportionate load
- * 5. Category shift — Sudden drop in a service category
- * 6. Payment method anomaly — Unusual payment mix (financing spike, etc.)
+ * 1. Target deviation - Revenue vs daily/weekly/monthly target
+ * 2. Rolling average - Today vs 7-day rolling average
+ * 3. Day-of-week pattern - Compare to same-day historical average
+ * 4. Provider imbalance - One provider carrying disproportionate load
+ * 5. Category shift - Sudden drop in a service category
+ * 6. Payment method anomaly - Unusual payment mix (financing spike, etc.)
  */
 
 // ── TYPES ──
@@ -118,7 +118,7 @@ function detectTargetDeviation(todayRevenue: number, dailyTarget: number): Anoma
       expected: dailyTarget,
       deviation: Math.round(deviation),
       message: `Great day! Revenue is ${Math.round(deviation)}% above target`,
-      recommendation: 'Analyze what drove the spike — replicate the winning formula.',
+      recommendation: 'Analyze what drove the spike - replicate the winning formula.',
     };
   }
 
@@ -127,7 +127,7 @@ function detectTargetDeviation(todayRevenue: number, dailyTarget: number): Anoma
 
 function detectRollingAvgAnomaly(todayRevenue: number, dailyRevenue: RevenueDataPoint[]): Anomaly | null {
   const last7 = dailyRevenue.slice(0, 7);
-  if (last7.length < 3) return null;
+  if (last7.length < 5) return null; // Need at least 5 days for stable rolling average
 
   const avg7 = last7.reduce((s, d) => s + d.amount, 0) / last7.length;
   if (avg7 === 0) return null;
@@ -168,7 +168,7 @@ function detectRollingAvgAnomaly(todayRevenue: number, dailyRevenue: RevenueData
       actual: todayRevenue,
       expected: Math.round(avg7),
       deviation: Math.round(deviation),
-      message: `Revenue is ${Math.round(deviation)}% above the 7-day average — exceptional day!`,
+      message: `Revenue is ${Math.round(deviation)}% above the 7-day average - exceptional day!`,
       recommendation: 'Identify what worked (specific treatment, provider, promotion) to replicate.',
     };
   }
@@ -213,12 +213,17 @@ function detectDowAnomaly(todayRevenue: number, dailyRevenue: RevenueDataPoint[]
 function detectProviderImbalance(byProvider: { provider: string; revenue: number }[]): Anomaly | null {
   if (byProvider.length < 2) return null;
 
+  // With only 2 providers, a 75% split is normal variation - raise threshold
+  const effectiveThreshold = byProvider.length === 2
+    ? Math.max(THRESHOLDS.providerImbalance, 85)
+    : THRESHOLDS.providerImbalance;
+
   const total = byProvider.reduce((s, p) => s + p.revenue, 0);
   if (total === 0) return null;
 
   for (const provider of byProvider) {
     const share = (provider.revenue / total) * 100;
-    if (share >= THRESHOLDS.providerImbalance) {
+    if (share >= effectiveThreshold) {
       return {
         type: 'provider_imbalance',
         severity: 'warning',

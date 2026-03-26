@@ -30,7 +30,7 @@ export const WEEKLY_REVIEW_CHECKLIST: WeeklyReviewChecklist[] = [
       {
         task: 'Review top rage-click elements',
         where: 'Clarity → Dashboard → Rage Clicks filter',
-        what: 'Elements receiving 3+ rapid clicks — indicates broken UI, unclear buttons, or unresponsive elements',
+        what: 'Elements receiving 3+ rapid clicks - indicates broken UI, unclear buttons, or unresponsive elements',
         action: 'Fix: make element clickable, enlarge tap target, add loading state, or clarify that the element is not interactive',
         priority: 'critical',
       },
@@ -63,7 +63,7 @@ export const WEEKLY_REVIEW_CHECKLIST: WeeklyReviewChecklist[] = [
       {
         task: 'Measure scroll depth on mobile',
         where: 'Clarity → Heatmaps → Filter: mobile only',
-        what: 'Mobile users typically scroll less — check if CTAs are visible without scrolling',
+        what: 'Mobile users typically scroll less - check if CTAs are visible without scrolling',
         action: 'Ensure primary CTA is above fold on mobile. Use sticky mobile CTA bar',
         priority: 'high',
       },
@@ -101,7 +101,7 @@ export const WEEKLY_REVIEW_CHECKLIST: WeeklyReviewChecklist[] = [
       {
         task: 'Track booking widget abandonment',
         where: 'Clarity → Recordings → Filter by custom tag: booking_attempt',
-        what: 'Users who open Mangomint widget but don\'t complete — note where they drop off in the booking flow',
+        what: 'Users who open Mangomint widget but don\'t complete - note where they drop off in the booking flow',
         action: 'Report friction points to streamline booking. Consider fewer form fields, clearer service selection',
         priority: 'critical',
       },
@@ -265,7 +265,7 @@ export const HEATMAP_ANALYSIS_GUIDES: HeatmapAnalysisGuide[] = [
       },
       {
         check: 'Below-fold visibility',
-        metric: 'Scroll map — what % reach FAQ, testimonials, CTA banner',
+        metric: 'Scroll map - what % reach FAQ, testimonials, CTA banner',
         threshold: 'If <30% reach the CTA banner, move it higher',
         action: 'Add mid-page CTA or sticky booking button',
       },
@@ -350,7 +350,7 @@ export const CONVERSION_PLAYBOOK: ConversionAction[] = [
     category: 'mobile',
     impact: 'high',
     effort: 'quick_win',
-    action: 'Ensure hero CTA is visible without scrolling. Add sticky mobile CTA bar (already exists — verify it\'s prominent)',
+    action: 'Ensure hero CTA is visible without scrolling. Add sticky mobile CTA bar (already exists - verify it\'s prominent)',
     expectedLift: '15-25% mobile bounce reduction',
   },
   {
@@ -375,7 +375,7 @@ export const CONVERSION_PLAYBOOK: ConversionAction[] = [
     category: 'layout',
     impact: 'high',
     effort: 'medium',
-    action: 'Add price ranges on service cards and hero. Don\'t hide pricing — transparency builds trust',
+    action: 'Add price ranges on service cards and hero. Don\'t hide pricing - transparency builds trust',
     expectedLift: '20-30% reduction in pricing-related bounces',
   },
   {

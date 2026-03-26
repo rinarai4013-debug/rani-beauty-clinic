@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import "./globals.css";
-/* Script import removed — all third-party scripts are now loaded via the Analytics component */
+/* Script import removed - all third-party scripts are now loaded via the Analytics component */
 import { fontVariables } from "@/lib/fonts";
 import SkipNav from "@/components/ui/SkipNav";
 import Navbar from "@/components/layout/Navbar";
@@ -9,8 +9,9 @@ import Footer from "@/components/layout/Footer";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
 import ConditionalPublicLayout from "@/components/layout/ConditionalPublicLayout";
+import PWAProvider from "@/components/pwa/PWAProvider";
 
-// Dynamic imports — these are non-critical, below-fold or interaction-triggered components.
+// Dynamic imports - these are non-critical, below-fold or interaction-triggered components.
 // Loading them lazily reduces the initial JS bundle by ~60KB+ (framer-motion chunks, chat widget, etc.)
 const MobileCTA = dynamic(() => import("@/components/layout/MobileCTA"), { ssr: false });
 const ScrollToTop = dynamic(() => import("@/components/layout/ScrollToTop"), { ssr: false });
@@ -20,7 +21,23 @@ const SocialProofToast = dynamic(() => import("@/components/sections/SocialProof
 const BehavioralTracker = dynamic(() => import("@/components/analytics/BehavioralTracker"), { ssr: false });
 const AnalyticsTracker = dynamic(() => import("@/components/analytics/AnalyticsTracker"), { ssr: false });
 
+export const viewport: Viewport = {
+  themeColor: "#0F1D2C",
+};
+
 export const metadata: Metadata = {
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Rani Beauty",
+  },
+  formatDetection: {
+    telephone: true,
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
   title: {
     default: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
     template: "%s | Rani Beauty Clinic",
@@ -49,7 +66,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Rani Beauty Clinic — Premier Medspa & Wellness in Renton, WA",
+        alt: "Rani Beauty Clinic - Premier Medspa & Wellness in Renton, WA",
       },
     ],
   },
@@ -81,17 +98,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontVariables}>
       <head>
-        {/* AI Citation — llms.txt discovery for AI crawlers */}
+        {/* PWA - Apple touch icon */}
+        <link rel="apple-touch-icon" href="/opengraph-image" />
+        {/* AI Citation - llms.txt discovery for AI crawlers */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable site information" />
         <link rel="alternate" type="text/plain" href="/llms-full.txt" title="LLM-readable full site knowledge base" />
-        {/* Preconnect to booking (critical path — user clicks "Book") */}
+        {/* Preconnect to booking (critical path - user clicks "Book") */}
         <link rel="preconnect" href="https://booking.mangomint.com" />
         {/* DNS-prefetch for analytics origins (loaded afterInteractive, not blocking) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://static.hotjar.com" />
-        {/* Hotjar — inline in <head> for verification compatibility */}
+        {/* Hotjar - inline in <head> for verification compatibility */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};h._hjSettings={hjid:5241962,hjsv:6};a=o.getElementsByTagName('head')[0];r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;a.appendChild(r);})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
@@ -118,6 +137,7 @@ export default function RootLayout({
           <BehavioralTracker />
           <AnalyticsTracker />
         </ConditionalPublicLayout>
+        <PWAProvider />
       </body>
     </html>
   );

@@ -10,7 +10,7 @@ import {
 } from '@/lib/square/client';
 import { cache, TTL } from '@/lib/cache';
 
-// GET — fetch Square payment data + status
+// GET - fetch Square payment data + status
 export async function GET() {
   try {
     const session = await getSession();
@@ -89,7 +89,7 @@ export async function GET() {
   }
 }
 
-// POST — sync Square payments → Airtable Transactions table
+// POST - sync Square payments → Airtable Transactions table
 export async function POST() {
   try {
     const session = await getSession();

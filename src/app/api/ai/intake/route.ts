@@ -38,16 +38,16 @@ INTAKE DATA:
 ${JSON.stringify(intakeData, null, 2)}
 
 AVAILABLE SERVICES:
-- Sofwave ($2,750–$4,500) — skin tightening
-- HydraFacial ($275) — signature facial
-- PRX-T33 ($495) — biorevitalization
-- VI Peel ($395) — chemical peel
-- PicoWay ($350–$600) — laser pigment removal
-- RF Microneedling ($495–$850) — skin renewal
+- Sofwave ($2,750-$4,500) - skin tightening
+- HydraFacial ($275) - signature facial
+- PRX-T33 ($495) - biorevitalization
+- VI Peel ($395) - chemical peel
+- PicoWay ($350-$600) - laser pigment removal
+- RF Microneedling ($495-$850) - skin renewal
 - Laser Hair Removal (from $800)
-- Botox/Fillers — injectables
+- Botox/Fillers - injectables
 - Wellness Injections: D3 $50, Tri-Immune $75, Glutathione $100, B12 $35, NAD+ $150-500
-- GLP-1 Weight Loss ($399–$599/mo)
+- GLP-1 Weight Loss ($399-$599/mo)
 - Tretinoin Rx ($99/mo)
 - Folix Hair Restoration
 

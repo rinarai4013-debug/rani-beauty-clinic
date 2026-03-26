@@ -1,6 +1,14 @@
+let withSentryConfig = null;
+try {
+  const sentryModule = await import("@sentry/nextjs");
+  if (sentryModule && typeof sentryModule.withSentryConfig === 'function') {
+    withSentryConfig = sentryModule.withSentryConfig;
+  }
+} catch {
+  withSentryConfig = null;
+}
+
 /** @type {import('next').NextConfig} */
-
-
 const nextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
@@ -399,7 +407,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self'",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com https://connect.facebook.net https://api.stripe.com https://booking.mangomint.com https://www.clarity.ms https://patient.withcherry.com https://api.airtable.com https://graph.facebook.com https://api.resend.com",
+              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com https://connect.facebook.net https://api.stripe.com https://booking.mangomint.com https://www.clarity.ms https://patient.withcherry.com https://api.airtable.com https://graph.facebook.com https://api.resend.com https://*.ingest.sentry.io",
               "frame-src https://booking.mangomint.com https://js.stripe.com https://patient.withcherry.com",
               "worker-src 'self' blob:",
             ].join("; "),
@@ -410,4 +418,16 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const sentryConfig = {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  tunnelRoute: "/monitoring",
+};
+
+export default withSentryConfig
+  ? withSentryConfig(nextConfig, sentryConfig)
+  : nextConfig;

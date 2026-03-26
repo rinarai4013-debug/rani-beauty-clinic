@@ -120,7 +120,7 @@ export default function ShareableResult({
           });
 
           await navigator.share({
-            title: 'My Treatment Simulation — Rani Beauty Clinic',
+            title: 'My Treatment Simulation - Rani Beauty Clinic',
             text: `Check out my projected treatment results from Rani Beauty Clinic! Skin score: ${skinScore.current} → ${skinScore.projected}`,
             files: [file],
           });
@@ -313,7 +313,7 @@ export default function ShareableResult({
             </span>
           </div>
           <p className="text-[10px] text-white/30 mt-2 italic">
-            Illustrative visualization — results may vary. Not a guarantee of treatment outcomes.
+            Illustrative visualization - results may vary. Not a guarantee of treatment outcomes.
           </p>
         </div>
       </motion.div>

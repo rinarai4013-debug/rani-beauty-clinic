@@ -15,7 +15,7 @@ export default function DoctorIntro() {
             <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-rani-cream to-white">
               <Image
                 src="/images/team/dr-landfield.webp"
-                alt="Dr. Alexander Landfield — Board-Certified Neurologist & Medical Director of Rani Beauty Clinic"
+                alt="Dr. Alexander Landfield - Board-Certified Neurologist & Medical Director of Rani Beauty Clinic"
                 width={600}
                 height={750}
                 className="h-full w-full object-cover object-top"

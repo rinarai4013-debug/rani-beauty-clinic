@@ -6,7 +6,7 @@ import { env, hasFeature } from '@/lib/env';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
-// POST — receive Cherry financing webhook events
+// POST - receive Cherry financing webhook events
 // Webhook URL to configure in Cherry dashboard:
 // https://www.ranibeautyclinic.com/api/webhooks/cherry
 export async function POST(request: NextRequest) {
@@ -34,7 +34,9 @@ export async function POST(request: NextRequest) {
     .createHmac('sha256', env.CHERRY_WEBHOOK_SECRET)
     .update(body)
     .digest('hex');
-  if (signature !== expected) {
+  const sigBuf = Buffer.from(signature, 'utf8');
+  const expBuf = Buffer.from(expected, 'utf8');
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
     logWebhookEvent('cherry', 'unknown', false, { error: 'Invalid signature' });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
                     fields: {
                       Type: 'Financing Application',
                       Severity: 'info',
-                      Message: `Financing application submitted — ${clientName}`,
+                      Message: `Financing application submitted - ${clientName}`,
                       'Action Recommended': 'Monitor for approval status',
                       Status: 'Active',
                       'Created Date': new Date().toISOString(),
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
 
         logWebhookEvent('cherry', 'application_approved', true, { clientName, approvedAmount });
 
-        // Update client record if found by email — add "Cherry Approved" tag
+        // Update client record if found by email - add "Cherry Approved" tag
         if (clientEmail) {
           try {
             const existingId = await rateLimitedQuery(() =>
@@ -153,8 +155,8 @@ export async function POST(request: NextRequest) {
                     fields: {
                       Type: 'Financing Approved',
                       Severity: 'info',
-                      Message: `Financing approved — ${clientName} for $${Number(approvedAmount).toLocaleString()}`,
-                      'Action Recommended': 'Schedule treatment — client has financing approved',
+                      Message: `Financing approved - ${clientName} for $${Number(approvedAmount).toLocaleString()}`,
+                      'Action Recommended': 'Schedule treatment - client has financing approved',
                       Status: 'Active',
                       'Created Date': new Date().toISOString(),
                     },
@@ -202,7 +204,7 @@ export async function POST(request: NextRequest) {
                     fields: {
                       Type: 'Financing Declined',
                       Severity: 'info',
-                      Message: `Financing declined — ${clientName}`,
+                      Message: `Financing declined - ${clientName}`,
                       'Action Recommended': 'Offer alternative payment plans (Afterpay, PatientFi, or in-house)',
                       Status: 'Active',
                       'Created Date': new Date().toISOString(),
@@ -259,7 +261,7 @@ export async function POST(request: NextRequest) {
                       Status: 'Completed',
                       'Is Financing': true,
                       'Financing Provider': 'Cherry',
-                      Notes: `Cherry financing — ${planDetails}`,
+                      Notes: `Cherry financing - ${planDetails}`,
                     },
                   },
                 ],
@@ -294,28 +296,18 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled Cherry event: ${event}`);
+        logWebhookEvent('cherry', event, true, { note: 'Unhandled event type' });
     }
 
     return NextResponse.json({ received: true, event });
   } catch (error) {
     logWebhookEvent('cherry', event, false, { error: String(error) });
-    // Always return 200 for valid signatures — Cherry retries on non-2xx
+    // Always return 200 for valid signatures - Cherry retries on non-2xx
     return NextResponse.json({ received: true, event, error: 'Processing error' });
   }
 }
 
-// GET — health check for webhook endpoint
+// GET - reject non-POST requests (no health check info exposed)
 export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    webhook: 'cherry',
-    configured: Boolean(env.CHERRY_API_KEY && env.CHERRY_WEBHOOK_SECRET),
-    events: [
-      'application_submitted',
-      'application_approved',
-      'application_declined',
-      'transaction_completed',
-    ],
-  });
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
 }

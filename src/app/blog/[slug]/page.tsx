@@ -8,6 +8,7 @@ import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
 import BlogCard from "@/components/blog/BlogCard";
 import StructuredData from "@/components/seo/StructuredData";
+import InternalLinks from "@/components/seo/InternalLinks";
 import { blogPosts } from "@/data/blog/posts";
 import { clinicInfo } from "@/data/clinic-info";
 import FAQSection from "./FAQSection";
@@ -42,7 +43,7 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
       url: `${clinicInfo.website}/blog/${post.slug}`,
       publishedTime: post.date,
       authors: [post.author],
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${post.metaTitle} — Rani Beauty Clinic` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${post.metaTitle} - Rani Beauty Clinic` }],
     },
   };
 }
@@ -219,6 +220,13 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </section>
       )}
+
+      <InternalLinks
+        currentSlug={post.slug}
+        type="service"
+        heading="Explore Our Treatments"
+        limit={6}
+      />
 
       <CTABanner
         label="READY TO GET STARTED?"

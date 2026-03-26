@@ -74,7 +74,7 @@ export async function GET(
 
     const activeMembership = memberships.find(m => m.fields['Status'] === 'Active');
 
-    // Recent messages (last 30 days) — count from actual message records
+    // Recent messages (last 30 days) - count from actual message records
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const recentMessageCount = messages.filter(m => {
       const msgDate = m.fields['Date'] || '';

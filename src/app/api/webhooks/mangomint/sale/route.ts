@@ -46,16 +46,18 @@ export async function POST(request: NextRequest) {
       .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
       .update(body)
       .digest('hex');
-    if (signature !== expected) {
+    const sigBuf = Buffer.from(signature, 'utf8');
+    const expBuf = Buffer.from(expected, 'utf8');
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     const payload = JSON.parse(body);
     const sale: SaleData = payload.data || payload;
 
+    // Log sale event without PII (HIPAA compliance)
     console.log('[Mangomint Sale Webhook] Received:', JSON.stringify({
       saleId: sale.id,
-      clientName: sale.client_name,
       total: sale.total,
       timestamp: new Date().toISOString(),
     }));

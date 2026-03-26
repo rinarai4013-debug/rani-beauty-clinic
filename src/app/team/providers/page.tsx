@@ -122,7 +122,7 @@ const knowledgeTopics = [
 
 const certifications = [
   "Board Certification in Neurology (ABPN)",
-  "Medical Director — Rani Beauty Clinic",
+  "Medical Director - Rani Beauty Clinic",
   "Advanced Injectable Technique Training",
   "Laser Safety Officer Certification",
   "FDA-Approved Device Protocol Training",
@@ -167,7 +167,7 @@ export default function ProvidersPage() {
     knowsAbout: knowledgeTopics,
     alumniOf: {
       "@type": "EducationalOrganization",
-      name: "Medical School — Board-Certified via ABPN",
+      name: "Medical School - Board-Certified via ABPN",
     },
     memberOf: [
       {
@@ -202,7 +202,7 @@ export default function ProvidersPage() {
   const reviewedBySchema = {
     "@context": "https://schema.org",
     "@type": "MedicalWebPage",
-    name: "Provider Expertise — Rani Beauty Clinic",
+    name: "Provider Expertise - Rani Beauty Clinic",
     url: `${clinicInfo.website}/team/providers`,
     reviewedBy: {
       "@type": "Physician",
@@ -269,7 +269,7 @@ export default function ProvidersPage() {
                 <div className="relative h-40 w-40 overflow-hidden rounded-2xl border-2 border-rani-gold/30">
                   <Image
                     src="/images/team/dr-landfield.webp"
-                    alt="Dr. Alexander Landfield — Medical Director, Board-Certified Neurologist"
+                    alt="Dr. Alexander Landfield - Medical Director, Board-Certified Neurologist"
                     fill
                     className="object-cover object-top"
                     sizes="160px"

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
  * Custom hook that returns `true` when the user's OS/browser has the
  * `prefers-reduced-motion: reduce` media query active.
  *
- * Reacts to live changes — if the user toggles the setting while the
+ * Reacts to live changes - if the user toggles the setting while the
  * page is open the returned value updates immediately.
  *
  * Safe for SSR: defaults to `false` (animations enabled) on the server

@@ -22,7 +22,7 @@ import CopyButton from "./CopyButton";
 export const metadata: Metadata = {
   title: "Press & Media Kit | Rani Beauty Clinic",
   description:
-    "Press kit, media resources, and embeddable tools from Rani Beauty Clinic — a physician-supervised luxury medspa in Renton, WA.",
+    "Press kit, media resources, and embeddable tools from Rani Beauty Clinic - a physician-supervised luxury medspa in Renton, WA.",
   alternates: {
     canonical: `${clinicInfo.website}/press`,
   },

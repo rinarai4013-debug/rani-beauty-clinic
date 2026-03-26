@@ -34,7 +34,7 @@ const DEFAULT_DATA: PlaidStorageData = {
 };
 
 // ---------------------------------------------------------------------------
-// AES-256-GCM Encryption — key derived from DASHBOARD_JWT_SECRET
+// AES-256-GCM Encryption - key derived from DASHBOARD_JWT_SECRET
 // ---------------------------------------------------------------------------
 
 const ALGORITHM = 'aes-256-gcm';
@@ -42,7 +42,13 @@ const IV_LENGTH = 12; // 96-bit IV recommended for GCM
 const AUTH_TAG_LENGTH = 16;
 
 function deriveKey(): Buffer {
-  const secret = process.env.DASHBOARD_JWT_SECRET || 'dev-secret-change-me';
+  const secret = process.env.DASHBOARD_JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      '[Plaid Storage] DASHBOARD_JWT_SECRET is not set. ' +
+      'Cannot encrypt/decrypt sensitive data without this environment variable.'
+    );
+  }
   return crypto.createHash('sha256').update(secret).digest(); // 32 bytes
 }
 
@@ -80,7 +86,7 @@ function decrypt(encryptedStr: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Airtable Alerts table — System Config storage
+// Airtable Alerts table - System Config storage
 // Requires a "Notes" Long Text field in the Alerts table.
 // ---------------------------------------------------------------------------
 
@@ -105,7 +111,7 @@ async function findConfigRecord(): Promise<{ id: string; notes: string } | null>
     {
       filterByFormula: `AND({Type}="${SYSTEM_CONFIG_TYPE}", {Metric Name}="${PLAID_CONFIG_KEY}")`,
     },
-    true, // skipTestFilter — System Config rows don't have "Is Test"
+    true, // skipTestFilter - System Config rows don't have "Is Test"
   );
   if (!records[0]) return null;
   return {
@@ -115,7 +121,7 @@ async function findConfigRecord(): Promise<{ id: string; notes: string } | null>
 }
 
 // ---------------------------------------------------------------------------
-// Public API — async replacements for the old fs-based functions
+// Public API - async replacements for the old fs-based functions
 // ---------------------------------------------------------------------------
 
 export async function readStorage(): Promise<PlaidStorageData> {
@@ -130,7 +136,7 @@ export async function readStorage(): Promise<PlaidStorageData> {
       try {
         parsed.accessToken = decrypt(parsed.accessToken);
       } catch {
-        console.error('[Plaid Storage] Failed to decrypt access token — clearing it');
+        console.error('[Plaid Storage] Failed to decrypt access token - clearing it');
         parsed.accessToken = null;
       }
     }

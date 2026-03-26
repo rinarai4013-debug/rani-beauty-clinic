@@ -43,7 +43,7 @@ export default function CTABanner({
               `Book your consultation today or call us at ${clinicInfo.phone}`}
           </p>
           <p className="mt-2 font-body text-sm text-gray-400">
-            Free phone consultations available — or $150 deposit for in-person (applies to your treatment)
+            Free phone consultations available - or $150 deposit for in-person (applies to your treatment)
           </p>
         </FadeInOnScroll>
 

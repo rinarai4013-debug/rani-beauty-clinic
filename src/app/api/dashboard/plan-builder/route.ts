@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
           FIELDS.treatmentPlans.servicesIncluded,
         ],
       },
-      true // skipTestFilter — Treatment Plans may not have Is Test field
+      true // skipTestFilter - Treatment Plans may not have Is Test field
     );
 
     // Manual pagination

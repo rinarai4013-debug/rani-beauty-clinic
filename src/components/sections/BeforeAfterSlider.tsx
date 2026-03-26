@@ -77,7 +77,7 @@ function SliderCard({ pair }: { pair: BeforeAfterPair }) {
       {/* After image (full) */}
       <Image
         src={pair.after}
-        alt={`${pair.label} treatment results — after photo at Rani Beauty Clinic`}
+        alt={`${pair.label} treatment results - after photo at Rani Beauty Clinic`}
         fill
         className="object-cover"
         sizes="(max-width: 768px) 100vw, 50vw"
@@ -92,7 +92,7 @@ function SliderCard({ pair }: { pair: BeforeAfterPair }) {
       >
         <Image
           src={pair.before}
-          alt={`${pair.label} treatment results — before photo at Rani Beauty Clinic`}
+          alt={`${pair.label} treatment results - before photo at Rani Beauty Clinic`}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"

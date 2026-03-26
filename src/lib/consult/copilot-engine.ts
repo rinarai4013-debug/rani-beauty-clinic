@@ -152,14 +152,14 @@ import { UNIFIED_CATALOG, type UnifiedService } from '@/data/services/unified-ca
 const SERVICE_DETAILS: Record<string, Omit<ServiceDetail, 'price' | 'duration' | 'sessions' | 'financingEligible'> & { catalogId?: string }> = {
   'HydraFacial': {
     results: 'Immediate glow, smoother texture, reduced pore size',
-    downtime: 'None — can wear makeup same day',
+    downtime: 'None - can wear makeup same day',
     concerns: ['dull skin', 'congested pores', 'uneven texture', 'dehydration', 'fine lines'],
     crossSells: ['VI Peel', 'Dermaplaning Add-On', 'Red Light Therapy Add-On'],
     catalogId: 'hydrafacial-signature',
   },
   'Botox': {
     results: 'Visible in 3-7 days, full effect at 2 weeks, lasts 3-4 months',
-    downtime: 'None — minor redness for 30 min',
+    downtime: 'None - minor redness for 30 min',
     concerns: ['forehead lines', 'crow\'s feet', 'frown lines', 'brow lift', 'preventative aging'],
     crossSells: ['Fillers', 'HydraFacial', 'Skincare'],
   },
@@ -192,7 +192,7 @@ const SERVICE_DETAILS: Record<string, Omit<ServiceDetail, 'price' | 'duration' |
   },
   'Sofwave': {
     results: 'Gradual tightening over 3-6 months, peak results at 12 weeks',
-    downtime: 'None to minimal — mild swelling 24-48 hours',
+    downtime: 'None to minimal - mild swelling 24-48 hours',
     concerns: ['skin tightening', 'jowls', 'neck laxity', 'brow lift', 'non-surgical facelift'],
     crossSells: ['Botox', 'Fillers', 'HydraFacial'],
     catalogId: 'sofwave-full-face',
@@ -213,14 +213,14 @@ const SERVICE_DETAILS: Record<string, Omit<ServiceDetail, 'price' | 'duration' |
   },
   'PRX-T33': {
     results: 'Immediate glow, progressive collagen stimulation over 2-4 weeks',
-    downtime: 'None — no peeling, no social downtime',
+    downtime: 'None - no peeling, no social downtime',
     concerns: ['dull skin', 'aging', 'hyperpigmentation', 'acne scars', 'stretch marks'],
     crossSells: ['HydraFacial', 'RF Microneedling', 'Tretinoin'],
     catalogId: 'prx-t33',
   },
   'BioRePeel': {
     results: 'Instant radiance, progressive improvement over 7-10 days',
-    downtime: 'None — zero downtime peel',
+    downtime: 'None - zero downtime peel',
     concerns: ['dull skin', 'acne', 'aging', 'large pores', 'uneven texture'],
     crossSells: ['HydraFacial', 'VI Peel', 'Medical-Grade Skincare Kit'],
     catalogId: 'biorepeel-face',
@@ -262,7 +262,7 @@ for (const [name, details] of Object.entries(SERVICE_DETAILS)) {
 
 const COMMON_OBJECTIONS: Record<string, { response: string; technique: string }> = {
   'too expensive': {
-    response: 'I completely understand — investing in yourself is a big decision. Many of our clients felt the same way initially, but found that the results were worth every penny. We also offer Cherry financing where you can split this into affordable monthly payments. Would you like me to show you what that would look like?',
+    response: 'I completely understand - investing in yourself is a big decision. Many of our clients felt the same way initially, but found that the results were worth every penny. We also offer Cherry financing where you can split this into affordable monthly payments. Would you like me to show you what that would look like?',
     technique: 'feel-felt-found + financing bridge',
   },
   'need to think about it': {
@@ -270,15 +270,15 @@ const COMMON_OBJECTIONS: Record<string, { response: string; technique: string }>
     technique: 'isolate the objection',
   },
   'not sure it works': {
-    response: 'That\'s a great question — I love that you want to be informed. Let me show you some of our before-and-after results from clients with similar concerns. We also have over 125 five-star Google reviews from real clients.',
+    response: 'That\'s a great question - I love that you want to be informed. Let me show you some of our before-and-after results from clients with similar concerns. We also have over 125 five-star Google reviews from real clients.',
     technique: 'social proof + evidence',
   },
   'want to compare prices': {
-    response: 'I appreciate you doing your research — that shows you take this seriously. Here\'s what sets us apart: physician-supervised care, medical-grade equipment, and a team that treats this as medical practice, not just beauty. Our results and safety record reflect that quality.',
+    response: 'I appreciate you doing your research - that shows you take this seriously. Here\'s what sets us apart: physician-supervised care, medical-grade equipment, and a team that treats this as medical practice, not just beauty. Our results and safety record reflect that quality.',
     technique: 'value reframe',
   },
   'scared of needles': {
-    response: 'You\'re definitely not alone — many of our clients shared that concern before their first treatment. We use numbing cream and our providers are incredibly gentle. Most clients say they barely felt anything. Would it help to start with a smaller treatment area to see how comfortable you are?',
+    response: 'You\'re definitely not alone - many of our clients shared that concern before their first treatment. We use numbing cream and our providers are incredibly gentle. Most clients say they barely felt anything. Would it help to start with a smaller treatment area to see how comfortable you are?',
     technique: 'normalize + gradual commitment',
   },
   'need to ask partner': {
@@ -327,33 +327,33 @@ function buildClientBriefing(input: ConsultInput): ClientBriefing {
 
   // Insights
   if (client.visitCount > 0) {
-    insights.push(`Returning client — ${client.visitCount} visits, $${client.totalSpend.toLocaleString()} lifetime spend`);
+    insights.push(`Returning client - ${client.visitCount} visits, $${client.totalSpend.toLocaleString()} lifetime spend`);
   }
   if (client.previousServices.length > 0) {
     insights.push(`Previous services: ${client.previousServices.join(', ')}`);
   }
   if (client.membershipStatus === 'active') {
-    insights.push('Active Angel Glow member — offer member pricing');
+    insights.push('Active Angel Glow member - offer member pricing');
   }
   if (client.age && client.age < 30) {
-    insights.push('Under 30 — great candidate for preventative treatments');
+    insights.push('Under 30 - great candidate for preventative treatments');
   }
   if (client.age && client.age > 45) {
-    insights.push('45+ — focus on results-driven treatments (Sofwave, RF Microneedling)');
+    insights.push('45+ - focus on results-driven treatments (Sofwave, RF Microneedling)');
   }
 
   // Risk flags
   if (client.churnRisk && client.churnRisk > 60) {
-    riskFlags.push(`High churn risk (${client.churnRisk}/100) — prioritize retention strategies`);
+    riskFlags.push(`High churn risk (${client.churnRisk}/100) - prioritize retention strategies`);
   }
   if (client.membershipStatus === 'cancelled') {
-    riskFlags.push('Cancelled membership — understand why and consider win-back offer');
+    riskFlags.push('Cancelled membership - understand why and consider win-back offer');
   }
   if (client.lastVisit) {
     const daysSince = Math.ceil(
       (new Date().getTime() - new Date(client.lastVisit).getTime()) / 86400000
     );
-    if (daysSince > 90) riskFlags.push(`${daysSince} days since last visit — re-engagement priority`);
+    if (daysSince > 90) riskFlags.push(`${daysSince} days since last visit - re-engagement priority`);
   }
 
   // Opportunities
@@ -364,10 +364,10 @@ function buildClientBriefing(input: ConsultInput): ClientBriefing {
     opportunities.push(`Cross-sell opportunity: Client hasn't tried ${unusedServices.slice(0, 3).join(', ')}`);
   }
   if (client.membershipStatus === 'none' && client.visitCount >= 2) {
-    opportunities.push('Membership conversion candidate — 2+ visits, no current membership');
+    opportunities.push('Membership conversion candidate - 2+ visits, no current membership');
   }
   if (client.totalSpend > 1000 && client.membershipStatus !== 'active') {
-    opportunities.push(`High spender ($${client.totalSpend.toLocaleString()}) — VIP treatment, loyalty offer`);
+    opportunities.push(`High spender ($${client.totalSpend.toLocaleString()}) - VIP treatment, loyalty offer`);
   }
 
   // LTV estimate
@@ -376,7 +376,7 @@ function buildClientBriefing(input: ConsultInput): ClientBriefing {
 
   const summary = input.consultType === 'new_client'
     ? `New client consultation. Focus on building rapport, understanding goals, and presenting a clear treatment pathway.`
-    : `Returning client (${client.visitCount} visits). ${segment === 'vip' ? 'VIP treatment — white glove experience.' : segment === 'at_risk' ? 'At risk of churning — retention focus.' : 'Focus on deepening relationship and expanding services.'}`;
+    : `Returning client (${client.visitCount} visits). ${segment === 'vip' ? 'VIP treatment - white glove experience.' : segment === 'at_risk' ? 'At risk of churning - retention focus.' : 'Focus on deepening relationship and expanding services.'}`;
 
   return {
     summary,
@@ -420,7 +420,7 @@ function buildTreatmentPlan(input: ConsultInput): TreatmentPlan {
 
   // Build timeline
   const timeline: TimelineStep[] = [
-    { week: 0, treatment: primary.service, description: `Start with ${primary.service} — ${primary.results}` },
+    { week: 0, treatment: primary.service, description: `Start with ${primary.service} - ${primary.results}` },
   ];
   if (alternatives.length > 0) {
     timeline.push({
@@ -432,7 +432,7 @@ function buildTreatmentPlan(input: ConsultInput): TreatmentPlan {
   timeline.push({
     week: 8,
     treatment: 'Follow-up',
-    description: 'Assessment visit — evaluate results and adjust plan',
+    description: 'Assessment visit - evaluate results and adjust plan',
   });
 
   return { primary, alternatives, packages, timeline };
@@ -491,7 +491,7 @@ function generateTalkingPoints(input: ConsultInput): TalkingPoint[] {
   if (input.consultType === 'new_client') {
     points.push({
       topic: 'Welcome & Rapport',
-      script: `Welcome to Rani Beauty Clinic, ${client.name}! I'm so glad you're here. Before we dive into anything, I'd love to hear more about what brought you in today and what your goals are.`,
+      script: `Welcome to Rani Beauty Clinic, ${client.name}! I'm so glad you're here. Before we get into anything, I'd love to hear more about what brought you in today and what your goals are.`,
       timing: 'opening',
       priority: 'must_say',
     });
@@ -507,7 +507,7 @@ function generateTalkingPoints(input: ConsultInput): TalkingPoint[] {
   // During - Concerns
   points.push({
     topic: 'Active Listening',
-    script: 'Tell me more about that — when did you first notice this concern, and how does it affect your confidence?',
+    script: 'Tell me more about that - when did you first notice this concern, and how does it affect your confidence?',
     timing: 'during',
     priority: 'must_say',
   });
@@ -639,18 +639,18 @@ function determineClosingStrategy(input: ConsultInput, plan: TreatmentPlan): Clo
 
   if (isNewClient && !isHighTicket) {
     approach = 'assumptive';
-    script = `Based on everything we discussed, ${plan.primary.service} is going to be perfect for you. Let me get you scheduled — do you prefer mornings or afternoons?`;
+    script = `Based on everything we discussed, ${plan.primary.service} is going to be perfect for you. Let me get you scheduled - do you prefer mornings or afternoons?`;
   } else if (isHighTicket) {
     approach = 'value';
-    script = `The total investment for your ${plan.primary.service} ${plan.primary.sessions > 1 ? 'series' : 'treatment'} is $${totalValue.toLocaleString()}. When you think about the confidence and results you'll get — and that this is physician-supervised care — it's an investment in yourself that pays dividends every day. Should we get started?`;
-    financingPitch = `We also have 0% financing through Cherry. That would make this just $${plan.primary.financingMonthly || Math.round(totalValue / 6)}/month — less than a daily coffee. Want me to check what you qualify for? It takes 30 seconds.`;
+    script = `The total investment for your ${plan.primary.service} ${plan.primary.sessions > 1 ? 'series' : 'treatment'} is $${totalValue.toLocaleString()}. When you think about the confidence and results you'll get - and that this is physician-supervised care - it's an investment in yourself that pays dividends every day. Should we get started?`;
+    financingPitch = `We also have 0% financing through Cherry. That would make this just $${plan.primary.financingMonthly || Math.round(totalValue / 6)}/month - less than a daily coffee. Want me to check what you qualify for? It takes 30 seconds.`;
   } else if (input.client.membershipStatus !== 'active' && input.client.visitCount >= 2) {
     approach = 'choice';
     script = `Would you like to book just today's ${plan.primary.service}, or would you like to look at our Angel Glow membership? As a member, you'd get this treatment at a better price plus monthly benefits.`;
     membershipPitch = 'Our Angel Glow members save an average of 15% on treatments, plus you get priority booking and exclusive member events.';
   } else {
     approach = 'assumptive';
-    script = `Let's get you scheduled for your ${plan.primary.service}. We have openings this week — what works best for you?`;
+    script = `Let's get you scheduled for your ${plan.primary.service}. We have openings this week - what works best for you?`;
   }
 
   const alternativeClose = `If you'd like to start smaller, we could begin with just a single ${plan.primary.service} session ($${plan.primary.price}) and see how you love the results before committing to the full plan.`;
@@ -667,7 +667,7 @@ function createFollowUpPlan(input: ConsultInput): FollowUpPlan {
     sameDay: `Send personalized text: "Hi ${client.name}, it was great meeting you today! Here's a summary of what we discussed: [treatment plan]. Let me know if you have any questions!"`,
     nextDay: `Follow-up text with before/after photos relevant to their concerns. Include direct booking link.`,
     oneWeek: `If no booking: "Hi ${client.name}, just checking in! We're holding our [current promotion] for a few more days. Would you like to take advantage of it?"`,
-    ifNoBook: `Add to reactivation sequence. Tag concerns in CRM for retargeting. Consider offering a "consult credit" — $50 off first treatment within 30 days.`,
+    ifNoBook: `Add to reactivation sequence. Tag concerns in CRM for retargeting. Consider offering a "consult credit" - $50 off first treatment within 30 days.`,
   };
 }
 

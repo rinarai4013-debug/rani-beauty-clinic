@@ -7,7 +7,7 @@ import { getAppointments, isConfigured as isMangomintConfigured } from '@/lib/ma
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { getVapiCallLogs } from '@/lib/phone/vapi-agent';
 
-// POST — test connection to a specific integration
+// POST - test connection to a specific integration
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
@@ -29,12 +29,12 @@ export async function POST(request: NextRequest) {
           const appointments = await getAppointments({ limit: 1 });
           return NextResponse.json({
             success: true,
-            message: `Connected — ${appointments.length > 0 ? 'appointments accessible' : 'API reachable'}`,
+            message: `Connected - ${appointments.length > 0 ? 'appointments accessible' : 'API reachable'}`,
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Unknown error'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Unknown error'}`,
           });
         }
       }
@@ -47,12 +47,12 @@ export async function POST(request: NextRequest) {
           const { payments } = await listPayments({ limit: 1 });
           return NextResponse.json({
             success: true,
-            message: `Connected — ${payments.length > 0 ? 'payments accessible' : 'API reachable'}`,
+            message: `Connected - ${payments.length > 0 ? 'payments accessible' : 'API reachable'}`,
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Invalid API key'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Invalid API key'}`,
           });
         }
       }
@@ -66,12 +66,12 @@ export async function POST(request: NextRequest) {
           const submissions = await getFormSubmissions('222995765731166', { limit: 1 });
           return NextResponse.json({
             success: true,
-            message: `Connected — ${submissions.length > 0 ? 'submissions accessible' : 'API reachable'}`,
+            message: `Connected - ${submissions.length > 0 ? 'submissions accessible' : 'API reachable'}`,
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Invalid API key'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Invalid API key'}`,
           });
         }
       }
@@ -93,12 +93,12 @@ export async function POST(request: NextRequest) {
           }
           return NextResponse.json({
             success: true,
-            message: `Connected — environment: ${env}`,
+            message: `Connected - environment: ${env}`,
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Unknown error'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Unknown error'}`,
           });
         }
       }
@@ -108,12 +108,12 @@ export async function POST(request: NextRequest) {
           const records = await fetchFirst(Tables.clients(), 1, {}, true);
           return NextResponse.json({
             success: true,
-            message: `Connected — ${records.length > 0 ? 'Clients table accessible' : 'table empty'}`,
+            message: `Connected - ${records.length > 0 ? 'Clients table accessible' : 'table empty'}`,
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Invalid PAT or Base ID'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Invalid PAT or Base ID'}`,
           });
         }
       }
@@ -128,13 +128,13 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             success: result.success,
             message: result.success
-              ? `Connected — ${result.calls.length} call log(s) retrieved`
-              : `Failed — ${result.message}`,
+              ? `Connected - ${result.calls.length} call log(s) retrieved`
+              : `Failed - ${result.message}`,
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Unknown error'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Unknown error'}`,
           });
         }
       }
@@ -154,17 +154,17 @@ export async function POST(request: NextRequest) {
             const indexCount = data?.indexes?.length ?? 0;
             return NextResponse.json({
               success: true,
-              message: `Connected — ${indexCount} index(es)`,
+              message: `Connected - ${indexCount} index(es)`,
             });
           }
           return NextResponse.json({
             success: false,
-            message: 'Failed — invalid API key or unreachable',
+            message: 'Failed - invalid API key or unreachable',
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Unknown error'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Unknown error'}`,
           });
         }
       }
@@ -181,17 +181,17 @@ export async function POST(request: NextRequest) {
           if (res.ok) {
             return NextResponse.json({
               success: true,
-              message: 'Connected — API key valid',
+              message: 'Connected - API key valid',
             });
           }
           return NextResponse.json({
             success: false,
-            message: 'Failed — invalid API key',
+            message: 'Failed - invalid API key',
           });
         } catch (err) {
           return NextResponse.json({
             success: false,
-            message: `Failed — ${err instanceof Error ? err.message : 'Unknown error'}`,
+            message: `Failed - ${err instanceof Error ? err.message : 'Unknown error'}`,
           });
         }
       }

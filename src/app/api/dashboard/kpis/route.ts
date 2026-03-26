@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
         fetchAll<AlertFields>(Tables.alerts(), {
           filterByFormula: `{Status} = "active"`,
         }),
-        // Clients created this week (no "Is Test" or "Created Date" field — use CREATED_TIME())
+        // Clients created this week (no "Is Test" or "Created Date" field - use CREATED_TIME())
         fetchAll<ClientFields>(Tables.clients(), {
           filterByFormula: `CREATED_TIME() >= DATEADD(TODAY(), -7, 'days')`,
         }, true),
@@ -194,7 +194,7 @@ export async function GET(request: NextRequest) {
     const newThisWeek = recentClients.length;
     const activeCount = allClients.length;
 
-    // Rebook rate — Clients table doesn't have Visit Count or Days Since Last Visit
+    // Rebook rate - Clients table doesn't have Visit Count or Days Since Last Visit
     // Use KPI snapshot data or default to 0
     const rebookRate = 0;
 

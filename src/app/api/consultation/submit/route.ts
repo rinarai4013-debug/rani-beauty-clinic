@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Too many submissions. Please wait a moment.' }, { status: 429 });
     }
 
-    // Parse FormData — wizard sends JSON in 'data' field + optional 'photos' files
+    // Parse FormData - wizard sends JSON in 'data' field + optional 'photos' files
     const formData = await req.formData();
     const rawData = formData.get('data');
     if (!rawData || typeof rawData !== 'string') {
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Sanitize inputs — prevent email header injection and XSS
+    // Sanitize inputs - prevent email header injection and XSS
     const sanitize = (val: string): string =>
       val.replace(/[\r\n]/g, '').trim();
     const escapeHtml = (val: string): string =>
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
       submittedAt: new Date().toISOString(),
     };
 
-    // Write to Airtable — progressive field discovery
+    // Write to Airtable - progressive field discovery
     // The live Airtable schema may differ from exported schema
     // Strategy: try fields progressively, dropping any that fail
     const allIntakeJson = JSON.stringify(allIntakeData, null, 2);
@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
         from: process.env.FROM_EMAIL || 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
         to: process.env.CONTACT_EMAIL || 'info@ranibeautyclinic.com',
         replyTo: safeEmail,
-        subject: `New Glow Intake — ${safeFirstName} ${safeLastName}`,
+        subject: `New Glow Intake - ${safeFirstName} ${safeLastName}`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background-color: #0F1D2C; padding: 24px; text-align: center;">
@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       }).catch(() => {
-        // Fire-and-forget — don't block response
+        // Fire-and-forget - don't block response
       });
     }
 
@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
           source: 'native-consultation-form',
         }),
       }).catch(() => {
-        // Fire-and-forget — don't block response
+        // Fire-and-forget - don't block response
       });
     }
 

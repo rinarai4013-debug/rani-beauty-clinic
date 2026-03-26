@@ -76,7 +76,7 @@ export default function PhoneAgentPage() {
         toast.error(result.error || 'Sync failed');
       }
     } catch {
-      toast.error('Failed to sync — check your connection');
+      toast.error('Failed to sync - check your connection');
     } finally {
       setIsSyncing(false);
     }
@@ -102,7 +102,7 @@ export default function PhoneAgentPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">AI Phone Agent</h1>
-            <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Vapi-powered AI receptionist — handles calls, books appointments, and answers questions 24/7</p>
+            <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Vapi-powered AI receptionist - handles calls, books appointments, and answers questions 24/7</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Vapi connection status */}
@@ -138,7 +138,7 @@ export default function PhoneAgentPage() {
           />
         ) : (
           <>
-            {/* Analytics Section — real data or empty state */}
+            {/* Analytics Section - real data or empty state */}
             {!hasAnalytics ? (
               <DashboardEmptyState
                 icon="phone"

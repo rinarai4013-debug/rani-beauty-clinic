@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { createSession, getSessionCookieConfig } from '@/lib/auth/session';
-import { timingSafeEqual } from 'crypto';
+import { timingSafeEqual, pbkdf2Sync, randomBytes } from 'crypto';
 import type { UserRole } from '@/types/auth';
 import { logAuthFailure, logEvent } from '@/lib/logging/structured-logger';
+import { captureAuthEvent } from '@/lib/sentry-utils';
 
 // --- Credentials from environment ---
 interface Credential {
-  password: string;
+  password: string;         // plaintext (legacy) or "pbkdf2:salt:hash" format
   role: UserRole;
   displayName: string;
 }
@@ -15,6 +17,38 @@ function getCredentials(): Record<string, Credential> {
   const raw = process.env.DASHBOARD_USERS;
   if (!raw) throw new Error('DASHBOARD_USERS environment variable is required');
   return JSON.parse(raw) as Record<string, Credential>;
+}
+
+// --- Password hashing (PBKDF2-SHA512) ---
+const PBKDF2_ITERATIONS = 100_000;
+const PBKDF2_KEYLEN = 64;
+const PBKDF2_DIGEST = 'sha512';
+
+/** Hash a password. Returns "pbkdf2:salt:hash" */
+export function hashPassword(password: string): string {
+  const salt = randomBytes(32).toString('hex');
+  const hash = pbkdf2Sync(password, salt, PBKDF2_ITERATIONS, PBKDF2_KEYLEN, PBKDF2_DIGEST).toString('hex');
+  return `pbkdf2:${salt}:${hash}`;
+}
+
+/** Verify a password against a stored hash. Supports both hashed and legacy plaintext. */
+function verifyPassword(supplied: string, stored: string): boolean {
+  if (stored.startsWith('pbkdf2:')) {
+    const parts = stored.split(':');
+    if (parts.length !== 3) return false;
+    const salt = parts[1];
+    const storedHash = parts[2];
+    const suppliedHash = pbkdf2Sync(supplied, salt, PBKDF2_ITERATIONS, PBKDF2_KEYLEN, PBKDF2_DIGEST).toString('hex');
+    const bufA = Buffer.from(suppliedHash, 'hex');
+    const bufB = Buffer.from(storedHash, 'hex');
+    if (bufA.length !== bufB.length) {
+      timingSafeEqual(bufA, bufA);
+      return false;
+    }
+    return timingSafeEqual(bufA, bufB);
+  }
+  // Legacy plaintext comparison (timing-safe)
+  return safeCompare(supplied, stored);
 }
 
 // --- Rate limiting ---
@@ -73,7 +107,7 @@ export async function POST(request: Request) {
     const ip = getClientIP(request);
 
     if (isRateLimited(ip)) {
-      logAuthFailure(ip, 'unknown', 'Rate limited — too many failed attempts');
+      logAuthFailure(ip, 'unknown', 'Rate limited - too many failed attempts');
       return NextResponse.json(
         { error: 'Too many failed attempts. Try again later.' },
         { status: 429 },
@@ -92,9 +126,10 @@ export async function POST(request: Request) {
     const credentials = getCredentials();
     const credential = credentials[username];
 
-    if (!credential || !safeCompare(password, credential.password)) {
+    if (!credential || !verifyPassword(password, credential.password)) {
       recordFailedAttempt(ip);
       logAuthFailure(ip, username, !credential ? 'Unknown username' : 'Invalid password');
+      captureAuthEvent('login', username, false, { ip, reason: !credential ? 'unknown_user' : 'bad_password' });
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 },
@@ -102,6 +137,7 @@ export async function POST(request: Request) {
     }
 
     clearFailedAttempts(ip);
+    captureAuthEvent('login', username, true, { ip, role: credential.role });
     logEvent('auth', 'info', 'Login successful', { ip, username, role: credential.role });
 
     const token = await createSession(username, credential.role, credential.displayName);

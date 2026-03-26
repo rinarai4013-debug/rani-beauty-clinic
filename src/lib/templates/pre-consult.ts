@@ -5,9 +5,9 @@
  * Triggered by Mangomint "Appointment Created" webhook via n8n WF3.
  *
  * Sequence:
- * 1. Immediate — Booking confirmation + what to expect
- * 2. 24h before — Reminder + prep instructions (service-specific)
- * 3. 2h before — Final reminder + directions/parking
+ * 1. Immediate - Booking confirmation + what to expect
+ * 2. 24h before - Reminder + prep instructions (service-specific)
+ * 3. 2h before - Final reminder + directions/parking
  */
 
 export interface PreConsultVars {
@@ -57,25 +57,25 @@ const PREP_INSTRUCTIONS: Record<string, string[]> = {
     'Avoid sun exposure and self-tanning for 2 weeks before your appointment',
     'Shave the treatment area 24 hours prior (do not wax or pluck)',
     'Discontinue retinol and AHA/BHA products 3-5 days before',
-    'Come with clean skin — no makeup, lotion, or deodorant on the treatment area',
+    'Come with clean skin - no makeup, lotion, or deodorant on the treatment area',
   ],
   injectable: [
     'Avoid blood-thinning supplements (fish oil, vitamin E, aspirin) for 7 days prior',
     'No alcohol for 24 hours before your appointment',
-    'Come with a clean face — no makeup',
+    'Come with a clean face - no makeup',
     'Eat a light meal before your visit to prevent lightheadedness',
   ],
   facial: [
     'Arrive with clean, makeup-free skin if possible',
     'Discontinue retinol products 3 days before',
-    'Stay hydrated — drink plenty of water the day before',
+    'Stay hydrated - drink plenty of water the day before',
     'Let us know about any new skincare products you\'ve started',
   ],
   wellness: [
     'Fast for 8-12 hours if bloodwork is included in your visit',
     'Bring a list of current medications and supplements',
     'Wear comfortable clothing with easy arm access for injections',
-    'Stay hydrated — drink plenty of water',
+    'Stay hydrated - drink plenty of water',
   ],
   body: [
     'Wear comfortable, loose-fitting clothing',
@@ -87,7 +87,7 @@ const PREP_INSTRUCTIONS: Record<string, string[]> = {
     'Think about your goals and what results you\'d like to achieve',
     'Bring a list of any current skincare products or medications',
     'Feel free to bring reference photos of results you admire',
-    'We\'ll discuss a personalized treatment plan — no pressure to commit',
+    'We\'ll discuss a personalized treatment plan - no pressure to commit',
   ],
 };
 
@@ -165,7 +165,7 @@ const BOOKING_CONFIRMATION: Template = {
 };
 
 const REMINDER_24H: Template = {
-  sms: `hey angel! 💛 just a friendly reminder — your {{serviceName}} appointment is tomorrow at {{appointmentTime}} ✨ remember to:\n{{prepList}}\nand we'll have everything ready for you! can't wait! 🤍`,
+  sms: `hey angel! 💛 just a friendly reminder - your {{serviceName}} appointment is tomorrow at {{appointmentTime}} ✨ remember to:\n{{prepList}}\nand we'll have everything ready for you! can't wait! 🤍`,
   emailSubject: `see you tomorrow, {{firstName}}! ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -175,7 +175,7 @@ const REMINDER_24H: Template = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">hey angel! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      just a friendly reminder — your <strong>{{serviceName}}</strong> appointment is tomorrow at <strong>{{appointmentTime}}</strong> with {{providerName}} ✨ we'll have everything ready for you!
+      just a friendly reminder - your <strong>{{serviceName}}</strong> appointment is tomorrow at <strong>{{appointmentTime}}</strong> with {{providerName}} ✨ we'll have everything ready for you!
     </p>
 
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #C9A96E;">

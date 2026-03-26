@@ -9,7 +9,7 @@ export default function CredibilitySection() {
   return (
     <section className="bg-rani-cream py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
-        {/* Block 1: Founders — photo left, text right */}
+        {/* Block 1: Founders - photo left, text right */}
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <FadeInOnScroll direction="left">
             <div className="relative aspect-[3/4] max-w-md mx-auto lg:mx-0 overflow-hidden rounded-xl">
@@ -53,7 +53,7 @@ export default function CredibilitySection() {
           <div className="h-px w-24 bg-rani-gold/30" />
         </div>
 
-        {/* Block 2: Doctor — text left, photo right */}
+        {/* Block 2: Doctor - text left, photo right */}
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <FadeInOnScroll direction="left">
             <div className="lg:order-first">
@@ -82,7 +82,7 @@ export default function CredibilitySection() {
             <div className="relative aspect-[4/5] max-w-md mx-auto lg:mx-0 lg:ml-auto overflow-hidden rounded-xl">
               <Image
                 src="/images/team/dr-landfield.webp"
-                alt="Dr. Alexander Landfield — Board-Certified Neurologist & Medical Director"
+                alt="Dr. Alexander Landfield - Board-Certified Neurologist & Medical Director"
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 80vw, 40vw"

@@ -29,13 +29,13 @@ export const costPages: CostPage[] = [
       { item: "Full Brazilian", price: "$225" },
       { item: "Full Legs", price: "$375" },
       { item: "Full Back", price: "$375" },
-      { item: "Full Body", price: "$1,199", note: "Best value — all areas included" },
+      { item: "Full Body", price: "$1,199", note: "Best value - all areas included" },
     ],
     factors: [
-      "Treatment area size — larger areas like full legs or full body cost more than small facial areas.",
-      "Number of sessions required — most clients need 6-8 sessions for permanent reduction, and package pricing reduces the per-session cost.",
-      "Hair and skin type — some combinations require additional sessions for optimal results.",
-      "Technology used — we use the Candela GentleMax Pro Plus, which treats all skin tones safely and effectively.",
+      "Treatment area size - larger areas like full legs or full body cost more than small facial areas.",
+      "Number of sessions required - most clients need 6-8 sessions for permanent reduction, and package pricing reduces the per-session cost.",
+      "Hair and skin type - some combinations require additional sessions for optimal results.",
+      "Technology used - we use the Candela GentleMax Pro Plus, which treats all skin tones safely and effectively.",
     ],
     financingNote:
       "We offer flexible financing through Afterpay, Cherry, and PatientFi so you can start your laser hair removal journey today and pay over time. Apply online or in-clinic with no impact to your credit score.",
@@ -58,7 +58,7 @@ export const costPages: CostPage[] = [
       {
         question: "Are laser hair removal packages a better deal?",
         answer:
-          "Yes. Our 6-session packages save you roughly 15-17% compared to booking individual sessions. For example, the Full Brazilian 6-Pack is $1,125 versus $1,350 if purchased individually — a savings of $225.",
+          "Yes. Our 6-session packages save you roughly 15-17% compared to booking individual sessions. For example, the Full Brazilian 6-Pack is $1,125 versus $1,350 if purchased individually - a savings of $225.",
       },
     ],
   },
@@ -83,10 +83,10 @@ export const costPages: CostPage[] = [
       { item: "Neck & Decollete Add-On", price: "$125" },
     ],
     factors: [
-      "Type of HydraFacial selected — Express, Signature, Back, or Keravive each address different concerns and treatment areas.",
-      "Add-on treatments — dermaplaning, neck and decollete extension, and red light therapy each enhance your results at an additional cost.",
-      "Membership status — Angel Glow Up members receive discounted HydraFacial pricing starting at $199 per session.",
-      "Package purchases — our Glow Up 3-Pack bundles three Signature HydraFacials with LED sessions for additional savings.",
+      "Type of HydraFacial selected - Express, Signature, Back, or Keravive each address different concerns and treatment areas.",
+      "Add-on treatments - dermaplaning, neck and decollete extension, and red light therapy each enhance your results at an additional cost.",
+      "Membership status - Angel Glow Up members receive discounted HydraFacial pricing starting at $199 per session.",
+      "Package purchases - our Glow Up 3-Pack bundles three Signature HydraFacials with LED sessions for additional savings.",
     ],
     financingNote:
       "Make your HydraFacial more affordable with financing through Afterpay, Cherry, or PatientFi. Split your payment into interest-free installments and keep your skin glowing without the upfront cost.",
@@ -94,7 +94,7 @@ export const costPages: CostPage[] = [
       {
         question: "Is a HydraFacial worth the price?",
         answer:
-          "HydraFacial delivers immediate, visible results in a single session — clearer, more hydrated, and more radiant skin. Many clients consider it their go-to monthly maintenance treatment because the results compound over time.",
+          "HydraFacial delivers immediate, visible results in a single session - clearer, more hydrated, and more radiant skin. Many clients consider it their go-to monthly maintenance treatment because the results compound over time.",
       },
       {
         question: "How often should I get a HydraFacial?",
@@ -134,11 +134,11 @@ export const costPages: CostPage[] = [
       { item: "Buttocks", price: "$695" },
     ],
     factors: [
-      "Treatment area — facial treatments are priced differently from body areas like the abdomen, arms, or legs.",
-      "Number of sessions — most clients see optimal results with 3 sessions spaced 4-6 weeks apart, and our 3-packs offer savings.",
-      "Severity of concerns — deeper scarring or more significant skin laxity may require additional sessions.",
-      "Combination treatments — pairing RF microneedling with Sofwave or PRP can enhance results and may affect overall investment.",
-      "Body area size — larger treatment zones like full legs ($1,500) cost more due to extended treatment time.",
+      "Treatment area - facial treatments are priced differently from body areas like the abdomen, arms, or legs.",
+      "Number of sessions - most clients see optimal results with 3 sessions spaced 4-6 weeks apart, and our 3-packs offer savings.",
+      "Severity of concerns - deeper scarring or more significant skin laxity may require additional sessions.",
+      "Combination treatments - pairing RF microneedling with Sofwave or PRP can enhance results and may affect overall investment.",
+      "Body area size - larger treatment zones like full legs ($1,500) cost more due to extended treatment time.",
     ],
     financingNote:
       "Invest in your skin with flexible financing through Afterpay, Cherry, and PatientFi. Break your RF microneedling cost into comfortable monthly payments with fast online approval.",
@@ -146,7 +146,7 @@ export const costPages: CostPage[] = [
       {
         question: "How many RF microneedling sessions do I need?",
         answer:
-          "Most clients achieve their desired results with 3 sessions spaced 4-6 weeks apart. Our RF Micro 3-Pack for the face is $1,999 — a savings of $251 compared to individual sessions.",
+          "Most clients achieve their desired results with 3 sessions spaced 4-6 weeks apart. Our RF Micro 3-Pack for the face is $1,999 - a savings of $251 compared to individual sessions.",
       },
       {
         question: "Is RF microneedling more expensive than regular microneedling?",
@@ -181,11 +181,11 @@ export const costPages: CostPage[] = [
       { item: "Full Face Treatment", price: "$400-$600", note: "Forehead + frown lines + crow's feet" },
     ],
     factors: [
-      "Number of units required — this depends on the treatment area, muscle strength, and your desired outcome.",
-      "Product choice — Botox and Dysport have different unit equivalencies and pricing per unit.",
-      "Treatment areas — treating multiple zones (forehead, frown lines, crow's feet) increases the total unit count.",
-      "Frequency of maintenance — Botox typically lasts 3-4 months, so plan for quarterly touch-ups to maintain results.",
-      "Provider expertise — all injectable treatments at Rani Beauty Clinic are performed under physician supervision.",
+      "Number of units required - this depends on the treatment area, muscle strength, and your desired outcome.",
+      "Product choice - Botox and Dysport have different unit equivalencies and pricing per unit.",
+      "Treatment areas - treating multiple zones (forehead, frown lines, crow's feet) increases the total unit count.",
+      "Frequency of maintenance - Botox typically lasts 3-4 months, so plan for quarterly touch-ups to maintain results.",
+      "Provider expertise - all injectable treatments at Rani Beauty Clinic are performed under physician supervision.",
     ],
     financingNote:
       "Keep your look refreshed with flexible financing through Afterpay, Cherry, and PatientFi. Pay for your Botox or Dysport treatment in installments that fit your budget.",
@@ -208,7 +208,7 @@ export const costPages: CostPage[] = [
       {
         question: "Do you offer any discounts on Botox?",
         answer:
-          "Yes. Angel Glow Up members receive up to 20% off toxin treatments as a signup bonus. We also run seasonal promotions — follow us on social media or sign up for our newsletter to stay informed.",
+          "Yes. Angel Glow Up members receive up to 20% off toxin treatments as a signup bonus. We also run seasonal promotions - follow us on social media or sign up for our newsletter to stay informed.",
       },
     ],
   },
@@ -233,11 +233,11 @@ export const costPages: CostPage[] = [
       { item: "Chin Augmentation (per syringe)", price: "$700-$1,000" },
     ],
     factors: [
-      "Type of filler product — different brands and formulations are priced differently and suited for specific areas of the face.",
-      "Number of syringes needed — lip enhancement may require 1 syringe while cheek augmentation often needs 1-2 syringes per side.",
-      "Treatment area complexity — delicate areas like under the eyes require specialized technique and premium products.",
-      "Desired outcome — subtle enhancement costs less than dramatic volume restoration, which may require more product.",
-      "Longevity of the filler — some products last 6-12 months while others can last up to 18-24 months.",
+      "Type of filler product - different brands and formulations are priced differently and suited for specific areas of the face.",
+      "Number of syringes needed - lip enhancement may require 1 syringe while cheek augmentation often needs 1-2 syringes per side.",
+      "Treatment area complexity - delicate areas like under the eyes require specialized technique and premium products.",
+      "Desired outcome - subtle enhancement costs less than dramatic volume restoration, which may require more product.",
+      "Longevity of the filler - some products last 6-12 months while others can last up to 18-24 months.",
     ],
     financingNote:
       "Make your filler treatment more accessible with financing from Afterpay, Cherry, or PatientFi. Apply in minutes with no impact to your credit score and enjoy flexible repayment terms.",
@@ -280,10 +280,10 @@ export const costPages: CostPage[] = [
       { item: "BioRePeel Back", price: "$575" },
     ],
     factors: [
-      "Type of peel — VI Peel, BioRePeel, and PRX T33 are different formulations with different ingredients, strengths, and price points.",
-      "Treatment area — face, neck, back, hands, underarms, and intimate areas each have specific pricing.",
-      "Skin concern being addressed — hyperpigmentation, acne, aging, or general rejuvenation may call for different peel types.",
-      "Series vs. single treatment — we offer 3-packs for VI Peel ($899) and BioRePeel ($949) for ongoing treatment plans.",
+      "Type of peel - VI Peel, BioRePeel, and PRX T33 are different formulations with different ingredients, strengths, and price points.",
+      "Treatment area - face, neck, back, hands, underarms, and intimate areas each have specific pricing.",
+      "Skin concern being addressed - hyperpigmentation, acne, aging, or general rejuvenation may call for different peel types.",
+      "Series vs. single treatment - we offer 3-packs for VI Peel ($899) and BioRePeel ($949) for ongoing treatment plans.",
     ],
     financingNote:
       "Invest in your skin with no financial stress. Afterpay, Cherry, and PatientFi offer flexible financing so you can start your chemical peel series today and pay over time.",
@@ -301,7 +301,7 @@ export const costPages: CostPage[] = [
       {
         question: "Is there downtime after a chemical peel?",
         answer:
-          "It depends on the peel. VI Peel involves 5-7 days of peeling. BioRePeel and PRX T33 are considered no-downtime peels — you can return to normal activities immediately, making them a great option for busy schedules.",
+          "It depends on the peel. VI Peel involves 5-7 days of peeling. BioRePeel and PRX T33 are considered no-downtime peels - you can return to normal activities immediately, making them a great option for busy schedules.",
       },
     ],
   },
@@ -316,7 +316,7 @@ export const costPages: CostPage[] = [
       "How much does BioRePeel cost? Face treatments start at $350 at Rani Beauty Clinic in Renton, WA. No downtime. See all treatment areas and 3-pack savings.",
     heroTitle: "How Much Does BioRePeel Cost?",
     intro:
-      "BioRePeel is a revolutionary no-downtime chemical peel that delivers dramatic skin rejuvenation. At Rani Beauty Clinic, BioRePeel face treatments start at $350. We offer treatments for multiple body areas and 3-pack series for clients who want ongoing skin renewal with maximum savings.",
+      "BioRePeel is an innovative no-downtime chemical peel that delivers dramatic skin rejuvenation. At Rani Beauty Clinic, BioRePeel face treatments start at $350. We offer treatments for multiple body areas and 3-pack series for clients who want ongoing skin renewal with maximum savings.",
     priceRanges: [
       { item: "BioRePeel Face", price: "$350" },
       { item: "BioRePeel Face & Neck", price: "$450" },
@@ -326,10 +326,10 @@ export const costPages: CostPage[] = [
       { item: "BioRePeel Back", price: "$575" },
     ],
     factors: [
-      "Treatment area — face, neck, hands, underarms, intimate area, and back each have different pricing based on size and complexity.",
-      "Number of sessions — a single treatment provides visible improvement, but a series of 3-4 yields the most significant and lasting results.",
-      "Combination with other treatments — BioRePeel pairs well with HydraFacial or RF microneedling for enhanced outcomes.",
-      "Skin condition severity — more pronounced pigmentation, acne, or texture concerns may benefit from additional sessions.",
+      "Treatment area - face, neck, hands, underarms, intimate area, and back each have different pricing based on size and complexity.",
+      "Number of sessions - a single treatment provides visible improvement, but a series of 3-4 yields the most significant and lasting results.",
+      "Combination with other treatments - BioRePeel pairs well with HydraFacial or RF microneedling for enhanced outcomes.",
+      "Skin condition severity - more pronounced pigmentation, acne, or texture concerns may benefit from additional sessions.",
     ],
     financingNote:
       "Make BioRePeel affordable with Afterpay, Cherry, or PatientFi financing. Apply in minutes and split your treatment cost into easy monthly payments with no credit score impact.",
@@ -337,7 +337,7 @@ export const costPages: CostPage[] = [
       {
         question: "What makes BioRePeel different from other peels?",
         answer:
-          "BioRePeel is a two-phase peel that combines 35% TCA with biostimulating ingredients. It delivers the results of a medium-depth peel with zero downtime — no visible peeling, redness, or social downtime required.",
+          "BioRePeel is a two-phase peel that combines 35% TCA with biostimulating ingredients. It delivers the results of a medium-depth peel with zero downtime - no visible peeling, redness, or social downtime required.",
       },
       {
         question: "How often should I get a BioRePeel?",
@@ -371,10 +371,10 @@ export const costPages: CostPage[] = [
       { item: "Full Face + Neck", price: "$3,999", note: "Most comprehensive treatment" },
     ],
     factors: [
-      "Treatment area — a targeted brow lift costs significantly less than a full face and neck treatment.",
-      "Severity of skin laxity — mild laxity may need only one session while moderate laxity may benefit from a combination approach.",
-      "Combination with other treatments — our Sofwave + RF Micro Combo ($4,499) pairs Sofwave with RF microneedling for enhanced skin tightening and texture improvement.",
-      "Maintenance schedule — most clients benefit from annual touch-up sessions to maintain their lifted results.",
+      "Treatment area - a targeted brow lift costs significantly less than a full face and neck treatment.",
+      "Severity of skin laxity - mild laxity may need only one session while moderate laxity may benefit from a combination approach.",
+      "Combination with other treatments - our Sofwave + RF Micro Combo ($4,499) pairs Sofwave with RF microneedling for enhanced skin tightening and texture improvement.",
+      "Maintenance schedule - most clients benefit from annual touch-up sessions to maintain their lifted results.",
     ],
     financingNote:
       "Sofwave is an investment in lasting skin tightening. Finance your treatment through Afterpay, Cherry, or PatientFi with flexible payment plans that make this premium treatment accessible.",
@@ -415,11 +415,11 @@ export const costPages: CostPage[] = [
       { item: "Acne Scar Treatment (Full Face)", price: "$750", note: "RF microneedling approach" },
     ],
     factors: [
-      "Type of scar — acne scars, surgical scars, and traumatic scars each respond to different treatment modalities.",
-      "Treatment modality — laser revision, RF microneedling, and combination therapies are priced based on the technology used.",
-      "Treatment area size — small isolated scars cost less than full-face acne scar treatments.",
-      "Number of sessions required — most scar reduction plans involve 3-6 treatments for optimal improvement.",
-      "Severity and depth of scarring — deeper or more widespread scarring may require more intensive and longer treatment series.",
+      "Type of scar - acne scars, surgical scars, and traumatic scars each respond to different treatment modalities.",
+      "Treatment modality - laser revision, RF microneedling, and combination therapies are priced based on the technology used.",
+      "Treatment area size - small isolated scars cost less than full-face acne scar treatments.",
+      "Number of sessions required - most scar reduction plans involve 3-6 treatments for optimal improvement.",
+      "Severity and depth of scarring - deeper or more widespread scarring may require more intensive and longer treatment series.",
     ],
     financingNote:
       "Scar reduction is an investment in your confidence. Afterpay, Cherry, and PatientFi offer financing options so you can begin your treatment plan without waiting.",
@@ -452,7 +452,7 @@ export const costPages: CostPage[] = [
       "How much does GLP-1 weight management cost? Programs start at $249/month at Rani Beauty Clinic in Renton, WA. Semaglutide, tirzepatide, and liraglutide options.",
     heroTitle: "How Much Does GLP-1 Weight Management Cost?",
     intro:
-      "GLP-1 weight management at Rani Beauty Clinic includes three medication options — liraglutide, semaglutide, and tirzepatide — with monthly costs ranging from $249 to $699 depending on the medication and dosage. All programs include physician oversight, body composition tracking, and in-house lab work for a comprehensive medical weight loss experience.",
+      "GLP-1 weight management at Rani Beauty Clinic includes three medication options - liraglutide, semaglutide, and tirzepatide - with monthly costs ranging from $249 to $699 depending on the medication and dosage. All programs include physician oversight, body composition tracking, and in-house lab work for a comprehensive medical weight loss experience.",
     priceRanges: [
       { item: "Liraglutide (Month 1-2)", price: "$249/month" },
       { item: "Semaglutide (Month 1)", price: "$349/month", note: "Starting dose 0.25mg/wk" },
@@ -462,11 +462,11 @@ export const costPages: CostPage[] = [
       { item: "Slim Start Package (3 months)", price: "$799", note: "Liraglutide + B12 + labs" },
     ],
     factors: [
-      "Medication type — liraglutide is the most affordable starting option, while tirzepatide is the most potent and highest-priced.",
-      "Dosage escalation — GLP-1 medications use a gradual dose increase schedule, so monthly costs typically increase over the first few months.",
-      "Program duration — most clients are on GLP-1 therapy for 6-12 months, with maintenance plans available afterward.",
-      "Included services — packages bundle labs, B12 injections, lipo shots, and body composition analysis for better value.",
-      "Lab work — starter labs ($199) and quarterly monitoring ($99) are essential components factored into your total investment.",
+      "Medication type - liraglutide is the most affordable starting option, while tirzepatide is the most potent and highest-priced.",
+      "Dosage escalation - GLP-1 medications use a gradual dose increase schedule, so monthly costs typically increase over the first few months.",
+      "Program duration - most clients are on GLP-1 therapy for 6-12 months, with maintenance plans available afterward.",
+      "Included services - packages bundle labs, B12 injections, lipo shots, and body composition analysis for better value.",
+      "Lab work - starter labs ($199) and quarterly monitoring ($99) are essential components factored into your total investment.",
     ],
     financingNote:
       "Start your weight loss journey today with financing through Afterpay, Cherry, or PatientFi. Our team can help you find a payment plan that fits your budget and timeline.",
@@ -474,7 +474,7 @@ export const costPages: CostPage[] = [
       {
         question: "What is the cheapest GLP-1 option?",
         answer:
-          "Liraglutide is our most affordable GLP-1 medication starting at $249/month. Our Slim Start Package at $799 includes 3 months of liraglutide plus B12 shots, body composition analysis, and starter labs — the best value for getting started.",
+          "Liraglutide is our most affordable GLP-1 medication starting at $249/month. Our Slim Start Package at $799 includes 3 months of liraglutide plus B12 shots, body composition analysis, and starter labs - the best value for getting started.",
       },
       {
         question: "Does insurance cover GLP-1 medications?",
@@ -514,10 +514,10 @@ export const costPages: CostPage[] = [
       { item: "Transform Package (3 months)", price: "$1,199", note: "Semaglutide + lipo shots + consults + labs" },
     ],
     factors: [
-      "Dosage level — semaglutide uses a gradual escalation from 0.25mg to 2.4mg per week, with costs increasing at each tier.",
-      "Treatment duration — most clients stay on semaglutide for 6-12 months, so total investment depends on how long you need to reach your goal weight.",
-      "Package vs. month-to-month — the Transform Package provides 3 months of semaglutide plus extras at a lower per-month cost.",
-      "Supplemental treatments — B12 injections ($25/shot) and lipo-B shots ($35/shot) are often recommended alongside semaglutide for enhanced energy and metabolism.",
+      "Dosage level - semaglutide uses a gradual escalation from 0.25mg to 2.4mg per week, with costs increasing at each tier.",
+      "Treatment duration - most clients stay on semaglutide for 6-12 months, so total investment depends on how long you need to reach your goal weight.",
+      "Package vs. month-to-month - the Transform Package provides 3 months of semaglutide plus extras at a lower per-month cost.",
+      "Supplemental treatments - B12 injections ($25/shot) and lipo-B shots ($35/shot) are often recommended alongside semaglutide for enhanced energy and metabolism.",
     ],
     financingNote:
       "Finance your semaglutide treatment with Afterpay, Cherry, or PatientFi. Flexible monthly payment plans make it easy to invest in your health without financial strain.",
@@ -560,10 +560,10 @@ export const costPages: CostPage[] = [
       { item: "Ultimate Package (3 months)", price: "$1,499", note: "Tirzepatide + lipo + B12 + body comp + labs" },
     ],
     factors: [
-      "Dosage escalation — tirzepatide starts at 2.5mg weekly and can increase up to 15mg, with pricing reflecting the higher medication volume at each tier.",
-      "Duration of treatment — most clients are on tirzepatide for 6-12 months depending on their weight loss goals and response to treatment.",
-      "Package selection — the Ultimate Package saves money versus month-to-month pricing by bundling medication with essential services.",
-      "Supplemental treatments — lipo-B shots, B12 injections, and peptide add-ons can enhance your results and are available at additional cost.",
+      "Dosage escalation - tirzepatide starts at 2.5mg weekly and can increase up to 15mg, with pricing reflecting the higher medication volume at each tier.",
+      "Duration of treatment - most clients are on tirzepatide for 6-12 months depending on their weight loss goals and response to treatment.",
+      "Package selection - the Ultimate Package saves money versus month-to-month pricing by bundling medication with essential services.",
+      "Supplemental treatments - lipo-B shots, B12 injections, and peptide add-ons can enhance your results and are available at additional cost.",
     ],
     financingNote:
       "Invest in your health with financing through Afterpay, Cherry, or PatientFi. Break your tirzepatide program into affordable monthly payments and start your transformation today.",
@@ -605,11 +605,11 @@ export const costPages: CostPage[] = [
       { item: "Glutathione Injections", price: "$49/shot", note: "Master antioxidant" },
     ],
     factors: [
-      "Specific peptide selected — each peptide targets different wellness goals (anti-aging, healing, sexual health, body composition) and is priced accordingly.",
-      "Treatment protocol — some peptides are used daily while others are administered on a specific schedule, affecting the monthly supply needed.",
-      "Duration of therapy — peptide protocols typically run 3-6 months for meaningful results, with some patients continuing long-term for maintenance.",
-      "Combination protocols — stacking multiple peptides for synergistic effects increases the monthly investment but can accelerate results.",
-      "Lab monitoring — periodic blood work may be recommended to track biomarkers and optimize your peptide protocol.",
+      "Specific peptide selected - each peptide targets different wellness goals (anti-aging, healing, sexual health, body composition) and is priced accordingly.",
+      "Treatment protocol - some peptides are used daily while others are administered on a specific schedule, affecting the monthly supply needed.",
+      "Duration of therapy - peptide protocols typically run 3-6 months for meaningful results, with some patients continuing long-term for maintenance.",
+      "Combination protocols - stacking multiple peptides for synergistic effects increases the monthly investment but can accelerate results.",
+      "Lab monitoring - periodic blood work may be recommended to track biomarkers and optimize your peptide protocol.",
     ],
     financingNote:
       "Explore peptide therapy with flexible financing from Afterpay, Cherry, or PatientFi. Monthly payment plans make it easy to start your peptide protocol without delay.",
@@ -646,14 +646,14 @@ export const costPages: CostPage[] = [
     priceRanges: [
       { item: "NAD+ Injection (SubQ)", price: "$149/shot", note: "Brain health, energy, anti-aging" },
       { item: "NAD+ Weekly Protocol (4 shots/month)", price: "$596/month", note: "Estimated for weekly sessions" },
-      { item: "Glutathione Add-On", price: "$49/shot", note: "Master antioxidant — pairs well with NAD+" },
+      { item: "Glutathione Add-On", price: "$49/shot", note: "Master antioxidant - pairs well with NAD+" },
       { item: "Vitamin B12 Add-On", price: "$25/shot" },
     ],
     factors: [
-      "Frequency of injections — weekly sessions provide the most consistent benefits, while biweekly or monthly sessions offer maintenance-level support.",
-      "Treatment goals — clients seeking anti-aging benefits may opt for ongoing protocols, while those addressing fatigue may use shorter-term series.",
-      "Combination with other injections — adding glutathione or B12 to your NAD+ session enhances the overall wellness benefit at a modest additional cost.",
-      "Protocol duration — NAD+ benefits accumulate over time, so longer protocols typically deliver more noticeable results.",
+      "Frequency of injections - weekly sessions provide the most consistent benefits, while biweekly or monthly sessions offer maintenance-level support.",
+      "Treatment goals - clients seeking anti-aging benefits may opt for ongoing protocols, while those addressing fatigue may use shorter-term series.",
+      "Combination with other injections - adding glutathione or B12 to your NAD+ session enhances the overall wellness benefit at a modest additional cost.",
+      "Protocol duration - NAD+ benefits accumulate over time, so longer protocols typically deliver more noticeable results.",
     ],
     financingNote:
       "Invest in your cellular health with flexible financing through Afterpay, Cherry, or PatientFi. Monthly payment plans make regular NAD+ sessions affordable and accessible.",
@@ -696,11 +696,11 @@ export const costPages: CostPage[] = [
       { item: "HRT Launch Package", price: "$449", note: "Consult + full panel labs + 1st month meds" },
     ],
     factors: [
-      "Type of hormone protocol — comprehensive HRT (estradiol, testosterone, thyroid) costs more than single-hormone supplementation (DHEA, pregnenolone).",
-      "Medication dosage — your specific dose is determined by lab results and may be adjusted over time, potentially affecting monthly cost.",
-      "Lab monitoring requirements — starter panels ($249) and quarterly monitoring ($119) are essential for safe HRT management.",
-      "Treatment duration — most HRT patients remain on therapy long-term, making monthly cost an important consideration.",
-      "Compounding pharmacy — we use Olympia compounding pharmacy for high-quality, custom-dosed medications.",
+      "Type of hormone protocol - comprehensive HRT (estradiol, testosterone, thyroid) costs more than single-hormone supplementation (DHEA, pregnenolone).",
+      "Medication dosage - your specific dose is determined by lab results and may be adjusted over time, potentially affecting monthly cost.",
+      "Lab monitoring requirements - starter panels ($249) and quarterly monitoring ($119) are essential for safe HRT management.",
+      "Treatment duration - most HRT patients remain on therapy long-term, making monthly cost an important consideration.",
+      "Compounding pharmacy - we use Olympia compounding pharmacy for high-quality, custom-dosed medications.",
     ],
     financingNote:
       "Begin your hormone optimization journey with financing from Afterpay, Cherry, or PatientFi. Flexible payment plans help you cover initial labs and the first months of treatment.",
@@ -747,10 +747,10 @@ export const costPages: CostPage[] = [
       { item: "DHEA Add-On", price: "$49-$99/month" },
     ],
     factors: [
-      "Testosterone dosage — your specific dose is based on your lab results and symptoms, and may be adjusted to optimize your levels.",
-      "Lab requirements — starter panels and quarterly monitoring are essential components that factor into your total annual investment.",
-      "Supplemental medications — some TRT protocols include ancillary medications like anastrozole or HCG, which may carry additional cost.",
-      "Treatment duration — TRT is typically a long-term commitment, and most men continue therapy indefinitely to maintain benefits.",
+      "Testosterone dosage - your specific dose is based on your lab results and symptoms, and may be adjusted to optimize your levels.",
+      "Lab requirements - starter panels and quarterly monitoring are essential components that factor into your total annual investment.",
+      "Supplemental medications - some TRT protocols include ancillary medications like anastrozole or HCG, which may carry additional cost.",
+      "Treatment duration - TRT is typically a long-term commitment, and most men continue therapy indefinitely to maintain benefits.",
     ],
     financingNote:
       "Start TRT with flexible financing through Afterpay, Cherry, or PatientFi. Spread your initial startup costs across manageable monthly payments.",
@@ -797,10 +797,10 @@ export const costPages: CostPage[] = [
       { item: "NAD+ Injection (SubQ)", price: "$149/shot", note: "Cellular energy and anti-aging" },
     ],
     factors: [
-      "Type of injection — basic B12 is the most affordable, while specialty injections like glutathione and NAD+ are priced higher due to the cost of the compounds.",
-      "Frequency of treatments — weekly injections cost more per month than monthly boosters, but provide more consistent benefits.",
-      "Bundling with other services — vitamin injections are often added to GLP-1 programs, HRT visits, or facial appointments at a discounted rate when bundled.",
-      "Wellness goals — clients seeking energy support may need B12 only, while those focused on anti-aging or detoxification may opt for glutathione or NAD+.",
+      "Type of injection - basic B12 is the most affordable, while specialty injections like glutathione and NAD+ are priced higher due to the cost of the compounds.",
+      "Frequency of treatments - weekly injections cost more per month than monthly boosters, but provide more consistent benefits.",
+      "Bundling with other services - vitamin injections are often added to GLP-1 programs, HRT visits, or facial appointments at a discounted rate when bundled.",
+      "Wellness goals - clients seeking energy support may need B12 only, while those focused on anti-aging or detoxification may opt for glutathione or NAD+.",
     ],
     financingNote:
       "Vitamin injections are affordable enough to pay per visit, but if you are combining them with other treatments, Afterpay, Cherry, and PatientFi financing can help manage the total cost.",
@@ -843,11 +843,11 @@ export const costPages: CostPage[] = [
       { item: "Comprehensive Hormone Panel", price: "$199" },
     ],
     factors: [
-      "Number of tests ordered — individual markers are more affordable, while comprehensive panels bundle multiple tests at a better per-test value.",
-      "Purpose of lab work — GLP-1 starter labs ($199), HRT starter panels ($249), and wellness screenings ($149) are priced as packages for specific programs.",
-      "Frequency of monitoring — quarterly monitoring labs ($99-$119) are less expensive than comprehensive starter panels because they test fewer markers.",
-      "Add-on tests — specialty markers like IGF-1 ($79), DHEA-S ($59), or PSA ($49) can be added to any panel at their individual price.",
-      "In-house convenience — our blood draw fee is $25 per visit, and results are typically available within a few business days.",
+      "Number of tests ordered - individual markers are more affordable, while comprehensive panels bundle multiple tests at a better per-test value.",
+      "Purpose of lab work - GLP-1 starter labs ($199), HRT starter panels ($249), and wellness screenings ($149) are priced as packages for specific programs.",
+      "Frequency of monitoring - quarterly monitoring labs ($99-$119) are less expensive than comprehensive starter panels because they test fewer markers.",
+      "Add-on tests - specialty markers like IGF-1 ($79), DHEA-S ($59), or PSA ($49) can be added to any panel at their individual price.",
+      "In-house convenience - our blood draw fee is $25 per visit, and results are typically available within a few business days.",
     ],
     financingNote:
       "Lab work is often bundled into our treatment packages at a discounted rate. For standalone labs, Afterpay, Cherry, and PatientFi financing options are available to help cover the cost.",

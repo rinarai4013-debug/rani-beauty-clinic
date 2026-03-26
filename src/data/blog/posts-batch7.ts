@@ -32,7 +32,7 @@ Four: Loose skin does not always tighten on its own. Many patients assume that o
 
 Five: There are effective treatments, but timing matters. Non-surgical skin tightening treatments like Sofwave and radiofrequency microneedling can meaningfully improve post-weight-loss skin changes. But these treatments are most effective when started within the first year after weight stabilization, before the skin fully adapts to its lax state. The sooner you address skin concerns after reaching your goal weight, the better the outcomes tend to be.
 
-At Rani Beauty Clinic in Renton, we specialize in helping GLP-1 patients navigate the skin changes that follow weight loss. Our Reveal protocol was designed specifically for this population, addressing the unique combination of volume loss, collagen depletion, and skin laxity that GLP-1 patients experience. If your weight loss doctor did not prepare you for these changes, we are here to help you address them. Schedule a Reveal Assessment to get started.`,
+At Rani Beauty Clinic in Renton, we specialize in helping GLP-1 patients manage the skin changes that follow weight loss. Our Reveal protocol was designed specifically for this population, addressing the unique combination of volume loss, collagen depletion, and skin laxity that GLP-1 patients experience. If your weight loss doctor did not prepare you for these changes, we are here to help you address them. Schedule a Reveal Assessment to get started.`,
     faqs: [
       {
         question: "Should I tell my weight loss doctor about my skin concerns?",

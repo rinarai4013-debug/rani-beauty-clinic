@@ -15,7 +15,7 @@ interface BodyZone {
   labelY: number;
 }
 
-// Front-view body silhouette zones — SVG path data for each tappable area
+// Front-view body silhouette zones - SVG path data for each tappable area
 const BODY_ZONES: BodyZone[] = [
   {
     id: 'face',
@@ -55,7 +55,7 @@ const BODY_ZONES: BodyZone[] = [
   {
     id: 'back',
     label: 'Back',
-    // Represented as a subtle overlay on the torso (conceptual — front view hint)
+    // Represented as a subtle overlay on the torso (conceptual - front view hint)
     path: 'M75,65 L82,62 L82,68 L75,72 Z M125,65 L118,62 L118,68 L125,72 Z',
     labelX: 158,
     labelY: 81,
@@ -138,7 +138,7 @@ export default function BodyMapPicker({
                 style={{ cursor: 'pointer' }}
               />
 
-              {/* Label — only visible when selected */}
+              {/* Label - only visible when selected */}
               {isSelected && (
                 <g>
                   <rect

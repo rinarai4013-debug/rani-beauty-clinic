@@ -91,7 +91,7 @@ function CompetitorIntelContent() {
       <div className="space-y-6 sm:space-y-8">
         <div>
           <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Competitor Intelligence</h1>
-          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Automated competitive landscape monitoring</p>
+          <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Automated competitive intelligence monitoring</p>
         </div>
 
         {/* How It Works */}
@@ -132,7 +132,7 @@ function CompetitorIntelContent() {
       {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Competitor Intelligence</h1>
-        <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Automated competitive landscape monitoring</p>
+        <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">Automated competitive intelligence monitoring</p>
       </div>
 
       {/* Hero KPIs */}
@@ -161,7 +161,7 @@ function CompetitorIntelContent() {
             <div>
               <h3 className="text-xs sm:text-sm font-body font-semibold text-rani-gold">Weekly Competitive Scan</h3>
               <p className="text-xs font-body text-white/70 mt-0.5">
-                Automated via n8n workflow — runs every Monday at 6 AM
+                Automated via n8n workflow - runs every Monday at 6 AM
               </p>
             </div>
           </div>
@@ -231,7 +231,7 @@ function CompetitorIntelContent() {
                     <td className="py-3 px-2 sm:px-3 text-right text-rani-muted text-xs hidden lg:table-cell">
                       {comp.lastScanDate
                         ? new Date(comp.lastScanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                        : '—'}
+                        : ' - '}
                     </td>
                   </motion.tr>
                 );
@@ -241,7 +241,7 @@ function CompetitorIntelContent() {
         </div>
       </div>
 
-      {/* Notes Section — show any entries with notes */}
+      {/* Notes Section - show any entries with notes */}
       {competitors.some(c => c.notes) && (
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-4 sm:p-5">
           <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider mb-4">
@@ -261,7 +261,7 @@ function CompetitorIntelContent() {
                   <Eye className="w-4 h-4 text-rani-gold flex-shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-xs font-body font-semibold text-rani-navy">
-                      {comp.competitorName} — {comp.serviceMonitored}
+                      {comp.competitorName} - {comp.serviceMonitored}
                     </p>
                     <p className="text-xs font-body text-rani-muted mt-1">{comp.notes}</p>
                   </div>

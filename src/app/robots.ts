@@ -3,7 +3,7 @@ import { MetadataRoute } from "next";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // ── AI Crawlers — explicitly allowed for AI citation visibility ──
+      // ── AI Crawlers - explicitly allowed for AI citation visibility ──
       {
         userAgent: "GPTBot",
         allow: "/",
@@ -54,7 +54,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/dashboard/", "/_next/"],
       },
-      // ── Default — all other crawlers ──
+      // ── Default - all other crawlers ──
       {
         userAgent: "*",
         allow: "/",
@@ -62,7 +62,7 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/dashboard/",
           "/_next/",
-          // WordPress artifact paths — save crawl budget
+          // WordPress artifact paths - save crawl budget
           "/wp-admin/",
           "/wp-content/",
           "/wp-includes/",

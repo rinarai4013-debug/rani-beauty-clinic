@@ -114,7 +114,7 @@ export default function AddLeadPage() {
         <FormField label="Lead Source" required>
           <FormSelect options={SOURCES} placeholder="Select source..." value={source} onChange={e => setSource(e.target.value)} required />
         </FormField>
-        <FormField label="Campaign" hint="Optional — ad campaign name">
+        <FormField label="Campaign" hint="Optional - ad campaign name">
           <FormInput placeholder="e.g. Spring GLP-1 Promo" value={campaign} onChange={e => setCampaign(e.target.value)} />
         </FormField>
       </div>

@@ -145,7 +145,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
     title: 'HydraFacial Treatment Protocol',
     content: `HydraFacial uses patented Vortex-Fusion technology for a multi-step treatment.
 
-    Steps: 1) Cleanse + Peel — gentle exfoliation using hydradermabrasion tip, 2) Extract + Hydrate — painless suction removes debris from pores while delivering moisturizing serums, 3) Fuse + Protect — antioxidants and peptides are infused to maximize glow.
+    Steps: 1) Cleanse + Peel - gentle exfoliation using hydradermabrasion tip, 2) Extract + Hydrate - painless suction removes debris from pores while delivering moisturizing serums, 3) Fuse + Protect - antioxidants and peptides are infused to maximize glow.
 
     Duration: 30-45 minutes for signature facial. 60 minutes with boosters.
 
@@ -213,7 +213,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
 
     Pricing: $499/month includes medication, physician oversight, monthly monitoring. $399/month for members. Lab work additional if needed.
 
-    IMPORTANT: This is a medical program requiring physician oversight. All injections are IM (intramuscular) — never use the word "infusion."`,
+    IMPORTANT: This is a medical program requiring physician oversight. All injections are IM (intramuscular) - never use the word "infusion."`,
     category: 'treatment_protocol',
     service: 'GLP-1',
     tags: ['weight-loss', 'semaglutide', 'medical', 'physician', 'monthly-program'],
@@ -227,13 +227,13 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'after-botox',
     title: 'Botox Aftercare Instructions',
-    content: `Post-Botox Instructions — Rani Beauty Clinic
+    content: `Post-Botox Instructions - Rani Beauty Clinic
 
     First 4 hours: Stay upright, do not lie down. Avoid touching, rubbing, or massaging treated areas. Gently exercise facial muscles (frown, raise eyebrows, squint) to help product settle into muscles.
 
     First 24 hours: Avoid strenuous exercise, alcohol, blood thinners (aspirin, ibuprofen), hot tubs, saunas, and facials. Do not wear hats or headbands that press on treated areas.
 
-    First 2 weeks: Avoid dental work if possible (especially jaw/masseter treatments). No facial massages or treatments. Mild bruising or swelling is normal — use cold compress if needed.
+    First 2 weeks: Avoid dental work if possible (especially jaw/masseter treatments). No facial massages or treatments. Mild bruising or swelling is normal - use cold compress if needed.
 
     When to call us: Severe headache that doesn't resolve with Tylenol, difficulty swallowing or breathing (rare), significant asymmetry after 2 weeks, drooping eyelid (ptosis).
 
@@ -249,13 +249,13 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'after-laser',
     title: 'Laser Hair Removal Aftercare',
-    content: `Post-Laser Hair Removal Instructions — Rani Beauty Clinic (GentleMax Pro Plus)
+    content: `Post-Laser Hair Removal Instructions - Rani Beauty Clinic (GentleMax Pro Plus)
 
     Immediately after: Mild redness and warmth is normal (like mild sunburn). Apply provided aloe vera gel to treated areas.
 
     First 24-48 hours: Avoid hot showers, saunas, steam rooms, and hot tubs. No strenuous exercise. Do not apply makeup or deodorant to treated areas. Wear loose, breathable clothing.
 
-    First 2 weeks: Apply SPF 50+ sunscreen daily to treated areas (even if under clothing and UV exposure is limited). Avoid direct sun exposure. Do not wax, tweeze, or pluck hairs — shaving is OK. Exfoliate gently starting day 5 to help shedding.
+    First 2 weeks: Apply SPF 50+ sunscreen daily to treated areas (even if under clothing and UV exposure is limited). Avoid direct sun exposure. Do not wax, tweeze, or pluck hairs - shaving is OK. Exfoliate gently starting day 5 to help shedding.
 
     Hair shedding: Treated hairs will fall out over 1-3 weeks. This is normal and a sign the treatment is working. Avoid picking or pulling at hairs.
 
@@ -275,7 +275,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'faq-general',
     title: 'General Clinic FAQs',
-    content: `Frequently Asked Questions — Rani Beauty Clinic
+    content: `Frequently Asked Questions - Rani Beauty Clinic
 
     Q: Where is Rani Beauty Clinic located?
     A: We are located at 401 Olympia Ave NE, Suite 101, Renton, WA 98056. We serve clients from Renton, Bellevue, Seattle, Kent, Auburn, and surrounding areas.
@@ -310,7 +310,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'faq-safety',
     title: 'Safety & Contraindication FAQs',
-    content: `Safety FAQs — Rani Beauty Clinic
+    content: `Safety FAQs - Rani Beauty Clinic
 
     Q: Is Botox safe?
     A: Yes, Botox has been FDA-approved since 2002 and has an excellent safety profile. Side effects are typically minor and temporary (mild bruising, headache). Serious complications are extremely rare when administered by a trained professional.
@@ -338,7 +338,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'policy-cancel',
     title: 'Cancellation & No-Show Policy',
-    content: `Rani Beauty Clinic — Cancellation Policy
+    content: `Rani Beauty Clinic - Cancellation Policy
 
     We require 24-hour notice for all cancellations and rescheduling. Late cancellations (less than 24 hours) are subject to a $50 fee. No-shows will be charged 50% of the scheduled service cost.
 
@@ -359,7 +359,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'policy-consent',
     title: 'Informed Consent & Privacy Policy',
-    content: `Rani Beauty Clinic — Consent & Privacy
+    content: `Rani Beauty Clinic - Consent & Privacy
 
     All clients must complete our digital intake form (via Typeform) before their first appointment. This includes medical history, treatment consent, photo consent, and privacy acknowledgment.
 
@@ -380,7 +380,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'product-skincare',
     title: 'Rx Skincare Products',
-    content: `Rani Beauty Clinic — Prescription Skincare
+    content: `Rani Beauty Clinic - Prescription Skincare
 
     Tretinoin (Rx): $99/month subscription. Available in 0.025%, 0.05%, and 0.1% concentrations. Gold standard for anti-aging, acne, and skin texture. Physician prescribed based on skin assessment.
 
@@ -405,7 +405,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
   {
     id: 'proto-wellness',
     title: 'Wellness Injection Protocols',
-    content: `Rani Beauty Clinic — Wellness Injection Menu
+    content: `Rani Beauty Clinic - Wellness Injection Menu
 
     All wellness injections are IM (intramuscular). NEVER use the word "infusion."
 
@@ -731,7 +731,7 @@ export async function searchPinecone(
 
   const queryEmbedding = await generateEmbedding(query);
   if (!queryEmbedding) {
-    throw new Error('Cannot generate query embedding — VOYAGE_API_KEY or OPENAI_API_KEY not set');
+    throw new Error('Cannot generate query embedding - VOYAGE_API_KEY or OPENAI_API_KEY not set');
   }
 
   const { Pinecone } = await import('@pinecone-database/pinecone');
@@ -825,7 +825,7 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
   const openaiApiKey = process.env.OPENAI_API_KEY;
 
   if (!voyageApiKey && !openaiApiKey) {
-    console.warn('[RAG] No VOYAGE_API_KEY or OPENAI_API_KEY set — cannot generate embeddings. Falling back to keyword search.');
+    console.warn('[RAG] No VOYAGE_API_KEY or OPENAI_API_KEY set - cannot generate embeddings. Falling back to keyword search.');
     return null;
   }
 
@@ -882,7 +882,7 @@ function detectKnowledgeGaps(docs: KnowledgeDocument[]): KnowledgeGap[] {
     for (const cat of required) {
       if (!existingCategories.has(cat)) {
         gaps.push({
-          area: `${service} — ${cat.replace('_', ' ')}`,
+          area: `${service} - ${cat.replace('_', ' ')}`,
           description: `Missing ${cat.replace('_', ' ')} documentation for ${service}`,
           priority: ['treatment_protocol', 'contraindication', 'aftercare'].includes(cat) ? 'high' : 'medium',
           suggestedAction: `Create ${cat.replace('_', ' ')} document for ${service} treatment`,

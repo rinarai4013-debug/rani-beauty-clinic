@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const recordId = await createRecord(Tables.alerts(), {
       'Type': 'Custom',
       'Severity': 'INFO',
-      'Message': `[Inventory ${adjustmentType}] ${itemName}${sku ? ` (${sku})` : ''} — ${quantity} units | ${category} | ${reason}`,
+      'Message': `[Inventory ${adjustmentType}] ${itemName}${sku ? ` (${sku})` : ''} - ${quantity} units | ${category} | ${reason}`,
       'Action Recommended': body.notes || '',
       'Status': 'Active',
       'Created Date': new Date().toISOString(),

@@ -37,7 +37,7 @@ export function serializeToPlanData(state: BuilderState): PlanData {
     const sessions = svc.quantity * svc.service.sessions;
     const total = svc.service.price * sessions;
     costLines.push(
-      `${svc.service.name} — ${sessions} session${sessions > 1 ? 's' : ''} × $${svc.service.price} = $${total.toLocaleString()}`
+      `${svc.service.name} - ${sessions} session${sessions > 1 ? 's' : ''} × $${svc.service.price} = $${total.toLocaleString()}`
     );
   }
   costLines.push('');

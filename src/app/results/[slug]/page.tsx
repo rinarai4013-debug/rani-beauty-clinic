@@ -36,7 +36,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: page.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/results/${params.slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${page.metaTitle} — Rani Beauty Clinic` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${page.metaTitle} - Rani Beauty Clinic` }],
     },
   };
 }
@@ -149,7 +149,7 @@ export default function GalleryPage({ params }: PageProps) {
                 <div className="aspect-square overflow-hidden rounded-xl border border-rani-gold/10 bg-white">
                   <Image
                     src={src}
-                    alt={`${page.title} patient transformation result ${i + 1} — Rani Beauty Clinic`}
+                    alt={`${page.title} patient transformation result ${i + 1} - Rani Beauty Clinic`}
                     loading="lazy"
                     width={600}
                     height={600}

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     const n8nUrl = process.env.N8N_WEBHOOK_URL;
     if (!n8nUrl) {
-      console.warn('N8N_WEBHOOK_URL not configured — skipping webhook');
+      console.warn('N8N_WEBHOOK_URL not configured - skipping webhook');
       return NextResponse.json({ success: true, message: 'Reminder logged (webhook not configured)' });
     }
 

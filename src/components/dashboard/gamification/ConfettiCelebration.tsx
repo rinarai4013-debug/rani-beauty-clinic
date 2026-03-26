@@ -26,7 +26,7 @@ export function useConfetti() {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#C9A96E', '#F3D6BE', '#FAF8F5'] });
         break;
       case 'levelup': {
-        // Big celebration — multiple bursts
+        // Big celebration - multiple bursts
         const duration = 2000;
         const end = Date.now() + duration;
         const frame = () => {
@@ -38,7 +38,7 @@ export function useConfetti() {
         break;
       }
       case 'boss': {
-        // Massive explosion — fireworks style
+        // Massive explosion - fireworks style
         const count = 200;
         confetti({ particleCount: count, spread: 100, origin: { y: 0.6 }, colors: ['#C9A96E', '#0F1D2C', '#F3D6BE', '#FFD700'] });
         setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.5, x: 0.3 }, colors: ['#FFD700', '#C9A96E'] }), 300);

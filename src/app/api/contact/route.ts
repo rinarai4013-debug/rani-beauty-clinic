@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: ContactFormData = await request.json();
 
-    // Honeypot check — if this hidden field has a value, it was filled by a bot
+    // Honeypot check - if this hidden field has a value, it was filled by a bot
     if (body.honeypot) {
       // Return success to the bot so it thinks it worked, but do nothing
       return NextResponse.json(
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         from: FROM_EMAIL,
         to: CLINIC_EMAIL,
         replyTo: sanitizedData.email,
-        subject: `New Consultation Request — ${sanitizedData.service}`,
+        subject: `New Consultation Request - ${sanitizedData.service}`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background-color: #0F1D2C; padding: 24px; text-align: center;">

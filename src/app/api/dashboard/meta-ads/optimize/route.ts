@@ -169,7 +169,7 @@ export async function GET() {
 
     // If Meta API not configured or returned no data, return a graceful "not configured" response
     if (!metaApiAvailable || campaigns.length === 0) {
-      // Return an analysis with empty campaigns — engine will produce baseline recommendations
+      // Return an analysis with empty campaigns - engine will produce baseline recommendations
       const fallbackInput: MetaAdsInput = {
         campaigns: [],
         adSets: [],

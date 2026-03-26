@@ -1,5 +1,5 @@
 /**
- * Consultation Wizard — Conditional Logic
+ * Consultation Wizard - Conditional Logic
  *
  * Pure functions that determine which follow-up questions to show
  * based on the user's selections. No side effects, no state.
@@ -122,9 +122,9 @@ export function getFollowUpQuestions(
       question: 'How would you describe your acne?',
       type: 'select',
       options: [
-        { value: 'mild', label: 'Mild — occasional breakouts' },
-        { value: 'moderate', label: 'Moderate — regular breakouts, some scarring' },
-        { value: 'severe', label: 'Severe — persistent, cystic, or widespread' },
+        { value: 'mild', label: 'Mild - occasional breakouts' },
+        { value: 'moderate', label: 'Moderate - regular breakouts, some scarring' },
+        { value: 'severe', label: 'Severe - persistent, cystic, or widespread' },
       ],
       required: true,
     });
@@ -180,9 +180,9 @@ export function getFollowUpQuestions(
       type: 'select',
       options: [
         { value: 'never', label: 'No, this would be my first time' },
-        { value: 'botox-only', label: 'Yes — Botox/neurotoxin only' },
-        { value: 'fillers-only', label: 'Yes — dermal fillers only' },
-        { value: 'both', label: 'Yes — both Botox and fillers' },
+        { value: 'botox-only', label: 'Yes - Botox/neurotoxin only' },
+        { value: 'fillers-only', label: 'Yes - dermal fillers only' },
+        { value: 'both', label: 'Yes - both Botox and fillers' },
       ],
       required: true,
     });
@@ -201,8 +201,8 @@ export function getFollowUpQuestions(
       question: 'What is your weight management goal?',
       type: 'select',
       options: [
-        { value: 'lose-10-20', label: 'Lose 10–20 lbs' },
-        { value: 'lose-20-40', label: 'Lose 20–40 lbs' },
+        { value: 'lose-10-20', label: 'Lose 10-20 lbs' },
+        { value: 'lose-20-40', label: 'Lose 20-40 lbs' },
         { value: 'lose-40-plus', label: 'Lose 40+ lbs' },
         { value: 'maintain', label: 'Maintain current weight' },
         { value: 'body-recomp', label: 'Body recomposition (tone & tighten)' },
@@ -235,7 +235,7 @@ export function getFollowUpQuestions(
     });
   }
 
-  // Hair removal — ask about skin tone for laser safety
+  // Hair removal - ask about skin tone for laser safety
   if (concerns.includes('unwanted-hair')) {
     questions.push({
       id: 'fitzpatrickType',

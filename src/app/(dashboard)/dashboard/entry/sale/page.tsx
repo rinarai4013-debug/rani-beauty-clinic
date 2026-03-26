@@ -99,7 +99,7 @@ export default function ManualSalePage() {
       </FormField>
 
       <FormField label="Service" required>
-        <FormInput placeholder="e.g. RF Microneedling Full Face — 3 Session Package" value={service} onChange={e => setService(e.target.value)} required />
+        <FormInput placeholder="e.g. RF Microneedling Full Face - 3 Session Package" value={service} onChange={e => setService(e.target.value)} required />
       </FormField>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -130,7 +130,7 @@ export default function ManualSalePage() {
         <FormTextarea placeholder="Any additional details..." value={notes} onChange={e => setNotes(e.target.value)} />
       </FormField>
 
-      {/* Bank feed matching — matches deposits */}
+      {/* Bank feed matching - matches deposits */}
       {parseFloat(amount) > 0 && (
         <BankMatchSuggestion
           amount={parseFloat(amount)}

@@ -380,7 +380,7 @@ export const variationImages: Record<string, ServiceImageEntry> = {
     category: "body",
   },
 
-  // ─── Peptide Therapy Variations (ARCHIVED — pending FDA reclassification) ───
+  // ─── Peptide Therapy Variations (ARCHIVED - pending FDA reclassification) ───
 
   // ─── GLP-1 Weight Management Variations ─────────────────────
   "glp1-weight-management/semaglutide": {

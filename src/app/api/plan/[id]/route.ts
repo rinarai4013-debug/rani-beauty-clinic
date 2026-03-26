@@ -205,7 +205,7 @@ export async function GET(
       return val.split(',').map((s) => s.trim()).filter(Boolean);
     };
 
-    // Only expose what the client needs — NO email, NO phone in response
+    // Only expose what the client needs - NO email, NO phone in response
     const plan = {
       id: intakeRecord.id,
       clientName: fullName,

@@ -11,7 +11,7 @@ export function SkeletonBar({ className = '' }: { className?: string }) {
   );
 }
 
-/** KPI Card skeleton – matches KPICard hero/standard sizing */
+/** KPI Card skeleton - matches KPICard hero/standard sizing */
 export function KPICardSkeleton({ size = 'hero' }: { size?: 'hero' | 'standard' | 'compact' }) {
   const pad = size === 'hero' ? 'p-6' : size === 'standard' ? 'p-5' : 'p-4';
   return (
@@ -138,7 +138,7 @@ export function ChartSkeleton({ className = '' }: { className?: string }) {
   );
 }
 
-/** Full page loading skeleton – used as the top-level fallback for any dashboard page */
+/** Full page loading skeleton - used as the top-level fallback for any dashboard page */
 export function PageSkeleton() {
   return (
     <div className="space-y-8">

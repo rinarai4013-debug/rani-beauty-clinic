@@ -42,7 +42,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: page.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/locations/${page.slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `Rani Beauty Clinic — ${page.city}` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `Rani Beauty Clinic - ${page.city}` }],
     },
   };
 }

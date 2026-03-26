@@ -115,6 +115,7 @@ export default function Navbar() {
 
       {/* ── Main Nav ─────────────────────────────────────────────────────── */}
       <nav
+        aria-label="Main navigation"
         className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
           showAnnouncement ? "top-[36px]" : "top-0"
         } ${
@@ -140,11 +141,12 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav (5 items, title case) */}
-          <div className="hidden items-center gap-6 lg:flex flex-1 justify-center">
+          <ul className="hidden items-center gap-6 lg:flex flex-1 justify-center list-none" role="menubar">
             {navLinks.map((link) => (
-              <div
+              <li
                 key={link.name}
                 className="relative"
+                role="none"
                 onMouseEnter={() =>
                   link.megaMenu ? setMegaOpen(true) : setMegaOpen(false)
                 }
@@ -152,13 +154,16 @@ export default function Navbar() {
               >
                 <Link
                   href={link.href}
+                  role="menuitem"
+                  aria-haspopup={link.megaMenu ? "true" : undefined}
+                  aria-expanded={link.megaMenu ? megaOpen : undefined}
                   className="group relative flex items-center gap-1 font-body text-sm font-medium text-white/90 transition-colors hover:text-white whitespace-nowrap"
                 >
                   {link.name}
                   {link.megaMenu && (
-                    <ChevronDown size={14} className="opacity-60" />
+                    <ChevronDown size={14} className="opacity-60" aria-hidden="true" />
                   )}
-                  <span className="absolute -bottom-1 left-0 h-[1.5px] w-0 bg-rani-gold transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute -bottom-1 left-0 h-[1.5px] w-0 bg-rani-gold transition-all duration-300 group-hover:w-full" aria-hidden="true" />
                 </Link>
 
                 {/* ── Mega Menu (720px, 4-column) ──────────────────────── */}
@@ -172,24 +177,26 @@ export default function Navbar() {
                         transition={{ duration: 0.25 }}
                         className="absolute left-1/2 top-full pt-4 -translate-x-1/2"
                       >
-                        <div className="w-[720px] rounded-xl border-t-[3px] border-t-rani-gold bg-rani-navy p-8 shadow-2xl">
+                        <div className="w-[720px] rounded-xl border-t-[3px] border-t-rani-gold bg-rani-navy p-8 shadow-2xl" role="menu" aria-label="Services menu">
                           <div className="grid grid-cols-4 gap-6">
                             {megaMenuColumns.map((col) => (
-                              <div key={col.title}>
-                                <h4 className="mb-3 font-body text-xs font-bold uppercase tracking-wider text-rani-gold/80">
+                              <div key={col.title} role="group" aria-labelledby={`mega-${col.title.replace(/\s+/g, '-').toLowerCase()}`}>
+                                <h4 id={`mega-${col.title.replace(/\s+/g, '-').toLowerCase()}`} className="mb-3 font-body text-xs font-bold uppercase tracking-wider text-rani-gold/80">
                                   {col.title}
                                 </h4>
-                                <div className="space-y-1">
+                                <ul className="space-y-1 list-none">
                                   {col.links.map((item) => (
-                                    <Link
-                                      key={item.href}
-                                      href={item.href}
-                                      className="block rounded-lg px-3 py-2 font-body text-[13px] font-medium text-white/80 transition-colors hover:bg-white/5 hover:text-rani-gold"
-                                    >
-                                      {item.name}
-                                    </Link>
+                                    <li key={item.href} role="none">
+                                      <Link
+                                        href={item.href}
+                                        role="menuitem"
+                                        className="block rounded-lg px-3 py-2 font-body text-[13px] font-medium text-white/80 transition-colors hover:bg-white/5 hover:text-rani-gold"
+                                      >
+                                        {item.name}
+                                      </Link>
+                                    </li>
                                   ))}
-                                </div>
+                                </ul>
                               </div>
                             ))}
                           </div>
@@ -209,17 +216,17 @@ export default function Navbar() {
                     )}
                   </AnimatePresence>
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
 
-          {/* Right side — Phone + Book Now (desktop) */}
+          {/* Right side - Phone + Book Now (desktop) */}
           <div className="hidden items-center gap-6 lg:flex shrink-0 ml-10">
             <a
               href={clinicInfo.phoneTel}
               className="flex items-center gap-2 font-body text-sm font-medium text-white/80 transition-colors hover:text-rani-gold whitespace-nowrap"
             >
-              <Phone size={15} />
+              <Phone size={15} aria-hidden="true" />
               {clinicInfo.phone}
             </a>
             <a
@@ -272,23 +279,25 @@ export default function Navbar() {
               />
             </div>
 
-            <nav className="flex flex-col items-center gap-1">
-              {mobileNavLinks.map((link, i) => (
-                <motion.div
-                  key={link.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05, duration: 0.2 }}
-                >
-                  <Link
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="block px-8 py-4 font-body text-xl font-semibold text-white transition-colors hover:text-rani-gold"
+            <nav aria-label="Mobile navigation">
+              <ul className="flex flex-col items-center gap-1 list-none">
+                {mobileNavLinks.map((link, i) => (
+                  <motion.li
+                    key={link.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.2 }}
                   >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-8 py-4 font-body text-xl font-semibold text-white transition-colors hover:text-rani-gold"
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
             </nav>
 
             <div className="mt-8 flex flex-col items-center gap-4">
@@ -296,7 +305,7 @@ export default function Navbar() {
                 href={clinicInfo.phoneTel}
                 className="flex items-center gap-2 font-body text-base font-semibold text-rani-gold"
               >
-                <Phone size={18} />
+                <Phone size={18} aria-hidden="true" />
                 {clinicInfo.phone}
               </a>
               <a

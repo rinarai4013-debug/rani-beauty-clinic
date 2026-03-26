@@ -34,7 +34,7 @@ const REVIEW_QUOTES = [
   "My skin has never looked better!",
   "The staff is so professional and kind.",
   "Finally found a clinic I trust completely.",
-  "Life-changing results — highly recommend!",
+  "Life-changing results - highly recommend!",
   "Dr. Landfield's supervision gives me peace of mind.",
   "Worth every penny. I'm a client for life.",
   "The most thorough consultation I've ever had.",
@@ -106,7 +106,7 @@ function generateNotifications(count: number): Notification[] {
         id: i,
         type: "review",
         message: `New 5-star review: "${quote}"`,
-        detail: `— ${name} from ${city}`,
+        detail: ` -  ${name} from ${city}`,
       });
     }
   }

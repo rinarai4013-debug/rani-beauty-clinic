@@ -545,7 +545,7 @@ export default function SkinQuiz() {
         {/* Quiz Card */}
         <div className="min-h-[480px] overflow-hidden rounded-2xl border border-rani-border bg-white p-6 shadow-sm sm:p-10">
           <AnimatePresence mode="wait" custom={direction}>
-            {/* Step 0 — Primary Concern */}
+            {/* Step 0 - Primary Concern */}
             {step === 0 && (
               <motion.div
                 key="step-0"
@@ -602,7 +602,7 @@ export default function SkinQuiz() {
               </motion.div>
             )}
 
-            {/* Step 1 — Skin Type */}
+            {/* Step 1 - Skin Type */}
             {step === 1 && (
               <motion.div
                 key="step-1"
@@ -662,7 +662,7 @@ export default function SkinQuiz() {
               </motion.div>
             )}
 
-            {/* Step 2 — Budget */}
+            {/* Step 2 - Budget */}
             {step === 2 && (
               <motion.div
                 key="step-2"
@@ -712,7 +712,7 @@ export default function SkinQuiz() {
               </motion.div>
             )}
 
-            {/* Step 3 — Timeline */}
+            {/* Step 3 - Timeline */}
             {step === 3 && (
               <motion.div
                 key="step-3"
@@ -772,7 +772,7 @@ export default function SkinQuiz() {
               </motion.div>
             )}
 
-            {/* Step 4 — Lead Capture */}
+            {/* Step 4 - Lead Capture */}
             {step === 4 && (
               <motion.div
                 key="step-4"

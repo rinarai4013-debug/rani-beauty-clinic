@@ -5,7 +5,7 @@ import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 /** Rate limit: 3 requests per minute (AI generation is expensive) */
 const SIMULATION_RATE_LIMIT = { limit: 3, windowMs: 60_000 };
 
-/** Max payload size — 10MB for base64 photo */
+/** Max payload size - 10MB for base64 photo */
 const MAX_PAYLOAD_BYTES = 10 * 1024 * 1024;
 
 const VALID_TIMEFRAMES = ['1-month', '3-months', '6-months'] as const;

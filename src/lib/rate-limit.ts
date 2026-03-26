@@ -16,13 +16,13 @@ const DEFAULT_CONFIG: RateLimitConfig = { limit: 10, windowMs: 60_000 };
 
 // Presets for different route types
 export const RATE_LIMITS = {
-  /** Public forms — strict: 5 per minute */
+  /** Public forms - strict: 5 per minute */
   FORM: { limit: 5, windowMs: 60_000 },
-  /** AI endpoints — moderate: 10 per minute */
+  /** AI endpoints - moderate: 10 per minute */
   AI: { limit: 10, windowMs: 60_000 },
-  /** Plan viewing — relaxed: 30 per minute */
+  /** Plan viewing - relaxed: 30 per minute */
   VIEW: { limit: 30, windowMs: 60_000 },
-  /** Webhooks — generous: 100 per minute */
+  /** Webhooks - generous: 100 per minute */
   WEBHOOK: { limit: 100, windowMs: 60_000 },
 } as const;
 
@@ -50,7 +50,7 @@ export function rateLimit(
   const store = getStore(routeKey);
   const now = Date.now();
 
-  // Periodic cleanup — remove expired entries when store grows
+  // Periodic cleanup - remove expired entries when store grows
   if (store.size > 500) {
     for (const [k, v] of store) {
       if (now > v.resetAt) store.delete(k);

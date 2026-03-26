@@ -1,0 +1,7 @@
+{
+  "type": "review-request",
+  "trigger": "appointment_completed",
+  "delayAfterTrigger": "7 days after appointment",
+  "message": "Hi {{first_name}}, thank you for choosing Rani Beauty Clinic! If you're happy with your results, we'd be grateful for a quick Google review. It helps others find us: {{review_link}} Thank you for your support!",
+  "characterCount": 218
+}

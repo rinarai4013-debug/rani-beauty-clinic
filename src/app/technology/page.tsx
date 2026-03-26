@@ -43,7 +43,7 @@ const devices = [
     specs: [
       "Dual wavelengths: Alexandrite 755nm + Nd:YAG 1064nm",
       "Integrated DCD cooling + air cooling system",
-      "Treats all Fitzpatrick skin types (I–VI)",
+      "Treats all Fitzpatrick skin types (I-VI)",
       "Large spot sizes for faster treatment coverage",
     ],
     services: [
@@ -78,7 +78,7 @@ const devices = [
       "SUPERB ultrasound technology",
       "Targets 1.5mm depth in mid-dermis",
       "Integrated cooling for patient comfort",
-      "No downtime — immediate return to activities",
+      "No downtime - immediate return to activities",
     ],
     services: [
       { name: "Sofwave Treatment", href: "/services/sofwave" },
@@ -94,7 +94,7 @@ const devices = [
       "Patented Vortex-Fusion delivery system",
       "Multi-step: cleanse, peel, extract, hydrate, protect",
       "Customizable with specialty boosters",
-      "Suitable for all skin types — no downtime",
+      "Suitable for all skin types - no downtime",
     ],
     services: [
       { name: "HydraFacial MD", href: "/services/hydrafacial" },

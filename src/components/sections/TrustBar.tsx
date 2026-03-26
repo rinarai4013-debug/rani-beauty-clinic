@@ -137,7 +137,7 @@ export default function TrustBar() {
   return (
     <section ref={ref} className="bg-rani-navy py-4">
       <div className="mx-auto max-w-7xl px-4">
-        {/* Scrollable container — no visible scrollbar */}
+        {/* Scrollable container - no visible scrollbar */}
         <div className="scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto md:justify-center">
           {trustItems.map((item, i) => (
             <TrustItemDisplay

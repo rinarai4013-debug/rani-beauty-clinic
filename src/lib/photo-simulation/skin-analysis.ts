@@ -81,25 +81,25 @@ IMPORTANT GUIDELINES:
 - Brand voice: luxury, confident, clinically-assured, educational, aspirational
 - NEVER use the words: "anti-aging", "problem areas", "fix", "flaws", "imperfections", "defects"
 - Instead use: "skin renewal", "areas of opportunity", "enhance", "refine", "elevate", "transform"
-- The summary should feel like a caring, expert consultation — not a clinical report
-- Be honest but positive — frame everything as an opportunity for enhancement
-- NEVER diagnose medical conditions — only observe visible skin characteristics
+- The summary should feel like a caring, expert consultation - not a clinical report
+- Be honest but positive - frame everything as an opportunity for enhancement
+- NEVER diagnose medical conditions - only observe visible skin characteristics
 
 DETECTABLE CONCERNS (use these exact IDs):
-- "acne" — Active breakouts, congestion, comedones
-- "hyperpigmentation" — Dark spots, melasma, post-inflammatory marks, uneven tone
-- "fine-lines" — Early fine lines, expression lines
-- "wrinkles" — Deeper wrinkles, creases
-- "texture" — Rough texture, uneven skin surface
-- "large-pores" — Visibly enlarged pores
-- "skin-laxity" — Loss of firmness, sagging
-- "dullness" — Lack of radiance, tired-looking skin
-- "sun-damage" — UV damage signs, sun spots, freckling from UV exposure
-- "redness" — Rosacea-like appearance, general redness, irritation
-- "dehydration" — Dry, flaky, or dehydrated skin
-- "uneven-tone" — Overall tone inconsistency
-- "dark-circles" — Under-eye discoloration or hollowing
-- "scarring" — Acne scars, textural scarring
+- "acne" - Active breakouts, congestion, comedones
+- "hyperpigmentation" - Dark spots, melasma, post-inflammatory marks, uneven tone
+- "fine-lines" - Early fine lines, expression lines
+- "wrinkles" - Deeper wrinkles, creases
+- "texture" - Rough texture, uneven skin surface
+- "large-pores" - Visibly enlarged pores
+- "skin-laxity" - Loss of firmness, sagging
+- "dullness" - Lack of radiance, tired-looking skin
+- "sun-damage" - UV damage signs, sun spots, freckling from UV exposure
+- "redness" - Rosacea-like appearance, general redness, irritation
+- "dehydration" - Dry, flaky, or dehydrated skin
+- "uneven-tone" - Overall tone inconsistency
+- "dark-circles" - Under-eye discoloration or hollowing
+- "scarring" - Acne scars, textural scarring
 
 FACE ZONES (use these for the "areas" field):
 - "forehead", "between-brows", "temples"
@@ -127,11 +127,11 @@ Respond ONLY with valid JSON in this exact structure (no markdown, no code block
 
 SCORING GUIDE:
 - overallScore: 0-100 where 100 is perfect skin health. Consider all visible concerns weighted by severity.
-  - 85-100: Excellent — minimal concerns, healthy skin
-  - 70-84: Good — a few areas of opportunity
-  - 55-69: Fair — multiple visible concerns that would benefit from treatment
-  - 40-54: Below average — significant concerns present
-  - Below 40: Needs attention — multiple significant concerns
+  - 85-100: Excellent - minimal concerns, healthy skin
+  - 70-84: Good - a few areas of opportunity
+  - 55-69: Fair - multiple visible concerns that would benefit from treatment
+  - 40-54: Below average - significant concerns present
+  - Below 40: Needs attention - multiple significant concerns
 - concern score: 0-100 where 100 is the most severe. A "mild" concern should be 20-40, "moderate" 41-65, "significant" 66-90.
 - skinType: one of "normal", "dry", "oily", "combination", "sensitive"
 - Only include concerns you can actually observe in the photo. Do not fabricate concerns.
@@ -305,7 +305,7 @@ function calculateProjectedScore(
     totalImprovement += rec.estimatedImprovement * weight;
   }
 
-  // Apply diminishing returns — can't exceed 95
+  // Apply diminishing returns - can't exceed 95
   const maxPossibleGain = 100 - overallScore;
   const actualGain = Math.min(totalImprovement * 0.5, maxPossibleGain * 0.7);
 
@@ -318,7 +318,7 @@ export async function analyzeSkinFromPhoto(photoBase64: string): Promise<SkinAna
   // Check for API key
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    console.warn('[SkinAnalysis] ANTHROPIC_API_KEY not set — returning fallback analysis');
+    console.warn('[SkinAnalysis] ANTHROPIC_API_KEY not set - returning fallback analysis');
     const fallback = createFallbackResult();
     fallback.recommendations = buildRecommendations(fallback.concerns);
     return fallback;
@@ -382,7 +382,7 @@ export async function analyzeSkinFromPhoto(photoBase64: string): Promise<SkinAna
       throw new Error('No text response received from analysis');
     }
 
-    // Parse JSON response — handle potential markdown wrapping
+    // Parse JSON response - handle potential markdown wrapping
     let jsonText = textBlock.text.trim();
     if (jsonText.startsWith('```')) {
       jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');

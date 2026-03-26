@@ -41,7 +41,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: page.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/compare/${page.slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${page.treatmentA} vs ${page.treatmentB} — Rani Beauty Clinic` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${page.treatmentA} vs ${page.treatmentB} - Rani Beauty Clinic` }],
     },
   };
 }

@@ -172,7 +172,7 @@ export default function ExecutiveHome() {
           </div>
         </div>
 
-        {/* Funnel Health — CEO Only */}
+        {/* Funnel Health - CEO Only */}
         {isCeo && <FunnelHealthPanel />}
 
         {/* Quick Actions */}

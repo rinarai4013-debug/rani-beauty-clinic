@@ -85,7 +85,7 @@ async function mangomintFetch<T>(endpoint: string, options?: RequestInit): Promi
 
   if (!res.ok) {
     const errorBody = await res.text();
-    throw new Error(`Mangomint API error: ${res.status} — ${errorBody}`);
+    throw new Error(`Mangomint API error: ${res.status} - ${errorBody}`);
   }
 
   return res.json() as Promise<T>;

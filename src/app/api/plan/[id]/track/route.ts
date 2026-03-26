@@ -11,7 +11,7 @@ interface TreatmentPlanFields {
 
 /**
  * POST /api/plan/[id]/track
- * Public tracking endpoint — no auth required.
+ * Public tracking endpoint - no auth required.
  * Updates the treatment plan status in Airtable based on client actions.
  *
  * Body: { action: 'viewed' | 'selected_tier', tier?: string, timestamp?: string }
@@ -42,7 +42,7 @@ export async function POST(
     );
 
     if (records.length === 0) {
-      // No treatment plan record found — this is fine for plans created before
+      // No treatment plan record found - this is fine for plans created before
       // the persistence feature was added. Just acknowledge the tracking event.
       return NextResponse.json({ success: true, tracked: false, reason: 'no_plan_record' });
     }
@@ -88,7 +88,7 @@ export async function POST(
     });
   } catch (error) {
     console.error('Plan tracking error:', error);
-    // Return 200 even on error — tracking should never break the client experience
+    // Return 200 even on error - tracking should never break the client experience
     return NextResponse.json({ success: false, error: 'Tracking failed' });
   }
 }

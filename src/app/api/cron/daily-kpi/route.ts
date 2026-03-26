@@ -4,11 +4,11 @@ import { FIELDS } from '@/lib/airtable/tables';
 import { calculateClinicScore } from '@/lib/gamification/engine';
 import type { DailyMetrics } from '@/types/gamification';
 
-// POST — Daily KPI snapshot creation
+// POST - Daily KPI snapshot creation
 // Triggered by n8n or Vercel Cron with CRON_SECRET auth
 export async function POST(request: NextRequest) {
   try {
-    // Auth: cron secret only (no session — this runs unattended)
+    // Auth: cron secret only (no session - this runs unattended)
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Daily KPI cron error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create KPI snapshot', details: String(error) },
+      { success: false, error: 'Failed to create KPI snapshot' },
       { status: 500 }
     );
   }

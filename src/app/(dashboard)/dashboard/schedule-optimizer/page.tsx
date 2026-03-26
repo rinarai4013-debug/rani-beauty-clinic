@@ -207,7 +207,7 @@ function ScheduleOptimizerContent() {
                   className="p-3 rounded-lg bg-rani-cream/30 border border-rani-border/50"
                 >
                   <div className="flex items-center justify-between mb-1 gap-2">
-                    <span className="text-xs font-body font-semibold text-rani-navy truncate">{gap.provider} — {gap.date}</span>
+                    <span className="text-xs font-body font-semibold text-rani-navy truncate">{gap.provider} - {gap.date}</span>
                     <span className="text-xs font-body text-green-600 font-semibold flex-shrink-0">+${gap.potentialRevenue}</span>
                   </div>
                   <div className="text-[10px] sm:text-xs font-body text-rani-muted">

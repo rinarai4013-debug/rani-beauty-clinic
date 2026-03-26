@@ -42,6 +42,56 @@ export default function AftercarePage({
 
   const pageUrl = `${clinicInfo.website}/aftercare/${page.slug}`;
 
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: `${page.treatment} Aftercare Guide`,
+    description: page.metaDescription,
+    url: pageUrl,
+    step: [
+      {
+        "@type": "HowToSection",
+        name: "Immediately After Treatment",
+        position: 1,
+        itemListElement: page.immediateAftercare.map((item, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          text: item,
+        })),
+      },
+      {
+        "@type": "HowToSection",
+        name: "First 24 Hours",
+        position: 2,
+        itemListElement: page.first24Hours.map((item, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          text: item,
+        })),
+      },
+      {
+        "@type": "HowToSection",
+        name: "First Week",
+        position: 3,
+        itemListElement: page.firstWeek.map((item, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          text: item,
+        })),
+      },
+      {
+        "@type": "HowToSection",
+        name: "Long-Term Care & Maintenance",
+        position: 4,
+        itemListElement: page.longTerm.map((item, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          text: item,
+        })),
+      },
+    ],
+  };
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "MedicalWebPage",
@@ -96,6 +146,7 @@ export default function AftercarePage({
 
   return (
     <>
+      <StructuredData data={howToSchema} />
       <StructuredData data={articleSchema} />
       <StructuredData data={faqSchema} />
       <StructuredData data={breadcrumbSchema} />

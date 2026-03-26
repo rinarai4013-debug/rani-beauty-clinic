@@ -193,7 +193,7 @@ export default function ServicePageTemplate({
         />
       )}
 
-      {/* Hero — with service image background */}
+      {/* Hero - with service image background */}
       <Hero
         title={service.title}
         subtitle={service.heroDescription}
@@ -353,7 +353,7 @@ export default function ServicePageTemplate({
         </div>
       </section>
 
-      {/* Social Proof — Google Reviews */}
+      {/* Social Proof - Google Reviews */}
       {(() => {
         const serviceReviews = testimonials.filter(
           (t) => t.treatmentSlug === service.slug
@@ -486,7 +486,7 @@ export default function ServicePageTemplate({
         </div>
       </section>
 
-      {/* Results Gallery — service treatment images */}
+      {/* Results Gallery - service treatment images */}
       <section className="bg-rani-cream py-20 md:py-28">
         <div className="mx-auto max-w-5xl px-6 text-center">
           <FadeInOnScroll>

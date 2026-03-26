@@ -32,7 +32,7 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
 
   const packages: GeneratedPackage[] = [];
 
-  // Essential — Phase 1 only
+  // Essential - Phase 1 only
   if (phase1Services.length > 0) {
     const total = calcTotal(phase1Services);
     packages.push({
@@ -50,7 +50,7 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
     });
   }
 
-  // Recommended — Phase 1 + 2
+  // Recommended - Phase 1 + 2
   const recommendedServices = [...phase1Services, ...phase2Services];
   if (recommendedServices.length > 0 && phase2Services.length > 0) {
     const originalTotal = calcTotal(recommendedServices);
@@ -76,7 +76,7 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
     });
   }
 
-  // Platinum — All phases
+  // Platinum - All phases
   if (allServices.length > 0 && phase3Services.length > 0) {
     const originalTotal = calcTotal(allServices);
     const discountRate = 0.15;

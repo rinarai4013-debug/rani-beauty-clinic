@@ -475,8 +475,9 @@ function projectCashFlow(
     const projectedNet = projectedRev - projectedExp;
     balance += projectedNet;
 
+    // Runway: if losing money (burn > 0), how many months until zero
     const monthlyBurn = projectedExp - projectedRev;
-    const runway = monthlyBurn > 0 ? Math.round(balance / monthlyBurn) : 99;
+    const runway = monthlyBurn > 0 && balance > 0 ? Math.round(balance / monthlyBurn) : monthlyBurn > 0 ? 0 : 99;
 
     projections.push({
       month: monthStr,
@@ -557,7 +558,7 @@ function calculateFinancialHealth(
   else {
     profitability = 20;
     alerts.push('Business is operating at a loss this period');
-    recommendations.push('Review expenses immediately — identify top 3 cost reduction opportunities');
+    recommendations.push('Review expenses immediately - identify top 3 cost reduction opportunities');
   }
 
   // Growth (0-100)
@@ -583,11 +584,11 @@ function calculateFinancialHealth(
   else if (pnl.grossMargin > 45) efficiency = 60;
   else {
     efficiency = 35;
-    alerts.push(`Gross margin at ${pnl.grossMargin}% — below industry standard of 55-70%`);
+    alerts.push(`Gross margin at ${pnl.grossMargin}% - below industry standard of 55-70%`);
     recommendations.push('Review supplier costs and consider negotiating bulk rates');
   }
 
-  // Stability (0-100) — based on revenue mix
+  // Stability (0-100) - based on revenue mix
   let stability = 50;
   if (kpis.membershipRevenuePercent > 30) stability = 85;
   else if (kpis.membershipRevenuePercent > 20) stability = 70;
@@ -641,7 +642,7 @@ function generateFinancialInsights(
   if (serviceMargins.length > 0) {
     const top = serviceMargins[0];
     insights.push(
-      `Top revenue generator: ${top.service} — $${top.revenue.toLocaleString()} (${top.grossMargin}% margin, ${top.bookings} bookings)`
+      `Top revenue generator: ${top.service} - $${top.revenue.toLocaleString()} (${top.grossMargin}% margin, ${top.bookings} bookings)`
     );
   }
 
@@ -656,11 +657,11 @@ function generateFinancialInsights(
   // Revenue mix
   if (kpis.newClientRevenuePercent > 40) {
     insights.push(
-      `${kpis.newClientRevenuePercent}% of revenue from new clients — great acquisition but focus on retention to build LTV.`
+      `${kpis.newClientRevenuePercent}% of revenue from new clients - great acquisition but focus on retention to build LTV.`
     );
   } else if (kpis.newClientRevenuePercent < 15) {
     insights.push(
-      `Only ${kpis.newClientRevenuePercent}% from new clients — increase marketing spend to maintain growth pipeline.`
+      `Only ${kpis.newClientRevenuePercent}% from new clients - increase marketing spend to maintain growth pipeline.`
     );
   }
 

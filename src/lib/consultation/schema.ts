@@ -1,5 +1,5 @@
 /**
- * Consultation Wizard — Zod Validation Schemas
+ * Consultation Wizard - Zod Validation Schemas
  *
  * Per-step validation schemas for the 8-step consultation wizard.
  * Fields map to Airtable Client Intakes table.
@@ -71,10 +71,10 @@ export const BUDGET_OPTIONS = [
 
 // ── Step Schemas ──
 
-/** Step 1: Welcome — no user input, just intro screen */
+/** Step 1: Welcome - no user input, just intro screen */
 const step1Schema = z.object({});
 
-/** Step 2: About You — personal info */
+/** Step 2: About You - personal info */
 const step2Schema = z.object({
   firstName: z
     .string()
@@ -109,7 +109,7 @@ const step2Schema = z.object({
     ),
 });
 
-/** Step 3: Concerns — skin concerns + target areas */
+/** Step 3: Concerns - skin concerns + target areas */
 const step3Schema = z.object({
   skinConcerns: z
     .array(z.enum(SKIN_CONCERN_OPTIONS))
@@ -119,14 +119,14 @@ const step3Schema = z.object({
     .min(1, 'Please select at least one target area'),
 });
 
-/** Step 4: Treatment Interests — service category IDs from unified catalog */
+/** Step 4: Treatment Interests - service category IDs from unified catalog */
 const step4Schema = z.object({
   treatmentInterests: z
     .array(z.string())
     .min(1, 'Please select at least one treatment of interest'),
 });
 
-/** Step 5: History — skin type + treatment history */
+/** Step 5: History - skin type + treatment history */
 const step5Schema = z.object({
   skinType: z.enum(SKIN_TYPES, {
     message: 'Please select your skin type',
@@ -138,7 +138,7 @@ const step5Schema = z.object({
     .default(''),
 });
 
-/** Step 6: Goals — personal goals, timeline preference, budget range */
+/** Step 6: Goals - personal goals, timeline preference, budget range */
 const step6Schema = z.object({
   goals: z
     .string()
@@ -152,7 +152,7 @@ const step6Schema = z.object({
   }),
 });
 
-/** Step 7: Photos — optional uploads, max 3 */
+/** Step 7: Photos - optional uploads, max 3 */
 const step7Schema = z.object({
   photos: z
     .array(z.instanceof(File))
@@ -172,7 +172,7 @@ const step7Schema = z.object({
     .default([]),
 });
 
-/** Step 8: Summary + SMS consent — review and submit */
+/** Step 8: Summary + SMS consent - review and submit */
 const step8Schema = z.object({
   smsConsent: z.boolean().default(false),
 });
@@ -191,7 +191,7 @@ export const stepSchemas = [
   step8Schema,
 ] as const;
 
-/** Full consultation form data — union of all step schemas */
+/** Full consultation form data - union of all step schemas */
 const fullSchema = step1Schema
   .merge(step2Schema)
   .merge(step3Schema)

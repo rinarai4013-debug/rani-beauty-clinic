@@ -24,7 +24,7 @@ export default function PlaidLinkButton({ onSuccess, variant = 'full' }: PlaidLi
         const data = await res.json();
         setLinkToken(data.linkToken);
       } catch {
-        // Silently fail — button will show loading state
+        // Silently fail - button will show loading state
       }
     }
     fetchToken();

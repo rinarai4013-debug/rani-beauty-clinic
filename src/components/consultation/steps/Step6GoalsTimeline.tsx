@@ -203,7 +203,7 @@ export default function Step6GoalsTimeline({
         <textarea
           id="goals"
           rows={3}
-          placeholder="Tell us about your ideal outcome — we love hearing your vision and will help you get there..."
+          placeholder="Tell us about your ideal outcome - we love hearing your vision and will help you get there..."
           value={formData.goals || ''}
           onChange={(e) => onUpdate('goals', e.target.value)}
           className={`
@@ -249,7 +249,7 @@ export default function Step6GoalsTimeline({
         )}
       </motion.div>
 
-      {/* Event Date Picker — shown when "event" timeline selected */}
+      {/* Event Date Picker - shown when "event" timeline selected */}
       {selectedTimeline === 'event' && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}

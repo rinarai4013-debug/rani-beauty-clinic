@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const [clients, recentConsults] = await Promise.all([
-      // Clients table has no "Is Test" field — pass skipTestFilter=true
+      // Clients table has no "Is Test" field - pass skipTestFilter=true
       fetchAll<ClientFields>(Tables.clients(), {}, true),
       fetchAll<AppointmentFields>(Tables.appointments(), {
         filterByFormula: `AND({Is Consult} = TRUE(), {Date} >= DATEADD(TODAY(), -30, 'days'))`,
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
         )
       : 0;
 
-    // --- Top lead sources (Source field not in Clients table — return empty) ---
+    // --- Top lead sources (Source field not in Clients table - return empty) ---
     const topLeadSources: LeadSource[] = [];
 
     const data: LeadFunnelData = {

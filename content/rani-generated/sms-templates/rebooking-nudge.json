@@ -1,0 +1,7 @@
+{
+  "type": "rebooking-nudge",
+  "trigger": "appointment_completed",
+  "delayAfterTrigger": "21 days after appointment (varies by treatment type)",
+  "message": "Hi {{first_name}}, it's time to schedule your next {{treatment_name}} session at Rani to keep your results on track. Book online at {{booking_link}} or reply here and we'll get you scheduled. Openings are filling up this week!",
+  "characterCount": 234
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import MobileNav from './MobileNav';
+import MobileNav from '../Shared/MobileNav';
 import type { UserRole } from '@/types/auth';
 
 interface DashboardShellProps {
@@ -28,7 +28,7 @@ export default function DashboardShell({ children, role, displayName }: Dashboar
 
   return (
     <div className="min-h-screen bg-rani-cream">
-      {/* Sidebar — hidden on mobile */}
+      {/* Sidebar - hidden on mobile */}
       <div className="hidden lg:block">
         <Sidebar
           role={role}
@@ -54,7 +54,7 @@ export default function DashboardShell({ children, role, displayName }: Dashboar
         </div>
       )}
 
-      {/* Main Content — shifts right on desktop when sidebar is visible */}
+      {/* Main Content - shifts right on desktop when sidebar is visible */}
       <div className={`transition-all duration-200 ${
         sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-[280px]'
       }`}>
@@ -67,7 +67,7 @@ export default function DashboardShell({ children, role, displayName }: Dashboar
           onSoundToggle={() => setSoundMuted(!soundMuted)}
         />
 
-        <main className="p-6 lg:p-8 max-w-[1600px] mx-auto pb-24 lg:pb-8">
+        <main className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-8">
           {children}
         </main>
       </div>

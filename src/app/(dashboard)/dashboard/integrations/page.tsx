@@ -104,7 +104,7 @@ const PLATFORM_CONFIG = {
     color: 'text-green-600',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-200',
-    description: 'Bank account connection — auto-import transactions',
+    description: 'Bank account connection - auto-import transactions',
     setupUrl: 'https://dashboard.plaid.com',
     setupLabel: 'Complete Setup',
     syncLabel: 'Sync Transactions',
@@ -117,7 +117,7 @@ const PLATFORM_CONFIG = {
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
-    description: 'Booking & scheduling (2,181 clients) — Webhooks enabled',
+    description: 'Booking & scheduling (2,181 clients) - Webhooks enabled',
     setupUrl: 'https://app.mangomint.com/876418/settings',
     setupLabel: 'Get API Key',
     syncLabel: 'Sync Clients',
@@ -143,7 +143,7 @@ const PLATFORM_CONFIG = {
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50',
     borderColor: 'border-emerald-200',
-    description: 'Patient financing — long-term payment plans up to 60 months',
+    description: 'Patient financing - long-term payment plans up to 60 months',
     setupUrl: 'https://app.patientfi.com/v2/rani-beauty-clinic/apply',
     setupLabel: 'Patient Apply Link',
     syncLabel: 'Sync Applications',
@@ -156,7 +156,7 @@ const PLATFORM_CONFIG = {
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-50',
     borderColor: 'border-indigo-200',
-    description: 'AI phone receptionist — inbound call handling',
+    description: 'AI phone receptionist - inbound call handling',
     setupUrl: 'https://dashboard.vapi.ai',
     setupLabel: 'Get API Key',
     syncLabel: 'Test Call Logs',
@@ -653,7 +653,7 @@ export default function IntegrationsPage() {
               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-pink-100 text-pink-600 text-xs font-bold flex-shrink-0">5</span>
               <div>
                 <p className="font-medium text-rani-navy">Cherry</p>
-                <p className="text-rani-muted">No API available — data is manually synced via dashboard extraction</p>
+                <p className="text-rani-muted">No API available - data is manually synced via dashboard extraction</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

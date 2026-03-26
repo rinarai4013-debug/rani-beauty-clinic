@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET — Pull a real active client from Airtable with their history
+// GET - Pull a real active client from Airtable with their history
 export async function GET() {
   const session = await getSession();
   if (!session) {
@@ -79,7 +79,7 @@ export async function GET() {
         {
           filterByFormula: `{${FIELDS.clients.status}} = 'Active'`,
         },
-        true // skipTestFilter — Clients table has no "Is Test" field
+        true // skipTestFilter - Clients table has no "Is Test" field
       );
 
       if (activeClients.length > 0) {

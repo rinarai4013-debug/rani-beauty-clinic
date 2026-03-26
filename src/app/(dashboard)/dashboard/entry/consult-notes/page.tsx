@@ -81,7 +81,7 @@ export default function ConsultNotesPage() {
       </FormField>
 
       <FormField label="Treatment Plan Presented" required>
-        <FormTextarea placeholder="e.g. 3x RF Microneedling + Hydrafacial package — $2,400" value={planPresented} onChange={e => setPlanPresented(e.target.value)} required />
+        <FormTextarea placeholder="e.g. 3x RF Microneedling + Hydrafacial package - $2,400" value={planPresented} onChange={e => setPlanPresented(e.target.value)} required />
       </FormField>
 
       <FormField label="Objections / Concerns">

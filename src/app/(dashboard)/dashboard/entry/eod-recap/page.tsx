@@ -30,7 +30,7 @@ export default function EODRecapPage() {
         const data = await res.json();
         throw new Error(data.error || 'Failed to save recap');
       }
-      toast.success('EOD recap saved! +50 XP — Great day!');
+      toast.success('EOD recap saved! +50 XP - Great day!');
       setTotalRevenue(''); setTotalClients(''); setHighlights('');
       setIssues(''); setInventoryNotes(''); setTomorrowPriorities('');
     } catch (err) {
@@ -69,7 +69,7 @@ export default function EODRecapPage() {
       </FormField>
 
       <FormField label="Inventory Notes" hint="Low stock, restocking needs">
-        <FormTextarea placeholder="e.g. Running low on Hydrafacial tips — 3 remaining" value={inventoryNotes} onChange={e => setInventoryNotes(e.target.value)} rows={2} />
+        <FormTextarea placeholder="e.g. Running low on Hydrafacial tips - 3 remaining" value={inventoryNotes} onChange={e => setInventoryNotes(e.target.value)} rows={2} />
       </FormField>
 
       <FormField label="Tomorrow's Priorities" hint="Top 3 things to focus on">

@@ -137,7 +137,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'zero-unmatched',
     name: 'Clean Books',
-    description: 'Zero unmatched transactions — everything reconciled',
+    description: 'Zero unmatched transactions - everything reconciled',
     icon: '✅',
     category: 'finance',
     rarity: 'epic',

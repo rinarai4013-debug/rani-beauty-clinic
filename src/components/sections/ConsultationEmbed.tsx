@@ -28,7 +28,7 @@ export default function ConsultationEmbed() {
               Start Your Glow Journey
             </h2>
             <p className="mt-4 max-w-2xl mx-auto font-body text-base leading-relaxed text-rani-text">
-              Take 3 minutes to tell us about your goals — we&apos;ll craft a
+              Take 3 minutes to tell us about your goals - we&apos;ll craft a
               personalized treatment roadmap just for you. Your $150 deposit
               applies directly toward any treatment.
             </p>

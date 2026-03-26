@@ -6,12 +6,12 @@
  * and promotional strategies.
  *
  * Strategies:
- * 1. Demand-based pricing — Adjust by time slot demand
- * 2. Capacity optimization — Fill low-utilization windows
- * 3. Seasonal adjustments — Holiday/event-driven pricing
- * 4. Client segment pricing — Membership vs. new vs. returning
- * 5. Smart package builder — Auto-generate high-margin bundles
- * 6. Competitor-aware pricing — Stay competitive within range
+ * 1. Demand-based pricing - Adjust by time slot demand
+ * 2. Capacity optimization - Fill low-utilization windows
+ * 3. Seasonal adjustments - Holiday/event-driven pricing
+ * 4. Client segment pricing - Membership vs. new vs. returning
+ * 5. Smart package builder - Auto-generate high-margin bundles
+ * 6. Competitor-aware pricing - Stay competitive within range
  */
 
 // ── TYPES ──
@@ -184,7 +184,14 @@ function generatePriceRecommendations(input: PricingInput): PricingRecommendatio
     const adjustment = calculatePriceAdjustment(factors);
 
     if (Math.abs(adjustment.change) >= 2) {
-      const suggestedPrice = Math.round(service.basePrice * (1 + adjustment.change / 100));
+      let suggestedPrice = Math.round(service.basePrice * (1 + adjustment.change / 100));
+
+      // GUARDRAIL: Never price below cost - enforce minimum 10% margin
+      const minPrice = Math.round(service.cost * 1.10);
+      if (suggestedPrice < minPrice) {
+        suggestedPrice = minPrice;
+        adjustment.reason += '. Floor applied: price cannot go below cost + 10% margin';
+      }
 
       recommendations.push({
         service: service.service,
@@ -298,7 +305,7 @@ function calculatePriceAdjustment(
   // Low demand + declining → capacity fill discount
   if (factors.demandScore < 30 && factors.trendDirection === 'declining') {
     change -= Math.min(10, MAX_PRICE_DECREASE);
-    reason = 'Low demand — recommend promotional pricing to fill capacity';
+    reason = 'Low demand - recommend promotional pricing to fill capacity';
     confidence = 70;
     strategy = 'capacity_fill';
   }
@@ -308,7 +315,7 @@ function calculatePriceAdjustment(
     const marginAdjust = Math.min((70 - factors.marginScore) * 0.15, MAX_PRICE_INCREASE);
     change += marginAdjust;
     reason = reason
-      ? `${reason}. Margin below target — adjust upward`
+      ? `${reason}. Margin below target - adjust upward`
       : 'Service margin below category target';
     confidence = Math.max(confidence, 75);
     strategy = change > 5 ? 'margin_optimization' : strategy;
@@ -319,7 +326,7 @@ function calculatePriceAdjustment(
     const compAdjust = Math.min(Math.abs(factors.competitivePosition) * 0.4, MAX_PRICE_INCREASE);
     change += compAdjust;
     reason = reason
-      ? `${reason}. Priced below market — competitive room to increase`
+      ? `${reason}. Priced below market - competitive room to increase`
       : 'Priced significantly below competitors';
     confidence = Math.max(confidence, 85);
     strategy = 'competitive_adjustment';
@@ -364,7 +371,7 @@ function estimateRevenueImpact(
 function generatePackages(input: PricingInput): PackageRecommendation[] {
   const packages: PackageRecommendation[] = [];
 
-  // Package 1: "First Visit Bundle" — Most popular facial + add-on
+  // Package 1: "First Visit Bundle" - Most popular facial + add-on
   const facials = input.services.filter(s => s.category === 'Facial').sort((a, b) => b.popularity - a.popularity);
   const peels = input.services.filter(s => s.category === 'Peel').sort((a, b) => b.popularity - a.popularity);
 
@@ -390,7 +397,7 @@ function generatePackages(input: PricingInput): PackageRecommendation[] {
     });
   }
 
-  // Package 2: "Membership Upgrade" — Series package
+  // Package 2: "Membership Upgrade" - Series package
   if (facials.length > 0) {
     const topService = facials[0];
     const seriesPrice = Math.round(topService.basePrice * 4 * 0.80); // 4 sessions, 20% off
@@ -408,7 +415,7 @@ function generatePackages(input: PricingInput): PackageRecommendation[] {
     });
   }
 
-  // Package 3: "Wellness Starter" — GLP-1 + Injections combo
+  // Package 3: "Wellness Starter" - GLP-1 + Injections combo
   const wellness = input.services.filter(s => s.category === 'Wellness').sort((a, b) => b.basePrice - a.basePrice);
   if (wellness.length >= 2) {
     const total = wellness[0].basePrice + wellness[1].basePrice;
@@ -430,7 +437,7 @@ function generatePackages(input: PricingInput): PackageRecommendation[] {
     });
   }
 
-  // Package 4: "Bride-to-Be" — Pre-event package
+  // Package 4: "Bride-to-Be" - Pre-event package
   const laser = input.services.filter(s => s.category === 'Laser' || s.category === 'Hair Removal')
     .sort((a, b) => b.popularity - a.popularity);
 
@@ -565,7 +572,7 @@ function generateInsights(
   // Utilization gap
   if (input.utilization.overall < 70) {
     insights.push(
-      `Overall utilization at ${input.utilization.overall}% — ${100 - input.utilization.overall}% of available time is unfilled. Off-peak promotions could recapture $${Math.round(input.services.reduce((s, svc) => s + svc.basePrice * svc.popularity * 0.01, 0) * (80 - input.utilization.overall) / 100)}/month.`
+      `Overall utilization at ${input.utilization.overall}% - ${100 - input.utilization.overall}% of available time is unfilled. Off-peak promotions could recapture $${Math.round(input.services.reduce((s, svc) => s + svc.basePrice * svc.popularity * 0.01, 0) * (80 - input.utilization.overall) / 100)}/month.`
     );
   }
 

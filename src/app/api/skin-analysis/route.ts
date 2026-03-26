@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check image size (rough estimate — base64 is ~4/3 of binary size)
+    // Check image size (rough estimate - base64 is ~4/3 of binary size)
     // Reject images over 20MB base64 (~15MB binary)
     if (body.image.length > 20_000_000) {
       return NextResponse.json(

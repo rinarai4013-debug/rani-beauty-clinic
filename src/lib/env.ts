@@ -10,7 +10,7 @@ import { z } from 'zod';
 /* ── Schema ─────────────────────────────────────────────────── */
 
 const envSchema = z.object({
-  // Required — app won't function without these
+  // Required - app won't function without these
   AIRTABLE_PAT: z.string().min(1, 'AIRTABLE_PAT is required'),
   AIRTABLE_BASE_ID: z.string().min(1, 'AIRTABLE_BASE_ID is required'),
   DASHBOARD_JWT_SECRET: z.string().min(1, 'DASHBOARD_JWT_SECRET is required'),

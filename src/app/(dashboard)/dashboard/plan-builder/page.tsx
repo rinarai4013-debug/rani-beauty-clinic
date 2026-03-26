@@ -205,9 +205,9 @@ export default function PlanBuilderPage() {
         </div>
       </div>
 
-      {/* Body — two columns */}
+      {/* Body - two columns */}
       <div className="flex gap-6 p-6 max-w-[1600px] mx-auto">
-        {/* Left column — Service Catalog (60%) */}
+        {/* Left column - Service Catalog (60%) */}
         <div className="w-[60%] space-y-4">
           <div className="bg-white rounded-xl border border-gray-100 p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -243,7 +243,7 @@ export default function PlanBuilderPage() {
           </div>
         </div>
 
-        {/* Right column — Plan Builder (40%) */}
+        {/* Right column - Plan Builder (40%) */}
         <div className="w-[40%] space-y-4">
           {/* Phase drop zones */}
           <div className="space-y-3">

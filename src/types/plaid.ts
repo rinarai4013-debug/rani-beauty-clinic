@@ -25,7 +25,7 @@ export interface PlaidTransaction {
   authorizedDate: string | null;
   name: string;
   merchantName: string | null;
-  amount: number; // positive = debit (money out), negative = credit (money in) — Plaid convention
+  amount: number; // positive = debit (money out), negative = credit (money in) - Plaid convention
   isoCurrencyCode: string | null;
   category: string[];
   categoryId: string | null;

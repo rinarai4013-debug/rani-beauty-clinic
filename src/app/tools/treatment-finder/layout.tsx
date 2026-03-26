@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         url: `${clinicInfo.website}/og/treatment-finder.jpg`,
         width: 1200,
         height: 630,
-        alt: "Treatment Finder Quiz — Rani Beauty Clinic",
+        alt: "Treatment Finder Quiz - Rani Beauty Clinic",
       },
     ],
   },

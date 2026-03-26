@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// vi.hoisted runs before vi.mock factories — set env vars and create mock fns here
+// vi.hoisted runs before vi.mock factories - set env vars and create mock fns here
 const {
   mockConstructEvent,
   mockCreate,

@@ -1,7 +1,7 @@
 /**
  * No-Show Prediction Engine
  *
- * Scores upcoming appointments 0–100 on no-show risk.
+ * Scores upcoming appointments 0-100 on no-show risk.
  * Higher score = more likely to no-show.
  *
  * Used by:
@@ -10,12 +10,12 @@
  * - Provider daily briefing
  *
  * Factors:
- * 1. Client history (35%) — Past no-show rate
- * 2. Booking lead time (15%) — How far in advance they booked
- * 3. Deposit status (20%) — Paid deposit = much lower risk
- * 4. Membership status (10%) — Members rarely no-show
- * 5. Day & time patterns (10%) — Monday AM, Friday PM = higher
- * 6. Booking source (10%) — Online vs phone vs walk-in
+ * 1. Client history (35%) - Past no-show rate
+ * 2. Booking lead time (15%) - How far in advance they booked
+ * 3. Deposit status (20%) - Paid deposit = much lower risk
+ * 4. Membership status (10%) - Members rarely no-show
+ * 5. Day & time patterns (10%) - Monday AM, Friday PM = higher
+ * 6. Booking source (10%) - Online vs phone vs walk-in
  */
 
 export interface NoShowInput {
@@ -63,8 +63,16 @@ const WEIGHTS = {
 // ── SCORING FUNCTIONS ──
 
 function scoreHistory(totalAppts: number, totalNoShows: number, isNewClient: boolean): { score: number; detail: string } {
-  if (isNewClient || totalAppts === 0) {
-    return { score: 35, detail: 'New client — no history to analyze' };
+  if (isNewClient && totalAppts === 0) {
+    return { score: 40, detail: 'Brand-new client - no history to analyze' };
+  }
+  if (totalAppts === 0) {
+    return { score: 35, detail: 'No appointment history on record' };
+  }
+  if (isNewClient && totalAppts <= 2) {
+    const noShowRate = totalNoShows / totalAppts;
+    if (noShowRate > 0) return { score: 55, detail: `New client with early no-show (${totalNoShows}/${totalAppts})` };
+    return { score: 25, detail: `New client with ${totalAppts} kept appointment(s)` };
   }
 
   const noShowRate = totalNoShows / totalAppts;
@@ -80,21 +88,21 @@ function scoreHistory(totalAppts: number, totalNoShows: number, isNewClient: boo
 function scoreLeadTime(days: number): { score: number; detail: string } {
   // Same-day bookings rarely no-show; far-out bookings forget
   if (days <= 0) return { score: 10, detail: 'Same-day booking' };
-  if (days <= 2) return { score: 15, detail: `Booked ${days}d ago — recent` };
+  if (days <= 2) return { score: 15, detail: `Booked ${days}d ago - recent` };
   if (days <= 7) return { score: 25, detail: `Booked ${days}d ago` };
-  if (days <= 14) return { score: 40, detail: `Booked ${days}d ago — moderate gap` };
-  if (days <= 30) return { score: 55, detail: `Booked ${days}d ago — may forget` };
-  return { score: 70, detail: `Booked ${days}d ago — high forget risk` };
+  if (days <= 14) return { score: 40, detail: `Booked ${days}d ago - moderate gap` };
+  if (days <= 30) return { score: 55, detail: `Booked ${days}d ago - may forget` };
+  return { score: 70, detail: `Booked ${days}d ago - high forget risk` };
 }
 
 function scoreDeposit(paid: boolean, amount: number): { score: number; detail: string } {
-  if (paid && amount >= 150) return { score: 5, detail: `$${amount} deposit paid — strong commitment` };
+  if (paid && amount >= 150) return { score: 5, detail: `$${amount} deposit paid - strong commitment` };
   if (paid && amount > 0) return { score: 15, detail: `$${amount} deposit paid` };
-  return { score: 60, detail: 'No deposit — lower commitment signal' };
+  return { score: 60, detail: 'No deposit - lower commitment signal' };
 }
 
 function scoreMembership(hasMembership: boolean): { score: number; detail: string } {
-  if (hasMembership) return { score: 8, detail: 'Active member — very reliable' };
+  if (hasMembership) return { score: 8, detail: 'Active member - very reliable' };
   return { score: 45, detail: 'Non-member' };
 }
 
@@ -108,37 +116,37 @@ function scoreTiming(dayOfWeek: number, hour: number): { score: number; detail: 
   // Monday morning effect
   if (dayOfWeek === 1 && hour < 11) {
     score = 55;
-    return { score, detail: `${day} morning — historically higher no-show rate` };
+    return { score, detail: `${day} morning - historically higher no-show rate` };
   }
 
   // Friday afternoon effect
   if (dayOfWeek === 5 && hour >= 15) {
     score = 50;
-    return { score, detail: `${day} afternoon — weekend plans compete` };
+    return { score, detail: `${day} afternoon - weekend plans compete` };
   }
 
   // Weekend = lower no-show (people plan weekend appointments intentionally)
   if (dayOfWeek === 0 || dayOfWeek === 6) {
     score = 15;
-    return { score, detail: `${day} — weekend appointments are typically kept` };
+    return { score, detail: `${day} - weekend appointments are typically kept` };
   }
 
   // Midweek midday = best
   if (dayOfWeek >= 2 && dayOfWeek <= 4 && hour >= 10 && hour <= 15) {
     score = 20;
-    return { score, detail: `${day} midday — optimal slot` };
+    return { score, detail: `${day} midday - optimal slot` };
   }
 
   // Early morning
   if (hour < 9) {
     score = 45;
-    return { score, detail: `Early ${day} morning — slightly higher risk` };
+    return { score, detail: `Early ${day} morning - slightly higher risk` };
   }
 
   // Late evening
   if (hour >= 18) {
     score = 40;
-    return { score, detail: `${day} evening — end-of-day fatigue factor` };
+    return { score, detail: `${day} evening - end-of-day fatigue factor` };
   }
 
   return { score, detail: `${day} at ${hour > 12 ? hour - 12 : hour}${hour >= 12 ? 'PM' : 'AM'}` };
@@ -147,19 +155,19 @@ function scoreTiming(dayOfWeek: number, hour: number): { score: number; detail: 
 function scoreSource(source: string): { score: number; detail: string } {
   const s = source.toLowerCase();
   if (s.includes('walk-in') || s.includes('walkin')) {
-    return { score: 5, detail: 'Walk-in — already present' };
+    return { score: 5, detail: 'Walk-in - already present' };
   }
   if (s.includes('phone') || s.includes('call')) {
-    return { score: 20, detail: 'Phone booking — personal commitment' };
+    return { score: 20, detail: 'Phone booking - personal commitment' };
   }
   if (s.includes('mangomint') || s.includes('online')) {
-    return { score: 35, detail: 'Online booking — moderate commitment' };
+    return { score: 35, detail: 'Online booking - moderate commitment' };
   }
   if (s.includes('typeform') || s.includes('form') || s.includes('website')) {
-    return { score: 40, detail: 'Web form — lower personal commitment' };
+    return { score: 40, detail: 'Web form - lower personal commitment' };
   }
   if (s.includes('referral')) {
-    return { score: 15, detail: 'Referral — social commitment' };
+    return { score: 15, detail: 'Referral - social commitment' };
   }
   return { score: 35, detail: `Source: ${source}` };
 }

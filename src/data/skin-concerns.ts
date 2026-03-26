@@ -29,7 +29,7 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Medical-grade acne solutions supervised by a board-certified neurologist. From active breakouts to stubborn acne scars, we combine advanced technology with clinical expertise to clear your skin for good.",
     overview:
-      "Acne affects people of all ages and skin types. While over-the-counter products may help with mild cases, persistent or cystic acne often requires professional intervention. At Rani Beauty Clinic, we take a comprehensive approach to acne treatment — addressing both the active breakouts and the scarring they leave behind.\n\nOur physician-supervised protocols use FDA-cleared devices and medical-grade formulations to target acne at its source: excess oil production, clogged pores, bacterial overgrowth, and inflammation. We customize every treatment plan based on your specific acne type, skin tone, and lifestyle.",
+      "Acne affects people of all ages and skin types. While over-the-counter products may help with mild cases, persistent or cystic acne often requires professional intervention. At Rani Beauty Clinic, we take a comprehensive approach to acne treatment - addressing both the active breakouts and the scarring they leave behind.\n\nOur physician-supervised protocols use FDA-cleared devices and medical-grade formulations to target acne at its source: excess oil production, clogged pores, bacterial overgrowth, and inflammation. We customize every treatment plan based on your specific acne type, skin tone, and lifestyle.",
     causes: [
       "Hormonal fluctuations (puberty, menstrual cycle, PCOS)",
       "Excess sebum (oil) production",
@@ -89,7 +89,7 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "At Rani Beauty Clinic, our acne treatment approach goes beyond surface-level solutions. Every protocol is supervised by Dr. Alexander Landfield, a board-certified neurologist serving as Medical Director. We use the Candela GentleMax Pro Plus laser system — specifically chosen because its dual-wavelength technology is safe and effective for all skin types, including Fitzpatrick IV-VI. Our team creates personalized multi-step treatment plans that combine in-clinic procedures with at-home skincare guidance, ensuring lasting results rather than temporary fixes.",
+      "At Rani Beauty Clinic, our acne treatment approach goes beyond surface-level solutions. Every protocol is supervised by Dr. Alexander Landfield, a board-certified neurologist serving as Medical Director. We use the Candela GentleMax Pro Plus laser system - specifically chosen because its dual-wavelength technology is safe and effective for all skin types, including Fitzpatrick IV-VI. Our team creates personalized multi-step treatment plans that combine in-clinic procedures with at-home skincare guidance, ensuring lasting results rather than temporary fixes.",
     faqs: [
       {
         question: "How many sessions does it take to clear acne?",
@@ -104,7 +104,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "What about acne scars?",
         answer:
-          "We treat all types of acne scars — ice pick, boxcar, and rolling scars — using RF microneedling (Cutera Secret Pro), chemical peels, and combination protocols. Most scar treatments require 3-4 sessions spaced 4-6 weeks apart for optimal results.",
+          "We treat all types of acne scars - ice pick, boxcar, and rolling scars - using RF microneedling (Cutera Secret Pro), chemical peels, and combination protocols. Most scar treatments require 3-4 sessions spaced 4-6 weeks apart for optimal results.",
       },
       {
         question: "Do you prescribe acne medication?",
@@ -128,7 +128,7 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Turn back the clock with physician-supervised anti-aging treatments. From fine lines and wrinkles to volume loss and skin laxity, our advanced technology and expert injectables deliver natural-looking rejuvenation.",
     overview:
-      "Skin aging is a natural process accelerated by sun exposure, environmental stress, genetics, and lifestyle factors. As collagen and elastin production decline — typically starting in our mid-20s — the skin loses firmness, develops fine lines and wrinkles, and may show volume loss in areas like the cheeks and under-eyes.\n\nAt Rani Beauty Clinic, we offer a comprehensive anti-aging menu that addresses every stage and sign of aging. Whether you're looking for prevention, correction, or maintenance, our physician-supervised approach ensures safe, natural-looking results customized to your facial anatomy and goals.",
+      "Skin aging is a natural process accelerated by sun exposure, environmental stress, genetics, and lifestyle factors. As collagen and elastin production decline - typically starting in our mid-20s - the skin loses firmness, develops fine lines and wrinkles, and may show volume loss in areas like the cheeks and under-eyes.\n\nAt Rani Beauty Clinic, we offer a comprehensive anti-aging menu that addresses every stage and sign of aging. Whether you're looking for prevention, correction, or maintenance, our physician-supervised approach ensures safe, natural-looking results customized to your facial anatomy and goals.",
     causes: [
       "Natural collagen and elastin decline (starts mid-20s)",
       "UV radiation and sun damage (photoaging)",
@@ -155,7 +155,7 @@ export const skinConcerns: SkinConcern[] = [
         slug: "botox-dysport",
         basePath: "/services",
         description:
-          "Neuromodulators relax the muscles that cause dynamic wrinkles — forehead lines, crow's feet, and frown lines. Results appear in 3-7 days and last 3-4 months. Our neurologist-supervised injections ensure precise, natural results.",
+          "Neuromodulators relax the muscles that cause dynamic wrinkles - forehead lines, crow's feet, and frown lines. Results appear in 3-7 days and last 3-4 months. Our neurologist-supervised injections ensure precise, natural results.",
         bestFor: "Dynamic wrinkles, prevention, crow's feet, forehead lines",
       },
       {
@@ -171,7 +171,7 @@ export const skinConcerns: SkinConcern[] = [
         slug: "sofwave",
         basePath: "/services",
         description:
-          "FDA-cleared ultrasound skin tightening that stimulates new collagen at 1.5mm depth. The SUPERB technology lifts brows, tightens jawline, and reduces wrinkles — all in a single 30-45 minute session with no downtime.",
+          "FDA-cleared ultrasound skin tightening that stimulates new collagen at 1.5mm depth. The SUPERB technology lifts brows, tightens jawline, and reduces wrinkles - all in a single 30-45 minute session with no downtime.",
         bestFor: "Skin laxity, brow lifting, jawline tightening, neck lines",
       },
       {
@@ -200,12 +200,12 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "Anti-aging treatments require precision, artistry, and medical expertise. At Rani Beauty Clinic, every injectable is supervised by Dr. Alexander Landfield, a board-certified neurologist — providing a depth of understanding of facial anatomy and neuromuscular function that sets us apart. Our non-invasive treatments use the latest FDA-cleared devices including Sofwave (ultrasound), Cutera Secret Pro (RF microneedling), and Candela GentleMax Pro Plus (laser). We believe in natural-looking results that enhance your features rather than change them.",
+      "Anti-aging treatments require precision, artistry, and medical expertise. At Rani Beauty Clinic, every injectable is supervised by Dr. Alexander Landfield, a board-certified neurologist - providing a depth of understanding of facial anatomy and neuromuscular function that sets us apart. Our non-invasive treatments use the latest FDA-cleared devices including Sofwave (ultrasound), Cutera Secret Pro (RF microneedling), and Candela GentleMax Pro Plus (laser). We believe in natural-looking results that enhance your features rather than change them.",
     faqs: [
       {
         question: "What age should I start anti-aging treatments?",
         answer:
-          "Prevention can start in your mid-to-late 20s with treatments like preventive Botox and HydraFacials. There's no wrong time to start — we customize treatment intensity based on your current skin condition, goals, and budget. A consultation helps us create the ideal plan for your stage of aging.",
+          "Prevention can start in your mid-to-late 20s with treatments like preventive Botox and HydraFacials. There's no wrong time to start - we customize treatment intensity based on your current skin condition, goals, and budget. A consultation helps us create the ideal plan for your stage of aging.",
       },
       {
         question: "How long do results last?",
@@ -215,7 +215,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "Can I combine multiple anti-aging treatments?",
         answer:
-          "Absolutely — in fact, combination approaches often deliver the best results. A common protocol might include Botox for dynamic wrinkles, filler for volume loss, and RF microneedling for overall texture improvement. We design multi-treatment plans during your consultation.",
+          "Absolutely - in fact, combination approaches often deliver the best results. A common protocol might include Botox for dynamic wrinkles, filler for volume loss, and RF microneedling for overall texture improvement. We design multi-treatment plans during your consultation.",
       },
       {
         question: "Are these treatments safe for darker skin tones?",
@@ -234,10 +234,10 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Expert treatment for dark spots, melasma, sun damage, and post-inflammatory hyperpigmentation. Our physician-supervised approach combines advanced technology with skin-type-specific protocols for even, radiant skin.",
     overview:
-      "Hyperpigmentation — the overproduction of melanin that causes dark patches, spots, or uneven skin tone — is one of the most common skin concerns we treat. It can be triggered by sun exposure, hormonal changes, acne scarring, or inflammation.\n\nEffective treatment requires understanding the type and depth of pigmentation, which is why our approach begins with an AI skin analysis. Melasma, sun spots, and post-inflammatory hyperpigmentation each respond to different protocols. Our physician-supervised treatments are carefully calibrated for your specific skin tone — especially important for melanin-rich skin, where aggressive treatments can worsen pigmentation.",
+      "Hyperpigmentation - the overproduction of melanin that causes dark patches, spots, or uneven skin tone - is one of the most common skin concerns we treat. It can be triggered by sun exposure, hormonal changes, acne scarring, or inflammation.\n\nEffective treatment requires understanding the type and depth of pigmentation, which is why our approach begins with an AI skin analysis. Melasma, sun spots, and post-inflammatory hyperpigmentation each respond to different protocols. Our physician-supervised treatments are carefully calibrated for your specific skin tone - especially important for melanin-rich skin, where aggressive treatments can worsen pigmentation.",
     causes: [
       "UV radiation and sun damage (solar lentigines)",
-      "Hormonal changes — pregnancy, birth control, HRT (melasma)",
+      "Hormonal changes - pregnancy, birth control, HRT (melasma)",
       "Post-inflammatory response from acne, cuts, or burns",
       "Medications (certain antibiotics, chemotherapy)",
       "Friction or irritation from shaving or waxing",
@@ -293,7 +293,7 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "Treating hyperpigmentation requires a nuanced approach — especially for melanin-rich skin where aggressive treatments can trigger rebound pigmentation. Our team has deep experience treating diverse skin tones safely and effectively. We start with an AI skin analysis to understand your specific pigmentation type, then create a multi-step protocol that may combine in-clinic treatments with prescription-strength at-home care. Every treatment is supervised by our Medical Director to ensure safety and optimal outcomes.",
+      "Treating hyperpigmentation requires a nuanced approach - especially for melanin-rich skin where aggressive treatments can trigger rebound pigmentation. Our team has deep experience treating diverse skin tones safely and effectively. We start with an AI skin analysis to understand your specific pigmentation type, then create a multi-step protocol that may combine in-clinic treatments with prescription-strength at-home care. Every treatment is supervised by our Medical Director to ensure safety and optimal outcomes.",
     faqs: [
       {
         question: "How long does it take to see results?",
@@ -313,7 +313,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "Do I need sunscreen during treatment?",
         answer:
-          "Absolutely — sunscreen is the single most important factor in treating and preventing hyperpigmentation. We recommend a broad-spectrum SPF 30+ (mineral preferred) applied daily, even on cloudy days. Without consistent sun protection, treatments will be significantly less effective.",
+          "Absolutely - sunscreen is the single most important factor in treating and preventing hyperpigmentation. We recommend a broad-spectrum SPF 30+ (mineral preferred) applied daily, even on cloudy days. Without consistent sun protection, treatments will be significantly less effective.",
       },
     ],
     relatedConcerns: ["acne", "aging-skin", "sun-damage"],
@@ -327,7 +327,7 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Restore firmness and lift without surgery. Our physician-supervised skin tightening treatments use Sofwave ultrasound, RF microneedling, and collagen-stimulating technology to turn back the clock on sagging skin.",
     overview:
-      "Skin laxity — the loss of firmness and elasticity — happens as collagen and elastin production naturally declines with age. Gravity, sun damage, weight fluctuations, and hormonal changes accelerate this process, leading to sagging along the jawline, drooping brows, and looseness in the neck and body.\n\nAt Rani Beauty Clinic, we offer multiple non-invasive approaches to skin tightening that stimulate your body's own collagen production. These treatments provide gradual, natural-looking lifting and firming without the risks, cost, or downtime of surgical procedures.",
+      "Skin laxity - the loss of firmness and elasticity - happens as collagen and elastin production naturally declines with age. Gravity, sun damage, weight fluctuations, and hormonal changes accelerate this process, leading to sagging along the jawline, drooping brows, and looseness in the neck and body.\n\nAt Rani Beauty Clinic, we offer multiple non-invasive approaches to skin tightening that stimulate your body's own collagen production. These treatments provide gradual, natural-looking lifting and firming without the risks, cost, or downtime of surgical procedures.",
     causes: [
       "Natural collagen and elastin decline with age",
       "UV damage breaking down structural proteins",
@@ -380,7 +380,7 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "Skin tightening is one of our specialty areas. We invested in Sofwave — one of the most advanced non-invasive lifting devices available — because of its proven clinical results and safety profile across all skin types. Combined with our Cutera Secret Pro for RF microneedling and expert filler artistry supervised by a board-certified neurologist, we offer a complete non-surgical facelift approach. Our team evaluates your degree of laxity and recommends the right combination of technologies for your goals.",
+      "Skin tightening is one of our specialty areas. We invested in Sofwave - one of the most advanced non-invasive lifting devices available - because of its proven clinical results and safety profile across all skin types. Combined with our Cutera Secret Pro for RF microneedling and expert filler artistry supervised by a board-certified neurologist, we offer a complete non-surgical facelift approach. Our team evaluates your degree of laxity and recommends the right combination of technologies for your goals.",
     faqs: [
       {
         question: "How many sessions do I need for skin tightening?",
@@ -400,7 +400,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "Can you tighten neck skin without surgery?",
         answer:
-          "Yes — both Sofwave and RF microneedling are excellent for neck rejuvenation. Sofwave is particularly effective for horizontal neck lines and mild neck laxity. For more significant neck concerns, we may recommend a combination approach with multiple treatment modalities.",
+          "Yes - both Sofwave and RF microneedling are excellent for neck rejuvenation. Sofwave is particularly effective for horizontal neck lines and mild neck laxity. For more significant neck concerns, we may recommend a combination approach with multiple treatment modalities.",
       },
     ],
     relatedConcerns: ["aging-skin", "body-contouring", "dull-skin"],
@@ -410,11 +410,11 @@ export const skinConcerns: SkinConcern[] = [
     title: "Unwanted Hair",
     metaTitle: "Laser Hair Removal in Renton, WA | All Skin Types",
     metaDescription:
-      "Permanent laser hair removal in Renton, WA. Candela GentleMax Pro Plus treats all skin types safely. Face, body, Brazilian — physician-supervised. Book today.",
+      "Permanent laser hair removal in Renton, WA. Candela GentleMax Pro Plus treats all skin types safely. Face, body, Brazilian - physician-supervised. Book today.",
     heroDescription:
-      "Say goodbye to shaving, waxing, and ingrown hairs. Our Candela GentleMax Pro Plus delivers permanent hair reduction for all skin types — including dark and melanin-rich skin — with built-in cooling for maximum comfort.",
+      "Say goodbye to shaving, waxing, and ingrown hairs. Our Candela GentleMax Pro Plus delivers permanent hair reduction for all skin types - including dark and melanin-rich skin - with built-in cooling for maximum comfort.",
     overview:
-      "Unwanted body and facial hair is one of the most common aesthetic concerns we treat. Traditional hair removal methods — shaving, waxing, threading, and depilatory creams — are temporary, time-consuming, and often lead to irritation, ingrown hairs, and hyperpigmentation.\n\nLaser hair removal provides a permanent solution by targeting the hair follicle with concentrated light energy. At Rani Beauty Clinic, we use the Candela GentleMax Pro Plus — the gold standard in laser hair removal — featuring dual wavelengths (755nm Alexandrite and 1064nm Nd:YAG) that safely and effectively treat all skin tones, from the lightest to the darkest.",
+      "Unwanted body and facial hair is one of the most common aesthetic concerns we treat. Traditional hair removal methods - shaving, waxing, threading, and depilatory creams - are temporary, time-consuming, and often lead to irritation, ingrown hairs, and hyperpigmentation.\n\nLaser hair removal provides a permanent solution by targeting the hair follicle with concentrated light energy. At Rani Beauty Clinic, we use the Candela GentleMax Pro Plus - the gold standard in laser hair removal - featuring dual wavelengths (755nm Alexandrite and 1064nm Nd:YAG) that safely and effectively treat all skin tones, from the lightest to the darkest.",
     causes: [
       "Genetics and ethnicity",
       "Hormonal factors (PCOS, thyroid disorders, menopause)",
@@ -435,11 +435,11 @@ export const skinConcerns: SkinConcern[] = [
         basePath: "/services",
         description:
           "Our Candela GentleMax Pro Plus delivers targeted laser energy that is absorbed by the melanin in hair follicles, permanently disabling their ability to produce new hair. The built-in Dynamic Cooling Device (DCD) makes treatment virtually pain-free. Dual wavelengths (Alexandrite 755nm for lighter skin, Nd:YAG 1064nm for darker skin) ensure safe treatment for all skin types.",
-        bestFor: "All areas — face, underarms, legs, bikini, Brazilian, back, chest",
+        bestFor: "All areas - face, underarms, legs, bikini, Brazilian, back, chest",
       },
     ],
     whyRani:
-      "We chose the Candela GentleMax Pro Plus specifically because it is the most versatile and effective laser hair removal system available. The dual-wavelength technology means we can safely treat ALL skin types — a critical differentiator in our diverse community. Every treatment is supervised by our Medical Director, and our experienced laser technicians customize parameters for your specific skin tone and hair type. We offer competitive package pricing for full treatment courses (typically 6-8 sessions), and most clients see 80-90% permanent hair reduction.",
+      "We chose the Candela GentleMax Pro Plus specifically because it is the most versatile and effective laser hair removal system available. The dual-wavelength technology means we can safely treat ALL skin types - a critical differentiator in our diverse community. Every treatment is supervised by our Medical Director, and our experienced laser technicians customize parameters for your specific skin tone and hair type. We offer competitive package pricing for full treatment courses (typically 6-8 sessions), and most clients see 80-90% permanent hair reduction.",
     faqs: [
       {
         question: "How many sessions do I need?",
@@ -473,7 +473,7 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Revive dull, tired skin with medical-grade rejuvenation. Our physician-supervised treatments deep cleanse, exfoliate, and nourish your skin to restore a luminous, healthy glow you can see immediately.",
     overview:
-      "Dull, lackluster skin affects nearly everyone at some point. Dead skin cell buildup, dehydration, environmental damage, stress, and poor circulation can all leave skin looking flat, tired, and rough to the touch.\n\nAt Rani Beauty Clinic, we specialize in treatments that address dullness at every level — from surface exfoliation to deep cellular rejuvenation. Many of our glow-boosting treatments deliver visible results in a single session, making them perfect for pre-event preparation or regular maintenance.",
+      "Dull, lackluster skin affects nearly everyone at some point. Dead skin cell buildup, dehydration, environmental damage, stress, and poor circulation can all leave skin looking flat, tired, and rough to the touch.\n\nAt Rani Beauty Clinic, we specialize in treatments that address dullness at every level - from surface exfoliation to deep cellular rejuvenation. Many of our glow-boosting treatments deliver visible results in a single session, making them perfect for pre-event preparation or regular maintenance.",
     causes: [
       "Dead skin cell accumulation (slow cell turnover)",
       "Dehydration (both skin and systemic)",
@@ -499,7 +499,7 @@ export const skinConcerns: SkinConcern[] = [
         slug: "hydrafacial",
         basePath: "/services",
         description:
-          "The ultimate glow treatment. Vortex-Fusion technology cleanses, exfoliates, extracts, and hydrates in 30 minutes. Infuses hyaluronic acid, peptides, and antioxidants for immediate luminosity. Zero downtime — walk out glowing.",
+          "The ultimate glow treatment. Vortex-Fusion technology cleanses, exfoliates, extracts, and hydrates in 30 minutes. Infuses hyaluronic acid, peptides, and antioxidants for immediate luminosity. Zero downtime - walk out glowing.",
         bestFor: "Immediate glow, dehydration, congestion, pre-event prep",
       },
       {
@@ -523,7 +523,7 @@ export const skinConcerns: SkinConcern[] = [
         slug: "red-light-therapy",
         basePath: "/services",
         description:
-          "Full-body LED panels deliver therapeutic red and near-infrared wavelengths that boost cellular energy (ATP), increase circulation, and stimulate collagen — resulting in a healthier, more radiant complexion from the inside out.",
+          "Full-body LED panels deliver therapeutic red and near-infrared wavelengths that boost cellular energy (ATP), increase circulation, and stimulate collagen - resulting in a healthier, more radiant complexion from the inside out.",
         bestFor: "Cellular rejuvenation, circulation, overall radiance, wellness",
       },
       {
@@ -536,12 +536,12 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "We believe glowing skin starts with healthy skin. Our approach combines surface-level rejuvenation (HydraFacial, peels) with cellular-level wellness (red light therapy, vitamin injections) for results that last. Every treatment is physician-supervised, and our AI skin analysis helps us identify the specific causes of your dullness — whether it's dehydration, buildup, or nutrient deficiency — so we can target the right solution from the start.",
+      "We believe glowing skin starts with healthy skin. Our approach combines surface-level rejuvenation (HydraFacial, peels) with cellular-level wellness (red light therapy, vitamin injections) for results that last. Every treatment is physician-supervised, and our AI skin analysis helps us identify the specific causes of your dullness - whether it's dehydration, buildup, or nutrient deficiency - so we can target the right solution from the start.",
     faqs: [
       {
         question: "Which treatment gives the fastest glow?",
         answer:
-          "HydraFacial delivers the most immediate visible glow — clients see results walking out of their session. It's our most popular pre-event treatment. For ongoing radiance, we recommend monthly HydraFacials combined with at-home skincare.",
+          "HydraFacial delivers the most immediate visible glow - clients see results walking out of their session. It's our most popular pre-event treatment. For ongoing radiance, we recommend monthly HydraFacials combined with at-home skincare.",
       },
       {
         question: "How often should I get skin rejuvenation treatments?",
@@ -551,7 +551,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "Can dull skin be a sign of something deeper?",
         answer:
-          "Yes — persistent dullness can indicate dehydration, nutritional deficiencies (vitamin D, B12, iron), hormonal imbalances, or other health factors. We offer comprehensive blood work and vitamin injection programs that address dull skin from the inside out.",
+          "Yes - persistent dullness can indicate dehydration, nutritional deficiencies (vitamin D, B12, iron), hormonal imbalances, or other health factors. We offer comprehensive blood work and vitamin injection programs that address dull skin from the inside out.",
       },
     ],
     relatedConcerns: ["aging-skin", "hyperpigmentation", "acne"],
@@ -565,7 +565,7 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Achieve your body goals with physician-supervised weight management. Our GLP-1 programs (Semaglutide and Tirzepatide), combined with metabolic support and wellness injections, provide a medical approach to sustainable weight loss.",
     overview:
-      "Achieving and maintaining a healthy weight is about more than willpower — it involves complex interactions between hormones, metabolism, genetics, and lifestyle factors. Modern medicine has given us powerful tools to support weight management, and at Rani Beauty Clinic, we combine these medical approaches with comprehensive wellness support.\n\nOur physician-supervised GLP-1 weight management programs use FDA-approved medications (Semaglutide and Tirzepatide) that work with your body's natural appetite regulation system. Combined with metabolic support through vitamin injections, NAD+ therapy, and hormone optimization, we address weight management from every angle.",
+      "Achieving and maintaining a healthy weight is about more than willpower - it involves complex interactions between hormones, metabolism, genetics, and lifestyle factors. Modern medicine has given us powerful tools to support weight management, and at Rani Beauty Clinic, we combine these medical approaches with comprehensive wellness support.\n\nOur physician-supervised GLP-1 weight management programs use FDA-approved medications (Semaglutide and Tirzepatide) that work with your body's natural appetite regulation system. Combined with metabolic support through vitamin injections, NAD+ therapy, and hormone optimization, we address weight management from every angle.",
     causes: [
       "Hormonal imbalances (insulin resistance, thyroid, cortisol)",
       "Metabolic slowdown with age",
@@ -589,7 +589,7 @@ export const skinConcerns: SkinConcern[] = [
         slug: "glp1-weight-management",
         basePath: "/wellness",
         description:
-          "Our physician-supervised programs use Semaglutide or Tirzepatide — GLP-1 receptor agonists that reduce appetite, slow gastric emptying, and improve insulin sensitivity. Includes monthly check-ins, dosage optimization, and nutritional guidance.",
+          "Our physician-supervised programs use Semaglutide or Tirzepatide - GLP-1 receptor agonists that reduce appetite, slow gastric emptying, and improve insulin sensitivity. Includes monthly check-ins, dosage optimization, and nutritional guidance.",
         bestFor: "Significant weight loss, appetite control, metabolic health",
       },
       {
@@ -626,7 +626,7 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "Weight management at Rani Beauty Clinic is a medical program, not a diet plan. Every patient receives physician supervision, regular blood work monitoring, and a customized protocol that may include GLP-1 medication, vitamin injections, hormone optimization, and lifestyle guidance. Our Medical Director oversees all prescriptions and dosage adjustments. We also offer the unique advantage of combining weight management with aesthetic treatments — so as your body transforms, we can address skin laxity, body contouring, and overall rejuvenation in parallel.",
+      "Weight management at Rani Beauty Clinic is a medical program, not a diet plan. Every patient receives physician supervision, regular blood work monitoring, and a customized protocol that may include GLP-1 medication, vitamin injections, hormone optimization, and lifestyle guidance. Our Medical Director oversees all prescriptions and dosage adjustments. We also offer the unique advantage of combining weight management with aesthetic treatments - so as your body transforms, we can address skin laxity, body contouring, and overall rejuvenation in parallel.",
     faqs: [
       {
         question: "How much weight can I expect to lose on GLP-1?",
@@ -660,7 +660,7 @@ export const skinConcerns: SkinConcern[] = [
     heroDescription:
       "Undo years of sun damage with advanced physician-supervised treatments. From sun spots and uneven tone to textural changes and premature wrinkles, our multi-modal approach restores healthy, youthful skin.",
     overview:
-      "Sun damage (photoaging) is the single largest contributor to visible skin aging. UV radiation breaks down collagen and elastin, triggers melanin overproduction, and causes DNA damage that leads to rough texture, wrinkles, dark spots, and potentially precancerous changes.\n\nAt Rani Beauty Clinic, we take a comprehensive approach to reversing sun damage using multiple treatment modalities that target different aspects of photodamage — from surface-level pigmentation to deep structural changes. Our physician-supervised protocols are customized based on the type and severity of your sun damage.",
+      "Sun damage (photoaging) is the single largest contributor to visible skin aging. UV radiation breaks down collagen and elastin, triggers melanin overproduction, and causes DNA damage that leads to rough texture, wrinkles, dark spots, and potentially precancerous changes.\n\nAt Rani Beauty Clinic, we take a comprehensive approach to reversing sun damage using multiple treatment modalities that target different aspects of photodamage - from surface-level pigmentation to deep structural changes. Our physician-supervised protocols are customized based on the type and severity of your sun damage.",
     causes: [
       "Cumulative UV exposure (UVA and UVB radiation)",
       "Sunburns, especially in childhood and adolescence",
@@ -719,7 +719,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "Can sun damage be reversed?",
         answer:
-          "Much of the visible effects of sun damage — pigmentation, texture changes, fine wrinkles — can be significantly improved with professional treatments. While some deeper structural changes may not be fully reversible, we can dramatically improve your skin's appearance and health. The key is combining treatments that address different layers of damage.",
+          "Much of the visible effects of sun damage - pigmentation, texture changes, fine wrinkles - can be significantly improved with professional treatments. While some deeper structural changes may not be fully reversible, we can dramatically improve your skin's appearance and health. The key is combining treatments that address different layers of damage.",
       },
       {
         question: "How long does sun damage treatment take?",
@@ -729,7 +729,7 @@ export const skinConcerns: SkinConcern[] = [
       {
         question: "Can I still go in the sun during treatment?",
         answer:
-          "Sun protection is essential during and after treatment — it's the foundation of any anti-sun-damage protocol. We recommend broad-spectrum SPF 30+ daily, sun-protective clothing, and avoiding peak UV hours. Without consistent protection, treatments will be less effective and damage will continue.",
+          "Sun protection is essential during and after treatment - it's the foundation of any anti-sun-damage protocol. We recommend broad-spectrum SPF 30+ daily, sun-protective clothing, and avoiding peak UV hours. Without consistent protection, treatments will be less effective and damage will continue.",
       },
     ],
     relatedConcerns: ["hyperpigmentation", "aging-skin", "skin-laxity"],
@@ -796,7 +796,7 @@ export const skinConcerns: SkinConcern[] = [
       },
     ],
     whyRani:
-      "We take a multi-treatment approach to pore concerns because no single treatment addresses all the factors that contribute to large pores. Our typical pore protocol combines regular HydraFacials for deep cleansing with RF microneedling for structural tightening — a powerful one-two punch. Our AI skin analysis measures your pore size objectively so we can track real improvement over your treatment course.",
+      "We take a multi-treatment approach to pore concerns because no single treatment addresses all the factors that contribute to large pores. Our typical pore protocol combines regular HydraFacials for deep cleansing with RF microneedling for structural tightening - a powerful one-two punch. Our AI skin analysis measures your pore size objectively so we can track real improvement over your treatment course.",
     faqs: [
       {
         question: "Can pores actually shrink?",

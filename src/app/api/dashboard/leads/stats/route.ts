@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       ? Math.round((convertedClients.length / newLeads30d) * 100)
       : 0;
 
-    // Source field doesn't exist in Clients table — return empty sources
+    // Source field doesn't exist in Clients table - return empty sources
     const topSources: { source: string; count: number; rate: number }[] = [];
 
     const data = {

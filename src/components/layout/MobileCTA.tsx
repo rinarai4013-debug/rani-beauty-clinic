@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { trackAnalyticsEvent } from "@/lib/analytics/events";
 
 /**
- * Simplified sticky mobile CTA bar — single full-width gold booking button.
+ * Simplified sticky mobile CTA bar - single full-width gold booking button.
  * Appears after scrolling past hero, hidden on md+ breakpoints.
  */
 export default function MobileCTA() {

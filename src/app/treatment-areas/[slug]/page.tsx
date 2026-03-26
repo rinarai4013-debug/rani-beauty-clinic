@@ -53,7 +53,7 @@ export default function TreatmentAreaPage({
     },
     about: {
       "@type": "MedicalProcedure",
-      name: `${page.treatment} — ${page.bodyArea}`,
+      name: `${page.treatment} - ${page.bodyArea}`,
       bodyLocation: page.bodyArea,
       url: `${clinicInfo.website}/${page.basePath}/${page.serviceSlug}`,
     },
@@ -90,7 +90,7 @@ export default function TreatmentAreaPage({
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: clinicInfo.website },
       { "@type": "ListItem", position: 2, name: page.treatment, item: `${clinicInfo.website}/${page.basePath}/${page.serviceSlug}` },
-      { "@type": "ListItem", position: 3, name: `${page.treatment} — ${page.bodyArea}`, item: pageUrl },
+      { "@type": "ListItem", position: 3, name: `${page.treatment} - ${page.bodyArea}`, item: pageUrl },
     ],
   };
 
@@ -120,7 +120,7 @@ export default function TreatmentAreaPage({
         {/* Hero */}
         <header className="mb-12">
           <p className="mb-2 text-sm font-medium uppercase tracking-widest text-rani-gold">
-            {page.treatment} — {page.bodyArea}
+            {page.treatment} - {page.bodyArea}
           </p>
           <h1 className="font-heading text-3xl font-bold text-rani-navy md:text-4xl lg:text-5xl">
             {page.title}

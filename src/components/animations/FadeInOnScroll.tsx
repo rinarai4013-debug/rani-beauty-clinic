@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ReactNode } from "react";
 
 interface FadeInOnScrollProps {
@@ -26,6 +26,23 @@ export default function FadeInOnScroll({
   direction = "up",
   className,
 }: FadeInOnScrollProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  // When reduced motion is preferred, skip all directional animation
+  if (prefersReducedMotion) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.01 }}
+        className={className}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, ...directionOffset[direction] }}

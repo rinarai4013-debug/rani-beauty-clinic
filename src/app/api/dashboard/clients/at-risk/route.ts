@@ -9,7 +9,7 @@ import { cache, TTL } from '@/lib/cache';
  *
  * Returns clients who are lapsing or at risk of churning,
  * based on their Airtable Status field (Lapsed 30/60/90, Churned).
- * Simple and fast — doesn't run full churn engine per client.
+ * Simple and fast - doesn't run full churn engine per client.
  */
 export async function GET() {
   try {

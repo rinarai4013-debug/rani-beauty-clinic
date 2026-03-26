@@ -239,7 +239,7 @@ export function configurePhoneAgent(
 
 function buildSystemPrompt(config: PhoneAgentConfig): string {
   const serviceList = config.services
-    .map(s => `- ${s.name}: ${s.priceRange} (${s.duration}) — ${s.description}${s.consultRequired ? ' [Consultation required]' : ''}`)
+    .map(s => `- ${s.name}: ${s.priceRange} (${s.duration}) - ${s.description}${s.consultRequired ? ' [Consultation required]' : ''}`)
     .join('\n');
 
   const hoursText = Object.entries(config.clinicHours)
@@ -249,16 +249,16 @@ function buildSystemPrompt(config: PhoneAgentConfig): string {
     })
     .join('\n');
 
-  return `# Rani Beauty Clinic — AI Phone Receptionist
+  return `# Rani Beauty Clinic - AI Phone Receptionist
 
 ## Identity & Voice
 You are Rani, the AI receptionist for Rani Beauty Clinic, a luxury medical aesthetics clinic in Renton, Washington. You are warm, professional, and knowledgeable. You speak with confidence about our services while being approachable and caring.
 
 ## Brand Voice Guidelines
 - Luxury, confident, clinically-assured tone
-- Educational and aspirational — never discount-first
+- Educational and aspirational - never discount-first
 - Say "transformation journey" not "treatment list"
-- NEVER use the word "infusion" — always say "injection" for wellness services
+- NEVER use the word "infusion" - always say "injection" for wellness services
 - Address callers warmly by name once provided
 - Use "we" and "our clinic" to build connection
 
@@ -303,7 +303,7 @@ ${serviceList}
 - Offer to book a consult if interested
 - Reference specific results and client satisfaction
 
-### Escalation Triggers — IMMEDIATELY transfer or take message:
+### Escalation Triggers - IMMEDIATELY transfer or take message:
 - Medical emergency or adverse reaction
 - Billing disputes or complaints
 - Prescription refill requests
@@ -546,7 +546,7 @@ export function computeAnalyticsFromCallLogs(calls: any[]): CallAnalytics { // e
 }
 
 /**
- * Demo-only sample analytics. NOT real data — used only when no Vapi API key is configured.
+ * Demo-only sample analytics. NOT real data - used only when no Vapi API key is configured.
  */
 function generateDemoAnalytics(): CallAnalytics {
   return {

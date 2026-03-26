@@ -1,15 +1,15 @@
 /**
  * Churn Prediction Engine for Rani Beauty Clinic
  *
- * Scores clients 0–100 on churn risk based on behavioral signals.
+ * Scores clients 0-100 on churn risk based on behavioral signals.
  * Higher score = higher risk of churning.
  *
  * Factors:
- * 1. Recency (40%) — Days since last visit
- * 2. Frequency decline (20%) — Visit frequency trending down
- * 3. Monetary trend (15%) — Spending decreasing
- * 4. Membership status (15%) — Active membership = lower risk
- * 5. Engagement (10%) — Recent communication responses
+ * 1. Recency (40%) - Days since last visit
+ * 2. Frequency decline (20%) - Visit frequency trending down
+ * 3. Monetary trend (15%) - Spending decreasing
+ * 4. Membership status (15%) - Active membership = lower risk
+ * 5. Engagement (10%) - Recent communication responses
  */
 
 export interface ChurnInput {
@@ -51,13 +51,13 @@ const WEIGHTS = {
  */
 function scoreRecency(daysSinceLastVisit: number): { score: number; detail: string } {
   if (daysSinceLastVisit <= 0) return { score: 0, detail: 'Visited today' };
-  if (daysSinceLastVisit <= 14) return { score: 5, detail: `${daysSinceLastVisit}d ago — recent` };
-  if (daysSinceLastVisit <= 30) return { score: 15, detail: `${daysSinceLastVisit}d ago — normal` };
-  if (daysSinceLastVisit <= 45) return { score: 35, detail: `${daysSinceLastVisit}d ago — starting to lapse` };
-  if (daysSinceLastVisit <= 60) return { score: 55, detail: `${daysSinceLastVisit}d ago — lapsing` };
-  if (daysSinceLastVisit <= 90) return { score: 75, detail: `${daysSinceLastVisit}d ago — at risk` };
-  if (daysSinceLastVisit <= 120) return { score: 90, detail: `${daysSinceLastVisit}d ago — high risk` };
-  return { score: 100, detail: `${daysSinceLastVisit}d ago — likely churned` };
+  if (daysSinceLastVisit <= 14) return { score: 5, detail: `${daysSinceLastVisit}d ago - recent` };
+  if (daysSinceLastVisit <= 30) return { score: 15, detail: `${daysSinceLastVisit}d ago - normal` };
+  if (daysSinceLastVisit <= 45) return { score: 35, detail: `${daysSinceLastVisit}d ago - starting to lapse` };
+  if (daysSinceLastVisit <= 60) return { score: 55, detail: `${daysSinceLastVisit}d ago - lapsing` };
+  if (daysSinceLastVisit <= 90) return { score: 75, detail: `${daysSinceLastVisit}d ago - at risk` };
+  if (daysSinceLastVisit <= 120) return { score: 90, detail: `${daysSinceLastVisit}d ago - high risk` };
+  return { score: 100, detail: `${daysSinceLastVisit}d ago - likely churned` };
 }
 
 /**
@@ -65,7 +65,8 @@ function scoreRecency(daysSinceLastVisit: number): { score: number; detail: stri
  * Compares recent 3-month visit frequency to prior 3-month frequency.
  */
 function scoreFrequency(visitDates: string[]): { score: number; detail: string } {
-  if (visitDates.length <= 1) return { score: 50, detail: 'Too few visits to analyze trend' };
+  if (visitDates.length === 0) return { score: 30, detail: 'No visits recorded' };
+  if (visitDates.length === 1) return { score: 20, detail: 'Only 1 visit - too early to assess trend' };
 
   const now = Date.now();
   const threeMonthsAgo = now - 90 * 24 * 60 * 60 * 1000;
@@ -93,7 +94,8 @@ function scoreFrequency(visitDates: string[]): { score: number; detail: string }
  * Compares average recent spend to prior average.
  */
 function scoreMonetary(amounts: number[]): { score: number; detail: string } {
-  if (amounts.length <= 1) return { score: 30, detail: 'Too few transactions to analyze' };
+  if (amounts.length === 0) return { score: 30, detail: 'No transaction history' };
+  if (amounts.length === 1) return { score: 15, detail: 'Single transaction - too early to assess trend' };
 
   const midpoint = Math.floor(amounts.length / 2);
   const recentAvg = amounts.slice(0, midpoint).reduce((s, a) => s + a, 0) / midpoint;
@@ -133,7 +135,7 @@ function scoreMembership(hasMembership: boolean, tier?: string): { score: number
  */
 function scoreEngagement(totalMessages: number, recentCount: number): { score: number; detail: string } {
   if (totalMessages === 0) return { score: 50, detail: 'No messages in system' };
-  if (recentCount >= 3) return { score: 5, detail: `${recentCount} messages in last 30d — highly engaged` };
+  if (recentCount >= 3) return { score: 5, detail: `${recentCount} messages in last 30d - highly engaged` };
   if (recentCount >= 1) return { score: 20, detail: `${recentCount} message(s) in last 30d` };
   if (totalMessages >= 5) return { score: 45, detail: 'Previously engaged, now quiet' };
   return { score: 65, detail: 'Low engagement history' };

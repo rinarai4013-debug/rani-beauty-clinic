@@ -13,9 +13,9 @@ export const clinicInfo = {
   email: "info@ranibeautyclinic.com",
   website: "https://www.ranibeautyclinic.com",
   hours: {
-    days: "Monday – Sunday",
-    time: "10:00 AM – 7:00 PM",
-    formatted: "Mon–Sun: 10 AM – 7 PM",
+    days: "Monday - Sunday",
+    time: "10:00 AM - 7:00 PM",
+    formatted: "Mon-Sun: 10 AM - 7 PM",
   },
   established: 2022,
   ownership: "Woman-Owned Business",

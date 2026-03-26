@@ -20,7 +20,7 @@ const FORM_NAMES: Record<string, string> = {
   [JOTFORM_FORMS.LYMPHATIC_CONSENT]: 'Lymphatic Consent',
 };
 
-// GET — fetch latest Jotform submissions + status
+// GET - fetch latest Jotform submissions + status
 export async function GET() {
   try {
     const session = await getSession();
@@ -84,7 +84,7 @@ export async function GET() {
   }
 }
 
-// POST — sync Jotform submissions → Airtable Clients table
+// POST - sync Jotform submissions → Airtable Clients table
 export async function POST() {
   try {
     const session = await getSession();

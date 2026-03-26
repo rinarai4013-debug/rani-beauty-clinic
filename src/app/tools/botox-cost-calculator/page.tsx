@@ -41,7 +41,7 @@ const treatmentAreas: TreatmentArea[] = [
     description: "Fine lines at the outer corners of the eyes",
     unitsMin: 20,
     unitsMax: 30,
-    note: "10–15 units per side",
+    note: "10-15 units per side",
   },
   {
     id: "bunny-lines",
@@ -63,7 +63,7 @@ const treatmentAreas: TreatmentArea[] = [
     description: "Slim the jawline or relieve teeth grinding",
     unitsMin: 50,
     unitsMax: 100,
-    note: "25–50 units per side",
+    note: "25-50 units per side",
   },
   {
     id: "neck-bands",
@@ -87,12 +87,12 @@ const faqItems = [
   {
     question: "How much does Botox cost per unit?",
     answer:
-      "At Rani Beauty Clinic, Botox is priced at $12–$14 per unit. The total cost depends on how many units your provider recommends for each treatment area. Most patients invest between $200–$600 per visit depending on the areas treated.",
+      "At Rani Beauty Clinic, Botox is priced at $12-$14 per unit. The total cost depends on how many units your provider recommends for each treatment area. Most patients invest between $200-$600 per visit depending on the areas treated.",
   },
   {
     question: "How many units of Botox will I need?",
     answer:
-      "The number of units varies based on the treatment area, muscle strength, and your aesthetic goals. For example, forehead lines typically require 10–30 units, frown lines need 15–25 units, and crow's feet use 20–30 units total. Your provider will determine the exact amount during your consultation.",
+      "The number of units varies based on the treatment area, muscle strength, and your aesthetic goals. For example, forehead lines typically require 10-30 units, frown lines need 15-25 units, and crow's feet use 20-30 units total. Your provider will determine the exact amount during your consultation.",
   },
   {
     question: "Does Botox pricing vary between clinics?",
@@ -171,7 +171,7 @@ export default function BotoxCostCalculatorPage() {
     };
   }, [selected]);
 
-  const embedCode = `<iframe src="${clinicInfo.website}/tools/botox-cost-calculator" width="100%" height="900" style="border:none;border-radius:12px;" title="Botox Cost Calculator — Rani Beauty Clinic"></iframe>`;
+  const embedCode = `<iframe src="${clinicInfo.website}/tools/botox-cost-calculator" width="100%" height="900" style="border:none;border-radius:12px;" title="Botox Cost Calculator - Rani Beauty Clinic"></iframe>`;
 
   const handleCopyEmbed = async () => {
     try {
@@ -202,7 +202,7 @@ export default function BotoxCostCalculatorPage() {
             <p className="font-body text-white/70 text-lg max-w-2xl mx-auto">
               Estimate your Botox investment by selecting the areas you&apos;d
               like to treat. Pricing is based on{" "}
-              <strong className="text-white">$12–$14 per unit</strong> at Rani
+              <strong className="text-white">$12-$14 per unit</strong> at Rani
               Beauty Clinic.
             </p>
           </div>
@@ -267,7 +267,7 @@ export default function BotoxCostCalculatorPage() {
                         </p>
                         <div className="flex items-baseline gap-2 mt-2">
                           <span className="font-body text-xs text-rani-muted">
-                            {area.unitsMin}–{area.unitsMax} units
+                            {area.unitsMin}-{area.unitsMax} units
                             {area.note && (
                               <span className="text-rani-muted/60">
                                 {" "}
@@ -276,7 +276,7 @@ export default function BotoxCostCalculatorPage() {
                             )}
                           </span>
                           <span className="font-body text-sm font-semibold text-rani-navy">
-                            ${costMin.toLocaleString()}–$
+                            ${costMin.toLocaleString()}-$
                             {costMax.toLocaleString()}
                           </span>
                         </div>
@@ -301,11 +301,11 @@ export default function BotoxCostCalculatorPage() {
                     </p>
                     <p className="font-heading text-3xl mt-1">
                       ${totals.costMin.toLocaleString()}
-                      <span className="text-white/40 mx-1">–</span>$
+                      <span className="text-white/40 mx-1">-</span>$
                       {totals.costMax.toLocaleString()}
                     </p>
                     <p className="font-body text-white/50 text-sm mt-1">
-                      {totals.unitsMin}–{totals.unitsMax} total units &middot;{" "}
+                      {totals.unitsMin}-{totals.unitsMax} total units &middot;{" "}
                       {selected.size} area{selected.size !== 1 && "s"} selected
                     </p>
                   </div>

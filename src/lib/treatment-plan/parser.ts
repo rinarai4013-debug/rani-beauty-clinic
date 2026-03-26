@@ -68,7 +68,7 @@ export interface TreatmentPackage {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Service Catalog — Unified source from data/services/unified-catalog.ts
+   Service Catalog - Unified source from data/services/unified-catalog.ts
    ═══════════════════════════════════════════════════════════════ */
 
 import { buildLegacyCatalog } from '@/data/services/unified-catalog';
@@ -84,7 +84,7 @@ export function matchService(text: string): { key: string; catalog: { price: num
     return { key: lower, catalog: SERVICE_CATALOG[lower] };
   }
 
-  // Fuzzy match — find the longest catalog key that appears in the text
+  // Fuzzy match - find the longest catalog key that appears in the text
   let bestMatch: { key: string; catalog: { price: number; duration: string; category: string } } | null = null;
   let bestLen = 0;
 
@@ -117,7 +117,7 @@ export function parseCostBreakdown(costText: string | null): ParsedTreatment[] {
     // Extract the service name (text before the first dollar sign)
     const nameSection = line.split('$')[0]
       .replace(/^[-•*\d.)\s]+/, '') // Remove leading bullets/numbers
-      .replace(/[:=–—]+\s*$/, '') // Remove trailing colons/dashes
+      .replace(/[:=\- ]+\s*$/, '') // Remove trailing colons/dashes
       .trim();
 
     if (!nameSection || nameSection.length < 2) continue;
@@ -184,8 +184,8 @@ export function parseProgramPlan(planText: string | null): { phases: ParsedPhase
   // Try to split by phase/step/week markers
   const phasePatterns = [
     /(?:Phase|Step|Stage)\s*(\d+)[:\s-]*/gi,
-    /(?:Week|Weeks?)\s*(\d+(?:\s*[-–]\s*\d+)?)[:\s-]*/gi,
-    /(?:Month|Months?)\s*(\d+(?:\s*[-–]\s*\d+)?)[:\s-]*/gi,
+    /(?:Week|Weeks?)\s*(\d+(?:\s*[-]\s*\d+)?)[:\s-]*/gi,
+    /(?:Month|Months?)\s*(\d+(?:\s*[-]\s*\d+)?)[:\s-]*/gi,
   ];
 
   // Split text into paragraphs
@@ -206,7 +206,7 @@ export function parseProgramPlan(planText: string | null): { phases: ParsedPhase
 
         // Extract the title from the rest of the line
         const restOfLine = para.substring(match.index + match[0].length).split('\n')[0].trim();
-        const title = restOfLine.replace(/^[-–:]\s*/, '').trim() || `Phase ${detectedPhases.length + 1}`;
+        const title = restOfLine.replace(/^[:\-\s]+/, '').trim() || `Phase ${detectedPhases.length + 1}`;
 
         // Clean and truncate title
         let cleanTitle = title.replace(/\*+/g, '').trim();
@@ -239,7 +239,7 @@ export function parseProgramPlan(planText: string | null): { phases: ParsedPhase
     if (!foundPhase && currentPhase) {
       currentPhase.content += '\n\n' + para;
     } else if (!foundPhase && !currentPhase) {
-      // First paragraph before any phase — treat as overview/highlight
+      // First paragraph before any phase - treat as overview/highlight
       const sentences = para.split(/[.!]\s+/).filter(s => s.trim().length > 10);
       for (const s of sentences.slice(0, 3)) {
         highlights.push(s.trim().replace(/[.!]+$/, '') + '.');
@@ -321,7 +321,7 @@ export function parseProgramPlan(planText: string | null): { phases: ParsedPhase
         });
       });
     } else {
-      // Fallback — use the text as a single phase description
+      // Fallback - use the text as a single phase description
       const firstSentences = planText.split(/[.!]\s+/).slice(0, 3).join('. ') + '.';
       phases.push({
         title: 'Your Treatment Protocol',
@@ -352,11 +352,11 @@ export function parseTimeline(timelineText: string | null): { week: string; desc
 
   for (const line of lines) {
     // Match "Week X:" or "Month X:" or "Week X-Y:" patterns
-    const weekMatch = line.match(/(?:Week|Weeks?|Month|Months?)\s*(\d+(?:\s*[-–]\s*\d+)?)/i);
+    const weekMatch = line.match(/(?:Week|Weeks?|Month|Months?)\s*(\d+(?:\s*[-]\s*\d+)?)/i);
     if (weekMatch) {
-      const weekLabel = weekMatch[0].replace(/\s*[-–:]\s*$/, '').trim();
+      const weekLabel = weekMatch[0].replace(/\s*[:\-\s]+$/, '').trim();
       const desc = line.substring(line.indexOf(weekMatch[0]) + weekMatch[0].length)
-        .replace(/^[\s:–-]+/, '')
+        .replace(/^[\s:\-]+/, '')
         .replace(/\*+/g, '')
         .trim();
       if (desc.length > 5) {
@@ -376,7 +376,7 @@ export function extractTotalValue(plan: PlanData): number {
     if (match) return parseInt(match[0].replace(/[$,]/g, ''), 10);
   }
 
-  // Try costBreakdown — look for total/grand total line
+  // Try costBreakdown - look for total/grand total line
   if (plan.costBreakdown) {
     const lines = plan.costBreakdown.split('\n');
     for (const line of lines.reverse()) {
@@ -515,7 +515,7 @@ export function buildPackagesFromAI(plan: PlanData): TreatmentPackage[] {
   ];
 }
 
-/** Fallback when we can't parse cost breakdown — extract treatments from programPlan */
+/** Fallback when we can't parse cost breakdown - extract treatments from programPlan */
 export function buildFallbackPackages(plan: PlanData): TreatmentPackage[] {
   const text = plan.programPlan || plan.intakeSummary || '';
   const found: ParsedTreatment[] = [];
@@ -538,7 +538,7 @@ export function buildFallbackPackages(plan: PlanData): TreatmentPackage[] {
   }
 
   if (found.length === 0) {
-    // Ultimate fallback — construct from concerns/interests
+    // Ultimate fallback - construct from concerns/interests
     const concerns = [...plan.skinConcerns, ...plan.targetAreas].join(' ').toLowerCase();
     const interests = plan.treatmentInterests.join(' ').toLowerCase();
     const combined = concerns + ' ' + interests;
@@ -592,7 +592,7 @@ export function buildFallbackPackages(plan: PlanData): TreatmentPackage[] {
 
   const recommendedTotal = recommendedItems.reduce((s, i) => s + i.total, 0);
 
-  // Essential — reduced subset
+  // Essential - reduced subset
   const essentialItems: LineItem[] = found.slice(0, 2).map(t => ({
     service: t.name,
     qty: 1,
@@ -601,7 +601,7 @@ export function buildFallbackPackages(plan: PlanData): TreatmentPackage[] {
   }));
   const essentialTotal = essentialItems.reduce((s, i) => s + i.total, 0);
 
-  // Platinum — expanded
+  // Platinum - expanded
   const platinumItems: LineItem[] = found.map(t => ({
     service: t.name,
     qty: t.sessions + Math.ceil(t.sessions * 0.5),

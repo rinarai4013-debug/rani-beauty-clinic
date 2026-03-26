@@ -1,5 +1,5 @@
 /* ──────────────────────────────────────────────────────────────
-   Analytics Type Definitions — Rani Beauty Clinic
+   Analytics Type Definitions - Rani Beauty Clinic
    Extends Window for GA4 / GTM / Meta Pixel / Clarity
    ────────────────────────────────────────────────────────────── */
 
@@ -14,7 +14,7 @@ declare global {
 
 /* ── Event Names ─────────────────────────────────────────────── */
 
-/** Behavioral events — automatic, no user intent */
+/** Behavioral events - automatic, no user intent */
 export type BehavioralEvent =
   | 'page_view'
   | 'scroll_depth'
@@ -26,7 +26,7 @@ export type BehavioralEvent =
   | 'page_abandonment'
   | 'session_start_enriched';
 
-/** Intent signals — user showing interest */
+/** Intent signals - user showing interest */
 export type IntentEvent =
   | 'service_page_view'
   | 'pricing_interaction'
@@ -41,7 +41,7 @@ export type IntentEvent =
   | 'booking_widget_opened'
   | 'consultation_form_opened';
 
-/** Conversion events — measurable actions */
+/** Conversion events - measurable actions */
 export type ConversionEvent =
   | 'lead_submitted'
   | 'contact_form_submitted'
@@ -49,7 +49,7 @@ export type ConversionEvent =
   | 'booking_started'
   | 'booking_completed';
 
-/** Revenue events — tied to dollar values */
+/** Revenue events - tied to dollar values */
 export type RevenueEvent =
   | 'plan_viewed'
   | 'plan_tier_selected'

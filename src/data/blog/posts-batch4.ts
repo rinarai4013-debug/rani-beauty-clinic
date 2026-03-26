@@ -51,7 +51,7 @@ If you are experiencing Ozempic face and want to explore your options, we encour
   },
   {
     slug: "ozempic-butt-real",
-    title: "Ozempic Butt Is Real — Here's What's Actually Happening to Your Skin",
+    title: "Ozempic Butt Is Real - Here's What's Actually Happening to Your Skin",
     metaTitle: "Ozempic Butt Explained: Causes & Skin Tightening Options | Rani Beauty",
     metaDescription: "Ozempic butt refers to sagging, deflated buttocks after GLP-1 weight loss. Learn what causes it and how non-surgical skin tightening can help at Rani Beauty Clinic.",
     excerpt: "Losing weight on GLP-1 medications does not just affect your face. The buttocks and thighs are among the first areas to lose volume, and the skin changes can be dramatic.",
@@ -374,7 +374,7 @@ What should you avoid doing too early? We advise against investing in expensive 
 
 Also avoid making permanent decisions about surgical procedures too early. Body contouring surgery should be considered only after your weight has been completely stable for at least six months, ideally twelve. The body continues to redistribute fat stores for months after weight loss ends, and surgical results are best when the body has fully settled.
 
-At Rani Beauty Clinic, we help patients navigate this timing with individualized guidance. During your Reveal Assessment, we will evaluate your current skin condition, discuss your weight loss trajectory, and recommend the right time to begin your treatment plan. The goal is not to rush you into treatments, but to make sure you start at the time that will give you the best possible results.`,
+At Rani Beauty Clinic, we help patients work through this timing with individualized guidance. During your Reveal Assessment, we will evaluate your current skin condition, discuss your weight loss trajectory, and recommend the right time to begin your treatment plan. The goal is not to rush you into treatments, but to make sure you start at the time that will give you the best possible results.`,
     faqs: [
       {
         question: "Can I start skin treatments while still losing weight on GLP-1?",
@@ -483,7 +483,7 @@ If the changes in your lower face are the aspect of post-GLP-1 aging that bother
   },
   {
     slug: "weight-loss-medications-affect-collagen",
-    title: "How Weight Loss Medications Affect Collagen — and What That Means for You",
+    title: "How Weight Loss Medications Affect Collagen - and What That Means for You",
     metaTitle: "How GLP-1 Weight Loss Affects Collagen Production | Rani Beauty Clinic",
     metaDescription: "Weight loss from GLP-1 medications may impact your body's collagen production. Learn the science behind this connection and how to protect your skin during treatment.",
     excerpt: "The caloric deficit created by GLP-1 medications does not just shrink fat cells. It may also affect your body's ability to produce the collagen that keeps skin firm and resilient.",

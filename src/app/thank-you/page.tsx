@@ -59,7 +59,7 @@ export default function ThankYouPage() {
                   3
                 </span>
                 <span className="font-body text-sm text-rani-text">
-                  Choose your preferred date and time — we&apos;re open 7 days a week
+                  Choose your preferred date and time - we&apos;re open 7 days a week
                 </span>
               </li>
             </ul>

@@ -98,7 +98,7 @@ export const FIELDS = {
     actionRecommended: 'Action Recommended',
     status: 'Status',
     createdDate: 'Created Date',
-    notes: 'Notes', // Long Text — used for System Config storage (e.g. encrypted Plaid connection)
+    notes: 'Notes', // Long Text - used for System Config storage (e.g. encrypted Plaid connection)
   },
   reviews: {
     platform: 'Platform',

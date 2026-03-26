@@ -11,7 +11,7 @@ import {
 } from '@/lib/mangomint/client';
 import { cache, TTL } from '@/lib/cache';
 
-// GET — fetch Mangomint data summary + connection status
+// GET - fetch Mangomint data summary + connection status
 export async function GET() {
   try {
     const session = await getSession();
@@ -100,7 +100,7 @@ export async function GET() {
   }
 }
 
-// POST — sync Mangomint clients → Airtable Clients table
+// POST - sync Mangomint clients → Airtable Clients table
 export async function POST() {
   try {
     const session = await getSession();

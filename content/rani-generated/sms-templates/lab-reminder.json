@@ -1,0 +1,7 @@
+{
+  "type": "lab-reminder",
+  "trigger": "lab_work_due",
+  "delayAfterTrigger": "7 days before lab due date",
+  "message": "Hi {{first_name}}, your lab work at Rani is due this week. Up-to-date labs help us optimize your treatment plan. Book your lab appointment: {{booking_link}} or reply here to schedule. Fasting may be required \u2014 we'll confirm when you book.",
+  "characterCount": 253
+}

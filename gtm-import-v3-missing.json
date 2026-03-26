@@ -1,0 +1,356 @@
+{
+    "exportFormatVersion": 2,
+    "exportTime": "2026-03-24 03:30:00",
+    "containerVersion": {
+        "path": "accounts/6335352542/containers/241387969/versions/0",
+        "accountId": "6335352542",
+        "containerId": "241387969",
+        "containerVersionId": "0",
+        "container": {
+            "path": "accounts/6335352542/containers/241387969",
+            "accountId": "6335352542",
+            "containerId": "241387969",
+            "name": "www.ranibeautyclinic.com",
+            "publicId": "GTM-MPS3MPNG",
+            "usageContext": ["WEB"],
+            "fingerprint": "1769010303988",
+            "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/6335352542/containers/241387969/workspaces?apiLink=container",
+            "features": {
+                "supportUserPermissions": true,
+                "supportEnvironments": true,
+                "supportWorkspaces": true,
+                "supportGtagConfigs": false,
+                "supportBuiltInVariables": true,
+                "supportClients": false,
+                "supportFolders": true,
+                "supportTags": true,
+                "supportTemplates": true,
+                "supportTriggers": true,
+                "supportVariables": true,
+                "supportVersions": true,
+                "supportZones": true,
+                "supportTransformations": false
+            },
+            "tagIds": ["GTM-MPS3MPNG"]
+        },
+        "tag": [
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "200",
+                "name": "GA4 - Conv - Consultation Booked",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "consultation_booked"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "consultation_type"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - consultation_type}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "deposit_amount"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - deposit_amount}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600200",
+                "firingTriggerId": ["200"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "201",
+                "name": "GA4 - Conv - Plan Checkout Completed",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "plan_checkout_completed"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "tier"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - tier}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "value"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - value}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "payment_method"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - payment_method}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600201",
+                "firingTriggerId": ["201"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "202",
+                "name": "GA4 - Conv - Membership Signup",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "membership_signup"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "membership_tier"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - membership_tier}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "monthly_value"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - monthly_value}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600202",
+                "firingTriggerId": ["202"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "203",
+                "name": "GA4 - Behavior - Scroll Depth",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "scroll_depth"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "depth_percent"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - depth_percent}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "time_on_page_ms"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - time_on_page_ms}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600203",
+                "firingTriggerId": ["203"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "204",
+                "name": "GA4 - Behavior - Rage Click",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "rage_click"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "element"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - element}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "click_count"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - click_count}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600204",
+                "firingTriggerId": ["204"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "205",
+                "name": "GA4 - Behavior - Hesitation",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "hesitation_detected"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "element"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - element}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "hover_duration_ms"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - hover_duration_ms}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600205",
+                "firingTriggerId": ["205"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "206",
+                "name": "GA4 - Intent - Quiz Step",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "quiz_step_completed"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "step_number"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - step_number}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "step_name"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - step_name}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600206",
+                "firingTriggerId": ["206"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "207",
+                "name": "GA4 - Revenue - Checkout Started",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "plan_checkout_started"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "tier"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - tier}}"}
+                        ]},
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "value"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - value}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600207",
+                "firingTriggerId": ["207"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "tagId": "208",
+                "name": "GA4 - Revenue - Financing Clicked",
+                "type": "gaawe",
+                "parameter": [
+                    {"type": "BOOLEAN", "key": "sendEcommerceData", "value": "false"},
+                    {"type": "TEMPLATE", "key": "eventName", "value": "plan_financing_clicked"},
+                    {"type": "TEMPLATE", "key": "measurementIdOverride", "value": "G-4YXJ90MXGG"},
+                    {"type": "LIST", "key": "eventParameters", "list": [
+                        {"type": "MAP", "map": [
+                            {"type": "TEMPLATE", "key": "name", "value": "value"},
+                            {"type": "TEMPLATE", "key": "value", "value": "{{DL - value}}"}
+                        ]}
+                    ]}
+                ],
+                "fingerprint": "1774350600208",
+                "firingTriggerId": ["208"],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {"type": "MAP"}
+            }
+        ],
+        "trigger": [
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "200",
+                "name": "CE - consultation_booked",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "consultation_booked"}]}],
+                "fingerprint": "1774350600200"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "201",
+                "name": "CE - plan_checkout_completed",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "plan_checkout_completed"}]}],
+                "fingerprint": "1774350600201"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "202",
+                "name": "CE - membership_signup",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "membership_signup"}]}],
+                "fingerprint": "1774350600202"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "203",
+                "name": "CE - scroll_depth",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "scroll_depth"}]}],
+                "fingerprint": "1774350600203"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "204",
+                "name": "CE - rage_click",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "rage_click"}]}],
+                "fingerprint": "1774350600204"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "205",
+                "name": "CE - hesitation_detected",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "hesitation_detected"}]}],
+                "fingerprint": "1774350600205"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "206",
+                "name": "CE - quiz_step_completed",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "quiz_step_completed"}]}],
+                "fingerprint": "1774350600206"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "207",
+                "name": "CE - plan_checkout_started",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "plan_checkout_started"}]}],
+                "fingerprint": "1774350600207"
+            },
+            {
+                "accountId": "6335352542",
+                "containerId": "241387969",
+                "triggerId": "208",
+                "name": "CE - plan_financing_clicked",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [{"type": "EQUALS", "parameter": [{"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"}, {"type": "TEMPLATE", "key": "arg1", "value": "plan_financing_clicked"}]}],
+                "fingerprint": "1774350600208"
+            }
+        ]
+    }
+}

@@ -132,9 +132,9 @@ export default function AdsPage() {
                       <td className="px-3 sm:px-4 py-3 text-right text-rani-muted">{formatNumber(c.clicks)}</td>
                       <td className="px-3 sm:px-4 py-3 text-right text-rani-muted">{c.ctr}%</td>
                       <td className="px-3 sm:px-4 py-3 text-right font-medium text-rani-navy">{c.conversions}</td>
-                      <td className="px-3 sm:px-4 py-3 text-right text-rani-navy">{c.cpa > 0 ? formatCurrency(c.cpa) : '—'}</td>
+                      <td className="px-3 sm:px-4 py-3 text-right text-rani-navy">{c.cpa > 0 ? formatCurrency(c.cpa) : ' - '}</td>
                       <td className="px-4 sm:px-6 py-3 text-right font-medium">
-                        <span className={c.roas >= 3 ? 'text-green-600' : c.roas >= 1 ? 'text-yellow-600' : 'text-red-500'}>{c.roas > 0 ? `${c.roas}x` : '—'}</span>
+                        <span className={c.roas >= 3 ? 'text-green-600' : c.roas >= 1 ? 'text-yellow-600' : 'text-red-500'}>{c.roas > 0 ? `${c.roas}x` : ' - '}</span>
                       </td>
                     </motion.tr>
                   ))}

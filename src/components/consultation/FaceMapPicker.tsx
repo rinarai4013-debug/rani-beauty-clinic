@@ -227,7 +227,7 @@ export default function FaceMapPicker({
               )}
               {zone.element === 'path' && <path {...(zoneProps as any)} />}
 
-              {/* Zone label — show on hover or when selected */}
+              {/* Zone label - show on hover or when selected */}
               {(hovered || selected) && (
                 <text
                   x={zone.labelX}

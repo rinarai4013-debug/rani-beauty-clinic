@@ -32,7 +32,7 @@ export interface InventoryItem {
   unit: string; // "units", "ml", "syringes", "vials", "packs"
   unitCost: number;
   expirationDate?: string; // YYYY-MM-DD
-  minStock: number; // par level — reorder when below this
+  minStock: number; // par level - reorder when below this
   maxStock: number; // max storage capacity
   supplier: string;
   lastOrdered?: string;
@@ -314,7 +314,7 @@ function generateAlerts(input: InventoryInput, usage: UsageAnalysis[]): Inventor
         itemId: item.id,
         itemName: item.name,
         message: `${item.name} is OUT OF STOCK`,
-        action: `Emergency order from ${item.supplier} — lead time ${item.leadTimeDays} days`,
+        action: `Emergency order from ${item.supplier} - lead time ${item.leadTimeDays} days`,
       });
     }
     // Low stock (below par)
@@ -329,8 +329,8 @@ function generateAlerts(input: InventoryInput, usage: UsageAnalysis[]): Inventor
       });
     }
 
-    // Reorder point (stock will hit 0 before delivery arrives)
-    if (itemUsage && itemUsage.daysOfStockRemaining <= item.leadTimeDays + 3) {
+    // Reorder point (stock will hit 0 before delivery arrives + safety buffer)
+    if (itemUsage && itemUsage.daysOfStockRemaining <= item.leadTimeDays + 5) {
       alerts.push({
         type: 'reorder_now',
         severity: item.currentStock <= item.minStock ? 'critical' : 'warning',
@@ -353,7 +353,7 @@ function generateAlerts(input: InventoryInput, usage: UsageAnalysis[]): Inventor
           severity: 'critical',
           itemId: item.id,
           itemName: item.name,
-          message: `${item.name} EXPIRED on ${item.expirationDate} — ${item.currentStock} ${item.unit} waste`,
+          message: `${item.name} EXPIRED on ${item.expirationDate} - ${item.currentStock} ${item.unit} waste`,
           action: `Remove from inventory. Loss: $${(item.currentStock * item.unitCost).toFixed(0)}`,
         });
       } else if (daysUntilExpiry <= 30) {
@@ -401,7 +401,9 @@ function generateReorderRecommendations(
       // Calculate optimal order quantity
       // Target: fill to max level + buffer for lead time
       const dailyRate = itemUsage?.dailyUsageRate || 0;
-      const safetyStock = Math.ceil(dailyRate * item.leadTimeDays * 1.2); // 20% safety buffer
+      // Increase safety buffer for items with increasing usage trend
+      const trendMultiplier = itemUsage?.trend === 'increasing' ? 1.4 : itemUsage?.trend === 'decreasing' ? 1.1 : 1.2;
+      const safetyStock = Math.ceil(dailyRate * item.leadTimeDays * trendMultiplier);
       const targetStock = item.maxStock;
       const orderQty = Math.max(0, targetStock - item.currentStock + safetyStock);
 
@@ -413,8 +415,8 @@ function generateReorderRecommendations(
         item.currentStock <= item.minStock * 1.2 ? 'next_order' : 'monitor';
 
       const reason =
-        urgency === 'immediate' ? `Stock will run out in ${daysRemaining} days — order immediately` :
-        urgency === 'this_week' ? `Below reorder point — ${daysRemaining} days of stock remaining` :
+        urgency === 'immediate' ? `Stock will run out in ${daysRemaining} days - order immediately` :
+        urgency === 'this_week' ? `Below reorder point - ${daysRemaining} days of stock remaining` :
         urgency === 'next_order' ? `Approaching minimum stock level` :
         `Proactive reorder to maintain optimal levels`;
 
@@ -470,14 +472,14 @@ function analyzeWaste(input: InventoryInput): WasteReport {
 
   const recommendations: string[] = [];
   if (expiredItems.length > 0) {
-    recommendations.push(`Remove ${expiredItems.length} expired items — $${totalWasteValue} in waste`);
+    recommendations.push(`Remove ${expiredItems.length} expired items - $${totalWasteValue} in waste`);
   }
   if (nearExpiryItems.length > 0) {
     const atRiskValue = nearExpiryItems.reduce((s, i) => s + i.value, 0);
-    recommendations.push(`${nearExpiryItems.length} items expiring within 30 days ($${atRiskValue}) — prioritize usage or run promotions`);
+    recommendations.push(`${nearExpiryItems.length} items expiring within 30 days ($${atRiskValue}) - prioritize usage or run promotions`);
   }
   if (wastePercentage > 5) {
-    recommendations.push('Waste rate above 5% — consider smaller, more frequent orders to reduce expiration risk');
+    recommendations.push('Waste rate above 5% - consider smaller, more frequent orders to reduce expiration risk');
   }
 
   return { expiredItems, nearExpiryItems, totalWasteValue, wastePercentage, recommendations };
@@ -526,7 +528,7 @@ function findCostOptimizations(
     );
     optimizations.push({
       type: 'reduce_par',
-      description: `${overstocked.length} items overstocked — $${Math.round(excessValue)} in excess inventory tying up cash`,
+      description: `${overstocked.length} items overstocked - $${Math.round(excessValue)} in excess inventory tying up cash`,
       currentCost: Math.round(excessValue),
       projectedCost: 0,
       savings: Math.round(excessValue),
@@ -564,9 +566,9 @@ function suggestParLevels(
     if (minDiff > item.minStock * 0.2 || maxDiff > item.maxStock * 0.2) {
       let reason = '';
       if (itemUsage.trend === 'increasing') {
-        reason = `Usage trending up — increase par levels to prevent stockouts`;
+        reason = `Usage trending up - increase par levels to prevent stockouts`;
       } else if (itemUsage.trend === 'decreasing') {
-        reason = `Usage trending down — reduce par levels to minimize carrying costs`;
+        reason = `Usage trending down - reduce par levels to minimize carrying costs`;
       } else {
         reason = `Optimized based on ${itemUsage.dailyUsageRate.toFixed(1)} ${item.unit}/day usage rate and ${item.leadTimeDays}-day lead time`;
       }

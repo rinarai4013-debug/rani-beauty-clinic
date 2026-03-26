@@ -138,7 +138,7 @@ export async function GET() {
       const totalSlots = 8 * 6 * weeksInPeriod; // 8 hours * 6 working days * weeks
       overallRate = Math.min(100, Math.round((totalBooked / totalSlots) * 100));
     } else {
-      // No appointment data — use zero utilization
+      // No appointment data - use zero utilization
       byDayOfWeek = dayNames.map(name => ({ day: name, rate: 0 }));
       byTimeSlot = ['10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17', '17-18']
         .map(slot => ({ slot, rate: 0 }));

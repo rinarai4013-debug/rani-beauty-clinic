@@ -1,4 +1,4 @@
-// Local Citation Content — Rani Beauty Clinic
+// Local Citation Content - Rani Beauty Clinic
 // NAP consistency is critical. Use citationTemplate as the single source of truth.
 
 export interface LocalCitation {

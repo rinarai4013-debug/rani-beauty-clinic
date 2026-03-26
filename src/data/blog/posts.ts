@@ -8,6 +8,46 @@ import { postsBatch7 } from "./posts-batch7";
 import { postsBatch8 } from "./posts-batch8";
 import { postsBatch9 } from "./posts-batch9";
 import { postsBatch10 } from "./posts-batch10";
+import { postsBatch11 } from "./posts-batch11";
+import { postsBatch12 } from "./posts-batch12";
+import { postsBatch13 } from "./posts-batch13";
+import { postsBatch14 } from "./posts-batch14";
+import { postsBatch15 } from "./posts-batch15";
+import { postsBatch16 } from "./posts-batch16";
+import { postsBatch17 } from "./posts-batch17";
+import { postsBatch18 } from "./posts-batch18";
+import { postsBatch19 } from "./posts-batch19";
+import { postsBatch20 } from "./posts-batch20";
+import { postsBatch21 } from "./posts-batch21";
+import { postsBatch22 } from "./posts-batch22";
+import { postsBatch23 } from "./posts-batch23";
+import { postsBatch24 } from "./posts-batch24";
+import { postsBatch25 } from "./posts-batch25";
+import { postsBatch26 } from "./posts-batch26";
+import { postsBatch27 } from "./posts-batch27";
+import { postsBatch28 } from "./posts-batch28";
+import { postsBatch29 } from "./posts-batch29";
+import { postsBatch30 } from "./posts-batch30";
+import { postsBatch31 } from "./posts-batch31";
+import { postsBatch32 } from "./posts-batch32";
+import { postsBatch33 } from "./posts-batch33";
+import { postsBatch34 } from "./posts-batch34";
+import { postsBatch35 } from "./posts-batch35";
+import { postsBatch36 } from "./posts-batch36";
+import { postsBatch37 } from "./posts-batch37";
+import { postsBatch38 } from "./posts-batch38";
+import { postsBatch39 } from "./posts-batch39";
+import { postsBatch40 } from "./posts-batch40";
+import { postsBatch41 } from "./posts-batch41";
+import { postsBatch42 } from "./posts-batch42";
+import { postsBatch43 } from "./posts-batch43";
+import { postsBatch44 } from "./posts-batch44";
+import { postsBatch45 } from "./posts-batch45";
+import { postsBatch46 } from "./posts-batch46";
+import { postsBatch47 } from "./posts-batch47";
+import { postsBatch48 } from "./posts-batch48";
+import { postsBatch49 } from "./posts-batch49";
+import { postsBatch50 } from "./posts-batch50";
 
 export interface BlogPost {
   slug: string;
@@ -30,7 +70,7 @@ const originalPosts: BlogPost[] = [
     title: "GLP-1 Weight Management: What Semaglutide and Tirzepatide Can Do That Diet Alone Cannot",
     metaTitle: "GLP-1 Weight Management: Semaglutide & Tirzepatide Explained | Rani Beauty Clinic",
     metaDescription: "Learn how GLP-1 medications like Semaglutide and Tirzepatide work for medical weight management. Discover who qualifies, expected results, and why physician supervision matters at Rani Beauty Clinic in Renton, WA.",
-    excerpt: "Discover how GLP-1 receptor agonists like Semaglutide and Tirzepatide are changing the landscape of medical weight management, and why physician-supervised programs deliver safer, longer-lasting results.",
+    excerpt: "Discover how GLP-1 receptor agonists like Semaglutide and Tirzepatide are changing the field of medical weight management, and why physician-supervised programs deliver safer, longer-lasting results.",
     date: "January 15, 2026",
     author: "Dr. Alexander Landfield",
     authorCredentials: "Board-Certified Neurologist & Medical Director",
@@ -510,4 +550,44 @@ export const blogPosts: BlogPost[] = [
   ...postsBatch8,
   ...postsBatch9,
   ...postsBatch10,
+  ...postsBatch11,
+  ...postsBatch12,
+  ...postsBatch13,
+  ...postsBatch14,
+  ...postsBatch15,
+  ...postsBatch16,
+  ...postsBatch17,
+  ...postsBatch18,
+  ...postsBatch19,
+  ...postsBatch20,
+  ...postsBatch21,
+  ...postsBatch22,
+  ...postsBatch23,
+  ...postsBatch24,
+  ...postsBatch25,
+  ...postsBatch26,
+  ...postsBatch27,
+  ...postsBatch28,
+  ...postsBatch29,
+  ...postsBatch30,
+  ...postsBatch31,
+  ...postsBatch32,
+  ...postsBatch33,
+  ...postsBatch34,
+  ...postsBatch35,
+  ...postsBatch36,
+  ...postsBatch37,
+  ...postsBatch38,
+  ...postsBatch39,
+  ...postsBatch40,
+  ...postsBatch41,
+  ...postsBatch42,
+  ...postsBatch43,
+  ...postsBatch44,
+  ...postsBatch45,
+  ...postsBatch46,
+  ...postsBatch47,
+  ...postsBatch48,
+  ...postsBatch49,
+  ...postsBatch50,
 ];

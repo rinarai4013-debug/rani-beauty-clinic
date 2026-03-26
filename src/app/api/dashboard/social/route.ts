@@ -16,7 +16,7 @@ const RANI_SERVICE_INFO = [
     educationalPoints: [
       'HydraFacial uses patented Vortex-Fusion technology to cleanse, extract, and hydrate skin simultaneously.',
       'Each treatment removes dead skin cells and impurities while delivering moisturizing serums.',
-      'Results are immediate with no downtime — perfect for pre-event skin prep.',
+      'Results are immediate with no downtime - perfect for pre-event skin prep.',
     ],
   },
   {
@@ -64,7 +64,7 @@ const RANI_SERVICE_INFO = [
     educationalPoints: [
       'Our GentleMax Pro Plus laser works on all skin tones safely.',
       'Most areas require 6-8 sessions for 80-90% permanent reduction.',
-      'Treatments are quick — underarms take just 10-15 minutes.',
+      'Treatments are quick - underarms take just 10-15 minutes.',
     ],
   },
   {
@@ -112,7 +112,7 @@ const RANI_SERVICE_INFO = [
     educationalPoints: [
       'PRX-T33 is a biorevitalization treatment that stimulates collagen without peeling.',
       'Combines TCA, hydrogen peroxide, and kojic acid for deep dermal stimulation.',
-      'Zero downtime — often called the lunchtime peel alternative.',
+      'Zero downtime - often called the lunchtime peel alternative.',
     ],
   },
 ];
@@ -133,7 +133,7 @@ export async function GET() {
       const clientRecords = await fetchAll(
         Tables.clients(),
         {},
-        true // skipTestFilter — Clients table has no "Is Test" field
+        true // skipTestFilter - Clients table has no "Is Test" field
       );
       totalClients = clientRecords.length;
     } catch (err) {

@@ -11,5 +11,11 @@
       "destination": "https://www.ranibeautyclinic.com/:path",
       "permanent": true
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/daily-briefing",
+      "schedule": "0 14 * * *"
+    }
   ]
 }

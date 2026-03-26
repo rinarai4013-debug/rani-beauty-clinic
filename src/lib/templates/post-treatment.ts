@@ -5,11 +5,11 @@
  * n8n workflow W17 (post-treatment-trigger) uses these templates.
  *
  * Sequence:
- * 1. Immediate (0h) — Thank you + aftercare link
- * 2. 24 hours — Check-in + aftercare reminder
- * 3. 72 hours — Review request
- * 4. 7 days — Results check + rebook nudge
- * 5. 30 days — Rebook reminder + membership pitch
+ * 1. Immediate (0h) - Thank you + aftercare link
+ * 2. 24 hours - Check-in + aftercare reminder
+ * 3. 72 hours - Review request
+ * 4. 7 days - Results check + rebook nudge
+ * 5. 30 days - Rebook reminder + membership pitch
  */
 
 export interface TemplateVars {
@@ -52,7 +52,7 @@ function fillTemplate(template: string, vars: TemplateVars): string {
 
 const IMMEDIATE: Template = {
   sms: `hi beautiful! ✨ thank you so much for coming in today! here's your personalized aftercare guide for your {{serviceName}}: {{aftercareLink}} 💛 your skin is going to look even more amazing over the next few days! 🤍`,
-  emailSubject: `your {{serviceName}} aftercare ✨ — Rani Beauty Clinic`,
+  emailSubject: `your {{serviceName}} aftercare ✨ - Rani Beauty Clinic`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background-color: #0F1D2C; padding: 32px; text-align: center;">
@@ -61,13 +61,13 @@ const IMMEDIATE: Template = {
   </div>
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-      hi beautiful! 💛 thank you so much for coming in today — your skin is going to look even more amazing over the next few days! here's your personalized aftercare guide:
+      hi beautiful! 💛 thank you so much for coming in today - your skin is going to look even more amazing over the next few days! here's your personalized aftercare guide:
     </p>
     <a href="{{aftercareLink}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; margin: 16px 0;">
       View Aftercare Guide ✨
     </a>
     <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 16px 0 0;">
-      we're here if you need anything at all — just text or call us anytime 🤍
+      we're here if you need anything at all - just text or call us anytime 🤍
     </p>
     <p style="color: #333; font-size: 14px; margin: 24px 0 0;">
       with love,<br/>
@@ -82,7 +82,7 @@ const IMMEDIATE: Template = {
 };
 
 const TWENTY_FOUR_HOURS: Template = {
-  sms: `hey gorgeous! 💛 just checking in after your {{serviceName}} — how are you feeling? remember to follow your aftercare tips and drink lots of water ✨ we're here if you need anything! 🤍`,
+  sms: `hey gorgeous! 💛 just checking in after your {{serviceName}} - how are you feeling? remember to follow your aftercare tips and drink lots of water ✨ we're here if you need anything! 🤍`,
   emailSubject: `how are you feeling, {{firstName}}? 💛`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -92,7 +92,7 @@ const TWENTY_FOUR_HOURS: Template = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">hey gorgeous! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      just checking in after your {{serviceName}} yesterday with {{providerName}} — how are you feeling? everything you're experiencing is totally normal ✨
+      just checking in after your {{serviceName}} yesterday with {{providerName}} - how are you feeling? everything you're experiencing is totally normal ✨
     </p>
     <ul style="color: #555; font-size: 14px; line-height: 1.8; padding-left: 20px;">
       <li>mild redness or sensitivity is normal for 24-48 hours</li>
@@ -100,7 +100,7 @@ const TWENTY_FOUR_HOURS: Template = {
       <li>stay hydrated and follow your aftercare guide</li>
     </ul>
     <p style="color: #333; font-size: 14px; margin-top: 16px;">
-      we're here if you need anything at all — text us or call <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a> 🤍
+      we're here if you need anything at all - text us or call <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a> 🤍
     </p>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
@@ -110,7 +110,7 @@ const TWENTY_FOUR_HOURS: Template = {
 };
 
 const SEVENTY_TWO_HOURS: Template = {
-  sms: `hi angel! ✨ your skin should be starting to show those beautiful results by now 💛 we'd love to hear how you're feeling — and if you want to share your experience, here's a quick link: {{reviewLink}} 🤍 no pressure at all, we're just happy you trusted us with your glow`,
+  sms: `hi angel! ✨ your skin should be starting to show those beautiful results by now 💛 we'd love to hear how you're feeling - and if you want to share your experience, here's a quick link: {{reviewLink}} 🤍 no pressure at all, we're just happy you trusted us with your glow`,
   emailSubject: `how's your glow, {{firstName}}? ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -120,13 +120,13 @@ const SEVENTY_TWO_HOURS: Template = {
   <div style="padding: 32px; background-color: #ffffff; text-align: center;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">hi angel! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      your skin should be starting to show those beautiful results from your {{serviceName}} — we'd love to hear how you're feeling! ✨
+      your skin should be starting to show those beautiful results from your {{serviceName}} - we'd love to hear how you're feeling! ✨
     </p>
     <p style="font-size: 32px; margin: 16px 0;">&#11088;&#11088;&#11088;&#11088;&#11088;</p>
     <a href="{{reviewLink}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
       Share Your Experience 🤍
     </a>
-    <p style="color: #888; font-size: 13px; margin-top: 16px;">no pressure at all — we're just happy you trusted us with your glow ✨</p>
+    <p style="color: #888; font-size: 13px; margin-top: 16px;">no pressure at all - we're just happy you trusted us with your glow ✨</p>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 12px;">Rani Beauty Clinic &middot; Renton, WA</p>
@@ -135,7 +135,7 @@ const SEVENTY_TWO_HOURS: Template = {
 };
 
 const SEVEN_DAYS: Template = {
-  sms: `hi beautiful! 💛 it's been a week since your {{serviceName}} and your results are probably looking amazing right now ✨ to keep this momentum going, your next session is recommended around {{nextRecommendedService}} — want us to get you on the schedule? {{bookingLink}} 🤍`,
+  sms: `hi beautiful! 💛 it's been a week since your {{serviceName}} and your results are probably looking amazing right now ✨ to keep this momentum going, your next session is recommended around {{nextRecommendedService}} - want us to get you on the schedule? {{bookingLink}} 🤍`,
   emailSubject: `your results are looking amazing, {{firstName}} ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -164,7 +164,7 @@ const SEVEN_DAYS: Template = {
 };
 
 const THIRTY_DAYS: Template = {
-  sms: `hey gorgeous! ✨ your {{serviceName}} results are at their peak right now — your next session is recommended to keep everything looking this perfect 💛 we also wanted to mention our membership which makes keeping your glow so much easier! {{bookingLink}} 🤍`,
+  sms: `hey gorgeous! ✨ your {{serviceName}} results are at their peak right now - your next session is recommended to keep everything looking this perfect 💛 we also wanted to mention our membership which makes keeping your glow so much easier! {{bookingLink}} 🤍`,
   emailSubject: `your glow is at its peak, {{firstName}} ✨`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -174,12 +174,12 @@ const THIRTY_DAYS: Template = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">hey gorgeous! 💛</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      your {{serviceName}} results are at their peak right now — your next session is recommended to keep everything looking this perfect ✨
+      your {{serviceName}} results are at their peak right now - your next session is recommended to keep everything looking this perfect ✨
     </p>
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #C9A96E;">
       <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 8px;">Angel Glow Up Membership ✨</p>
       <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;">
-        starting at $199/mo — monthly treatments, exclusive pricing, and priority booking. keeping your glow has never been easier 💛
+        starting at $199/mo - monthly treatments, exclusive pricing, and priority booking. keeping your glow has never been easier 💛
       </p>
     </div>
     <div style="text-align: center; margin: 24px 0;">

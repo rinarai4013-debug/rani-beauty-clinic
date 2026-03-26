@@ -6,11 +6,11 @@
  * appointment is detected within 48 hours of the consult.
  *
  * Sequence:
- * 1. 48h after consult — Recap + financing options (Cherry 0% APR)
- * 2. 5 days — Before/after results + FAQ responses
- * 3. 10 days — Personal follow-up + limited-time incentive
+ * 1. 48h after consult - Recap + financing options (Cherry 0% APR)
+ * 2. 5 days - Before/after results + FAQ responses
+ * 3. 10 days - Personal follow-up + limited-time incentive
  *
- * IMPORTANT: Never use the word "infusion" — always say "injection."
+ * IMPORTANT: Never use the word "infusion" - always say "injection."
  */
 
 export interface PostConsultNoBookVars {
@@ -18,7 +18,7 @@ export interface PostConsultNoBookVars {
   treatmentName: string;
   providerName: string;
   consultDate: string;           // "March 15, 2026"
-  costEstimate: string;          // "$2,750–$4,500"
+  costEstimate: string;          // "$2,750-$4,500"
   monthlyPayment?: string;       // "$229/mo" (Cherry financing)
   concerns: string;              // primary concern discussed
   treatmentPlan?: string;        // summary of what was discussed
@@ -53,7 +53,7 @@ function fill(template: string, vars: PostConsultNoBookVars): string {
     .replace(/{{patientfiUrl}}/g, PATIENTFI_URL);
 }
 
-// ── EMAIL 1: 48H — RECAP + FINANCING ──
+// ── EMAIL 1: 48H - RECAP + FINANCING ──
 
 const EMAIL_1_RECAP_FINANCING: Template = {
   sms: `Hi {{firstName}}, it was wonderful meeting you at Rani! We wanted to follow up on your {{treatmentName}} consultation with {{providerName}}. Did you know we offer 0% APR financing? Starting at {{monthlyPayment}}. Apply: {{patientfiUrl}} Questions? Text us anytime or book: {{bookingUrl}}`,
@@ -96,7 +96,7 @@ const EMAIL_1_RECAP_FINANCING: Template = {
       <ul style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
         <li><strong>0% APR financing</strong> available on qualifying plans</li>
         <li>Monthly payments starting at <strong>{{monthlyPayment}}</strong></li>
-        <li>Quick approval — check your rate in 30 seconds with no impact to your credit score</li>
+        <li>Quick approval - check your rate in 30 seconds with no impact to your credit score</li>
         <li>No hidden fees, no surprises</li>
       </ul>
       <div style="margin-top: 16px; text-align: center;">
@@ -125,7 +125,7 @@ const EMAIL_1_RECAP_FINANCING: Template = {
 </div>`,
 };
 
-// ── EMAIL 2: 5 DAYS — BEFORE/AFTER + FAQ ──
+// ── EMAIL 2: 5 DAYS - BEFORE/AFTER + FAQ ──
 
 const EMAIL_2_RESULTS_FAQ: Template = {
   sms: `Hi {{firstName}}, still thinking about {{treatmentName}}? We totally get it. Our clients see amazing results and we'd love to show you what's possible. Have questions? Text us anytime: {{clinicPhone}}`,
@@ -165,7 +165,7 @@ const EMAIL_2_RESULTS_FAQ: Template = {
 
       <div style="padding: 16px 0;">
         <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 6px;">Can I combine treatments?</p>
-        <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;">Absolutely. Many clients pair {{treatmentName}} with complementary services for enhanced results. {{providerName}} discussed options during your consult — we can revisit anytime.</p>
+        <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;">Absolutely. Many clients pair {{treatmentName}} with complementary services for enhanced results. {{providerName}} discussed options during your consult - we can revisit anytime.</p>
       </div>
     </div>
 
@@ -181,7 +181,7 @@ const EMAIL_2_RESULTS_FAQ: Template = {
 </div>`,
 };
 
-// ── EMAIL 3: 10 DAYS — PERSONAL FOLLOW-UP ──
+// ── EMAIL 3: 10 DAYS - PERSONAL FOLLOW-UP ──
 
 const EMAIL_3_PERSONAL_FOLLOWUP: Template = {
   sms: `{{firstName}}, {{providerName}} at Rani wanted to personally check in. We'd love to help you start your {{treatmentName}} journey. Is there anything holding you back that we can help with? Text or call: {{clinicPhone}}`,
@@ -198,14 +198,14 @@ const EMAIL_3_PERSONAL_FOLLOWUP: Template = {
       I wanted to reach out personally. I really enjoyed our consultation on {{consultDate}} and discussing how {{treatmentName}} could help address your concerns around {{concerns}}.
     </p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      I understand that making this decision takes time, and I respect that completely. I just want you to know that whenever you're ready, your treatment plan is here — and so am I.
+      I understand that making this decision takes time, and I respect that completely. I just want you to know that whenever you're ready, your treatment plan is here - and so am I.
     </p>
 
     <div style="background-color: #F8F6F1; border-radius: 12px; padding: 24px; margin: 24px 0;">
       <p style="color: #0F1D2C; font-size: 14px; font-weight: 600; margin: 0 0 12px;">Here's what I can offer to make it easier:</p>
       <ul style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
         <li>A second consultation at no charge if you'd like to discuss anything further</li>
-        <li>0% APR financing through PatientFi or Cherry — starting at {{monthlyPayment}}</li>
+        <li>0% APR financing through PatientFi or Cherry - starting at {{monthlyPayment}}</li>
         <li>Priority scheduling to get you the appointment time that works best</li>
       </ul>
     </div>

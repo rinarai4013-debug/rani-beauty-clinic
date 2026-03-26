@@ -149,7 +149,7 @@ function ReactivationContent() {
       <div>
         <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Reactivation List</h1>
         <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
-          Win back lapsed clients with targeted outreach — sorted by highest value first
+          Win back lapsed clients with targeted outreach - sorted by highest value first
         </p>
       </div>
 
@@ -227,7 +227,7 @@ function ReactivationContent() {
         <DashboardEmptyState
           icon="users"
           title="No lapsed clients in this segment"
-          description="Great news — no clients are lapsing in this time range!"
+          description="Great news - no clients are lapsing in this time range!"
         />
       ) : (
         <div className="bg-white rounded-xl border border-rani-border overflow-hidden">
@@ -303,7 +303,7 @@ function ClientRow({
         <div className="font-body font-medium text-rani-navy">{client.name}</div>
         <div className="text-xs text-rani-muted sm:hidden">{client.phone}</div>
       </td>
-      <td className="p-3 font-body text-rani-navy hidden sm:table-cell">{client.phone || '—'}</td>
+      <td className="p-3 font-body text-rani-navy hidden sm:table-cell">{client.phone || ' - '}</td>
       <td className="p-3 font-body text-rani-muted hidden md:table-cell">
         {new Date(client.lastVisitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
       </td>

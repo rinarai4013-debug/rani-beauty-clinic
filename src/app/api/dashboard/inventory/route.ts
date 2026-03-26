@@ -23,8 +23,8 @@ const VALID_CATEGORIES = new Set<InventoryCategory>([
 
 /**
  * Parse an inventory alert message back into structured data.
- * Format: [Inventory {type}] {name} ({sku}) — {qty} units | {category} | {reason}
- * or:     [Inventory {type}] {name} — {qty} units | {category} | {reason}
+ * Format: [Inventory {type}] {name} ({sku}) - {qty} units | {category} | {reason}
+ * or:     [Inventory {type}] {name} - {qty} units | {category} | {reason}
  */
 function parseInventoryMessage(message: string): {
   adjustmentType: string;
@@ -35,7 +35,7 @@ function parseInventoryMessage(message: string): {
   reason: string;
 } | null {
   const match = message.match(
-    /^\[Inventory (\w+)\]\s+(.+?)\s+—\s+(\d+)\s+units\s*\|\s*([^|]*)\s*\|\s*(.*)$/
+    /^\[Inventory (\w+)\]\s+(.+?)\s+ - \s+(\d+)\s+units\s*\|\s*([^|]*)\s*\|\s*(.*)$/
   );
   if (!match) return null;
 
@@ -57,7 +57,7 @@ function parseInventoryMessage(message: string): {
 
 /**
  * Aggregate inventory alert records into InventoryItem objects.
- * Multiple alerts for the same item (by name) are merged — adds increase stock,
+ * Multiple alerts for the same item (by name) are merged - adds increase stock,
  * subtracts for removals/adjustments.
  */
 function buildInventoryItems(
@@ -144,7 +144,7 @@ export async function GET() {
       }
     );
 
-    // No inventory data yet — return clear empty state
+    // No inventory data yet - return clear empty state
     if (inventoryRecords.length === 0) {
       const emptyResponse = {
         success: true as const,

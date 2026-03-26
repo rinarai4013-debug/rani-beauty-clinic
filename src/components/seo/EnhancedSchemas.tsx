@@ -209,7 +209,7 @@ export function HomepageSchema() {
     "@id": `${clinicInfo.website}/#website`,
     name: clinicInfo.name,
     url: clinicInfo.website,
-    description: "Official website of Rani Beauty Clinic — physician-supervised medspa in Renton, WA.",
+    description: "Official website of Rani Beauty Clinic - physician-supervised medspa in Renton, WA.",
     publisher: {
       "@id": `${clinicInfo.website}/#organization`,
     },
@@ -233,7 +233,7 @@ export function HomepageSchema() {
   );
 }
 
-/* ─── 1b. AI Citation Schemas — Speakable, Reviews, FAQ ──── */
+/* ─── 1b. AI Citation Schemas - Speakable, Reviews, FAQ ──── */
 
 interface ReviewData {
   name: string;
@@ -255,7 +255,7 @@ export function AICitationSchemas({
   reviews: ReviewData[];
   faqs: FAQData[];
 }) {
-  // Speakable schema — tells Google AI Overview which content to cite
+  // Speakable schema - tells Google AI Overview which content to cite
   const speakable = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -285,7 +285,7 @@ export function AICitationSchemas({
     },
   };
 
-  // Individual Review schema — more citation surface for AI
+  // Individual Review schema - more citation surface for AI
   const reviewSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -332,7 +332,7 @@ export function AICitationSchemas({
     })),
   };
 
-  // ItemList of services — helps AI models understand the full service offering
+  // ItemList of services - helps AI models understand the full service offering
   const serviceList = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -588,7 +588,7 @@ export function LocationSchema({ location, services }: LocationSchemaProps) {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "MedicalBusiness"],
     "@id": `${locationUrl}/#localbusiness`,
-    name: `${clinicInfo.name} — Serving ${location.city}, ${location.state}`,
+    name: `${clinicInfo.name} - Serving ${location.city}, ${location.state}`,
     description:
       location.metaDescription ??
       `${clinicInfo.name} serves ${location.city}, ${location.state} residents with physician-supervised aesthetic and wellness treatments. ${location.driveTime} from ${location.city}.`,

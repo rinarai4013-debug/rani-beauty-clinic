@@ -153,6 +153,9 @@ export interface ScheduleRecommendation {
 
 const MIN_BUFFER_MINUTES = 10; // minimum between appointments
 const IDEAL_BUFFER_MINUTES = 15;
+const PREP_BUFFER_MINUTES = 5; // prep time before treatment
+const CLEANUP_BUFFER_MINUTES = 10; // cleanup/turnover after treatment
+const MAX_ROOMS = 3; // Rani has 3 treatment rooms
 const PEAK_HOURS = [10, 11, 14, 15, 16]; // 10AM-12PM and 2-5PM
 const OFF_PEAK_HOURS = [12, 13, 17, 18]; // lunch and late day
 
@@ -420,7 +423,7 @@ function findRevenueOpportunities(
     if (upgrade) {
       opportunities.push({
         type: 'upgrade',
-        description: `${appt.date}: ${appt.clientName} booked ${appt.service} ($${appt.estimatedRevenue}) — suggest upgrade to ${upgrade.service} ($${upgrade.revenue})`,
+        description: `${appt.date}: ${appt.clientName} booked ${appt.service} ($${appt.estimatedRevenue}) - suggest upgrade to ${upgrade.service} ($${upgrade.revenue})`,
         potentialRevenue: upgrade.revenue - appt.estimatedRevenue,
         suggestedClient: appt.clientName,
       });
@@ -478,7 +481,7 @@ function analyzeProviderBalance(input: ScheduleInput): ProviderBalanceAnalysis[]
       status === 'underloaded'
         ? `${provider.name} has ${Math.round(availableHours - scheduledHours)} hours open. Assign walk-ins and consultations to fill capacity.`
         : status === 'overloaded'
-        ? `${provider.name} at ${utilization}% capacity — risk of burnout. Redistribute to other providers.`
+        ? `${provider.name} at ${utilization}% capacity - risk of burnout. Redistribute to other providers.`
         : `${provider.name} well-balanced at ${utilization}% utilization.`;
 
     return {

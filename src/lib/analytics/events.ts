@@ -90,7 +90,7 @@ function getUtmParams(): Record<string, string> {
     try {
       sessionStorage.setItem('rani_utm', JSON.stringify(utm));
     } catch {
-      // SSR or private browsing — ignore
+      // SSR or private browsing - ignore
     }
   } else {
     try {
@@ -199,7 +199,7 @@ export function trackOutboundClick(url: string, clickText: string) {
       link_domain: domain,
     });
   } catch {
-    // Invalid URL — skip
+    // Invalid URL - skip
   }
 }
 

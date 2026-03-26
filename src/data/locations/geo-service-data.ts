@@ -75,7 +75,7 @@ export const serviceDirectory: Record<ServiceSlug, ServiceInfo> = {
     category: "aesthetic",
     keyBenefits: [
       "Immediate visible results after one session",
-      "Zero downtime — return to activities right away",
+      "Zero downtime - return to activities right away",
       "Customizable with boosters for specific concerns",
       "Suitable for all skin types and conditions",
     ],
@@ -138,7 +138,7 @@ export const serviceDirectory: Record<ServiceSlug, ServiceInfo> = {
       {
         question: "What makes BioRePeel different from a regular chemical peel?",
         answer:
-          "BioRePeel uses a biphasic technology that exfoliates while simultaneously delivering amino acids, vitamins, and GABA to nourish and bio-stimulate the skin — all without the typical peeling and downtime.",
+          "BioRePeel uses a biphasic technology that exfoliates while simultaneously delivering amino acids, vitamins, and GABA to nourish and bio-stimulate the skin - all without the typical peeling and downtime.",
       },
     ],
   },

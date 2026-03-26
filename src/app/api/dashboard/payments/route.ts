@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
@@ -42,26 +43,29 @@ export async function GET(request: NextRequest) {
   if (cached) return NextResponse.json(cached);
 
   try {
-    // Build Airtable filter formula
+    // Build Airtable filter formula - sanitize all user inputs
     const conditions: string[] = [];
 
-    // Payment method filter
+    // Payment method filter (allowlist approach)
     if (method && method !== 'all') {
       const methodMap: Record<string, string> = {
         stripe: 'Stripe',
         cherry: 'Cherry',
         square: 'Square',
       };
-      const mappedMethod = methodMap[method.toLowerCase()] || method;
-      conditions.push(`FIND("${mappedMethod}", {Payment Method})`);
+      const mappedMethod = methodMap[method.toLowerCase()];
+      if (mappedMethod) {
+        conditions.push(`FIND("${sanitizeFormulaValue(mappedMethod)}", {Payment Method})`);
+      }
     }
 
-    // Date range filter
-    if (from) {
-      conditions.push(`{Date} >= "${from}"`);
+    // Date range filter - validate ISO date format before injecting
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (from && dateRegex.test(from)) {
+      conditions.push(`{Date} >= "${sanitizeFormulaValue(from)}"`);
     }
-    if (to) {
-      conditions.push(`{Date} <= "${to}"`);
+    if (to && dateRegex.test(to)) {
+      conditions.push(`{Date} <= "${sanitizeFormulaValue(to)}"`);
     }
 
     const filterByFormula = conditions.length > 0

@@ -97,6 +97,9 @@ export default function ExitIntentPopup() {
 
           {/* Modal Card */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exit-intent-heading"
             className="relative w-full max-w-lg rounded-2xl border-t-4 border-rani-gold bg-white p-8 shadow-2xl sm:p-10"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -120,14 +123,14 @@ export default function ExitIntentPopup() {
               </div>
 
               {/* Headline */}
-              <h2 className="font-heading text-2xl font-bold leading-tight text-rani-navy sm:text-3xl">
-                Before You Go — Free Phone Consultation
+              <h2 id="exit-intent-heading" className="font-heading text-2xl font-bold leading-tight text-rani-navy sm:text-3xl">
+                Before You Go - Free Phone Consultation
               </h2>
 
               {/* Subtext */}
               <p className="mt-4 font-body text-base leading-relaxed text-gray-600">
                 Not sure which treatment is right for you? Schedule a free phone
-                consultation with our team — no commitment, no pressure.
+                consultation with our team - no commitment, no pressure.
               </p>
 
               {/* Social proof */}

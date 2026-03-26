@@ -14,7 +14,7 @@ export const pressReleases: PressRelease[] = [
       "Rani Beauty Clinic Launches Physician-Supervised GLP-1 Weight Management Program",
     subheadline:
       "Board-Certified Neurologist Dr. Alexander Landfield Oversees Comprehensive Medical Weight Loss Initiative at Renton Medspa",
-    dateline: "RENTON, WA — March 2026",
+    dateline: "RENTON, WA - March 2026",
     body: `Rani Beauty Clinic, a luxury medspa serving South King County and the greater Seattle area, today announced the launch of its physician-supervised GLP-1 weight management program. The program operates under the direct medical oversight of Dr. Alexander Landfield, a board-certified neurologist who serves as the clinic's Medical Director.
 
 The GLP-1 weight management program at Rani Beauty Clinic combines FDA-approved GLP-1 receptor agonist medications with personalized wellness protocols tailored to each patient's medical history, body composition, and long-term health objectives. Unlike standalone weight loss clinics, Rani Beauty Clinic integrates GLP-1 therapy within a full-spectrum aesthetic medicine practice, allowing patients to address both body composition and cosmetic goals under unified physician supervision.
@@ -45,7 +45,7 @@ The GLP-1 weight management program is available by appointment at Rani Beauty C
       "Renton Medspa Introduces AI-Powered Skin Analysis Technology",
     subheadline:
       "Rani Beauty Clinic Deploys Advanced Artificial Intelligence System to Deliver Data-Driven Skincare Assessments",
-    dateline: "RENTON, WA — March 2026",
+    dateline: "RENTON, WA - March 2026",
     body: `Rani Beauty Clinic, a physician-supervised luxury medspa in Renton, Washington, has introduced AI-powered skin analysis technology to its clinical services. The system uses advanced imaging and machine learning algorithms to evaluate skin health across multiple dimensions, providing patients with objective, data-driven assessments that inform personalized treatment plans.
 
 The AI skin analysis platform captures high-resolution images of the patient's skin and analyzes factors including texture irregularities, pigmentation patterns, pore size distribution, fine lines, wrinkle depth, hydration levels, and signs of sun damage. The system generates a comprehensive skin health report that clinicians use alongside their professional evaluation to recommend targeted treatment protocols.
@@ -76,7 +76,7 @@ The AI skin analysis service is available at Rani Beauty Clinic's Renton locatio
       "Rani Beauty Clinic Brings Sofwave SUPERB Non-Invasive Skin Tightening to South King County",
     subheadline:
       "FDA-Cleared HIFU Technology Now Available at Renton Luxury Medspa for Face and Body Lifting Without Surgery or Downtime",
-    dateline: "RENTON, WA — March 2026",
+    dateline: "RENTON, WA - March 2026",
     body: `Rani Beauty Clinic has added Sofwave SUPERB technology to its treatment menu, making the FDA-cleared, non-invasive skin tightening system available to patients across South King County and the greater Seattle metropolitan area. The Sofwave platform uses Synchronous Ultrasound Parallel Beam (SUPERB) technology to stimulate collagen and elastin production at precise tissue depths, delivering lifting and tightening results without surgery, needles, or significant downtime.
 
 Sofwave SUPERB operates by directing focused ultrasound energy to the mid-dermal layer of the skin at a depth of 1.5 millimeters, where collagen remodeling produces the most visible tightening effect. The system's proprietary Intense Ultrasound Beam technology treats a large area simultaneously, reducing treatment time while maintaining consistent energy delivery. Clinical studies have demonstrated measurable improvements in skin laxity on the face, neck, and submental area following a single treatment session.
@@ -107,7 +107,7 @@ Sofwave SUPERB treatments are available by appointment at Rani Beauty Clinic in 
       "Board-Certified Neurologist Joins Rani Beauty Clinic as Medical Director",
     subheadline:
       "Dr. Alexander Landfield Brings Advanced Neurological Expertise to Renton Luxury Medspa, Elevating Standard of Clinical Oversight",
-    dateline: "RENTON, WA — March 2026",
+    dateline: "RENTON, WA - March 2026",
     body: `Rani Beauty Clinic has announced the appointment of Dr. Alexander Landfield as Medical Director. Dr. Landfield, a board-certified neurologist, brings extensive medical training and a deep understanding of neuromuscular physiology to the clinic's physician-supervised aesthetic and wellness practice.
 
 Dr. Landfield's neurological expertise is particularly relevant to several of the clinic's core services. His advanced understanding of facial nerve anatomy and neuromuscular function directly enhances the precision and safety of neuromodulator treatments such as Botox. His medical background also strengthens the clinic's oversight of injectable therapies, GLP-1 weight management protocols, NAD+ injections, vitamin injection therapies, and hormone therapy programs.
@@ -140,7 +140,7 @@ To schedule a consultation with the Rani Beauty Clinic team, call (425) 539-4440
       "Rani Beauty Clinic Recognized for Dual-Wavelength Laser Technology Innovation in the Pacific Northwest",
     subheadline:
       "Candela GentleMax Pro Plus Platform Delivers Advanced Laser Hair Removal and Skin Treatments for All Skin Types at Renton Medspa",
-    dateline: "RENTON, WA — March 2026",
+    dateline: "RENTON, WA - March 2026",
     body: `Rani Beauty Clinic has earned recognition among Pacific Northwest aesthetic practices for its deployment of the Candela GentleMax Pro Plus, a dual-wavelength laser platform that represents a significant advancement in laser hair removal and skin treatment technology. The system combines 755nm Alexandrite and 1064nm Nd:YAG wavelengths in a single platform, enabling clinicians to treat the full Fitzpatrick skin type spectrum safely and effectively.
 
 The dual-wavelength configuration allows practitioners to select the optimal laser wavelength based on each patient's skin tone, hair characteristics, and treatment objectives. The 755nm Alexandrite wavelength delivers superior absorption in melanin-rich hair follicles, making it highly effective for lighter skin tones. The 1064nm Nd:YAG wavelength penetrates deeper into the skin with reduced melanin absorption at the surface, providing a safer and more effective option for darker skin types. This versatility enables Rani Beauty Clinic to serve the diverse population of the greater Seattle metropolitan area with a single, clinically validated platform.

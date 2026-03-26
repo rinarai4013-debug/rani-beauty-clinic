@@ -117,7 +117,7 @@ export async function GET() {
         }
       }
     } catch (e) {
-      // KPI snapshots might not have Daily Score field yet — that's okay
+      // KPI snapshots might not have Daily Score field yet - that's okay
       console.warn('Streak calculation skipped:', e);
       streak = 0;
     }

@@ -30,7 +30,7 @@ const technologies = [
     icon: Waves,
     name: "HydraFacial Syndeo",
     description:
-      "The next generation of HydraFacial technology. Syndeo delivers a personalized, connected treatment experience with patented Vortex-Fusion technology for deep cleansing, extraction, and hydration — all with real-time skin data tracking for optimized results.",
+      "The next generation of HydraFacial technology. Syndeo delivers a personalized, connected treatment experience with patented Vortex-Fusion technology for deep cleansing, extraction, and hydration - all with real-time skin data tracking for optimized results.",
   },
   {
     icon: Radiation,
@@ -42,7 +42,7 @@ const technologies = [
     icon: ScanFace,
     name: "AI Skin Analysis",
     description:
-      "State-of-the-art skin analysis technology that maps your skin's condition across multiple dimensions — including texture, pores, wrinkles, pigmentation, and UV damage — to create a personalized treatment plan backed by data.",
+      "State-of-the-art skin analysis technology that maps your skin's condition across multiple dimensions - including texture, pores, wrinkles, pigmentation, and UV damage - to create a personalized treatment plan backed by data.",
   },
 ];
 
@@ -171,7 +171,7 @@ export default function AboutPageClient() {
       <Hero
         label="ABOUT US"
         title="About Rani Beauty Clinic"
-        subtitle="A physician-supervised medspa and wellness clinic in Renton, WA — where advanced aesthetics and medical wellness come together under one roof."
+        subtitle="A physician-supervised medspa and wellness clinic in Renton, WA - where advanced aesthetics and medical wellness come together under one roof."
         dark={false}
       />
 
@@ -198,7 +198,7 @@ export default function AboutPageClient() {
                 <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
                   Nestled in the heart of Renton, WA, Rani Beauty Clinic serves
                   patients across King County and beyond. Our approach combines
-                  cutting-edge technology with genuine human connection — because
+                  advanced technology with genuine human connection - because
                   looking your best should also feel like the best experience
                   of your day. Every treatment is overseen by our board-certified
                   Medical Director, ensuring the highest standards of safety and results.
@@ -239,7 +239,7 @@ export default function AboutPageClient() {
                 <div className="relative h-72 w-72 overflow-hidden rounded-full border-4 border-rani-gold/30 shadow-lg">
                   <Image
                     src="/images/team/dr-landfield.webp"
-                    alt="Dr. Alexander Landfield — Board-Certified Neurologist & Medical Director"
+                    alt="Dr. Alexander Landfield - Board-Certified Neurologist & Medical Director"
                     fill
                     className="object-cover object-top"
                     sizes="288px"

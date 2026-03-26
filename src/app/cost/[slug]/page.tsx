@@ -48,7 +48,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: page.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/cost/${page.slug}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${page.metaTitle} — Rani Beauty Clinic` }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${page.metaTitle} - Rani Beauty Clinic` }],
     },
   };
 }
@@ -197,7 +197,7 @@ export default function CostPage({ params }: PageProps) {
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
               All prices are per session unless otherwise noted. Prices are
-              subject to change — contact us for the most current pricing.
+              subject to change - contact us for the most current pricing.
             </p>
           </FadeInOnScroll>
 

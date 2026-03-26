@@ -314,7 +314,7 @@ function analyzeCampaigns(input: MetaAdsInput): CampaignAnalysis[] {
     let recommendation = '';
     switch (performance) {
       case 'excellent':
-        recommendation = `Top performer — consider scaling budget by 20-30%`;
+        recommendation = `Top performer - consider scaling budget by 20-30%`;
         break;
       case 'good':
         recommendation = `Performing well. Test new ad variants to improve further`;
@@ -323,7 +323,7 @@ function analyzeCampaigns(input: MetaAdsInput): CampaignAnalysis[] {
         recommendation = `Below potential. Review targeting and creative for optimization opportunities`;
         break;
       case 'poor':
-        recommendation = `Underperforming — pause lowest-performing ads and reallocate budget`;
+        recommendation = `Underperforming - pause lowest-performing ads and reallocate budget`;
         break;
       case 'critical':
         recommendation = `Critical: ROAS below 1.0x. Pause campaign and redesign strategy`;
@@ -362,7 +362,7 @@ function generateOptimizations(
         type: 'pause',
         priority: 'high',
         adId: ad.id,
-        description: `Pause "${ad.name}" — ROAS at ${ad.metrics.roas}x (below 1.0x breakeven)`,
+        description: `Pause "${ad.name}" - ROAS at ${ad.metrics.roas}x (below 1.0x breakeven)`,
         expectedImpact: `Save $${Math.round(ad.metrics.spent * 0.3)}/month in wasted spend`,
         estimatedSavings: Math.round(ad.metrics.spent * 0.3),
       });
@@ -374,7 +374,7 @@ function generateOptimizations(
         type: 'refresh_creative',
         priority: 'medium',
         adId: ad.id,
-        description: `Refresh creative for "${ad.name}" — frequency at ${ad.metrics.frequency}x (fatigue threshold: ${CREATIVE_FATIGUE_FREQUENCY}x)`,
+        description: `Refresh creative for "${ad.name}" - frequency at ${ad.metrics.frequency}x (fatigue threshold: ${CREATIVE_FATIGUE_FREQUENCY}x)`,
         expectedImpact: 'CTR recovery of 20-40% with fresh creative',
       });
     }
@@ -387,7 +387,7 @@ function generateOptimizations(
         type: 'scale',
         priority: 'high',
         campaignId: campaign.campaignId,
-        description: `Scale "${campaign.campaignName}" — ROAS at ${campaign.roas}x. Increase budget 25%`,
+        description: `Scale "${campaign.campaignName}" - ROAS at ${campaign.roas}x. Increase budget 25%`,
         expectedImpact: `Projected +$${Math.round(campaign.revenue * 0.25)} additional revenue`,
         estimatedRevenueGain: Math.round(campaign.revenue * 0.25),
       });
@@ -443,16 +443,16 @@ function generateAdCopyVariants(input: MetaAdsInput): AdCopyVariant[] {
 function generateHeadline(service: string, angle: string): string {
   const headlines: Record<string, Record<string, string>> = {
     'HydraFacial': {
-      'Instant glow': 'Get Your Glow On — HydraFacial $225',
+      'Instant glow': 'Get Your Glow On - HydraFacial $225',
       'Red carpet ready': 'Red Carpet Skin in 60 Minutes',
       'Lunch-break facial': 'The Lunch-Break Facial Everyone Wants',
-      'Glass skin effect': 'Glass Skin Is Possible — See How',
+      'Glass skin effect': 'Glass Skin Is Possible - See How',
     },
     'Botox': {
       'Preventative Botox': 'Start Preventative Botox in Your 20s-30s',
       'Wrinkle-free confidence': 'Smooth. Natural. Confident.',
       'Quick 15-min treatment': '15 Minutes to a Fresher You',
-      'Natural results': 'Botox That Looks Like You — Just Better',
+      'Natural results': 'Botox That Looks Like You - Just Better',
     },
     'GLP-1': {
       'Weight loss solution': 'Medical Weight Loss That Actually Works',
@@ -462,7 +462,7 @@ function generateHeadline(service: string, angle: string): string {
     },
   };
 
-  return headlines[service]?.[angle] || `${angle} — ${service} at Rani Beauty Clinic`;
+  return headlines[service]?.[angle] || `${angle} - ${service} at Rani Beauty Clinic`;
 }
 
 function generatePrimaryText(service: ServiceAdData, angle: string): string {
@@ -502,12 +502,12 @@ function optimizeBudget(
     switch (campaign.performance) {
       case 'excellent':
         recommendedBudget = Math.round(matchingCampaign.budget * 1.25);
-        reason = `ROAS at ${campaign.roas}x exceeds target — scale budget 25%`;
+        reason = `ROAS at ${campaign.roas}x exceeds target - scale budget 25%`;
         expectedROAS = campaign.roas * 0.9; // slight decrease with scale
         break;
       case 'good':
         recommendedBudget = Math.round(matchingCampaign.budget * 1.10);
-        reason = `Solid performance at ${campaign.roas}x ROAS — gradual 10% increase`;
+        reason = `Solid performance at ${campaign.roas}x ROAS - gradual 10% increase`;
         expectedROAS = campaign.roas;
         break;
       case 'average':
@@ -515,12 +515,12 @@ function optimizeBudget(
         break;
       case 'poor':
         recommendedBudget = Math.round(matchingCampaign.budget * 0.5);
-        reason = `ROAS at ${campaign.roas}x — cut budget 50% and optimize before scaling`;
+        reason = `ROAS at ${campaign.roas}x - cut budget 50% and optimize before scaling`;
         expectedROAS = campaign.roas * 1.3; // expect improvement with optimization
         break;
       case 'critical':
         recommendedBudget = 0;
-        reason = `ROAS below 1.0x — pause campaign and redesign`;
+        reason = `ROAS below 1.0x - pause campaign and redesign`;
         expectedROAS = 0;
         break;
     }
@@ -564,11 +564,11 @@ function analyzeAudiences(input: MetaAdsInput): AudienceInsight[] {
 
     let recommendation = '';
     if (cpa < input.targetCPA * 0.7) {
-      recommendation = 'Top performing audience — expand reach with lookalike';
+      recommendation = 'Top performing audience - expand reach with lookalike';
     } else if (cpa > input.targetCPA * 1.5) {
-      recommendation = 'High CPA — narrow targeting or test new interests';
+      recommendation = 'High CPA - narrow targeting or test new interests';
     } else {
-      recommendation = 'Performing within target — maintain and monitor';
+      recommendation = 'Performing within target - maintain and monitor';
     }
 
     insights.push({
@@ -607,8 +607,8 @@ function detectCreativeFatigue(input: MetaAdsInput): CreativeFatigueAlert[] {
         ctrDecline,
         daysRunning: daysSinceCreation,
         action: ctrDecline > 30
-          ? 'Replace creative immediately — severe fatigue'
-          : 'Refresh creative within 1 week — moderate fatigue',
+          ? 'Replace creative immediately - severe fatigue'
+          : 'Refresh creative within 1 week - moderate fatigue',
       });
     }
 

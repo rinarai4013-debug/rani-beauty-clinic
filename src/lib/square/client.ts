@@ -69,7 +69,7 @@ async function squareFetch<T>(endpoint: string, options?: RequestInit): Promise<
 
   if (!res.ok) {
     const errorBody = await res.text();
-    throw new Error(`Square API error: ${res.status} — ${errorBody}`);
+    throw new Error(`Square API error: ${res.status} - ${errorBody}`);
   }
 
   return res.json() as Promise<T>;

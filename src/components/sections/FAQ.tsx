@@ -20,7 +20,7 @@ const faqItems: FAQItem[] = [
   {
     question: "How does the consultation deposit work?",
     answer:
-      "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose — so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
+      "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose - so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap.",
   },
   {
     question: "How do I know which treatment is right for me?",
@@ -43,32 +43,45 @@ function FAQAccordionItem({
   item,
   isOpen,
   onToggle,
+  index,
 }: {
   item: FAQItem;
   isOpen: boolean;
   onToggle: () => void;
+  index: number;
 }) {
+  const headingId = `faq-heading-${index}`;
+  const panelId = `faq-panel-${index}`;
+
   return (
     <div className="border-b border-rani-border last:border-b-0">
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center justify-between py-5 text-left transition-colors hover:text-rani-gold"
-        aria-expanded={isOpen}
-      >
-        <span className="pr-4 font-body text-base font-semibold text-rani-navy">
-          {item.question}
-        </span>
-        <motion.span
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex-shrink-0"
+      <h3>
+        <button
+          id={headingId}
+          onClick={onToggle}
+          className="flex w-full items-center justify-between py-5 text-left transition-colors hover:text-rani-gold"
+          aria-expanded={isOpen}
+          aria-controls={panelId}
         >
-          <ChevronDown size={20} className="text-rani-gold" />
-        </motion.span>
-      </button>
+          <span className="pr-4 font-body text-base font-semibold text-rani-navy">
+            {item.question}
+          </span>
+          <motion.span
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex-shrink-0"
+            aria-hidden="true"
+          >
+            <ChevronDown size={20} className="text-rani-gold" />
+          </motion.span>
+        </button>
+      </h3>
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            id={panelId}
+            role="region"
+            aria-labelledby={headingId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -126,6 +139,7 @@ export default function FAQ() {
                 <FAQAccordionItem
                   key={i}
                   item={item}
+                  index={i}
                   isOpen={openIndex === i}
                   onToggle={() =>
                     setOpenIndex(openIndex === i ? null : i)

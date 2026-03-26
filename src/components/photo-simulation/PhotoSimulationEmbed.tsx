@@ -151,10 +151,10 @@ export default function PhotoSimulationEmbed({
       setAnalysis(data);
       setPhase('results');
     } catch {
-      // Graceful fallback — show simulation without AI analysis
+      // Graceful fallback - show simulation without AI analysis
       setAnalysis(null);
       setPhase('results');
-      setAnalysisError('AI analysis unavailable — showing visual simulation.');
+      setAnalysisError('AI analysis unavailable - showing visual simulation.');
     }
   }, []);
 

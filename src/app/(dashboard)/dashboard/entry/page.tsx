@@ -108,7 +108,7 @@ export default function EntryHubPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Quick Entry Hub</h1>
           <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
-            Log data fast — everything feeds into your dashboard
+            Log data fast - everything feeds into your dashboard
           </p>
         </div>
 

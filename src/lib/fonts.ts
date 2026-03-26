@@ -4,7 +4,7 @@ import { Montserrat, Playfair_Display } from "next/font/google";
  * Self-hosted font configuration using Next.js built-in font optimization.
  *
  * Next.js automatically downloads Google Fonts at build time and serves
- * them from the same domain — eliminating render-blocking external
+ * them from the same domain - eliminating render-blocking external
  * requests and improving LCP / CLS.
  *
  * Fonts are loaded with `display: "swap"` so text is visible immediately

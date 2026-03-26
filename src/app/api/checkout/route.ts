@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { logEvent } from '@/lib/logging/structured-logger';
+import { captureCheckoutEvent } from '@/lib/sentry-utils';
 
 export async function POST(request: NextRequest) {
   // Rate limit
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
     const Stripe = (await import('stripe')).default;
     const stripe = new Stripe(stripeKey);
 
-    // Deposit amount — $250 consultation deposit (applied to treatment)
+    // Deposit amount - $250 consultation deposit (applied to treatment)
     const depositAmount = 25000; // cents
 
     const session = await stripe.checkout.sessions.create({
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Rani Beauty Clinic — ${tier} Consultation Deposit`,
+              name: `Rani Beauty Clinic - ${tier} Consultation Deposit`,
               description: `Fully refundable $250 deposit for your ${tier} treatment plan. Applied to your first treatment.`,
               images: ['https://www.ranibeautyclinic.com/og-image.jpg'],
             },
@@ -59,6 +61,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `https://www.ranibeautyclinic.com/plan/${planId}`,
     });
 
+    captureCheckoutEvent(tier, depositAmount, { planId, sessionId: session.id });
     logEvent('api', 'info', 'Stripe checkout session created', {
       planId,
       tier,
@@ -67,6 +70,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (error) {
+    Sentry.captureException(error, { tags: { route: 'checkout' } });
     logEvent('api', 'error', 'Stripe checkout error', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

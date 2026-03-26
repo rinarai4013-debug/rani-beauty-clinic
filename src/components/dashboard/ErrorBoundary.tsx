@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  eventId: string | null;
 }
 
 interface ErrorBoundaryProps {
@@ -19,15 +21,22 @@ export default class DashboardErrorBoundary extends React.Component<
 > {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, eventId: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('[DashboardErrorBoundary]', error, errorInfo);
+    const eventId = Sentry.captureException(error, {
+      contexts: {
+        react: { componentStack: errorInfo.componentStack ?? undefined },
+      },
+      tags: { component: 'dashboard' },
+    });
+    this.setState({ eventId });
   }
 
   handleReset = () => {

@@ -218,7 +218,7 @@ export function applyToneEvening(
   avgG /= skinPixelCount;
   avgB /= skinPixelCount;
 
-  // Warm baseline — shift average slightly toward warm tones
+  // Warm baseline - shift average slightly toward warm tones
   const warmR = avgR * 1.02;
   const warmG = avgG * 1.0;
   const warmB = avgB * 0.97;
@@ -340,7 +340,7 @@ export function applyBrighteningEffect(
 
     // Only brighten pixels darker than average (shadow areas / dark spots)
     if (lum < avgLum) {
-      // How much darker than average — stronger lift for darker areas
+      // How much darker than average - stronger lift for darker areas
       const darkness = (avgLum - lum) / avgLum;
       const lift = darkness * intensity * 0.4; // Max 40% lift
 

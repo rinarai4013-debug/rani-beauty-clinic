@@ -85,7 +85,7 @@ export async function GET() {
     const appointmentsToday = todayAppts.length;
     const consultsToday = todayAppts.filter((a) => a.fields['Is Consult']).length;
 
-    // Streak: simple calculation — default to 0 for now as we need KPI snapshots
+    // Streak: simple calculation - default to 0 for now as we need KPI snapshots
     // A full streak calculation would query KPI Snapshots for consecutive days with score >= 80
     const streakDays = 0;
 
@@ -100,13 +100,13 @@ export async function GET() {
     // Focus area based on weakest signals
     let focusArea = '';
     if (appointmentsToday < 5) {
-      focusArea = 'Light schedule today — great time for follow-ups and outreach';
+      focusArea = 'Light schedule today - great time for follow-ups and outreach';
     } else if (consultsToday >= 2) {
-      focusArea = `${consultsToday} consults today — close them all for bonus XP`;
+      focusArea = `${consultsToday} consults today - close them all for bonus XP`;
     } else if (yesterdayRevenue < 2000) {
-      focusArea = 'Revenue was light yesterday — push for upsells and add-ons today';
+      focusArea = 'Revenue was light yesterday - push for upsells and add-ons today';
     } else {
-      focusArea = 'Strong momentum — keep the energy up and crush today';
+      focusArea = 'Strong momentum - keep the energy up and crush today';
     }
 
     // Weekly target (5 business days x $4K daily target)

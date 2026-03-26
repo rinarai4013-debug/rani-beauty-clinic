@@ -53,7 +53,7 @@ function buildSyncSummary(platform: string, data: Record<string, unknown>): stri
   return `[${platform}] sync completed: ${parts.length > 0 ? parts.join(', ') : 'no changes'}`;
 }
 
-// POST — trigger sync across all configured platforms
+// POST - trigger sync across all configured platforms
 // Can also be called by cron/webhook for automatic syncing
 export async function POST(request: NextRequest) {
   try {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const cronSecret = process.env.CRON_SECRET;
 
     if (authHeader === `Bearer ${cronSecret}` && cronSecret) {
-      // Authorized via cron secret — skip session check
+      // Authorized via cron secret - skip session check
     } else {
       const session = await getSession();
       if (!session) {
@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Persist sync metadata to cache (long TTL — survives between page loads)
+    // Persist sync metadata to cache (long TTL - survives between page loads)
     cache.set(SYNC_META_KEY, syncMeta, 24 * 60 * 60 * 1000); // 24h TTL
 
     return NextResponse.json(results);
@@ -272,7 +272,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET — check integration status across all platforms (with sync health metadata)
+// GET - check integration status across all platforms (with sync health metadata)
 export async function GET() {
   try {
     const session = await getSession();
@@ -333,7 +333,7 @@ export async function GET() {
         mangomint: {
           configured: isMangomintConfigured(),
           webhooksEnabled: true,
-          description: 'Booking & scheduling (2,181 clients) — Webhooks enabled',
+          description: 'Booking & scheduling (2,181 clients) - Webhooks enabled',
           action: isMangomintConfigured()
             ? 'Ready to sync'
             : 'Webhooks add-on active. Add MANGOMINT_API_KEY to .env.local for full API sync.',
@@ -342,7 +342,7 @@ export async function GET() {
         cherry: {
           configured: false,
           description: 'Patient financing applications',
-          action: 'No API available — data extracted manually via dashboard scraping',
+          action: 'No API available - data extracted manually via dashboard scraping',
           lastSync: null,
           lastError: null,
           health: 'unknown' as const,
@@ -350,7 +350,7 @@ export async function GET() {
         // AI Service integrations
         vapi: {
           configured: !!process.env.VAPI_API_KEY,
-          description: 'AI phone receptionist — inbound call handling',
+          description: 'AI phone receptionist - inbound call handling',
           action: process.env.VAPI_API_KEY
             ? 'Ready'
             : 'Add VAPI_API_KEY to .env.local',

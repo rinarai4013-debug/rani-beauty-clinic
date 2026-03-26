@@ -1,16 +1,16 @@
 /**
- * Membership Pitch Templates — Angel Glow Up Membership
+ * Membership Pitch Templates - Angel Glow Up Membership
  *
  * 3-email sequence to upgrade existing clients to the Angel Glow Up
  * monthly membership program. Triggered by n8n WF7 (Membership Engine)
  * for clients who meet upgrade criteria (3+ visits, no active membership).
  *
  * Sequence:
- * 1. Immediate — Membership introduction + savings breakdown
- * 2. 3 days — Exclusive member perks + testimonial
- * 3. 7 days — Limited enrollment + urgency close
+ * 1. Immediate - Membership introduction + savings breakdown
+ * 2. 3 days - Exclusive member perks + testimonial
+ * 3. 7 days - Limited enrollment + urgency close
  *
- * IMPORTANT: Never use the word "infusion" — always say "injection."
+ * IMPORTANT: Never use the word "infusion" - always say "injection."
  */
 
 export interface MembershipPitchVars {
@@ -47,10 +47,10 @@ function fill(template: string, vars: MembershipPitchVars): string {
     .replace(/{{clinicAddress}}/g, CLINIC_ADDRESS);
 }
 
-// ── EMAIL 1: IMMEDIATE — MEMBERSHIP INTRO + SAVINGS ──
+// ── EMAIL 1: IMMEDIATE - MEMBERSHIP INTRO + SAVINGS ──
 
 const EMAIL_1_INTRO: Template = {
-  sms: `Hi {{firstName}}! As one of our valued clients, you're invited to join the Angel Glow Up membership — starting at {{membershipPrice}}. Members save 20-40% on every treatment. Ask us about it at your next visit or call {{clinicPhone}}.`,
+  sms: `Hi {{firstName}}! As one of our valued clients, you're invited to join the Angel Glow Up membership - starting at {{membershipPrice}}. Members save 20-40% on every treatment. Ask us about it at your next visit or call {{clinicPhone}}.`,
   emailSubject: `{{firstName}}, You're Invited: Angel Glow Up Membership`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -61,7 +61,7 @@ const EMAIL_1_INTRO: Template = {
   <div style="padding: 32px; background-color: #ffffff;">
     <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi {{firstName}},</p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
-      You've been one of our most dedicated clients — with <strong>{{totalVisits}} visits</strong> and a clear commitment to your beauty and wellness journey. We love seeing you!
+      You've been one of our most dedicated clients - with <strong>{{totalVisits}} visits</strong> and a clear commitment to your beauty and wellness journey. We love seeing you!
     </p>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
       That's exactly why we'd love to invite you to our <strong>Angel Glow Up membership</strong>. It's designed for clients like you who are serious about maintaining and building on their results.
@@ -79,23 +79,23 @@ const EMAIL_1_INTRO: Template = {
       <div style="display: flex; flex-direction: column; gap: 12px;">
         <div style="display: flex; align-items: flex-start; gap: 12px;">
           <span style="color: #C9A96E; font-size: 18px; line-height: 1;">&#10003;</span>
-          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Monthly treatment credit</strong> — applied toward your favorite services</p>
+          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Monthly treatment credit</strong> - applied toward your favorite services</p>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 12px;">
           <span style="color: #C9A96E; font-size: 18px; line-height: 1;">&#10003;</span>
-          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>20-40% off all services</strong> — including {{favoriteService}}</p>
+          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>20-40% off all services</strong> - including {{favoriteService}}</p>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 12px;">
           <span style="color: #C9A96E; font-size: 18px; line-height: 1;">&#10003;</span>
-          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Priority booking</strong> — first access to preferred appointment times</p>
+          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Priority booking</strong> - first access to preferred appointment times</p>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 12px;">
           <span style="color: #C9A96E; font-size: 18px; line-height: 1;">&#10003;</span>
-          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Exclusive member events</strong> — early access to new treatments and VIP events</p>
+          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Exclusive member events</strong> - early access to new treatments and VIP events</p>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 12px;">
           <span style="color: #C9A96E; font-size: 18px; line-height: 1;">&#10003;</span>
-          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Complimentary add-ons</strong> — LED therapy, dermaplaning, or enhancement upgrades</p>
+          <p style="color: #555; font-size: 14px; line-height: 1.5; margin: 0;"><strong>Complimentary add-ons</strong> - LED therapy, dermaplaning, or enhancement upgrades</p>
         </div>
       </div>
     </div>
@@ -122,7 +122,7 @@ const EMAIL_1_INTRO: Template = {
 </div>`,
 };
 
-// ── EMAIL 2: 3 DAYS — PERKS + TESTIMONIAL ──
+// ── EMAIL 2: 3 DAYS - PERKS + TESTIMONIAL ──
 
 const EMAIL_2_PERKS: Template = {
   sms: `{{firstName}}, Angel Glow Up members at Rani get 20-40% off every visit + priority booking. One of our members said it's the best investment she's made in herself. Learn more: {{bookingUrl}}`,
@@ -143,7 +143,7 @@ const EMAIL_2_PERKS: Template = {
       <p style="color: #333; font-size: 15px; line-height: 1.6; font-style: italic; margin: 0 0 12px; text-align: center;">
         "Joining the Angel Glow Up membership was the best decision. I save so much on my monthly treatments, and the priority booking means I always get the times I want. It's made being consistent with my skincare so much easier."
       </p>
-      <p style="color: #888; font-size: 13px; margin: 0; text-align: center;">— Angel Glow Up Member</p>
+      <p style="color: #888; font-size: 13px; margin: 0; text-align: center;"> -  Angel Glow Up Member</p>
     </div>
 
     <div style="margin: 24px 0;">
@@ -177,7 +177,7 @@ const EMAIL_2_PERKS: Template = {
 </div>`,
 };
 
-// ── EMAIL 3: 7 DAYS — LIMITED ENROLLMENT + URGENCY ──
+// ── EMAIL 3: 7 DAYS - LIMITED ENROLLMENT + URGENCY ──
 
 const EMAIL_3_URGENCY: Template = {
   sms: `{{firstName}}, this is your last chance to join Angel Glow Up at {{membershipPrice}}. We're limiting new members this month to maintain our VIP experience. Enroll now: {{bookingUrl}} or call {{clinicPhone}}.`,
@@ -229,7 +229,7 @@ const EMAIL_3_URGENCY: Template = {
 
     <div style="text-align: center; margin: 28px 0;">
       <a href="{{bookingUrl}}" style="display: inline-block; background-color: #C9A96E; color: #0F1D2C; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
-        Enroll Now — {{membershipPrice}}
+        Enroll Now - {{membershipPrice}}
       </a>
       <p style="margin: 12px 0 0; color: #888; font-size: 13px;">
         Or call to enroll: <a href="tel:+14252078883" style="color: #C9A96E;">{{clinicPhone}}</a>

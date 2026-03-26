@@ -149,7 +149,7 @@ export const galleryPages: GalleryPage[] = [
     faqs: [
       { question: "Are dermal filler results immediate?", answer: "Yes, you will see volume and contour improvement immediately after injection. Expect mild swelling for 3-7 days. Final results settle at about two weeks when any swelling fully resolves and the filler integrates naturally." },
       { question: "How long do different types of fillers last?", answer: "Lip fillers typically last 6-9 months. Cheek and midface fillers last 12-18 months. Jawline and chin fillers can last 12-24 months. Individual metabolism and lifestyle factors affect longevity." },
-      { question: "Can dermal fillers be reversed?", answer: "Hyaluronic acid fillers can be dissolved with hyaluronidase if needed. This is one reason HA fillers are preferred — they offer a safety net. Non-HA fillers cannot be reversed, which is why we primarily use HA-based products." },
+      { question: "Can dermal fillers be reversed?", answer: "Hyaluronic acid fillers can be dissolved with hyaluronidase if needed. This is one reason HA fillers are preferred - they offer a safety net. Non-HA fillers cannot be reversed, which is why we primarily use HA-based products." },
     ],
   },
   {

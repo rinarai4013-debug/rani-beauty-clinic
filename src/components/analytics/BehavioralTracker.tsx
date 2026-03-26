@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { initBehavioralTracking } from '@/lib/analytics/behavioral-tracking';
 
 /**
- * BehavioralTracker — Client component that initializes the behavioral
+ * BehavioralTracker - Client component that initializes the behavioral
  * intelligence engine on every page navigation.
  *
  * Tracks: scroll depth, rage clicks, hesitation, CTA clicks, booking attempts,

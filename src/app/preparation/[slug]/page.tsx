@@ -125,7 +125,7 @@ export default function PreparationPage({
         {/* Weeks Before */}
         <section className="mb-10">
           <h2 className="mb-4 font-heading text-2xl font-bold text-rani-navy">
-            1–2 Weeks Before Your Appointment
+            1-2 Weeks Before Your Appointment
           </h2>
           <ul className="space-y-3">
             {page.weeksBeforeSteps.map((item, i) => (

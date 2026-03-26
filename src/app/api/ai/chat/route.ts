@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import Anthropic from '@anthropic-ai/sdk';
 import { buildRAGContext } from '@/lib/rag/knowledge-base';
 import { logEvent } from '@/lib/logging/structured-logger';
 import { RANI_SYSTEM_PROMPT } from '@/lib/voice/rani-voice';
+import { captureAgentExecution } from '@/lib/sentry-utils';
 
 // Simple rate limiter: 10 requests per minute per IP
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -79,7 +81,7 @@ export async function POST(request: NextRequest) {
         ragContext = `\n\nKNOWLEDGE BASE CONTEXT (use this to inform your answer):\n${rag.contextText}`;
       }
     } catch {
-      // RAG lookup failed — continue without it
+      // RAG lookup failed - continue without it
     }
 
     const client = new Anthropic({ apiKey });
@@ -113,6 +115,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ reply: cleanReply, actions, leadInfo, source: 'ai' });
   } catch (error) {
+    Sentry.captureException(error, { tags: { route: 'ai-chat' } });
     console.error('AI chat error:', error);
     return NextResponse.json({
       reply: "I apologize, I'm having a moment! Please reach out to us directly at ranibeautyclinic.com or call (425) 539-4440. We'd love to help you.",
