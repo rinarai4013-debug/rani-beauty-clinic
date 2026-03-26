@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import MobileNav from '../Shared/MobileNav';
+import MobileNav from '../shared/MobileNav';
 import type { UserRole } from '@/types/auth';
 
 interface DashboardShellProps {
