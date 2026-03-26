@@ -1,0 +1,147 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  deployments: read
+
+jobs:
+  preview:
+    name: Deploy Preview & Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Vercel deployment
+        id: vercel
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const MAX_WAIT = 300; // 5 minutes
+            const POLL_INTERVAL = 15; // 15 seconds
+            let elapsed = 0;
+            let previewUrl = null;
+
+            while (elapsed < MAX_WAIT) {
+              const { data: deployments } = await github.rest.repos.listDeployments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.payload.pull_request.head.ref,
+                per_page: 1,
+              });
+
+              if (deployments.length > 0) {
+                const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  deployment_id: deployments[0].id,
+                  per_page: 1,
+                });
+
+                if (statuses.length > 0 && statuses[0].state === 'success') {
+                  previewUrl = statuses[0].environment_url || statuses[0].target_url;
+                  break;
+                }
+              }
+
+              await new Promise(r => setTimeout(r, POLL_INTERVAL * 1000));
+              elapsed += POLL_INTERVAL;
+            }
+
+            if (!previewUrl) {
+              // Fallback: construct Vercel preview URL from branch name
+              const branch = context.payload.pull_request.head.ref;
+              const slug = branch.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
+              previewUrl = `https://rani-beauty-clinic-git-${slug}-sukhithebanker.vercel.app`;
+              core.warning('Could not detect deployment URL; using constructed URL.');
+            }
+
+            core.setOutput('url', previewUrl);
+            return previewUrl;
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const previewUrl = '${{ steps.vercel.outputs.url }}';
+            const body = [
+              '## Preview Deployment',
+              '',
+              `**URL:** ${previewUrl}`,
+              '',
+              '| Page | Link |',
+              '|------|------|',
+              `| Home | [${previewUrl}](${previewUrl}) |`,
+              `| Services | [${previewUrl}/services](${previewUrl}/services) |`,
+              `| About | [${previewUrl}/about](${previewUrl}/about) |`,
+              `| Contact | [${previewUrl}/contact](${previewUrl}/contact) |`,
+              `| Blog | [${previewUrl}/blog](${previewUrl}/blog) |`,
+              '',
+              '_Deployed automatically by Vercel._',
+            ].join('\n');
+
+            // Check for existing preview comment to update
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.includes('## Preview Deployment')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run smoke tests against preview
+        run: |
+          PREVIEW_URL="${{ steps.vercel.outputs.url }}"
+          echo "Running smoke tests against $PREVIEW_URL"
+
+          # Basic connectivity checks
+          for path in "/" "/services" "/about" "/contact" "/blog"; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${PREVIEW_URL}${path}" || echo "000")
+            echo "GET ${path} -> HTTP ${STATUS}"
+            if [ "$STATUS" != "200" ] && [ "$STATUS" != "304" ]; then
+              echo "::warning::Smoke test failed for ${path} (HTTP ${STATUS})"
+            fi
+          done
+
+          # Check that key meta tags exist on homepage
+          HOMEPAGE=$(curl -s "$PREVIEW_URL")
+          if echo "$HOMEPAGE" | grep -q '<title>'; then
+            echo "Homepage has <title> tag"
+          else
+            echo "::warning::Homepage missing <title> tag"
+          fi
