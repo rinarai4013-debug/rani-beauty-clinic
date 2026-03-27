@@ -345,7 +345,8 @@ export default function PricingPageClient() {
                       </Button>
                     ) : (
                       <Button
-                        href="/contact"
+                        href="https://booking.mangomint.com/ranibeautyclinic1"
+                        target="_blank"
                         className={
                           tier.popular
                             ? "!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"

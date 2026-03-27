@@ -208,7 +208,7 @@ export const pricingData = {
         savings: "~$3,600/year",
         features: [
           "Everything in GLOW plus:",
-          "2nd Body Laser Area (e.g., Brazilian + Underarms)",
+          "2nd Body Laser Area (Brazilian or Underarms + Full Legs or Full Arms)",
           "Quarterly Advanced Treatment (Microneedling, Peel, or LED)",
           "20% off all services & retail",
           "VIP Booking (2 weeks early)",
