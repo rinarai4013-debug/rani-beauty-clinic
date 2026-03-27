@@ -197,8 +197,8 @@ const FINANCING_PROVIDER: FieldOption[] = [
 
 const MEMBERSHIP_TIERS: FieldOption[] = [
   { value: 'halo_199', label: 'HALO ($199/mo)' },
-  { value: 'glow_399', label: 'GLOW ($399/mo)' },
-  { value: 'elite_599', label: 'ELITE AURA ($599/mo)' },
+  { value: 'glow_349', label: 'GLOW ($349/mo)' },
+  { value: 'elite_549', label: 'ELITE AURA ($549/mo)' },
 ];
 
 const CONSULT_OUTCOME: FieldOption[] = [

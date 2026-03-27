@@ -1018,7 +1018,7 @@ This technology transforms the consultation experience from subjective observati
       {
         question: "Is AI skin analysis included with my treatment?",
         answer:
-          "A monthly AI Skin Scan is included with all Angel Glow Up membership tiers (HALO at $199/mo, GLOW at $399/mo, and ELITE AURA at $599/mo). It is also included as part of your initial consultation for many treatment programs. Our New Client Welcome Bundle ($99) includes an Express HydraFacial, consultation, and $50 off your first treatment. Contact us at (425) 539-4440 to learn about our current offers.",
+          "A monthly AI Skin Scan is included with all Angel Glow Up membership tiers (HALO at $199/mo, GLOW at $349/mo, and ELITE AURA at $549/mo). It is also included as part of your initial consultation for many treatment programs. Our New Client Welcome Bundle ($99) includes an Express HydraFacial, consultation, and $50 off your first treatment. Contact us at (425) 539-4440 to learn about our current offers.",
       },
       {
         question: "Do I need to remove my makeup for the analysis?",
