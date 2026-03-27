@@ -13,7 +13,6 @@ const QuizCTA = dynamic(() => import("@/components/sections/QuizCTA"));
 const PopularPackages = dynamic(() => import("@/components/sections/PopularPackages"));
 const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
 const ConsultationCTA = dynamic(() => import("@/components/sections/ConsultationCTA"));
-const ConsultationEmbed = dynamic(() => import("@/components/sections/ConsultationEmbed"));
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
 
 const reviews = [
@@ -128,18 +127,18 @@ export default function HomePage() {
 
       {/* 1. Hero - Cinematic Split Layout */}
       <Hero
-        label="PHYSICIAN-SUPERVISED MEDSPA"
-        title="Physician-Supervised Beauty. Personally Designed."
-        subtitle="Expert-led treatments for skin, body, and wellness - designed by a neurologist-led team."
+        label="RENTON'S PREMIER MEDICAL AESTHETICS CLINIC"
+        title="Where Precision Medicine Meets Uncompromising Beauty."
+        subtitle="Every treatment designed by a board-certified neurologist. Every result held to a higher standard."
         primaryCTA={{
-          text: "Book Your Consultation",
+          text: "Reserve Your Consultation",
           href: clinicInfo.booking.url,
           target: "_blank",
         }}
         badges={[
-          "Board-Certified Neurologist",
-          "4.9 Google Rating",
-          "Open 7 Days",
+          "Neurologist-Directed Protocols",
+          "4.9 Stars, 127+ Reviews",
+          "Open 7 Days a Week",
         ]}
         backgroundImage="/images/hero/facility.jpg"
         backgroundOverlay={0}
@@ -160,22 +159,19 @@ export default function HomePage() {
       {/* 5. Founders + Medical Director */}
       <CredibilitySection />
 
-      {/* 6. Quiz CTA */}
-      <QuizCTA />
-
-      {/* 7. Signature Packages */}
+      {/* 6. Signature Packages */}
       <PopularPackages />
 
-      {/* 8. Your Path to Results */}
+      {/* 7. Your Path to Results */}
       <ProcessSteps />
 
-      {/* 9. Consultation Wizard */}
-      <ConsultationEmbed />
+      {/* 8. Personalized Quiz */}
+      <QuizCTA />
 
-      {/* 10. Consultation CTA (quick book) */}
+      {/* 9. Consultation CTA (single, clear close) */}
       <ConsultationCTA />
 
-      {/* 11. FAQ */}
+      {/* 10. FAQ */}
       <FAQ />
     </>
   );

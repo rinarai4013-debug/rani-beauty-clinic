@@ -50,21 +50,23 @@ function useCountUp(
   isInView: boolean,
   options?: { duration?: number; isDecimal?: boolean }
 ): string {
-  const { duration = 2000, isDecimal = false } = options || {};
-  const [value, setValue] = useState(0);
+  const { duration = 1200, isDecimal = false } = options || {};
+  const [value, setValue] = useState(target);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
     if (!isInView || hasAnimated.current) return;
     hasAnimated.current = true;
 
+    const startFrom = target * 0.7;
+    const range = target - startFrom;
     const startTime = performance.now();
 
     function tick(now: number) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(eased * target);
+      setValue(startFrom + eased * range);
 
       if (progress < 1) {
         requestAnimationFrame(tick);

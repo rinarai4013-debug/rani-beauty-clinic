@@ -773,12 +773,12 @@ export const comparisonPages: ComparisonPage[] = [
       },
       {
         category: "Treatment Time",
-        treatmentA: "15-30 minutes for injection; 2-4 hours for IV infusion",
+        treatmentA: "15-30 minutes for injection; 2-4 hours for IV drip",
         treatmentB: "5-10 minutes for a quick intramuscular injection",
       },
       {
         category: "Recovery",
-        treatmentA: "No downtime; mild flushing possible during infusion",
+        treatmentA: "No downtime; mild flushing possible during IV drip",
         treatmentB: "No downtime; injection site may be slightly sore",
       },
       {
@@ -788,7 +788,7 @@ export const comparisonPages: ComparisonPage[] = [
       },
       {
         category: "Cost Range",
-        treatmentA: "$200-500 per injection or infusion",
+        treatmentA: "$200-500 per injection or IV drip",
         treatmentB: "$25-75 per injection",
       },
       {
@@ -810,7 +810,7 @@ export const comparisonPages: ComparisonPage[] = [
     ],
     consA: [
       "Significantly higher cost per treatment than B12",
-      "Longer treatment time especially for IV infusion protocols",
+      "Longer treatment time especially for IV drip protocols",
       "Newer therapy with less long-term clinical data than B12",
     ],
     prosB: [

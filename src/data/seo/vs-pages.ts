@@ -391,18 +391,18 @@ export const vsPages: VsPage[] = [
     metaTitle: "NAD+ IM Injection vs IV | Which Delivery Is Better?",
     metaDescription:
       "NAD+ IM injection vs IV comparison: time, comfort, bioavailability, and results. Why Rani Beauty Clinic chose IM delivery. Expert analysis, Renton WA.",
-    keywords: ["nad im vs iv", "nad injection vs infusion", "nad delivery method", "im nad injection", "nad iv alternative"],
+    keywords: ["nad im vs iv", "nad injection vs iv drip", "nad delivery method", "im nad injection", "nad iv alternative"],
     heroDescription:
       "NAD+ can be delivered through two primary methods: intramuscular (IM) injection and intravenous (IV) administration. At Rani Beauty Clinic, we exclusively offer NAD+ IM injections because they deliver excellent bioavailability in minutes rather than hours, are significantly more comfortable, and eliminate the time commitment that makes IV NAD+ impractical for regular use. This guide compares both delivery methods honestly so you can understand why IM injection is the superior choice for consistent NAD+ therapy.",
     comparisonTable: [
       { category: "Administration Time", treatmentA: "2-5 minutes per injection", treatmentB: "2-4 hours per session" },
-      { category: "Comfort", treatmentA: "Brief injection, well-tolerated", treatmentB: "Frequently causes flushing, nausea, chest tightness during infusion" },
+      { category: "Comfort", treatmentA: "Brief injection, well-tolerated", treatmentB: "Frequently causes flushing, nausea, chest tightness during IV drip" },
       { category: "Bioavailability", treatmentA: "High - bypasses digestive system, absorbed from muscle tissue", treatmentB: "High - direct bloodstream delivery" },
       { category: "Convenience", treatmentA: "Quick appointment, no scheduling burden", treatmentB: "Requires 2-4 hour clinic visit per session" },
       { category: "Compliance", treatmentA: "High - easy to maintain weekly/biweekly schedule", treatmentB: "Low - many patients discontinue due to time and discomfort" },
       { category: "Side Effects", treatmentA: "Minimal - mild injection site soreness possible", treatmentB: "Common - flushing, nausea, lightheadedness during administration" },
       { category: "Cost Per Session", treatmentA: "$150-$500 depending on dose", treatmentB: "$500-$1,500+ per session" },
-      { category: "Dosing Flexibility", treatmentA: "Easy dose adjustment per injection", treatmentB: "Rate adjustment possible but limited by infusion time" },
+      { category: "Dosing Flexibility", treatmentA: "Easy dose adjustment per injection", treatmentB: "Rate adjustment possible but limited by drip time" },
     ],
     sections: [
       {

@@ -23,12 +23,12 @@ export default function QuizCTA() {
             <div>
               <SectionLabel label="PERSONALIZED CARE" dark />
               <h2 className="mt-6 font-heading text-3xl font-bold text-white md:text-4xl">
-                Find Your Perfect Treatment in 60 Seconds
+                Your Personalized Treatment Blueprint
               </h2>
               <p className="mt-6 max-w-lg font-body text-base leading-relaxed text-gray-300">
-                Our AI-powered quiz matches you with the right treatments based
-                on your goals, skin type, and experience level. Get a
-                personalized plan in under a minute.
+                Answer a few questions about your goals, skin, and history.
+                Our clinical team uses your responses to design a protocol
+                built around you, not a generic menu.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Button

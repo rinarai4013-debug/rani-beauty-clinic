@@ -198,7 +198,7 @@ The HydraFacial is consistently ranked as the most popular non-invasive aestheti
       {
         question: "Can I get a HydraFacial if I have acne?",
         answer:
-          "Absolutely. The HydraFacial is an excellent treatment for acne-prone skin. The deep cleansing and extraction steps remove the excess oil, dead skin cells, and bacteria that contribute to breakouts, while the infusion step delivers salicylic acid and other acne-fighting ingredients directly into the pores. Many acne clients see a noticeable reduction in breakouts and pore congestion after their first session. For active inflammatory acne, we may combine the HydraFacial with our Laser Acne Facial or recommend a specific treatment plan. Consult with our team to determine the best approach for your acne concerns.",
+          "Absolutely. The HydraFacial is an excellent treatment for acne-prone skin. The deep cleansing and extraction steps remove the excess oil, dead skin cells, and bacteria that contribute to breakouts, while the hydration step delivers salicylic acid and other acne-fighting ingredients directly into the pores. Many acne clients see a noticeable reduction in breakouts and pore congestion after their first session. For active inflammatory acne, we may combine the HydraFacial with our Laser Acne Facial or recommend a specific treatment plan. Consult with our team to determine the best approach for your acne concerns.",
       },
       {
         question: "Can I wear makeup after a HydraFacial?",

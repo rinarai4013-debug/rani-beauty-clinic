@@ -69,7 +69,7 @@ export default function ComplianceOverviewPage() {
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#0F1D2C] font-['Playfair_Display']">
+        <h1 className="text-2xl font-bold text-rani-navy font-heading">
           Compliance & Documentation
         </h1>
         <p className="text-gray-500 mt-1">

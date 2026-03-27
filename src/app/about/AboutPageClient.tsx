@@ -263,7 +263,7 @@ export default function AboutPageClient() {
                   a unique depth of medical expertise to aesthetic medicine. His
                   extensive training in neuromuscular anatomy and neurotoxin science
                   provides unparalleled precision in treatments like Botox and Dysport,
-                  making him one of the most qualified injectors in the Pacific Northwest.
+                  bringing a rare depth of neurological expertise to every treatment protocol.
                 </p>
                 <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
                   As Medical Director of Rani Beauty Clinic, Dr. Landfield oversees

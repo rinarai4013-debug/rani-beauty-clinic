@@ -15,11 +15,11 @@ export const postsBatch15: BlogPost[] = [
 
 The protocol sequencing matters. At Rani Beauty Clinic, we perform HydraFacial first, followed by Botox. This order is intentional and clinically important. HydraFacial cleanses, exfoliates, extracts, and hydrates the skin, creating a clean, fresh canvas. The gentle vortex technology does not involve aggressive manipulation that could affect Botox placement. Performing Botox afterward ensures the neurotoxin is injected into properly prepared, clean skin.
 
-Performing these treatments in reverse order, Botox first, would risk displacing the precisely placed neurotoxin during the manual manipulation required for HydraFacial extraction and serum infusion. While this risk is theoretical with gentle techniques, our protocol eliminates it entirely.
+Performing these treatments in reverse order, Botox first, would risk displacing the precisely placed neurotoxin during the manual manipulation required for HydraFacial extraction and serum delivery. While this risk is theoretical with gentle techniques, our protocol eliminates it entirely.
 
 The complementary benefits of this combination are substantial. HydraFacial addresses skin quality factors that Botox cannot: congestion, dehydration, dullness, and textural irregularities. Botox addresses dynamic wrinkles that HydraFacial cannot: forehead lines, frown lines, and crow's feet. Together, they produce a comprehensive facial rejuvenation that looks remarkably refreshed and natural.
 
-A typical combined appointment at Rani Beauty Clinic takes approximately forty-five to sixty minutes. The HydraFacial portion takes thirty minutes, delivering cleansing, exfoliation, extraction, and serum infusion. After a brief transition, Botox injection takes ten to fifteen minutes. You leave with immediately improved skin quality from the HydraFacial and the knowledge that Botox results will develop over the following week.
+A typical combined appointment at Rani Beauty Clinic takes approximately forty-five to sixty minutes. The HydraFacial portion takes thirty minutes, delivering cleansing, exfoliation, extraction, and serum hydration. After a brief transition, Botox injection takes ten to fifteen minutes. You leave with immediately improved skin quality from the HydraFacial and the knowledge that Botox results will develop over the following week.
 
 This combination is particularly popular before significant events. The HydraFacial provides an immediate glow, while Botox smooths expression lines over the next seven to fourteen days. When timed two weeks before an event, patients arrive at their occasion with both radiant skin and smooth, relaxed expression areas.
 

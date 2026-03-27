@@ -155,7 +155,7 @@ function getRecommendations(concern: ConcernKey): Recommendation {
         label: "Better",
         treatment: "Botox + HydraFacial",
         reason:
-          "Combining Botox with a HydraFacial adds intense hydration and antioxidant infusion for a smoother, more radiant complexion.",
+          "Combining Botox with a HydraFacial adds intense hydration and antioxidant treatment for a smoother, more radiant complexion.",
         priceRange: "$400 - $700",
         timeline: "Immediate glow, full Botox effect in 1 week",
       },

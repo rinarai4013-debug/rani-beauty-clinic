@@ -15,7 +15,7 @@ export const postsBatch32: BlogPost[] = [
 
 Winter in the Pacific Northwest takes a specific toll on skin. Months of indoor heating, reduced humidity, cold outdoor air, and minimal sun exposure create a complexion that is often dehydrated, dull, and congested. The heavier moisturizers and richer products that protected your skin during winter have done their job, but they may have also contributed to a buildup of surface debris and clogged pores that need clearing.
 
-The first step in your spring skincare cleanse is professional exfoliation. A HydraFacial at the start of spring removes the accumulated dead cells, excess product residue, and winter congestion in one thorough session. The vortex extraction technology clears pores that may have become clogged under heavy winter moisturizers, while the serum infusion delivers a fresh dose of hydration and antioxidants to the newly revealed skin beneath.
+The first step in your spring skincare cleanse is professional exfoliation. A HydraFacial at the start of spring removes the accumulated dead cells, excess product residue, and winter congestion in one thorough session. The vortex extraction technology clears pores that may have become clogged under heavy winter moisturizers, while the serum delivery step provides a fresh dose of hydration and antioxidants to the newly revealed skin beneath.
 
 After professional exfoliation, reassess your at-home products. Transition from rich, occlusive winter moisturizers to lighter, gel-based or water-based formulations that provide adequate hydration without heaviness. Your skin's natural oil production increases as temperatures rise, so the thick creams that prevented winter dehydration may now contribute to congestion and shine.
 
@@ -164,7 +164,7 @@ The most effective new year skincare reset begins with an honest assessment of w
 
 January is ideal for starting or restarting prescription tretinoin. The lower UV exposure of winter reduces photosensitivity concerns, and the adjustment period, which may involve mild dryness and peeling for four to six weeks, is easiest to manage when you are spending most of your time indoors. By spring, your skin will have acclimated to tretinoin and you will be seeing the accelerated cell turnover, improved texture, and collagen stimulation that make this ingredient transformative.
 
-A January HydraFacial with brightening boosters clears the post-holiday skin dullness that results from weeks of late nights, richer foods, and possibly increased alcohol consumption. The deep cleanse removes congestion while the antioxidant serum infusion jumpstarts the renewal process. Consider this your skin's fresh start treatment.
+A January HydraFacial with brightening boosters clears the post-holiday skin dullness that results from weeks of late nights, richer foods, and possibly increased alcohol consumption. The deep cleanse removes congestion while the antioxidant serum delivery jumpstarts the renewal process. Consider this your skin's fresh start treatment.
 
 Build your annual treatment calendar in January. Planning ahead ensures you space treatments optimally and align intensive procedures with lower-UV months. A typical annual plan might include Botox every three to four months, monthly HydraFacials, a collagen-stimulating treatment like RF microneedling or Sofwave once or twice per year, chemical peels in spring and fall, and PicoWay laser as needed for pigmentation.
 
@@ -284,7 +284,7 @@ Building a consistent routine is the first and most important step for teen skin
 
 The most common mistake teens make is using harsh, stripping products in an attempt to dry out acne. Products containing high concentrations of benzoyl peroxide, alcohol-based toners, and aggressive physical scrubs can damage the skin barrier, increase inflammation, and paradoxically worsen acne by triggering more oil production. Gentle, consistent care outperforms aggressive sporadic treatment every time.
 
-At Rani Beauty Clinic, HydraFacial is our recommended professional treatment for teens. The gentle vortex extraction clears clogged pores more thoroughly and less traumatically than manual squeezing, which often spreads bacteria and causes scarring. The anti-inflammatory serum infusion calms active breakouts while the hydrating finish keeps skin balanced. Monthly HydraFacials during the school year prevent the pore congestion that leads to breakout cycles.
+At Rani Beauty Clinic, HydraFacial is our recommended professional treatment for teens. The gentle vortex extraction clears clogged pores more thoroughly and less traumatically than manual squeezing, which often spreads bacteria and causes scarring. The anti-inflammatory serum delivery calms active breakouts while the hydrating finish keeps skin balanced. Monthly HydraFacials during the school year prevent the pore congestion that leads to breakout cycles.
 
 For teens with moderate to severe acne that does not respond to basic skincare, medical-grade treatment options exist. Prescription-strength retinoids and targeted treatments can be discussed during a consultation. Starting appropriate treatment early prevents the scarring and pigmentation that may otherwise require more intensive correction later.
 

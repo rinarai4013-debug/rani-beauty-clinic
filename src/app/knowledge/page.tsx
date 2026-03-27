@@ -294,7 +294,7 @@ export default function KnowledgePage() {
                 in every cell that plays a critical role in energy
                 metabolism, DNA repair, and cellular signaling. NAD+ levels
                 decline naturally with age. Rani Beauty Clinic offers
-                intramuscular NAD+ injections (not IV infusions) for
+                intramuscular NAD+ injections for
                 cellular energy production, anti-aging support, cognitive
                 enhancement, and athletic recovery. Sessions range from $150
                 to $500.

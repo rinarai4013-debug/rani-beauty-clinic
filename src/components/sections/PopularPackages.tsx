@@ -56,12 +56,12 @@ export default function PopularPackages() {
     <section className="bg-rani-cream py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <FadeInOnScroll>
-          <SectionLabel label="CURATED PACKAGES" />
+          <SectionLabel label="TREATMENT PROTOCOLS" />
           <h2 className="mt-6 text-center font-heading text-3xl font-bold text-rani-navy md:text-4xl">
-            Signature Experiences, Curated for You
+            Physician-Designed Treatment Protocols
           </h2>
-          <p className="mx-auto mt-3 text-center font-body text-sm font-semibold text-rani-gold">
-            127+ five-star reviews
+          <p className="mx-auto mt-3 max-w-lg text-center font-body text-base text-rani-muted leading-relaxed">
+            Each protocol is built by our clinical team to deliver measurable results, not a one-size-fits-all menu.
           </p>
         </FadeInOnScroll>
 

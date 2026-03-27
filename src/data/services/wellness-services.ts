@@ -280,14 +280,14 @@ NAD+ subcutaneous injections at Rani Beauty Clinic deliver NAD+ directly into th
       "Individuals interested in proactive longevity and anti-aging strategies at the cellular level",
       "Those recovering from chronic illness, long-haul viral infections, or prolonged periods of high stress",
       "People with neurodegenerative concerns or a family history of cognitive decline",
-      "Busy individuals who want the benefits of NAD+ without the time commitment of IV infusions",
+      "Busy individuals who want the benefits of NAD+ without the time commitment of IV drip sessions",
       "Anyone who has noticed a significant decline in energy, focus, or vitality and wants to address it at the root cause",
     ],
     whatToExpect: {
       before:
         "No special preparation is required for NAD+ injections. We recommend staying well-hydrated and eating normally before your appointment. Wear comfortable clothing that allows easy access to the injection site (abdomen, upper arm, or thigh). Inform your clinician of all medications and supplements you are currently taking.",
       during:
-        "The appointment takes approximately 10\u201315 minutes total, including check-in and the injection itself. The subcutaneous injection is administered using an ultra-fine needle and takes only seconds. Most clients describe the sensation as a brief pinch followed by mild warmth at the injection site. The experience is far quicker and more comfortable than an IV infusion.",
+        "The appointment takes approximately 10\u201315 minutes total, including check-in and the injection itself. The subcutaneous injection is administered using an ultra-fine needle and takes only seconds. Most clients describe the sensation as a brief pinch followed by mild warmth at the injection site. The experience is far quicker and more comfortable than an IV drip session.",
       after:
         "You can return to all normal activities immediately - there is no downtime. Some clients report feeling a subtle boost in energy and mental clarity within hours of the injection. Others notice the cumulative effects building over the first few sessions. Mild soreness or redness at the injection site may occur and typically resolves within a day. For optimal results, we recommend a consistent injection schedule as discussed with your clinician.",
     },
@@ -304,7 +304,7 @@ NAD+ subcutaneous injections at Rani Beauty Clinic deliver NAD+ directly into th
       {
         question: "How long does an NAD+ injection appointment take?",
         answer:
-          "An NAD+ injection appointment takes approximately 10\u201315 minutes, including check-in and the injection itself. The actual injection takes only seconds. This makes it easy to fit into a lunch break or busy schedule \u2014 a major advantage over IV infusions that can require 2\u20134 hours.",
+          "An NAD+ injection appointment takes approximately 10\u201315 minutes, including check-in and the injection itself. The actual injection takes only seconds. This makes it easy to fit into a lunch break or busy schedule \u2014 a major advantage over IV drip sessions that can require 2\u20134 hours.",
       },
       {
         question: "What do NAD+ injections feel like?",

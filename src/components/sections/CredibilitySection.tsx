@@ -27,7 +27,7 @@ export default function CredibilitySection() {
             <div>
               <SectionLabel label="OUR STORY" className="!items-start" />
               <h2 className="mt-6 font-heading text-3xl font-bold text-rani-navy md:text-4xl">
-                Built by People Who Care About Your Results
+                Founded on Clinical Obsession. Sustained by Real Results.
               </h2>
               <p className="mt-6 max-w-lg font-body text-base leading-relaxed text-rani-text">
                 After training at top aesthetic clinics in Los Angeles, Dubai,

@@ -146,7 +146,7 @@ The treatment protocol at Rani Beauty Clinic involves thorough skin cleansing, f
 
 Immediately after treatment, most patients notice brighter, smoother, more hydrated skin. There is typically no redness, flaking, or visible peeling. You can apply makeup immediately and return to all normal activities. This zero-downtime profile makes BioRePeel ideal for patients who cannot take time away from work or social engagements.
 
-Clinical indications for BioRePeel include dull, tired-looking skin that needs an immediate refresh. Fine lines and early wrinkles respond to the collagen-stimulating effect. Acne and oily skin benefit from the salicylic acid component. Uneven texture smoothes as cellular turnover accelerates. Dehydrated skin receives an infusion of moisturizing ingredients. Pre-event preparation for a last-minute glow.
+Clinical indications for BioRePeel include dull, tired-looking skin that needs an immediate refresh. Fine lines and early wrinkles respond to the collagen-stimulating effect. Acne and oily skin benefit from the salicylic acid component. Uneven texture smoothes as cellular turnover accelerates. Dehydrated skin receives a boost of moisturizing ingredients. Pre-event preparation for a last-minute glow.
 
 For optimal results, a series of four to six BioRePeel treatments spaced seven to fourteen days apart is recommended. The short interval between sessions is possible precisely because there is no epidermal damage requiring extended healing. This protocol allows rapid accumulation of collagen-stimulating signals, producing progressive improvement over the course of the series.
 

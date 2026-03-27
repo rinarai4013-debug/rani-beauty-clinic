@@ -16,13 +16,13 @@ export default function ConsultationCTA() {
           <SectionLabel label="YOUR NEXT STEP" dark />
 
           <h2 className="mt-6 font-heading text-3xl font-bold text-white md:text-4xl lg:text-5xl leading-tight">
-            Your Transformation Starts with a Conversation
+            Ready to See What&apos;s Possible?
           </h2>
 
           <p className="mx-auto mt-6 max-w-lg font-body text-base leading-relaxed text-gray-300">
-            Whether you&apos;re exploring options or ready to begin, a
-            consultation gives you a personalized plan designed around your
-            goals.
+            In a private consultation with our clinical team, we assess your skin,
+            listen to your goals, and design a protocol built specifically for you.
+            No pressure. Just clarity.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

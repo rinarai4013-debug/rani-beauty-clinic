@@ -1087,7 +1087,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "NAD+ Injection Pricing",
         content:
-          "NAD+ IM injections at Rani Beauty Clinic are priced from $150 for standard doses to $500 for high-dose protocols. Your dosing is personalized by Dr. Alexander Landfield based on your wellness goals, health status, and response to treatment. Many clients begin with higher loading doses and transition to lower maintenance doses over time. NAD+ is administered as an intramuscular injection, which is faster and more convenient than IV administration, with no extended infusion time required.",
+          "NAD+ IM injections at Rani Beauty Clinic are priced from $150 for standard doses to $500 for high-dose protocols. Your dosing is personalized by Dr. Alexander Landfield based on your wellness goals, health status, and response to treatment. Many clients begin with higher loading doses and transition to lower maintenance doses over time. NAD+ is administered as an intramuscular injection, which is faster and more convenient than IV administration, with no extended IV drip time required.",
       },
       {
         heading: "NAD+ Treatment Schedules and Total Investment",
@@ -1112,7 +1112,7 @@ export const financingPages: FinancingPage[] = [
     ],
     keyTakeaways: [
       "NAD+ IM injections range from $150 to $500 per session depending on dosing protocol",
-      "IM injection delivery is faster and more convenient than IV administration with no extended infusion time",
+      "IM injection delivery is faster and more convenient than IV administration with no extended drip time",
       "Membership pricing delivers significant annual savings for clients on regular NAD+ protocols",
       "Cherry financing covers multi-session protocols with comfortable monthly payments",
       "NAD+ supports cellular energy, DNA repair, cognitive function, and athletic recovery",
@@ -1137,7 +1137,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Why IM injection instead of IV for NAD+?",
         answer:
-          "NAD+ IM injections are faster and more convenient than IV administration. IV NAD+ typically requires 2 to 4 hours of infusion time per session and can cause significant flushing and discomfort. IM injections take minutes, are well-tolerated, and deliver NAD+ effectively without the time commitment of IV protocols.",
+          "NAD+ IM injections are faster and more convenient than IV administration. IV NAD+ typically requires 2 to 4 hours of drip time per session and can cause significant flushing and discomfort. IM injections take minutes, are well-tolerated, and deliver NAD+ effectively without the time commitment of IV protocols.",
       },
       {
         question: "Is NAD+ therapy covered by HSA or FSA?",

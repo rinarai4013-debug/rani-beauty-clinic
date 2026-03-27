@@ -520,3 +520,54 @@ export function useSEOMonitor() {
     refreshInterval: 300000, // 5 min
   });
 }
+
+// ── Revenue Optimizer Hooks ──
+
+export function useRevenueGaps(range: '7' | '14' | '30' = '14') {
+  return useDashboardData(`/revenue-optimizer/gaps?range=${range}`, {
+    refreshInterval: 120000, // 2 min
+  });
+}
+
+export function useUpsellAnalysis(clientId?: string) {
+  return useDashboardData(
+    clientId ? `/revenue-optimizer/upsells?clientId=${clientId}` : '/revenue-optimizer/upsells',
+    { refreshInterval: 300000 },
+  );
+}
+
+export function usePricingOptimizer() {
+  return useDashboardData('/revenue-optimizer/pricing', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useRetentionAnalysis() {
+  return useDashboardData('/revenue-optimizer/retention', {
+    refreshInterval: 120000, // 2 min
+  });
+}
+
+export function useRevenueOptimizerForecast() {
+  return useDashboardData('/revenue-optimizer/forecast', {
+    refreshInterval: 300000, // 5 min
+  });
+}
+
+export function useOpportunityScorer() {
+  return useDashboardData('/revenue-optimizer/opportunities', {
+    refreshInterval: 60000, // 1 min
+  });
+}
+
+export function useRevenueOptimizerSummary() {
+  return useDashboardData('/revenue-optimizer', {
+    refreshInterval: 60000, // 1 min
+  });
+}
+
+export function useDailyActions() {
+  return useDashboardData('/revenue-optimizer/actions', {
+    refreshInterval: 60000, // 1 min
+  });
+}
