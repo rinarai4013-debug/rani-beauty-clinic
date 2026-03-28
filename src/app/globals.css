@@ -105,6 +105,49 @@ h1 {
   }
 }
 
+/* ── Print styles for treatment plan viewer ───────────────────────────────── */
+@media print {
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  .print\\:bg-white {
+    background-color: #fff !important;
+  }
+
+  .print\\:break-before-page {
+    break-before: page;
+  }
+
+  .print\\:py-6 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 12px;
+  }
+
+  /* Ensure brand colors print correctly */
+  .bg-gradient-to-b,
+  .bg-gradient-to-r {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Improve readability */
+  a[href]::after {
+    content: none;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1cm;
+  }
+}
+
 /* ── Accessibility: Screen reader only utility ────────────────────────────── */
 .sr-only {
   position: absolute;
