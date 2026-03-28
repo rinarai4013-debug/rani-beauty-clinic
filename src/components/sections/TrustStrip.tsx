@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Stethoscope, Heart, Star, Clock, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useCountUp } from "@/hooks/useCountUp";
+import { AGGREGATE_RATING, REVIEW_COUNT } from "@/data/constants";
 
 interface TrustItem {
   icon: LucideIcon;
@@ -28,10 +30,10 @@ const trustItems: TrustItem[] = [
   {
     icon: Star,
     label: "Rating",
-    numericValue: 4.9,
-    numericSuffix: " (127+)",
+    numericValue: AGGREGATE_RATING,
+    numericSuffix: ` (${REVIEW_COUNT}+)`,
     isDecimal: true,
-    tooltip: "4.9 stars across 127+ verified Google reviews",
+    tooltip: `${AGGREGATE_RATING} stars across ${REVIEW_COUNT}+ verified Google reviews`,
   },
   {
     icon: Clock,
@@ -44,43 +46,6 @@ const trustItems: TrustItem[] = [
     tooltip: "Use your health savings or flexible spending account",
   },
 ];
-
-function useCountUp(
-  target: number,
-  isInView: boolean,
-  options?: { duration?: number; isDecimal?: boolean }
-): string {
-  const { duration = 1200, isDecimal = false } = options || {};
-  const [value, setValue] = useState(target);
-  const hasAnimated = useRef(false);
-
-  useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
-    hasAnimated.current = true;
-
-    const startFrom = target * 0.7;
-    const range = target - startFrom;
-    const startTime = performance.now();
-
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(startFrom + eased * range);
-
-      if (progress < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        setValue(target);
-      }
-    }
-
-    requestAnimationFrame(tick);
-  }, [isInView, target, duration]);
-
-  if (isDecimal) return value.toFixed(1);
-  return Math.floor(value).toLocaleString();
-}
 
 function TrustItemDisplay({
   item,
@@ -118,7 +83,7 @@ export default function TrustStrip() {
   const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
-    <section ref={ref} className="bg-rani-navy border-t border-white/5">
+    <section ref={ref} className="bg-rani-navy border-t border-white/5" aria-label="Clinic statistics and trust indicators">
       <div className="mx-auto max-w-7xl px-4">
         {/* Desktop: single row */}
         <div className="hidden md:flex items-center justify-center py-5">

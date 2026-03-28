@@ -32,7 +32,8 @@ function isRateLimited(ip: string): boolean {
 // ─── Access Code Generation ─────────────────────────────────────────
 // Generates a deterministic 6-digit access code from record ID + secret
 function generateAccessCode(recordId: string): string {
-  const secret = process.env.DASHBOARD_JWT_SECRET || 'rani-plan-access-2026';
+  const secret = process.env.DASHBOARD_JWT_SECRET;
+  if (!secret) throw new Error('DASHBOARD_JWT_SECRET is required');
   const hash = crypto.createHmac('sha256', secret).update(recordId).digest('hex');
   // Take first 6 digits from hash
   const numericHash = parseInt(hash.slice(0, 8), 16);

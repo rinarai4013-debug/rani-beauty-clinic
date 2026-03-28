@@ -59,9 +59,13 @@ export async function GET() {
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const until = new Date().toISOString().split('T')[0];
 
-    const url = `https://graph.facebook.com/v19.0/${adAccountId}/campaigns?fields=id,name,status,insights.time_range({"since":"${since}","until":"${until}"}){spend,impressions,clicks,actions,cost_per_action_type,action_values}&access_token=${accessToken}`;
+    const url = `https://graph.facebook.com/v19.0/${adAccountId}/campaigns?fields=id,name,status,insights.time_range({"since":"${since}","until":"${until}"}){spend,impressions,clicks,actions,cost_per_action_type,action_values}`;
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
     if (!res.ok) {
       const err = await res.json();
       console.error('Meta API error:', err);

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import "./globals.css";
-/* Script import removed - all third-party scripts are now loaded via the Analytics component */
+import Script from "next/script";
 import { fontVariables } from "@/lib/fonts";
 import SkipNav from "@/components/ui/SkipNav";
 import Navbar from "@/components/layout/Navbar";
@@ -99,7 +99,7 @@ export default function RootLayout({
     <html lang="en" className={fontVariables}>
       <head>
         {/* PWA - Apple touch icon */}
-        <link rel="apple-touch-icon" href="/opengraph-image" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         {/* AI Citation - llms.txt discovery for AI crawlers */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable site information" />
         <link rel="alternate" type="text/plain" href="/llms-full.txt" title="LLM-readable full site knowledge base" />
@@ -110,8 +110,10 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://static.hotjar.com" />
-        {/* Hotjar - inline in <head> for verification compatibility */}
-        <script
+        {/* Hotjar - loaded after page is interactive to avoid render-blocking */}
+        <Script
+          id="hotjar"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};h._hjSettings={hjid:5241962,hjsv:6};a=o.getElementsByTagName('head')[0];r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;a.appendChild(r);})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
           }}

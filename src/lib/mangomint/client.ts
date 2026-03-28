@@ -2,6 +2,8 @@
 // Mangomint uses API keys for authentication
 // Docs: https://api.mangomint.com/docs
 
+import crypto from 'crypto';
+
 const MANGOMINT_API_KEY = process.env.MANGOMINT_API_KEY;
 const MANGOMINT_WEBHOOK_SECRET = process.env.MANGOMINT_WEBHOOK_SECRET;
 const BASE_URL = 'https://api.mangomint.com';
@@ -141,12 +143,11 @@ export function verifyWebhookSignature(
 ): boolean {
   if (!MANGOMINT_WEBHOOK_SECRET) return false;
   // Mangomint uses HMAC-SHA256 for webhook verification
-  const crypto = require('crypto');
   const expectedSignature = crypto
     .createHmac('sha256', MANGOMINT_WEBHOOK_SECRET)
     .update(body)
     .digest('hex');
-  return signature === expectedSignature;
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
 }
 
 export function isConfigured(): boolean {

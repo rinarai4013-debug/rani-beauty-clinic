@@ -4,6 +4,7 @@ import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
 import Button from "@/components/ui/Button";
 import { clinicInfo } from "@/data/clinic-info";
+import { CONSULTATION_DEPOSIT_DISPLAY } from "@/data/constants";
 
 export default function ConsultationCTA() {
   return (
@@ -42,7 +43,7 @@ export default function ConsultationCTA() {
           </div>
 
           <p className="mt-6 font-body text-sm text-gray-400">
-            Your $150 consultation deposit applies entirely toward your first
+            Your {CONSULTATION_DEPOSIT_DISPLAY} consultation deposit applies entirely toward your first
             treatment.
           </p>
         </FadeInOnScroll>

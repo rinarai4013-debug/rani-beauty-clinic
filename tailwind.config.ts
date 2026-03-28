@@ -11,8 +11,9 @@ const config: Config = {
       colors: {
         "rani-navy": "#0F1D2C",
         "rani-navy-light": "#1A2A3C",
-        "rani-gold": "#F3D6BE",
-        "rani-gold-light": "#F8E5D5",
+        "rani-gold": "#C9A96E",
+        "rani-gold-light": "#D4B87A",
+        "rani-gold-dark": "#B8944F",
         "rani-cream": "#FAF8F5",
         "rani-text": "#2A2A2A",
         "rani-muted": "#6B7280",
@@ -41,8 +42,8 @@ const config: Config = {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         glowPulse: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(243, 214, 190, 0.2)" },
-          "50%": { boxShadow: "0 0 40px rgba(243, 214, 190, 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(201, 169, 110, 0.2)" },
+          "50%": { boxShadow: "0 0 40px rgba(201, 169, 110, 0.4)" },
         },
         underlineIn: {
           from: { width: "0" },

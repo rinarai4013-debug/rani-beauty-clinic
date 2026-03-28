@@ -151,7 +151,6 @@ const organizationStructuredData = {
   ],
   medicalSpecialty: [
     "Dermatology",
-    "PlasticSurgery",
   ],
   employee: {
     "@type": "Physician",
@@ -182,7 +181,7 @@ export default function AboutPageClient() {
             <FadeInOnScroll direction="left">
               <div>
                 <SectionLabel label="OUR STORY" className="!items-start" />
-                <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
+                <h2 className="mt-6 font-heading text-3xl font-bold text-rani-navy md:text-4xl">
                   Founded in {clinicInfo.established}
                 </h2>
                 <p className="mt-2 font-body text-sm font-semibold uppercase tracking-wide text-rani-gold">
@@ -250,7 +249,7 @@ export default function AboutPageClient() {
 
             <FadeInOnScroll direction="right">
               <div>
-                <h2 className="font-body text-3xl font-bold text-rani-navy md:text-4xl">
+                <h2 className="font-heading text-3xl font-bold text-rani-navy md:text-4xl">
                   {clinicInfo.medicalDirector.name}
                 </h2>
                 <p className="mt-2 font-body text-lg font-semibold text-rani-gold">
@@ -289,7 +288,7 @@ export default function AboutPageClient() {
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="OUR TEAM" />
-            <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
+            <h2 className="mt-6 text-center font-heading text-3xl font-bold text-rani-navy md:text-4xl">
               Meet the Experts Behind Your Results
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
@@ -300,13 +299,13 @@ export default function AboutPageClient() {
           </FadeInOnScroll>
 
           <StaggerChildren className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {teamMembers.map((member, index) => (
-              <Card key={index} goldTop>
+            {teamMembers.map((member) => (
+              <Card key={member.name} goldTop>
                 <div className="flex flex-col items-center text-center">
                   <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-rani-gold/20">
                     <Image
                       src={member.image}
-                      alt={member.name}
+                      alt={`${member.name}, ${member.role}`}
                       fill
                       className="object-cover object-top"
                       sizes="80px"
@@ -333,7 +332,7 @@ export default function AboutPageClient() {
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="OUR TECHNOLOGY" />
-            <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
+            <h2 className="mt-6 text-center font-heading text-3xl font-bold text-rani-navy md:text-4xl">
               Industry-Leading Equipment
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
@@ -367,7 +366,7 @@ export default function AboutPageClient() {
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="OUR VALUES" />
-            <h2 className="mt-6 text-center font-body text-3xl font-bold text-rani-navy md:text-4xl">
+            <h2 className="mt-6 text-center font-heading text-3xl font-bold text-rani-navy md:text-4xl">
               What We Stand For
             </h2>
           </FadeInOnScroll>

@@ -59,12 +59,13 @@ export default function QuizCTA() {
                 </p>
                 <div className="space-y-3">
                   {previewOptions.map((option) => (
-                    <div
+                    <Link
                       key={option}
-                      className="rounded-xl border border-white/10 px-5 py-4 font-body text-sm text-white/70 transition-colors hover:border-rani-gold/30 hover:bg-white/5"
+                      href="/quiz"
+                      className="block rounded-xl border border-white/10 px-5 py-4 font-body text-sm text-white/70 transition-colors hover:border-rani-gold/30 hover:bg-white/5"
                     >
                       {option}
-                    </div>
+                    </Link>
                   ))}
                 </div>
                 <Link

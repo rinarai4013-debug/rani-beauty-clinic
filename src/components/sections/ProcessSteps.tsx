@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { MessageSquare, ClipboardCheck, Sparkles } from "lucide-react";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
+import { CONSULTATION_DEPOSIT_DISPLAY } from "@/data/constants";
 
 const steps = [
   {
@@ -11,7 +12,7 @@ const steps = [
     number: "01",
     title: "Consult",
     description:
-      "We learn your goals, assess your skin, and run in-house labs if needed. Your $150 deposit applies toward treatment.",
+      `We learn your goals, assess your skin, and run in-house labs if needed. Your ${CONSULTATION_DEPOSIT_DISPLAY} deposit applies toward treatment.`,
   },
   {
     icon: ClipboardCheck,

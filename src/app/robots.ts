@@ -102,7 +102,6 @@ export default function robots(): MetadataRoute.Robots {
     ],
     sitemap: [
       "https://www.ranibeautyclinic.com/sitemap.xml",
-      "https://www.ranibeautyclinic.com/feed.xml",
     ],
   };
 }

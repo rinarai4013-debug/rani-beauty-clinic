@@ -155,7 +155,7 @@ export default function GlobalError({
               Need urgent help?
             </p>
             <a
-              href="tel:+14259052410"
+              href="tel:+14255394440"
               style={{
                 fontSize: "0.95rem",
                 fontWeight: 600,
@@ -163,7 +163,7 @@ export default function GlobalError({
                 textDecoration: "none",
               }}
             >
-              (425) 905-2410
+              (425) 539-4440
             </a>
           </div>
 

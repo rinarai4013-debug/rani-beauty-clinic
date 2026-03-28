@@ -28,6 +28,7 @@ import { serviceGeoEntries } from "@/data/locations/service-geo";
 import { extendedServiceGeoEntries } from "@/data/locations/service-geo-extended";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
+const BUILD_DATE = new Date('2026-03-27').toISOString();
 
 const aestheticSlugs = [
   "laser-hair-removal",
@@ -55,7 +56,7 @@ const wellnessSlugs = [
 // Blog slugs are now dynamically pulled from the data
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date().toISOString();
+  const now = BUILD_DATE;
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

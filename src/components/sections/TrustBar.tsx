@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Stethoscope, Users, Star, Clock, Heart } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useCountUp } from "@/hooks/useCountUp";
+import { TOTAL_CLIENTS, AGGREGATE_RATING } from "@/data/constants";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -28,13 +30,13 @@ const trustItems: TrustItem[] = [
   {
     icon: Users,
     label: "Clients Treated",
-    numericValue: 2181,
+    numericValue: TOTAL_CLIENTS,
     numericSuffix: "+",
   },
   {
     icon: Star,
     label: "Google Rating",
-    numericValue: 4.9,
+    numericValue: AGGREGATE_RATING,
     numericSuffix: "\u2605",
     isDecimal: true,
   },
@@ -47,47 +49,6 @@ const trustItems: TrustItem[] = [
     label: "Woman-Owned",
   },
 ];
-
-// ── Animated counter hook ───────────────────────────────────────────────────
-
-function useCountUp(
-  target: number,
-  isInView: boolean,
-  options?: { duration?: number; isDecimal?: boolean }
-): string {
-  const { duration = 1200, isDecimal = false } = options || {};
-  const [value, setValue] = useState(target);
-  const hasAnimated = useRef(false);
-
-  useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
-    hasAnimated.current = true;
-
-    const startFrom = target * 0.7;
-    const range = target - startFrom;
-    const startTime = performance.now();
-
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(startFrom + eased * range);
-
-      if (progress < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        setValue(target);
-      }
-    }
-
-    requestAnimationFrame(tick);
-  }, [isInView, target, duration]);
-
-  if (isDecimal) {
-    return value.toFixed(1);
-  }
-  return Math.floor(value).toLocaleString();
-}
 
 // ── Single trust item ───────────────────────────────────────────────────────
 
@@ -136,7 +97,7 @@ export default function TrustBar() {
   const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
-    <section ref={ref} className="bg-rani-navy py-4">
+    <section ref={ref} className="bg-rani-navy py-4" aria-label="Clinic statistics and trust indicators">
       <div className="mx-auto max-w-7xl px-4">
         {/* Scrollable container - no visible scrollbar */}
         <div className="scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto md:justify-center">

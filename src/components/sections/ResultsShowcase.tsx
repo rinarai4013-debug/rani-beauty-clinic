@@ -159,14 +159,16 @@ interface Review {
 export default function ResultsShowcase({ reviews }: { reviews: Review[] }) {
   const displayReviews = reviews.slice(0, 3);
   const [mobileIndex, setMobileIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Mobile auto-rotate
+  // Mobile auto-rotate (pauses on hover/focus)
   useEffect(() => {
+    if (isPaused) return;
     const timer = setInterval(() => {
       setMobileIndex((prev) => (prev + 1) % displayReviews.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [displayReviews.length]);
+  }, [displayReviews.length, isPaused]);
 
   return (
     <section className="bg-white py-20 md:py-28">
@@ -206,24 +208,35 @@ export default function ResultsShowcase({ reviews }: { reviews: Review[] }) {
         </div>
 
         {/* Testimonials - Mobile: single rotating card */}
-        <div className="mt-12 md:hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={mobileIndex}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.3 }}
-            >
-              <TestimonialCard
-                name={displayReviews[mobileIndex].name}
-                text={displayReviews[mobileIndex].text}
-                rating={displayReviews[mobileIndex].rating}
-                treatment={displayReviews[mobileIndex].treatment}
-                date={displayReviews[mobileIndex].date}
-              />
-            </motion.div>
-          </AnimatePresence>
+        <div
+          className="mt-12 md:hidden"
+          role="region"
+          aria-label="Client testimonials"
+          aria-roledescription="carousel"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
+        >
+          <div aria-live="polite">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={mobileIndex}
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -40 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TestimonialCard
+                  name={displayReviews[mobileIndex].name}
+                  text={displayReviews[mobileIndex].text}
+                  rating={displayReviews[mobileIndex].rating}
+                  treatment={displayReviews[mobileIndex].treatment}
+                  date={displayReviews[mobileIndex].date}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* Dot indicators */}
           <div className="mt-6 flex items-center justify-center gap-2">

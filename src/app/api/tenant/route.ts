@@ -73,6 +73,9 @@ const createTenantSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const { error } = await requireAdmin();
+  if (error) return error;
+
   try {
     const body = await request.json();
     const parsed = createTenantSchema.safeParse(body);
