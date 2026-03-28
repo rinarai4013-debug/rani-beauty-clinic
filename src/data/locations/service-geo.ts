@@ -1,4 +1,5 @@
 import { pnwCities } from "./pnw-cities";
+import { waCitiesExtended } from "./wa-cities-extended";
 
 export interface ServiceGeoEntry {
   citySlug: string;
@@ -239,11 +240,12 @@ Lip filler at Rani Beauty Clinic starts at $650 per syringe. Most clients achiev
   },
 ];
 
-// Generate all 500 service-geo entries
+// Generate all service-geo entries (50 PNW cities + 100 extended cities x 10 services = 1,500 entries)
 function generateServiceGeoEntries(): ServiceGeoEntry[] {
   const entries: ServiceGeoEntry[] = [];
+  const allCities = [...pnwCities, ...waCitiesExtended];
 
-  for (const city of pnwCities) {
+  for (const city of allCities) {
     for (const service of serviceTemplates) {
       entries.push({
         citySlug: city.slug,
