@@ -128,8 +128,27 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
                   for 12 months
                 </p>
                 <p className="text-[10px] text-gray-400 mt-0.5">
-                  ${pkg.monthlyPayment24}/mo for 24 months via Cherry
+                  ${pkg.monthlyPayment24}/mo for 24 months
                 </p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <a
+                    href="https://patient.withcherry.com/apply/rani-beauty-clinic"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-medium text-[#C9A96E] hover:underline"
+                  >
+                    Cherry
+                  </a>
+                  <span className="text-gray-300">|</span>
+                  <a
+                    href="https://app.patientfi.com/v2/rani-beauty-clinic/apply"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-medium text-[#C9A96E] hover:underline"
+                  >
+                    PatientFi
+                  </a>
+                </div>
               </div>
             </div>
           );
