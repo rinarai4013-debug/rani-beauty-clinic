@@ -542,7 +542,7 @@ function buildMedspaCampaign(): GoogleAdsCampaign {
           headlines: [
             'Top Rated Renton Medspa',       // 22 chars
             'Luxury Medspa Near You',         // 22 chars
-            'HydraFacial From $275',          // 21 chars
+            'HydraFacial From $249',          // 21 chars
             'Expert Botox & Fillers',         // 22 chars
             'Sofwave Skin Tightening',        // 24 chars
             'Laser Hair Removal',             // 19 chars

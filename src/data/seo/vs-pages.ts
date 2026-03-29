@@ -93,7 +93,7 @@ export const vsPages: VsPage[] = [
       { category: "Results Duration", treatmentA: "4-6 weeks of visible improvement", treatmentB: "1-2 weeks of improvement typically" },
       { category: "Downtime", treatmentA: "Zero - immediate glow, no redness", treatmentB: "May have redness, breakouts from manual extraction" },
       { category: "Customization", treatmentA: "Boosters and serums tailored to specific concerns", treatmentB: "Limited customization based on products available" },
-      { category: "Average Cost", treatmentA: "$275 at Rani Beauty Clinic", treatmentB: "$150-$350 at high-end spas" },
+      { category: "Average Cost", treatmentA: "$249 at Rani Beauty Clinic", treatmentB: "$150-$350 at high-end spas" },
     ],
     sections: [
       {
@@ -114,7 +114,7 @@ export const vsPages: VsPage[] = [
       {
         heading: "The Cost-Per-Result Comparison",
         content:
-          "At face value, HydraFacial at $275 may seem more expensive than a $150 spa facial. However, when you factor in results duration, the math tells a different story. A $150 facial that lasts 1 to 2 weeks costs $75 to $150 per week of visible improvement. A $275 HydraFacial that lasts 4 to 6 weeks costs $46 to $69 per week of visible improvement. On a per-week-of-results basis, HydraFacial actually delivers better value. When you factor in the consistency of results, medical-grade serum delivery, and painless extraction, the value gap widens further.",
+          "At face value, HydraFacial at $249 may seem more expensive than a $150 spa facial. However, when you factor in results duration, the math tells a different story. A $150 facial that lasts 1 to 2 weeks costs $75 to $150 per week of visible improvement. A $249 HydraFacial that lasts 4 to 6 weeks costs $42 to $62 per week of visible improvement. On a per-week-of-results basis, HydraFacial actually delivers better value. When you factor in the consistency of results, medical-grade serum delivery, and painless extraction, the value gap widens further.",
       },
       {
         heading: "When a Traditional Facial Makes Sense",

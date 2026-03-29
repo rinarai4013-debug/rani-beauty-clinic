@@ -242,7 +242,7 @@ const SERVICE_LANDING_DATA: ServiceLandingData[] = [
       { step: 3, title: 'Fuse & Protect', description: 'Antioxidants and peptides are infused to maximize your glow.' },
     ],
     pricing: [
-      { label: 'Signature HydraFacial', price: '$275', note: '60-minute treatment' },
+      { label: 'Signature HydraFacial', price: '$249', note: '60-minute treatment' },
     ],
     faqs: [
       { question: 'How often should I get a HydraFacial?', answer: 'Monthly treatments are ideal for maintaining results. Many clients come every 4-6 weeks.' },

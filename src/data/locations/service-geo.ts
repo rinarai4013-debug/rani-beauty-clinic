@@ -47,7 +47,7 @@ ${cityName} residents in ${county} can reach Rani Beauty Clinic at 401 Olympia A
   {
     slug: "hydrafacial",
     name: "HydraFacial",
-    priceRange: "$275",
+    priceRange: "$249",
     category: "aesthetic",
     faqs: [
       { question: "How often should I get a HydraFacial?", answer: "For optimal results, we recommend monthly HydraFacial treatments. This maintains skin hydration, clarity, and glow while addressing ongoing concerns like congestion and uneven texture." },
@@ -57,11 +57,11 @@ ${cityName} residents in ${county} can reach Rani Beauty Clinic at 401 Olympia A
     generateContent: (cityName, county, drivingTime, distance) =>
       `${cityName} residents looking for the ultimate glow-boosting facial will love the HydraFacial MD treatment at Rani Beauty Clinic in Renton, located just ${distance} away. The HydraFacial is a multi-step treatment that cleanses, exfoliates, extracts, and hydrates your skin using patented Vortex-Fusion technology. The result is immediately visible - radiant, hydrated, clear skin with absolutely zero downtime. It is the perfect treatment for busy ${cityName} professionals who want results they can see right away.
 
-The HydraFacial treatment at Rani follows a carefully designed protocol. First, the Vortex-Cleansing tip gently exfoliates and resurfaces the skin, opening pores for optimal cleansing. Next, a gentle acid peel loosens debris from deep within the pores without irritation. The Vortex-Extraction step uses painless suction to remove impurities and blackheads - our clients love watching the extraction canister fill up. Finally, the Vortex-Fusion step delivers a cocktail of antioxidants, peptides, and hyaluronic acid deep into the skin for maximum hydration and glow.
+The HydraFacial treatment at Rani follows a carefully designed protocol. First, the Vortex-Cleansing tip gently exfoliates and resurfaces the skin, opening pores for optimal cleansing. Next, a gentle acid peel loosens debris from deep within the pores without irritation. The Vortex-Extraction step uses painless suction to remove impurities and blackheads. Finally, the Vortex-Fusion step delivers a cocktail of antioxidants, peptides, and hyaluronic acid deep into the skin for maximum hydration and glow.
 
 What sets the HydraFacial at Rani apart is our ability to customize the treatment with specialized boosters. Whether you want to target hyperpigmentation with a brightening booster, fight fine lines with a growth factor serum, or calm redness with a soothing complex, your provider will tailor the treatment to your skin's specific needs. Every HydraFacial at Rani Beauty Clinic is performed under the supervision of Dr. Alexander Landfield, our board-certified Medical Director.
 
-The HydraFacial is suitable for all skin types, including sensitive skin, and can be performed year-round without sun sensitivity concerns. A standard HydraFacial treatment takes approximately 30 to 45 minutes and is priced at $275 at Rani Beauty Clinic. We recommend monthly treatments for optimal ongoing results, though even a single session delivers a noticeable improvement in skin clarity and radiance.
+The HydraFacial is suitable for all skin types, including sensitive skin, and can be performed year-round without sun sensitivity concerns. A standard HydraFacial treatment takes approximately 30 to 45 minutes and is priced at $249 at Rani Beauty Clinic. We recommend monthly treatments for optimal ongoing results, though even a single session delivers a noticeable improvement in skin clarity and radiance.
 
 ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking is available and we are open seven days a week from 10 AM to 7 PM. Book your HydraFacial online or call (425) 539-4440.`,
   },

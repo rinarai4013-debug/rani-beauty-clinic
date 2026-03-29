@@ -645,7 +645,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Is RF Microneedling worth the investment compared to regular facials?",
         answer:
-          "RF Microneedling produces significantly deeper, longer-lasting results than regular facials. While a monthly facial costs $150 to $275 per session ($1,800 to $3,300 per year) for surface-level improvement, an RF Microneedling series creates structural collagen changes that last months. The long-term cost-per-result is substantially lower.",
+          "RF Microneedling produces significantly deeper, longer-lasting results than regular facials. While a monthly facial costs $150 to $249 per session ($1,800 to $2,988 per year) for surface-level improvement, an RF Microneedling series creates structural collagen changes that last months. The long-term cost-per-result is substantially lower.",
       },
     ],
   },
@@ -727,12 +727,12 @@ export const financingPages: FinancingPage[] = [
     metaDescription:
       "HydraFacial pricing and payment options at Rani Beauty Clinic. Monthly memberships, Cherry financing, and value comparison. Physician-supervised in Renton, WA.",
     heroDescription:
-      "HydraFacial is one of the most popular facial treatments in the world, delivering immediate visible improvement with zero downtime. At Rani Beauty Clinic, our signature HydraFacial is priced at $275, and our membership program makes monthly facials more affordable than ever. With multiple payment options available, maintaining your best skin has never been more accessible.",
+      "HydraFacial is one of the most popular facial treatments in the world, delivering immediate visible improvement with zero downtime. At Rani Beauty Clinic, our signature HydraFacial is priced at $249, and our membership program makes monthly facials more affordable than ever. With multiple payment options available, maintaining your best skin has never been more accessible.",
     sections: [
       {
         heading: "HydraFacial Pricing at Rani Beauty Clinic",
         content:
-          "Our signature HydraFacial is priced at $275 and includes the full cleanse, exfoliation, extraction, and hydration protocol. Add-on boosters targeting specific concerns such as brightening, anti-aging, or acne are available to customize your treatment. Enhanced HydraFacial packages that include LED light therapy, lymphatic drainage, or additional boosters are available at a higher price point. Every HydraFacial at Rani is performed by trained aestheticians under physician supervision.",
+          "Our signature HydraFacial is priced at $249 and includes the full cleanse, exfoliation, extraction, and hydration protocol. Add-on boosters targeting specific concerns such as brightening, anti-aging, or acne are available to customize your treatment. Enhanced HydraFacial packages that include LED light therapy, lymphatic drainage, or additional boosters are available at a higher price point. Every HydraFacial at Rani is performed by trained aestheticians under physician supervision.",
       },
       {
         heading: "Membership: The Best Value for Regular HydraFacials",
@@ -742,7 +742,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "HydraFacial vs. Traditional Facials: Value Comparison",
         content:
-          "Traditional facials at high-end spas in the Seattle area typically range from $150 to $350 per session, with results lasting 1 to 2 weeks. HydraFacial at $275 uses patented Vortex-Fusion technology that delivers deeper cleansing, more effective extraction, and longer-lasting hydration than manual facials. The clinical-grade results from HydraFacial maintain visible improvement for 4 to 6 weeks, meaning fewer treatments per year for better results. When you factor in results duration, HydraFacial offers superior value per treatment dollar.",
+          "Traditional facials at high-end spas in the Seattle area typically range from $150 to $350 per session, with results lasting 1 to 2 weeks. HydraFacial at $249 uses patented Vortex-Fusion technology that delivers deeper cleansing, more effective extraction, and longer-lasting hydration than manual facials. The clinical-grade results from HydraFacial maintain visible improvement for 4 to 6 weeks, meaning fewer treatments per year for better results. When you factor in results duration, HydraFacial offers superior value per treatment dollar.",
       },
       {
         heading: "Cherry Financing for HydraFacial Packages",
@@ -756,7 +756,7 @@ export const financingPages: FinancingPage[] = [
       },
     ],
     keyTakeaways: [
-      "Signature HydraFacial at Rani Beauty Clinic is priced at $275 per session",
+      "Signature HydraFacial at Rani Beauty Clinic is priced at $249 per session",
       "Membership pricing delivers the best value for clients maintaining monthly HydraFacials",
       "HydraFacial results last 4 to 6 weeks, offering better value per treatment dollar than traditional facials",
       "Cherry financing is available for multi-session packages or combination treatment plans",
@@ -767,7 +767,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "How much does a HydraFacial cost at Rani Beauty Clinic?",
         answer:
-          "Our signature HydraFacial is $275. Enhanced versions with additional boosters, LED therapy, or lymphatic drainage are available at higher price points. Your aesthetician will recommend the right protocol for your skin during your appointment.",
+          "Our signature HydraFacial is $249. Enhanced versions with additional boosters, LED therapy, or lymphatic drainage are available at higher price points. Your aesthetician will recommend the right protocol for your skin during your appointment.",
       },
       {
         question: "Is a membership worth it for HydraFacials?",

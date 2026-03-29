@@ -134,7 +134,7 @@ export const worthItPages: WorthItPage[] = [
       ],
       cons: [
         "Results are temporary - best with monthly maintenance treatments",
-        "Higher cost than basic facials ($275 vs. $80-$120 for a standard facial)",
+        "Higher cost than basic facials ($249 vs. $80-$120 for a standard facial)",
         "Does not address deep wrinkles, significant scarring, or skin laxity",
         "Not a substitute for medical-grade treatments like RF microneedling, chemical peels, or lasers for serious skin concerns",
         "Some patients may see only modest improvement if their skin is already in good condition"
@@ -148,7 +148,7 @@ export const worthItPages: WorthItPage[] = [
       "Anyone with oily or acne-prone skin who benefits from deep pore extraction",
       "Patients who want to maintain results from more intensive treatments between sessions"
     ],
-    costBreakdown: { description: "Per session (Signature HydraFacial)", value: "$275" },
+    costBreakdown: { description: "Per session (Signature HydraFacial)", value: "$249" },
     howLongResults: "1-2 weeks of peak glow, with best results maintained through monthly sessions",
     satisfactionRate: "97% of HydraFacial patients report immediate improvement in skin appearance",
     comparisonToAlternatives: [
@@ -158,7 +158,7 @@ export const worthItPages: WorthItPage[] = [
       { alternative: "RF Microneedling", comparison: "RF microneedling addresses deeper concerns like scarring, wrinkles, and skin tightening but requires numbing cream and 2-3 days of downtime. HydraFacial is better for surface-level maintenance, while RF microneedling targets structural skin improvement." }
     ],
     faqs: [
-      { question: "Is a HydraFacial worth the price?", answer: "For most patients, yes - especially if you value immediate, visible results with zero downtime. At $275 per session, a HydraFacial at Rani Beauty Clinic costs more than a basic facial but delivers more consistent results through its patented vortex extraction and medical-grade serums. Patients who commit to monthly sessions see the most cumulative benefit in skin clarity, hydration, and texture." },
+      { question: "Is a HydraFacial worth the price?", answer: "For most patients, yes - especially if you value immediate, visible results with zero downtime. At $249 per session, a HydraFacial at Rani Beauty Clinic costs more than a basic facial but delivers more consistent results through its patented vortex extraction and medical-grade serums. Patients who commit to monthly sessions see the most cumulative benefit in skin clarity, hydration, and texture." },
       { question: "How often should I get a HydraFacial?", answer: "For optimal results, we recommend monthly HydraFacial treatments. This aligns with your skin's natural 28-day turnover cycle, ensuring consistent exfoliation, extraction, and hydration. Some patients come every 2-3 months for maintenance, while others book more frequently before important events." },
       { question: "Is HydraFacial better than a regular facial?", answer: "HydraFacial uses patented vortex technology and medical-grade serums that deliver more consistent extraction and deeper product penetration than manual techniques used in standard facials. The results are typically more dramatic and uniform. However, a regular facial may be sufficient for patients with minimal skin concerns who simply want relaxation." },
       { question: "Can HydraFacial help with acne?", answer: "Yes - HydraFacial is effective for mild to moderate acne and congested skin. The vortex extraction removes impurities from pores without aggressive squeezing, and acne-targeting booster serums help reduce breakouts. For moderate to severe acne, we may recommend combining HydraFacial with chemical peels or medical-grade skincare for optimal results." },

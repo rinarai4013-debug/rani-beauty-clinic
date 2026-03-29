@@ -9,7 +9,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const SERVICES = [
   { name: 'Botox & Fillers', price: 'From $300', desc: 'Wrinkle relaxation and volume restoration for a naturally refreshed look', icon: '\u{1F489}', href: '/services/botox-dysport' },
-  { name: 'HydraFacial', price: '$275', desc: 'Deep-cleansing, hydrating facial for instant glow and clarity', icon: '\u2728', href: '/services/hydrafacial' },
+  { name: 'HydraFacial', price: '$249', desc: 'Deep-cleansing, hydrating facial for instant glow and clarity', icon: '\u2728', href: '/services/hydrafacial' },
   { name: 'Sofwave', price: 'From $2,750', desc: 'Non-invasive ultrasound skin tightening and lifting', icon: '\u{1F52C}', href: '/services/sofwave' },
   { name: 'RF Microneedling', price: 'From $495', desc: 'Collagen stimulation for acne scars, texture, and tightening', icon: '\u{1F3AF}', href: '/services/rf-microneedling' },
   { name: 'Laser Hair Removal', price: 'Packages from $800', desc: 'Permanent hair reduction for all skin tones', icon: '\u26A1', href: '/services/laser-hair-removal' },
@@ -48,10 +48,10 @@ export default function GetStartedPage() {
               2-minute assessment · Results in 24 hours · Physician-supervised care
             </motion.p>
             <motion.div variants={fadeUp}>
-              <a href="https://ranibeautyclinic.typeform.com/to/Ecgz85JA" target="_blank" rel="noopener noreferrer"
+              <Link href="/contact"
                 className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                 Start Your Free Assessment <ChevronRight className="w-5 h-5" />
-              </a>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
@@ -146,10 +146,10 @@ export default function GetStartedPage() {
             Start your free AI-powered skin assessment and receive a personalized treatment plan within 24 hours.
           </motion.p>
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="https://ranibeautyclinic.typeform.com/to/Ecgz85JA" target="_blank" rel="noopener noreferrer"
+            <Link href="/contact"
               className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
               Start Your Free Assessment <ChevronRight className="w-5 h-5" />
-            </a>
+            </Link>
             <a href="tel:+14255394440" className="inline-flex items-center gap-2 text-rani-navy font-body font-medium hover:text-rani-gold transition-colors">
               <Phone className="w-4 h-4" /> Or call (425) 539-4440
             </a>
@@ -158,10 +158,10 @@ export default function GetStartedPage() {
       </section>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-rani-border p-3 sm:hidden z-50">
-        <a href="https://ranibeautyclinic.typeform.com/to/Ecgz85JA" target="_blank" rel="noopener noreferrer"
+        <Link href="/contact"
           className="block w-full bg-rani-gold text-rani-navy font-body font-bold text-center py-3.5 rounded-full">
           Start Your Free Assessment
-        </a>
+        </Link>
       </div>
     </div>
   );

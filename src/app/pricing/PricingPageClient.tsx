@@ -12,6 +12,8 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { pricingData } from "@/data/pricing";
 import { clinicInfo } from "@/data/clinic-info";
+import { trackCTAClick, trackAnalyticsEvent } from "@/lib/analytics/events";
+import ConsultationUrgency from "@/components/conversion/ConsultationUrgency";
 
 type PriceItem = { name: string; price: string; note?: string; time?: string };
 
@@ -102,7 +104,135 @@ export default function PricingPageClient() {
         subtitle="Quality physician-supervised treatments at transparent prices. All consultations include a personalized treatment plan."
         dark={false}
         badges={["HSA/FSA Accepted", "Financing Available", "No Hidden Fees"]}
+        primaryCTA={{ text: "Schedule a Consultation", href: clinicInfo.booking.url, target: "_blank" }}
+        secondaryCTA={{ text: "Call Us", href: clinicInfo.phoneTel }}
       />
+
+      {/* New Patient Guidance */}
+      <section className="bg-rani-cream py-12">
+        <div className="mx-auto max-w-3xl px-6">
+          <FadeInOnScroll>
+            <div className="rounded-xl border border-rani-gold/20 bg-white p-8 text-center">
+              <h2 className="font-heading text-2xl font-bold text-rani-navy">
+                New to Rani?
+              </h2>
+              <p className="mt-3 mx-auto max-w-xl font-body text-sm leading-relaxed text-rani-muted">
+                Start with a consultation and we&apos;ll help you choose the right
+                treatments for your goals and budget. Your consultation fee is applied
+                as a credit toward your first treatment.
+              </p>
+              <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                <Button
+                  href={clinicInfo.booking.url}
+                  target="_blank"
+                  className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
+                  onClick={() => trackCTAClick('Book Your Consultation', 'pricing_new_patient', clinicInfo.booking.url)}
+                >
+                  Book Your Consultation
+                </Button>
+                <Button
+                  variant="ghost"
+                  href={clinicInfo.phoneTel}
+                >
+                  Call {clinicInfo.phone}
+                </Button>
+              </div>
+            </div>
+          </FadeInOnScroll>
+        </div>
+      </section>
+
+      {/* Highlighted Picks */}
+      <section className="bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <FadeInOnScroll>
+            <SectionLabel label="WHERE TO START" />
+            <h2 className="mt-4 text-center font-body text-2xl font-bold text-rani-navy md:text-3xl">
+              Our Most Recommended
+            </h2>
+          </FadeInOnScroll>
+
+          <StaggerChildren className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {/* Most Popular */}
+            <Card goldTop className="relative !p-6">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="rounded-full bg-rani-gold px-4 py-1 font-body text-xs font-bold uppercase tracking-wider text-rani-navy">
+                  Most Popular
+                </span>
+              </div>
+              <div className="flex flex-col items-center text-center pt-2">
+                <Sparkles size={28} className="text-rani-gold" />
+                <h3 className="mt-3 font-body text-lg font-bold text-rani-navy">
+                  HydraFacial Signature
+                </h3>
+                <p className="mt-1 font-body text-2xl font-bold text-rani-gold">$249</p>
+                <p className="mt-2 font-body text-sm text-rani-muted">
+                  Deep cleanse, exfoliate, and hydrate in one session. Immediate glow, zero downtime.
+                </p>
+                <Button
+                  href="/services/hydrafacial"
+                  className="mt-4 !text-xs"
+                  icon
+                >
+                  Learn More
+                </Button>
+              </div>
+            </Card>
+
+            {/* Best Starter */}
+            <Card className="relative !p-6">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="rounded-full bg-rani-navy px-4 py-1 font-body text-xs font-bold uppercase tracking-wider text-white">
+                  Best Starter
+                </span>
+              </div>
+              <div className="flex flex-col items-center text-center pt-2">
+                <Star size={28} className="text-rani-gold" />
+                <h3 className="mt-3 font-body text-lg font-bold text-rani-navy">
+                  Laser Hair Removal
+                </h3>
+                <p className="mt-1 font-body text-2xl font-bold text-rani-gold">From $79</p>
+                <p className="mt-2 font-body text-sm text-rani-muted">
+                  Small area sessions starting at $79. Pain-free Candela technology, safe for all skin types.
+                </p>
+                <Button
+                  href="/services/laser-hair-removal"
+                  className="mt-4 !text-xs"
+                  icon
+                >
+                  Learn More
+                </Button>
+              </div>
+            </Card>
+
+            {/* Best Value */}
+            <Card className="relative !p-6">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="rounded-full bg-rani-navy px-4 py-1 font-body text-xs font-bold uppercase tracking-wider text-white">
+                  Best Value
+                </span>
+              </div>
+              <div className="flex flex-col items-center text-center pt-2">
+                <Crown size={28} className="text-rani-gold" />
+                <h3 className="mt-3 font-body text-lg font-bold text-rani-navy">
+                  GLOW Membership
+                </h3>
+                <p className="mt-1 font-body text-2xl font-bold text-rani-gold">$199/mo</p>
+                <p className="mt-2 font-body text-sm text-rani-muted">
+                  Monthly HydraFacial, member pricing on all services, and exclusive perks.
+                </p>
+                <Button
+                  href="#membership"
+                  className="mt-4 !text-xs"
+                  icon
+                >
+                  See Membership
+                </Button>
+              </div>
+            </Card>
+          </StaggerChildren>
+        </div>
+      </section>
 
       {/* Laser Hair Removal */}
       <CategorySection
@@ -151,9 +281,37 @@ export default function PricingPageClient() {
       >
         <CollapsibleSection title="RF Microneedling (Cutera Secret)" defaultOpen>
           <PriceGrid items={pricingData.rfMicroneedling} columns={2} />
+          <FadeInOnScroll delay={0.1}>
+            <div className="mt-4 rounded-lg border border-rani-gold/30 bg-rani-gold/5 px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+              <p className="font-body text-sm text-rani-navy">
+                <span className="font-bold">Financing available</span> — 3-pack from <span className="font-bold text-rani-gold">~$167/mo</span>
+              </p>
+              <Button
+                href="/contact"
+                className="!py-2 !px-5 !text-xs"
+                onClick={() => { trackCTAClick('Ask About Financing', 'pricing_rf_micro', '/contact'); trackAnalyticsEvent('plan_financing_clicked', { service_name: 'RF Microneedling' }); }}
+              >
+                Ask About Financing
+              </Button>
+            </div>
+          </FadeInOnScroll>
         </CollapsibleSection>
         <CollapsibleSection title="Sofwave" defaultOpen>
           <PriceGrid items={pricingData.sofwave} columns={2} />
+          <FadeInOnScroll delay={0.1}>
+            <div className="mt-4 rounded-lg border border-rani-gold/30 bg-rani-gold/5 px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+              <p className="font-body text-sm text-rani-navy">
+                <span className="font-bold">Financing available</span> — Sofwave from <span className="font-bold text-rani-gold">~$230/mo</span> with Cherry or PatientFi
+              </p>
+              <Button
+                href="/contact"
+                className="!py-2 !px-5 !text-xs"
+                onClick={() => { trackCTAClick('Ask About Financing', 'pricing_sofwave', '/contact'); trackAnalyticsEvent('plan_financing_clicked', { service_name: 'Sofwave' }); }}
+              >
+                Ask About Financing
+              </Button>
+            </div>
+          </FadeInOnScroll>
         </CollapsibleSection>
       </CategorySection>
 
@@ -340,18 +498,20 @@ export default function PricingPageClient() {
                       <Button
                         href="/contact"
                         className="!w-full"
+                        onClick={() => trackCTAClick('Contact Us', 'pricing_membership', '/contact')}
                       >
                         Contact Us
                       </Button>
                     ) : (
                       <Button
-                        href="https://booking.mangomint.com/ranibeautyclinic1"
+                        href={clinicInfo.booking.url}
                         target="_blank"
                         className={
                           tier.popular
                             ? "!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
                             : "!w-full"
                         }
+                        onClick={() => { trackCTAClick(`Join ${tier.name}`, 'pricing_membership', clinicInfo.booking.url); trackAnalyticsEvent('membership_page_view', { tier: tier.name, value: parseInt(tier.price.replace(/\D/g, '')) }); }}
                       >
                         Join {tier.name}
                       </Button>
@@ -450,7 +610,11 @@ export default function PricingPageClient() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button href="/contact" icon>
+                  <Button
+                    href="/contact"
+                    icon
+                    onClick={() => { trackCTAClick('Ask About Financing', 'pricing_financing_section', '/contact'); trackAnalyticsEvent('plan_financing_clicked', { service_name: 'general' }); }}
+                  >
                     Ask About Financing
                   </Button>
                 </div>
@@ -478,6 +642,13 @@ export default function PricingPageClient() {
           </div>
         </div>
       </section>
+
+      {/* Urgency before final CTA */}
+      <div className="bg-white py-4 px-6">
+        <div className="mx-auto max-w-3xl">
+          <ConsultationUrgency />
+        </div>
+      </div>
 
       <CTABanner
         title="Questions About Pricing?"

@@ -730,7 +730,7 @@ export function buildGooglePMaxCampaign(services: ServiceProfile[], dailyBudget:
         'Where Science Meets Luxury',
         'Book Your Free Consultation',
         'Botox, Fillers & More',
-        'HydraFacial from $275',
+        'HydraFacial from $249',
         'GLP-1 Weight Loss Program',
         'Sofwave Skin Tightening',
         '5-Star Rated Medical Spa',

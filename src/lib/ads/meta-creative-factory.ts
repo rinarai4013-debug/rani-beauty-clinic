@@ -268,7 +268,7 @@ const BODY_COPY_LIBRARY: Record<string, string[]> = {
   hydrafacial: [
     'Deep cleanse, exfoliate, extract, and hydrate in one 60-minute session. The HydraFacial at Rani Beauty Clinic delivers skin that glows for days.',
     'Your skin deserves more than a regular facial. Our signature HydraFacial removes impurities and delivers antioxidants for that "just got back from vacation" look.',
-    'The most-requested facial in our clinic for a reason. HydraFacial from $275. Walk-ins welcome when available.',
+    'The most-requested facial in our clinic for a reason. HydraFacial from $249. Walk-ins welcome when available.',
   ],
   peptides: [
     'BPC-157, Sermorelin, and advanced peptide therapy protocols supervised by our physician team. Recovery, anti-aging, and performance, tailored to your goals.',

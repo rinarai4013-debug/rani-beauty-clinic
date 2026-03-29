@@ -155,7 +155,7 @@ const RANI_KNOWLEDGE: KnowledgeDocument[] = [
 
     Results: Immediate improvement in skin texture, tone, and hydration. No downtime. Recommend monthly maintenance for optimal results. Series of 6 for best transformation.
 
-    Pricing: Signature HydraFacial $275. Deluxe with boosters $350. Package of 3: $750.`,
+    Pricing: Signature HydraFacial $249. Deluxe with boosters $350. Package of 3: $675.`,
     category: 'treatment_protocol',
     service: 'HydraFacial',
     tags: ['facial', 'hydration', 'exfoliation', 'no-downtime', 'all-skin-types'],

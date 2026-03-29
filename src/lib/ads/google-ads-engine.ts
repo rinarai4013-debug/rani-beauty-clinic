@@ -296,7 +296,7 @@ const SITELINKS: SitelinkExtension[] = [
   {
     text: 'HydraFacial',
     description1: 'Deep cleanse and hydrate',
-    description2: 'Signature facial from $275',
+    description2: 'Signature facial from $249',
     finalUrl: 'https://ranibeautyclinic.com/services/hydrafacial',
   },
   {
@@ -394,7 +394,7 @@ const PRICE_EXTENSIONS: PriceExtension[] = [
     type: 'services',
     items: [
       { header: 'Botox', description: 'Expert injectable treatment', price: '$12', priceUnit: 'per_unit', finalUrl: 'https://ranibeautyclinic.com/services/botox' },
-      { header: 'HydraFacial', description: 'Signature deep cleansing facial', price: '$275', priceUnit: 'per_session', finalUrl: 'https://ranibeautyclinic.com/services/hydrafacial' },
+      { header: 'HydraFacial', description: 'Signature deep cleansing facial', price: '$249', priceUnit: 'per_session', finalUrl: 'https://ranibeautyclinic.com/services/hydrafacial' },
       { header: 'GLP-1 Weight Loss', description: 'Medical weight loss program', price: '$399', priceUnit: 'per_month', finalUrl: 'https://ranibeautyclinic.com/services/glp-1-weight-loss' },
       { header: 'Sofwave', description: 'Non-surgical skin tightening', price: '$2,750', priceUnit: 'from', finalUrl: 'https://ranibeautyclinic.com/services/sofwave' },
       { header: 'RF Microneedling', description: 'Collagen renewal treatment', price: '$495', priceUnit: 'from', finalUrl: 'https://ranibeautyclinic.com/services/rf-microneedling' },
@@ -701,7 +701,7 @@ function getServiceHeadlines(serviceId: string): string[] {
       'Expert Filler Injections',
     ],
     hydrafacial: [
-      'HydraFacial from $275',
+      'HydraFacial from $249',
       'HydraFacial Renton WA',
       '60-Minute Glow Treatment',
       'Deep Cleanse & Hydrate',
@@ -796,7 +796,7 @@ function getServiceDescriptions(serviceId: string): string[] {
       'Juvederm and Restylane by physician-supervised specialists. Free consultation.',
     ],
     hydrafacial: [
-      'Signature HydraFacial: cleanse, exfoliate, hydrate in 60 minutes. From $275.',
+      'Signature HydraFacial: cleanse, exfoliate, hydrate in 60 minutes. From $249.',
       'The facial everyone is asking about. Walk-ins welcome at Rani Beauty Clinic.',
     ],
     laser_hair: [
@@ -1066,7 +1066,7 @@ function buildLandingPageMap(): LandingPageMapping[] {
       keywordCluster: 'HydraFacial',
       keywords: ['hydrafacial renton', 'hydrafacial near me', 'best facial renton'],
       landingPage: '/services/hydrafacial',
-      requiredElements: ['H1 with "HydraFacial"', 'Pricing ($275)', 'Treatment process', 'Skin benefits', 'Book now CTA'],
+      requiredElements: ['H1 with "HydraFacial"', 'Pricing ($249)', 'Treatment process', 'Skin benefits', 'Book now CTA'],
       conversionGoal: 'Direct booking',
     },
     {

@@ -6,9 +6,10 @@ import { HomepageSchema, AICitationSchemas } from "@/components/seo/EnhancedSche
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 import { faqItems } from "@/data/faqs";
-import { AGGREGATE_RATING, REVIEW_COUNT } from "@/data/constants";
+import { AGGREGATE_RATING } from "@/data/constants";
 
 // Below-fold sections - dynamically imported to reduce initial JS bundle.
+const NewPatientPaths = dynamic(() => import("@/components/sections/NewPatientPaths"));
 const ResultsShowcase = dynamic(() => import("@/components/sections/ResultsShowcase"));
 const CredibilitySection = dynamic(() => import("@/components/sections/CredibilitySection"));
 const QuizCTA = dynamic(() => import("@/components/sections/QuizCTA"));
@@ -16,6 +17,7 @@ const PopularPackages = dynamic(() => import("@/components/sections/PopularPacka
 const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"));
 const ConsultationCTA = dynamic(() => import("@/components/sections/ConsultationCTA"));
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
+const ConsultationUrgency = dynamic(() => import("@/components/conversion/ConsultationUrgency"));
 
 const reviews = [
   {
@@ -105,15 +107,15 @@ export default function HomePage() {
       <Hero
         label="RENTON'S PREMIER MEDICAL AESTHETICS CLINIC"
         title="Where Precision Medicine Meets Uncompromising Beauty."
-        subtitle="Every treatment designed by a board-certified neurologist. Every result held to a higher standard."
+        subtitle="Every protocol designed by a board-certified neurologist. Every result held to a higher standard."
         primaryCTA={{
-          text: "Reserve Your Consultation",
+          text: "Book Your Consultation",
           href: clinicInfo.booking.url,
           target: "_blank",
         }}
         badges={[
           "Neurologist-Directed Protocols",
-          `${AGGREGATE_RATING} Stars, ${REVIEW_COUNT}+ Reviews`,
+          `${AGGREGATE_RATING} Stars \u00b7 Google Reviews`,
           "Open 7 Days a Week",
         ]}
         backgroundImage="/images/hero/facility.jpg"
@@ -123,11 +125,21 @@ export default function HomePage() {
         fullHeight
       />
 
+      {/* 1b. Urgency / Scheduling Pressure */}
+      <div className="bg-white py-3 px-6">
+        <div className="mx-auto max-w-7xl">
+          <ConsultationUrgency />
+        </div>
+      </div>
+
       {/* 2. Trust Credential Strip */}
       <TrustStrip />
 
       {/* 3. Service Categories */}
       <ServiceCategoryPanels />
+
+      {/* 3b. New Patient Paths */}
+      <NewPatientPaths />
 
       {/* 4. Results Showcase (B/A + Testimonials) */}
       <ResultsShowcase reviews={reviews} />

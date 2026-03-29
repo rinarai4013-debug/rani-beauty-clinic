@@ -51,7 +51,7 @@ function generateHydrafacialContent(city: string, drive: string): string {
 
 <p>The Pacific Northwest climate presents unique skincare challenges. The combination of rain, wind, and limited sunlight can leave ${city} residents dealing with dull, dehydrated skin, uneven texture, and stubborn congestion. The HydraFacial addresses all of these concerns in a single 30-to-45-minute session. Many of our patients schedule monthly HydraFacials to maintain that fresh, hydrated glow throughout the year, regardless of the weather outside.</p>
 
-<p>The HydraFacial is suitable for all skin types, including sensitive skin, and can be performed year-round without sun sensitivity concerns. A standard HydraFacial treatment is priced at $275 at Rani Beauty Clinic, with our Deluxe HydraFacial at $375, which includes additional booster serums and LED light therapy. There is no downtime: you can apply makeup and return to your normal activities immediately after your appointment. Many ${city} professionals schedule their HydraFacials during lunch breaks.</p>
+<p>The HydraFacial is suitable for all skin types, including sensitive skin, and can be performed year-round without sun sensitivity concerns. A standard HydraFacial treatment is priced at $249 at Rani Beauty Clinic, with our Deluxe HydraFacial at $375, which includes additional booster serums and LED light therapy. There is no downtime: you can apply makeup and return to your normal activities immediately after your appointment. Many ${city} professionals schedule their HydraFacials during lunch breaks.</p>
 
 <p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking. We are open seven days a week from 10 AM to 7 PM. The HydraFacial pairs beautifully with other treatments in our menu, including Botox, chemical peels, and our AI-powered skin analysis for a comprehensive skincare strategy. Financing through PatientFi and Cherry is available. Call (425) 539-4440 or book your HydraFacial online today.</p>`;
 }
@@ -60,8 +60,8 @@ export const hydrafacialGeoPages: ServiceGeoPage[] = hydrafacialCities.map((c) =
   city: c.city,
   state: 'WA',
   slug: c.slug,
-  metaTitle: `HydraFacial ${c.city === 'Renton' ? 'in' : 'Near'} ${c.city}, WA | $275 | Rani Beauty Clinic`,
-  metaDescription: `HydraFacial MD treatments ${c.city === 'Renton' ? 'in' : 'near'} ${c.city}, WA. Deep cleansing, extraction, and hydration with zero downtime at Rani Beauty Clinic. From $275. Book today.`,
+  metaTitle: `HydraFacial ${c.city === 'Renton' ? 'in' : 'Near'} ${c.city}, WA | $249 | Rani Beauty Clinic`,
+  metaDescription: `HydraFacial MD treatments ${c.city === 'Renton' ? 'in' : 'near'} ${c.city}, WA. Deep cleansing, extraction, and hydration with zero downtime at Rani Beauty Clinic. From $249. Book today.`,
   heroHeading: `HydraFacial ${c.city === 'Renton' ? 'in' : 'Near'} ${c.city}, WA`,
   heroSubheading: `The ultimate glow treatment for ${c.city} residents at Rani Beauty Clinic`,
   content: generateHydrafacialContent(c.city, c.drive),

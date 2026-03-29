@@ -122,7 +122,7 @@ const SERVICE_MONTHLY_VALUES: Record<string, number> = {
   'Semaglutide': 399,
   'Tirzepatide': 499,
   'Sofwave': 275, // amortized over 12 months from $3,300
-  'HydraFacial': 92, // quarterly at $275
+  'HydraFacial': 83, // quarterly at $249
   'PRX-T33': 165, // bimonthly at $495
   'VI Peel': 99, // quarterly at $395
   'PicoWay': 150, // quarterly at $450 avg

@@ -179,7 +179,7 @@ const RANI_PROVIDERS: ProviderInfo[] = [
 const RANI_SERVICES: ServiceQuickRef[] = [
   { name: 'Botox', priceRange: '$300-500', duration: '15-30 min', description: 'Wrinkle-relaxing injectable for forehead, crows feet, and more', consultRequired: false, category: 'injectable' },
   { name: 'Dermal Fillers', priceRange: '$600-1200', duration: '30-45 min', description: 'Volume restoration for lips, cheeks, jawline, and under-eyes', consultRequired: true, category: 'injectable' },
-  { name: 'HydraFacial', priceRange: '$275-350', duration: '30-60 min', description: 'Deep-cleansing facial with hydration and glow', consultRequired: false, category: 'facial' },
+  { name: 'HydraFacial', priceRange: '$249-350', duration: '30-60 min', description: 'Deep-cleansing facial with hydration and glow', consultRequired: false, category: 'facial' },
   { name: 'Sofwave', priceRange: '$2,750-4,500', duration: '30-45 min', description: 'Non-invasive skin tightening and lifting using ultrasound', consultRequired: true, category: 'device' },
   { name: 'RF Microneedling', priceRange: '$495-850', duration: '45-60 min', description: 'Collagen stimulation for acne scars, texture, and tightening', consultRequired: true, category: 'device' },
   { name: 'VI Peel', priceRange: '$395', duration: '30 min', description: 'Medical-grade chemical peel for tone, texture, and clarity', consultRequired: false, category: 'peel' },

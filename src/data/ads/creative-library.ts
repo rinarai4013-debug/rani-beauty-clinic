@@ -91,7 +91,7 @@ export const HEADLINES: Headline[] = [
   { text: 'The Lunch-Break Glow-Up', service: 'hydrafacial', platform: 'both', characterCount: 23, style: 'benefit' },
   { text: 'Red Carpet Skin in 60 Minutes', service: 'hydrafacial', platform: 'both', characterCount: 29, style: 'benefit' },
   { text: 'What Is Your Skin Telling You?', service: 'hydrafacial', platform: 'meta', characterCount: 30, style: 'question' },
-  { text: 'Signature HydraFacial from $275', service: 'hydrafacial', platform: 'google', characterCount: 31, style: 'benefit' },
+  { text: 'Signature HydraFacial from $249', service: 'hydrafacial', platform: 'google', characterCount: 31, style: 'benefit' },
   // Laser Hair Removal
   { text: 'Never Shave Again. Seriously.', service: 'laser_hair', platform: 'both', characterCount: 29, style: 'benefit' },
   { text: 'Smooth Skin All Year Round', service: 'laser_hair', platform: 'both', characterCount: 26, style: 'benefit' },
@@ -146,7 +146,7 @@ export const DESCRIPTIONS: Description[] = [
   { text: 'Expert Botox injections that look natural, not frozen. 15-minute appointment, zero downtime. Physician-supervised care at Rani Beauty Clinic, Renton WA.', service: 'botox', platform: 'both', characterCount: 152, angle: 'natural_results' },
   { text: 'Whether you are preventing or correcting, our Botox specialists create results that look like the best version of you. Walk-ins welcome.', service: 'botox', platform: 'meta', characterCount: 139, angle: 'personalization' },
   // HydraFacial
-  { text: 'Deep cleanse, exfoliate, and hydrate in one 60-minute session. The HydraFacial at Rani Beauty Clinic gives you that glow everyone asks about. Starting at $275.', service: 'hydrafacial', platform: 'both', characterCount: 162, angle: 'process' },
+  { text: 'Deep cleanse, exfoliate, and hydrate in one 60-minute session. The HydraFacial at Rani Beauty Clinic gives you that glow everyone asks about. Starting at $249.', service: 'hydrafacial', platform: 'both', characterCount: 162, angle: 'process' },
   { text: 'Your skin deserves more than a regular facial. HydraFacial removes impurities and delivers antioxidants for skin you can feel confident in.', service: 'hydrafacial', platform: 'meta', characterCount: 143, angle: 'upgrade' },
   // Laser Hair Removal
   { text: 'Advanced laser hair removal for all skin types. Full body packages starting at $800. Pain-free technology, lasting results. Renton, WA.', service: 'laser_hair', platform: 'google', characterCount: 139, angle: 'comprehensive' },
