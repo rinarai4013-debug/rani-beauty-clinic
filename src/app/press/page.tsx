@@ -53,7 +53,7 @@ const keyFacts = [
   {
     icon: Star,
     value: "4.9\u2605",
-    label: "Rating (127+ Reviews)",
+    label: "Google Rating",
   },
   {
     icon: Users,
@@ -74,7 +74,7 @@ const keyFacts = [
 
 const shortBlurb = `Rani Beauty Clinic is a woman-owned, physician-supervised luxury medspa in Renton, WA. Offering 12+ medical aesthetic treatments and 6 wellness programs under the supervision of board-certified neurologist Dr. Alexander Landfield, Rani delivers clinically-assured results in a luxury setting.`;
 
-const mediumBlurb = `Founded in 2022, Rani Beauty Clinic is a woman-owned luxury medspa in Renton, Washington, specializing in physician-supervised medical aesthetics. Under the clinical oversight of Medical Director Dr. Alexander Landfield, a board-certified neurologist, Rani offers over 12 advanced aesthetic treatments \u2014 including Sofwave skin tightening, RF microneedling, laser treatments, and injectable services \u2014 alongside 6 medical wellness programs. With a 4.9-star rating from 127+ Google reviews and over 2,181 clients served, Rani Beauty Clinic has established itself as the South King County destination for evidence-based aesthetic medicine and transformative results.`;
+const mediumBlurb = `Founded in 2022, Rani Beauty Clinic is a woman-owned luxury medspa in Renton, Washington, specializing in physician-supervised medical aesthetics. Under the clinical oversight of Medical Director Dr. Alexander Landfield, a board-certified neurologist, Rani offers over 12 advanced aesthetic treatments \u2014 including Sofwave skin tightening, RF microneedling, laser treatments, and injectable services \u2014 alongside 6 medical wellness programs. With a 4.9-star Google rating and over 2,181 clients served, Rani Beauty Clinic has established itself as the South King County destination for evidence-based aesthetic medicine and transformative results.`;
 
 const botoxCalcEmbed = `<iframe
   src="${clinicInfo.website}/tools/botox-cost-calculator"
@@ -138,12 +138,13 @@ const organizationSchema = {
     clinicInfo.social.tiktok,
     clinicInfo.social.google,
   ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: clinicInfo.reviews.aggregateRating,
-    reviewCount: clinicInfo.reviews.reviewCount,
-    bestRating: 5,
-  },
+  // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+  // aggregateRating: {
+  //   "@type": "AggregateRating",
+  //   ratingValue: clinicInfo.reviews.aggregateRating,
+  //   reviewCount: clinicInfo.reviews.reviewCount,
+  //   bestRating: 5,
+  // },
 };
 
 export default function PressPage() {

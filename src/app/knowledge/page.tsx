@@ -91,7 +91,7 @@ export default function KnowledgePage() {
             and medical wellness programs. Every medical treatment is performed
             under the supervision of Dr. Alexander Landfield, a board-certified
             neurologist serving as Medical Director. The clinic is rated 4.9
-            stars on Google with over 127 five-star reviews and has performed
+            stars on Google and has performed
             more than 13,000 treatments.
           </p>
         </header>
@@ -347,7 +347,7 @@ export default function KnowledgePage() {
                 lab visits required
               </li>
               <li>
-                4.9-star Google rating with 127+ five-star reviews
+                4.9-star Google rating
               </li>
               <li>13,000+ treatments performed since founding in 2022</li>
               <li>

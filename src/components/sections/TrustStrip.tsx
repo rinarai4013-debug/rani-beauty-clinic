@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { Stethoscope, Heart, Star, Clock, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
-import { AGGREGATE_RATING, REVIEW_COUNT } from "@/data/constants";
+import { AGGREGATE_RATING } from "@/data/constants";
 
 interface TrustItem {
   icon: LucideIcon;
@@ -20,7 +20,7 @@ const trustItems: TrustItem[] = [
   {
     icon: Stethoscope,
     label: "Neurologist-Led",
-    tooltip: "Every treatment designed under board-certified neurologist oversight",
+    tooltip: "Every protocol designed by a board-certified neurologist whose neuromuscular expertise ensures precise, natural-looking results",
   },
   {
     icon: Heart,
@@ -29,11 +29,11 @@ const trustItems: TrustItem[] = [
   },
   {
     icon: Star,
-    label: "Rating",
+    label: "Google Reviews",
     numericValue: AGGREGATE_RATING,
-    numericSuffix: ` (${REVIEW_COUNT}+)`,
+    numericSuffix: " Stars",
     isDecimal: true,
-    tooltip: `${AGGREGATE_RATING} stars across ${REVIEW_COUNT}+ verified Google reviews`,
+    tooltip: `${AGGREGATE_RATING} stars on Google. Check our Google Business Profile for verified reviews.`,
   },
   {
     icon: Clock,

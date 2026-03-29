@@ -241,7 +241,7 @@ export default function TVLandingClient() {
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-white/80 text-sm">
             <div className="flex items-center gap-1.5">
               <div className="flex">{[...Array(5)].map((_, i) => <Star key={i} />)}</div>
-              <span className="font-medium">127+ Five-Star Reviews</span>
+              <span className="font-medium">4.9 Stars on Google</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckIcon />
@@ -261,7 +261,7 @@ export default function TVLandingClient() {
           <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-sm font-medium text-[#0F1D2C]">
             <div className="flex items-center gap-2">
               <div className="flex">{[...Array(5)].map((_, i) => <Star key={i} />)}</div>
-              <span>127+ Five-Star Google Reviews</span>
+              <span>4.9 Stars on Google</span>
             </div>
             <div className="flex items-center gap-2">
               <svg className="h-5 w-5 text-[#8B6F4E]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

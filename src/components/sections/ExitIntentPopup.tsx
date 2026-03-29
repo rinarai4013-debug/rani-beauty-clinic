@@ -144,7 +144,7 @@ export default function ExitIntentPopup() {
                   {clinicInfo.reviews.aggregateRating}
                 </span>
                 <span className="font-body text-sm text-gray-500">
-                  ({clinicInfo.reviews.reviewCount}+ reviews)
+                  Google Reviews
                 </span>
               </div>
 

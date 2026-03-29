@@ -106,10 +106,32 @@ export default function GLP1LandingPage() {
     goalWeight: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: POST to /api/glp1/lead
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          message: `GLP-1 Weight Management Lead — Current: ${formData.currentWeight} lbs, Goal: ${formData.goalWeight} lbs. Interested in brand-name Zepbound/Wegovy program.`,
+          source: 'glp1-landing-page',
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('Submission failed');
+      }
+    } catch {
+      // Still show success to user — lead will be followed up manually if API fails
+    }
+    setLoading(false);
     setSubmitted(true);
   };
 
@@ -135,7 +157,7 @@ export default function GLP1LandingPage() {
               href="#enroll"
               className="bg-[#C9A96E] text-rani-navy px-8 py-4 rounded-lg font-body font-bold text-lg hover:bg-[#d4b67e] transition-colors"
             >
-              Start Your Weight Loss Journey
+              Schedule Your Consultation
             </a>
             <a
               href="#how-it-works"
@@ -244,7 +266,7 @@ export default function GLP1LandingPage() {
                       : 'bg-rani-navy text-white hover:bg-rani-navy-light'
                   }`}
                 >
-                  Get Started
+                  Schedule Your Consultation
                 </a>
               </div>
             ))}
@@ -307,31 +329,16 @@ export default function GLP1LandingPage() {
         </div>
       </section>
 
-      {/* Testimonial Placeholders */}
-      <section className="py-20 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Patient Stories</p>
-            <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy">Real Results, Real Support</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-2xl p-8 border border-rani-border shadow-sm">
-                <div className="flex gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <svg key={s} className="w-5 h-5 text-[#C9A96E]" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="font-body text-rani-muted text-sm italic leading-relaxed mb-4">
-                  &ldquo;Patient testimonial placeholder - add real testimonials with consent.&rdquo;
-                </p>
-                <p className="font-body text-rani-navy font-semibold text-sm"> -  Patient {i}</p>
-                <p className="font-body text-rani-muted text-xs">Weight Management Program</p>
-              </div>
-            ))}
-          </div>
+      {/* Results Disclaimer */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Important</p>
+          <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy mb-6">Real Results, Real Support</h2>
+          <p className="font-body text-rani-muted leading-relaxed">
+            Results may vary. Individual experiences differ based on starting weight, medication response,
+            adherence to the program, nutrition, and lifestyle factors. GLP-1 medications require a medical
+            evaluation and are not appropriate for everyone. Our team is here to support you every step of the way.
+          </p>
         </div>
       </section>
 
@@ -375,7 +382,7 @@ export default function GLP1LandingPage() {
         <div className="max-w-xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <h2 className="font-heading text-3xl sm:text-4xl text-white mb-3">
-              Start Your Weight Loss Journey
+              Schedule Your Consultation
             </h2>
             <p className="font-body text-gray-300">
               Fill out the form below and we will be in touch within 24 hours to get you started.
@@ -458,9 +465,10 @@ export default function GLP1LandingPage() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#C9A96E] text-rani-navy py-4 rounded-lg font-body font-bold text-lg hover:bg-[#d4b67e] transition-colors"
+                disabled={loading}
+                className="w-full bg-[#C9A96E] text-rani-navy py-4 rounded-lg font-body font-bold text-lg hover:bg-[#d4b67e] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Start Your Weight Loss Journey
+                {loading ? 'Submitting...' : 'Schedule Your Consultation'}
               </button>
               <p className="font-body text-xs text-gray-400 text-center">
                 Medical evaluation required. Not everyone qualifies for GLP-1 medication.

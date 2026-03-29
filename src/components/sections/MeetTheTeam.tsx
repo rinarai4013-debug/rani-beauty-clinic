@@ -63,7 +63,7 @@ export default function MeetTheTeam() {
                 {[
                   { value: "3+", label: "Countries Trained In" },
                   { value: "7", label: "Days Open Per Week" },
-                  { value: "127+", label: "5-Star Reviews" },
+                  { value: "4.9", label: "Google Rating" },
                   { value: "2022", label: "Established" },
                 ].map((stat) => (
                   <div
@@ -85,7 +85,7 @@ export default function MeetTheTeam() {
                   href={clinicInfo.booking.url}
                   className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
                 >
-                  Book a Consultation
+                  Book Your Consultation
                 </Button>
                 <Button variant="ghost" href="/about">
                   Our Story

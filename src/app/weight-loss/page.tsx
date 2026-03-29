@@ -172,7 +172,7 @@ export default function WeightLossLandingPage() {
               href="#enroll"
               className="bg-[#C9A96E] text-rani-navy px-5 py-2 rounded-lg font-body font-semibold text-sm hover:bg-[#d4b67e] transition-colors"
             >
-              Get Started
+              Schedule Your Consultation
             </a>
           </div>
         </div>
@@ -307,7 +307,7 @@ export default function WeightLossLandingPage() {
                       : 'bg-rani-navy text-white hover:bg-rani-navy-light'
                   }`}
                 >
-                  Get Started
+                  Schedule Your Consultation
                 </a>
               </div>
             ))}
@@ -348,38 +348,18 @@ export default function WeightLossLandingPage() {
         </div>
       </section>
 
-      {/* Testimonial Placeholders */}
+      {/* Results Disclaimer */}
       <section className="py-20 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Patient Stories</p>
+            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Results</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy">Real Results, Real Support</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { quote: 'The convenience of having my medication shipped changed everything. Down 35 pounds and counting.', name: 'Sarah M.', city: 'Renton, WA' },
-              { quote: 'I was nervous about injections, but the team walked me through everything. The telehealth visits are so easy.', name: 'Jennifer K.', city: 'Kent, WA' },
-              { quote: 'After my second child, I could not lose the weight. This program gave me my confidence back.', name: 'Priya N.', city: 'Auburn, WA' },
-            ].map((t) => (
-              <div key={t.name} className="bg-white rounded-2xl p-8 border border-rani-border shadow-sm">
-                <div className="flex gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <svg key={s} className="w-5 h-5 text-[#C9A96E]" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="font-body text-rani-muted text-sm italic leading-relaxed mb-4">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <p className="font-body text-rani-navy font-semibold text-sm"> -  {t.name}</p>
-                <p className="font-body text-rani-muted text-xs">{t.city}</p>
-              </div>
-            ))}
+          <div className="bg-white rounded-2xl p-8 sm:p-10 border border-rani-border shadow-sm text-center">
+            <p className="font-body text-rani-muted text-sm leading-relaxed">
+              Individual results vary. Weight loss outcomes depend on starting weight, adherence to treatment protocol, lifestyle factors, and medical history. All patients undergo medical evaluation before treatment. Results shown are not guaranteed.
+            </p>
           </div>
-          <p className="font-body text-xs text-rani-muted text-center mt-6">
-            *Testimonial placeholders - replace with verified patient reviews once collected. Individual results may vary.
-          </p>
         </div>
       </section>
 
@@ -423,7 +403,7 @@ export default function WeightLossLandingPage() {
         <div className="max-w-xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <h2 className="font-heading text-3xl sm:text-4xl text-white mb-3">
-              Book Your Free Consultation
+              Schedule Your Consultation
             </h2>
             <p className="font-body text-gray-300">
               Fill out the form below and our team will contact you within 24 hours to get started.

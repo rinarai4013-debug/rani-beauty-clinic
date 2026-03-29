@@ -8,6 +8,7 @@ import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import Button from "@/components/ui/Button";
 import { clinicInfo } from "@/data/clinic-info";
+import { trackCTAClick } from "@/lib/analytics/events";
 
 const treatmentHighlights = [
   {
@@ -113,6 +114,7 @@ export default function ResultsPageClient() {
                 <Button
                   href={clinicInfo.consultation.url}
                   className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
+                  onClick={() => trackCTAClick('Book Your Consultation', 'results_mid_page', clinicInfo.consultation.url)}
                 >
                   Book Your Consultation
                 </Button>
@@ -120,6 +122,7 @@ export default function ResultsPageClient() {
                   variant="ghost"
                   href="/services"
                   className="!border-white/30 !text-white hover:!bg-white/10"
+                  onClick={() => trackCTAClick('Explore Services', 'results_mid_page', '/services')}
                 >
                   Explore Services
                 </Button>
@@ -132,7 +135,7 @@ export default function ResultsPageClient() {
             <div className="mt-16 grid grid-cols-2 gap-4 md:grid-cols-4">
               {[
                 { value: "4.9★", label: "Google Rating" },
-                { value: "127+", label: "5-Star Reviews" },
+                { value: "5★", label: "Average Review" },
                 { value: "3+", label: "Countries Trained In" },
                 { value: "100%", label: "Physician Supervised" },
               ].map((stat) => (

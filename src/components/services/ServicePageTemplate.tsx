@@ -133,12 +133,13 @@ export default function ServicePageTemplate({
         latitude: clinicInfo.geo.latitude,
         longitude: clinicInfo.geo.longitude,
       },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: clinicInfo.reviews.aggregateRating,
-        reviewCount: clinicInfo.reviews.reviewCount,
-        bestRating: 5,
-      },
+      // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+      // aggregateRating: {
+      //   "@type": "AggregateRating",
+      //   ratingValue: clinicInfo.reviews.aggregateRating,
+      //   reviewCount: clinicInfo.reviews.reviewCount,
+      //   bestRating: 5,
+      // },
     },
     areaServed: {
       "@type": "State",
@@ -378,7 +379,7 @@ export default function ServicePageTemplate({
                       ))}
                     </div>
                     <span className="font-body text-sm text-rani-muted">
-                      {clinicInfo.reviews.reviewCount}+ verified reviews
+                      Verified Google Reviews
                     </span>
                   </div>
                 </div>
@@ -424,7 +425,7 @@ export default function ServicePageTemplate({
                     rel="noopener noreferrer"
                     className="font-body text-sm font-semibold text-rani-gold hover:underline"
                   >
-                    Read all {clinicInfo.reviews.reviewCount}+ reviews on Google &rarr;
+                    Read Our Reviews on Google &rarr;
                   </a>
                 </p>
               </FadeInOnScroll>

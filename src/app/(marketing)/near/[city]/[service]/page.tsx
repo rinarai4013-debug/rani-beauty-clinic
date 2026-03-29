@@ -117,12 +117,13 @@ export default function ServiceCityPage({ params }: PageProps) {
     },
     openingHours: "Mo-Su 10:00-19:00",
     priceRange: "$$-$$$",
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: clinicInfo.reviews.aggregateRating,
-      reviewCount: clinicInfo.reviews.reviewCount,
-      bestRating: 5,
-    },
+    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+    // aggregateRating: {
+    //   "@type": "AggregateRating",
+    //   ratingValue: clinicInfo.reviews.aggregateRating,
+    //   reviewCount: clinicInfo.reviews.reviewCount,
+    //   bestRating: 5,
+    // },
     medicalSpecialty: "Dermatology",
     isAcceptingNewPatients: true,
     hasOfferCatalog: {

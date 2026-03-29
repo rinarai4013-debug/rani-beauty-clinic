@@ -7,10 +7,10 @@ export const teamMembers = [
     initials: "AL",
   },
   {
-    name: "Raj",
-    role: "Co-Founder & Operations",
-    bio: "After training in many different dermatology clinics in Los Angeles, Dubai and Korea, Raj brings world-class aesthetic techniques and genuine, personalized care to the Greater Seattle & Bellevue area. Her commitment to combining advanced technology with exceptional patient experiences has made Rani Beauty Clinic the premier medspa destination in the Pacific Northwest.",
+    name: "Raj Rai",
+    role: "Founder",
+    bio: "Raj Rai is the founder of Rani Beauty Clinic. Her vision for the clinic began in 1990, with a clear goal to create a beauty and wellness space that feels refined, trustworthy, and personal. With global training and a strong eye for both results and experience, Raj built Rani Beauty Clinic to bring physician-supervised aesthetics and medical wellness together in one welcoming space. Her standard is simple: honest care, beautiful work, and an experience that makes patients feel comfortable from the moment they walk in.",
     image: "/images/team/raj.jpg",
-    initials: "R",
+    initials: "RR",
   },
 ];

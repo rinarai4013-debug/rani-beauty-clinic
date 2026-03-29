@@ -58,7 +58,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
 
 const topServices = [
   { name: "Botox & Dysport", slug: "botox", price: "From $12/unit", description: "Smooth fine lines and wrinkles with expert injections. Natural-looking results that refresh without freezing your expressions." },
-  { name: "HydraFacial MD", slug: "hydrafacial", price: "$275", description: "Deep cleansing, extraction, and hydration in one session using Vortex-Fusion technology. Instant glow with zero downtime." },
+  { name: "HydraFacial MD", slug: "hydrafacial", price: "$249", description: "Deep cleansing, extraction, and hydration in one session using Vortex-Fusion technology. Instant glow with zero downtime." },
   { name: "Laser Hair Removal", slug: "laser-hair-removal", price: "From $79/session", description: "Permanent hair reduction for all skin types using the Candela GentleMax Pro Plus with dual-wavelength technology." },
   { name: "RF Microneedling", slug: "rf-microneedling", price: "From $495", description: "Stimulate collagen production with the Cutera Secret Pro for firmer, smoother, tighter skin with minimal downtime." },
   { name: "Sofwave", slug: "sofwave", price: "From $2,750", description: "Non-invasive skin tightening using SUPERB ultrasound technology. Lift brows, tighten jawline, and smooth wrinkles in one session." },
@@ -117,12 +117,13 @@ export default function NearCityPage({ params }: PageProps) {
     },
     openingHours: "Mo-Su 10:00-19:00",
     priceRange: "$$-$$$",
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: clinicInfo.reviews.aggregateRating,
-      reviewCount: clinicInfo.reviews.reviewCount,
-      bestRating: 5,
-    },
+    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+    // aggregateRating: {
+    //   "@type": "AggregateRating",
+    //   ratingValue: clinicInfo.reviews.aggregateRating,
+    //   reviewCount: clinicInfo.reviews.reviewCount,
+    //   bestRating: 5,
+    // },
     medicalSpecialty: "Dermatology",
     isAcceptingNewPatients: true,
   };
@@ -231,7 +232,7 @@ export default function NearCityPage({ params }: PageProps) {
             <div className="mt-8 flex items-center gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1.5">
                 <Star className="h-4 w-4 text-[#C9A96E]" />
-                {clinicInfo.reviews.aggregateRating} stars ({clinicInfo.reviews.reviewCount} reviews)
+                {clinicInfo.reviews.aggregateRating} Stars on Google
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-[#C9A96E]" />
@@ -324,7 +325,7 @@ export default function NearCityPage({ params }: PageProps) {
                     <Shield className="h-4 w-4 text-[#C9A96E]" /> Dr. Alexander Landfield, Medical Director
                   </li>
                   <li className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-[#C9A96E]" /> {clinicInfo.reviews.aggregateRating}/5 ({clinicInfo.reviews.reviewCount} Google reviews)
+                    <Star className="h-4 w-4 text-[#C9A96E]" /> {clinicInfo.reviews.aggregateRating} Stars on Google
                   </li>
                   <li className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-[#C9A96E]" /> Woman-owned business
@@ -401,7 +402,7 @@ export default function NearCityPage({ params }: PageProps) {
                   { name: "Botox / Dysport", price: "$12/unit", category: "Injectable" },
                   { name: "Dermal Fillers", price: "$650/syringe", category: "Injectable" },
                   { name: "Lip Filler", price: "$650", category: "Injectable" },
-                  { name: "HydraFacial MD", price: "$275", category: "Facial" },
+                  { name: "HydraFacial MD", price: "$249", category: "Facial" },
                   { name: "Chemical Peels (VI Peel)", price: "$395", category: "Facial" },
                   { name: "BioRePeel (PRX-T33)", price: "$495", category: "Facial" },
                   { name: "Laser Hair Removal", price: "$79/session", category: "Laser" },

@@ -65,7 +65,7 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
             What Our Patients Say
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center font-body text-base text-rani-muted">
-            Trusted by 127+ patients with a 4.9-star Google rating. Hear directly from the people who have experienced the Rani difference.
+            Rated 4.9 stars on Google. Hear directly from the people who have experienced the Rani difference.
           </p>
         </FadeInOnScroll>
 
@@ -164,7 +164,7 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
         <FadeInOnScroll delay={0.3}>
           <div className="mt-10 text-center">
             <Button variant="ghost" href="https://g.page/ranibeautyclinic" target="_blank">
-              Read All 127+ Reviews on Google
+              Read Our Reviews on Google
             </Button>
           </div>
         </FadeInOnScroll>

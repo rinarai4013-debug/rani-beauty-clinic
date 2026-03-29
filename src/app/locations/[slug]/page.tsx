@@ -109,12 +109,13 @@ export default function LocationPage({ params }: PageProps) {
       latitude: clinicInfo.geo.latitude,
       longitude: clinicInfo.geo.longitude,
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: clinicInfo.reviews.aggregateRating.toString(),
-      reviewCount: clinicInfo.reviews.reviewCount.toString(),
-      bestRating: "5",
-    },
+    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+    // aggregateRating: {
+    //   "@type": "AggregateRating",
+    //   ratingValue: clinicInfo.reviews.aggregateRating.toString(),
+    //   reviewCount: clinicInfo.reviews.reviewCount.toString(),
+    //   bestRating: "5",
+    // },
   };
 
   const breadcrumbs = [
@@ -203,7 +204,7 @@ export default function LocationPage({ params }: PageProps) {
                 <ul className="space-y-3">
                   {aestheticServiceSlugs.map((service) => (
                     <li key={service.slug}>
-                      <Link href={`/locations/${page.slug}/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
+                      <Link href={`/services/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
                         <ChevronRight size={14} className="text-rani-gold transition-transform group-hover:translate-x-1" />
                         <span>{service.name}</span>
                       </Link>
@@ -220,7 +221,7 @@ export default function LocationPage({ params }: PageProps) {
                 <ul className="space-y-3">
                   {wellnessServiceSlugs.map((service) => (
                     <li key={service.slug}>
-                      <Link href={`/locations/${page.slug}/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
+                      <Link href={`/wellness/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
                         <ChevronRight size={14} className="text-rani-gold transition-transform group-hover:translate-x-1" />
                         <span>{service.name}</span>
                       </Link>

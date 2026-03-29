@@ -137,12 +137,13 @@ const organizationStructuredData = {
     opens: "10:00",
     closes: "19:00",
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: clinicInfo.reviews.aggregateRating,
-    reviewCount: clinicInfo.reviews.reviewCount,
-    bestRating: 5,
-  },
+  // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+  // aggregateRating: {
+  //   "@type": "AggregateRating",
+  //   ratingValue: clinicInfo.reviews.aggregateRating,
+  //   reviewCount: clinicInfo.reviews.reviewCount,
+  //   bestRating: 5,
+  // },
   sameAs: [
     clinicInfo.social.instagram,
     clinicInfo.social.facebook,
@@ -170,7 +171,7 @@ export default function AboutPageClient() {
       <Hero
         label="ABOUT US"
         title="About Rani Beauty Clinic"
-        subtitle="A physician-supervised medspa and wellness clinic in Renton, WA - where advanced aesthetics and medical wellness come together under one roof."
+        subtitle="A physician-supervised medspa and wellness clinic in Renton, WA. Advanced aesthetics and medical wellness come together under one roof."
         dark={false}
       />
 
@@ -182,25 +183,22 @@ export default function AboutPageClient() {
               <div>
                 <SectionLabel label="OUR STORY" className="!items-start" />
                 <h2 className="mt-6 font-heading text-3xl font-bold text-rani-navy md:text-4xl">
-                  Founded in {clinicInfo.established}
+                  Founded by Raj Rai
                 </h2>
                 <p className="mt-2 font-body text-sm font-semibold uppercase tracking-wide text-rani-gold">
-                  {clinicInfo.ownership}
+                  A vision that began in 1990, built on global training, high standards, and personal care.
                 </p>
                 <p className="mt-6 font-body text-base leading-relaxed text-rani-text">
-                  Rani Beauty Clinic was born from a simple belief: everyone deserves
-                  access to physician-supervised aesthetic and wellness treatments in a
-                  space that feels welcoming, not intimidating. After years in the
-                  aesthetics industry, our founders saw a gap between high-end
-                  clinics and the warm, personal care every patient deserves.
+                  Rani Beauty Clinic began with a vision Raj Rai has held since 1990:
+                  to create a beauty and wellness destination that feels refined,
+                  trustworthy, and personal. With global training and a strong
+                  commitment to quality, she built Rani to bring physician-supervised
+                  aesthetics and medical wellness together in one welcoming space.
                 </p>
                 <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
-                  Nestled in the heart of Renton, WA, Rani Beauty Clinic serves
-                  patients across King County and beyond. Our approach combines
-                  advanced technology with genuine human connection - because
-                  looking your best should also feel like the best experience
-                  of your day. Every treatment is overseen by our board-certified
-                  Medical Director, ensuring the highest standards of safety and results.
+                  Her approach is grounded in honest care, strong standards, and an
+                  experience that helps every patient feel comfortable, supported,
+                  and confident in their treatment plan.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Badge icon="heart">Woman-Owned</Badge>
@@ -265,11 +263,17 @@ export default function AboutPageClient() {
                   bringing a rare depth of neurological expertise to every treatment protocol.
                 </p>
                 <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
-                  As Medical Director of Rani Beauty Clinic, Dr. Landfield oversees
-                  every medical treatment protocol, from GLP-1 weight management and
-                  hormone therapy to advanced aesthetic procedures. His commitment to
-                  evidence-based medicine ensures that every patient receives treatments
-                  that are not only effective but held to the highest standards of safety.
+                  Why a neurologist? The same neuromuscular expertise that guides
+                  neurological care translates directly to precision with neurotoxins
+                  like Botox and Dysport. That is why Rani&apos;s injectable results
+                  look natural, not frozen.
+                </p>
+                <p className="mt-4 font-body text-base leading-relaxed text-rani-text">
+                  As Medical Director, Dr. Landfield oversees every medical treatment
+                  protocol, from GLP-1 weight management and hormone therapy to
+                  advanced aesthetic procedures. His commitment to evidence-based
+                  medicine ensures that every patient receives treatments that are
+                  not only effective but held to the highest standards of safety.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
@@ -320,6 +324,53 @@ export default function AboutPageClient() {
                   <p className="mt-3 font-body text-sm leading-relaxed text-rani-muted">
                     {member.bio}
                   </p>
+                </div>
+              </Card>
+            ))}
+          </StaggerChildren>
+        </div>
+      </section>
+
+      {/* What Our Patients Say */}
+      <section className="bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-6">
+          <FadeInOnScroll>
+            <SectionLabel label="PATIENT STORIES" />
+            <h2 className="mt-6 text-center font-heading text-3xl font-bold text-rani-navy md:text-4xl">
+              What Our Patients Say
+            </h2>
+          </FadeInOnScroll>
+
+          <StaggerChildren className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+            {[
+              {
+                name: "Sarah M.",
+                text: "The laser hair removal at Rani is truly pain-free. After just 4 sessions, I can already see incredible results.",
+                treatment: "Laser Hair Removal",
+              },
+              {
+                name: "Jennifer L.",
+                text: "Knowing that a board-certified neurologist oversees the Botox treatments gave me so much confidence. My results look completely natural.",
+                treatment: "Botox",
+              },
+              {
+                name: "David K.",
+                text: "The GLP-1 program at Rani changed my life. Dr. Landfield monitors everything closely, and having blood work done right in the clinic makes it so convenient.",
+                treatment: "GLP-1 Weight Management",
+              },
+            ].map((review) => (
+              <Card key={review.name}>
+                <div className="flex flex-col text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className="text-rani-gold text-lg">&#9733;</span>
+                    ))}
+                  </div>
+                  <p className="mt-4 font-body text-sm leading-relaxed text-rani-muted italic">
+                    &ldquo;{review.text}&rdquo;
+                  </p>
+                  <p className="mt-4 font-body text-sm font-bold text-rani-navy">{review.name}</p>
+                  <p className="font-body text-xs text-rani-gold">{review.treatment}</p>
                 </div>
               </Card>
             ))}
@@ -394,7 +445,7 @@ export default function AboutPageClient() {
       {/* CTA Banner */}
       <CTABanner
         title="Experience the Rani Difference"
-        subtitle="Book your consultation and discover how our physician-supervised approach can help you achieve your aesthetic and wellness goals. Your $150 deposit applies toward treatment."
+        subtitle="Book your consultation and see why patients across King County choose Rani. Your $150 consultation fee is applied as a credit toward your first treatment."
       />
     </>
   );

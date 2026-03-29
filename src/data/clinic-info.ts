@@ -38,9 +38,10 @@ export const clinicInfo = {
     latitude: 47.4856,
     longitude: -122.2031,
   },
+  // TODO: Update reviewCount with exact live GBP number before next deploy
   reviews: {
     aggregateRating: 4.9,
-    reviewCount: 127,
+    reviewCount: 127, // schema-only — not shown in public UI until verified
     platform: "Google",
   },
   booking: {
@@ -50,8 +51,8 @@ export const clinicInfo = {
     companyId: 876418,
   },
   consultation: {
-    url: "https://07l76i25tvv.typeform.com/to/Ecgz85JA",
-    provider: "Typeform",
+    url: "/contact",
+    provider: "Website",
   },
   financing: {
     patientfi: {
@@ -71,6 +72,6 @@ export const clinicInfo = {
     gtm: "GTM-MPS3MPNG",
     metaPixel: "769852657929598",
     clarity: "vnjnfo8pn5",
-    hotjar: "5241962",
+    // hotjar removed — Clarity provides equivalent session replay + heatmaps
   },
 };

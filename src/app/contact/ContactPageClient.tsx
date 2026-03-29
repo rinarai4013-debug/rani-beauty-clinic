@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import { trackAnalyticsEvent } from "@/lib/analytics/events";
-import { MapPin, Phone, Clock, Mail, CheckCircle } from "lucide-react";
+import { useState, useEffect, FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { trackAnalyticsEvent, trackCTAClick, trackBookingOpen, trackPhoneClick } from "@/lib/analytics/events";
+import { MapPin, Phone, Clock, Mail, CheckCircle, Calendar } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
@@ -45,12 +46,13 @@ const contactStructuredData = {
   },
   priceRange: "$$$",
   paymentAccepted: "Cash, Credit Card, Debit Card, HSA, Cherry Financing, PatientFi",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: clinicInfo.reviews.aggregateRating,
-    reviewCount: clinicInfo.reviews.reviewCount,
-    bestRating: 5,
-  },
+  // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
+  // aggregateRating: {
+  //   "@type": "AggregateRating",
+  //   ratingValue: clinicInfo.reviews.aggregateRating,
+  //   reviewCount: clinicInfo.reviews.reviewCount,
+  //   bestRating: 5,
+  // },
 };
 
 const serviceOptions = [
@@ -74,7 +76,6 @@ interface FormData {
   email: string;
   phone: string;
   service: string;
-  preferredDate: string;
   message: string;
   honeypot: string;
 }
@@ -85,7 +86,6 @@ export default function ContactPageClient() {
     email: "",
     phone: "",
     service: "",
-    preferredDate: "",
     message: "",
     honeypot: "",
   });
@@ -93,6 +93,20 @@ export default function ContactPageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+
+  // Pre-fill service from query param (e.g. /contact?service=GLP-1+Weight+Loss)
+  useEffect(() => {
+    const serviceParam = searchParams.get("service");
+    if (serviceParam && !formData.service) {
+      const match = serviceOptions.find(
+        (opt) => opt.toLowerCase() === serviceParam.toLowerCase()
+      );
+      if (match) {
+        setFormData((prev) => ({ ...prev, service: match }));
+      }
+    }
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -103,6 +117,7 @@ export default function ContactPageClient() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setIsSubmitting(true);
     setError(null);
 
@@ -131,7 +146,6 @@ export default function ContactPageClient() {
         email: "",
         phone: "",
         service: "",
-        preferredDate: "",
         message: "",
         honeypot: "",
       });
@@ -165,20 +179,49 @@ export default function ContactPageClient() {
             {/* Left: Contact Form */}
             <FadeInOnScroll direction="left">
               <div>
-                <SectionLabel label="SEND US A MESSAGE" className="!items-start" />
+                {/* Direct Booking Card — fastest path */}
+                <div className="mb-8 rounded-xl border-2 border-rani-gold bg-rani-gold/5 p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rani-gold">
+                      <Calendar size={20} className="text-rani-navy" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-body text-lg font-bold text-rani-navy">
+                        Book Instantly Online
+                      </h3>
+                      <p className="mt-1 font-body text-sm text-rani-muted">
+                        Skip the form — choose your service, pick a time, and book in under 60 seconds.
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <a
+                          href={clinicInfo.booking.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => { trackCTAClick('Book Now', 'contact_direct_booking', clinicInfo.booking.url); trackBookingOpen('contact_page'); }}
+                          className="inline-flex items-center gap-2 rounded-full bg-rani-gold px-6 py-2.5 font-body text-sm font-bold text-rani-navy transition-colors hover:bg-rani-gold-light"
+                        >
+                          Book Now
+                        </a>
+                        <a
+                          href={clinicInfo.phoneTel}
+                          onClick={() => trackPhoneClick('contact_direct_booking')}
+                          className="inline-flex items-center gap-2 rounded-full border border-rani-navy/20 px-5 py-2.5 font-body text-sm font-semibold text-rani-navy transition-colors hover:bg-rani-navy hover:text-white"
+                        >
+                          <Phone size={14} />
+                          Call {clinicInfo.phone}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <SectionLabel label="OR SEND US A MESSAGE" className="!items-start" />
                 <h2 className="mt-6 font-body text-3xl font-bold text-rani-navy md:text-4xl">
-                  Book a Consultation
+                  Request a Consultation
                 </h2>
                 <p className="mt-4 font-body text-base text-rani-muted">
-                  Fill out the form below and our team will get back to you within
-                  24 hours. For immediate assistance, call us at{" "}
-                  <a
-                    href={clinicInfo.phoneTel}
-                    className="font-semibold text-rani-navy hover:text-rani-gold transition-colors"
-                  >
-                    {clinicInfo.phone}
-                  </a>
-                  .
+                  Have questions first? Fill out the form and our team will get back to you within
+                  24 hours.
                 </p>
 
                 {isSubmitted ? (
@@ -287,33 +330,18 @@ export default function ContactPageClient() {
                       </select>
                     </div>
 
-                    {/* Preferred Date */}
-                    <div>
-                      <label htmlFor="preferredDate" className={labelStyles}>
-                        Preferred Date
-                      </label>
-                      <input
-                        type="date"
-                        id="preferredDate"
-                        name="preferredDate"
-                        value={formData.preferredDate}
-                        onChange={handleChange}
-                        className={inputStyles}
-                      />
-                    </div>
-
-                    {/* Message */}
+                    {/* Message (optional, collapsed) */}
                     <div>
                       <label htmlFor="message" className={labelStyles}>
-                        Message
+                        Message <span className="text-rani-muted font-normal">(optional)</span>
                       </label>
                       <textarea
                         id="message"
                         name="message"
-                        rows={4}
+                        rows={2}
                         value={formData.message}
                         onChange={handleChange}
-                        placeholder="Tell us about your goals or any questions you have..."
+                        placeholder="Any questions or goals you'd like to share..."
                         className={inputStyles + " resize-vertical"}
                       />
                     </div>
@@ -328,7 +356,8 @@ export default function ContactPageClient() {
                     {/* Submit */}
                     <Button
                       type="submit"
-                      className="!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
+                      disabled={isSubmitting}
+                      className="!w-full !bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light disabled:!opacity-60 disabled:!cursor-not-allowed"
                     >
                       {isSubmitting ? "Sending..." : "Request Consultation"}
                     </Button>
