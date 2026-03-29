@@ -22,6 +22,7 @@ import {
 
 import PhotoSimulation from '@/components/photo-simulation/PhotoSimulation';
 import { clinicInfo } from '@/data/clinic-info';
+import { getCareInstructions } from '@/lib/plan-builder/aftercare-map';
 import {
   parseProgramPlan,
   parseCostBreakdown,
@@ -54,6 +55,14 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState(false);
   const [showSimulation, setShowSimulation] = useState(false);
+
+  const trackAction = (action: string) => {
+    fetch(`/api/plan/${planId}/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planId, action }),
+    }).catch(() => {}); // fire and forget
+  };
 
   const fetchPlan = async (code?: string) => {
     setViewState({ status: 'loading' });
@@ -312,13 +321,64 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
                       <p className="text-xs text-gray-500 mb-3">{phase.description}</p>
                     )}
                     <ul className="space-y-2">
-                      {phase.items.map((item, i) => (
+                      {phase.treatments.map((treatment: string, i: number) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                           <CheckCircle className="h-4 w-4 text-[#C9A96E] flex-shrink-0 mt-0.5" />
-                          <span>{item}</span>
+                          <span>{treatment}</span>
                         </li>
                       ))}
                     </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Before & After Care Instructions */}
+        {parsedPhases && parsedPhases.phases.length > 0 && (
+          <motion.section {...fadeIn} className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 className="font-heading text-lg font-bold text-[#0F1D2C] mb-4">
+              Care Instructions
+            </h2>
+            <div className="space-y-4">
+              {parsedPhases.phases.flatMap((phase) => phase.treatments).filter((t, i, arr) => arr.indexOf(t) === i).map((treatment: string) => {
+                const care = getCareInstructions(treatment);
+                if (!care) return null;
+                return (
+                  <div key={treatment} className="border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+                    <h3 className="text-sm font-semibold text-[#0F1D2C] mb-2">{treatment}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {care.preCare.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-[#C9A96E] uppercase tracking-wider mb-1">Before Treatment</p>
+                          <ul className="space-y-1">
+                            {care.preCare.map((item, i) => (
+                              <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
+                                <Check className="h-3 w-3 text-[#C9A96E] flex-shrink-0 mt-0.5" />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {care.postCare.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-green-600 uppercase tracking-wider mb-1">After Treatment</p>
+                          <ul className="space-y-1">
+                            {care.postCare.map((item, i) => (
+                              <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
+                                <Check className="h-3 w-3 text-green-500 flex-shrink-0 mt-0.5" />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    {care.expectedDowntime && (
+                      <p className="text-xs text-gray-400 mt-2">Expected downtime: {care.expectedDowntime}</p>
+                    )}
                   </div>
                 );
               })}
@@ -334,37 +394,45 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {packages.map((pkg) => {
-                const isRecommended = pkg.highlight;
+                const isHighlighted = pkg.highlight;
+                const tierIcon = pkg.tier === 'Start' ? (
+                  <Star className="h-4 w-4 text-[#C9A96E]" />
+                ) : pkg.tier === 'Transform' ? (
+                  <Sparkles className="h-4 w-4 text-[#C9A96E]" />
+                ) : (
+                  <Crown className="h-4 w-4 text-[#C9A96E]" />
+                );
                 return (
                   <div
                     key={pkg.tier}
                     className={`rounded-2xl border-2 p-5 transition-all ${
-                      isRecommended
+                      isHighlighted
                         ? 'border-[#C9A96E] bg-[#C9A96E]/5 ring-2 ring-[#C9A96E]/20 shadow-md'
-                        : pkg.tier === 'Platinum'
+                        : pkg.tier === 'Elite'
                           ? 'border-[#0F1D2C] bg-[#0F1D2C]/5'
                           : 'border-gray-200 bg-white'
                     }`}
                   >
                     {/* Tier header */}
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
-                        {pkg.tier === 'Essential' ? (
-                          <Star className="h-4 w-4 text-[#C9A96E]" />
-                        ) : (
-                          <Crown className="h-4 w-4 text-[#C9A96E]" />
-                        )}
+                        {tierIcon}
                         <span className="text-sm font-bold text-[#0F1D2C]">{pkg.name}</span>
                       </div>
-                      {isRecommended && (
+                      {isHighlighted && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#C9A96E] text-white">
-                          Recommended
+                          Most Popular
                         </span>
                       )}
                     </div>
 
+                    {/* Subtitle */}
+                    {pkg.subtitle && (
+                      <p className="text-[11px] text-gray-500 mb-3 ml-6">{pkg.subtitle}</p>
+                    )}
+
                     {/* Price */}
-                    <div className="flex items-baseline gap-2 mb-2">
+                    <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-2xl font-bold text-[#0F1D2C]">
                         ${pkg.price.toLocaleString()}
                       </span>
@@ -374,6 +442,36 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
                         </span>
                       )}
                     </div>
+
+                    {/* Savings dollar amount */}
+                    {pkg.savingsVsStandalone && pkg.savingsVsStandalone > 0 && (
+                      <p className="text-[11px] text-green-600 font-medium mb-2">
+                        Save ${pkg.savingsVsStandalone.toLocaleString()}
+                      </p>
+                    )}
+
+                    {/* Result intensity */}
+                    {pkg.resultIntensity && (
+                      <p className="text-xs text-[#0F1D2C] font-medium capitalize mb-1">
+                        Expected: {pkg.resultIntensity}
+                      </p>
+                    )}
+
+                    {/* Best for */}
+                    {pkg.bestFor && (
+                      <p className="text-[11px] text-gray-500 italic mb-3">
+                        {pkg.bestFor}
+                      </p>
+                    )}
+
+                    {/* Why best callout — Transform only */}
+                    {pkg.whyBest && (
+                      <div className="bg-[#C9A96E]/10 border border-[#C9A96E]/20 rounded-lg p-2.5 mb-3">
+                        <p className="text-[11px] text-[#0F1D2C] font-medium leading-relaxed">
+                          {pkg.whyBest}
+                        </p>
+                      </div>
+                    )}
 
                     <p className="text-xs text-gray-500 mb-3">
                       {pkg.sessions} session{pkg.sessions !== 1 ? 's' : ''}
@@ -435,6 +533,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
               href={clinicInfo.financing.cherry.applyUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackAction('financing_clicked')}
               className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#C9A96E] hover:shadow-sm transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
@@ -451,6 +550,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
               href={clinicInfo.financing.patientfi.applyUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackAction('financing_clicked')}
               className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#C9A96E] hover:shadow-sm transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
@@ -512,6 +612,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
               href={clinicInfo.booking.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackAction('booking_clicked')}
               className="inline-flex items-center gap-2 px-8 py-3 bg-[#C9A96E] text-white rounded-xl font-semibold hover:bg-[#B8944F] transition-colors text-lg"
             >
               Book Your Consultation

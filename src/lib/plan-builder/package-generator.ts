@@ -3,9 +3,9 @@ import type { PlanPhase, GeneratedPackage, SelectedService } from './types';
 /**
  * Generate 3-tier treatment packages from plan builder selections.
  *
- * Essential = Phase 1 only (no discount)
- * Recommended = Phase 1 + 2 (10% discount, highlighted)
- * Platinum = All phases (15% discount + extras)
+ * Start     = Phase 1 only (no discount) — "Your confident first step"
+ * Transform = Phase 1 + 2 (10% discount, highlighted) — "Most popular — the sweet spot"
+ * Elite     = All phases (15% discount) — "Fastest, most comprehensive result"
  */
 export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): GeneratedPackage[] {
   const phase1Services = phases[0].services;
@@ -30,14 +30,27 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
   const calcSessions = (services: SelectedService[]) =>
     services.reduce((sum, s) => sum + s.quantity * s.service.sessions, 0);
 
+  const extractConcerns = (services: SelectedService[]): string[] => {
+    const concerns = new Set<string>();
+    for (const s of services) {
+      if (s.service.concerns) {
+        for (const c of s.service.concerns) {
+          concerns.add(c);
+        }
+      }
+    }
+    return Array.from(concerns);
+  };
+
   const packages: GeneratedPackage[] = [];
 
-  // Essential - Phase 1 only
+  // Start - Phase 1 only
   if (phase1Services.length > 0) {
     const total = calcTotal(phase1Services);
     packages.push({
-      tier: 'Essential',
-      name: 'Foundation Package',
+      tier: 'Start',
+      name: 'Start',
+      subtitle: 'Your confident first step',
       price: total,
       originalPrice: total,
       discount: 0,
@@ -47,23 +60,28 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
       monthlyPayment24: Math.ceil(total / 24),
       highlighted: false,
       extras: ['Personalized treatment plan', 'Aftercare protocols'],
+      bestFor: 'First-time clients or those wanting a low-commitment entry',
+      resultIntensity: 'visible improvement',
+      concernsAddressed: extractConcerns(phase1Services),
+      savingsVsStandalone: 0,
     });
   }
 
-  // Recommended - Phase 1 + 2
-  const recommendedServices = [...phase1Services, ...phase2Services];
-  if (recommendedServices.length > 0 && phase2Services.length > 0) {
-    const originalTotal = calcTotal(recommendedServices);
+  // Transform - Phase 1 + 2
+  const transformServices = [...phase1Services, ...phase2Services];
+  if (transformServices.length > 0 && phase2Services.length > 0) {
+    const originalTotal = calcTotal(transformServices);
     const discountRate = 0.10;
     const discountedTotal = Math.round(originalTotal * (1 - discountRate));
     packages.push({
-      tier: 'Recommended',
-      name: 'Transformation Package',
+      tier: 'Transform',
+      name: 'Transform',
+      subtitle: 'Most popular \u2014 the sweet spot',
       price: discountedTotal,
       originalPrice: originalTotal,
       discount: 10,
-      sessions: calcSessions(recommendedServices),
-      lineItems: buildLineItems(recommendedServices),
+      sessions: calcSessions(transformServices),
+      lineItems: buildLineItems(transformServices),
       monthlyPayment12: Math.ceil(discountedTotal / 12),
       monthlyPayment24: Math.ceil(discountedTotal / 24),
       highlighted: true,
@@ -73,17 +91,23 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
         'Priority scheduling',
         'Progress tracking photos',
       ],
+      bestFor: 'Most clients \u2014 best balance of results and investment',
+      resultIntensity: 'significant transformation',
+      whyBest: 'Combines foundation prep with active treatments for the most noticeable, lasting change',
+      concernsAddressed: extractConcerns(transformServices),
+      savingsVsStandalone: originalTotal - discountedTotal,
     });
   }
 
-  // Platinum - All phases
+  // Elite - All phases
   if (allServices.length > 0 && phase3Services.length > 0) {
     const originalTotal = calcTotal(allServices);
     const discountRate = 0.15;
     const discountedTotal = Math.round(originalTotal * (1 - discountRate));
     packages.push({
-      tier: 'Platinum',
-      name: 'Complete Transformation',
+      tier: 'Elite',
+      name: 'Elite',
+      subtitle: 'Fastest, most comprehensive result',
       price: discountedTotal,
       originalPrice: originalTotal,
       discount: 15,
@@ -100,6 +124,10 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
         'Complimentary skincare consultation',
         'Membership pricing on add-ons',
       ],
+      bestFor: 'Clients who want maximum results in minimum time',
+      resultIntensity: 'dramatic, comprehensive transformation',
+      concernsAddressed: extractConcerns(allServices),
+      savingsVsStandalone: originalTotal - discountedTotal,
     });
   }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPatientSession } from '@/lib/patient-auth/session';
-import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
+import { Tables, rateLimitedQuery, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { z } from 'zod';
 
@@ -68,9 +68,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
-    await rateLimitedQuery(() =>
-      Tables.clients().update(session.patientId, updates)
-    );
+    await updateRecord(Tables.clients(), session.patientId, updates);
 
     return NextResponse.json({ success: true });
   } catch (error) {

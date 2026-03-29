@@ -55,15 +55,15 @@ interface ServicePhase {
 }
 
 const tierIcons: Record<string, React.ReactNode> = {
-  Essential: <Star className="w-5 h-5" />,
-  Recommended: <Crown className="w-5 h-5" />,
-  Platinum: <Gem className="w-5 h-5" />,
+  Start: <Star className="w-5 h-5" />,
+  Transform: <Crown className="w-5 h-5" />,
+  Elite: <Gem className="w-5 h-5" />,
 };
 
 const tierAccents: Record<string, string> = {
-  Essential: 'border-rani-border',
-  Recommended: 'border-rani-gold ring-1 ring-rani-gold/20',
-  Platinum: 'border-rani-gold ring-2 ring-rani-gold/30',
+  Start: 'border-rani-border',
+  Transform: 'border-rani-gold ring-1 ring-rani-gold/20',
+  Elite: 'border-rani-gold ring-2 ring-rani-gold/30',
 };
 
 export default function PlanPage() {
@@ -271,7 +271,7 @@ export default function PlanPage() {
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
             {data.packages.map((pkg) => {
-              const isRecommended = pkg.tier === 'Recommended';
+              const isRecommended = pkg.tier === 'Transform';
               return (
                 <div
                   key={pkg.tier}

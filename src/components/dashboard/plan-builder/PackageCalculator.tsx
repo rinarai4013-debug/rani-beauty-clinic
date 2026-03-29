@@ -1,6 +1,6 @@
 'use client';
 
-import { Crown, Check, Star } from 'lucide-react';
+import { Crown, Check, Star, Sparkles, Zap } from 'lucide-react';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 
 interface PackageCalculatorProps {
@@ -8,23 +8,23 @@ interface PackageCalculatorProps {
 }
 
 const TIER_ICONS: Record<string, typeof Crown> = {
-  Essential: Star,
-  Recommended: Crown,
-  Platinum: Crown,
+  Start: Star,
+  Transform: Sparkles,
+  Elite: Crown,
 };
 
 const TIER_COLORS: Record<string, { border: string; bg: string; badge: string }> = {
-  Essential: {
+  Start: {
     border: 'border-gray-200',
     bg: 'bg-white',
     badge: 'bg-gray-100 text-gray-700',
   },
-  Recommended: {
+  Transform: {
     border: 'border-[#C9A96E]',
     bg: 'bg-[#C9A96E]/5',
     badge: 'bg-[#C9A96E] text-white',
   },
-  Platinum: {
+  Elite: {
     border: 'border-[#0F1D2C]',
     bg: 'bg-[#0F1D2C]/5',
     badge: 'bg-[#0F1D2C] text-white',
@@ -51,7 +51,7 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
       <h3 className="text-sm font-semibold text-[#0F1D2C] mb-4">Auto-Generated Packages</h3>
       <div className="grid grid-cols-1 gap-3">
         {packages.map((pkg) => {
-          const colors = TIER_COLORS[pkg.tier] || TIER_COLORS.Essential;
+          const colors = TIER_COLORS[pkg.tier] || TIER_COLORS.Start;
           const Icon = TIER_ICONS[pkg.tier] || Star;
           const hasDiscount = pkg.discount > 0;
 
@@ -63,20 +63,23 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
               }`}
             >
               {/* Tier header */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4 text-[#C9A96E]" />
                   <span className="text-sm font-bold text-[#0F1D2C]">{pkg.name}</span>
                 </div>
                 {pkg.highlighted && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#C9A96E] text-white">
-                    Recommended
+                    Most Popular
                   </span>
                 )}
               </div>
 
+              {/* Subtitle */}
+              <p className="text-[11px] text-gray-500 mb-3 ml-6">{pkg.subtitle}</p>
+
               {/* Price */}
-              <div className="flex items-baseline gap-2 mb-3">
+              <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-2xl font-bold text-[#0F1D2C] tabular-nums">
                   ${pkg.price.toLocaleString()}
                 </span>
@@ -91,6 +94,35 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
                   </span>
                 )}
               </div>
+
+              {/* Savings amount */}
+              {pkg.savingsVsStandalone > 0 && (
+                <p className="text-[11px] text-green-600 font-medium mb-2">
+                  You save ${pkg.savingsVsStandalone.toLocaleString()} vs. standalone pricing
+                </p>
+              )}
+
+              {/* Result intensity */}
+              <div className="flex items-center gap-1.5 mb-2">
+                <Zap className="h-3 w-3 text-[#C9A96E]" />
+                <span className="text-[11px] font-medium text-[#0F1D2C] capitalize">
+                  {pkg.resultIntensity}
+                </span>
+              </div>
+
+              {/* Best for */}
+              <p className="text-[11px] text-gray-500 italic mb-3">
+                Best for: {pkg.bestFor}
+              </p>
+
+              {/* Why best callout — Transform only */}
+              {pkg.whyBest && (
+                <div className="bg-[#C9A96E]/10 border border-[#C9A96E]/20 rounded-lg p-2.5 mb-3">
+                  <p className="text-[11px] text-[#0F1D2C] font-medium leading-relaxed">
+                    {pkg.whyBest}
+                  </p>
+                </div>
+              )}
 
               {/* Sessions */}
               <p className="text-xs text-gray-500 mb-3">

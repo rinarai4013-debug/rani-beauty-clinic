@@ -11,6 +11,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Wand2,
+  Send,
+  Printer,
+  BookTemplate,
 } from 'lucide-react';
 
 import { usePlanBuilder } from '@/hooks/usePlanBuilder';
@@ -20,6 +24,7 @@ import ServiceCatalogCard from '@/components/dashboard/plan-builder/ServiceCatal
 import PhaseDropZone from '@/components/dashboard/plan-builder/PhaseDropZone';
 import PlanTotals from '@/components/dashboard/plan-builder/PlanTotals';
 import PackageCalculator from '@/components/dashboard/plan-builder/PackageCalculator';
+import PlanEconomics from '@/components/dashboard/plan-builder/PlanEconomics';
 import PlanPreviewModal from '@/components/dashboard/plan-builder/PlanPreviewModal';
 
 import {
@@ -29,6 +34,22 @@ import {
 } from '@/data/services/unified-catalog';
 import type { UnifiedService } from '@/data/services/unified-catalog';
 import { serializeToPlanData, convertToTreatmentPackages, serializeForAirtable } from '@/lib/plan-builder/plan-serializer';
+import { recommendTreatmentPlan } from '@/lib/plan-builder/ai-recommender';
+import ProviderNotes from '@/components/dashboard/plan-builder/ProviderNotes';
+
+function parseFitzpatrick(skinType: string): 1 | 2 | 3 | 4 | 5 | 6 | undefined {
+  if (!skinType) return undefined;
+  const match = skinType.match(/(\d)/);
+  if (match) {
+    const num = parseInt(match[1], 10);
+    if (num >= 1 && num <= 6) return num as 1 | 2 | 3 | 4 | 5 | 6;
+  }
+  const lower = skinType.toLowerCase();
+  if (lower.includes('fair') || lower.includes('light') || lower.includes('type i')) return 1;
+  if (lower.includes('medium') || lower.includes('olive')) return 3;
+  if (lower.includes('dark') || lower.includes('brown')) return 5;
+  return undefined;
+}
 
 export default function PlanBuilderPage() {
   const {
@@ -45,6 +66,7 @@ export default function PlanBuilderPage() {
   } = usePlanBuilder();
 
   const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -137,6 +159,158 @@ export default function PlanBuilderPage() {
     [dispatch]
   );
 
+  const handleAISuggest = useCallback(async () => {
+    if (!state.client) {
+      toast.error('Select a client first to get AI recommendations');
+      return;
+    }
+
+    let concerns = state.client.skinConcerns || [];
+    let interests = state.client.treatmentInterests || [];
+
+    // Always try to enrich from intake/intelligence data (includes Aura scan results)
+    try {
+      const res = await fetch(`/api/dashboard/clients/${state.client.id}?full=true`);
+      if (res.ok) {
+        const data = await res.json();
+        // Pull concerns from intake data (Aura scan populates these)
+        const intakeConcerns = data.intake?.skinConcerns
+          || data.intake?.['Top Skin Concerns']
+          || data.intelligence?.concerns
+          || [];
+        const intakeInterests = data.intake?.treatmentInterests
+          || data.intake?.['Treatment Interests']
+          || [];
+
+        if (concerns.length === 0) {
+          concerns = Array.isArray(intakeConcerns) ? intakeConcerns : [intakeConcerns];
+        }
+        if (interests.length === 0) {
+          interests = Array.isArray(intakeInterests) ? intakeInterests : [intakeInterests];
+        }
+
+        // Pull Aura scan intelligence for richer recommendations
+        const skinType = data.intake?.['Skin Type'] || data.intelligence?.fitzpatrickType;
+        const fitzpatrick = skinType ? parseFitzpatrick(skinType) : undefined;
+
+        if (concerns.length > 0 || interests.length > 0) {
+          const recs = recommendTreatmentPlan({
+            skinConcerns: concerns.filter(Boolean),
+            treatmentInterests: interests.filter(Boolean),
+            fitzpatrickType: fitzpatrick,
+            previousTreatments: data.treatments?.map((t: { service: string }) => t.service) || [],
+          });
+          if (recs.length > 0) {
+            if (totalServices > 0) {
+              const ok = window.confirm(`Replace current plan with ${recs.length} AI-recommended treatments?`);
+              if (!ok) return;
+            }
+            dispatch({ type: 'CLEAR' });
+            dispatch({ type: 'SET_CLIENT', client: state.client });
+            for (const rec of recs) {
+              addService(rec.service.id, rec.service, rec.phase);
+            }
+            const quickWin = recs.find((r) => r.quickWin);
+            const anchor = recs.find((r) => r.anchorTreatment);
+            let msg = `Added ${recs.length} AI-recommended treatments`;
+            if (quickWin) msg += ` — Quick win: ${quickWin.service.name}`;
+            toast.success(msg);
+            return;
+          }
+        }
+      }
+    } catch {
+      // Fall through to direct concern matching
+    }
+
+    if (concerns.length === 0 && interests.length === 0) {
+      toast.error('No skin concerns or Aura scan data found for this client');
+      return;
+    }
+
+    const recs = recommendTreatmentPlan({ skinConcerns: concerns, treatmentInterests: interests });
+    if (recs.length === 0) {
+      toast.error('No matching treatments found for this client\'s concerns');
+      return;
+    }
+
+    // If plan already has services, confirm before replacing
+    if (totalServices > 0) {
+      const ok = window.confirm(`Replace current plan with ${recs.length} AI-recommended treatments?`);
+      if (!ok) return;
+    }
+
+    dispatch({ type: 'CLEAR' });
+    dispatch({ type: 'SET_CLIENT', client: state.client });
+    for (const rec of recs) {
+      addService(rec.service.id, rec.service, rec.phase);
+    }
+    toast.success(`Added ${recs.length} AI-recommended treatments across 3 phases`);
+  }, [state.client, totalServices, dispatch, addService]);
+
+  const handleSendToClient = useCallback(async () => {
+    if (!state.savedPlanId || !state.client) {
+      toast.error('Save the plan first, then send to client');
+      return;
+    }
+    if (!state.client.email) {
+      toast.error('Client email is required to send the plan');
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await fetch('/api/dashboard/plan-builder/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: state.savedPlanId,
+          clientEmail: state.client.email,
+          clientName: state.client.name,
+          clientPhone: state.client.phone,
+        }),
+      });
+      if (!res.ok) throw new Error('Send failed');
+      const data = await res.json();
+      toast.success('Plan sent to client!');
+    } catch {
+      toast.error('Failed to send plan');
+    } finally {
+      setSending(false);
+    }
+  }, [state.savedPlanId, state.client]);
+
+  const handleExportPDF = useCallback(async () => {
+    if (totalServices === 0) {
+      toast.error('Add services before exporting');
+      return;
+    }
+    try {
+      const res = await fetch('/api/dashboard/plan-builder/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planData: serializeToPlanData(state),
+          packages: packages.map((p) => ({
+            tier: p.tier, name: p.name, price: p.price,
+            originalPrice: p.originalPrice, discount: p.discount,
+            sessions: p.sessions, lineItems: p.lineItems, extras: p.extras,
+            monthlyPayment12: p.monthlyPayment12, monthlyPayment24: p.monthlyPayment24,
+          })),
+        }),
+      });
+      if (!res.ok) throw new Error('Export failed');
+      const data = await res.json();
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(data.html);
+        printWindow.document.close();
+        setTimeout(() => printWindow.print(), 500);
+      }
+    } catch {
+      toast.error('Failed to generate PDF');
+    }
+  }, [state, packages, totalServices]);
+
   const previewPlanData = useMemo(() => serializeToPlanData(state), [state]);
   const previewPackages = useMemo(() => convertToTreatmentPackages(packages), [packages]);
 
@@ -181,6 +355,15 @@ export default function PlanBuilderPage() {
               aria-label="Clear plan"
             >
               <RotateCcw className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleAISuggest}
+              disabled={!state.client}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#C9A96E] bg-[#C9A96E]/10 rounded-lg hover:bg-[#C9A96E]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              title="Auto-populate plan with AI-recommended treatments based on client concerns"
+            >
+              <Wand2 className="h-4 w-4" />
+              <span className="hidden sm:inline">AI Suggest</span>
             </button>
             <button
               onClick={handlePreview}
@@ -290,19 +473,59 @@ export default function PlanBuilderPage() {
               packages={packages}
             />
             <PackageCalculator packages={packages} />
+            <PlanEconomics
+              packages={packages}
+              totalServices={totalServices}
+              totalValue={totalValue}
+            />
+            <ProviderNotes
+              phases={state.phases}
+              client={state.client}
+              packages={packages}
+            />
 
             {state.savedPlanId && (
-              <div className="bg-white rounded-xl border border-gray-100 p-4">
-                <p className="text-xs text-gray-500 mb-1">Client Link</p>
-                <a
-                  href={`/plan/${state.savedPlanId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[#C9A96E] hover:underline break-all"
-                >
-                  /plan/{state.savedPlanId}
-                </a>
+              <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Client Link</p>
+                  <a
+                    href={`/plan/${state.savedPlanId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#C9A96E] hover:underline break-all"
+                  >
+                    /plan/{state.savedPlanId}
+                  </a>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSendToClient}
+                    disabled={sending || !state.client?.email}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-white bg-[#C9A96E] rounded-lg hover:bg-[#B8944F] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {sending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                    Send to Client
+                  </button>
+                  <button
+                    onClick={handleExportPDF}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-[#0F1D2C] bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    title="Print / Export PDF"
+                  >
+                    <Printer className="h-3 w-3" />
+                  </button>
+                </div>
               </div>
+            )}
+
+            {/* Export button (even before save) */}
+            {!state.savedPlanId && totalServices > 0 && (
+              <button
+                onClick={handleExportPDF}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-[#0F1D2C] bg-white border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                Print Preview
+              </button>
             )}
           </aside>
         </div>

@@ -87,6 +87,7 @@ export function convertToTreatmentPackages(packages: GeneratedPackage[]): Treatm
   return packages.map((pkg) => ({
     tier: pkg.tier,
     name: pkg.name,
+    subtitle: pkg.subtitle,
     price: pkg.price,
     sessions: pkg.sessions,
     lineItems: pkg.lineItems.map(
@@ -101,6 +102,10 @@ export function convertToTreatmentPackages(packages: GeneratedPackage[]): Treatm
     highlight: pkg.highlighted,
     savings: pkg.discount > 0 ? `Save ${pkg.discount}%` : undefined,
     monthlyPayment: pkg.monthlyPayment12,
+    bestFor: pkg.bestFor,
+    resultIntensity: pkg.resultIntensity,
+    whyBest: pkg.whyBest,
+    savingsVsStandalone: pkg.savingsVsStandalone,
   }));
 }
 

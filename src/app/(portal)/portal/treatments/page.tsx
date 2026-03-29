@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Loader2,
   CalendarDays,
@@ -8,9 +8,22 @@ import {
   ArrowRight,
   Filter,
   ClipboardList,
+  Camera,
+  ChevronDown,
+  ChevronUp,
+  Trash2,
 } from 'lucide-react';
 import TreatmentTimeline, { type TreatmentEntry } from '@/components/portal/TreatmentTimeline';
+import PhotoUploadZone from '@/components/photo-simulation/PhotoUploadZone';
 import { clinicInfo } from '@/data/clinic-info';
+
+interface ProgressPhoto {
+  id: string;
+  label: 'before' | 'after';
+  dataUrl: string;
+  date: string;
+}
+
 
 type FilterTab = 'All' | 'Facials' | 'Laser' | 'Wellness' | 'Injectables';
 
@@ -39,6 +52,86 @@ export default function TreatmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterTab>('All');
+
+  // Progress photos state
+  const [progressOpen, setProgressOpen] = useState(false);
+  const [progressPhotos, setProgressPhotos] = useState<ProgressPhoto[]>([]);
+  const [beforePhotos, setBeforePhotos] = useState<File[]>([]);
+  const [afterPhotos, setAfterPhotos] = useState<File[]>([]);
+
+  const fileToDataUrl = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const handleBeforePhotosChange = useCallback(
+    async (photos: File[]) => {
+      setBeforePhotos(photos);
+      // Convert new files to stored progress photos
+      const newEntries: ProgressPhoto[] = [];
+      for (const file of photos) {
+        const dataUrl = await fileToDataUrl(file);
+        newEntries.push({
+          id: `before-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          label: 'before',
+          dataUrl,
+          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        });
+      }
+      setProgressPhotos((prev) => [
+        ...prev.filter((p) => p.label !== 'before'),
+        ...newEntries,
+      ]);
+    },
+    [fileToDataUrl]
+  );
+
+  const handleAfterPhotosChange = useCallback(
+    async (photos: File[]) => {
+      setAfterPhotos(photos);
+      const newEntries: ProgressPhoto[] = [];
+      for (const file of photos) {
+        const dataUrl = await fileToDataUrl(file);
+        newEntries.push({
+          id: `after-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          label: 'after',
+          dataUrl,
+          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        });
+      }
+      setProgressPhotos((prev) => [
+        ...prev.filter((p) => p.label !== 'after'),
+        ...newEntries,
+      ]);
+    },
+    [fileToDataUrl]
+  );
+
+  const removeProgressPhoto = useCallback(
+    (id: string) => {
+      const photo = progressPhotos.find((p) => p.id === id);
+      if (!photo) return;
+      setProgressPhotos((prev) => prev.filter((p) => p.id !== id));
+      if (photo.label === 'before') {
+        const idx = progressPhotos.filter((p) => p.label === 'before').findIndex((p) => p.id === id);
+        if (idx >= 0) {
+          setBeforePhotos((prev) => prev.filter((_, i) => i !== idx));
+        }
+      } else {
+        const idx = progressPhotos.filter((p) => p.label === 'after').findIndex((p) => p.id === id);
+        if (idx >= 0) {
+          setAfterPhotos((prev) => prev.filter((_, i) => i !== idx));
+        }
+      }
+    },
+    [progressPhotos]
+  );
+
+  const beforeEntries = progressPhotos.filter((p) => p.label === 'before');
+  const afterEntries = progressPhotos.filter((p) => p.label === 'after');
 
   useEffect(() => {
     async function fetchTreatments() {
@@ -184,6 +277,144 @@ export default function TreatmentsPage() {
           </button>
         </div>
       )}
+
+      {/* Progress Photos */}
+      <section className="bg-white border border-rani-navy/10 rounded-xl overflow-hidden">
+        <button
+          onClick={() => setProgressOpen(!progressOpen)}
+          className="w-full flex items-center justify-between px-6 py-4 hover:bg-rani-cream/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-rani-cream flex items-center justify-center">
+              <Camera className="w-5 h-5 text-rani-gold" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-heading text-lg text-rani-navy">Track Your Progress</h3>
+              <p className="font-body text-xs text-rani-muted">
+                Upload before &amp; after photos to visualize your transformation
+              </p>
+            </div>
+          </div>
+          {progressOpen ? (
+            <ChevronUp className="w-5 h-5 text-rani-muted flex-shrink-0" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-rani-muted flex-shrink-0" />
+          )}
+        </button>
+
+        {progressOpen && (
+          <div className="px-6 pb-6 space-y-6 border-t border-rani-navy/5">
+            {/* Upload sections */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+              {/* Before */}
+              <div>
+                <h4 className="font-body text-sm font-semibold text-rani-navy mb-3 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-rani-muted/40" />
+                  Before Photos
+                </h4>
+                <PhotoUploadZone
+                  photos={beforePhotos}
+                  onPhotosChange={handleBeforePhotosChange}
+                  maxPhotos={3}
+                />
+              </div>
+
+              {/* After */}
+              <div>
+                <h4 className="font-body text-sm font-semibold text-rani-navy mb-3 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-rani-gold" />
+                  After Photos
+                </h4>
+                <PhotoUploadZone
+                  photos={afterPhotos}
+                  onPhotosChange={handleAfterPhotosChange}
+                  maxPhotos={3}
+                />
+              </div>
+            </div>
+
+            {/* Side-by-side comparison */}
+            {(beforeEntries.length > 0 || afterEntries.length > 0) && (
+              <div>
+                <h4 className="font-body text-sm font-semibold text-rani-navy mb-3">
+                  Comparison View
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Before column */}
+                  <div className="space-y-3">
+                    <div className="text-center font-body text-xs text-rani-muted font-medium uppercase tracking-wider">
+                      Before
+                    </div>
+                    {beforeEntries.length > 0 ? (
+                      beforeEntries.map((photo) => (
+                        <div key={photo.id} className="relative group rounded-lg overflow-hidden border border-rani-navy/10">
+                          <img
+                            src={photo.dataUrl}
+                            alt="Before"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2">
+                            <span className="font-body text-[10px] text-white/80">{photo.date}</span>
+                          </div>
+                          <button
+                            onClick={() => removeProgressPhoto(photo.id)}
+                            className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                            aria-label="Remove photo"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="aspect-[3/4] rounded-lg border-2 border-dashed border-rani-navy/10 flex items-center justify-center">
+                        <span className="font-body text-xs text-rani-muted">No photos yet</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* After column */}
+                  <div className="space-y-3">
+                    <div className="text-center font-body text-xs text-rani-muted font-medium uppercase tracking-wider">
+                      After
+                    </div>
+                    {afterEntries.length > 0 ? (
+                      afterEntries.map((photo) => (
+                        <div key={photo.id} className="relative group rounded-lg overflow-hidden border border-rani-navy/10">
+                          <img
+                            src={photo.dataUrl}
+                            alt="After"
+                            className="w-full aspect-[3/4] object-cover"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2">
+                            <span className="font-body text-[10px] text-white/80">{photo.date}</span>
+                          </div>
+                          <button
+                            onClick={() => removeProgressPhoto(photo.id)}
+                            className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                            aria-label="Remove photo"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="aspect-[3/4] rounded-lg border-2 border-dashed border-rani-navy/10 flex items-center justify-center">
+                        <span className="font-body text-xs text-rani-muted">No photos yet</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Disclaimer */}
+            <p className="font-body text-[10px] text-rani-muted/70 text-center leading-relaxed">
+              Photos are stored locally on your device and are not uploaded to any server.
+              They will be cleared when you close this browser session.
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* Book CTA */}
       <section className="bg-rani-cream rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">

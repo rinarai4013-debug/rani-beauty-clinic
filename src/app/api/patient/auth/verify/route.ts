@@ -42,20 +42,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Look up client by email
-    const client = await fetchFirst<ClientRecord>(
+    const clientRecords = await fetchFirst<ClientRecord>(
       Tables.clients(),
       1,
       { filterByFormula: `{Email} = '${payload.email}'` },
       true // skip cache to get fresh data
     );
 
-    if (!client) {
+    if (!clientRecords || clientRecords.length === 0) {
       return NextResponse.json(
         { error: 'Account not found' },
         { status: 401 }
       );
     }
 
+    const client = clientRecords[0];
     const clientId = client.id;
     const email = client.fields.Email;
     const name = client.fields.Client;

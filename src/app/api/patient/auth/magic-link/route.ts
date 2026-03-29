@@ -41,21 +41,75 @@ export async function POST(request: NextRequest) {
         to: email,
         subject: 'Your Rani Beauty Clinic Portal Login Link',
         html: `
-          <div style="font-family: 'Montserrat', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-            <h1 style="color: #0F1D2C; font-family: 'Playfair Display', Georgia, serif; font-size: 24px; margin-bottom: 24px;">
-              Welcome to Your Patient Portal
-            </h1>
-            <p style="color: #333; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
-              Click the button below to securely access your Rani Beauty Clinic patient portal. This link expires in 15 minutes.
-            </p>
-            <a href="${magicLinkUrl}" style="display: inline-block; background-color: #C9A96E; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-size: 16px; font-weight: 600;">
-              Access My Portal
-            </a>
-            <p style="color: #999; font-size: 13px; margin-top: 32px; line-height: 1.5;">
-              If you didn't request this link, you can safely ignore this email.<br/>
-              Rani Beauty Clinic &middot; 401 Olympia Ave NE #101, Renton, WA 98056
-            </p>
-          </div>
+          <!DOCTYPE html>
+          <html lang="en">
+          <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
+          <body style="margin: 0; padding: 0; background-color: #F8F6F1; font-family: 'Montserrat', Arial, sans-serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F8F6F1;">
+              <tr>
+                <td align="center" style="padding: 40px 16px;">
+                  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(15,29,44,0.08);">
+                    <!-- Header -->
+                    <tr>
+                      <td style="background-color: #0F1D2C; padding: 32px 40px; text-align: center;">
+                        <h1 style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 700; color: #C9A96E; letter-spacing: 1px;">
+                          Rani Beauty Clinic
+                        </h1>
+                      </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                      <td style="padding: 48px 40px 40px;">
+                        <h2 style="margin: 0 0 16px; font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 600; color: #0F1D2C;">
+                          Sign in to Your Portal
+                        </h2>
+                        <p style="margin: 0 0 32px; font-size: 15px; line-height: 1.7; color: #444444;">
+                          Click the button below to securely access your treatment plans, appointments, and rewards.
+                        </p>
+                        <!-- CTA Button -->
+                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto 32px;">
+                          <tr>
+                            <td style="background-color: #C9A96E; border-radius: 8px;">
+                              <a href="${magicLinkUrl}" target="_blank" style="display: inline-block; padding: 16px 40px; font-family: 'Montserrat', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; letter-spacing: 0.5px;">
+                                Access My Portal
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+                        <p style="margin: 0 0 8px; font-size: 13px; color: #999999; text-align: center;">
+                          This link expires in 15 minutes.
+                        </p>
+                        <p style="margin: 0; font-size: 13px; color: #999999; text-align: center;">
+                          If you didn&rsquo;t request this link, you can safely ignore this email.
+                        </p>
+                      </td>
+                    </tr>
+                    <!-- Divider -->
+                    <tr>
+                      <td style="padding: 0 40px;">
+                        <hr style="border: none; border-top: 1px solid #E8E4DF; margin: 0;" />
+                      </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                      <td style="padding: 24px 40px 32px; text-align: center;">
+                        <p style="margin: 0 0 4px; font-size: 12px; color: #999999; line-height: 1.6;">
+                          Rani Beauty Clinic
+                        </p>
+                        <p style="margin: 0 0 4px; font-size: 12px; color: #999999; line-height: 1.6;">
+                          401 Olympia Ave NE, Suite 101, Renton, WA 98056
+                        </p>
+                        <p style="margin: 0; font-size: 12px; color: #999999; line-height: 1.6;">
+                          <a href="tel:+14255394440" style="color: #C9A96E; text-decoration: none;">(425) 539-4440</a>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
         `,
       });
     }

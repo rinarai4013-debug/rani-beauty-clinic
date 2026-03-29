@@ -17,8 +17,9 @@ export interface PlanPhase {
 }
 
 export interface GeneratedPackage {
-  tier: 'Essential' | 'Recommended' | 'Platinum';
+  tier: 'Start' | 'Transform' | 'Elite';
   name: string;
+  subtitle: string;
   price: number;
   originalPrice: number;
   discount: number; // percentage
@@ -28,6 +29,11 @@ export interface GeneratedPackage {
   monthlyPayment24: number;
   highlighted: boolean;
   extras: string[];
+  bestFor: string;
+  resultIntensity: string;
+  concernsAddressed: string[];
+  whyBest?: string; // Only on Transform
+  savingsVsStandalone: number; // Dollar amount saved
 }
 
 export interface BuilderClient {
