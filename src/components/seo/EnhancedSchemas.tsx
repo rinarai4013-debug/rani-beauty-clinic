@@ -40,14 +40,13 @@ const CLINIC_BASE = {
     },
   ],
   priceRange: "$$",
-  // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-  // aggregateRating: {
-  //   "@type": "AggregateRating",
-  //   ratingValue: clinicInfo.reviews.aggregateRating,
-  //   reviewCount: clinicInfo.reviews.reviewCount,
-  //   bestRating: 5,
-  //   worstRating: 1,
-  // },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: clinicInfo.reviews.aggregateRating,
+    reviewCount: clinicInfo.reviews.reviewCount,
+    bestRating: 5,
+    worstRating: 1,
+  },
   sameAs: [
     clinicInfo.social.instagram,
     clinicInfo.social.facebook,
@@ -310,14 +309,13 @@ export function AICitationSchemas({
         name: r.treatment,
       },
     })),
-    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-    // aggregateRating: {
-    //   "@type": "AggregateRating",
-    //   ratingValue: clinicInfo.reviews.aggregateRating,
-    //   reviewCount: clinicInfo.reviews.reviewCount,
-    //   bestRating: 5,
-    //   worstRating: 1,
-    // },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: clinicInfo.reviews.aggregateRating,
+      reviewCount: clinicInfo.reviews.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
   };
 
   // Homepage FAQ schema
@@ -411,14 +409,13 @@ export function ServiceSchema({ service }: ServiceSchemaProps) {
         name: "Washington",
       },
     },
-    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-    // aggregateRating: {
-    //   "@type": "AggregateRating",
-    //   ratingValue: clinicInfo.reviews.aggregateRating,
-    //   reviewCount: clinicInfo.reviews.reviewCount,
-    //   bestRating: 5,
-    //   worstRating: 1,
-    // },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: clinicInfo.reviews.aggregateRating,
+      reviewCount: clinicInfo.reviews.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
   };
 
   const medicalProcedure = {

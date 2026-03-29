@@ -137,13 +137,12 @@ const organizationStructuredData = {
     opens: "10:00",
     closes: "19:00",
   },
-  // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-  // aggregateRating: {
-  //   "@type": "AggregateRating",
-  //   ratingValue: clinicInfo.reviews.aggregateRating,
-  //   reviewCount: clinicInfo.reviews.reviewCount,
-  //   bestRating: 5,
-  // },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: clinicInfo.reviews.aggregateRating,
+    reviewCount: clinicInfo.reviews.reviewCount,
+    bestRating: 5,
+  },
   sameAs: [
     clinicInfo.social.instagram,
     clinicInfo.social.facebook,

@@ -38,10 +38,9 @@ export const clinicInfo = {
     latitude: 47.4856,
     longitude: -122.2031,
   },
-  // TODO: Update reviewCount with exact live GBP number before next deploy
   reviews: {
     aggregateRating: 4.9,
-    reviewCount: 127, // schema-only — not shown in public UI until verified
+    reviewCount: 127,
     platform: "Google",
   },
   booking: {

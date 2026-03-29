@@ -133,13 +133,12 @@ export default function ServicePageTemplate({
         latitude: clinicInfo.geo.latitude,
         longitude: clinicInfo.geo.longitude,
       },
-      // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-      // aggregateRating: {
-      //   "@type": "AggregateRating",
-      //   ratingValue: clinicInfo.reviews.aggregateRating,
-      //   reviewCount: clinicInfo.reviews.reviewCount,
-      //   bestRating: 5,
-      // },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: clinicInfo.reviews.aggregateRating,
+        reviewCount: clinicInfo.reviews.reviewCount,
+        bestRating: 5,
+      },
     },
     areaServed: {
       "@type": "State",

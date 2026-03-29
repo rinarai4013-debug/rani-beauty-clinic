@@ -109,13 +109,12 @@ export default function LocationPage({ params }: PageProps) {
       latitude: clinicInfo.geo.latitude,
       longitude: clinicInfo.geo.longitude,
     },
-    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-    // aggregateRating: {
-    //   "@type": "AggregateRating",
-    //   ratingValue: clinicInfo.reviews.aggregateRating.toString(),
-    //   reviewCount: clinicInfo.reviews.reviewCount.toString(),
-    //   bestRating: "5",
-    // },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: clinicInfo.reviews.aggregateRating.toString(),
+      reviewCount: clinicInfo.reviews.reviewCount.toString(),
+      bestRating: "5",
+    },
   };
 
   const breadcrumbs = [

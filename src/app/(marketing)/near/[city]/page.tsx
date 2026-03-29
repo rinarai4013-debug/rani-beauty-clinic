@@ -117,13 +117,12 @@ export default function NearCityPage({ params }: PageProps) {
     },
     openingHours: "Mo-Su 10:00-19:00",
     priceRange: "$$-$$$",
-    // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-    // aggregateRating: {
-    //   "@type": "AggregateRating",
-    //   ratingValue: clinicInfo.reviews.aggregateRating,
-    //   reviewCount: clinicInfo.reviews.reviewCount,
-    //   bestRating: 5,
-    // },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: clinicInfo.reviews.aggregateRating,
+      reviewCount: clinicInfo.reviews.reviewCount,
+      bestRating: 5,
+    },
     medicalSpecialty: "Dermatology",
     isAcceptingNewPatients: true,
   };

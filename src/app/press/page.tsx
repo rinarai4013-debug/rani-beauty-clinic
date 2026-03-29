@@ -138,13 +138,12 @@ const organizationSchema = {
     clinicInfo.social.tiktok,
     clinicInfo.social.google,
   ],
-  // TODO: Re-enable aggregateRating once reviewCount is verified against live GBP
-  // aggregateRating: {
-  //   "@type": "AggregateRating",
-  //   ratingValue: clinicInfo.reviews.aggregateRating,
-  //   reviewCount: clinicInfo.reviews.reviewCount,
-  //   bestRating: 5,
-  // },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: clinicInfo.reviews.aggregateRating,
+    reviewCount: clinicInfo.reviews.reviewCount,
+    bestRating: 5,
+  },
 };
 
 export default function PressPage() {
