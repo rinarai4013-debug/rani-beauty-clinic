@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import ContactPageClient from "./ContactPageClient";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Contact Us - Book a Consultation Today",
@@ -24,5 +27,9 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  return <ContactPageClient />;
+  return (
+    <Suspense>
+      <ContactPageClient />
+    </Suspense>
+  );
 }
