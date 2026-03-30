@@ -2,7 +2,7 @@
 
 export const TABLE_NAMES = {
   CLIENTS: 'Clients',
-  CLIENT_INTAKES: 'Client Intakes',
+  CLIENT_INTAKES: 'Intake',
   INTAKE_INTELLIGENCE: 'Intake Intelligence',
   APPOINTMENTS: 'Appointments',
   PACKAGES: 'Packages',
