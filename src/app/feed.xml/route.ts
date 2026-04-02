@@ -7,7 +7,6 @@ import { comparisonPages } from "@/data/comparisons";
 import { skinConcerns } from "@/data/skin-concerns";
 import { pillarGuides } from "@/data/guides/pillar-pages";
 import { geoPages } from "@/data/locations/geo-pages";
-import { pnwCities } from "@/data/locations/pnw-cities";
 import { galleryPages } from "@/data/results/gallery";
 import { serviceVariations } from "@/data/services/service-variations";
 
@@ -68,12 +67,12 @@ export async function GET() {
     entries.push(entry(`${baseUrl}/blog/${post.slug}`, post.title, post.date ? new Date(post.date).toISOString() : undefined));
   }
 
-  // Cost pages — RESTORED: template built 2026-03-31
+  // Cost pages
   for (const page of costPages) {
     entries.push(entry(`${baseUrl}/cost/${page.slug}`, page.metaTitle || page.service || page.slug));
   }
 
-  // Comparison pages — RESTORED: template built 2026-03-31
+  // Comparison pages
   for (const page of comparisonPages) {
     entries.push(entry(`${baseUrl}/compare/${page.slug}`, `${page.treatmentA} vs ${page.treatmentB}`));
   }
@@ -102,11 +101,6 @@ export async function GET() {
   // Geo location pages
   for (const geo of geoPages) {
     entries.push(entry(`${baseUrl}/locations/${geo.slug}`, `Medspa Serving ${geo.city}, ${geo.state}`));
-  }
-
-  // Near city pages (top 50 PNW cities — feed shouldn't be too large, extended cities stay sitemap-only)
-  for (const city of pnwCities) {
-    entries.push(entry(`${baseUrl}/near/${city.slug}`, `Medspa Near ${city.name} | Rani Beauty Clinic`));
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
