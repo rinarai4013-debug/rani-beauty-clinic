@@ -10,6 +10,7 @@ import { clinicInfo } from "@/data/clinic-info";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import SectionLabel from "@/components/ui/SectionLabel";
 import Button from "@/components/ui/Button";
+import StructuredData from "@/components/seo/StructuredData";
 
 /* ─── Static params ──────────────────────────────────────────────────────── */
 
@@ -66,8 +67,83 @@ export default function ResultsPage({
     .filter((g) => g.slug !== gallery.slug)
     .slice(0, 4);
 
+  // Structured data for SEO
+  const baseUrl = "https://www.ranibeautyclinic.com";
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: baseUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Results",
+        item: `${baseUrl}/results`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: gallery.title,
+        item: `${baseUrl}/results/${gallery.slug}`,
+      },
+    ],
+  };
+
+  const imageGallerySchema = {
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    name: gallery.title,
+    description: gallery.metaDescription,
+    url: `${baseUrl}/results/${gallery.slug}`,
+    provider: {
+      "@type": "MedicalBusiness",
+      name: "Rani Beauty Clinic",
+      url: baseUrl,
+      telephone: clinicInfo.phone,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: clinicInfo.address.street,
+        addressLocality: clinicInfo.address.city,
+        addressRegion: clinicInfo.address.state,
+        postalCode: clinicInfo.address.zip,
+      },
+    },
+    image: gallery.images.map((src, index) => ({
+      "@type": "ImageObject",
+      url: `${baseUrl}${src}`,
+      name: `${gallery.title} result ${index + 1}`,
+      description: `${gallery.title} at Rani Beauty Clinic in Renton, WA`,
+    })),
+  };
+
+  const faqSchema =
+    gallery.faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: gallery.faqs.map((faq) => ({
+            "@type": "Question",
+            name: faq.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: faq.answer,
+            },
+          })),
+        }
+      : null;
+
   return (
     <>
+      <StructuredData data={breadcrumbSchema} />
+      <StructuredData data={imageGallerySchema} />
+      {faqSchema && <StructuredData data={faqSchema} />}
+
       <Breadcrumbs
         items={[
           { label: "Results", href: "/results" },
