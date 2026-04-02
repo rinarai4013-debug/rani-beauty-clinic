@@ -1,8 +1,7 @@
 import { MetadataRoute } from "next";
 import { geoPages } from "@/data/locations/geo-pages";
-import { allServiceSlugs } from "@/data/locations/geo-service-data";
-import { costPages } from "@/data/cost-pages";
-import { comparisonPages } from "@/data/comparisons";
+// cost-pages and comparisons data files exist but templates are not yet built — excluded from sitemap
+// geo-service-data excluded — /locations/[slug]/[service] templates not yet built
 import { serviceVariations } from "@/data/services/service-variations";
 import { galleryPages } from "@/data/results/gallery";
 import { pillarGuides } from "@/data/guides/pillar-pages";
@@ -71,7 +70,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/locations`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
     { url: `${baseUrl}/membership`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/quiz`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/compare`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/team`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/team/dr-landfield`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/safety`, lastModified: now, priority: 0.6, changeFrequency: "yearly" },
@@ -136,30 +134,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
   }));
 
-  // Geo-service combo pages (48 locations x 18 services = 864 pages)
-  const geoServicePages: MetadataRoute.Sitemap = [];
-  for (const geo of geoPages) {
-    for (const svc of allServiceSlugs) {
-      geoServicePages.push({
-        url: `${baseUrl}/locations/${geo.slug}/${svc}`,
-        lastModified: now,
-        priority: 0.6,
-        changeFrequency: "monthly",
-      });
-    }
-  }
-
-  // Cost/pricing pages
-  const costPageUrls: MetadataRoute.Sitemap = costPages.map((page) => ({
-    url: `${baseUrl}/cost/${page.slug}`,
+  // Geo-service combo pages — EXCLUDED: /locations/[slug]/[service] is a notFound() stub. Use /near/[city]/[service] instead (fully built).
+  // Cost/pricing pages — RESTORED: template built 2026-03-31
+  const costPageUrls: MetadataRoute.Sitemap = [
+    "laser-hair-removal-cost", "hydrafacial-cost", "rf-microneedling-cost", "botox-cost",
+    "dermal-fillers-cost", "chemical-peels-cost", "biorepeel-cost", "sofwave-cost",
+    "scar-reduction-cost", "glp1-cost", "semaglutide-cost", "tirzepatide-cost",
+    "peptide-therapy-cost", "nad-injections-cost", "hormone-therapy-cost", "testosterone-cost",
+    "vitamin-injections-cost", "blood-work-cost",
+  ].map((slug) => ({
+    url: `${baseUrl}/cost/${slug}`,
     lastModified: now,
     priority: 0.7,
     changeFrequency: "monthly",
   }));
-
-  // Comparison pages
-  const comparisonPageUrls: MetadataRoute.Sitemap = comparisonPages.map((page) => ({
-    url: `${baseUrl}/compare/${page.slug}`,
+  // Comparison pages — RESTORED: template built 2026-03-31. Note: /vs/ pages also exist with different data; both serve distinct intents.
+  const comparisonPageUrls: MetadataRoute.Sitemap = [
+    "botox-vs-dysport", "semaglutide-vs-tirzepatide", "hydrafacial-vs-chemical-peel",
+    "rf-microneedling-vs-sofwave", "biorepeel-vs-vi-peel", "laser-hair-removal-vs-waxing",
+    "laser-hair-removal-vs-electrolysis", "botox-vs-dermal-fillers", "nad-vs-vitamin-b12",
+    "semaglutide-vs-liraglutide", "rf-microneedling-vs-traditional-microneedling",
+    "biorepeel-vs-prx-t33", "hydrafacial-vs-regular-facial", "sofwave-vs-ultherapy",
+    "peptide-therapy-vs-hgh",
+  ].map((slug) => ({
+    url: `${baseUrl}/compare/${slug}`,
     lastModified: now,
     priority: 0.7,
     changeFrequency: "monthly",
@@ -332,11 +330,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...wellnessPages,
     ...blogPageUrls,
     ...locationPages,
-    ...geoServicePages,
     ...nearCityPages,
     ...nearServicePages,
-    ...costPageUrls,
-    ...comparisonPageUrls,
     ...aestheticVariationPages,
     ...wellnessVariationPages,
     ...galleryPageUrls,
@@ -356,5 +351,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...agePageUrls,
     ...combinationPageUrls,
     ...vsPageUrls,
+    ...costPageUrls,
+    ...comparisonPageUrls,
   ];
 }
