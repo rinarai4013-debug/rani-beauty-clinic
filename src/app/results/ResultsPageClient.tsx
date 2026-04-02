@@ -9,6 +9,7 @@ import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import Button from "@/components/ui/Button";
 import { clinicInfo } from "@/data/clinic-info";
 import { trackCTAClick } from "@/lib/analytics/events";
+import ReviewCTA from "@/components/conversion/ReviewCTA";
 
 const treatmentHighlights = [
   {
@@ -165,6 +166,11 @@ export default function ResultsPageClient() {
                 professionals under the supervision of Dr. Alexander Landfield.
               </p>
             </div>
+          </FadeInOnScroll>
+
+          {/* Google Review CTA */}
+          <FadeInOnScroll delay={0.4}>
+            <ReviewCTA location="results_page_bottom" className="mt-12" />
           </FadeInOnScroll>
         </div>
       </section>

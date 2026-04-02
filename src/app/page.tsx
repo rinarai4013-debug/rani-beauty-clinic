@@ -8,6 +8,7 @@ import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 import { faqItems } from "@/data/faqs";
 import { AGGREGATE_RATING } from "@/data/constants";
+import { testimonials } from "@/data/testimonials";
 
 export const metadata: Metadata = {
   title: "Premier Medspa & Wellness in Renton, WA",
@@ -42,80 +43,7 @@ const ConsultationCTA = dynamic(() => import("@/components/sections/Consultation
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
 const ConsultationUrgency = dynamic(() => import("@/components/conversion/ConsultationUrgency"));
 
-const reviews = [
-  {
-    id: 1,
-    name: "Sarah M.",
-    rating: 5,
-    text: "The laser hair removal at Rani is truly pain-free. I was nervous about my first session, but the cooling technology made it so comfortable. After just 4 sessions, I can already see incredible results.",
-    treatment: "Laser Hair Removal",
-    date: "January 2026",
-  },
-  {
-    id: 2,
-    name: "Jennifer L.",
-    rating: 5,
-    text: "Knowing that a board-certified neurologist oversees the Botox treatments gave me so much confidence. My results look completely natural - refreshed, not frozen. The staff is incredibly professional and warm.",
-    treatment: "Botox",
-    date: "December 2025",
-  },
-  {
-    id: 3,
-    name: "David K.",
-    rating: 5,
-    text: "The GLP-1 program at Rani changed my life. Dr. Landfield monitors everything closely, and having blood work done right in the clinic makes it so convenient. I feel healthier and more energetic than I have in years.",
-    treatment: "GLP-1 Weight Management",
-    date: "November 2025",
-  },
-  {
-    id: 4,
-    name: "Priya R.",
-    rating: 5,
-    text: "I tried HydraFacial at several spas before Rani, but the difference here is night and day. The clinical approach combined with a warm atmosphere makes it feel like genuine self-care, not just a treatment. My skin has never looked this radiant.",
-    treatment: "HydraFacial MD",
-    date: "February 2026",
-  },
-  {
-    id: 5,
-    name: "Michelle T.",
-    rating: 5,
-    text: "The RF microneedling results have been amazing for my acne scars. The team was upfront about expectations and timeline, and they were right - after three sessions, my skin texture is dramatically smoother. Worth every penny.",
-    treatment: "RF Microneedling",
-    date: "March 2026",
-  },
-  {
-    id: 6,
-    name: "Angela W.",
-    rating: 5,
-    text: "I was hesitant about fillers but the team walked me through every step. The fact that a neurologist oversees the process made me feel completely safe. The results are so subtle and natural - my friends just say I look rested.",
-    treatment: "Dermal Fillers",
-    date: "January 2026",
-  },
-  {
-    id: 7,
-    name: "Robert H.",
-    rating: 5,
-    text: "Started the NAD+ injection program here and the difference in my energy and recovery is remarkable. The in-house blood work makes it so easy to track progress. This is what modern wellness should feel like.",
-    treatment: "NAD+ Injections",
-    date: "February 2026",
-  },
-  {
-    id: 8,
-    name: "Lisa K.",
-    rating: 5,
-    text: "Open 7 days a week makes all the difference for my schedule. I come in for my chemical peel on Sundays and it fits perfectly into my routine. The team remembers my preferences and my skin has never been clearer.",
-    treatment: "Chemical Peels",
-    date: "March 2026",
-  },
-  {
-    id: 9,
-    name: "Carmen D.",
-    rating: 5,
-    text: "The hormone therapy program has been transformative. Dr. Landfield took the time to review my comprehensive blood panel and created a protocol that addressed my specific needs. I finally feel like myself again.",
-    treatment: "Hormone Therapy",
-    date: "December 2025",
-  },
-];
+const reviews = testimonials;
 
 const homepageFaqs = faqItems;
 

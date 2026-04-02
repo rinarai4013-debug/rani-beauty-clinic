@@ -7,6 +7,7 @@ import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import SectionLabel from "@/components/ui/SectionLabel";
 import Button from "@/components/ui/Button";
 import TestimonialCard from "@/components/ui/TestimonialCard";
+import { galleryPages } from "@/data/results/gallery";
 
 // ── Before/After Slider ─────────────────────────────────────────────────────
 
@@ -17,14 +18,32 @@ interface BeforeAfterPair {
   sessions?: string;
 }
 
-const defaultPairs: BeforeAfterPair[] = [
-  {
-    before: "/images/before-after/before-1.webp",
-    after: "/images/before-after/after-1.webp",
-    label: "Skin Rejuvenation",
-    sessions: "3 sessions",
-  },
+/**
+ * Build homepage pairs from gallery data.
+ * We pick one representative pair per major service category,
+ * using the first two images from each gallery page as before/after.
+ */
+const targetSlugs: { slug: string; label: string; sessions: string }[] = [
+  { slug: "laser-hair-removal", label: "Laser Hair Removal", sessions: "6-8 sessions" },
+  { slug: "hydrafacial", label: "HydraFacial", sessions: "1 session" },
+  { slug: "rf-microneedling", label: "RF Microneedling", sessions: "3-4 sessions" },
+  { slug: "botox-dysport", label: "Botox & Dysport", sessions: "Single session" },
+  { slug: "chemical-peels", label: "Chemical Peels", sessions: "4-6 sessions" },
+  { slug: "sofwave", label: "Sofwave Skin Tightening", sessions: "1 session" },
 ];
+
+const homepagePairs: BeforeAfterPair[] = targetSlugs
+  .map(({ slug, label, sessions }) => {
+    const page = galleryPages.find((p) => p.slug === slug);
+    if (!page || page.images.length < 2) return null;
+    return {
+      before: page.images[0],
+      after: page.images[1],
+      label,
+      sessions,
+    };
+  })
+  .filter((p): p is BeforeAfterPair => p !== null);
 
 function SliderCard({ pair }: { pair: BeforeAfterPair }) {
   const [position, setPosition] = useState(50);
@@ -161,6 +180,19 @@ export default function ResultsShowcase({ reviews }: { reviews: Review[] }) {
   const [mobileIndex, setMobileIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  // Active slider pair index
+  const [activePair, setActivePair] = useState(0);
+  const [sliderPaused, setSliderPaused] = useState(false);
+
+  // Auto-rotate before/after pairs every 5 seconds
+  useEffect(() => {
+    if (sliderPaused || homepagePairs.length <= 1) return;
+    const timer = setInterval(() => {
+      setActivePair((prev) => (prev + 1) % homepagePairs.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [sliderPaused]);
+
   // Mobile auto-rotate (pauses on hover/focus)
   useEffect(() => {
     if (isPaused) return;
@@ -184,13 +216,43 @@ export default function ResultsShowcase({ reviews }: { reviews: Review[] }) {
           </p>
         </FadeInOnScroll>
 
-        {/* Before/After Slider */}
-        <div className="mx-auto mt-12 max-w-3xl">
-          {defaultPairs.map((pair) => (
-            <FadeInOnScroll key={pair.label}>
-              <SliderCard pair={pair} />
-            </FadeInOnScroll>
-          ))}
+        {/* Before/After Slider with auto-rotation */}
+        <div
+          className="mx-auto mt-12 max-w-3xl"
+          onMouseEnter={() => setSliderPaused(true)}
+          onMouseLeave={() => setSliderPaused(false)}
+          onFocus={() => setSliderPaused(true)}
+          onBlur={() => setSliderPaused(false)}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activePair}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.4 }}
+            >
+              <FadeInOnScroll>
+                <SliderCard pair={homepagePairs[activePair]} />
+              </FadeInOnScroll>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation dots */}
+          <div className="mt-6 flex items-center justify-center gap-2">
+            {homepagePairs.map((pair, i) => (
+              <button
+                key={pair.label}
+                onClick={() => setActivePair(i)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  i === activePair
+                    ? "w-6 bg-rani-gold"
+                    : "w-2.5 bg-rani-border hover:bg-rani-gold/40"
+                }`}
+                aria-label={`View ${pair.label} results`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Testimonials - Desktop: 3-card grid */}
