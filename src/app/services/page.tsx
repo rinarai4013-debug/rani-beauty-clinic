@@ -5,6 +5,7 @@ import StaggerChildren from "@/components/animations/StaggerChildren";
 import ServiceCard from "@/components/services/ServiceCard";
 import CTABanner from "@/components/sections/CTABanner";
 import BookingCTA from "@/components/conversion/BookingCTA";
+import QuickConsult from "@/components/conversion/QuickConsult";
 import { clinicInfo } from "@/data/clinic-info";
 import { serviceImages } from "@/data/service-images";
 
@@ -292,6 +293,13 @@ export default function ServicesPage() {
               </a>
             </div>
           </FadeInOnScroll>
+        </div>
+      </section>
+
+      {/* Quick Consult Lead Capture */}
+      <section className="bg-rani-cream py-16 md:py-20">
+        <div className="mx-auto max-w-3xl px-6">
+          <QuickConsult />
         </div>
       </section>
 

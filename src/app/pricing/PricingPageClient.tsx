@@ -14,6 +14,7 @@ import { pricingData } from "@/data/pricing";
 import { clinicInfo } from "@/data/clinic-info";
 import { trackCTAClick, trackAnalyticsEvent } from "@/lib/analytics/events";
 import ConsultationUrgency from "@/components/conversion/ConsultationUrgency";
+import QuickConsult from "@/components/conversion/QuickConsult";
 
 type PriceItem = { name: string; price: string; note?: string; time?: string };
 
@@ -640,6 +641,13 @@ export default function PricingPageClient() {
               </div>
             </FadeInOnScroll>
           </div>
+        </div>
+      </section>
+
+      {/* Quick Consult Lead Capture */}
+      <section className="bg-rani-cream py-16 md:py-20">
+        <div className="mx-auto max-w-3xl px-6">
+          <QuickConsult />
         </div>
       </section>
 

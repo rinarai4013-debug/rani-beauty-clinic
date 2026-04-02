@@ -10,7 +10,7 @@ interface EmailCaptureProps {
 
 const STORAGE_KEY = "rani_email_subscribers";
 
-function storeEmail(email: string) {
+function storeEmailLocally(email: string) {
   try {
     const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     if (!existing.includes(email)) {
@@ -24,16 +24,45 @@ function storeEmail(email: string) {
 
 export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
   const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email || status === "submitting") return;
 
     setStatus("submitting");
+    setErrorMessage("");
 
     try {
-      storeEmail(email);
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          source: `newsletter_${variant}`,
+          honeypot,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        // Fall back to localStorage on API failure
+        storeEmailLocally(email);
+
+        if (res.status === 429) {
+          setErrorMessage(data.error || "Too many requests. Please try again later.");
+          setStatus("error");
+          return;
+        }
+        if (res.status === 422) {
+          setErrorMessage(data.error || "Please enter a valid email address.");
+          setStatus("error");
+          return;
+        }
+        // Non-blocking server errors — treat as success since localStorage fallback saved it
+      }
 
       trackAnalyticsEvent("lead_submitted", {
         form_type: "email_capture",
@@ -44,6 +73,9 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
       setStatus("success");
       setEmail("");
     } catch {
+      // Network failure — save to localStorage as fallback
+      storeEmailLocally(email);
+      setErrorMessage("Connection error. Your email was saved locally — we'll sync it soon.");
       setStatus("error");
     }
   };
@@ -73,6 +105,17 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
                 </p>
               ) : (
                 <form onSubmit={handleSubmit} className="flex gap-3">
+                  {/* Honeypot — hidden from real users */}
+                  <input
+                    type="text"
+                    name="honeypot"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    className="absolute -left-[9999px] opacity-0 h-0 w-0"
+                    aria-hidden="true"
+                  />
                   <input
                     type="email"
                     required
@@ -98,9 +141,14 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
                 </form>
               )}
               {status === "error" && (
-                <p className="mt-2 font-body text-xs text-red-400 text-center md:text-right">
-                  Something went wrong. Please try again.
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setStatus("idle")}
+                  className="mt-2 font-body text-xs text-red-400 text-center md:text-right
+                    hover:text-red-300 underline underline-offset-2 cursor-pointer bg-transparent border-none"
+                >
+                  {errorMessage || "Something went wrong."} Tap to retry.
+                </button>
               )}
               {status !== "success" && (
                 <p className="mt-2 font-body text-[11px] text-gray-500 text-center md:text-right">
@@ -142,6 +190,17 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+              {/* Honeypot — hidden from real users */}
+              <input
+                type="text"
+                name="honeypot"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                className="absolute -left-[9999px] opacity-0 h-0 w-0"
+                aria-hidden="true"
+              />
               <input
                 type="email"
                 required
@@ -167,9 +226,14 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
             </form>
           )}
           {status === "error" && (
-            <p className="mt-3 font-body text-sm text-red-500">
-              Something went wrong. Please try again.
-            </p>
+            <button
+              type="button"
+              onClick={() => setStatus("idle")}
+              className="mt-3 font-body text-sm text-red-500
+                hover:text-red-400 underline underline-offset-2 cursor-pointer bg-transparent border-none"
+            >
+              {errorMessage || "Something went wrong."} Tap to retry.
+            </button>
           )}
           {status !== "success" && (
             <p className="mt-3 font-body text-xs text-gray-400">
