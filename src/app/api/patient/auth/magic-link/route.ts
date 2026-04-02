@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Resend } from 'resend';
 import { createMagicLinkToken } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -28,12 +29,12 @@ export async function POST(request: NextRequest) {
     const client = await fetchFirst<{ Email: string }>(
       Tables.clients(),
       1,
-      { filterByFormula: `{Email} = '${email}'` }
+      { filterByFormula: `{Email} = '${sanitizeFormulaValue(email)}'` }
     );
 
     if (client) {
       const token = await createMagicLinkToken(email);
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com';
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
       const magicLinkUrl = `${baseUrl}/portal?token=${token}`;
 
       await resend.emails.send({

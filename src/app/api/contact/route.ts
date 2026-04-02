@@ -71,7 +71,10 @@ export async function POST(req: NextRequest) {
         "do not exist in the Client Intakes table. Verify field names at https://airtable.com/app1SwhSfwe8GKUg4"
       );
     }
-    // Don't block the user — still attempt email + n8n
+    return NextResponse.json(
+      { error: "We couldn't save your request. Please try again or call us directly." },
+      { status: 502 }
+    );
   }
 
   // 2. Send notification email via Resend

@@ -6,6 +6,7 @@ import {
   getPatientSessionCookieConfig,
 } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 const requestSchema = z.object({
   token: z.string().min(1),
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     const clientRecords = await fetchFirst<ClientRecord>(
       Tables.clients(),
       1,
-      { filterByFormula: `{Email} = '${payload.email}'` },
+      { filterByFormula: `{Email} = '${sanitizeFormulaValue(payload.email)}'` },
       true // skip cache to get fresh data
     );
 

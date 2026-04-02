@@ -10,12 +10,18 @@
       ],
       "destination": "https://www.ranibeautyclinic.com/:path",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "offers.ranibeautyclinic.com"
+        }
+      ],
+      "destination": "https://www.ranibeautyclinic.com/pricing",
+      "permanent": true
     }
   ],
-  "crons": [
-    {
-      "path": "/api/cron/daily-briefing",
-      "schedule": "0 14 * * *"
-    }
-  ]
+  "crons": []
 }
