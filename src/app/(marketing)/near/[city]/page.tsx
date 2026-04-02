@@ -431,10 +431,22 @@ export default function NearCityPage({ params }: PageProps) {
               View Full Pricing Details <ChevronRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/financing"
+              href="/cost/botox-cost"
               className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
             >
-              Financing Options <ChevronRight className="h-4 w-4" />
+              Botox Cost Guide <ChevronRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/cost/laser-hair-removal-cost"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
+            >
+              Laser Hair Removal Cost <ChevronRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/compare/botox-vs-dysport"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
+            >
+              Compare: Botox vs Dysport <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
