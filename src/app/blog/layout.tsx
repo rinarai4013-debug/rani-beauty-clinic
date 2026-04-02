@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import EmailCapture from "@/components/conversion/EmailCapture";
 
 export const metadata: Metadata = {
   title: "Blog | Expert Insights & Skincare Tips",
@@ -28,5 +29,10 @@ export default function BlogLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <EmailCapture variant="full" />
+    </>
+  );
 }

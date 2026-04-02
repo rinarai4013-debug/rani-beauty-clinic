@@ -51,6 +51,7 @@ export default function CTABanner({
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               href={clinicInfo.consultation.url}
+              target="_blank"
               className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
               onClick={() => trackCTAClick('Book Your Consultation', 'cta_banner', clinicInfo.consultation.url)}
             >

@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function GlobalError({
   error,
   reset,
@@ -40,9 +42,11 @@ export default function GlobalError({
           }}
         >
           {/* Logo */}
-          <img
+          <Image
             src="/logo/rani-logo.png"
             alt="Rani Beauty Clinic"
+            width={160}
+            height={48}
             style={{
               width: "160px",
               height: "auto",

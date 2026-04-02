@@ -50,8 +50,8 @@ export const clinicInfo = {
     companyId: 876418,
   },
   consultation: {
-    url: "/contact",
-    provider: "Website",
+    url: "https://booking.mangomint.com/ranibeautyclinic1",
+    provider: "Mangomint",
   },
   financing: {
     patientfi: {

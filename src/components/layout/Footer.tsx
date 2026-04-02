@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Instagram, Facebook, MapPin, Phone, Clock, Mail } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
+import EmailCapture from "@/components/conversion/EmailCapture";
 
 const navigateLinks = [
   { name: "Services", href: "/services" },
@@ -24,6 +25,9 @@ const serviceLinks = [
 export default function Footer() {
   return (
     <footer className="bg-rani-navy border-t border-rani-gold/10">
+      {/* Email Capture */}
+      <EmailCapture variant="compact" />
+
       <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Column 1: Logo + Social + Tagline */}

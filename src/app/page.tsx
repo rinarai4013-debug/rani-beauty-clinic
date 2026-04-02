@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import TrustStrip from "@/components/sections/TrustStrip";
@@ -7,6 +8,28 @@ import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 import { faqItems } from "@/data/faqs";
 import { AGGREGATE_RATING } from "@/data/constants";
+
+export const metadata: Metadata = {
+  title: "Premier Medspa & Wellness in Renton, WA",
+  description:
+    "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections, hormone therapy & more. Book your consultation today.",
+  alternates: {
+    canonical: "https://ranibeautyclinic.com",
+  },
+  openGraph: {
+    title: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
+    description:
+      "Physician-supervised laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections & more in Renton, WA.",
+    url: "https://ranibeautyclinic.com",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Rani Beauty Clinic" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
+    description:
+      "Physician-supervised laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections & more in Renton, WA.",
+  },
+};
 
 // Below-fold sections - dynamically imported to reduce initial JS bundle.
 const NewPatientPaths = dynamic(() => import("@/components/sections/NewPatientPaths"));
