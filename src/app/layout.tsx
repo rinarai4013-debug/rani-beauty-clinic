@@ -20,6 +20,7 @@ const AIChatWidget = dynamic(() => import("@/components/AIChatWidget"), { ssr: f
 const SocialProofToast = dynamic(() => import("@/components/sections/SocialProofToast"), { ssr: false });
 const BehavioralTracker = dynamic(() => import("@/components/analytics/BehavioralTracker"), { ssr: false });
 const AnalyticsTracker = dynamic(() => import("@/components/analytics/AnalyticsTracker"), { ssr: false });
+const CookieConsent = dynamic(() => import("@/components/analytics/CookieConsent"), { ssr: false });
 
 export const viewport: Viewport = {
   themeColor: "#0F1D2C",
@@ -142,6 +143,7 @@ export default function RootLayout({
           <AIChatWidget />
           <BehavioralTracker />
           <AnalyticsTracker />
+          <CookieConsent />
         </ConditionalPublicLayout>
         <PWAProvider />
       </body>
