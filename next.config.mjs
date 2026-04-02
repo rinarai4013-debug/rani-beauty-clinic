@@ -19,6 +19,42 @@ const nextConfig = {
         destination: "https://www.ranibeautyclinic.com/:path*",
         permanent: true,
       },
+      /* ── Results short-slug redirects ── */
+      {
+        source: "/results/botox",
+        destination: "/results/botox-dysport",
+        permanent: true,
+      },
+      {
+        source: "/results/dysport",
+        destination: "/results/botox-dysport",
+        permanent: true,
+      },
+      {
+        source: "/results/fillers",
+        destination: "/results/dermal-fillers",
+        permanent: true,
+      },
+      {
+        source: "/results/microneedling",
+        destination: "/results/rf-microneedling",
+        permanent: true,
+      },
+      {
+        source: "/results/glp1",
+        destination: "/results/glp1-weight-management",
+        permanent: true,
+      },
+      {
+        source: "/results/weight-loss",
+        destination: "/results/glp1-weight-management",
+        permanent: true,
+      },
+      {
+        source: "/results/peels",
+        destination: "/results/chemical-peels",
+        permanent: true,
+      },
     ];
   },
   async headers() {
