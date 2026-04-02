@@ -510,7 +510,7 @@ export function getRequiredDisclaimers(service: string): string[] {
   const requirement = DISCLAIMER_REQUIREMENTS.find(d => d.service === service);
   const genericDisclaimers = [
     'All treatments at Rani Beauty Clinic are physician-supervised.',
-    'Rani Beauty Clinic | 401 Olympia Ave NE #101, Renton, WA 98056',
+    'Rani Beauty Clinic | 401 Olympia Ave NE, Suite 101, Renton, WA 98056',
   ];
 
   if (requirement) {

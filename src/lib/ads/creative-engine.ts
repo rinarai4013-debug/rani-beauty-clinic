@@ -494,21 +494,21 @@ export function generateDKITemplates(service: ServiceProfile): DKITemplate[] {
       headline: `{KeyWord:${service.name}} in Renton`,
       description: `${service.topBenefit}. Book now at Rani Beauty Clinic. Physician-supervised care.`,
       displayUrl: `ranibeautyclinic.com/${service.id}`,
-      finalUrl: `https://ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
+      finalUrl: `https://www.ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
       service: service.id,
     },
     {
       headline: `Best {KeyWord:${service.name}} Near You`,
       description: `${service.socialProofStat}. Starting at ${service.priceRange}. Free consultation available.`,
       displayUrl: `ranibeautyclinic.com/${service.id}`,
-      finalUrl: `https://ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
+      finalUrl: `https://www.ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
       service: service.id,
     },
     {
       headline: `{KeyWord:${service.name}} — ${service.priceRange}`,
       description: `${service.results[0]}. Physician-supervised at Rani Beauty Clinic in Renton, WA.`,
       displayUrl: `ranibeautyclinic.com/${service.id}`,
-      finalUrl: `https://ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
+      finalUrl: `https://www.ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
       service: service.id,
     },
   ];
@@ -567,7 +567,7 @@ export function generateRSA(service: ServiceProfile): RSACombination {
     descriptions,
     pinnedHeadlines: { 1: 0 }, // Pin brand headline to position 1
     service: service.id,
-    finalUrl: `https://ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
+    finalUrl: `https://www.ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
   };
 }
 

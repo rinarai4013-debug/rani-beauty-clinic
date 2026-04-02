@@ -57,7 +57,7 @@ const sampleJourneys: CustomerJourney[] = [
 
 describe('parseUTMParams', () => {
   it('extracts all UTM parameters', () => {
-    const result = parseUTMParams('https://ranibeautyclinic.com?utm_source=google&utm_medium=cpc&utm_campaign=spring&utm_content=ad1&utm_term=sofwave');
+    const result = parseUTMParams('https://www.ranibeautyclinic.com?utm_source=google&utm_medium=cpc&utm_campaign=spring&utm_content=ad1&utm_term=sofwave');
     expect(result.source).toBe('google');
     expect(result.medium).toBe('cpc');
     expect(result.campaign).toBe('spring');
@@ -66,7 +66,7 @@ describe('parseUTMParams', () => {
   });
 
   it('returns empty for URL without UTMs', () => {
-    const result = parseUTMParams('https://ranibeautyclinic.com');
+    const result = parseUTMParams('https://www.ranibeautyclinic.com');
     expect(result.source).toBeUndefined();
     expect(result.medium).toBeUndefined();
   });
@@ -77,7 +77,7 @@ describe('parseUTMParams', () => {
   });
 
   it('handles partial UTMs', () => {
-    const result = parseUTMParams('https://ranibeautyclinic.com?utm_source=instagram');
+    const result = parseUTMParams('https://www.ranibeautyclinic.com?utm_source=instagram');
     expect(result.source).toBe('instagram');
     expect(result.medium).toBeUndefined();
   });

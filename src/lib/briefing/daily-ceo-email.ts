@@ -433,7 +433,7 @@ export function renderDailyHtml(data: DailyBriefingData): string {
 
   // ── Quick Links ────────────────────────────────────────
   sections.push(quickLinksBar([
-    { text: 'Dashboard', url: 'https://ranibeautyclinic.com/dashboard' },
+    { text: 'Dashboard', url: 'https://www.ranibeautyclinic.com/dashboard' },
     { text: 'Bookings', url: 'https://app.mangomint.com/876418' },
     { text: 'Airtable', url: 'https://airtable.com/app1SwhSfwe8GKUg4' },
     { text: 'n8n', url: 'https://ranibeautyclinic.app.n8n.cloud' },

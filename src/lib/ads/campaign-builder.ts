@@ -492,37 +492,37 @@ export const SITELINK_EXTENSIONS: SitelinkExtension[] = [
     text: 'Book Free Consultation',
     description1: 'Personalized treatment plan',
     description2: 'from our expert team',
-    finalUrl: 'https://ranibeautyclinic.com/book',
+    finalUrl: 'https://www.ranibeautyclinic.com/book',
   },
   {
     text: 'See Our Services',
     description1: 'Injectables, laser, facials',
     description2: 'wellness and more',
-    finalUrl: 'https://ranibeautyclinic.com/services',
+    finalUrl: 'https://www.ranibeautyclinic.com/services',
   },
   {
     text: 'View Before & After',
     description1: 'Real client transformations',
     description2: 'verified results gallery',
-    finalUrl: 'https://ranibeautyclinic.com/results',
+    finalUrl: 'https://www.ranibeautyclinic.com/results',
   },
   {
     text: 'Membership Plans',
     description1: 'Save 15-25% on treatments',
     description2: 'exclusive member benefits',
-    finalUrl: 'https://ranibeautyclinic.com/memberships',
+    finalUrl: 'https://www.ranibeautyclinic.com/memberships',
   },
   {
     text: 'GLP-1 Weight Loss',
     description1: 'Physician-supervised program',
     description2: 'from $399/month',
-    finalUrl: 'https://ranibeautyclinic.com/glp1',
+    finalUrl: 'https://www.ranibeautyclinic.com/glp1',
   },
   {
     text: 'Financing Available',
     description1: 'Affordable payment plans',
     description2: '0% APR options available',
-    finalUrl: 'https://ranibeautyclinic.com/financing',
+    finalUrl: 'https://www.ranibeautyclinic.com/financing',
   },
 ];
 
@@ -613,7 +613,7 @@ export function buildMetaCampaign(config: {
           callToAction: funnelStage === 'tofu' ? 'Learn More' : funnelStage === 'mofu' ? 'See Results' : 'Book Now',
           framework,
         },
-        trackingUrl: `https://ranibeautyclinic.com/${service.id}?utm_source=meta&utm_medium=paid&utm_campaign=${funnelStage}&utm_content=${framework}`,
+        trackingUrl: `https://www.ranibeautyclinic.com/${service.id}?utm_source=meta&utm_medium=paid&utm_campaign=${funnelStage}&utm_content=${framework}`,
         status: 'draft' as const,
       };
     })
@@ -672,7 +672,7 @@ export function buildGoogleSearchCampaign(config: {
       headlines: generateGoogleHeadlines(service),
       descriptions: generateGoogleDescriptions(service),
       pinnedHeadlines: { 1: 0 },
-      finalUrl: `https://ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
+      finalUrl: `https://www.ranibeautyclinic.com/${service.id === 'consultation' ? 'book' : service.id}`,
       displayUrl: `ranibeautyclinic.com/${service.id}`,
       path1: service.name.toLowerCase().replace(/\s+/g, '-').slice(0, 15),
       path2: 'book',
@@ -687,12 +687,12 @@ export function buildGoogleSearchCampaign(config: {
       callouts: CALLOUT_EXTENSIONS,
       structuredSnippets: STRUCTURED_SNIPPETS,
       callExtension: { phoneNumber: '+14255557264', countryCode: 'US' },
-      locationExtension: { address: '401 Olympia Ave NE #101, Renton, WA 98056' },
+      locationExtension: { address: '401 Olympia Ave NE, Suite 101, Renton, WA 98056' },
       priceExtensions: services.slice(0, 5).map(s => ({
         header: s.name,
         price: s.priceRange,
         description: s.topBenefit.slice(0, 25),
-        finalUrl: `https://ranibeautyclinic.com/${s.id}`,
+        finalUrl: `https://www.ranibeautyclinic.com/${s.id}`,
       })),
     },
   };
@@ -747,7 +747,7 @@ export function buildGooglePMaxCampaign(services: ServiceProfile[], dailyBudget:
         'Transform your confidence with expert care. GLP-1 weight loss, skin tightening, and injectable specialists.',
         'Same-week appointments available. Financing options. Personalized treatment plans for every client.',
       ].map(d => d.slice(0, 90)),
-      finalUrl: 'https://ranibeautyclinic.com',
+      finalUrl: 'https://www.ranibeautyclinic.com',
       displayUrl: 'ranibeautyclinic.com',
     }],
   }];

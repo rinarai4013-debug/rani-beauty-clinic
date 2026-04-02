@@ -68,7 +68,7 @@ export default function ConfirmationCard({ appointment, onAddToCalendar }: Confi
 
       <div className="mt-6 pt-6 border-t border-[#E8E4DF]">
         <p className="text-xs text-[#6B7280]">
-          Rani Beauty Clinic | 401 Olympia Ave NE #101, Renton, WA 98056
+          Rani Beauty Clinic | 401 Olympia Ave NE, Suite 101, Renton, WA 98056
         </p>
       </div>
     </div>

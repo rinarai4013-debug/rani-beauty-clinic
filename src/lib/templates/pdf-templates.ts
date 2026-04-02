@@ -64,7 +64,7 @@ function footer(): string {
   return `
     <div style="background: ${BRAND.navy}; padding: 24px 40px; text-align: center; margin-top: 40px;">
       <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.gold}; margin: 0 0 4px;">
-        Rani Beauty Clinic &middot; 401 Olympia Ave NE #101, Renton, WA 98056
+        Rani Beauty Clinic &middot; 401 Olympia Ave NE, Suite 101, Renton, WA 98056
       </p>
       <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.muted}; margin: 0 0 4px;">
         (425) 271-7264 &middot; info@ranibeautyclinic.com &middot; ranibeautyclinic.com

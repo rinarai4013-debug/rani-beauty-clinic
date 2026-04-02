@@ -1087,11 +1087,11 @@ function renderActionItem(item: MegaActionItem, priority: string): string {
 function renderFooter(generatedAt: string): string {
   return `<div class="footer">
   <div>
-    <a href="https://ranibeautyclinic.com/dashboard">Dashboard</a>
-    <a href="https://ranibeautyclinic.com/dashboard/clients">Clients</a>
-    <a href="https://ranibeautyclinic.com/dashboard/meta-ads">Ads</a>
-    <a href="https://ranibeautyclinic.com/dashboard/pnl">P&amp;L</a>
-    <a href="https://ranibeautyclinic.com/dashboard/schedule-optimizer">Schedule</a>
+    <a href="https://www.ranibeautyclinic.com/dashboard">Dashboard</a>
+    <a href="https://www.ranibeautyclinic.com/dashboard/clients">Clients</a>
+    <a href="https://www.ranibeautyclinic.com/dashboard/meta-ads">Ads</a>
+    <a href="https://www.ranibeautyclinic.com/dashboard/pnl">P&amp;L</a>
+    <a href="https://www.ranibeautyclinic.com/dashboard/schedule-optimizer">Schedule</a>
   </div>
   <div class="copyright">
     Generated at ${new Date(generatedAt).toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })} PST<br>

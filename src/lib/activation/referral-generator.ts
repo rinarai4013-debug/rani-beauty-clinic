@@ -220,7 +220,7 @@ Thank you for spreading the word!
 Warmly,
 Rina
 Rani Beauty Clinic
-401 Olympia Ave NE Unit 101, Renton WA 98056
+401 Olympia Ave NE, Suite 101, Renton WA 98056
 (425) 539-4440`;
 
   const socialCaption = `I found my glow at @ranibeautyclinic and you should too! Use my code ${code} for $25 off your first visit. Trust me, you will thank me later. Book at ${shareUrl}`;
@@ -601,7 +601,7 @@ export function generateRefereeWelcome(
 
   return {
     sms: `hi ${firstName}! welcome to Rani Beauty Clinic. ${referrerFirst} referred you and we're so glad you're here! Enjoy $${discountAmount} off your first visit. Book at ${BOOKING_URL}`,
-    email: `Hi ${firstName},\n\nWelcome to Rani Beauty Clinic! ${referrerFirst} shared their referral code with you, and we are so excited to meet you.\n\nYou have $${discountAmount} off your first treatment. Simply mention your code ${code} when you book or check in.\n\nWe cannot wait to help you discover your best self.\n\nSee you soon,\nRina\nRani Beauty Clinic\n401 Olympia Ave NE Unit 101, Renton WA 98056\n(425) 539-4440`,
+    email: `Hi ${firstName},\n\nWelcome to Rani Beauty Clinic! ${referrerFirst} shared their referral code with you, and we are so excited to meet you.\n\nYou have $${discountAmount} off your first treatment. Simply mention your code ${code} when you book or check in.\n\nWe cannot wait to help you discover your best self.\n\nSee you soon,\nRina\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton WA 98056\n(425) 539-4440`,
   };
 }
 

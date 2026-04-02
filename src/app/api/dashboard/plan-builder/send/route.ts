@@ -92,7 +92,7 @@ function buildEmailHtml(clientName: string, planUrl: string): string {
                 Rani Beauty Clinic
               </p>
               <p style="margin:0 0 4px;font-size:13px;color:#8899AA;">
-                401 Olympia Ave NE #101, Renton, WA 98056
+                401 Olympia Ave NE, Suite 101, Renton, WA 98056
               </p>
               <p style="margin:0 0 4px;font-size:13px;color:#8899AA;">
                 (425) 539-4440 &nbsp;|&nbsp; info@ranibeautyclinic.com
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     // Generate access code and plan URL
     const accessCode = generateAccessCode(planId);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com';
     const planUrl = `${baseUrl}/plan/${planId}?code=${accessCode}`;
 
     // Send branded email via Resend

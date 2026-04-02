@@ -115,7 +115,7 @@ export interface LandingPagePerformance {
 
 const CLINIC_INFO = {
   name: 'Rani Beauty Clinic',
-  address: '401 Olympia Ave NE #101, Renton, WA 98056',
+  address: '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
   phone: '(425) 555-7264',
   url: 'ranibeautyclinic.com',
   hours: 'Mon-Sat 9AM-6PM',

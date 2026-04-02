@@ -501,7 +501,7 @@ describe('Campaign Builder', () => {
         name: 'Compliant Test',
         type: 'promotional',
         channel: 'email',
-        body: 'Special offer!\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+        body: 'Special offer!\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
         audienceFilter: { groups: [], logic: 'AND', excludeUnsubscribed: true, excludeRecentlyContacted: true },
         createdBy: 'Staff',
       });

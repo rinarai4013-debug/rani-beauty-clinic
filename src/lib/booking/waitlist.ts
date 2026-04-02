@@ -394,7 +394,7 @@ export interface WaitlistNotification {
 export function generateWaitlistNotification(
   entry: WaitlistEntry,
   slots: TimeSlot[],
-  baseUrl: string = 'https://ranibeautyclinic.com/book',
+  baseUrl: string = 'https://www.ranibeautyclinic.com/book',
 ): WaitlistNotification {
   const firstName = entry.clientName.split(' ')[0];
   const topSlots = slots.slice(0, 3);

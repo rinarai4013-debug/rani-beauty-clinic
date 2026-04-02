@@ -10,6 +10,17 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
   },
   poweredByHeader: false,
+  trailingSlash: false,
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "ranibeautyclinic.com" }],
+        destination: "https://www.ranibeautyclinic.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

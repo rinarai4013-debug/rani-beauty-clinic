@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (client) {
       const token = await createMagicLinkToken(email);
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com';
       const magicLinkUrl = `${baseUrl}/portal?token=${token}`;
 
       await resend.emails.send({

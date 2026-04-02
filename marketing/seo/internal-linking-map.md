@@ -158,7 +158,7 @@ Homepage should include:
 Ensure consistent Name, Address, Phone across all listings:
 
 **Name:** Rani Beauty Clinic
-**Address:** 401 Olympia Ave NE #101, Renton, WA 98056
+**Address:** 401 Olympia Ave NE, Suite 101, Renton, WA 98056
 **Phone:** (425) 539-4440
 **Website:** https://ranibeautyclinic.com
 

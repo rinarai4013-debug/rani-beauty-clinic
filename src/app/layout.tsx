@@ -37,6 +37,10 @@ export const metadata: Metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
+    "geo.region": "US-WA",
+    "geo.placename": "Renton",
+    "geo.position": "47.4856;-122.2031",
+    "ICBM": "47.4856, -122.2031",
   },
   title: {
     default: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",

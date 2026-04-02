@@ -7,12 +7,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: readable,
     description: `Compare ${readable.toLowerCase()} at Rani Beauty Clinic in Renton, WA. See which treatment is right for your goals with our physician-guided comparison.`,
     alternates: {
-      canonical: `https://ranibeautyclinic.com/vs/${params.slug}`,
+      canonical: `https://www.ranibeautyclinic.com/vs/${params.slug}`,
     },
     openGraph: {
       title: `${readable} | Rani Beauty Clinic`,
       description: `Compare ${readable.toLowerCase()} — physician-guided treatment comparison at Rani Beauty Clinic in Renton, WA.`,
-      url: `https://ranibeautyclinic.com/vs/${params.slug}`,
+      url: `https://www.ranibeautyclinic.com/vs/${params.slug}`,
     },
   };
 }

@@ -33,12 +33,12 @@ export async function generateMetadata({
     title: gallery.metaTitle,
     description: gallery.metaDescription,
     alternates: {
-      canonical: `https://ranibeautyclinic.com/results/${params.slug}`,
+      canonical: `https://www.ranibeautyclinic.com/results/${params.slug}`,
     },
     openGraph: {
       title: `${gallery.title} | Rani Beauty Clinic`,
       description: gallery.metaDescription,
-      url: `https://ranibeautyclinic.com/results/${params.slug}`,
+      url: `https://www.ranibeautyclinic.com/results/${params.slug}`,
       images: gallery.images[0]
         ? [{ url: gallery.images[0], width: 800, height: 600 }]
         : undefined,

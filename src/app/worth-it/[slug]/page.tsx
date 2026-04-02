@@ -6,12 +6,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: `Is ${title} Worth It?`,
     description: `Is ${title.toLowerCase()} worth it? Read honest reviews, real results, and cost breakdowns at Rani Beauty Clinic in Renton, WA. Make an informed decision.`,
     alternates: {
-      canonical: `https://ranibeautyclinic.com/worth-it/${params.slug}`,
+      canonical: `https://www.ranibeautyclinic.com/worth-it/${params.slug}`,
     },
     openGraph: {
       title: `Is ${title} Worth It? | Rani Beauty Clinic`,
       description: `Honest reviews and real results for ${title.toLowerCase()} at Rani Beauty Clinic in Renton, WA.`,
-      url: `https://ranibeautyclinic.com/worth-it/${params.slug}`,
+      url: `https://www.ranibeautyclinic.com/worth-it/${params.slug}`,
     },
   };
 }

@@ -27,7 +27,7 @@ import { serviceGeoEntries } from "@/data/locations/service-geo";
 import { extendedServiceGeoEntries } from "@/data/locations/service-geo-extended";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
-const BUILD_DATE = new Date('2026-03-27').toISOString();
+const BUILD_DATE = new Date().toISOString();
 
 const aestheticSlugs = [
   "laser-hair-removal",

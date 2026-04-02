@@ -3,7 +3,7 @@
 ## Business
 - **Name:** Rani Beauty Clinic
 - **Type:** Luxury medical aesthetics clinic (physician-supervised medspa)
-- **Location:** 401 Olympia Ave NE #101, Renton, WA 98056
+- **Location:** 401 Olympia Ave NE, Suite 101, Renton, WA 98056
 - **Owner:** Rina (CEO) + Mom (Provider)
 - **Brand Voice:** Luxury, confident, clinically-assured. Educational + aspirational (never discount-first). "Transformation journey" not "treatment list."
 - **CRITICAL:** Rani does IM INJECTIONS only. NEVER use the word "infusion." Always say "injection."

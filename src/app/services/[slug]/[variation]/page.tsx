@@ -1,21 +1,7 @@
-import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-export async function generateMetadata({ params }: { params: { slug: string; variation: string } }): Promise<Metadata> {
-  const serviceName = params.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-  const variationName = params.variation.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-  const title = `${variationName} - ${serviceName}`;
-  return {
-    title,
-    description: `Learn about ${variationName.toLowerCase()} for ${serviceName.toLowerCase()} at Rani Beauty Clinic in Renton, WA. Physician-supervised treatments tailored to your goals.`,
-    alternates: {
-      canonical: `https://ranibeautyclinic.com/services/${params.slug}/${params.variation}`,
-    },
-    openGraph: {
-      title: `${title} | Rani Beauty Clinic`,
-      description: `${variationName} for ${serviceName.toLowerCase()} — physician-supervised aesthetic treatments in Renton, WA.`,
-      url: `https://ranibeautyclinic.com/services/${params.slug}/${params.variation}`,
-    },
-  };
+// Variation pages have no content — redirect to the parent service page
+// to avoid indexing empty pages and stranding users.
+export default function Page({ params }: { params: { slug: string; variation: string } }) {
+  redirect(`/services/${params.slug}`);
 }
-
-export default function Page() { return null; }

@@ -205,7 +205,7 @@ describe('renderWeeklyHtml', () => {
 
   it('should include quick links', () => {
     const html = renderWeeklyHtml(makeWeeklyData());
-    expect(html).toContain('https://ranibeautyclinic.com/dashboard');
+    expect(html).toContain('https://www.ranibeautyclinic.com/dashboard');
     expect(html).toContain('https://app.mangomint.com/876418');
   });
 

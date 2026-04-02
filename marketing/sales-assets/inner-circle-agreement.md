@@ -69,4 +69,4 @@ I have read and agree to the terms of this membership agreement.
 
 ---
 
-*Rani Beauty Clinic | 401 Olympia Ave NE #101, Renton, WA 98056 | (425) 539-4440 | info@ranibeautyclinic.com*
+*Rani Beauty Clinic | 401 Olympia Ave NE, Suite 101, Renton, WA 98056 | (425) 539-4440 | info@ranibeautyclinic.com*

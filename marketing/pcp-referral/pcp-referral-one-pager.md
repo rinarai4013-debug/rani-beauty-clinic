@@ -84,7 +84,7 @@ We welcome the opportunity to co-manage patients with their prescribing physicia
 ### Contact
 
 **Rani Beauty Clinic**
-401 Olympia Ave NE #101, Renton, WA 98056
+401 Olympia Ave NE, Suite 101, Renton, WA 98056
 Phone: (425) 539-4440
 Email: info@ranibeautyclinic.com
 Web: ranibeautyclinic.com

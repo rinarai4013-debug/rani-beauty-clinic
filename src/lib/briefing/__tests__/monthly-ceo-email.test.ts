@@ -277,7 +277,7 @@ describe('renderMonthlyHtml', () => {
 
   it('should include quick links', () => {
     const html = renderMonthlyHtml(makeMonthlyData());
-    expect(html).toContain('https://ranibeautyclinic.com/dashboard');
+    expect(html).toContain('https://www.ranibeautyclinic.com/dashboard');
     expect(html).toContain('ranibeautyclinic.com/dashboard/pnl');
   });
 

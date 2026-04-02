@@ -30,7 +30,7 @@ interface Template {
   emailBody: string;
 }
 
-const CLINIC_ADDRESS = '401 Olympia Ave NE #101, Renton, WA 98056';
+const CLINIC_ADDRESS = '401 Olympia Ave NE, Suite 101, Renton, WA 98056';
 const CLINIC_PHONE = '(425) 207-8883';
 const MAPS_LINK = 'https://maps.google.com/?q=401+Olympia+Ave+NE+%23101+Renton+WA+98056';
 const BOOKING_URL = 'https://www.ranibeautyclinic.com/contact';

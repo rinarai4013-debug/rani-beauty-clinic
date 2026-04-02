@@ -89,7 +89,7 @@ export const GLP1_ANNOUNCEMENT = {
   <!-- Footer -->
   <div style="background-color: #FAF8F5; padding: 20px; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 12px; font-family: 'Montserrat', sans-serif;">
-      Rani Beauty Clinic &middot; 401 Olympia Ave NE #101, Renton, WA 98056
+      Rani Beauty Clinic &middot; 401 Olympia Ave NE, Suite 101, Renton, WA 98056
     </p>
     <p style="margin: 4px 0 0; color: #aaa; font-size: 11px; font-family: 'Montserrat', sans-serif;">
       Medical evaluation required. Not everyone qualifies for GLP-1 medication.

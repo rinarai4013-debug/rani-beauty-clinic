@@ -136,7 +136,7 @@ export default function ShareableResult({
     // Fallback: copy clinic URL to clipboard
     try {
       await navigator.clipboard.writeText(
-        'https://ranibeautyclinic.com/photo-simulation?ref=share',
+        'https://www.ranibeautyclinic.com/photo-simulation?ref=share',
       );
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2500);
@@ -290,7 +290,7 @@ export default function ShareableResult({
         {/* Book CTA */}
         <div className="px-6 py-4 bg-[#0F1D2C]/[0.02] border-b border-[#0F1D2C]/5">
           <a
-            href="https://ranibeautyclinic.com/book"
+            href="https://www.ranibeautyclinic.com/book"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full bg-[#C9A96E] hover:bg-[#B8944D] text-white text-center py-3 rounded-xl font-semibold text-sm transition-colors"

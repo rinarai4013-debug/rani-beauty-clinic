@@ -14,7 +14,7 @@ export interface TreatmentPlanNotifyVars {
 }
 
 const CLINIC_PHONE = '(425) 539-4440';
-const CLINIC_ADDRESS = '401 Olympia Ave NE #101, Renton, WA 98056';
+const CLINIC_ADDRESS = '401 Olympia Ave NE, Suite 101, Renton, WA 98056';
 
 /**
  * Generate the branded HTML email body for the "Treatment Plan Ready" notification.

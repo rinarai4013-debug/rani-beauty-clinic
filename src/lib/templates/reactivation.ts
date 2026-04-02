@@ -60,7 +60,7 @@ const LAPSED_30: ReactivationTemplate = {
     </div>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
-    <p style="margin: 0; color: #888; font-size: 12px;">Rani Beauty Clinic &middot; 401 Olympia Ave NE #101, Renton, WA 98056</p>
+    <p style="margin: 0; color: #888; font-size: 12px;">Rani Beauty Clinic &middot; 401 Olympia Ave NE, Suite 101, Renton, WA 98056</p>
   </div>
 </div>`,
 };
@@ -133,7 +133,7 @@ const LAPSED_90: ReactivationTemplate = {
     </div>
   </div>
   <div style="background-color: #F8F6F1; padding: 16px; text-align: center;">
-    <p style="margin: 0; color: #888; font-size: 12px;">Rani Beauty Clinic &middot; 401 Olympia Ave NE #101, Renton, WA 98056</p>
+    <p style="margin: 0; color: #888; font-size: 12px;">Rani Beauty Clinic &middot; 401 Olympia Ave NE, Suite 101, Renton, WA 98056</p>
   </div>
 </div>`,
 };

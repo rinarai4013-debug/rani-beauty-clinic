@@ -270,7 +270,7 @@ export const SOPS: SOP[] = [
     lastUpdated: '2026-03-10',
     steps: [
       { step: 1, description: 'Identify the emergency type: medical (anaphylaxis, cardiac, syncope, vascular occlusion), fire, active threat, natural disaster, or utility failure.' },
-      { step: 2, description: 'For MEDICAL EMERGENCIES: Alert the provider immediately. The most senior clinical staff member takes charge of patient care. Front desk calls 911 and provides: clinic address (401 Olympia Ave NE #101, Renton, WA 98056), nature of emergency, number of people affected.' },
+      { step: 2, description: 'For MEDICAL EMERGENCIES: Alert the provider immediately. The most senior clinical staff member takes charge of patient care. Front desk calls 911 and provides: clinic address (401 Olympia Ave NE, Suite 101, Renton, WA 98056), nature of emergency, number of people affected.' },
       { step: 3, description: 'Retrieve the emergency kit from the supply room. Know the contents: epinephrine auto-injectors, diphenhydramine, nitroglycerin, albuterol inhaler, BP cuff, pulse oximeter, glucose tablets.' },
       { step: 4, description: 'AED location: wall-mounted between treatment rooms 1 and 2. If cardiac arrest is suspected, retrieve the AED immediately. Follow voice prompts.' },
       { step: 5, description: 'Clear the path from the treatment room to the front entrance for paramedics. Assign a team member to meet paramedics at the door and guide them to the patient.' },

@@ -477,7 +477,7 @@ const emergencyProtocols: TrainingModule = {
       title: 'Medical Emergency Response',
       content: `As a front desk team member at a medical aesthetics clinic, you are the first line of response coordination during any emergency. While clinical treatment of emergencies is the provider's responsibility, front desk staff must know exactly what to do to support, coordinate, and communicate during critical situations.
 
-Anaphylactic Reaction Protocol: Although rare, anaphylaxis can occur with injectable treatments (fillers, Botox, wellness injections). Signs include: difficulty breathing, swelling of throat/tongue, hives, rapid pulse, dizziness, loss of consciousness. Immediate steps: (1) Alert the provider immediately - do NOT leave the client unattended. (2) The provider will administer epinephrine from the emergency kit. (3) Call 911 - provide the clinic address: 401 Olympia Ave NE #101, Renton, WA 98056. (4) Clear the path from the treatment room to the front entrance for paramedics. (5) Meet paramedics at the door and direct them to the treatment room. (6) Ask other clients in the waiting area to step outside briefly.
+Anaphylactic Reaction Protocol: Although rare, anaphylaxis can occur with injectable treatments (fillers, Botox, wellness injections). Signs include: difficulty breathing, swelling of throat/tongue, hives, rapid pulse, dizziness, loss of consciousness. Immediate steps: (1) Alert the provider immediately - do NOT leave the client unattended. (2) The provider will administer epinephrine from the emergency kit. (3) Call 911 - provide the clinic address: 401 Olympia Ave NE, Suite 101, Renton, WA 98056. (4) Clear the path from the treatment room to the front entrance for paramedics. (5) Meet paramedics at the door and direct them to the treatment room. (6) Ask other clients in the waiting area to step outside briefly.
 
 Vasovagal Syncope (Fainting): More common than anaphylaxis, especially with injectable treatments. Signs: pale skin, sweating, nausea, lightheadedness, tunnel vision. Front desk role: (1) Do NOT attempt to move the client yourself. (2) Alert the provider if not already present. (3) Bring water and cold compresses when requested. (4) Ensure the waiting area remains calm. (5) If the client does not recover within 2-3 minutes, call 911.
 
@@ -507,13 +507,13 @@ Post-Emergency Documentation: After any medical emergency, front desk must: (1) 
         {
           question: 'What is the clinic address you must provide when calling 911?',
           options: [
-            '401 Olympia Ave NE #101, Renton, WA 98056',
+            '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
             '401 Olympic Ave NE, Renton, WA 98056',
             '401 Olympia Ave SE #101, Renton, WA 98056',
             '410 Olympia Ave NE #101, Renton, WA 98056',
           ],
           correctIndex: 0,
-          explanation: 'The exact clinic address is 401 Olympia Ave NE #101, Renton, WA 98056. Memorize this.',
+          explanation: 'The exact clinic address is 401 Olympia Ave NE, Suite 101, Renton, WA 98056. Memorize this.',
         },
       ],
     },

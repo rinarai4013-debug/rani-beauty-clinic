@@ -506,7 +506,7 @@ describe('renderDailyHtml', () => {
 
   it('should include quick links', () => {
     const html = renderDailyHtml(makeDailyData());
-    expect(html).toContain('https://ranibeautyclinic.com/dashboard');
+    expect(html).toContain('https://www.ranibeautyclinic.com/dashboard');
     expect(html).toContain('https://app.mangomint.com/876418');
     expect(html).toContain('https://airtable.com/app1SwhSfwe8GKUg4');
   });

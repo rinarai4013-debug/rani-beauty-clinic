@@ -26,7 +26,7 @@ const BOOKING_URL = 'https://www.ranibeautyclinic.com/contact';
 const CLINIC_PHONE = '(425) 207-8883';
 
 function fill(template: string, vars: ReferralNotificationVars): string {
-  const shareUrl = vars.shareUrl || `https://ranibeautyclinic.com/get-started?ref=${vars.referralCode}`;
+  const shareUrl = vars.shareUrl || `https://www.ranibeautyclinic.com/get-started?ref=${vars.referralCode}`;
   return template
     .replace(/{{referrerFirstName}}/g, vars.referrerFirstName)
     .replace(/{{referrerName}}/g, vars.referrerName)
@@ -48,7 +48,7 @@ const brandHeader = (title: string) => `
 const brandFooter = `
 <div style="padding: 24px; text-align: center; background-color: #F8F6F1; border-top: 1px solid #E5E0D8;">
   <p style="color: #666; font-size: 13px; margin: 0;">Rani Beauty Clinic | ${CLINIC_PHONE}</p>
-  <p style="color: #999; font-size: 12px; margin: 8px 0 0;">401 Olympia Ave NE #101, Renton, WA 98056</p>
+  <p style="color: #999; font-size: 12px; margin: 8px 0 0;">401 Olympia Ave NE, Suite 101, Renton, WA 98056</p>
 </div>`;
 
 // ── Referral Sent (to referrer) ──────────────────────────────────────────

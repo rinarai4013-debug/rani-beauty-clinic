@@ -1,5 +1,3 @@
-"use client";
-
 import Hero from "@/components/sections/Hero";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";

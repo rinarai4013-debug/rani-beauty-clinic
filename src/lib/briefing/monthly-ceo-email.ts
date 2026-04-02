@@ -372,8 +372,8 @@ export function renderMonthlyHtml(data: MonthlyBriefingData): string {
 
   // ── Quick Links ────────────────────────────────────────
   sections_arr.push(quickLinksBar([
-    { text: 'Dashboard', url: 'https://ranibeautyclinic.com/dashboard' },
-    { text: 'P&L', url: 'https://ranibeautyclinic.com/dashboard/pnl' },
+    { text: 'Dashboard', url: 'https://www.ranibeautyclinic.com/dashboard' },
+    { text: 'P&L', url: 'https://www.ranibeautyclinic.com/dashboard/pnl' },
     { text: 'Airtable', url: 'https://airtable.com/app1SwhSfwe8GKUg4' },
     { text: 'n8n', url: 'https://ranibeautyclinic.app.n8n.cloud' },
   ]));

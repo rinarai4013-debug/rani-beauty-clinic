@@ -257,7 +257,7 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
     supportEmail: 'info@ranibeautyclinic.com',
     supportPhone: '(425) 555-0100',
     website: 'https://www.ranibeautyclinic.com',
-    address: '401 Olympia Ave NE #101, Renton, WA 98056',
+    address: '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
   },
   features: TIER_FEATURES.enterprise, // Rani gets all features
   subscription: {

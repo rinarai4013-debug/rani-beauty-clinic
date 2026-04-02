@@ -205,7 +205,7 @@ const CALL_EXTENSION: CallExtension = {
 
 const LOCATION_EXTENSION: LocationExtension = {
   businessName: 'Rani Beauty Clinic',
-  address: '401 Olympia Ave NE Unit 101',
+  address: '401 Olympia Ave NE, Suite 101',
   city: 'Renton',
   state: 'WA',
   zip: '98056',

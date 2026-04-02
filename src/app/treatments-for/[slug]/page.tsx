@@ -6,12 +6,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: `Treatments for ${title}`,
     description: `Explore physician-supervised treatments for ${title.toLowerCase()} at Rani Beauty Clinic in Renton, WA. Personalized solutions backed by clinical expertise.`,
     alternates: {
-      canonical: `https://ranibeautyclinic.com/treatments-for/${params.slug}`,
+      canonical: `https://www.ranibeautyclinic.com/treatments-for/${params.slug}`,
     },
     openGraph: {
       title: `Treatments for ${title} | Rani Beauty Clinic`,
       description: `Physician-supervised treatments for ${title.toLowerCase()} at Rani Beauty Clinic in Renton, WA.`,
-      url: `https://ranibeautyclinic.com/treatments-for/${params.slug}`,
+      url: `https://www.ranibeautyclinic.com/treatments-for/${params.slug}`,
     },
   };
 }
