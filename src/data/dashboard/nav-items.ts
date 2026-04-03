@@ -19,6 +19,14 @@ export const NAV_ITEMS: NavItem[] = [
     group: 'overview',
   },
   {
+    label: 'AI Council',
+    href: '/dashboard/command-center',
+    icon: 'Crown',
+    permission: 'view_executive',
+    badge: 'New',
+    group: 'overview',
+  },
+  {
     label: 'Leaderboard',
     href: '/dashboard/leaderboard',
     icon: 'Trophy',
@@ -169,6 +177,14 @@ export const NAV_ITEMS: NavItem[] = [
   },
 
   // Tools
+  {
+    label: 'Mastermind',
+    href: '/dashboard/mastermind',
+    icon: 'Brain',
+    permission: 'view_schedule',
+    badge: 'New',
+    group: 'tools',
+  },
   {
     label: 'Plan Builder',
     href: '/dashboard/plan-builder',

@@ -1,0 +1,93 @@
+/**
+ * POST /api/mastermind/sessions/[id]/validate
+ *
+ * Validates the current plan in a session against the constraint pipeline.
+ * Returns warnings without blocking — same pipeline used in plan generation.
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getSessionById } from '@/lib/mastermind/session';
+import { validatePlan } from '@/lib/plan-builder/constraints';
+import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
+
+export async function POST(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const session = getSessionById(id);
+
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    if (!session.mastermindPlan) {
+      return NextResponse.json({
+        success: true,
+        data: { warnings: [], message: 'No plan to validate' },
+      });
+    }
+
+    // Reconstruct PlanPhases from MastermindPlan for the validator
+    const plan = session.mastermindPlan;
+    const allTreatments = [
+      ...(plan.recommendations?.primary || []),
+      ...(plan.recommendations?.complementary || []),
+      ...(plan.recommendations?.maintenance || []),
+    ];
+
+    const phases: [PlanPhase, PlanPhase, PlanPhase] = [
+      { id: 1, ...PHASE_LABELS[1], services: [] },
+      { id: 2, ...PHASE_LABELS[2], services: [] },
+      { id: 3, ...PHASE_LABELS[3], services: [] },
+    ];
+
+    allTreatments.forEach((tx, i) => {
+      // Map urgency to phase
+      const phase = tx.urgency === 'immediate' ? 1 : tx.urgency === 'within-3-months' ? 2 : 3;
+      const selected: SelectedService = {
+        id: tx.id,
+        serviceId: tx.id,
+        service: {
+          id: tx.id,
+          name: tx.treatmentName,
+          category: tx.category as any,
+          description: tx.aiReasoning,
+          price: tx.perSession,
+          sessions: tx.sessionsRequired,
+          downtime: tx.downtime,
+          results: tx.timeToResults,
+          slug: tx.id,
+          parentSlug: null,
+        } as any,
+        quantity: tx.sessionsRequired,
+        notes: tx.clinicalRationale,
+        phase: phase as 1 | 2 | 3,
+      };
+      phases[phase - 1].services.push(selected);
+    });
+
+    const warnings = validatePlan(phases);
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        warnings,
+        isValid: warnings.filter((w) => w.severity === 'error').length === 0,
+        errorCount: warnings.filter((w) => w.severity === 'error').length,
+        warningCount: warnings.filter((w) => w.severity === 'warning').length,
+        infoCount: warnings.filter((w) => w.severity === 'info').length,
+      },
+    });
+  } catch (error) {
+    console.error('[Mastermind Validate] Error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Validation failed' },
+      { status: 500 }
+    );
+  }
+}
