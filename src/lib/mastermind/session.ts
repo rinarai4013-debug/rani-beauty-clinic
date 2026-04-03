@@ -154,24 +154,40 @@ export function createSession(
 // Uses in-memory Map + /tmp file persistence (server-side on Vercel)
 // + localStorage (client-side). /tmp persists across warm function
 // invocations on Vercel, solving the serverless session gap.
-
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
-import { join } from 'path';
+//
+// Note: fs is loaded dynamically via require() only on the server
+// to avoid "Can't resolve 'fs'" in the client bundle.
 
 const sessions = new Map<string, MastermindSession>();
 const SESSION_DIR = '/tmp/rani-mastermind-sessions';
 
-function ensureSessionDir(): void {
-  try { mkdirSync(SESSION_DIR, { recursive: true }); } catch { /* exists */ }
+function getFs(): typeof import('fs') | null {
+  if (typeof window !== 'undefined') return null;
+  try { return require('fs'); } catch { return null; }
+}
+
+function getPath(): typeof import('path') | null {
+  if (typeof window !== 'undefined') return null;
+  try { return require('path'); } catch { return null; }
 }
 
 function sessionFilePath(id: string): string {
-  return join(SESSION_DIR, `${id.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`);
+  const path = getPath();
+  if (!path) return '';
+  return path.join(SESSION_DIR, `${id.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`);
+}
+
+function ensureSessionDir(): void {
+  const fs = getFs();
+  if (!fs) return;
+  try { fs.mkdirSync(SESSION_DIR, { recursive: true }); } catch { /* exists */ }
 }
 
 function readSessionFromDisk(id: string): MastermindSession | null {
+  const fs = getFs();
+  if (!fs) return null;
   try {
-    const raw = readFileSync(sessionFilePath(id), 'utf-8');
+    const raw = fs.readFileSync(sessionFilePath(id), 'utf-8');
     const parsed = JSON.parse(raw);
     return hydrateSession(parsed);
   } catch {
@@ -180,9 +196,11 @@ function readSessionFromDisk(id: string): MastermindSession | null {
 }
 
 function writeSessionToDisk(session: MastermindSession): void {
+  const fs = getFs();
+  if (!fs) return;
   try {
     ensureSessionDir();
-    writeFileSync(sessionFilePath(session.id), JSON.stringify(session), 'utf-8');
+    fs.writeFileSync(sessionFilePath(session.id), JSON.stringify(session), 'utf-8');
   } catch (err) {
     console.warn('[Session] Failed to write to disk:', err);
   }
@@ -286,13 +304,15 @@ export function saveSession(session: MastermindSession): void {
 export function getAllSessions(): MastermindSession[] {
   // Server-side: read from /tmp disk
   if (typeof window === 'undefined') {
-    try {
+    const fs = getFs();
+    const path = getPath();
+    if (fs && path) try {
       ensureSessionDir();
-      const files = readdirSync(SESSION_DIR).filter((f) => f.endsWith('.json'));
+      const files = fs.readdirSync(SESSION_DIR).filter((f: string) => f.endsWith('.json'));
       const diskSessions: MastermindSession[] = [];
       for (const file of files) {
         try {
-          const raw = readFileSync(join(SESSION_DIR, file), 'utf-8');
+          const raw = fs.readFileSync(path.join(SESSION_DIR, file), 'utf-8');
           const parsed = JSON.parse(raw);
           const session = hydrateSession(parsed);
           sessions.set(session.id, session);
@@ -336,7 +356,8 @@ export function deleteSession(id: string): void {
 
   // Remove from disk
   if (typeof window === 'undefined') {
-    try { unlinkSync(sessionFilePath(id)); } catch { /* noop */ }
+    const fs = getFs();
+    if (fs) try { fs.unlinkSync(sessionFilePath(id)); } catch { /* noop */ }
   }
 
   // Remove from localStorage
