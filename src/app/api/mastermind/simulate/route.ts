@@ -1,21 +1,34 @@
 /**
  * POST /api/mastermind/simulate
  *
- * Placeholder route for future server-side simulation rendering.
- * Currently, all simulation runs client-side via Canvas API.
- * This route exists for contract stability and future SSR support.
+ * Generates simulation comparison data for a Mastermind session.
+ * Accepts { sessionId } to load session and save result, or runs standalone.
+ * Currently returns mock data; will upgrade to server-side rendering when needed.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { mockSimulationComparison } from '@/lib/mastermind/mock-data';
+import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
 
-    // For now, return mock data. Client-side simulation is the primary path.
-    // This route will be upgraded to server-side rendering when needed.
     const result = mockSimulationComparison();
+
+    // Save simulation to session if sessionId provided
+    if (sessionId) {
+      const session = await getSessionByIdAsync(sessionId);
+      if (!session) {
+        return NextResponse.json(
+          { success: false, error: 'Session not found' },
+          { status: 404 }
+        );
+      }
+      const updated = sessionReducer(session, { type: 'SET_SIMULATION', comparison: result });
+      await saveSessionAsync(updated);
+    }
 
     return NextResponse.json({
       success: true,
