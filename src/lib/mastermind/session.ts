@@ -150,27 +150,68 @@ export function createSession(
   };
 }
 
-// ── In-Memory Store ──
+// ── Session Store ──
+// Uses in-memory Map + /tmp file persistence (server-side on Vercel)
+// + localStorage (client-side). /tmp persists across warm function
+// invocations on Vercel, solving the serverless session gap.
+
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
+import { join } from 'path';
 
 const sessions = new Map<string, MastermindSession>();
+const SESSION_DIR = '/tmp/rani-mastermind-sessions';
+
+function ensureSessionDir(): void {
+  try { mkdirSync(SESSION_DIR, { recursive: true }); } catch { /* exists */ }
+}
+
+function sessionFilePath(id: string): string {
+  return join(SESSION_DIR, `${id.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`);
+}
+
+function readSessionFromDisk(id: string): MastermindSession | null {
+  try {
+    const raw = readFileSync(sessionFilePath(id), 'utf-8');
+    const parsed = JSON.parse(raw);
+    return hydrateSession(parsed);
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionToDisk(session: MastermindSession): void {
+  try {
+    ensureSessionDir();
+    writeFileSync(sessionFilePath(session.id), JSON.stringify(session), 'utf-8');
+  } catch (err) {
+    console.warn('[Session] Failed to write to disk:', err);
+  }
+}
 
 export function getSessionById(id: string): MastermindSession | null {
   // Check memory first
   if (sessions.has(id)) return sessions.get(id)!;
 
-  // Try localStorage
+  // Try /tmp disk (server-side, Vercel)
+  if (typeof window === 'undefined') {
+    const diskSession = readSessionFromDisk(id);
+    if (diskSession) {
+      sessions.set(id, diskSession);
+      return diskSession;
+    }
+  }
+
+  // Try localStorage (client-side)
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(`mastermind_session_${id}`);
       if (stored) {
         const parsed = JSON.parse(stored);
-        // Hydrate with defaults for any missing fields (forward-compat)
         const session = hydrateSession(parsed);
         sessions.set(id, session);
         return session;
       }
     } catch {
-      // Corrupt localStorage entry — remove it silently
       try { localStorage.removeItem(`mastermind_session_${id}`); } catch { /* noop */ }
     }
   }
@@ -219,14 +260,18 @@ function isValidTier(val: unknown): val is 'Start' | 'Transform' | 'Elite' {
 export function saveSession(session: MastermindSession): void {
   sessions.set(session.id, session);
 
-  // Persist to localStorage
+  // Persist to /tmp disk (server-side)
+  if (typeof window === 'undefined') {
+    writeSessionToDisk(session);
+  }
+
+  // Persist to localStorage (client-side)
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(
         `mastermind_session_${session.id}`,
         JSON.stringify(session)
       );
-      // Update session index
       const index = getSessionIndex();
       if (!index.includes(session.id)) {
         index.push(session.id);
@@ -239,28 +284,62 @@ export function saveSession(session: MastermindSession): void {
 }
 
 export function getAllSessions(): MastermindSession[] {
+  // Server-side: read from /tmp disk
+  if (typeof window === 'undefined') {
+    try {
+      ensureSessionDir();
+      const files = readdirSync(SESSION_DIR).filter((f) => f.endsWith('.json'));
+      const diskSessions: MastermindSession[] = [];
+      for (const file of files) {
+        try {
+          const raw = readFileSync(join(SESSION_DIR, file), 'utf-8');
+          const parsed = JSON.parse(raw);
+          const session = hydrateSession(parsed);
+          sessions.set(session.id, session);
+          diskSessions.push(session);
+        } catch {
+          // Skip corrupt files
+        }
+      }
+      // Merge with in-memory (dedup by ID)
+      const merged = new Map<string, MastermindSession>();
+      for (const s of diskSessions) merged.set(s.id, s);
+      for (const s of sessions.values()) merged.set(s.id, s);
+      return Array.from(merged.values()).sort(
+        (a, b) => (b.updatedAt > a.updatedAt ? 1 : b.updatedAt < a.updatedAt ? -1 : 0)
+      );
+    } catch {
+      // Fall through to in-memory
+    }
+  }
+
+  // Client-side: try localStorage
   if (typeof window !== 'undefined') {
     try {
       const index = getSessionIndex();
       return index
         .map((id) => getSessionById(id))
         .filter((s): s is MastermindSession => s !== null)
-        .sort(
-          (a, b) =>
-            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
+        .sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : b.updatedAt < a.updatedAt ? -1 : 0));
     } catch {
       // Fall through
     }
   }
+
   return Array.from(sessions.values()).sort(
-    (a, b) =>
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    (a, b) => (b.updatedAt > a.updatedAt ? 1 : b.updatedAt < a.updatedAt ? -1 : 0)
   );
 }
 
 export function deleteSession(id: string): void {
   sessions.delete(id);
+
+  // Remove from disk
+  if (typeof window === 'undefined') {
+    try { unlinkSync(sessionFilePath(id)); } catch { /* noop */ }
+  }
+
+  // Remove from localStorage
   if (typeof window !== 'undefined') {
     try {
       localStorage.removeItem(`mastermind_session_${id}`);
