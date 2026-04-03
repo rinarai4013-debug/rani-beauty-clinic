@@ -12,7 +12,7 @@ Hi [FIRST_NAME]! You've been doing so well on [MEDICATION] and I wanted to tell 
 
 ## If They Ask For Details (SMS)
 
-Sermorelin is a growth hormone-releasing peptide. It helps your body produce more of its own growth hormone naturally. Patients love it for deeper sleep, faster recovery, better skin, and it complements your [MEDICATION] beautifully. It's $349/mo and our Medical Director would review you for it through Qualiphy. Want me to set that up?
+Sermorelin helps your body produce more growth hormone naturally. Patients love it for deeper sleep, faster recovery, and better skin. It pairs perfectly with [MEDICATION]. $349/mo and our Medical Director reviews you through Qualiphy. Want me to set that up? (425) 539-4440
 
 ---
 

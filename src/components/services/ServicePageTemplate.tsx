@@ -4,6 +4,7 @@ import { ChevronRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import Hero from "@/components/sections/Hero";
+import StickyBookBar from "@/components/ui/StickyBookBar";
 import SectionLabel from "@/components/ui/SectionLabel";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import StaggerChildren from "@/components/animations/StaggerChildren";
@@ -227,7 +228,7 @@ export default function ServicePageTemplate({
       </div>
 
       {/* What Is It */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="ABOUT THIS TREATMENT" />
@@ -244,7 +245,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* How It Works */}
-      <section className="bg-rani-cream py-20 md:py-28">
+      <section className="bg-rani-cream py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-4xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="THE PROCESS" />
@@ -278,7 +279,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* Who Is It For */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="IDEAL CANDIDATES" />
@@ -306,7 +307,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* What to Expect */}
-      <section className="bg-rani-cream py-20 md:py-28">
+      <section className="bg-rani-cream py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-4xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="YOUR EXPERIENCE" />
@@ -337,7 +338,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* Results & Recovery */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="RESULTS" />
@@ -434,7 +435,7 @@ export default function ServicePageTemplate({
       })()}
 
       {/* Why Rani */}
-      <section className="bg-rani-cream py-20 md:py-28">
+      <section className="bg-rani-cream py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="THE RANI ADVANTAGE" />
@@ -464,7 +465,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* Pricing placeholder */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <FadeInOnScroll>
             <SectionLabel label="INVESTMENT" />
@@ -487,7 +488,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* Results Gallery - service treatment images */}
-      <section className="bg-rani-cream py-20 md:py-28">
+      <section className="bg-rani-cream py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-5xl px-6 text-center">
           <FadeInOnScroll>
             <SectionLabel label="RESULTS GALLERY" />
@@ -547,7 +548,7 @@ export default function ServicePageTemplate({
       </section>
 
       {/* FAQ */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-12 md:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6">
           <FadeInOnScroll>
             <SectionLabel label="COMMON QUESTIONS" />
@@ -568,7 +569,7 @@ export default function ServicePageTemplate({
 
       {/* Related Treatments */}
       {relatedServices.length > 0 && (
-        <section className="bg-rani-cream py-20 md:py-28">
+        <section className="bg-rani-cream py-12 md:py-20 lg:py-28">
           <div className="mx-auto max-w-4xl px-6">
             <FadeInOnScroll>
               <SectionLabel label="YOU MAY ALSO LIKE" />
@@ -619,13 +620,13 @@ export default function ServicePageTemplate({
       )}
 
       {/* Cross Links */}
-      <section className="bg-rani-cream py-12">
+      <section className="bg-rani-cream py-8 sm:py-12">
         <div className="mx-auto max-w-4xl px-6">
           <div className="flex flex-wrap justify-center gap-3">
             {COST_SLUG_MAP[service.slug] && (
               <Link
                 href={`/cost/${COST_SLUG_MAP[service.slug]}`}
-                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
               >
                 {service.title} Cost →
               </Link>
@@ -633,7 +634,7 @@ export default function ServicePageTemplate({
             {RESULTS_SLUGS.has(service.slug) && (
               <Link
                 href={`/results/${service.slug}`}
-                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
               >
                 Before & After →
               </Link>
@@ -642,7 +643,7 @@ export default function ServicePageTemplate({
               <Link
                 key={concern.slug}
                 href={`/concerns/${concern.slug}`}
-                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
               >
                 {concern.title} →
               </Link>
@@ -651,14 +652,14 @@ export default function ServicePageTemplate({
               <Link
                 key={comp.slug}
                 href={`/compare/${comp.slug}`}
-                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                className="rounded-full border border-rani-gold/20 bg-white px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
               >
                 {comp.treatmentA} vs {comp.treatmentB} →
               </Link>
             ))}
             <Link
               href="/contact"
-              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+              className="rounded-full border border-rani-gold/20 bg-white px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
             >
               Visit Our Clinic →
             </Link>
@@ -667,10 +668,15 @@ export default function ServicePageTemplate({
       </section>
 
       {/* CTA */}
-      <CTABanner
-        title={`Ready to Book Your ${service.title}?`}
-        subtitle={`Call ${clinicInfo.phone} or book online to schedule your consultation.`}
-      />
+      <div className="pb-20 lg:pb-0">
+        <CTABanner
+          title={`Ready to Book Your ${service.title}?`}
+          subtitle={`Call ${clinicInfo.phone} or book online to schedule your consultation.`}
+        />
+      </div>
+
+      {/* Sticky Book Bar — mobile only */}
+      <StickyBookBar />
     </>
   );
 }

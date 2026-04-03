@@ -26,6 +26,7 @@ const metaEventMap: Record<string, string> = {
   consultation_booked: 'Schedule',
   booking_completed: 'Schedule',
   // Intent
+  cta_click: 'Lead',
   booking_widget_opened: 'Schedule',
   quiz_completed: 'CompleteRegistration',
   service_page_view: 'ViewContent',

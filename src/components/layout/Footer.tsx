@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Facebook, MapPin, Phone, Clock, Mail } from "lucide-react";
+import { Instagram, Facebook, MapPin, Phone, Clock, Mail, ChevronDown } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
 import EmailCapture from "@/components/conversion/EmailCapture";
 
@@ -29,125 +29,145 @@ export default function Footer() {
       <EmailCapture variant="compact" />
 
       <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Column 1: Logo + Social + Tagline */}
-          <div>
-            <Image
-              src="/images/logo/logo-light.png"
-              alt="Rani Beauty Clinic"
-              width={200}
-              height={25}
-              className="h-6 w-auto opacity-90"
-            />
-            <p className="mt-4 font-body text-sm text-gray-400 leading-relaxed">
-              Physician-supervised beauty. Personally designed.
-            </p>
-            <div className="mt-6 flex items-center gap-4">
-              <a
-                href={clinicInfo.social.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 transition-all duration-200 hover:text-rani-gold hover:scale-110"
-                aria-label="Instagram"
-              >
-                <Instagram size={20} />
-              </a>
-              <a
-                href={clinicInfo.social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 transition-all duration-200 hover:text-rani-gold hover:scale-110"
-                aria-label="Facebook"
-              >
-                <Facebook size={20} />
-              </a>
-            </div>
+        {/* Logo + Social — always visible */}
+        <div className="mb-10 md:mb-0">
+          <Image
+            src="/images/logo/logo-light.png"
+            alt="Rani Beauty Clinic"
+            width={200}
+            height={25}
+            className="h-6 w-auto opacity-90"
+          />
+          <p className="mt-4 font-body text-sm text-gray-400 leading-relaxed">
+            Physician-supervised beauty. Personally designed.
+          </p>
+          <div className="mt-6 flex items-center gap-5">
+            <a
+              href={clinicInfo.social.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 transition-all duration-200 hover:text-rani-gold hover:scale-110 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Instagram"
+            >
+              <Instagram size={22} />
+            </a>
+            <a
+              href={clinicInfo.social.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 transition-all duration-200 hover:text-rani-gold hover:scale-110 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Facebook"
+            >
+              <Facebook size={22} />
+            </a>
           </div>
+        </div>
 
-          {/* Column 2: Navigate */}
+        {/* Mobile: tap-to-call + directions (always visible on mobile) */}
+        <div className="flex flex-col gap-3 mb-8 md:hidden">
+          <a
+            href={clinicInfo.phoneTel}
+            className="flex items-center justify-center gap-2 rounded-lg bg-[#C9A96E] min-h-[48px] font-body text-sm font-semibold text-[#0F1D2C]"
+          >
+            <Phone size={16} />
+            Call {clinicInfo.phone}
+          </a>
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicInfo.address.full)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-lg border border-white/20 min-h-[48px] font-body text-sm font-semibold text-white"
+          >
+            <MapPin size={16} />
+            Get Directions
+          </a>
+        </div>
+
+        {/* Desktop: 3-column grid | Mobile: accordion sections */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-10">
           <nav aria-label="Footer navigation">
-            <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">
-              Navigate
-            </h3>
+            <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">Navigate</h3>
             <ul className="space-y-2.5">
               {navigateLinks.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
+                <li key={link.name}><Link href={link.href} className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold">{link.name}</Link></li>
               ))}
             </ul>
           </nav>
-
-          {/* Column 3: Services */}
           <nav aria-label="Services">
-            <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">
-              Services
-            </h3>
+            <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">Services</h3>
             <ul className="space-y-2.5">
               {serviceLinks.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
+                <li key={link.name}><Link href={link.href} className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold">{link.name}</Link></li>
               ))}
             </ul>
           </nav>
-
-          {/* Column 4: Contact */}
           <div>
-            <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">
-              Visit Us
-            </h3>
+            <h3 className="font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold mb-4">Visit Us</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="mt-0.5 shrink-0 text-rani-gold" aria-hidden="true" />
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicInfo.address.full)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-body text-sm text-gray-300 leading-relaxed transition-colors hover:text-rani-gold"
-                >
-                  {clinicInfo.address.street}
-                  <br />
-                  {clinicInfo.address.city}, {clinicInfo.address.state}{" "}
-                  {clinicInfo.address.zip}
-                </a>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicInfo.address.full)}`} target="_blank" rel="noopener noreferrer" className="font-body text-sm text-gray-300 leading-relaxed transition-colors hover:text-rani-gold">{clinicInfo.address.street}<br />{clinicInfo.address.city}, {clinicInfo.address.state} {clinicInfo.address.zip}</a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={16} className="shrink-0 text-rani-gold" aria-hidden="true" />
-                <a
-                  href={clinicInfo.phoneTel}
-                  className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold"
-                >
-                  {clinicInfo.phone}
-                </a>
+                <a href={clinicInfo.phoneTel} className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold">{clinicInfo.phone}</a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={16} className="shrink-0 text-rani-gold" aria-hidden="true" />
-                <a
-                  href="mailto:info@ranibeautyclinic.com"
-                  className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold"
-                >
-                  info@ranibeautyclinic.com
-                </a>
+                <a href="mailto:info@ranibeautyclinic.com" className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold">info@ranibeautyclinic.com</a>
               </li>
               <li className="flex items-center gap-3">
                 <Clock size={16} className="shrink-0 text-rani-gold" aria-hidden="true" />
-                <span className="font-body text-sm text-gray-300">
-                  Mon-Sun, 10am-7pm
-                </span>
+                <span className="font-body text-sm text-gray-300">Mon-Sun, 10am-7pm</span>
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Mobile accordion sections */}
+        <div className="space-y-0 divide-y divide-rani-gold/10 md:hidden">
+          <details className="group">
+            <summary className="flex cursor-pointer items-center justify-between py-4 font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold min-h-[48px]">
+              Navigate
+              <ChevronDown size={16} className="text-rani-gold/60 transition-transform group-open:rotate-180" />
+            </summary>
+            <ul className="pb-4 space-y-1">
+              {navigateLinks.map((link) => (
+                <li key={link.name}><Link href={link.href} className="block py-2 font-body text-sm text-gray-300 transition-colors hover:text-rani-gold min-h-[44px] flex items-center">{link.name}</Link></li>
+              ))}
+            </ul>
+          </details>
+          <details className="group">
+            <summary className="flex cursor-pointer items-center justify-between py-4 font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold min-h-[48px]">
+              Services
+              <ChevronDown size={16} className="text-rani-gold/60 transition-transform group-open:rotate-180" />
+            </summary>
+            <ul className="pb-4 space-y-1">
+              {serviceLinks.map((link) => (
+                <li key={link.name}><Link href={link.href} className="block py-2 font-body text-sm text-gray-300 transition-colors hover:text-rani-gold min-h-[44px] flex items-center">{link.name}</Link></li>
+              ))}
+            </ul>
+          </details>
+          <details className="group">
+            <summary className="flex cursor-pointer items-center justify-between py-4 font-body text-sm font-semibold uppercase tracking-[0.1em] text-rani-gold min-h-[48px]">
+              Visit Us
+              <ChevronDown size={16} className="text-rani-gold/60 transition-transform group-open:rotate-180" />
+            </summary>
+            <ul className="pb-4 space-y-3">
+              <li className="flex items-center gap-3 min-h-[44px]">
+                <Clock size={16} className="shrink-0 text-rani-gold" />
+                <span className="font-body text-sm text-gray-300">Mon-Sun, 10am-7pm</span>
+              </li>
+              <li className="flex items-center gap-3 min-h-[44px]">
+                <Mail size={16} className="shrink-0 text-rani-gold" />
+                <a href="mailto:info@ranibeautyclinic.com" className="font-body text-sm text-gray-300 transition-colors hover:text-rani-gold">info@ranibeautyclinic.com</a>
+              </li>
+              <li className="flex items-start gap-3 min-h-[44px]">
+                <MapPin size={16} className="mt-0.5 shrink-0 text-rani-gold" />
+                <span className="font-body text-sm text-gray-300">{clinicInfo.address.street}, {clinicInfo.address.city}, {clinicInfo.address.state} {clinicInfo.address.zip}</span>
+              </li>
+            </ul>
+          </details>
         </div>
 
         {/* Distance framing */}
@@ -159,8 +179,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* SEO Link Network */}
-      <div className="border-t border-rani-gold/10">
+      {/* SEO Link Network — hidden on mobile, visible md+ */}
+      <div className="border-t border-rani-gold/10 hidden md:block">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {/* Aesthetic Services */}
@@ -233,8 +253,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Pricing & Comparisons */}
-      <div className="border-t border-rani-gold/10">
+      {/* Pricing & Comparisons — hidden on mobile */}
+      <div className="border-t border-rani-gold/10 hidden md:block">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
@@ -307,8 +327,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Treatment Areas & Specialties */}
-      <div className="border-t border-rani-gold/10">
+      {/* Treatment Areas & Specialties — hidden on mobile */}
+      <div className="border-t border-rani-gold/10 hidden md:block">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
@@ -373,8 +393,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Seasonal, Aftercare, Financing & Locations */}
-      <div className="border-t border-rani-gold/10">
+      {/* Seasonal, Aftercare, Financing & Locations — hidden on mobile */}
+      <div className="border-t border-rani-gold/10 hidden md:block">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
             <div>

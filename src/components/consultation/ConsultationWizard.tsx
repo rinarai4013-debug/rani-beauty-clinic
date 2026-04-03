@@ -36,6 +36,7 @@ import {
   getRecommendedServices,
 } from '@/lib/consultation/conditional-logic';
 import { UNIFIED_CATALOG, type ServiceCategory } from '@/data/services/unified-catalog';
+import type { AuraScanResult } from '@/types/mastermind';
 
 // ── Constants ──
 
@@ -117,6 +118,8 @@ interface WizardState {
   errors: Record<string, string>;
   isSubmitting: boolean;
   isSubmitted: boolean;
+  auraScanResult: AuraScanResult | null;
+  isScanning: boolean;
 }
 
 type WizardAction =
@@ -127,7 +130,10 @@ type WizardAction =
   | { type: 'SET_ERRORS'; errors: Record<string, string> }
   | { type: 'SUBMIT_START' }
   | { type: 'SUBMIT_END'; success: boolean }
-  | { type: 'GO_TO_STEP'; step: number };
+  | { type: 'GO_TO_STEP'; step: number }
+  | { type: 'SCAN_START' }
+  | { type: 'SCAN_COMPLETE'; result: AuraScanResult }
+  | { type: 'SCAN_ERROR' };
 
 const initialState: WizardState = {
   currentStep: 0,
@@ -143,6 +149,8 @@ const initialState: WizardState = {
   errors: {},
   isSubmitting: false,
   isSubmitted: false,
+  auraScanResult: null,
+  isScanning: false,
 };
 
 function wizardReducer(state: WizardState, action: WizardAction): WizardState {
@@ -191,6 +199,12 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         direction: action.step > state.currentStep ? 1 : -1,
         errors: {},
       };
+    case 'SCAN_START':
+      return { ...state, isScanning: true };
+    case 'SCAN_COMPLETE':
+      return { ...state, isScanning: false, auraScanResult: action.result };
+    case 'SCAN_ERROR':
+      return { ...state, isScanning: false };
     default:
       return state;
   }
@@ -217,7 +231,7 @@ const slideVariants = {
 
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
-  const { currentStep, direction, formData, errors, isSubmitting, isSubmitted } = state;
+  const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
 
   // ── Handlers ──
 
@@ -282,7 +296,16 @@ export default function ConsultationWizard() {
         throw new Error('Submission failed');
       }
 
+      const result = await res.json();
+
       dispatch({ type: 'SUBMIT_END', success: true });
+
+      // Store session ID for post-submit reference (e.g., dashboard redirect)
+      if (result.data?.sessionId) {
+        try {
+          sessionStorage.setItem('mastermind_last_session', result.data.sessionId);
+        } catch { /* sessionStorage unavailable */ }
+      }
     } catch {
       dispatch({ type: 'SUBMIT_END', success: false });
       dispatch({

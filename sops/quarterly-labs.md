@@ -24,3 +24,6 @@
 ## Quarterly Lab Text (SMS)
 
 Hi [FIRST_NAME]! It's been 3 months and it's time for your check-in labs. This helps us make sure everything looks great and that your [MEDICATION] is working perfectly for you. I'm sending you a lab order now. Same thing as before, super quick at Quest or Labcorp! Let me know once you've done them. (425) 539-4440
+
+---
+**COMPLIANCE:** Rina does NOT diagnose or prescribe. All lab reviews = Medical Director via Qualiphy. No Rx refill without current quarterly labs.

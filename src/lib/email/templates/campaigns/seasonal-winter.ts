@@ -46,7 +46,7 @@ const template = buildTemplate({
       'Switch to a richer, more emollient moisturizer',
       'Continue using SPF daily - UV rays are present year-round',
       'Use a humidifier at home to combat indoor dryness',
-      'Avoid very hot showers - they strip your skin's natural oils',
+      "Avoid very hot showers - they strip your skin's natural oils",
       'Layer hydrating serums under your moisturizer for extra nourishment',
     ])}
 

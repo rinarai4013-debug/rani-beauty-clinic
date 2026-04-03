@@ -110,11 +110,11 @@ export default function ComparePage({ params }: PageProps) {
       />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#0F1D2C] via-[#1a2d40] to-[#0F1D2C] py-20 lg:py-28">
+      <section className="relative bg-gradient-to-br from-[#0F1D2C] via-[#1a2d40] to-[#0F1D2C] py-12 sm:py-16 lg:py-28">
         <div className="absolute inset-0 bg-[url('/images/pattern-dots.svg')] opacity-5" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <nav aria-label="Breadcrumb" className="mb-6 text-sm text-gray-400">
+            <nav aria-label="Breadcrumb" className="mb-4 sm:mb-6 text-sm text-gray-400">
               <ol className="flex items-center gap-2">
                 <li>
                   <Link href="/" className="hover:text-[#C9A96E] transition-colors">Home</Link>
@@ -127,24 +127,24 @@ export default function ComparePage({ params }: PageProps) {
                 <li className="text-white font-medium">{page.treatmentA} vs {page.treatmentB}</li>
               </ol>
             </nav>
-            <h1 className="font-playfair text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+            <h1 className="font-playfair text-3xl font-bold text-white sm:text-5xl lg:text-6xl">
               <span className="text-[#C9A96E]">{page.treatmentA}</span>
               {" "}vs{" "}
               <span className="text-[#C9A96E]">{page.treatmentB}</span>
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-gray-300 sm:text-xl">
+            <p className="mt-4 sm:mt-6 text-base leading-relaxed text-gray-300 sm:text-xl">
               An honest, side-by-side comparison from the physician-supervised team at Rani Beauty Clinic in Renton, WA.
             </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <a
                 href={clinicInfo.booking.url}
-                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 py-3.5 text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 min-h-[48px] text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
               >
                 Book Consultation
               </a>
               <a
                 href={clinicInfo.phoneTel}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 min-h-[48px] text-base font-semibold text-white transition hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" />
                 {clinicInfo.phone}
@@ -155,73 +155,73 @@ export default function ComparePage({ params }: PageProps) {
       </section>
 
       {/* Intro */}
-      <section className="bg-white py-16 lg:py-20">
+      <section className="bg-white py-10 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <p className="text-lg leading-relaxed text-gray-700">
+          <p className="text-base sm:text-lg leading-relaxed text-gray-700">
             {page.intro}
           </p>
         </div>
       </section>
 
       {/* Comparison Table */}
-      <section className="bg-[#F8F6F1] py-16 lg:py-24">
+      <section className="bg-[#F8F6F1] py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
+          <h2 className="text-center font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-4xl">
             Side-by-Side Comparison
           </h2>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            {/* Desktop Table */}
-            <div className="hidden sm:block">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="bg-[#0F1D2C] text-white">
-                    <th className="px-6 py-4 font-semibold">Category</th>
-                    <th className="px-6 py-4 font-semibold text-[#C9A96E]">{page.treatmentA}</th>
-                    <th className="px-6 py-4 font-semibold text-[#C9A96E]">{page.treatmentB}</th>
+          {/* Desktop Table */}
+          <div className="mt-8 sm:mt-10 hidden sm:block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="bg-[#0F1D2C] text-white">
+                  <th className="px-6 py-4 font-semibold">Category</th>
+                  <th className="px-6 py-4 font-semibold text-[#C9A96E]">{page.treatmentA}</th>
+                  <th className="px-6 py-4 font-semibold text-[#C9A96E]">{page.treatmentB}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {page.comparisonTable.map((row, i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
+                    <td className="px-6 py-4 font-semibold text-[#0F1D2C]">{row.category}</td>
+                    <td className="px-6 py-4 text-gray-700">{row.treatmentA}</td>
+                    <td className="px-6 py-4 text-gray-700">{row.treatmentB}</td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {page.comparisonTable.map((row, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
-                      <td className="px-6 py-4 font-semibold text-[#0F1D2C]">{row.category}</td>
-                      <td className="px-6 py-4 text-gray-700">{row.treatmentA}</td>
-                      <td className="px-6 py-4 text-gray-700">{row.treatmentB}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {/* Mobile Cards */}
-            <div className="divide-y divide-gray-100 sm:hidden">
-              {page.comparisonTable.map((row, i) => (
-                <div key={i} className="p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{row.category}</p>
-                  <div className="mt-2 grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-xs font-semibold text-[#C9A96E]">{page.treatmentA}</p>
-                      <p className="mt-1 text-sm text-gray-700">{row.treatmentA}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-[#C9A96E]">{page.treatmentB}</p>
-                      <p className="mt-1 text-sm text-gray-700">{row.treatmentB}</p>
-                    </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Mobile: Stacked comparison cards per category */}
+          <div className="mt-8 space-y-4 sm:hidden">
+            {page.comparisonTable.map((row, i) => (
+              <div key={i} className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+                <div className="bg-[#0F1D2C] px-4 py-2.5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-white/70">{row.category}</p>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  <div className="px-4 py-3">
+                    <p className="text-xs font-bold text-[#C9A96E] mb-1">{page.treatmentA}</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">{row.treatmentA}</p>
+                  </div>
+                  <div className="px-4 py-3">
+                    <p className="text-xs font-bold text-[#C9A96E] mb-1">{page.treatmentB}</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">{row.treatmentB}</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Pros & Cons */}
-      <section className="bg-white py-16 lg:py-24">
+      <section className="bg-white py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
+          <h2 className="text-center font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-4xl">
             Pros &amp; Cons
           </h2>
-          <div className="mt-12 grid gap-8 lg:grid-cols-2">
+          <div className="mt-8 sm:mt-12 grid gap-6 sm:gap-8 lg:grid-cols-2">
             {/* Treatment A */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm">
               <h3 className="font-playfair text-2xl font-bold text-[#0F1D2C]">{page.treatmentA}</h3>
               <div className="mt-6">
                 <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Advantages</p>
@@ -256,7 +256,7 @@ export default function ComparePage({ params }: PageProps) {
             </div>
 
             {/* Treatment B */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm">
               <h3 className="font-playfair text-2xl font-bold text-[#0F1D2C]">{page.treatmentB}</h3>
               <div className="mt-6">
                 <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Advantages</p>
@@ -294,9 +294,9 @@ export default function ComparePage({ params }: PageProps) {
       </section>
 
       {/* Verdict */}
-      <section className="bg-[#F8F6F1] py-16 lg:py-20">
+      <section className="bg-[#F8F6F1] py-10 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-[#C9A96E]/20 bg-white p-8 shadow-sm lg:p-10">
+          <div className="rounded-2xl border border-[#C9A96E]/20 bg-white p-5 sm:p-8 shadow-sm lg:p-10">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="h-6 w-6 text-[#C9A96E]" />
               <h2 className="font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-3xl">
@@ -306,16 +306,16 @@ export default function ComparePage({ params }: PageProps) {
             <p className="text-base leading-relaxed text-gray-700">
               {page.verdict}
             </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <a
                 href={clinicInfo.booking.url}
-                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-6 py-3 text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-6 min-h-[48px] text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
               >
                 Book a Consultation
               </a>
               <a
                 href={clinicInfo.phoneTel}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#0F1D2C]/20 px-6 py-3 text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#0F1D2C] hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#0F1D2C]/20 px-6 min-h-[48px] text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#0F1D2C] hover:text-white"
               >
                 <Phone className="h-4 w-4" />
                 {clinicInfo.phone}
@@ -326,22 +326,22 @@ export default function ComparePage({ params }: PageProps) {
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-white py-16 lg:py-24">
+      <section className="bg-white py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
+          <h2 className="text-center font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-4xl">
             {page.treatmentA} vs {page.treatmentB} FAQ
           </h2>
-          <div className="mt-10 space-y-4">
+          <div className="mt-8 sm:mt-10 space-y-3 sm:space-y-4">
             {page.faqs.map((faq, i) => (
               <details
                 key={i}
                 className="group rounded-xl border border-gray-200 bg-[#F8F6F1]"
               >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-base font-semibold text-[#0F1D2C]">
-                  {faq.question}
-                  <ChevronRight className="h-5 w-5 text-gray-400 transition group-open:rotate-90" />
+                <summary className="flex cursor-pointer items-center justify-between px-4 sm:px-6 py-4 text-[15px] sm:text-base font-semibold text-[#0F1D2C] min-h-[48px] gap-3">
+                  <span>{faq.question}</span>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-gray-400 transition group-open:rotate-90" />
                 </summary>
-                <p className="px-6 pb-4 text-sm leading-relaxed text-gray-700">
+                <p className="px-4 sm:px-6 pb-4 text-sm leading-relaxed text-gray-700">
                   {faq.answer}
                 </p>
               </details>
@@ -351,7 +351,7 @@ export default function ComparePage({ params }: PageProps) {
       </section>
 
       {/* Related Comparisons */}
-      <section className="bg-[#F8F6F1] py-16 lg:py-24">
+      <section className="bg-[#F8F6F1] py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-playfair text-3xl font-bold text-[#0F1D2C]">
             More Treatment Comparisons
@@ -387,30 +387,30 @@ export default function ComparePage({ params }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0F1D2C] py-16 lg:py-20">
+      <section className="bg-[#0F1D2C] py-12 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="font-playfair text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="font-playfair text-2xl font-bold text-white sm:text-4xl">
             Still Not Sure? Let Us Help.
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-gray-300">
+          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-gray-300">
             Book a personalized consultation and our physician-supervised team will recommend the right treatment for your goals, skin type, and budget.
           </p>
-          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
             <a
               href={clinicInfo.booking.url}
-              className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 py-3.5 text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+              className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 min-h-[48px] text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
             >
               Book Online
             </a>
             <a
               href={clinicInfo.phoneTel}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 min-h-[48px] text-base font-semibold text-white transition hover:bg-white/10"
             >
               <Phone className="h-4 w-4" />
               Call {clinicInfo.phone}
             </a>
           </div>
-          <div className="mt-6 flex items-center justify-center gap-4 text-sm text-gray-400">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
             <span className="flex items-center gap-1.5">
               <Star className="h-4 w-4 text-[#C9A96E]" />
               {clinicInfo.reviews.aggregateRating}/5 on Google

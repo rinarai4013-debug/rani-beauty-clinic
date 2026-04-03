@@ -82,8 +82,8 @@ export function useDashboardData<T>(
       // Exponential back-off retry: 1s, 3s, 10s then stop
       errorRetryCount: 3,
       onErrorRetry: (err, _key, _config, revalidate, { retryCount }) => {
-        // Don't retry on auth errors
-        if (err instanceof FetchError && (err.status === 401 || err.status === 403)) return;
+        // Don't retry on auth errors or unimplemented routes
+        if (err instanceof FetchError && (err.status === 401 || err.status === 403 || err.status === 501)) return;
         // Exponential back-off
         const delay = Math.min(1000 * Math.pow(3, retryCount), 10000);
         setTimeout(() => revalidate({ retryCount }), delay);

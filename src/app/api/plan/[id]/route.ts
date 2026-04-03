@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Tables, fetchFirst } from '@/lib/airtable/client';
+import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
+import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import crypto from 'crypto';
 
@@ -259,6 +260,29 @@ export async function GET(
         ? new Date(new Date(createdDate).getTime() + PLAN_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
         : null,
     };
+
+    // ── Fire-and-forget: Track plan view ──
+    // Update Treatment Plans status from 'Sent' to 'Viewed' if applicable
+    // This looks up the Treatment Plans record linked to this intake record
+    const trackViewAsync = async () => {
+      try {
+        const treatmentPlans = await fetchFirst<{ Status?: string; 'Intake Record ID'?: string }>(
+          Tables.treatmentPlans(),
+          1,
+          { filterByFormula: `{Intake Record ID} = '${sanitizedId}'` },
+          true
+        );
+        if (treatmentPlans.length > 0 && treatmentPlans[0].fields.Status === 'Sent') {
+          await updateRecord(Tables.treatmentPlans(), treatmentPlans[0].id, {
+            [FIELDS.treatmentPlans.status]: 'Viewed',
+          });
+        }
+      } catch (trackErr) {
+        console.error('[Plan View Tracking] Failed to update status:', trackErr);
+      }
+    };
+    // Don't await - fire and forget so we don't block the response
+    trackViewAsync();
 
     return NextResponse.json({ plan });
   } catch (error) {

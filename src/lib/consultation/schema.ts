@@ -126,7 +126,7 @@ const step4Schema = z.object({
     .min(1, 'Please select at least one treatment of interest'),
 });
 
-/** Step 5: History - skin type + treatment history */
+/** Step 5: History - skin type + treatment history + medical history */
 const step5Schema = z.object({
   skinType: z.enum(SKIN_TYPES, {
     message: 'Please select your skin type',
@@ -136,6 +136,20 @@ const step5Schema = z.object({
     .max(2000, 'Treatment history must be 2000 characters or fewer')
     .optional()
     .default(''),
+  // Enhanced medical fields (all optional for progressive disclosure)
+  pregnant: z.boolean().optional().default(false),
+  breastfeeding: z.boolean().optional().default(false),
+  bloodThinners: z.boolean().optional().default(false),
+  keloidHistory: z.boolean().optional().default(false),
+  activeSkinInfection: z.boolean().optional().default(false),
+  recentSunExposure: z.boolean().optional().default(false),
+  isotretinoinHistory: z.boolean().optional().default(false),
+  isotretinoinEndDate: z.string().optional(),
+  hasAutoimmune: z.boolean().optional().default(false),
+  hasMedications: z.boolean().optional().default(false),
+  hasAllergies: z.boolean().optional().default(false),
+  smokingStatus: z.enum(['never', 'former', 'current']).optional().default('never'),
+  sunProtectionHabit: z.enum(['never', 'sometimes', 'usually', 'always']).optional().default('sometimes'),
 });
 
 /** Step 6: Goals - personal goals, timeline preference, budget range */

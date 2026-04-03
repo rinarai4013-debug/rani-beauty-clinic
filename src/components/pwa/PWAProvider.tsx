@@ -1,22 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import { registerServiceWorker, setupInstallPrompt } from "@/lib/pwa/register";
-import InstallPrompt from "./InstallPrompt";
-import OfflineBanner from "./OfflineBanner";
-import UpdatePrompt from "./UpdatePrompt";
+import { ReactNode } from "react";
 
-export default function PWAProvider() {
-  useEffect(() => {
-    registerServiceWorker();
-    setupInstallPrompt();
-  }, []);
-
-  return (
-    <>
-      <OfflineBanner />
-      <UpdatePrompt />
-      <InstallPrompt />
-    </>
-  );
+/**
+ * PWA Provider stub — placeholder for future PWA functionality.
+ * Wraps children without modification.
+ */
+export default function PWAProvider({ children }: { children: ReactNode }) {
+  return <>{children}</>;
 }

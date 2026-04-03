@@ -29,10 +29,9 @@ export const ClientSchema = z.object({
 }).passthrough();
 
 export const ClientIntakeSchema = z.object({
-  'First Name': z.string().min(1).optional(),
-  'Last Name': z.string().optional(),
+  'Full Name': z.string().min(1).optional(),
   'Email': z.string().email().optional(),
-  'Phone': z.string().optional(),
+  'Phone Number': z.string().optional(),
   'Intake Summary (AI)': z.string().optional(),
   'Program Plan (AI)': z.string().optional(),
   'Cost Breakdown (AI)': z.string().optional(),

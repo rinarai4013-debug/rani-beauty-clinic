@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, Phone, Shield, Star, Clock, CreditCard, DollarSign } from "lucide-react";
+import StickyBookBar from "@/components/ui/StickyBookBar";
 import StructuredData from "@/components/seo/StructuredData";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
@@ -151,11 +152,11 @@ export default function CostPage({ params }: PageProps) {
       />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#0F1D2C] via-[#1a2d40] to-[#0F1D2C] py-20 lg:py-28">
+      <section className="relative bg-gradient-to-br from-[#0F1D2C] via-[#1a2d40] to-[#0F1D2C] py-12 sm:py-16 lg:py-28">
         <div className="absolute inset-0 bg-[url('/images/pattern-dots.svg')] opacity-5" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <nav aria-label="Breadcrumb" className="mb-6 text-sm text-gray-400">
+            <nav aria-label="Breadcrumb" className="mb-4 sm:mb-6 text-sm text-gray-400">
               <ol className="flex items-center gap-2">
                 <li>
                   <Link href="/" className="hover:text-[#C9A96E] transition-colors">Home</Link>
@@ -168,31 +169,31 @@ export default function CostPage({ params }: PageProps) {
                 <li className="text-white font-medium">{page.service}</li>
               </ol>
             </nav>
-            <h1 className="font-playfair text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+            <h1 className="font-playfair text-3xl font-bold text-white sm:text-5xl lg:text-6xl">
               {page.heroTitle}
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-gray-300 sm:text-xl">
+            <p className="mt-4 sm:mt-6 text-base leading-relaxed text-gray-300 sm:text-xl">
               Transparent pricing at Rani Beauty Clinic in Renton, WA. Physician-supervised treatments with financing available.
             </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <a
                 href={clinicInfo.booking.url}
-                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 py-3.5 text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 min-h-[48px] text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
               >
                 Book Consultation
               </a>
               <a
                 href={clinicInfo.phoneTel}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 min-h-[48px] text-base font-semibold text-white transition hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" />
                 {clinicInfo.phone}
               </a>
             </div>
-            <div className="mt-8 flex items-center gap-6 text-sm text-gray-400">
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-400">
               <span className="flex items-center gap-1.5">
                 <Star className="h-4 w-4 text-[#C9A96E]" />
-                {clinicInfo.reviews.aggregateRating} Stars on Google
+                {clinicInfo.reviews.aggregateRating} Stars
               </span>
               <span className="flex items-center gap-1.5">
                 <Shield className="h-4 w-4 text-[#C9A96E]" />
@@ -208,39 +209,52 @@ export default function CostPage({ params }: PageProps) {
       </section>
 
       {/* Intro + Pricing Table */}
-      <section className="bg-white py-16 lg:py-24">
+      <section className="bg-white py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-3">
+          <div className="grid gap-8 sm:gap-12 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <p className="text-lg leading-relaxed text-gray-700">
+              <p className="text-base sm:text-lg leading-relaxed text-gray-700">
                 {page.intro}
               </p>
 
-              {/* Pricing Table */}
-              <div className="mt-10 overflow-hidden rounded-2xl border border-gray-100">
+              {/* Pricing — Desktop Table */}
+              <div className="mt-8 sm:mt-10 hidden sm:block overflow-hidden rounded-2xl border border-gray-100">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-[#0F1D2C] text-white">
                     <tr>
                       <th className="px-6 py-4 font-semibold">Treatment</th>
                       <th className="px-6 py-4 font-semibold">Price</th>
-                      <th className="hidden px-6 py-4 font-semibold sm:table-cell">Details</th>
+                      <th className="px-6 py-4 font-semibold">Details</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {page.priceRanges.map((range, i) => (
                       <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
-                        <td className="px-6 py-4 font-medium text-[#0F1D2C]">
-                          {range.item}
-                          {range.note && (
-                            <span className="block text-xs text-gray-500 sm:hidden">{range.note}</span>
-                          )}
-                        </td>
+                        <td className="px-6 py-4 font-medium text-[#0F1D2C]">{range.item}</td>
                         <td className="px-6 py-4 text-lg font-bold text-[#C9A96E]">{range.price}</td>
-                        <td className="hidden px-6 py-4 text-gray-500 sm:table-cell">{range.note || "—"}</td>
+                        <td className="px-6 py-4 text-gray-500">{range.note || "—"}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Pricing — Mobile Stacked Cards */}
+              <div className="mt-8 space-y-3 sm:hidden">
+                {page.priceRanges.map((range, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-semibold text-[#0F1D2C] text-base">{range.item}</p>
+                      <p className="text-lg font-bold text-[#C9A96E] whitespace-nowrap">{range.price}</p>
+                    </div>
+                    {range.note && (
+                      <p className="mt-1.5 text-sm text-gray-500">{range.note}</p>
+                    )}
+                  </div>
+                ))}
               </div>
 
               {serviceLink && (
@@ -286,7 +300,7 @@ export default function CostPage({ params }: PageProps) {
                     href={clinicInfo.financing.cherry.applyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full rounded-lg bg-[#C9A96E] py-2.5 text-center text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+                    className="w-full rounded-lg bg-[#C9A96E] min-h-[44px] flex items-center justify-center text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
                   >
                     Apply with Cherry
                   </a>
@@ -294,7 +308,7 @@ export default function CostPage({ params }: PageProps) {
                     href={clinicInfo.financing.patientfi.applyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full rounded-lg border border-white/20 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/10"
+                    className="w-full rounded-lg border border-white/20 min-h-[44px] flex items-center justify-center text-sm font-semibold text-white transition hover:bg-white/10"
                   >
                     Apply with PatientFi
                   </a>
@@ -321,7 +335,7 @@ export default function CostPage({ params }: PageProps) {
                 </ul>
                 <a
                   href={clinicInfo.booking.url}
-                  className="mt-6 block w-full rounded-lg bg-[#0F1D2C] py-2.5 text-center text-sm font-semibold text-white transition hover:bg-[#1a2d40]"
+                  className="mt-6 w-full rounded-lg bg-[#0F1D2C] min-h-[44px] flex items-center justify-center text-sm font-semibold text-white transition hover:bg-[#1a2d40]"
                 >
                   Book Consultation
                 </a>
@@ -346,22 +360,22 @@ export default function CostPage({ params }: PageProps) {
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-[#F8F6F1] py-16 lg:py-24">
+      <section className="bg-[#F8F6F1] py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
+          <h2 className="text-center font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-4xl">
             {page.service} Pricing FAQ
           </h2>
-          <div className="mt-10 space-y-4">
+          <div className="mt-8 sm:mt-10 space-y-3 sm:space-y-4">
             {page.faqs.map((faq, i) => (
               <details
                 key={i}
                 className="group rounded-xl border border-gray-200 bg-white"
               >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-base font-semibold text-[#0F1D2C]">
-                  {faq.question}
-                  <ChevronRight className="h-5 w-5 text-gray-400 transition group-open:rotate-90" />
+                <summary className="flex cursor-pointer items-center justify-between px-4 sm:px-6 py-4 text-[15px] sm:text-base font-semibold text-[#0F1D2C] min-h-[48px] gap-3">
+                  <span>{faq.question}</span>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-gray-400 transition group-open:rotate-90" />
                 </summary>
-                <p className="px-6 pb-4 text-sm leading-relaxed text-gray-700">
+                <p className="px-4 sm:px-6 pb-4 text-sm leading-relaxed text-gray-700">
                   {faq.answer}
                 </p>
               </details>
@@ -371,7 +385,7 @@ export default function CostPage({ params }: PageProps) {
       </section>
 
       {/* Related Cost Pages */}
-      <section className="bg-white py-16 lg:py-24">
+      <section className="bg-white py-10 sm:py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-playfair text-3xl font-bold text-[#0F1D2C]">
             More Treatment Pricing
@@ -410,24 +424,24 @@ export default function CostPage({ params }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0F1D2C] py-16 lg:py-20">
+      <section className="bg-[#0F1D2C] py-12 sm:py-16 lg:py-20 pb-24 lg:pb-20">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="font-playfair text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="font-playfair text-2xl font-bold text-white sm:text-4xl">
             Ready to Get Started with {page.service}?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-gray-300">
+          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-gray-300">
             Book a consultation to discuss your treatment plan and get a personalized quote. Financing available through Cherry and PatientFi.
           </p>
-          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
             <a
               href={clinicInfo.booking.url}
-              className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 py-3.5 text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+              className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 min-h-[48px] text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
             >
               Book Online
             </a>
             <a
               href={clinicInfo.phoneTel}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 min-h-[48px] text-base font-semibold text-white transition hover:bg-white/10"
             >
               <Phone className="h-4 w-4" />
               Call {clinicInfo.phone}
@@ -435,6 +449,9 @@ export default function CostPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Sticky Book Bar — mobile only */}
+      <StickyBookBar />
     </>
   );
 }

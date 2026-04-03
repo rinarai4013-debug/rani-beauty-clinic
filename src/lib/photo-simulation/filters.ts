@@ -8,6 +8,15 @@ export interface FilterStep {
   intensity: number; // 0-1
 }
 
+/** Degradation filter step for aging simulation */
+export interface DegradationFilterStep {
+  filter: 'agingProgression' | 'textureDegradation' | 'toneDecline' | 'elasticityLoss';
+  intensity: number; // 0-1
+}
+
+/** Unified filter step — supports both improvement and degradation */
+export type UnifiedFilterStep = FilterStep | DegradationFilterStep;
+
 /**
  * Apply skin smoothing via iterative box blur.
  * Uses 3-pass box blur to approximate gaussian blur, then blends
@@ -386,6 +395,61 @@ export function applyFilterChain(
     const fn = filterMap[step.filter];
     if (fn) {
       fn(ctx, width, height, step.intensity);
+    }
+  }
+}
+
+/**
+ * Apply a unified filter chain supporting both improvement and degradation filters.
+ * Lazily imports degradation filters to avoid bundling them when not needed.
+ */
+export async function applyUnifiedFilterChain(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  filters: UnifiedFilterStep[],
+): Promise<void> {
+  // Separate improvement from degradation steps
+  const improvementSteps: FilterStep[] = [];
+  const degradationSteps: DegradationFilterStep[] = [];
+
+  for (const step of filters) {
+    if (['skinSmoothing', 'toneEvening', 'glow', 'brightening'].includes(step.filter)) {
+      improvementSteps.push(step as FilterStep);
+    } else {
+      degradationSteps.push(step as DegradationFilterStep);
+    }
+  }
+
+  // Apply improvement filters first
+  if (improvementSteps.length > 0) {
+    applyFilterChain(ctx, width, height, improvementSteps);
+  }
+
+  // Apply degradation filters
+  if (degradationSteps.length > 0) {
+    const {
+      applyAgingProgression,
+      applyTextureDegradation,
+      applyToneDecline,
+      applyElasticityLoss,
+    } = await import('./degradation-filters');
+
+    const degradationMap: Record<
+      DegradationFilterStep['filter'],
+      (ctx: CanvasRenderingContext2D, w: number, h: number, i: number) => void
+    > = {
+      agingProgression: applyAgingProgression,
+      textureDegradation: applyTextureDegradation,
+      toneDecline: applyToneDecline,
+      elasticityLoss: applyElasticityLoss,
+    };
+
+    for (const step of degradationSteps) {
+      const fn = degradationMap[step.filter];
+      if (fn) {
+        fn(ctx, width, height, step.intensity);
+      }
     }
   }
 }

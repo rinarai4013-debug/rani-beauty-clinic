@@ -137,7 +137,7 @@ Pre-Treatment Instructions by Category: Each service category has specific prepa
 
 Handling Client Questions: When clients respond to pre-appointment communications with questions, front desk staff should answer standard questions about logistics (parking, timing, payment methods). Medical questions about treatment specifics, contraindications, or expected results should be escalated to the provider with a message: "Great question! Let me have [Provider Name] reach out to you directly with that clinical information." Never provide medical advice.
 
-New Client Intake Forms: All new clients are sent a Typeform intake form (ID: Ecgz85JA) after booking confirmation. This form collects medical history, aesthetic goals, allergies, medications, and consent. The intake must be completed before the appointment. Monitor completion status in Airtable - if incomplete 24 hours before the appointment, send a manual reminder. Incomplete intakes delay the consultation and reduce conversion rates.`,
+New Client Intake Forms: All new clients complete the intake form on our website at ranibeautyclinic.com/contact after booking confirmation. This form collects service interest, contact details, and an optional message. The submission is automatically processed by our AI Intake Intelligence Engine within 60 seconds — creating a Client Intakes record in Airtable, sending an email notification, and triggering the n8n lead response workflow. Monitor completion status in Airtable - if incomplete 24 hours before the appointment, send a manual reminder. Incomplete intakes delay the consultation and reduce conversion rates.`,
       quiz: [
         {
           question: 'What is the standard deposit for a new client Sofwave booking?',
@@ -184,7 +184,7 @@ The Greeting Protocol: Stand and make eye contact within 3 seconds of a client e
 
 Identity Verification: For every visit, verify the client's identity by confirming their full name and date of birth. This is a HIPAA requirement and a safety protocol. For new clients, verify a government-issued photo ID on the first visit and note it in Mangomint.
 
-Intake Form Status: Before the client sits down, confirm their intake form is complete. Check Airtable for the intake status. If the form is incomplete, hand them a tablet with the Typeform link and allow 10-15 minutes for completion before the consultation. Never send a client back to the treatment room without a completed intake - this is a compliance and safety requirement.
+Intake Form Status: Before the client sits down, confirm their intake form is complete. Check Airtable for the intake status. If the form is incomplete, hand them a tablet with ranibeautyclinic.com/contact open and allow 10-15 minutes for completion before the consultation. Never send a client back to the treatment room without a completed intake - this is a compliance and safety requirement.
 
 Consent Review: Each treatment category requires specific consent forms. Injectable treatments require informed consent covering risks, benefits, alternatives, and expected outcomes. Laser treatments require laser consent with Fitzpatrick skin type documentation. GLP-1 programs require medical program consent and lab work authorization. Verify all required consents are signed and current (consents expire annually).
 
@@ -221,11 +221,11 @@ Payment Verification: Confirm the client's payment method is on file. If they ha
       title: 'New Client Onboarding & Record Creation',
       content: `New clients represent our biggest revenue opportunity and our most critical first impression moment. The new client onboarding process is meticulous and must be executed flawlessly every time.
 
-Document Collection Checklist: (1) Government-issued photo ID - scan or photograph for file. (2) Completed Typeform intake (medical history, allergies, medications, aesthetic goals). (3) Signed general consent form. (4) Signed treatment-specific consent (after provider consultation). (5) HIPAA Notice of Privacy Practices acknowledgment. (6) Financial policy acknowledgment (cancellation, deposit, payment terms). (7) Photography consent (before/after documentation).
+Document Collection Checklist: (1) Government-issued photo ID - scan or photograph for file. (2) Completed website intake form at ranibeautyclinic.com/contact (service interest, contact details, optional message). (3) Signed general consent form. (4) Signed treatment-specific consent (after provider consultation). (5) HIPAA Notice of Privacy Practices acknowledgment. (6) Financial policy acknowledgment (cancellation, deposit, payment terms). (7) Photography consent (before/after documentation).
 
 Mangomint Profile Setup: Create the full client profile in Mangomint with all collected information. Add notes from the intake form that are relevant to scheduling - allergies, medication interactions, skin type, treatment history at other clinics. Tag the client with appropriate labels: "New Client," service interest tags, and referral source.
 
-Airtable CRM Entry: The Typeform submission automatically creates a record in Airtable via our n8n automation. Verify the record exists and the AI intake analysis has been processed (check for "Intake Summary (AI)" field population). If the automation has not triggered, manually flag the record for processing.
+Airtable CRM Entry: The website contact form submission automatically creates a Client Intakes record in Airtable, sends an email notification, and triggers the n8n lead response workflow within 60 seconds. Verify the record exists and the AI intake analysis has been processed (check for "Intake Summary (AI)" field population). If the automation has not triggered, manually flag the record for processing.
 
 Welcome Communication: After the first visit, a welcome sequence is triggered automatically: same-day thank you email with provider introduction, next-day follow-up with post-treatment care instructions (if applicable), and a 7-day check-in message. These are automated through n8n but front desk should be aware of what clients receive.
 
@@ -237,7 +237,7 @@ Referral Tracking: Always ask new clients how they heard about us. Options: Goog
           question: 'How many documents are on the new client collection checklist?',
           options: ['5', '6', '7', '8'],
           correctIndex: 2,
-          explanation: 'The new client document collection checklist includes 7 items: photo ID, Typeform intake, general consent, treatment consent, HIPAA acknowledgment, financial policy, and photography consent.',
+          explanation: 'The new client document collection checklist includes 7 items: photo ID, website intake form, general consent, treatment consent, HIPAA acknowledgment, financial policy, and photography consent.',
         },
         {
           question: 'What field should you check in Airtable to verify the AI intake analysis has processed?',

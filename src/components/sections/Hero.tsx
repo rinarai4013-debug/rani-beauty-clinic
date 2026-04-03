@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { clinicInfo } from "@/data/clinic-info";
+import { trackCTAClick, trackPhoneClick } from "@/lib/analytics/events";
 
 interface HeroStat {
   value: string;
@@ -107,6 +108,7 @@ export default function Hero({
                     href={primaryCTA.href}
                     target={primaryCTA.target}
                     className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light !rounded-full !px-8 w-full sm:w-auto"
+                    onClick={() => trackCTAClick(primaryCTA.text, 'hero_split', primaryCTA.href)}
                   >
                     {primaryCTA.text}
                   </Button>
@@ -115,6 +117,7 @@ export default function Hero({
 
               <a
                 href={clinicInfo.phoneTel}
+                onClick={() => trackPhoneClick('hero_split')}
                 className="mt-4 inline-block font-body text-[15px] text-white/55 transition-colors hover:text-white/80 hover:underline"
               >
                 Or call {clinicInfo.phone}
@@ -231,6 +234,7 @@ export default function Hero({
                   href={primaryCTA.href}
                   target={primaryCTA.target}
                   className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
+                  onClick={() => trackCTAClick(primaryCTA.text, 'hero_full', primaryCTA.href)}
                 >
                   {primaryCTA.text}
                 </Button>
@@ -240,6 +244,7 @@ export default function Hero({
                   variant="ghost"
                   href={secondaryCTA.href}
                   className="!text-white"
+                  onClick={() => trackCTAClick(secondaryCTA.text, 'hero_full_secondary', secondaryCTA.href)}
                 >
                   {secondaryCTA.text}
                 </Button>

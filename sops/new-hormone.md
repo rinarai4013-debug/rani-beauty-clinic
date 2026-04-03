@@ -34,3 +34,6 @@
 - Monthly check-ins
 - Quarterly labs required
 - Cross-sell: B12 + Vitamin D combo
+
+---
+**COMPLIANCE:** Rina does NOT diagnose or prescribe. All medical decisions = Medical Director via Qualiphy. Quarterly labs required for ongoing hormone patients.

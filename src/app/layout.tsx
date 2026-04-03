@@ -114,15 +114,6 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <link rel="dns-prefetch" href="https://static.hotjar.com" />
-        {/* Hotjar - loaded after page is interactive to avoid render-blocking */}
-        <Script
-          id="hotjar"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};h._hjSettings={hjid:5241962,hjsv:6};a=o.getElementsByTagName('head')[0];r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;a.appendChild(r);})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
-          }}
-        />
         <Analytics />
         {/* Mangomint booking scripts are loaded via Analytics component */}
       </head>

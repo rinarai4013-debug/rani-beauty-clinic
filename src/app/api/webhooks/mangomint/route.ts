@@ -61,7 +61,7 @@ async function upsertRecord(
   if (existingId) {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.update([{ id: existingId, fields }], { typecast: true }, (err) => {
+        table.update([{ id: existingId, fields }] as Parameters<typeof table.update>[0], { typecast: true }, (err: unknown) => {
           if (err) reject(err);
           else resolve();
         });
@@ -70,7 +70,7 @@ async function upsertRecord(
   } else {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.create([{ fields }], { typecast: true }, (err) => {
+        table.create([{ fields }] as Parameters<typeof table.create>[0], { typecast: true }, (err: unknown) => {
           if (err) reject(err);
           else resolve();
         });

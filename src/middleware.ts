@@ -147,11 +147,24 @@ export async function middleware(request: NextRequest) {
   response.headers.set('x-tenant-source', tenantSource);
   response.headers.set('x-tenant-host', hostname);
 
-  // CORS for multi-tenant API routes
+  // CORS for API routes — restrict to known origins
   if (pathname.startsWith('/api/')) {
-    response.headers.set('Access-Control-Allow-Origin', '*');
+    const origin = request.headers.get('origin') || '';
+    const allowedOrigins = [
+      'https://ranibeautyclinic.com',
+      'https://www.ranibeautyclinic.com',
+      'https://ranios.com',
+      'https://ranios.dev',
+    ];
+    // Allow localhost in development
+    if (process.env.NODE_ENV === 'development') {
+      allowedOrigins.push('http://localhost:3000', 'http://localhost:3001');
+    }
+    const corsOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+    response.headers.set('Access-Control-Allow-Origin', corsOrigin);
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant-ID');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
 
   return response;

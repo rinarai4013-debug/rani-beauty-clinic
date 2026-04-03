@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Sparkles, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 interface QuizOption {
   label: string;
@@ -259,15 +260,13 @@ export default function TreatmentQuiz() {
             )}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <a
-                href="https://form.typeform.com/to/rani-consultation"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/contact"
                 className="inline-flex items-center gap-2 rounded-full bg-rani-gold px-7 py-3 font-body text-sm font-semibold text-rani-navy transition-all duration-300 hover:bg-white"
               >
                 Book Your Consultation
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
 
               <button
                 onClick={() => {
