@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionById } from '@/lib/mastermind/session';
+import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { validatePlan } from '@/lib/plan-builder/constraints';
 import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
 
@@ -16,7 +16,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const session = getSessionById(id);
+    const session = await getSessionByIdAsync(id);
 
     if (!session) {
       return NextResponse.json(
@@ -73,14 +73,24 @@ export async function POST(
 
     const warnings = validatePlan(phases);
 
+    // Single pass to count by severity instead of 3 separate filter calls
+    let errorCount = 0;
+    let warningCount = 0;
+    let infoCount = 0;
+    for (const w of warnings) {
+      if (w.severity === 'error') errorCount++;
+      else if (w.severity === 'warning') warningCount++;
+      else if (w.severity === 'info') infoCount++;
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         warnings,
-        isValid: warnings.filter((w) => w.severity === 'error').length === 0,
-        errorCount: warnings.filter((w) => w.severity === 'error').length,
-        warningCount: warnings.filter((w) => w.severity === 'warning').length,
-        infoCount: warnings.filter((w) => w.severity === 'info').length,
+        isValid: errorCount === 0,
+        errorCount,
+        warningCount,
+        infoCount,
       },
     });
   } catch (error) {

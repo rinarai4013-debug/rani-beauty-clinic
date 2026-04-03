@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionById, saveSession, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { generateConsultationPdf } from '@/lib/mastermind/pdf-generator';
 import { storePdf } from '@/lib/mastermind/pdf-storage';
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Load session
-    const session = getSessionById(sessionId);
+    const session = await getSessionByIdAsync(sessionId);
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Session not found' },
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Update session with PDF URL
     const updated = sessionReducer(session, { type: 'SET_PDF_URL', url: pdfUrl });
-    saveSession(updated);
+    await saveSessionAsync(updated);
 
     return NextResponse.json({
       success: true,

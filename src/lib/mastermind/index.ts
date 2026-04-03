@@ -33,8 +33,12 @@ const PHASE_ORDER: MastermindPhase[] = [
   'completed',
 ];
 
+const PHASE_INDEX = new Map<MastermindPhase, number>(
+  PHASE_ORDER.map((p, i) => [p, i])
+);
+
 export function getPhaseIndex(phase: MastermindPhase): number {
-  return PHASE_ORDER.indexOf(phase);
+  return PHASE_INDEX.get(phase) ?? -1;
 }
 
 export function isPhaseAtLeast(current: MastermindPhase, target: MastermindPhase): boolean {
@@ -144,7 +148,7 @@ export interface SlideConfig {
   requiresData: (session: MastermindSession) => boolean;
 }
 
-export const PRESENTATION_SLIDES: SlideConfig[] = [
+export const PRESENTATION_SLIDES: readonly SlideConfig[] = [
   {
     id: 'aura-score',
     title: 'Your Aura Score',
@@ -233,7 +237,7 @@ export function calculateFinancingOptions(amount: number): FinancingOption[] {
 
 // ── Re-exports for convenience ──
 
-export { sessionReducer, createSession, getSessionById, saveSession, getAllSessions, deleteSession } from './session';
+export { sessionReducer, createSession, getSessionById, getSessionByIdAsync, saveSession, saveSessionAsync, getAllSessions, getAllSessionsAsync, deleteSession } from './session';
 export { generateMastermindPlan } from './plan-generator';
 export { generateSimulationComparison } from './simulation-engine';
 export { mockAuraScanResult, mockMastermindPlan, mockSimulationComparison, mockMastermindSession } from './mock-data';

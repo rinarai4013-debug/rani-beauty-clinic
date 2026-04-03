@@ -151,75 +151,22 @@ export function createSession(
 }
 
 // ── Session Store ──
-// Uses in-memory Map + /tmp file persistence (server-side on Vercel)
-// + localStorage (client-side). /tmp persists across warm function
-// invocations on Vercel, solving the serverless session gap.
-//
-// Note: fs is loaded dynamically via require() only on the server
-// to avoid "Can't resolve 'fs'" in the client bundle.
+// Server-side: Airtable-backed via session-store.ts (persists across
+// Vercel serverless invocations). Client-side: localStorage.
+// In-memory Map used as read cache within a single invocation.
 
 const sessions = new Map<string, MastermindSession>();
-const SESSION_DIR = '/tmp/rani-mastermind-sessions';
 
-function getFs(): typeof import('fs') | null {
-  if (typeof window !== 'undefined') return null;
-  try { return require('fs'); } catch { return null; }
-}
-
-function getPath(): typeof import('path') | null {
-  if (typeof window !== 'undefined') return null;
-  try { return require('path'); } catch { return null; }
-}
-
-function sessionFilePath(id: string): string {
-  const path = getPath();
-  if (!path) return '';
-  return path.join(SESSION_DIR, `${id.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`);
-}
-
-function ensureSessionDir(): void {
-  const fs = getFs();
-  if (!fs) return;
-  try { fs.mkdirSync(SESSION_DIR, { recursive: true }); } catch { /* exists */ }
-}
-
-function readSessionFromDisk(id: string): MastermindSession | null {
-  const fs = getFs();
-  if (!fs) return null;
-  try {
-    const raw = fs.readFileSync(sessionFilePath(id), 'utf-8');
-    const parsed = JSON.parse(raw);
-    return hydrateSession(parsed);
-  } catch {
-    return null;
-  }
-}
-
-function writeSessionToDisk(session: MastermindSession): void {
-  const fs = getFs();
-  if (!fs) return;
-  try {
-    ensureSessionDir();
-    fs.writeFileSync(sessionFilePath(session.id), JSON.stringify(session), 'utf-8');
-  } catch (err) {
-    console.warn('[Session] Failed to write to disk:', err);
-  }
-}
-
+/**
+ * Get session by ID.
+ * Sync version — checks memory + localStorage only.
+ * For server-side Airtable reads, use getSessionByIdAsync.
+ */
 export function getSessionById(id: string): MastermindSession | null {
-  // Check memory first
+  // Check memory
   if (sessions.has(id)) return sessions.get(id)!;
 
-  // Try /tmp disk (server-side, Vercel)
-  if (typeof window === 'undefined') {
-    const diskSession = readSessionFromDisk(id);
-    if (diskSession) {
-      sessions.set(id, diskSession);
-      return diskSession;
-    }
-  }
-
-  // Try localStorage (client-side)
+  // Client-side: try localStorage
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(`mastermind_session_${id}`);
@@ -231,6 +178,33 @@ export function getSessionById(id: string): MastermindSession | null {
       }
     } catch {
       try { localStorage.removeItem(`mastermind_session_${id}`); } catch { /* noop */ }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Get session by ID — async version with Airtable fallback.
+ * Use this in API routes for persistent cross-invocation reads.
+ */
+export async function getSessionByIdAsync(id: string): Promise<MastermindSession | null> {
+  // Check memory first
+  const memSession = getSessionById(id);
+  if (memSession) return memSession;
+
+  // Server-side: try Airtable
+  if (typeof window === 'undefined') {
+    try {
+      const { getSessionFromAirtable } = await import('./session-store');
+      const atSession = await getSessionFromAirtable(id);
+      if (atSession) {
+        const hydrated = hydrateSession(atSession as unknown as Record<string, unknown>);
+        sessions.set(id, hydrated);
+        return hydrated;
+      }
+    } catch (err) {
+      console.warn('[Session] Airtable read failed:', err);
     }
   }
 
@@ -278,12 +252,16 @@ function isValidTier(val: unknown): val is 'Start' | 'Transform' | 'Elite' {
 export function saveSession(session: MastermindSession): void {
   sessions.set(session.id, session);
 
-  // Persist to /tmp disk (server-side)
+  // Server-side: persist to Airtable (fire-and-forget)
   if (typeof window === 'undefined') {
-    writeSessionToDisk(session);
+    import('./session-store').then(({ saveSessionToAirtable }) => {
+      saveSessionToAirtable(session).catch((err) => {
+        console.warn('[Session] Airtable save failed:', err);
+      });
+    }).catch(() => { /* dynamic import failed */ });
   }
 
-  // Persist to localStorage (client-side)
+  // Client-side: persist to localStorage
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(
@@ -301,39 +279,25 @@ export function saveSession(session: MastermindSession): void {
   }
 }
 
-export function getAllSessions(): MastermindSession[] {
-  // Server-side: read from /tmp disk
+/**
+ * Async save — waits for Airtable write to complete.
+ * Use in API routes where persistence must be confirmed.
+ */
+export async function saveSessionAsync(session: MastermindSession): Promise<void> {
+  sessions.set(session.id, session);
+
   if (typeof window === 'undefined') {
-    const fs = getFs();
-    const path = getPath();
-    if (fs && path) try {
-      ensureSessionDir();
-      const files = fs.readdirSync(SESSION_DIR).filter((f: string) => f.endsWith('.json'));
-      const diskSessions: MastermindSession[] = [];
-      for (const file of files) {
-        try {
-          const raw = fs.readFileSync(path.join(SESSION_DIR, file), 'utf-8');
-          const parsed = JSON.parse(raw);
-          const session = hydrateSession(parsed);
-          sessions.set(session.id, session);
-          diskSessions.push(session);
-        } catch {
-          // Skip corrupt files
-        }
-      }
-      // Merge with in-memory (dedup by ID)
-      const merged = new Map<string, MastermindSession>();
-      for (const s of diskSessions) merged.set(s.id, s);
-      for (const s of sessions.values()) merged.set(s.id, s);
-      return Array.from(merged.values()).sort(
-        (a, b) => (b.updatedAt > a.updatedAt ? 1 : b.updatedAt < a.updatedAt ? -1 : 0)
-      );
-    } catch {
-      // Fall through to in-memory
+    try {
+      const { saveSessionToAirtable } = await import('./session-store');
+      await saveSessionToAirtable(session);
+    } catch (err) {
+      console.warn('[Session] Airtable save failed:', err);
     }
   }
+}
 
-  // Client-side: try localStorage
+export function getAllSessions(): MastermindSession[] {
+  // Sync version — returns cached sessions only
   if (typeof window !== 'undefined') {
     try {
       const index = getSessionIndex();
@@ -341,34 +305,41 @@ export function getAllSessions(): MastermindSession[] {
         .map((id) => getSessionById(id))
         .filter((s): s is MastermindSession => s !== null)
         .sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : b.updatedAt < a.updatedAt ? -1 : 0));
-    } catch {
-      // Fall through
-    }
+    } catch { /* fall through */ }
   }
-
   return Array.from(sessions.values()).sort(
     (a, b) => (b.updatedAt > a.updatedAt ? 1 : b.updatedAt < a.updatedAt ? -1 : 0)
   );
 }
 
+/**
+ * Async version — fetches from Airtable for server-side routes.
+ */
+export async function getAllSessionsAsync(): Promise<MastermindSession[]> {
+  if (typeof window === 'undefined') {
+    try {
+      const { getAllSessionsFromAirtable } = await import('./session-store');
+      return getAllSessionsFromAirtable();
+    } catch { /* fall through */ }
+  }
+  return getAllSessions();
+}
+
 export function deleteSession(id: string): void {
   sessions.delete(id);
 
-  // Remove from disk
   if (typeof window === 'undefined') {
-    const fs = getFs();
-    if (fs) try { fs.unlinkSync(sessionFilePath(id)); } catch { /* noop */ }
+    import('./session-store').then(({ deleteSessionFromAirtable }) => {
+      deleteSessionFromAirtable(id).catch(() => {});
+    }).catch(() => {});
   }
 
-  // Remove from localStorage
   if (typeof window !== 'undefined') {
     try {
       localStorage.removeItem(`mastermind_session_${id}`);
       const index = getSessionIndex().filter((sid) => sid !== id);
       localStorage.setItem('mastermind_sessions', JSON.stringify(index));
-    } catch {
-      // Ignore
-    }
+    } catch { /* Ignore */ }
   }
 }
 

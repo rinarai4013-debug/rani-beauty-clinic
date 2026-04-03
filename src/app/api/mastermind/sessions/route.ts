@@ -4,33 +4,25 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createSession, saveSession, getAllSessions } from '@/lib/mastermind/session';
+import { createSession, saveSessionAsync, getAllSessionsAsync } from '@/lib/mastermind/session';
+import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession } from '@/types/mastermind';
 
 export async function GET() {
   try {
-    const sessions = getAllSessions();
-    return NextResponse.json({ success: true, data: sessions });
+    const sessions = await getAllSessionsAsync();
+    return apiSuccess(sessions);
   } catch (error) {
     console.error('[Mastermind Sessions] GET error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch sessions' },
-      { status: 500 }
-    );
+    return apiError('Failed to fetch sessions');
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        { success: false, error: 'Invalid JSON body' },
-        { status: 400 }
-      );
-    }
+    const parsed = await parseJsonBody(request);
+    if ('error' in parsed) return parsed.error;
+    const { body } = parsed;
 
     // Only allow safe override fields — never accept id, createdAt, etc.
     const overrides: Partial<MastermindSession> = {};
@@ -41,14 +33,11 @@ export async function POST(request: NextRequest) {
     if (typeof body.patientEmail === 'string') overrides.patientEmail = body.patientEmail;
 
     const session = createSession(overrides);
-    saveSession(session);
+    await saveSessionAsync(session);
 
     return NextResponse.json({ success: true, data: session }, { status: 201 });
   } catch (error) {
     console.error('[Mastermind Sessions] POST error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to create session' },
-      { status: 500 }
-    );
+    return apiError('Failed to create session');
   }
 }

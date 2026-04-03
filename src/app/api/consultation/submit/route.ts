@@ -14,7 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { createSession, saveSession, sessionReducer } from '@/lib/mastermind/session';
+import { createSession, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       patientEmail,
       sourcePhotoUrl,
     });
-    saveSession(session);
+    await saveSessionAsync(session);
 
     // 4. Auto-run Aura Scan (non-blocking — advance session if it works)
     const useMock = process.env.USE_MOCK_AI === 'true';
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         type: 'SET_SCAN_RESULT',
         result: scanResult,
       });
-      saveSession(scanned);
+      await saveSessionAsync(scanned);
     } catch (err) {
       // Scan failure is non-blocking — session remains at 'intake' phase
       console.warn('[Consultation Submit] Auto-scan failed:', err);

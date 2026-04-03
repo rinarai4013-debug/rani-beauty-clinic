@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionById, saveSession, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import {
   buildCompletionResult,
   buildN8nWebhookPayload,
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Load session
-    const session = getSessionById(sessionId);
+    const session = await getSessionByIdAsync(sessionId);
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Session not found' },
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     // Mark session as completed
     const completed = sessionReducer(session, { type: 'COMPLETE' });
-    saveSession(completed);
+    await saveSessionAsync(completed);
 
     // Return stable response with webhook status
     return NextResponse.json({
