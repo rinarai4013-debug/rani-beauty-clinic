@@ -58,10 +58,11 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
   try {
     if (cached?.recordId) {
       // Update existing record
-      await fetch(airtableUrl(cached.recordId), {
+      const res = await fetch(airtableUrl(cached.recordId), {
         method: 'PATCH',
         headers: headers(),
         body: JSON.stringify({
+          typecast: true,
           fields: {
             Status: session.phase,
             Details: sessionJson,
@@ -70,15 +71,20 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
         }),
         signal: AbortSignal.timeout(8000),
       });
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '');
+        console.error(`[SessionStore] PATCH failed (${res.status}):`, errBody);
+      }
     } else {
       // Check if record exists (from a previous cold start)
       const existing = await findSessionRecord(session.id);
       if (existing) {
         // Update
-        await fetch(airtableUrl(existing.recordId), {
+        const res = await fetch(airtableUrl(existing.recordId), {
           method: 'PATCH',
           headers: headers(),
           body: JSON.stringify({
+            typecast: true,
             fields: {
               Status: session.phase,
               Details: sessionJson,
@@ -87,6 +93,10 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
           }),
           signal: AbortSignal.timeout(8000),
         });
+        if (!res.ok) {
+          const errBody = await res.text().catch(() => '');
+          console.error(`[SessionStore] PATCH (found) failed (${res.status}):`, errBody);
+        }
         cache.set(session.id, { session, recordId: existing.recordId });
       } else {
         // Create new record
@@ -107,10 +117,17 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
           }),
           signal: AbortSignal.timeout(8000),
         });
-        const data = await res.json();
-        const recordId = data?.records?.[0]?.id;
-        if (recordId) {
-          cache.set(session.id, { session, recordId });
+        if (!res.ok) {
+          const errBody = await res.text().catch(() => '');
+          console.error(`[SessionStore] CREATE failed (${res.status}):`, errBody);
+        } else {
+          const data = await res.json();
+          const recordId = data?.records?.[0]?.id;
+          if (recordId) {
+            cache.set(session.id, { session, recordId });
+          } else {
+            console.warn('[SessionStore] CREATE succeeded but no recordId in response');
+          }
         }
       }
     }
