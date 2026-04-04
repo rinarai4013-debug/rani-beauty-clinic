@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Clock, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Sparkles, Clock, CheckCircle2, AlertCircle, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useMastermindSessions } from '@/hooks/useMastermindSessions';
+import NewConsultationModal from '@/components/dashboard/mastermind/NewConsultationModal';
 import type { MastermindPhase } from '@/types/mastermind';
 
 const PHASE_CONFIG: Record<MastermindPhase, { label: string; color: string; icon: typeof Sparkles }> = {
@@ -21,10 +24,25 @@ const PHASE_CONFIG: Record<MastermindPhase, { label: string; color: string; icon
 };
 
 export default function MastermindQueuePage() {
-  const { sessions, isLoading } = useMastermindSessions();
+  const { sessions, isLoading, mutate } = useMastermindSessions();
+  const [showNewModal, setShowNewModal] = useState(false);
+  const router = useRouter();
+
+  const handleCreated = (sessionId: string) => {
+    setShowNewModal(false);
+    mutate(); // Refresh session list
+    router.push(`/dashboard/mastermind/${sessionId}`);
+  };
 
   return (
     <div className="p-6 space-y-6">
+      {/* New Consultation Modal */}
+      <NewConsultationModal
+        open={showNewModal}
+        onClose={() => setShowNewModal(false)}
+        onCreated={handleCreated}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -35,10 +53,17 @@ export default function MastermindQueuePage() {
             Consultation sessions powered by Aura Skin Scan
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="font-body text-sm text-[#0F1D2C]/40">
             {sessions.length} session{sessions.length !== 1 ? 's' : ''}
           </span>
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F1D2C] text-white font-body text-sm font-semibold hover:bg-[#0F1D2C]/90 transition-all shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            New Consultation
+          </button>
         </div>
       </div>
 
@@ -77,9 +102,16 @@ export default function MastermindQueuePage() {
           <h3 className="font-[family-name:var(--font-heading)] text-lg text-[#0F1D2C] mb-2">
             No Sessions Yet
           </h3>
-          <p className="font-body text-sm text-[#0F1D2C]/50 max-w-md mx-auto">
-            Sessions are created when patients complete the consultation wizard with an Aura Skin Scan.
+          <p className="font-body text-sm text-[#0F1D2C]/50 max-w-md mx-auto mb-4">
+            Start a consultation to run an AI-powered Aura Skin Scan and generate a personalized treatment plan.
           </p>
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#C9A96E] text-white font-body text-sm font-semibold hover:bg-[#C9A96E]/90 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            New Consultation
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
