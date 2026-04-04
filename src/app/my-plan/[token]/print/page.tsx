@@ -550,7 +550,7 @@ export default function PrintPlanPage() {
                 </div>
 
                 <div className="aftercare-section">
-                  <div className="aftercare-section-title">\u{1F4C5} Week 1 Guidance</div>
+                  <div className="aftercare-section-title">{'\u{1F4C5}'} Week 1 Guidance</div>
                   <ul className="aftercare-list">
                     {ac.weekOneGuidance.map((item, j) => (
                       <li key={j}>{item}</li>
@@ -560,7 +560,7 @@ export default function PrintPlanPage() {
 
                 {ac.productsRecommended.length > 0 && (
                   <div className="aftercare-section">
-                    <div className="aftercare-section-title">\u{1F9F4} Recommended Products</div>
+                    <div className="aftercare-section-title">{'\u{1F9F4}'} Recommended Products</div>
                     <div className="aftercare-products">
                       {ac.productsRecommended.map((p, j) => (
                         <div key={j} className="aftercare-product">
@@ -625,10 +625,10 @@ export default function PrintPlanPage() {
               <span className="contact-brand-rani">Rani</span> Beauty Clinic
             </div>
             <div className="contact-details">
-              <div className="contact-item">\u{1F4DE} (425) 999-7264</div>
+              <div className="contact-item">{'\u{1F4DE}'} (425) 999-7264</div>
               <div className="contact-item">\u2709 info@ranibeautyclinic.com</div>
-              <div className="contact-item">\u{1F4CD} 401 Olympia Ave NE, Suite 101, Renton, WA 98056</div>
-              <div className="contact-item">\u{1F310} ranibeautyclinic.com</div>
+              <div className="contact-item">{'\u{1F4CD}'} 401 Olympia Ave NE, Suite 101, Renton, WA 98056</div>
+              <div className="contact-item">{'\u{1F310}'} ranibeautyclinic.com</div>
             </div>
           </div>
 
