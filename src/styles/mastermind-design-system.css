@@ -1,0 +1,597 @@
+/* ============================================================================
+   MASTERMIND DESIGN SYSTEM
+   Rani Beauty Clinic — Futuristic Luxury Dashboard
+   Apple Vision Pro x Luxury Fashion x Sci-Fi Medical Interface
+   ============================================================================ */
+
+/* ── 1. Glassmorphism Effects ────────────────────────────────────────────────── */
+
+.glass {
+  background: rgba(15, 29, 44, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(201, 169, 110, 0.15);
+}
+
+.glass-light {
+  background: rgba(248, 246, 241, 0.8);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(201, 169, 110, 0.2);
+}
+
+.glass-gold {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.15), rgba(201, 169, 110, 0.05));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+}
+
+.glass-dark {
+  background: rgba(10, 21, 32, 0.85);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(201, 169, 110, 0.1);
+}
+
+.glass-frosted {
+  background: rgba(15, 29, 44, 0.5);
+  backdrop-filter: blur(40px) saturate(120%);
+  -webkit-backdrop-filter: blur(40px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── 2. Animated Gradient Borders ────────────────────────────────────────────── */
+
+.border-glow {
+  position: relative;
+  overflow: visible;
+}
+
+.border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #C9A96E, transparent 40%, transparent 60%, #C9A96E);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-rotate 4s linear infinite;
+  pointer-events: none;
+}
+
+.border-glow-slow::before {
+  animation-duration: 8s;
+}
+
+.border-glow-fast::before {
+  animation-duration: 2s;
+}
+
+.border-glow-intense::before {
+  background: linear-gradient(135deg, #C9A96E, #E8D5A8, transparent 30%, transparent 70%, #E8D5A8, #C9A96E);
+  filter: blur(0.5px);
+}
+
+/* ── 3. Gold Shimmer Text ────────────────────────────────────────────────────── */
+
+.text-shimmer {
+  background: linear-gradient(120deg, #C9A96E, #E8D5A8, #C9A96E, #A08040, #C9A96E);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-text 3s ease-in-out infinite;
+}
+
+.text-shimmer-slow {
+  animation-duration: 6s;
+}
+
+.text-shimmer-subtle {
+  background: linear-gradient(120deg, #C9A96E 30%, #E8D5A8 50%, #C9A96E 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-text 4s ease-in-out infinite;
+}
+
+/* ── 4. Futuristic Card Hover ────────────────────────────────────────────────── */
+
+.card-hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    0 20px 60px rgba(201, 169, 110, 0.15),
+    0 0 40px rgba(201, 169, 110, 0.05);
+}
+
+.card-hover-subtle {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-subtle:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 30px rgba(201, 169, 110, 0.1),
+    0 0 20px rgba(201, 169, 110, 0.03);
+}
+
+.card-hover-glow {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-hover-glow:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 60px rgba(201, 169, 110, 0.2),
+    0 0 80px rgba(201, 169, 110, 0.08),
+    inset 0 0 20px rgba(201, 169, 110, 0.03);
+}
+
+/* ── 5. Pulse/Glow Animations for Scores ─────────────────────────────────────── */
+
+.score-glow {
+  box-shadow:
+    0 0 20px rgba(201, 169, 110, 0.3),
+    0 0 40px rgba(201, 169, 110, 0.1);
+  animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+.score-glow-intense {
+  box-shadow:
+    0 0 30px rgba(201, 169, 110, 0.4),
+    0 0 60px rgba(201, 169, 110, 0.2),
+    0 0 100px rgba(201, 169, 110, 0.05);
+  animation: pulse-glow-intense 2s ease-in-out infinite alternate;
+}
+
+.score-ring {
+  box-shadow:
+    0 0 0 2px rgba(201, 169, 110, 0.3),
+    0 0 20px rgba(201, 169, 110, 0.15),
+    0 0 40px rgba(201, 169, 110, 0.05);
+  animation: pulse-ring 3s ease-in-out infinite;
+}
+
+/* ── 6. Gradient Backgrounds ─────────────────────────────────────────────────── */
+
+.bg-mastermind {
+  background: linear-gradient(135deg, #0a1520 0%, #0F1D2C 50%, #162536 100%);
+}
+
+.bg-mastermind-radial {
+  background:
+    radial-gradient(ellipse at top right, rgba(201, 169, 110, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom left, rgba(201, 169, 110, 0.05) 0%, transparent 60%),
+    linear-gradient(135deg, #0a1520 0%, #0F1D2C 100%);
+}
+
+.bg-mastermind-mesh {
+  background:
+    radial-gradient(at 20% 20%, rgba(201, 169, 110, 0.06) 0%, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(201, 169, 110, 0.04) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(22, 37, 54, 0.5) 0%, transparent 80%),
+    linear-gradient(135deg, #0a1520 0%, #0F1D2C 50%, #162536 100%);
+}
+
+.bg-mastermind-light {
+  background:
+    radial-gradient(ellipse at top right, rgba(201, 169, 110, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #FAF8F5 0%, #F0EDE6 100%);
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #C9A96E, #E8D5A8, #C9A96E);
+}
+
+.bg-gold-gradient-subtle {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.1), rgba(201, 169, 110, 0.03));
+}
+
+/* ── 7. Animated Data Visualization ──────────────────────────────────────────── */
+
+.bar-fill {
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: fill-bar 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.bar-fill-delay-1 { animation-delay: 0.1s; }
+.bar-fill-delay-2 { animation-delay: 0.2s; }
+.bar-fill-delay-3 { animation-delay: 0.3s; }
+.bar-fill-delay-4 { animation-delay: 0.4s; }
+.bar-fill-delay-5 { animation-delay: 0.5s; }
+
+.counter-animate {
+  animation: count-up 2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.line-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-line 2s ease-out forwards;
+}
+
+.circle-draw {
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  animation: draw-circle 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fade-in-up 0.6s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.fade-in-up-delay-1 { animation-delay: 0.1s; }
+.fade-in-up-delay-2 { animation-delay: 0.2s; }
+.fade-in-up-delay-3 { animation-delay: 0.3s; }
+.fade-in-up-delay-4 { animation-delay: 0.4s; }
+.fade-in-up-delay-5 { animation-delay: 0.5s; }
+
+.scale-in {
+  opacity: 0;
+  transform: scale(0.9);
+  animation: scale-in 0.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* ── 8. Floating Particle Background ─────────────────────────────────────────── */
+
+.particles {
+  position: relative;
+}
+
+.particles::before,
+.particles::after {
+  content: '';
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(201, 169, 110, 0.3);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particles::before {
+  top: 20%;
+  left: 15%;
+  animation: float-particle-1 15s infinite ease-in-out;
+}
+
+.particles::after {
+  top: 60%;
+  right: 20%;
+  width: 3px;
+  height: 3px;
+  background: rgba(201, 169, 110, 0.2);
+  animation: float-particle-2 18s infinite ease-in-out;
+}
+
+/* ── 9. Status Badge Animations ──────────────────────────────────────────────── */
+
+.badge-pulse {
+  animation: badge-pulse 2s infinite;
+}
+
+.badge-success {
+  background: linear-gradient(135deg, #059669, #34d399);
+  color: white;
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+  color: white;
+}
+
+.badge-danger {
+  background: linear-gradient(135deg, #dc2626, #f87171);
+  color: white;
+}
+
+.badge-gold {
+  background: linear-gradient(135deg, #C9A96E, #E8D5A8);
+  color: #0F1D2C;
+}
+
+.badge-info {
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+  color: white;
+}
+
+.badge-glass {
+  background: rgba(201, 169, 110, 0.15);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  color: #C9A96E;
+  backdrop-filter: blur(8px);
+}
+
+/* ── 10. Smooth Page Transitions ─────────────────────────────────────────────── */
+
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ── 11. Custom Scrollbar (luxury) ───────────────────────────────────────────── */
+
+.scrollbar-luxury::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-luxury::-webkit-scrollbar-track {
+  background: rgba(15, 29, 44, 0.3);
+  border-radius: 3px;
+}
+
+.scrollbar-luxury::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #C9A96E, #A08040);
+  border-radius: 3px;
+}
+
+.scrollbar-luxury::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #E8D5A8, #C9A96E);
+}
+
+/* Firefox scrollbar */
+.scrollbar-luxury {
+  scrollbar-width: thin;
+  scrollbar-color: #C9A96E rgba(15, 29, 44, 0.3);
+}
+
+/* ── 12. HUD / Sci-Fi Grid Lines ─────────────────────────────────────────────── */
+
+.hud-grid {
+  background-image:
+    linear-gradient(rgba(201, 169, 110, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 169, 110, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.hud-grid-fine {
+  background-image:
+    linear-gradient(rgba(201, 169, 110, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 169, 110, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ── 13. Neon / Accent Line Separators ───────────────────────────────────────── */
+
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.4), transparent);
+}
+
+.divider-gold-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.5), transparent);
+  box-shadow: 0 0 8px rgba(201, 169, 110, 0.2);
+}
+
+/* ── 14. Inner Glow Effects ──────────────────────────────────────────────────── */
+
+.inner-glow {
+  box-shadow: inset 0 0 30px rgba(201, 169, 110, 0.05);
+}
+
+.inner-glow-strong {
+  box-shadow: inset 0 0 60px rgba(201, 169, 110, 0.08);
+}
+
+/* ── 15. Elevation System ────────────────────────────────────────────────────── */
+
+.elevation-1 {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.elevation-2 {
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.elevation-3 {
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.elevation-gold {
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(201, 169, 110, 0.08);
+}
+
+/* ============================================================================
+   KEYFRAME ANIMATIONS
+   ============================================================================ */
+
+@keyframes shimmer-text {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow:
+      0 0 20px rgba(201, 169, 110, 0.3),
+      0 0 40px rgba(201, 169, 110, 0.1);
+  }
+  100% {
+    box-shadow:
+      0 0 30px rgba(201, 169, 110, 0.5),
+      0 0 60px rgba(201, 169, 110, 0.2);
+  }
+}
+
+@keyframes pulse-glow-intense {
+  0% {
+    box-shadow:
+      0 0 30px rgba(201, 169, 110, 0.4),
+      0 0 60px rgba(201, 169, 110, 0.2),
+      0 0 100px rgba(201, 169, 110, 0.05);
+  }
+  100% {
+    box-shadow:
+      0 0 40px rgba(201, 169, 110, 0.6),
+      0 0 80px rgba(201, 169, 110, 0.3),
+      0 0 120px rgba(201, 169, 110, 0.1);
+  }
+}
+
+@keyframes pulse-ring {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(201, 169, 110, 0.3),
+      0 0 20px rgba(201, 169, 110, 0.15),
+      0 0 40px rgba(201, 169, 110, 0.05);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(201, 169, 110, 0.15),
+      0 0 30px rgba(201, 169, 110, 0.2),
+      0 0 60px rgba(201, 169, 110, 0.08);
+  }
+}
+
+@keyframes border-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float-particle-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  25% { transform: translate(30px, -40px) scale(1.2); opacity: 0.5; }
+  50% { transform: translate(-20px, -80px) scale(0.8); opacity: 0.2; }
+  75% { transform: translate(40px, -30px) scale(1.1); opacity: 0.4; }
+}
+
+@keyframes float-particle-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  33% { transform: translate(-40px, 30px) scale(1.3); opacity: 0.4; }
+  66% { transform: translate(20px, -50px) scale(0.7); opacity: 0.15; }
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fill-bar {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes count-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes draw-line {
+  0% { stroke-dashoffset: 1000; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes draw-circle {
+  0% { stroke-dashoffset: 283; }
+  100% { stroke-dashoffset: var(--target-offset, 0); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ambient-shift {
+  0%, 100% { opacity: 0.5; transform: translate(0, 0) scale(1); }
+  33% { opacity: 0.7; transform: translate(5%, -3%) scale(1.05); }
+  66% { opacity: 0.4; transform: translate(-3%, 5%) scale(0.98); }
+}
+
+@keyframes grid-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* ── Reduced motion: respect user preference ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .text-shimmer,
+  .text-shimmer-slow,
+  .text-shimmer-subtle,
+  .border-glow::before,
+  .score-glow,
+  .score-glow-intense,
+  .score-ring,
+  .badge-pulse,
+  .bar-fill,
+  .counter-animate,
+  .line-draw,
+  .circle-draw,
+  .fade-in-up,
+  .scale-in,
+  .particles::before,
+  .particles::after {
+    animation: none !important;
+  }
+
+  .card-hover:hover,
+  .card-hover-subtle:hover,
+  .card-hover-glow:hover {
+    transform: none !important;
+  }
+
+  .bar-fill {
+    transform: scaleX(1) !important;
+  }
+
+  .fade-in-up,
+  .scale-in {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

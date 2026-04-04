@@ -8,14 +8,22 @@
 
 import { NextRequest } from 'next/server';
 import { generateMastermindPlan } from '@/lib/mastermind/plan-generator';
+import { generateAIPlan } from '@/lib/mastermind/ai-plan-generator';
 import { mockMastermindPlan } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { requireAuth, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { AuraScanResult } from '@/types/mastermind';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — allow unauthenticated in development
+    const authSession = await requireAuth(request).catch(() => null);
+    if (!authSession && process.env.NODE_ENV !== 'development') {
+      return unauthorized();
+    }
+
     const parsed = await parseJsonBody(request);
     if ('error' in parsed) return parsed.error;
     const { body } = parsed;
@@ -44,12 +52,24 @@ export async function POST(request: NextRequest) {
     }
 
     const useMock = process.env.USE_MOCK_AI === 'true';
+    const useAI = process.env.ANTHROPIC_API_KEY && !useMock;
     let plan;
     let source: string;
 
     if (useMock) {
       plan = mockMastermindPlan();
       source = 'mock';
+    } else if (useAI) {
+      // Use Claude AI for personalized plan generation
+      try {
+        const { UNIFIED_CATALOG } = await import('@/data/services/unified-catalog');
+        plan = await generateAIPlan(scanResult, intakeData, UNIFIED_CATALOG);
+        source = 'ai';
+      } catch (aiErr) {
+        console.warn('[Mastermind Plan] AI generation failed, falling back to rule engine:', aiErr);
+        plan = generateMastermindPlan(scanResult, intakeData);
+        source = 'engine-fallback';
+      }
     } else {
       plan = generateMastermindPlan(scanResult, intakeData);
       source = 'engine';

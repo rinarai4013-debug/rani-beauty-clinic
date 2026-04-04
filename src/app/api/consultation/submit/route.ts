@@ -17,6 +17,7 @@ import sharp from 'sharp';
 import { createSession, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
+import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 
 const MAX_PHOTO_WIDTH = 1200;
@@ -85,12 +86,39 @@ export async function POST(request: NextRequest) {
     });
     await saveSessionAsync(session);
 
-    // 4. Auto-run Aura Scan (non-blocking — advance session if it works)
-    const useMock = process.env.USE_MOCK_AI === 'true';
+    // 4. Write to Airtable Client Intakes table (non-blocking — CRM pipeline + n8n triggers)
     try {
-      const scanResult = useMock
-        ? mockAuraScanResult()
-        : await runAuraScan(intakeData);
+      await rateLimitedQuery(async () => {
+        await Tables.intakes().create(
+          {
+            'Full Name': patientName,
+            'Email': patientEmail,
+            'Phone Number': (intakeData.phone as string) || '',
+            'Processing Status': 'New',
+          } as Record<string, unknown>,
+          { typecast: true }
+        );
+      });
+    } catch (err) {
+      // Airtable write failure is non-blocking — session still created
+      console.warn('[Consultation Submit] Airtable intake write failed:', err);
+    }
+
+    // 5. Auto-run Aura Scan (non-blocking — advance session if it works)
+    // Prefers AI scan (Claude vision) when API key available and photo exists
+    const useMock = process.env.USE_MOCK_AI === 'true';
+    const useAIScan = !!process.env.ANTHROPIC_API_KEY && !useMock;
+    try {
+      let scanResult;
+      if (useMock) {
+        scanResult = mockAuraScanResult();
+      } else if (useAIScan) {
+        // Use Claude AI vision to analyze the photo + intake data
+        const { runAIAuraScan } = await import('@/lib/mastermind/ai-aura-scan');
+        scanResult = await runAIAuraScan(intakeData, sourcePhotoUrl || undefined);
+      } else {
+        scanResult = await runAuraScan(intakeData);
+      }
 
       const scanned = sessionReducer(session, {
         type: 'SET_SCAN_RESULT',
@@ -102,7 +130,7 @@ export async function POST(request: NextRequest) {
       console.warn('[Consultation Submit] Auto-scan failed:', err);
     }
 
-    // 5. Return session ID
+    // 6. Return session ID
     return NextResponse.json({
       success: true,
       data: {

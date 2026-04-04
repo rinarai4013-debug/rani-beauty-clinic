@@ -42,6 +42,7 @@ const ProcessSteps = dynamic(() => import("@/components/sections/ProcessSteps"))
 const ConsultationCTA = dynamic(() => import("@/components/sections/ConsultationCTA"));
 const FAQ = dynamic(() => import("@/components/sections/FAQ"));
 const ConsultationUrgency = dynamic(() => import("@/components/conversion/ConsultationUrgency"));
+const AreasWeServe = dynamic(() => import("@/components/sections/AreasWeServe"));
 
 const reviews = testimonials;
 
@@ -107,10 +108,13 @@ export default function HomePage() {
       {/* 8. Personalized Quiz */}
       <QuizCTA />
 
-      {/* 9. Consultation CTA (single, clear close) */}
+      {/* 9. Areas We Serve — internal linking to geo pages for SEO */}
+      <AreasWeServe />
+
+      {/* 10. Consultation CTA (single, clear close) */}
       <ConsultationCTA />
 
-      {/* 10. FAQ */}
+      {/* 11. FAQ */}
       <FAQ />
     </>
   );

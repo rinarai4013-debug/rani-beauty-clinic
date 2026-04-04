@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { aestheticServices } from "@/data/services/aesthetic-services";
 import { wellnessServices } from "@/data/services/wellness-services";
 import ServicePageTemplate from "@/components/services/ServicePageTemplate";
+import RelatedBlogArticles from "@/components/seo/RelatedBlogArticles";
 import { clinicInfo } from "@/data/clinic-info";
 
 const allServices = [
@@ -51,6 +52,9 @@ export default function WellnessServicePage({
   }
 
   return (
-    <ServicePageTemplate service={service} allServices={allServices} />
+    <>
+      <ServicePageTemplate service={service} allServices={allServices} />
+      <RelatedBlogArticles serviceSlug={service.slug} serviceTitle={service.title} />
+    </>
   );
 }

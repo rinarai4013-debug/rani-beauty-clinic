@@ -5,11 +5,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createSession, saveSessionAsync, getAllSessionsAsync } from '@/lib/mastermind/session';
+import { requireAuth, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession } from '@/types/mastermind';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Auth check — allow unauthenticated in development
+    const session = await requireAuth(request).catch(() => null);
+    if (!session && process.env.NODE_ENV !== 'development') {
+      return unauthorized();
+    }
+
     const sessions = await getAllSessionsAsync();
     return apiSuccess(sessions);
   } catch (error) {
@@ -20,6 +27,12 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — allow unauthenticated in development
+    const authSession = await requireAuth(request).catch(() => null);
+    if (!authSession && process.env.NODE_ENV !== 'development') {
+      return unauthorized();
+    }
+
     const parsed = await parseJsonBody(request);
     if ('error' in parsed) return parsed.error;
     const { body } = parsed;

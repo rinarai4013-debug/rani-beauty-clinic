@@ -8,7 +8,7 @@
 
 import { NextRequest } from 'next/server';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { requireAuth } from '@/lib/auth/middleware';
+import { requireAuth, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSessionAction, PlanModification } from '@/types/mastermind';
 
@@ -17,6 +17,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Auth check — allow unauthenticated in development
+    const authSession = await requireAuth(_request).catch(() => null);
+    if (!authSession && process.env.NODE_ENV !== 'development') {
+      return unauthorized();
+    }
+
     const { id } = await params;
     const session = await getSessionByIdAsync(id);
 
@@ -36,6 +42,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Auth check — allow unauthenticated in development
+    const authSession = await requireAuth(request).catch(() => null);
+    if (!authSession && process.env.NODE_ENV !== 'development') {
+      return unauthorized();
+    }
+
     const { id } = await params;
     const session = await getSessionByIdAsync(id);
 

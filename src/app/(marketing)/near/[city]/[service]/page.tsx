@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MapPin, Clock, ChevronRight, Phone, Star, Shield, ArrowLeft } from "lucide-react";
 import StructuredData from "@/components/seo/StructuredData";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
+import RelatedBlogArticles from "@/components/seo/RelatedBlogArticles";
 import { clinicInfo } from "@/data/clinic-info";
 import { pnwCities } from "@/data/locations/pnw-cities";
 import { waCitiesExtended } from "@/data/locations/wa-cities-extended";
@@ -271,6 +272,38 @@ export default function ServiceCityPage({ params }: PageProps) {
                   </p>
                 </div>
               )}
+
+              {/* City-specific content — unique per city for content differentiation */}
+              <div className="mt-10">
+                <h3 className="font-playfair text-2xl font-bold text-[#0F1D2C]">
+                  About {city.name}
+                </h3>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">
+                  {city.description}
+                </p>
+              </div>
+
+              {city.whyRani && (
+                <div className="mt-8 rounded-2xl border border-[#C9A96E]/20 bg-gradient-to-br from-[#F8F6F1] to-white p-6">
+                  <h3 className="font-playfair text-xl font-bold text-[#0F1D2C]">
+                    Why {city.name} Residents Choose Rani
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-gray-700">
+                    {city.whyRani}
+                  </p>
+                </div>
+              )}
+
+              {city.demographics && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-semibold uppercase tracking-wider text-[#C9A96E]">
+                    Who We Serve in {city.name}
+                  </h4>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                    {city.demographics}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -435,6 +468,9 @@ export default function ServiceCityPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Related Articles — cross-link to blog for content depth + SEO */}
+      <RelatedBlogArticles serviceSlug={params.service} serviceTitle={entry.serviceName} />
 
       {/* CTA */}
       <section className="bg-[#0F1D2C] py-16 lg:py-20">

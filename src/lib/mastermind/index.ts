@@ -203,36 +203,32 @@ export interface FinancingOption {
 export function calculateFinancingOptions(amount: number): FinancingOption[] {
   if (amount <= 0) return [];
 
-  return [
-    {
-      termMonths: 6,
-      label: '6 Months',
-      monthlyPayment: Math.round(amount / 6),
-      totalCost: amount, // 0% for 6 months
-      apr: 0,
-    },
-    {
-      termMonths: 12,
-      label: '12 Months',
-      monthlyPayment: Math.round((amount * 1.0499) / 12),
-      totalCost: Math.round(amount * 1.0499),
-      apr: 4.99,
-    },
-    {
-      termMonths: 24,
-      label: '24 Months',
-      monthlyPayment: Math.round((amount * 1.0999) / 24),
-      totalCost: Math.round(amount * 1.0999),
-      apr: 9.99,
-    },
-    {
-      termMonths: 36,
-      label: '36 Months',
-      monthlyPayment: Math.round((amount * 1.1499) / 36),
-      totalCost: Math.round(amount * 1.1499),
-      apr: 14.99,
-    },
+  const tiers: { months: number; label: string; apr: number }[] = [
+    { months: 6, label: '6 Months', apr: 0 },
+    { months: 12, label: '12 Months', apr: 4.99 },
+    { months: 24, label: '24 Months', apr: 9.99 },
+    { months: 36, label: '36 Months', apr: 14.99 },
   ];
+
+  return tiers.map(({ months, label, apr }) => {
+    let monthlyPayment: number;
+    let totalCost: number;
+
+    if (apr === 0) {
+      // 0% APR — simple division
+      monthlyPayment = Math.round(amount / months);
+      totalCost = amount;
+    } else {
+      // Amortized payment formula:
+      // M = P * [r(1+r)^n] / [(1+r)^n - 1]
+      const monthlyRate = apr / 100 / 12;
+      const factor = Math.pow(1 + monthlyRate, months);
+      monthlyPayment = Math.round(amount * (monthlyRate * factor) / (factor - 1));
+      totalCost = monthlyPayment * months;
+    }
+
+    return { termMonths: months, label, monthlyPayment, totalCost, apr };
+  });
 }
 
 // ── Re-exports for convenience ──

@@ -2,6 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '../styles/mastermind-design-system.css';
+
+/* ── Patient Portal: Luxury Visual Polish ── */
+
+@keyframes gradientMesh {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 25%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 0% 75%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes goldPulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(201, 169, 110, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(201, 169, 110, 0.6)); }
+}
+
+@keyframes borderRotate {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+.patient-hero-gradient {
+  background: linear-gradient(
+    170deg,
+    #0F1D2C 0%,
+    #142536 20%,
+    #1A2D3F 40%,
+    #0F1D2C 60%,
+    #162840 80%,
+    #0F1D2C 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientMesh 12s ease infinite;
+}
+
+.aura-gauge-glow svg {
+  animation: goldPulse 3s ease-in-out infinite;
+}
+
+.gold-border-animated {
+  position: relative;
+}
+
+.gold-border-animated::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 1rem;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    #C9A96E 0%,
+    #D4BA87 25%,
+    #B8944F 50%,
+    #D4BA87 75%,
+    #C9A96E 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderRotate 4s linear infinite;
+  pointer-events: none;
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.paper-texture {
+  position: relative;
+}
+
+.paper-texture::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-card {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(15, 29, 44, 0.1);
+}
+
+.treatment-card-accent {
+  border-left: 3px solid #C9A96E;
+}
+
+.gold-separator {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, #C9A96E, #D4BA87);
+  margin: 0 auto;
+}
+
+/* Momentum scrolling for mobile */
+.patient-portal-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ── End Patient Portal Polish ── */
+
 /* Base styles */
 html {
   scroll-behavior: smooth;

@@ -9,9 +9,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockSimulationComparison } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { requireAuth, unauthorized } from '@/lib/auth/middleware';
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — allow unauthenticated in development
+    const authSession = await requireAuth(request).catch(() => null);
+    if (!authSession && process.env.NODE_ENV !== 'development') {
+      return unauthorized();
+    }
+
     const body = await request.json();
     const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
 

@@ -1,0 +1,690 @@
+'use client';
+
+/**
+ * AuraImportPanel — Hexagon Aura 3D Scanner Import UI
+ *
+ * Allows importing Aura device scans into a Mastermind session.
+ * Shows available scans, auto-suggests matches, and displays
+ * imported scan images in a diagnostic grid.
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
+import type { MastermindSession } from '@/types/mastermind';
+
+// ── TYPES ──
+
+interface AvailableScan {
+  name: string;
+  date: string;
+  imageCount: number;
+}
+
+interface ImportedScanImages {
+  front?: string;
+  brownAreas?: string;
+  redAreas?: string;
+  wrinkles?: string;
+  pores?: string;
+  smoothness?: string;
+  overview?: string;
+  distancesFront?: string;
+  distancesRight?: string;
+  anglesLeft?: string;
+  anglesRight?: string;
+}
+
+interface ImportResult {
+  scan: {
+    patientName: string;
+    scanDate: string;
+    imageKeys: string[];
+    expressionKeys: string[];
+    handoutPdfPath: string | null;
+  };
+  scanResult: any;
+  session: {
+    id: string;
+    phase: string;
+    updatedAt: string;
+  };
+}
+
+// ── PROPS ──
+
+interface AuraImportPanelProps {
+  session: MastermindSession;
+  onImportComplete?: (result: ImportResult) => void;
+}
+
+// ── COMPONENT ──
+
+export default function AuraImportPanel({ session, onImportComplete }: AuraImportPanelProps) {
+  // State
+  const [availableScans, setAvailableScans] = useState<AvailableScan[]>([]);
+  const [loadingScans, setLoadingScans] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [showSelector, setShowSelector] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importedImages, setImportedImages] = useState<ImportedScanImages | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<{ src: string; label: string } | null>(null);
+
+  // Determine if we already have a device scan imported
+  const hasExistingScan = !!session.auraScanResult && !!session.sourcePhotoUrl;
+
+  // Auto-suggest: find scans matching the patient name
+  const suggestedScans = useMemo(() => {
+    if (!session.patientName || availableScans.length === 0) return [];
+    const name = session.patientName.toLowerCase();
+    return availableScans.filter((s) => {
+      const scanName = s.name.toLowerCase();
+      return (
+        scanName.includes(name) ||
+        name.includes(scanName) ||
+        scanName.split(' ')[0] === name.split(' ')[0]
+      );
+    });
+  }, [session.patientName, availableScans]);
+
+  const otherScans = useMemo(() => {
+    const suggestedNames = new Set(suggestedScans.map((s) => `${s.name}_${s.date}`));
+    return availableScans.filter((s) => !suggestedNames.has(`${s.name}_${s.date}`));
+  }, [availableScans, suggestedScans]);
+
+  // Fetch available scans from the device
+  const fetchAvailableScans = useCallback(async () => {
+    setLoadingScans(true);
+    setScanError(null);
+    try {
+      const res = await fetch('/api/mastermind/aura-import');
+      const json = await res.json();
+      if (json.success) {
+        setAvailableScans(json.data || []);
+      } else {
+        setScanError(json.error || 'Failed to list scans');
+      }
+    } catch (err) {
+      setScanError('Could not connect to Aura scanner');
+    } finally {
+      setLoadingScans(false);
+    }
+  }, []);
+
+  // Import a specific scan
+  const handleImport = useCallback(
+    async (scan: AvailableScan) => {
+      setImporting(true);
+      setImportError(null);
+      setShowSelector(false);
+
+      try {
+        const res = await fetch('/api/mastermind/aura-import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: session.id,
+            patientName: scan.name,
+            scanDate: scan.date,
+          }),
+        });
+
+        const json = await res.json();
+
+        if (json.success) {
+          setImportResult(json.data);
+
+          // Store imported images from the session's source photo
+          // The API stores images in the scan result; the front is the sourcePhotoUrl
+          const imageKeys = json.data.scan.imageKeys as string[];
+          const images: ImportedScanImages = {};
+
+          // The images are stored in the session — we need to fetch the session
+          // to get the actual base64 data. For the import panel display,
+          // we use the sourcePhotoUrl (front) and note available keys.
+          if (imageKeys.includes('front')) {
+            images.front = session.sourcePhotoUrl || undefined;
+          }
+
+          setImportedImages(images);
+          onImportComplete?.(json.data);
+        } else {
+          setImportError(json.error || 'Import failed');
+        }
+      } catch (err) {
+        setImportError('Import request failed — check server logs');
+      } finally {
+        setImporting(false);
+      }
+    },
+    [session.id, session.sourcePhotoUrl, onImportComplete]
+  );
+
+  // Import latest scan for this patient
+  const handleImportLatest = useCallback(async () => {
+    setImporting(true);
+    setImportError(null);
+
+    try {
+      const res = await fetch('/api/mastermind/aura-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: session.id,
+          patientName: session.patientName,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+        setImportResult(json.data);
+        onImportComplete?.(json.data);
+      } else {
+        setImportError(json.error || 'Import failed');
+      }
+    } catch (err) {
+      setImportError('Import request failed');
+    } finally {
+      setImporting(false);
+    }
+  }, [session.id, session.patientName, onImportComplete]);
+
+  // Open scan selector
+  const handleOpenSelector = useCallback(() => {
+    setShowSelector(true);
+    fetchAvailableScans();
+  }, [fetchAvailableScans]);
+
+  // Format date for display
+  const formatDate = (isoDate: string) => {
+    try {
+      return new Date(isoDate).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return isoDate;
+    }
+  };
+
+  // ── LOADING STATE ──
+
+  if (importing) {
+    return (
+      <div className="rounded-xl border border-[#C9A96E]/30 bg-gradient-to-br from-[#0F1D2C] to-[#1A2D40] p-6">
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          {/* Animated scanner icon */}
+          <div className="relative mb-6">
+            <div className="w-20 h-20 rounded-full border-2 border-[#C9A96E]/30 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full border-2 border-[#C9A96E]/60 flex items-center justify-center animate-pulse">
+                <svg className="w-8 h-8 text-[#C9A96E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                </svg>
+              </div>
+            </div>
+            {/* Scanning line animation */}
+            <div className="absolute inset-0 w-20 h-20 rounded-full overflow-hidden">
+              <div className="h-0.5 bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent animate-scan" />
+            </div>
+          </div>
+          <h3 className="font-display text-lg font-semibold text-[#F8F6F1] mb-2">
+            Importing Aura 3D Scan Data...
+          </h3>
+          <p className="font-body text-sm text-[#F8F6F1]/60 max-w-xs">
+            Analyzing medical-grade imaging with AI. This typically takes 15-30 seconds.
+          </p>
+          {/* Progress dots */}
+          <div className="flex gap-1.5 mt-4">
+            <div className="w-2 h-2 rounded-full bg-[#C9A96E] animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-[#C9A96E] animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-[#C9A96E] animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── SUCCESS STATE ──
+
+  if (importResult) {
+    const scanData = importResult.scan;
+    const analysisKeys = scanData.imageKeys.filter(
+      (k) => !['front', 'overview'].includes(k)
+    );
+
+    return (
+      <div className="rounded-xl border border-[#C9A96E]/30 bg-gradient-to-br from-[#0F1D2C] to-[#1A2D40] p-6 space-y-5">
+        {/* Header with success badge */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-display text-base font-semibold text-[#F8F6F1]">
+                Aura 3D Scan Imported
+              </h3>
+              <p className="font-body text-xs text-[#F8F6F1]/50">
+                {scanData.patientName} &middot; {formatDate(scanData.scanDate)} &middot; {scanData.imageKeys.length} images
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setImportResult(null);
+              setImportedImages(null);
+              handleOpenSelector();
+            }}
+            className="font-body text-xs text-[#C9A96E] hover:text-[#C9A96E]/80 transition-colors"
+          >
+            Re-import
+          </button>
+        </div>
+
+        {/* Aura Score badge (if available) */}
+        {importResult.scanResult?.auraScore && (
+          <div className="flex items-center gap-3 bg-[#F8F6F1]/5 rounded-lg p-3">
+            <div className="w-14 h-14 rounded-full border-2 border-[#C9A96E] flex items-center justify-center flex-shrink-0">
+              <span className="font-display text-xl font-bold text-[#C9A96E]">
+                {importResult.scanResult.auraScore.overall}
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-display text-sm font-semibold text-[#F8F6F1]">
+                  Aura Score: {importResult.scanResult.auraScore.grade}
+                </span>
+                <span className="font-body text-xs text-[#F8F6F1]/40">
+                  {importResult.scanResult.auraScore.label}
+                </span>
+              </div>
+              <p className="font-body text-xs text-[#F8F6F1]/50 mt-0.5">
+                Skin Age: {importResult.scanResult.auraScore.skinAge} &middot;
+                {importResult.scanResult.auraScore.skinAgeDelta > 0
+                  ? ` +${importResult.scanResult.auraScore.skinAgeDelta} years`
+                  : ` ${importResult.scanResult.auraScore.skinAgeDelta} years`}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Image Grid — Analysis Views */}
+        <div className="space-y-3">
+          <h4 className="font-body text-xs font-semibold text-[#F8F6F1]/70 uppercase tracking-wide">
+            Scanner Analysis Layers
+          </h4>
+
+          {/* Analysis images in a 2x3 grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[
+              { key: 'brownAreas', label: 'Hyperpigmentation', color: '#8B6914' },
+              { key: 'redAreas', label: 'Redness/Vascular', color: '#DC2626' },
+              { key: 'wrinkles', label: 'Wrinkles', color: '#65A30D' },
+              { key: 'pores', label: 'Pores', color: '#7C3AED' },
+              { key: 'smoothness', label: 'Texture Mesh', color: '#0EA5E9' },
+              { key: 'overview', label: 'Overview', color: '#C9A96E' },
+            ].map(({ key, label, color }) => {
+              const hasImage = scanData.imageKeys.includes(key);
+              return (
+                <button
+                  key={key}
+                  disabled={!hasImage}
+                  onClick={() => {
+                    if (hasImage) {
+                      setLightboxImage({ src: key, label });
+                    }
+                  }}
+                  className={`relative aspect-[4/3] rounded-lg overflow-hidden border transition-all ${
+                    hasImage
+                      ? 'border-[#C9A96E]/30 hover:border-[#C9A96E]/60 cursor-pointer group'
+                      : 'border-[#F8F6F1]/10 opacity-40 cursor-not-allowed'
+                  }`}
+                >
+                  {/* Placeholder background */}
+                  <div className="absolute inset-0 bg-[#0F1D2C] flex items-center justify-center">
+                    <svg className="w-6 h-6 text-[#F8F6F1]/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                  </div>
+                  {/* Label */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                    <div className="flex items-center gap-1.5">
+                      <div
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="font-body text-[10px] font-medium text-[#F8F6F1] truncate">
+                        {label}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Hover overlay */}
+                  {hasImage && (
+                    <div className="absolute inset-0 bg-[#C9A96E]/0 group-hover:bg-[#C9A96E]/10 transition-colors flex items-center justify-center">
+                      <svg className="w-5 h-5 text-[#F8F6F1] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Measurements row */}
+        {(scanData.imageKeys.includes('distancesFront') ||
+          scanData.imageKeys.includes('anglesLeft')) && (
+          <div className="space-y-2">
+            <h4 className="font-body text-xs font-semibold text-[#F8F6F1]/70 uppercase tracking-wide">
+              Facial Measurements
+            </h4>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: 'distancesFront', label: 'Distances (Front)' },
+                { key: 'distancesRight', label: 'Distances (Right)' },
+                { key: 'anglesLeft', label: 'Angles (Left)' },
+                { key: 'anglesRight', label: 'Angles (Right)' },
+              ]
+                .filter(({ key }) => scanData.imageKeys.includes(key))
+                .map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setLightboxImage({ src: key, label })}
+                    className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[#C9A96E]/20 hover:border-[#C9A96E]/50 transition-all cursor-pointer group bg-[#0F1D2C]"
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[#C9A96E]/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                      </svg>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                      <span className="font-body text-[10px] font-medium text-[#F8F6F1]">
+                        {label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Handout PDF link */}
+        {scanData.handoutPdfPath && (
+          <div className="flex items-center gap-2 bg-[#F8F6F1]/5 rounded-lg px-3 py-2">
+            <svg className="w-4 h-4 text-[#C9A96E] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            <span className="font-body text-xs text-[#F8F6F1]/70 truncate">
+              Handout PDF saved
+            </span>
+          </div>
+        )}
+
+        {/* Lightbox Modal */}
+        {lightboxImage && (
+          <div
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+            onClick={() => setLightboxImage(null)}
+          >
+            <div className="relative max-w-4xl max-h-[90vh] w-full">
+              <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-10">
+                <span className="font-display text-sm font-semibold text-[#F8F6F1] bg-black/50 rounded-lg px-3 py-1">
+                  {lightboxImage.label}
+                </span>
+                <button
+                  onClick={() => setLightboxImage(null)}
+                  className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-[#F8F6F1] hover:bg-black/70 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="rounded-xl overflow-hidden border-2 border-[#C9A96E]/30 bg-[#0F1D2C] flex items-center justify-center min-h-[300px]">
+                <p className="font-body text-sm text-[#F8F6F1]/40">
+                  {lightboxImage.label} — Full resolution view
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── DEFAULT STATE — Import Button ──
+
+  return (
+    <div className="rounded-xl border border-[#C9A96E]/20 bg-gradient-to-br from-[#0F1D2C] to-[#1A2D40] p-6 space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-[#C9A96E]/10 flex items-center justify-center">
+          <svg className="w-5 h-5 text-[#C9A96E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="font-display text-base font-semibold text-[#F8F6F1]">
+            Aura 3D Scanner
+          </h3>
+          <p className="font-body text-xs text-[#F8F6F1]/50">
+            Import medical-grade 3D imaging data
+          </p>
+        </div>
+      </div>
+
+      {/* Import buttons */}
+      <div className="space-y-2">
+        <button
+          onClick={handleOpenSelector}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-[#C9A96E] to-[#B8964E] text-[#0F1D2C] font-body text-sm font-semibold hover:from-[#D4B87E] hover:to-[#C9A96E] transition-all shadow-lg shadow-[#C9A96E]/20"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+          </svg>
+          Import from Aura Scanner
+        </button>
+
+        {session.patientName && (
+          <button
+            onClick={handleImportLatest}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[#C9A96E]/30 text-[#C9A96E] font-body text-xs font-medium hover:bg-[#C9A96E]/10 transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            Auto-find latest scan for {session.patientName}
+          </button>
+        )}
+      </div>
+
+      {/* Error display */}
+      {importError && (
+        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+          <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <p className="font-body text-xs text-red-300">{importError}</p>
+        </div>
+      )}
+
+      {/* Scan Selector Modal */}
+      {showSelector && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setShowSelector(false)}>
+          <div
+            className="bg-[#0F1D2C] border border-[#C9A96E]/30 rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-4 border-b border-[#F8F6F1]/10">
+              <h3 className="font-display text-lg font-semibold text-[#F8F6F1]">
+                Select Aura Scan
+              </h3>
+              <button
+                onClick={() => setShowSelector(false)}
+                className="w-8 h-8 rounded-full hover:bg-[#F8F6F1]/10 flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5 text-[#F8F6F1]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Scan list */}
+            <div className="overflow-y-auto max-h-[60vh] p-4 space-y-4">
+              {loadingScans && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+                  <span className="font-body text-sm text-[#F8F6F1]/50 ml-3">Scanning for available data...</span>
+                </div>
+              )}
+
+              {scanError && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                  <p className="font-body text-xs text-red-300">{scanError}</p>
+                  <p className="font-body text-[10px] text-red-300/50 mt-1">
+                    Ensure the Aura scanner app has been used and scan data exists on this machine.
+                  </p>
+                </div>
+              )}
+
+              {!loadingScans && !scanError && availableScans.length === 0 && (
+                <div className="text-center py-8">
+                  <svg className="w-12 h-12 text-[#F8F6F1]/20 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                  </svg>
+                  <p className="font-body text-sm text-[#F8F6F1]/40">No scans found</p>
+                  <p className="font-body text-xs text-[#F8F6F1]/25 mt-1">
+                    Complete a scan in the Aura app first
+                  </p>
+                </div>
+              )}
+
+              {/* Suggested matches */}
+              {suggestedScans.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-body text-xs font-semibold text-[#C9A96E] uppercase tracking-wide flex items-center gap-1.5">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                    Suggested Match
+                  </h4>
+                  {suggestedScans.map((scan) => (
+                    <ScanCard
+                      key={`${scan.name}_${scan.date}`}
+                      scan={scan}
+                      isMatch
+                      onSelect={() => handleImport(scan)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Other scans */}
+              {otherScans.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-body text-xs font-semibold text-[#F8F6F1]/50 uppercase tracking-wide">
+                    {suggestedScans.length > 0 ? 'Other Scans' : 'Available Scans'}
+                  </h4>
+                  {otherScans.map((scan) => (
+                    <ScanCard
+                      key={`${scan.name}_${scan.date}`}
+                      scan={scan}
+                      isMatch={false}
+                      onSelect={() => handleImport(scan)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inline styles for scan animation */}
+      <style jsx>{`
+        @keyframes scan {
+          0% { transform: translateY(0); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(80px); opacity: 0; }
+        }
+        .animate-scan {
+          animation: scan 2s ease-in-out infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ── SUBCOMPONENT: Scan Card ──
+
+function ScanCard({
+  scan,
+  isMatch,
+  onSelect,
+}: {
+  scan: AvailableScan;
+  isMatch: boolean;
+  onSelect: () => void;
+}) {
+  const formatDate = (isoDate: string) => {
+    try {
+      return new Date(isoDate).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return isoDate;
+    }
+  };
+
+  return (
+    <button
+      onClick={onSelect}
+      className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all text-left ${
+        isMatch
+          ? 'border-[#C9A96E]/40 bg-[#C9A96E]/5 hover:bg-[#C9A96E]/10 hover:border-[#C9A96E]/60'
+          : 'border-[#F8F6F1]/10 hover:bg-[#F8F6F1]/5 hover:border-[#F8F6F1]/20'
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+            isMatch ? 'bg-[#C9A96E]/20' : 'bg-[#F8F6F1]/5'
+          }`}
+        >
+          <svg
+            className={`w-4 h-4 ${isMatch ? 'text-[#C9A96E]' : 'text-[#F8F6F1]/40'}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+        </div>
+        <div>
+          <p className={`font-body text-sm font-medium ${isMatch ? 'text-[#F8F6F1]' : 'text-[#F8F6F1]/80'}`}>
+            {scan.name}
+          </p>
+          <p className="font-body text-xs text-[#F8F6F1]/40">
+            {formatDate(scan.date)} &middot; {scan.imageCount} images
+          </p>
+        </div>
+      </div>
+      <svg className="w-4 h-4 text-[#F8F6F1]/30 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+  );
+}
