@@ -92,7 +92,7 @@ async function enrichWithProviderIdentity(
   }
 
   const providerId = authSession.username;
-  const providerName = authSession.displayName;
+  const providerName = authSession.name;
 
   if (action.type === 'SET_PROVIDER_REVIEW') {
     return {
