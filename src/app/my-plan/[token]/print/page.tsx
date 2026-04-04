@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import type { PatientPlanData } from '@/app/api/mastermind/share/[token]/route';
+import type { PatientPlanData } from '@/types/patient-plan';
 
 // ── Types for the page ──
 

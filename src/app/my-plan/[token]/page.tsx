@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import type { PatientPlanData } from '@/app/api/mastermind/share/[token]/route';
+import type { PatientPlanData } from '@/types/patient-plan';
 
 // ── Design Tokens ──
 
