@@ -87,7 +87,28 @@ export async function POST(request: NextRequest) {
     await saveSessionAsync(session);
 
     // 4. Write to Airtable Client Intakes table (non-blocking — CRM pipeline + n8n triggers)
+    // Include rich intake data so clinic staff can act on it immediately
     try {
+      const concerns = Array.isArray(intakeData.skinConcerns)
+        ? (intakeData.skinConcerns as string[]).join(', ')
+        : '';
+      const areas = Array.isArray(intakeData.targetAreas)
+        ? (intakeData.targetAreas as string[]).join(', ')
+        : '';
+      const goals = typeof intakeData.goals === 'string' ? intakeData.goals : '';
+      const timeline = typeof intakeData.timeline === 'string' ? intakeData.timeline : '';
+      const budget = typeof intakeData.budget === 'string' ? intakeData.budget : '';
+
+      const intakeSummary = [
+        `Skin Concerns: ${concerns || 'Not specified'}`,
+        `Target Areas: ${areas || 'Not specified'}`,
+        goals ? `Goals: ${goals}` : '',
+        timeline ? `Timeline: ${timeline}` : '',
+        budget ? `Budget: ${budget}` : '',
+        sourcePhotoUrl ? 'Photo: Uploaded' : 'Photo: None',
+        `Session ID: ${session.id}`,
+      ].filter(Boolean).join('\n');
+
       await rateLimitedQuery(async () => {
         await Tables.intakes().create(
           {
@@ -95,6 +116,7 @@ export async function POST(request: NextRequest) {
             'Email': patientEmail,
             'Phone Number': (intakeData.phone as string) || '',
             'Processing Status': 'New',
+            'Intake Summary (AI)': intakeSummary,
           } as Record<string, unknown>,
           { typecast: true }
         );
@@ -104,31 +126,42 @@ export async function POST(request: NextRequest) {
       console.warn('[Consultation Submit] Airtable intake write failed:', err);
     }
 
-    // 5. Auto-run Aura Scan (non-blocking — advance session if it works)
-    // Prefers AI scan (Claude vision) when API key available and photo exists
+    // 5. Auto-run Aura Scan (truly non-blocking — don't hold up the response)
+    // The scan can take 10-30s with Claude AI; returning the session ID
+    // immediately prevents Vercel function timeouts and gives the client
+    // a responsive experience. The dashboard polls for scan completion.
     const useMock = process.env.USE_MOCK_AI === 'true';
     const useAIScan = !!process.env.ANTHROPIC_API_KEY && !useMock;
-    try {
-      let scanResult;
-      if (useMock) {
-        scanResult = mockAuraScanResult();
-      } else if (useAIScan) {
-        // Use Claude AI vision to analyze the photo + intake data
-        const { runAIAuraScan } = await import('@/lib/mastermind/ai-aura-scan');
-        scanResult = await runAIAuraScan(intakeData, sourcePhotoUrl || undefined);
-      } else {
-        scanResult = await runAuraScan(intakeData);
-      }
 
-      const scanned = sessionReducer(session, {
-        type: 'SET_SCAN_RESULT',
-        result: scanResult,
-      });
-      await saveSessionAsync(scanned);
-    } catch (err) {
-      // Scan failure is non-blocking — session remains at 'intake' phase
-      console.warn('[Consultation Submit] Auto-scan failed:', err);
+    const scanPromise = (async () => {
+      try {
+        let scanResult;
+        if (useMock) {
+          scanResult = mockAuraScanResult();
+        } else if (useAIScan) {
+          const { runAIAuraScan } = await import('@/lib/mastermind/ai-aura-scan');
+          scanResult = await runAIAuraScan(intakeData, sourcePhotoUrl || undefined);
+        } else {
+          scanResult = await runAuraScan(intakeData);
+        }
+
+        const scanned = sessionReducer(session, {
+          type: 'SET_SCAN_RESULT',
+          result: scanResult,
+        });
+        await saveSessionAsync(scanned);
+        console.log(`[Consultation Submit] Auto-scan completed for session ${session.id}`);
+      } catch (err) {
+        console.error('[Consultation Submit] Auto-scan failed:', err);
+      }
+    })();
+
+    // For mock/rule-based scans (fast), wait briefly so the session
+    // is ready when the dashboard loads. For AI scans, don't block.
+    if (useMock || !useAIScan) {
+      await scanPromise;
     }
+    // AI scan runs in background — client polls /api/mastermind/session for completion
 
     // 6. Return session ID
     return NextResponse.json({

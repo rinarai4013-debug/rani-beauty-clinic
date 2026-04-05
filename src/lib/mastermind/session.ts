@@ -256,9 +256,11 @@ export function saveSession(session: MastermindSession): void {
   if (typeof window === 'undefined') {
     import('./session-store').then(({ saveSessionToAirtable }) => {
       saveSessionToAirtable(session).catch((err) => {
-        console.warn('[Session] Airtable save failed:', err);
+        console.error(`[Session] Airtable fire-and-forget save failed for ${session.id}:`, err);
       });
-    }).catch(() => { /* dynamic import failed */ });
+    }).catch((err) => {
+      console.error('[Session] session-store import failed:', err);
+    });
   }
 
   // Client-side: persist to localStorage
@@ -291,7 +293,12 @@ export async function saveSessionAsync(session: MastermindSession): Promise<void
       const { saveSessionToAirtable } = await import('./session-store');
       await saveSessionToAirtable(session);
     } catch (err) {
-      console.warn('[Session] Airtable save failed:', err);
+      // Log as error — if this fails, session only exists in memory
+      // and will be lost on Vercel cold start
+      console.error(
+        `[Session] CRITICAL: Airtable save failed for session ${session.id} (phase: ${session.phase}, patient: ${session.patientName || 'unknown'})`,
+        err
+      );
     }
   }
 }

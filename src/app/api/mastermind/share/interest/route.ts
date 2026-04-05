@@ -82,8 +82,8 @@ export async function POST(request: NextRequest) {
 
     const { token, name, phone, packageTier, message } = validation.data;
 
-    // Validate token
-    const tokenRecord = resolveToken(token);
+    // Validate token (checks cache, falls back to Airtable)
+    const tokenRecord = await resolveToken(token);
     if (!tokenRecord) {
       return NextResponse.json(
         {
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[Interest] Submission failed:', err);
     return NextResponse.json(
-      { success: false, error: 'Something went wrong. Please call us directly at (425) 555-RANI.' },
+      { success: false, error: 'Something went wrong. Please call us directly at (425) 539-4440.' },
       { status: 500 }
     );
   }

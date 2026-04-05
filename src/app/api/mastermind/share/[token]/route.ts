@@ -235,8 +235,8 @@ export async function GET(
       );
     }
 
-    // Resolve token
-    const record = resolveToken(token);
+    // Resolve token (checks cache, falls back to Airtable)
+    const record = await resolveToken(token);
     if (!record) {
       return NextResponse.json(
         {
