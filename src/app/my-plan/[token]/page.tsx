@@ -855,21 +855,54 @@ export default function PatientPlanPage() {
   if (loading) {
     return (
       <div
-        className="min-h-screen flex flex-col items-center justify-center"
-        style={{ backgroundColor: COLORS.cream }}
+        className="min-h-screen flex flex-col items-center justify-center patient-hero-gradient"
       >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="w-12 h-12 rounded-full mb-6"
-          style={{ border: `3px solid ${COLORS.divider}`, borderTopColor: COLORS.gold }}
+        {/* Subtle gold radial glow */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-[0.08]"
+          style={{ background: `radial-gradient(circle, ${COLORS.gold} 0%, transparent 70%)` }}
         />
-        <p
-          className="text-sm tracking-wide"
-          style={{ color: `${COLORS.navy}60`, fontFamily: 'var(--font-body), Montserrat, sans-serif' }}
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-10 mb-10"
         >
-          Loading your personalized plan...
-        </p>
+          <div
+            className="text-3xl font-bold tracking-[0.25em]"
+            style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.gold }}
+          >
+            RANI
+          </div>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: '100%' }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="h-px mt-3"
+            style={{ background: `linear-gradient(90deg, transparent, ${COLORS.gold}, transparent)` }}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="relative z-10 flex flex-col items-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
+            className="w-10 h-10 rounded-full mb-5"
+            style={{ border: `2px solid ${COLORS.gold}25`, borderTopColor: COLORS.gold }}
+          />
+          <p
+            className="text-sm tracking-[0.15em] uppercase"
+            style={{ color: `${COLORS.white}50`, fontFamily: 'var(--font-body), Montserrat, sans-serif' }}
+          >
+            Preparing your plan
+          </p>
+        </motion.div>
       </div>
     );
   }
@@ -1761,10 +1794,16 @@ export default function PatientPlanPage() {
         style={{ backgroundColor: COLORS.navy }}
       >
         <div className="gold-separator mb-6" style={{ opacity: 0.3 }} />
-        <p className="text-xs tracking-widest uppercase mb-3" style={{ color: `${COLORS.gold}60` }}>
-          Powered by AI Mastermind &middot; Rani Beauty Clinic
+        <p
+          className="text-lg font-bold tracking-[0.2em] mb-4"
+          style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: `${COLORS.gold}40` }}
+        >
+          RANI
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: `${COLORS.white}25` }}>
+        <p className="text-xs tracking-widest uppercase mb-3" style={{ color: `${COLORS.gold}40` }}>
+          Physician-Supervised Aesthetic Medicine
+        </p>
+        <p className="text-xs leading-relaxed" style={{ color: `${COLORS.white}20` }}>
           This plan was prepared exclusively for {data.patientName}.
           <br />
           Results may vary. This is a projected treatment plan and not a guarantee of outcomes.

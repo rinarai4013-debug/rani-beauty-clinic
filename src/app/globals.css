@@ -101,9 +101,9 @@
 }
 
 .gold-separator {
-  width: 40px;
+  width: 60px;
   height: 1px;
-  background: linear-gradient(90deg, #C9A96E, #D4BA87);
+  background: linear-gradient(90deg, transparent, #C9A96E, #D4BA87, transparent);
   margin: 0 auto;
 }
 
