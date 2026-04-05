@@ -288,6 +288,15 @@ export interface AuraDeviceAnalysis {
 // Separate from the AI pipeline phase — this tracks the human follow-up workflow
 export type ClinicStatus = 'new' | 'reviewed' | 'contacted' | 'booked' | 'no_response' | 'closed';
 
+// ── ACTIVITY LOG ──
+// Auditable timeline of actions taken on a consultation
+export interface ActivityLogEntry {
+  timestamp: string;
+  action: string;     // e.g. 'status_changed', 'note_added', 'share_link_generated', 'plan_generated'
+  detail: string;     // human-readable description
+  actor?: string;     // staff name if available
+}
+
 // ── MASTERMIND SESSION ──
 
 export type MastermindPhase =
@@ -338,6 +347,7 @@ export interface MastermindSession {
   clinicStatus?: ClinicStatus;
   clinicNotes?: string;
   shareToken?: string;
+  activityLog?: ActivityLogEntry[];
 }
 
 // ── SESSION ACTIONS ──

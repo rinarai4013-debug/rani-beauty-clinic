@@ -10,7 +10,25 @@ import type {
   MastermindSessionAction,
   MastermindPhase,
   ClinicStatus,
+  ActivityLogEntry,
 } from '@/types/mastermind';
+
+// ── Activity Log Helper ──
+
+function appendLog(
+  existing: ActivityLogEntry[] | undefined,
+  action: string,
+  detail: string,
+  actor?: string
+): ActivityLogEntry[] {
+  const entry: ActivityLogEntry = {
+    timestamp: new Date().toISOString(),
+    action,
+    detail,
+    ...(actor ? { actor } : {}),
+  };
+  return [...(existing || []), entry];
+}
 
 // ── Session Reducer ──
 
@@ -44,6 +62,7 @@ export function sessionReducer(
         updatedAt: now,
         phase: 'scan_complete',
         auraScanResult: action.result,
+        activityLog: appendLog(state.activityLog, 'scan_completed', `Aura scan completed (score: ${action.result?.auraScore?.overall ?? '?'})`),
       };
 
     case 'SET_PLAN':
@@ -52,6 +71,7 @@ export function sessionReducer(
         updatedAt: now,
         phase: 'plan_ready',
         mastermindPlan: action.plan,
+        activityLog: appendLog(state.activityLog, 'plan_generated', `Treatment plan generated (${action.plan?.packages?.length ?? 0} packages)`),
       };
 
     case 'SET_PROVIDER_REVIEW':
@@ -118,16 +138,30 @@ export function sessionReducer(
       };
 
     case 'COMPLETE':
-      return { ...state, updatedAt: now, phase: 'completed' };
+      return {
+        ...state, updatedAt: now, phase: 'completed',
+        activityLog: appendLog(state.activityLog, 'completed', 'Consultation completed'),
+      };
 
-    case 'SET_CLINIC_STATUS':
-      return { ...state, updatedAt: now, clinicStatus: action.status };
+    case 'SET_CLINIC_STATUS': {
+      const prev = state.clinicStatus || 'new';
+      return {
+        ...state, updatedAt: now, clinicStatus: action.status,
+        activityLog: appendLog(state.activityLog, 'status_changed', `Status changed from "${prev}" to "${action.status}"`),
+      };
+    }
 
     case 'SET_CLINIC_NOTES':
-      return { ...state, updatedAt: now, clinicNotes: action.notes };
+      return {
+        ...state, updatedAt: now, clinicNotes: action.notes,
+        activityLog: appendLog(state.activityLog, 'note_updated', 'Staff notes updated'),
+      };
 
     case 'SET_SHARE_TOKEN':
-      return { ...state, updatedAt: now, shareToken: action.token };
+      return {
+        ...state, updatedAt: now, shareToken: action.token,
+        activityLog: appendLog(state.activityLog, 'share_link_generated', 'Patient plan link generated'),
+      };
 
     default:
       return state;
@@ -246,6 +280,7 @@ function hydrateSession(parsed: Record<string, unknown>): MastermindSession {
     clinicStatus: isValidClinicStatus(parsed.clinicStatus) ? parsed.clinicStatus : undefined,
     clinicNotes: typeof parsed.clinicNotes === 'string' ? parsed.clinicNotes : undefined,
     shareToken: typeof parsed.shareToken === 'string' ? parsed.shareToken : undefined,
+    activityLog: Array.isArray(parsed.activityLog) ? parsed.activityLog as ActivityLogEntry[] : undefined,
   };
 }
 
