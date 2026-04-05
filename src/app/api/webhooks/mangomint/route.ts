@@ -105,6 +105,54 @@ async function handleAppointmentCreated(data: Record<string, unknown>, payload: 
   cache.invalidatePrefix('schedule');
   cache.invalidatePrefix('kpi');
   await forwardToN8n('/webhook/booking-sync', payload);
+
+  // Consultation-to-booking sync: auto-mark matching consultation as "booked"
+  syncConsultationBooking(data).catch(err => {
+    console.error('[Mangomint] Consultation booking sync failed (non-blocking):', err);
+  });
+}
+
+/**
+ * When a Mangomint booking comes in, find any matching consultation
+ * (by email or phone) and auto-mark it as "booked" with a log entry.
+ */
+async function syncConsultationBooking(data: Record<string, unknown>): Promise<void> {
+  const clientEmail = (data.clientEmail as string) || (data.email as string) || '';
+  const clientPhone = (data.clientPhone as string) || (data.mobilePhone as string) || (data.phone as string) || '';
+  const mangomintId = String(data.id || '');
+
+  if (!clientEmail && !clientPhone) return;
+
+  try {
+    const { getAllSessionsAsync, getSessionByIdAsync, saveSessionAsync, sessionReducer } = await import('@/lib/mastermind/session');
+    const sessions = await getAllSessionsAsync();
+
+    // Find matching sessions that aren't already booked
+    for (const session of sessions) {
+      if (session.clinicStatus === 'booked' || session.bookedAppointmentId) continue;
+
+      const sessionEmail = session.patientEmail || (session.intakeData?.email as string) || '';
+      const sessionPhone = (session.intakeData?.phone as string) || '';
+
+      const emailMatch = clientEmail && sessionEmail && clientEmail.toLowerCase() === sessionEmail.toLowerCase();
+      const phoneMatch = clientPhone && sessionPhone && clientPhone.replace(/\D/g, '') === sessionPhone.replace(/\D/g, '');
+
+      if (emailMatch || phoneMatch) {
+        // Mark as booked via reducer for proper activity logging
+        let updated = sessionReducer(session, { type: 'SET_BOOKED', appointmentId: mangomintId });
+        updated = sessionReducer(updated, {
+          type: 'SET_CLINIC_STATUS',
+          status: 'booked',
+          actor: 'Mangomint sync',
+        });
+        await saveSessionAsync(updated);
+        console.log(`[Mangomint] Auto-linked booking ${mangomintId} to consultation ${session.id} (${session.patientName})`);
+        break; // Only link to the most recent matching session
+      }
+    }
+  } catch (err) {
+    console.warn('[Mangomint] Consultation sync lookup failed:', err);
+  }
 }
 
 async function handleAppointmentUpdated(data: Record<string, unknown>) {

@@ -147,20 +147,20 @@ export function sessionReducer(
       const prev = state.clinicStatus || 'new';
       return {
         ...state, updatedAt: now, clinicStatus: action.status,
-        activityLog: appendLog(state.activityLog, 'status_changed', `Status changed from "${prev}" to "${action.status}"`),
+        activityLog: appendLog(state.activityLog, 'status_changed', `Status changed from "${prev}" to "${action.status}"`, action.actor),
       };
     }
 
     case 'SET_CLINIC_NOTES':
       return {
         ...state, updatedAt: now, clinicNotes: action.notes,
-        activityLog: appendLog(state.activityLog, 'note_updated', 'Staff notes updated'),
+        activityLog: appendLog(state.activityLog, 'note_updated', 'Staff notes updated', action.actor),
       };
 
     case 'SET_SHARE_TOKEN':
       return {
         ...state, updatedAt: now, shareToken: action.token,
-        activityLog: appendLog(state.activityLog, 'share_link_generated', 'Patient plan link generated'),
+        activityLog: appendLog(state.activityLog, 'share_link_generated', 'Patient plan link generated', action.actor),
       };
 
     default:

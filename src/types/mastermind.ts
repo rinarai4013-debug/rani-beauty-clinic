@@ -366,6 +366,6 @@ export type MastermindSessionAction =
   | { type: 'SET_PDF_URL'; url: string }
   | { type: 'SET_BOOKED'; appointmentId: string }
   | { type: 'COMPLETE' }
-  | { type: 'SET_CLINIC_STATUS'; status: ClinicStatus }
-  | { type: 'SET_CLINIC_NOTES'; notes: string }
-  | { type: 'SET_SHARE_TOKEN'; token: string };
+  | { type: 'SET_CLINIC_STATUS'; status: ClinicStatus; actor?: string }
+  | { type: 'SET_CLINIC_NOTES'; notes: string; actor?: string }
+  | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string };

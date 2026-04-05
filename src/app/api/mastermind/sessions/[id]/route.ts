@@ -87,11 +87,12 @@ async function enrichWithProviderIdentity(
   action: MastermindSessionAction
 ): Promise<MastermindSessionAction> {
   // Only enrich actions that carry provider identity
-  if (
-    action.type !== 'SET_PROVIDER_REVIEW' &&
-    action.type !== 'ADD_MODIFICATION' &&
-    action.type !== 'SET_APPROVAL_STATUS'
-  ) {
+  // Enrich staff-trackable actions with actor identity
+  const staffActions = [
+    'SET_PROVIDER_REVIEW', 'ADD_MODIFICATION', 'SET_APPROVAL_STATUS',
+    'SET_CLINIC_STATUS', 'SET_CLINIC_NOTES', 'SET_SHARE_TOKEN',
+  ];
+  if (!staffActions.includes(action.type)) {
     return action;
   }
 
@@ -125,6 +126,17 @@ async function enrichWithProviderIdentity(
         providerId,
       },
     };
+  }
+
+  // Inject actor into staff-trackable actions for activity log attribution
+  if (action.type === 'SET_CLINIC_STATUS') {
+    return { ...action, actor: providerName };
+  }
+  if (action.type === 'SET_CLINIC_NOTES') {
+    return { ...action, actor: providerName };
+  }
+  if (action.type === 'SET_SHARE_TOKEN') {
+    return { ...action, actor: providerName };
   }
 
   // SET_APPROVAL_STATUS — no provider field to enrich, just return as-is

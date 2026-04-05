@@ -34,6 +34,9 @@ import {
   Zap,
   FormInput,
   Bot,
+  Send,
+  TrendingUp,
+  ArrowRight,
 } from 'lucide-react';
 import type { ClinicStatus, MastermindPhase, ActivityLogEntry } from '@/types/mastermind';
 import type { UnifiedConsultation } from '@/app/api/dashboard/consultations/route';
@@ -173,11 +176,29 @@ export default function ConsultationPipelinePage() {
     [consultations, selectedId]
   );
 
+  // Conversion funnel metrics
+  const funnel = useMemo(() => {
+    const total = consultations.length;
+    if (total === 0) return null;
+    const contacted = consultations.filter(c => ['contacted', 'booked', 'closed'].includes(c.clinicStatus)).length;
+    const booked = consultations.filter(c => c.clinicStatus === 'booked').length;
+    const withPlan = consultations.filter(c => c.hasPlan).length;
+    return {
+      total,
+      contacted,
+      booked,
+      withPlan,
+      contactRate: Math.round((contacted / total) * 100),
+      bookRate: total > 0 ? Math.round((booked / total) * 100) : 0,
+      planRate: total > 0 ? Math.round((withPlan / total) * 100) : 0,
+    };
+  }, [consultations]);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h1
               className="text-2xl font-bold"
@@ -190,6 +211,23 @@ export default function ConsultationPipelinePage() {
             </p>
           </div>
         </div>
+
+        {/* Conversion Funnel */}
+        {funnel && funnel.total > 0 && (
+          <div
+            className="flex items-center gap-2 p-3 rounded-xl mb-4 overflow-x-auto hide-scrollbar"
+            style={{ backgroundColor: '#fff', border: '1px solid #0F1D2C08' }}
+          >
+            <TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: '#C9A96E' }} />
+            <FunnelStep label="Submitted" value={funnel.total} />
+            <ArrowRight className="w-3 h-3 flex-shrink-0" style={{ color: '#0F1D2C20' }} />
+            <FunnelStep label="Plan Ready" value={funnel.withPlan} rate={funnel.planRate} />
+            <ArrowRight className="w-3 h-3 flex-shrink-0" style={{ color: '#0F1D2C20' }} />
+            <FunnelStep label="Contacted" value={funnel.contacted} rate={funnel.contactRate} />
+            <ArrowRight className="w-3 h-3 flex-shrink-0" style={{ color: '#0F1D2C20' }} />
+            <FunnelStep label="Booked" value={funnel.booked} rate={funnel.bookRate} color="#059669" />
+          </div>
+        )}
 
         {/* Search */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -309,6 +347,22 @@ function StatusTab({
         </span>
       )}
     </button>
+  );
+}
+
+// ── FUNNEL STEP ──
+
+function FunnelStep({ label, value, rate, color }: { label: string; value: number; rate?: number; color?: string }) {
+  return (
+    <div className="flex items-center gap-1.5 flex-shrink-0">
+      <span className="text-sm font-bold" style={{ color: color || '#0F1D2C' }}>{value}</span>
+      <div className="flex flex-col">
+        <span className="text-[10px] leading-tight font-medium" style={{ color: '#0F1D2C80' }}>{label}</span>
+        {rate !== undefined && (
+          <span className="text-[9px] leading-tight" style={{ color: color || '#0F1D2C50' }}>{rate}%</span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -445,6 +499,8 @@ function ConsultationDetailDrawer({
 }) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [generatingLink, setGeneratingLink] = useState(false);
+  const [sendingPlan, setSendingPlan] = useState(false);
+  const [planSent, setPlanSent] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [notesDraft, setNotesDraft] = useState('');
@@ -520,6 +576,30 @@ function ConsultationDetailDrawer({
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   }, [c.shareToken]);
+
+  const handleSendPlan = useCallback(async () => {
+    if (!isMastermind || !c.sessionId || !c.email) return;
+    setSendingPlan(true);
+    try {
+      const res = await fetch('/api/mastermind/share/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: c.sessionId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPlanSent(true);
+        onMutate();
+        setTimeout(() => setPlanSent(false), 3000);
+      } else {
+        console.error('[Consultations] Send plan failed:', data.error);
+      }
+    } catch (err) {
+      console.error('[Consultations] Send plan error:', err);
+    } finally {
+      setSendingPlan(false);
+    }
+  }, [isMastermind, c.sessionId, c.email, onMutate]);
 
   return (
     <DrawerShell onClose={onClose}>
@@ -610,6 +690,25 @@ function ConsultationDetailDrawer({
               <ExternalLink className="w-3.5 h-3.5" />
               View Plan
             </a>
+          )}
+          {/* Send/Resend plan email */}
+          {isMastermind && (c.hasPlan || c.hasShareLink) && c.email && (
+            <button
+              type="button"
+              onClick={handleSendPlan}
+              disabled={sendingPlan}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors hover:opacity-80 disabled:opacity-50"
+              style={{ backgroundColor: planSent ? '#059669' : '#6366F1', color: '#fff' }}
+            >
+              {sendingPlan ? (
+                <div className="w-3.5 h-3.5 border border-white border-t-transparent rounded-full animate-spin" />
+              ) : planSent ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              {planSent ? 'Sent!' : c.hasShareLink ? 'Resend Plan' : 'Send Plan'}
+            </button>
           )}
         </div>
 
@@ -870,6 +969,8 @@ const TIMELINE_ICONS: Record<string, { icon: typeof Clock; color: string }> = {
   completed: { icon: Check, color: '#059669' },
   ai_processed: { icon: Bot, color: '#6366F1' },
   auto_responded: { icon: Mail, color: '#059669' },
+  plan_sent: { icon: Send, color: '#6366F1' },
+  booking_synced: { icon: CalendarCheck, color: '#059669' },
 };
 
 function ActivityTimeline({ entries }: { entries: ActivityLogEntry[] }) {
