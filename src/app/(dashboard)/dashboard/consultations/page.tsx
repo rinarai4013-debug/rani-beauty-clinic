@@ -581,7 +581,7 @@ function ConsultationDetailDrawer({
     if (!isMastermind || !c.sessionId || !c.email) return;
     setSendingPlan(true);
     try {
-      const res = await fetch('/api/mastermind/share/send', {
+      const res = await fetch('/api/mastermind/plan-send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: c.sessionId }),

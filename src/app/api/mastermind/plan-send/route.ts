@@ -1,5 +1,5 @@
 /**
- * POST /api/mastermind/share/send
+ * POST /api/mastermind/plan-send
  *
  * Sends (or resends) a patient's plan link via email.
  * If no share token exists yet, generates one first.
@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { requireAuth, unauthorized } from '@/lib/auth/middleware';
-import { resolveToken } from '../route';
+import { resolveToken } from '../share/route';
 import crypto from 'crypto';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
