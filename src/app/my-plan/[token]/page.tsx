@@ -19,6 +19,146 @@ const COLORS = {
   divider: '#E8E2D9',
 } as const;
 
+const NAV_SECTIONS = [
+  { id: 'analysis', label: 'Analysis' },
+  { id: 'journey', label: 'Journey' },
+  { id: 'packages', label: 'Packages' },
+  { id: 'aftercare', label: 'Aftercare' },
+] as const;
+
+// ── Sticky Navigation Bar ──
+
+function StickyNav({ token }: { token: string }) {
+  const [visible, setVisible] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setVisible(window.scrollY > 400);
+
+      // Determine active section
+      const sections = NAV_SECTIONS.map((s) => {
+        const el = document.getElementById(s.id);
+        if (!el) return { id: s.id, top: Infinity };
+        return { id: s.id, top: el.getBoundingClientRect().top };
+      });
+      const current = sections
+        .filter((s) => s.top <= 200)
+        .sort((a, b) => b.top - a.top)[0];
+      setActiveSection(current?.id || '');
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <motion.nav
+      initial={{ y: -60, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: -60, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg"
+      style={{
+        backgroundColor: `${COLORS.navy}E8`,
+        borderBottom: `1px solid ${COLORS.gold}20`,
+      }}
+    >
+      <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-12">
+        <span
+          className="text-sm font-bold tracking-[0.15em]"
+          style={{ color: COLORS.gold, fontFamily: 'var(--font-heading), Playfair Display, serif' }}
+        >
+          RANI
+        </span>
+
+        <div className="flex items-center gap-1">
+          {NAV_SECTIONS.map((section) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200"
+              style={{
+                color: activeSection === section.id ? COLORS.gold : `${COLORS.white}60`,
+                backgroundColor: activeSection === section.id ? `${COLORS.gold}15` : 'transparent',
+                fontFamily: 'var(--font-body), Montserrat, sans-serif',
+              }}
+            >
+              {section.label}
+            </a>
+          ))}
+
+          <span className="w-px h-4 mx-1" style={{ backgroundColor: `${COLORS.white}15` }} />
+
+          <a
+            href={`/my-plan/${token}/print`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 hover:bg-white/5"
+            style={{
+              color: `${COLORS.white}60`,
+              fontFamily: 'var(--font-body), Montserrat, sans-serif',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Print
+          </a>
+        </div>
+      </div>
+    </motion.nav>
+  );
+}
+
+// ── Trust Badge ──
+
+function TrustBadge() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.0, duration: 0.6 }}
+      className="flex items-center justify-center gap-3 flex-wrap"
+    >
+      <div
+        className="flex items-center gap-2 px-4 py-2 rounded-full text-xs"
+        style={{
+          backgroundColor: `${COLORS.white}08`,
+          border: `1px solid ${COLORS.white}12`,
+          color: `${COLORS.white}60`,
+          fontFamily: 'var(--font-body), Montserrat, sans-serif',
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={COLORS.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <polyline points="9 12 11 14 15 10" />
+        </svg>
+        Physician-Supervised Care
+      </div>
+      <div
+        className="flex items-center gap-2 px-4 py-2 rounded-full text-xs"
+        style={{
+          backgroundColor: `${COLORS.white}08`,
+          border: `1px solid ${COLORS.white}12`,
+          color: `${COLORS.white}60`,
+          fontFamily: 'var(--font-body), Montserrat, sans-serif',
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={COLORS.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" />
+        </svg>
+        AI-Powered Analysis
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Animated Section Wrapper ──
 
 function Section({
@@ -122,13 +262,13 @@ function AuraGauge({
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className="text-5xl font-bold tabular-nums"
-          style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: COLORS.navy }}
+          style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
         >
           {animatedScore}
         </span>
         <span
           className="text-sm font-medium mt-1 tracking-wide uppercase"
-          style={{ color: COLORS.gold, fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          style={{ color: COLORS.gold, fontFamily: 'var(--font-body), Montserrat, sans-serif' }}
         >
           {label}
         </span>
@@ -214,7 +354,7 @@ function PackageCard({
           <div className="flex items-baseline gap-2">
             <span
               className="text-3xl font-bold"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: COLORS.navy }}
+              style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
             >
               ${pkg.price.toLocaleString()}
             </span>
@@ -397,7 +537,7 @@ function InterestModal({
               </div>
               <h3
                 className="text-xl font-bold mb-2"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: COLORS.navy }}
+                style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
               >
                 Thank You!
               </h3>
@@ -418,7 +558,7 @@ function InterestModal({
             <>
               <h3
                 className="text-xl font-bold mb-1"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: COLORS.navy }}
+                style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
               >
                 Express Your Interest
               </h3>
@@ -472,7 +612,7 @@ function InterestModal({
                     }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = COLORS.gold)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = COLORS.divider)}
-                    placeholder="(425) 555-0100"
+                    placeholder="(425) 000-0000"
                   />
                 </div>
 
@@ -558,7 +698,7 @@ function TreatmentTimeline({
               style={{
                 backgroundColor: `${COLORS.gold}15`,
                 color: COLORS.gold,
-                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontFamily: 'var(--font-heading), Playfair Display, serif',
               }}
             >
               {phase.phase}
@@ -604,7 +744,7 @@ function TreatmentTimeline({
                     <h5
                       className="font-bold"
                       style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        fontFamily: 'var(--font-heading), Playfair Display, serif',
                         color: COLORS.navy,
                       }}
                     >
@@ -726,7 +866,7 @@ export default function PatientPlanPage() {
         />
         <p
           className="text-sm tracking-wide"
-          style={{ color: `${COLORS.navy}60`, fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          style={{ color: `${COLORS.navy}60`, fontFamily: 'var(--font-body), Montserrat, sans-serif' }}
         >
           Loading your personalized plan...
         </p>
@@ -753,7 +893,7 @@ export default function PatientPlanPage() {
           </div>
           <h1
             className="text-2xl font-bold mb-3"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: COLORS.navy }}
+            style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
           >
             Link Expired or Invalid
           </h1>
@@ -769,8 +909,8 @@ export default function PatientPlanPage() {
           </a>
           <p className="text-xs mt-6" style={{ color: `${COLORS.navy}40` }}>
             Need help? Call us at{' '}
-            <a href="tel:+14255551234" style={{ color: COLORS.gold }}>
-              (425) 555-1234
+            <a href="tel:+14255394440" style={{ color: COLORS.gold }}>
+              (425) 539-4440
             </a>
           </p>
         </div>
@@ -809,6 +949,10 @@ export default function PatientPlanPage() {
 
   return (
     <div className="min-h-screen paper-texture patient-portal-scroll" style={{ backgroundColor: COLORS.cream }}>
+      <AnimatePresence>
+        <StickyNav token={token} />
+      </AnimatePresence>
+
       {/* ────────────────── SECTION 1: HERO ────────────────── */}
       <section
         className="relative overflow-hidden patient-hero-gradient"
@@ -854,7 +998,7 @@ export default function PatientPlanPage() {
             <span
               className="hidden text-2xl tracking-[0.2em] font-bold"
               style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontFamily: 'var(--font-heading), Playfair Display, serif',
                 color: COLORS.gold,
               }}
             >
@@ -942,6 +1086,11 @@ export default function PatientPlanPage() {
               {skinAgeDirection}{skinAgeDelta} years
             </div>
           </motion.div>
+
+          {/* Trust Signals */}
+          <div className="mt-8">
+            <TrustBadge />
+          </div>
         </div>
       </section>
 
@@ -1043,7 +1192,7 @@ export default function PatientPlanPage() {
                     <p
                       className="text-lg font-bold"
                       style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        fontFamily: 'var(--font-heading), Playfair Display, serif',
                         color: zone.overallScore >= 70 ? '#4CAF50' : zone.overallScore >= 40 ? COLORS.gold : '#F44336',
                       }}
                     >
@@ -1069,7 +1218,7 @@ export default function PatientPlanPage() {
             <p
               className="text-lg md:text-xl font-bold leading-relaxed"
               style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontFamily: 'var(--font-heading), Playfair Display, serif',
                 color: COLORS.white,
               }}
             >
@@ -1476,7 +1625,7 @@ export default function PatientPlanPage() {
                 >
                   <div className="flex items-center justify-center gap-8 flex-wrap">
                     <div>
-                      <p className="text-3xl font-bold" style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: '#4CAF50' }}>
+                      <p className="text-3xl font-bold" style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: '#4CAF50' }}>
                         +{data.simulation.comparison.auraScoreDelta}
                       </p>
                       <p className="text-xs mt-1" style={{ color: `${COLORS.navy}50` }}>
@@ -1488,7 +1637,7 @@ export default function PatientPlanPage() {
                       style={{ backgroundColor: COLORS.divider }}
                     />
                     <div>
-                      <p className="text-3xl font-bold" style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: '#4CAF50' }}>
+                      <p className="text-3xl font-bold" style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: '#4CAF50' }}>
                         -{Math.abs(data.simulation.comparison.skinAgeDelta)}
                       </p>
                       <p className="text-xs mt-1" style={{ color: `${COLORS.navy}50` }}>
@@ -1574,7 +1723,7 @@ export default function PatientPlanPage() {
                 </svg>
               </a>
               <a
-                href="tel:+14255551234"
+                href="tel:+14255394440"
                 className="inline-flex items-center gap-2 px-8 py-4 min-h-[48px] rounded-xl text-sm font-bold tracking-wide transition-all duration-300 hover:bg-white/5"
                 style={{
                   backgroundColor: 'transparent',
@@ -1596,7 +1745,7 @@ export default function PatientPlanPage() {
               </p>
               <p>401 Olympia Ave NE, Suite 101, Renton, WA 98056</p>
               <p>
-                <a href="tel:+14255551234" className="hover:underline">(425) 555-1234</a>
+                <a href="tel:+14255394440" className="hover:underline">(425) 539-4440</a>
                 {' '}&middot;{' '}
                 <a href="mailto:info@ranibeautyclinic.com" className="hover:underline">info@ranibeautyclinic.com</a>
               </p>
