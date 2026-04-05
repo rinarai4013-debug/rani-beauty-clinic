@@ -376,7 +376,9 @@ function PhotoDropZone({
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     setDragOver(false);
-    const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+    const dropped = Array.from(e.dataTransfer.files).filter(
+      (f) => f.type.startsWith('image/') || f.type === 'application/pdf'
+    );
     onFiles(dropped.slice(0, maxFiles - files.length));
   };
 
@@ -392,7 +394,7 @@ function PhotoDropZone({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic"
+        accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
         multiple
         className="hidden"
         onChange={handleSelect}
@@ -402,12 +404,19 @@ function PhotoDropZone({
         <div className="flex gap-3 flex-wrap">
           {files.map((f, i) => (
             <div key={i} className="relative group">
-              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-[#C9A96E]/30">
-                <img
-                  src={URL.createObjectURL(f)}
-                  alt={`Upload ${i + 1}`}
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-[#C9A96E]/30 flex items-center justify-center bg-[#0F1D2C]">
+                {f.type === 'application/pdf' ? (
+                  <div className="text-center">
+                    <div className="text-[#C9A96E] text-lg">📄</div>
+                    <div className="text-[8px] text-[#F8F6F1]/50 mt-0.5 px-1 truncate max-w-[76px]">{f.name}</div>
+                  </div>
+                ) : (
+                  <img
+                    src={URL.createObjectURL(f)}
+                    alt={`Upload ${i + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
               <button
                 type="button"
