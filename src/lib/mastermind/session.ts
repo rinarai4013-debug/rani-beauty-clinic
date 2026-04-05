@@ -9,6 +9,7 @@ import type {
   MastermindSession,
   MastermindSessionAction,
   MastermindPhase,
+  ClinicStatus,
 } from '@/types/mastermind';
 
 // ── Session Reducer ──
@@ -118,6 +119,15 @@ export function sessionReducer(
 
     case 'COMPLETE':
       return { ...state, updatedAt: now, phase: 'completed' };
+
+    case 'SET_CLINIC_STATUS':
+      return { ...state, updatedAt: now, clinicStatus: action.status };
+
+    case 'SET_CLINIC_NOTES':
+      return { ...state, updatedAt: now, clinicNotes: action.notes };
+
+    case 'SET_SHARE_TOKEN':
+      return { ...state, updatedAt: now, shareToken: action.token };
 
     default:
       return state;
@@ -233,6 +243,9 @@ function hydrateSession(parsed: Record<string, unknown>): MastermindSession {
     selectedPackageTier: isValidTier(parsed.selectedPackageTier) ? parsed.selectedPackageTier : null,
     pdfUrl: typeof parsed.pdfUrl === 'string' ? parsed.pdfUrl : null,
     bookedAppointmentId: typeof parsed.bookedAppointmentId === 'string' ? parsed.bookedAppointmentId : null,
+    clinicStatus: isValidClinicStatus(parsed.clinicStatus) ? parsed.clinicStatus : undefined,
+    clinicNotes: typeof parsed.clinicNotes === 'string' ? parsed.clinicNotes : undefined,
+    shareToken: typeof parsed.shareToken === 'string' ? parsed.shareToken : undefined,
   };
 }
 
@@ -247,6 +260,12 @@ function isValidPhase(val: unknown): val is MastermindPhase {
 
 function isValidTier(val: unknown): val is 'Start' | 'Transform' | 'Elite' {
   return val === 'Start' || val === 'Transform' || val === 'Elite';
+}
+
+const VALID_CLINIC_STATUSES: ClinicStatus[] = ['new', 'reviewed', 'contacted', 'booked', 'no_response', 'closed'];
+
+function isValidClinicStatus(val: unknown): val is ClinicStatus {
+  return typeof val === 'string' && VALID_CLINIC_STATUSES.includes(val as ClinicStatus);
 }
 
 export function saveSession(session: MastermindSession): void {

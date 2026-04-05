@@ -284,6 +284,10 @@ export interface AuraDeviceAnalysis {
   scoringMode: ScoringMode;
 }
 
+// ── CLINIC FOLLOW-UP STATUS ──
+// Separate from the AI pipeline phase — this tracks the human follow-up workflow
+export type ClinicStatus = 'new' | 'reviewed' | 'contacted' | 'booked' | 'no_response' | 'closed';
+
 // ── MASTERMIND SESSION ──
 
 export type MastermindPhase =
@@ -329,6 +333,11 @@ export interface MastermindSession {
   selectedPackageTier: 'Start' | 'Transform' | 'Elite' | null;
   pdfUrl: string | null;
   bookedAppointmentId: string | null;
+
+  // Staff follow-up workflow
+  clinicStatus?: ClinicStatus;
+  clinicNotes?: string;
+  shareToken?: string;
 }
 
 // ── SESSION ACTIONS ──
@@ -346,4 +355,7 @@ export type MastermindSessionAction =
   | { type: 'SELECT_PACKAGE'; tier: 'Start' | 'Transform' | 'Elite' }
   | { type: 'SET_PDF_URL'; url: string }
   | { type: 'SET_BOOKED'; appointmentId: string }
-  | { type: 'COMPLETE' };
+  | { type: 'COMPLETE' }
+  | { type: 'SET_CLINIC_STATUS'; status: ClinicStatus }
+  | { type: 'SET_CLINIC_NOTES'; notes: string }
+  | { type: 'SET_SHARE_TOKEN'; token: string };
