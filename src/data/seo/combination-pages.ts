@@ -60,7 +60,7 @@ export const combinationPages: CombinationPage[] = [
       {
         heading: "Cost and Value Analysis",
         content:
-          "The combined annual investment for monthly HydraFacials ($275 per session) and quarterly Botox delivers comprehensive anti-aging maintenance at a fraction of what more invasive interventions would cost. This combination prevents the accumulation of aging that eventually drives patients toward expensive corrective treatments. Cherry financing can cover treatment packages, and our membership program reduces per-treatment costs. Many clients find that the confidence and skin quality they gain from this combination makes it one of their most worthwhile recurring investments.",
+          "The combined annual investment for monthly HydraFacials ($275 per session) and quarterly Botox delivers comprehensive anti-aging maintenance at a fraction of what more invasive interventions would cost. This combination prevents the accumulation of aging that eventually drives patients toward expensive corrective treatments. Flexible financing can cover treatment packages, and our membership program reduces per-treatment costs. Many clients find that the confidence and skin quality they gain from this combination makes it one of their most worthwhile recurring investments.",
       },
       {
         heading: "Who This Combination Is Best For",
@@ -130,7 +130,7 @@ export const combinationPages: CombinationPage[] = [
       {
         heading: "Cost and Financing for the Combined Protocol",
         content:
-          "A complete RF Microneedling plus chemical peel protocol typically includes 3 to 4 RF Microneedling sessions ($495 to $850 each) and 2 to 3 chemical peels ($395 to $495 each). The total investment ranges based on the number of sessions and treatment areas. Package pricing is available for combined protocols, providing per-session savings. Cherry financing can spread the total cost into monthly payments over 6 to 24 months, making this comprehensive skin transformation accessible. Your provider will create a personalized protocol with clear pricing during your consultation.",
+          "A complete RF Microneedling plus chemical peel protocol typically includes 3 to 4 RF Microneedling sessions ($495 to $850 each) and 2 to 3 chemical peels ($395 to $495 each). The total investment ranges based on the number of sessions and treatment areas. Package pricing is available for combined protocols, providing per-session savings. Flexible financing can spread the total cost into monthly payments over 6 to 24 months, making this comprehensive skin transformation accessible. Your provider will create a personalized protocol with clear pricing during your consultation.",
       },
       {
         heading: "Maintenance After Your Initial Protocol",
@@ -205,7 +205,7 @@ export const combinationPages: CombinationPage[] = [
       {
         heading: "Cost and Program Structure",
         content:
-          "The combined GLP-1 plus peptide program is structured as a physician-supervised wellness protocol with monthly monitoring. GLP-1 programs range from $399 to $599 per month, with peptide therapy costs varying based on the specific peptides prescribed. The total monthly investment for the combined stack reflects the comprehensive nature of the program, which includes both medications, all bloodwork, physician consultations, body composition monitoring, and dosing adjustments. Cherry financing and membership pricing help manage the investment. The value becomes clear when you consider that this single coordinated program replaces multiple fragmented wellness expenses.",
+          "The combined GLP-1 plus peptide program is structured as a physician-supervised wellness protocol with monthly monitoring. GLP-1 programs range from $399 to $599 per month, with peptide therapy costs varying based on the specific peptides prescribed. The total monthly investment for the combined stack reflects the comprehensive nature of the program, which includes both medications, all bloodwork, physician consultations, body composition monitoring, and dosing adjustments. Flexible financing and membership pricing help manage the investment. The value becomes clear when you consider that this single coordinated program replaces multiple fragmented wellness expenses.",
       },
     ],
     expectedResults: [
@@ -219,7 +219,7 @@ export const combinationPages: CombinationPage[] = [
     faqs: [
       { question: "Can I take GLP-1 and peptides at the same time?", answer: "Yes, under physician supervision. Dr. Landfield designs integrated protocols that account for the interactions between GLP-1 medications and peptide therapy, ensuring safe and effective coordination of both treatments." },
       { question: "Will peptides help me keep muscle while losing weight?", answer: "That is one of the primary benefits of adding peptide therapy to a GLP-1 program. Growth hormone-releasing peptides support muscle protein synthesis and recovery, helping ensure that the weight you lose is predominantly fat. Combined with adequate protein intake and resistance training, the results are significantly better body composition." },
-      { question: "How much does the combined stack cost per month?", answer: "The total monthly cost depends on the specific GLP-1 medication, peptide protocol, and monitoring frequency prescribed. Schedule a consultation for a personalized protocol recommendation with transparent pricing. Cherry financing is available for multi-month programs." },
+      { question: "How much does the combined stack cost?", answer: "The total cost depends on the specific GLP-1 medication, peptide protocol, and monitoring frequency prescribed. Schedule a consultation for a personalized protocol recommendation with transparent pricing. Flexible payment options are available for multi-month programs." },
       { question: "How long should I be on the combined protocol?", answer: "Most patients maintain the combined protocol for 6 to 12 months during their active weight loss phase. After reaching their goal, patients may continue peptide therapy for ongoing wellness benefits while GLP-1 is tapered or discontinued. Dr. Landfield adjusts the protocol based on your progress and goals." },
       { question: "Do I still need to exercise on this program?", answer: "We strongly encourage exercise, particularly resistance training, to maximize body composition results. The combined protocol supports your ability to train effectively by preserving energy, enhancing recovery, and maintaining muscle mass. Exercise amplifies the benefits of both GLP-1 and peptide therapy." },
     ],
@@ -242,7 +242,7 @@ export const combinationPages: CombinationPage[] = [
       "Both treatments require zero downtime - return to all activities immediately",
       "Complete body confidence from smooth, hair-free skin plus firm, lifted facial contours",
       "Efficient use of clinic visits by combining treatments in single appointments",
-      "Cherry financing can cover both treatment plans in a single application",
+      "Flexible financing can cover both treatment plans in a single application",
     ],
     schedulingGuide: [
       { step: "Laser hair removal series begins", timing: "Sessions every 4-6 weeks", notes: "6-8 sessions for optimal permanent hair reduction" },
@@ -269,7 +269,7 @@ export const combinationPages: CombinationPage[] = [
       {
         heading: "Financing Both Treatments Together",
         content:
-          "Cherry financing can cover both laser hair removal and Sofwave in a single application, spreading the combined investment into comfortable monthly payments. Financing both together often makes more financial sense than treating them separately because you lock in the total investment and simplify your monthly payment tracking. Package pricing may be available for combined treatment plans. During your consultation, your provider will create a comprehensive treatment plan with a single total cost and financing estimate.",
+          "Flexible financing can cover both laser hair removal and Sofwave in a single application, spreading the combined investment into comfortable monthly payments. Financing both together often makes more financial sense than treating them separately because you lock in the total investment and simplify your monthly payment tracking. Package pricing may be available for combined treatment plans. During your consultation, your provider will create a comprehensive treatment plan with a single total cost and financing estimate.",
       },
       {
         heading: "Beyond Laser and Sofwave: Adding More",
@@ -288,7 +288,7 @@ export const combinationPages: CombinationPage[] = [
     faqs: [
       { question: "Can I do laser hair removal and Sofwave on the same day?", answer: "Yes. These treatments target different areas and use different technologies, so they can safely be performed in the same appointment. This is convenient for patients who want to minimize clinic visits." },
       { question: "Which treatment should I start first?", answer: "You can start both simultaneously. Laser hair removal sessions are spaced 4 to 6 weeks apart, and Sofwave can be performed alongside any laser session. Starting both together means your results develop in parallel." },
-      { question: "How much does the combined treatment cost?", answer: "The total cost depends on the laser hair removal areas and the Sofwave treatment scope. Cherry financing can cover both treatments in a single application. Schedule a consultation for a personalized estimate." },
+      { question: "How much does the combined treatment cost?", answer: "The total cost depends on the laser hair removal areas and the Sofwave treatment scope. Flexible financing can cover both treatments in a single application. Schedule a consultation for a personalized estimate." },
       { question: "Is this combination popular with men?", answer: "Very. Male patients frequently combine laser hair removal for the back, chest, or shoulders with Sofwave for facial tightening. The zero-downtime profile of both treatments appeals to men who want results without any visible treatment signs." },
       { question: "How long do the results last?", answer: "Laser hair removal results are permanent for treated follicles, with 1-2 annual maintenance sessions. Sofwave results last 12 months or longer, with annual maintenance recommended. Both treatments provide lasting value with minimal upkeep." },
     ],
@@ -339,7 +339,7 @@ export const combinationPages: CombinationPage[] = [
       {
         heading: "Investment and Financing",
         content:
-          "The Full Anti-Aging Stack represents a significant annual investment in your appearance, but it is substantially less expensive than the surgical interventions it replaces or delays. Cherry financing can spread the annual cost into monthly payments, making the program accessible. Membership pricing reduces per-treatment costs across all five modalities. When you calculate the per-day cost of looking and feeling your best year-round, the investment compares favorably to premium skincare regimens that deliver a fraction of the results. Your provider will create a detailed annual plan with clear pricing during your consultation.",
+          "The Full Anti-Aging Stack represents a significant annual investment in your appearance, but it is substantially less expensive than the surgical interventions it replaces or delays. Flexible financing can spread the annual cost into monthly payments, making the program accessible. Membership pricing reduces per-treatment costs across all five modalities. When you calculate the per-day cost of looking and feeling your best year-round, the investment compares favorably to premium skincare regimens that deliver a fraction of the results. Your provider will create a detailed annual plan with clear pricing during your consultation.",
       },
       {
         heading: "Who Should Consider the Full Stack",
@@ -357,7 +357,7 @@ export const combinationPages: CombinationPage[] = [
       "Results compound year over year with continued annual programs",
     ],
     faqs: [
-      { question: "How much does the Full Anti-Aging Stack cost per year?", answer: "The total annual investment depends on the specific treatment parameters. It includes annual Sofwave, quarterly Botox, an RF Microneedling series, quarterly peels, and monthly HydraFacials. Membership pricing provides significant savings. Cherry financing can spread the cost into manageable monthly payments. Schedule a consultation for a personalized annual estimate." },
+      { question: "How much does the Full Anti-Aging Stack cost per year?", answer: "The total annual investment depends on the specific treatment parameters. It includes annual Sofwave, quarterly Botox, an RF Microneedling series, quarterly peels, and monthly HydraFacials. Membership pricing provides significant savings. Flexible payment options are available. Schedule a consultation for a personalized annual estimate." },
       { question: "Is the Full Stack necessary or is it overkill?", answer: "The Full Stack is the most comprehensive non-surgical option, but it is not the right fit for everyone. Many patients achieve excellent results with a subset of these treatments. Your provider will recommend only the treatments your skin needs. The Full Stack is ideal for patients who want maximum results and are committed to the appointment schedule." },
       { question: "Can I start with fewer treatments and add more later?", answer: "Absolutely. Many patients start with Botox plus HydraFacial, then add RF Microneedling, then Sofwave, gradually building up to the Full Stack over 1 to 2 years. Your treatment plan evolves with your goals and budget." },
       { question: "How many appointments per month does the Full Stack require?", answer: "Approximately 2 to 3 appointments per month on average, with some months requiring more (during the RF Microneedling series) and some less. Your provider creates a schedule that minimizes clinic visits by combining treatments when possible." },

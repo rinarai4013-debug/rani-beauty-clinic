@@ -302,7 +302,7 @@ export default function PricingPageClient() {
           <FadeInOnScroll delay={0.1}>
             <div className="mt-4 rounded-lg border border-rani-gold/30 bg-rani-gold/5 px-4 py-3 flex items-center justify-between flex-wrap gap-3">
               <p className="font-body text-sm text-rani-navy">
-                <span className="font-bold">Financing available</span> — Sofwave from <span className="font-bold text-rani-gold">~$230/mo</span> with Cherry or PatientFi
+                <span className="font-bold">Financing available</span> — Ask about flexible payment options for Sofwave treatments
               </p>
               <Button
                 href="/contact"

@@ -51,7 +51,7 @@ function generatePeptideContent(city: string, drive: string): string {
 
 <p>The Pacific Northwest lifestyle, from hiking the Cascades to exploring the waterfront, demands a body that performs at its best. Peptide therapy at Rani Beauty Clinic helps ${city} residents support their bodies at the cellular level, promoting repair, recovery, and resilience. Our patients tell us they notice improvements in energy, sleep quality, and recovery time within the first few weeks of their protocol.</p>
 
-<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking and hours seven days a week from 10 AM to 7 PM. Peptide therapy programs start at $200-$400 per month depending on the protocol. Financing through PatientFi and Cherry is available for qualified applicants. Call (425) 539-4440 or book your peptide therapy consultation online today.</p>`;
+<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking and hours seven days a week from 10 AM to 7 PM. Peptide therapy programs start from $200-$400 depending on the protocol. Flexible payment options available for qualified applicants. Call (425) 539-4440 or book your peptide therapy consultation online today.</p>`;
 }
 
 export const peptideTherapyGeoPages: ServiceGeoPage[] = peptideCities.map((c) => ({

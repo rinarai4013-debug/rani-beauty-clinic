@@ -53,7 +53,7 @@ function generateHormoneContent(city: string, drive: string): string {
 
 <p>Ongoing monitoring is a cornerstone of our approach. We schedule follow-up labs at regular intervals to track your response and make adjustments as needed. Dr. Landfield reviews every set of results and personally guides your care throughout the process. This level of physician involvement is what sets Rani Beauty Clinic apart from clinics that offer hormone therapy without genuine medical oversight.</p>
 
-<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton. We are open seven days a week from 10 AM to 7 PM, with free on-site parking. Hormone therapy consultations include a comprehensive assessment and lab draw. Financing through PatientFi and Cherry is available. Call (425) 539-4440 or book online to start your hormone optimization journey.</p>`;
+<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton. We are open seven days a week from 10 AM to 7 PM, with free on-site parking. Hormone therapy consultations include a comprehensive assessment and lab draw. Flexible payment options available. Call (425) 539-4440 or book online to start your hormone optimization journey.</p>`;
 }
 
 export const hormoneTherapyGeoPages: ServiceGeoPage[] = hormoneCities.map((c) => ({

@@ -20,7 +20,7 @@ const SERVICES = [
 const TRUST_POINTS = [
   { icon: Shield, label: 'Physician-Supervised', desc: 'Every treatment overseen by our medical director' },
   { icon: Clock, label: 'Free Consultations', desc: 'Complimentary assessment with personalized plan' },
-  { icon: CreditCard, label: '0% Financing', desc: 'Cherry financing with instant approval' },
+  { icon: CreditCard, label: 'Flexible Financing', desc: 'Payment plans with instant approval' },
   { icon: Star, label: 'HSA/FSA Accepted', desc: 'Use pre-tax dollars for eligible treatments' },
 ];
 

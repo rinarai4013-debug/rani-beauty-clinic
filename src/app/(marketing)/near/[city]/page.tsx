@@ -177,7 +177,7 @@ export default function NearCityPage({ params }: PageProps) {
         name: "What is The Rani Protocol for weight management?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "The Rani Protocol is our physician-supervised GLP-1 weight management program using Semaglutide and Tirzepatide. It includes in-house blood work, custom dosing, ongoing medical support, and regular follow-ups with Dr. Landfield's team. Programs start at $399 per month.",
+          text: "The Rani Protocol is our physician-supervised GLP-1 weight management program using Semaglutide and Tirzepatide. It includes in-house blood work, custom dosing, ongoing medical support, and regular follow-ups with Dr. Landfield's team. Contact us for current pricing.",
         },
       },
     ],
@@ -384,8 +384,8 @@ export default function NearCityPage({ params }: PageProps) {
             Pricing for {city.name} Clients
           </h2>
           <p className="mt-3 sm:mt-4 max-w-2xl text-sm sm:text-base text-gray-600">
-            Transparent pricing with no hidden fees. Financing available through
-            PatientFi and Cherry for qualified applicants.
+            Transparent pricing with no hidden fees. Flexible payment options
+            available for qualified applicants.
           </p>
           {(() => {
             const pricingRows = [
@@ -398,7 +398,7 @@ export default function NearCityPage({ params }: PageProps) {
               { name: "Laser Hair Removal", price: "$79/session", category: "Laser" },
               { name: "RF Microneedling", price: "$495", category: "Skin Renewal" },
               { name: "Sofwave", price: "$2,750", category: "Skin Tightening" },
-              { name: "GLP-1 Weight Management", price: "$399/month", category: "Wellness" },
+              { name: "GLP-1 Weight Management", price: "From $399", category: "Wellness" },
               { name: "NAD+ Injections", price: "$150", category: "Wellness" },
               { name: "Vitamin Injections", price: "$35", category: "Wellness" },
               { name: "Peptide Therapy", price: "Consultation", category: "Wellness" },
@@ -463,7 +463,7 @@ export default function NearCityPage({ params }: PageProps) {
               Laser Hair Removal Cost <ChevronRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/compare/botox-vs-dysport"
+              href="/vs/botox-vs-dysport"
               className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
             >
               Compare: Botox vs Dysport <ChevronRight className="h-4 w-4" />

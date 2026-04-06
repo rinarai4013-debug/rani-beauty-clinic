@@ -26,7 +26,7 @@ We use only premium hyaluronic acid fillers that deliver smooth, soft, natural-f
 
 Following your lip filler appointment, ${cityName} clients can expect mild swelling for 2 to 5 days, with possible bruising at the injection points. We recommend avoiding strenuous exercise, alcohol, and blood-thinning supplements for 24 to 48 hours after treatment to minimize bruising. Your lips will look and feel natural once the initial swelling resolves, typically within 10 to 14 days. Lip filler results generally last 6 to 12 months, and many of our clients prefer to schedule maintenance appointments every 8 to 10 months to preserve their results.
 
-Lip filler at Rani Beauty Clinic starts at $650 per syringe, with most clients achieving their desired outcome with 1 to 2 syringes. Financing through PatientFi and Cherry is available for qualified applicants. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking is available, and we are open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your lip filler consultation online today.`,
+Lip filler at Rani Beauty Clinic starts at $650 per syringe, with most clients achieving their desired outcome with 1 to 2 syringes. Flexible payment options available for qualified applicants. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking is available, and we are open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your lip filler consultation online today.`,
   },
   {
     slug: "scar-treatment",
@@ -48,7 +48,7 @@ For pigmented scars and post-inflammatory hyperpigmentation, we use targeted las
 
 Your scar treatment journey at Rani begins with a thorough consultation where your provider evaluates your scar type, depth, color, location, and skin type. We create a customized treatment plan that outlines the recommended modalities, expected timeline, and realistic outcomes. Most clients see significant improvement over a series of 3 to 6 treatments spaced 4 to 6 weeks apart. Results continue to improve for months after your final treatment as collagen remodeling progresses.
 
-Scar treatment at Rani Beauty Clinic starts at $350 per session, with pricing varying based on the treatment modality and area treated. Financing through PatientFi and Cherry is available. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your scar treatment consultation online.`,
+Scar treatment at Rani Beauty Clinic starts at $350 per session, with pricing varying based on the treatment modality and area treated. Flexible payment options available. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your scar treatment consultation online.`,
   },
   {
     slug: "skin-tightening",
@@ -70,12 +70,12 @@ Sofwave at Rani Beauty Clinic is ideal for ${cityName} clients who want to lift 
 
 The beauty of Sofwave is that results build naturally over time. As new collagen forms in the weeks and months following treatment, your skin progressively tightens, lifts, and firms. Many clients notice an initial improvement within the first 2 to 4 weeks, with full results visible at 3 to 6 months. The natural, gradual improvement means friends and colleagues simply notice that you look refreshed and rested, without the telltale signs of a procedure.
 
-Sofwave skin tightening at Rani Beauty Clinic starts at $2,750 for the full face, with full face and neck treatments available at $4,500. Financing through PatientFi and Cherry is available for qualified applicants. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your Sofwave consultation online.`,
+Sofwave skin tightening at Rani Beauty Clinic starts at $2,750 for the full face, with full face and neck treatments available at $4,500. Flexible payment options available for qualified applicants. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your Sofwave consultation online.`,
   },
   {
     slug: "weight-loss-glp1",
     name: "Weight Loss (GLP-1)",
-    priceRange: "From $399/month",
+    priceRange: "From $399",
     category: "wellness",
     faqs: [
       { question: "What GLP-1 medications does Rani offer?", answer: "We prescribe both Semaglutide (the active ingredient in Wegovy and Ozempic) and Tirzepatide (the active ingredient in Mounjaro and Zepbound). Your provider will recommend the best option based on your health history, goals, and response to treatment." },
@@ -91,7 +91,7 @@ What distinguishes The Rani Protocol from online prescribers and telehealth weig
 
 ${cityName} residents appreciate having blood work, consultations, medication management, dosing adjustments, and side effect management all in one location. There is no need to coordinate with separate labs, pharmacies, or providers. The Rani Protocol is a complete, self-contained program designed for your success. Our team monitors your progress closely and provides the ongoing support and medical guidance that makes the difference between short-term weight loss and lasting transformation.
 
-The Rani Protocol starts at $399 per month for Semaglutide and $599 per month for Tirzepatide, which includes medication, in-house blood work, custom dosing, and ongoing medical support. Financing through PatientFi and Cherry is available. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your GLP-1 consultation online.`,
+The Rani Protocol starts at $399 for Semaglutide and $599 for Tirzepatide, which includes medication, in-house blood work, custom dosing, and ongoing medical support. Flexible payment options available. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your GLP-1 consultation online.`,
   },
   {
     slug: "hormone-therapy-hrt",
@@ -133,7 +133,7 @@ function generateExtendedServiceGeoEntries(): ServiceGeoEntry[] {
         serviceName: service.name,
         slug: `${city.slug}/${service.slug}`,
         title: `Best ${service.name} Near ${city.name} - ${service.priceRange} | Rani Beauty Clinic`,
-        metaDescription: `${service.name} for ${city.name} residents at Rani Beauty Clinic in Renton. Physician-supervised by Dr. Landfield. ${service.priceRange}. ${city.drivingTime}. Book today!`,
+        metaDescription: `${service.name} near ${city.name}, ${city.county}. Physician-supervised at Rani Beauty Clinic — ${service.priceRange}. Just ${city.distanceFromRenton} (${city.drivingTime}). Board-certified Medical Director. Book today!`,
         content: service.generateContent(city.name, city.county, city.drivingTime, city.distanceFromRenton),
       });
     }
@@ -149,7 +149,7 @@ function generateExtendedServiceGeoEntries(): ServiceGeoEntry[] {
         serviceName: service.name,
         slug: `${city.slug}/${service.slug}`,
         title: `Best ${service.name} Near ${city.name} - ${service.priceRange} | Rani Beauty Clinic`,
-        metaDescription: `${service.name} for ${city.name} residents at Rani Beauty Clinic in Renton. Physician-supervised by Dr. Landfield. ${service.priceRange}. ${city.drivingTime}. Book today!`,
+        metaDescription: `${service.name} near ${city.name}, ${city.county}. Physician-supervised at Rani Beauty Clinic — ${service.priceRange}. Just ${city.distanceFromRenton} (${city.drivingTime}). Board-certified Medical Director. Book today!`,
         content: service.generateContent(city.name, city.county, city.drivingTime, city.distanceFromRenton),
       });
     }

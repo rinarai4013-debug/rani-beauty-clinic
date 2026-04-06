@@ -168,7 +168,7 @@ export default function ServiceCityPage({ params }: PageProps) {
         name: `What is the cost of ${entry.serviceName} at Rani Beauty Clinic?`,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `${entry.serviceName} at Rani Beauty Clinic is priced ${template.priceRange}. Financing is available through PatientFi and Cherry for qualified applicants. Contact us at (425) 539-4440 for a personalized quote.`,
+          text: `${entry.serviceName} at Rani Beauty Clinic is priced ${template.priceRange}. Flexible payment options are available for qualified applicants. Contact us at (425) 539-4440 for a personalized quote.`,
         },
       },
     ],
@@ -332,7 +332,7 @@ export default function ServiceCityPage({ params }: PageProps) {
                   Book Now
                 </a>
                 <p className="mt-3 text-center text-xs text-gray-400">
-                  Financing available via PatientFi &amp; Cherry
+                  Flexible payment options available
                 </p>
               </div>
 

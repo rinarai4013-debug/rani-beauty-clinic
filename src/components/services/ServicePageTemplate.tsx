@@ -474,7 +474,7 @@ export default function ServicePageTemplate({
             </h2>
             <p className="mt-6 font-body text-base text-rani-muted">
               Contact us for personalized pricing. We offer competitive rates and
-              flexible financing through Cherry and PatientFi.
+              flexible payment options for qualified applicants.
             </p>
             <div className="mt-4 flex flex-wrap gap-3 justify-center">
               {service.isWellness && <Badge icon="check">HSA Accepted</Badge>}
@@ -651,7 +651,7 @@ export default function ServicePageTemplate({
             {getComparisonsForService(service.slug).map((comp) => (
               <Link
                 key={comp.slug}
-                href={`/compare/${comp.slug}`}
+                href={`/vs/${comp.slug}`}
                 className="rounded-full border border-rani-gold/20 bg-white px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
               >
                 {comp.treatmentA} vs {comp.treatmentB} →

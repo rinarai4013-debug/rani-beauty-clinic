@@ -53,7 +53,7 @@ function generateLaserContent(city: string, drive: string): string {
 
 <p>The Pacific Northwest's relatively mild climate means ${city} residents can enjoy laser treatments year-round with appropriate sun protection. Our team will provide detailed pre- and post-treatment instructions, including sunscreen requirements, to ensure optimal results and safety. We recommend avoiding direct sun exposure and tanning for 2 weeks before and after laser treatments.</p>
 
-<p>Laser hair removal packages start from $79 per session for small areas, with multi-session packages offering significant savings. PicoWay treatments range from $350 to $600 per session. Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking. We are open seven days a week from 10 AM to 7 PM. Financing through PatientFi and Cherry is available for qualified applicants. Call (425) 539-4440 or book your laser consultation online today.</p>`;
+<p>Laser hair removal packages start from $79 per session for small areas, with multi-session packages offering significant savings. PicoWay treatments range from $350 to $600 per session. Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking. We are open seven days a week from 10 AM to 7 PM. Flexible payment options available for qualified applicants. Call (425) 539-4440 or book your laser consultation online today.</p>`;
 }
 
 export const laserGeoPages: ServiceGeoPage[] = laserCities.map((c) => ({

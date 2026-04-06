@@ -430,7 +430,7 @@ export default function CostPage({ params }: PageProps) {
             Ready to Get Started with {page.service}?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-gray-300">
-            Book a consultation to discuss your treatment plan and get a personalized quote. Financing available through Cherry and PatientFi.
+            Book a consultation to discuss your treatment plan and get a personalized quote. Flexible payment options available.
           </p>
           <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
             <a

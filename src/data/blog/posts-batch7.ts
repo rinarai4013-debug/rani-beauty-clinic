@@ -453,7 +453,7 @@ The second factor is risk tolerance. Surgery, even minor cosmetic surgery, carri
 
 The third factor is the advancement of technology. Ten years ago, non-surgical skin tightening was often ineffective or inconsistent. Devices overpromised and underdelivered. That has changed dramatically. Current-generation devices like Sofwave and Secret RF produce real, measurable results that satisfy patients who have realistic expectations. The gap between surgical and non-surgical outcomes has narrowed significantly, particularly for patients with mild to moderate laxity.
 
-The fourth factor is financial accessibility. A facelift costs $12,000 to $25,000 or more in the Seattle metro area. A comprehensive non-surgical protocol costs $5,000 to $10,000. With financing options like Afterpay, Cherry, and PatientFi, monthly payments for non-surgical treatment are often comparable to what patients spend on other health and wellness investments.
+The fourth factor is financial accessibility. A facelift costs $12,000 to $25,000 or more in the Seattle metro area. A comprehensive non-surgical protocol costs $5,000 to $10,000. With flexible financing options available, non-surgical treatment is often comparable to what patients spend on other health and wellness investments.
 
 The patients we see at Rani Beauty Clinic are not settling for less by choosing non-surgical treatment. They are making a calculated decision that the combination of effectiveness, convenience, safety, and cost makes non-surgical options the right fit for their situation. When realistic expectations are set from the start, patient satisfaction with non-surgical skin tightening is consistently high.
 
