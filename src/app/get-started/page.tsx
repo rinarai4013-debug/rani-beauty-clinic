@@ -14,7 +14,7 @@ const SERVICES = [
   { name: 'Sofwave', price: 'From $2,750', desc: 'Non-invasive ultrasound skin tightening and lifting', icon: '\u{1F52C}', href: '/services/sofwave' },
   { name: 'RF Microneedling', price: 'From $495', desc: 'Collagen stimulation for acne scars, texture, and tightening', icon: '\u{1F3AF}', href: '/services/rf-microneedling' },
   { name: 'Laser Hair Removal', price: 'Packages from $800', desc: 'Permanent hair reduction for all skin tones', icon: '\u26A1', href: '/services/laser-hair-removal' },
-  { name: 'GLP-1 Weight Loss', price: '$399-599/mo', desc: 'Physician-supervised medical weight loss program', icon: '\u{1F4AA}', href: '/wellness/glp1-weight-management' },
+  { name: 'GLP-1 Weight Loss', price: 'From $399', desc: 'Physician-supervised medical weight loss program', icon: '\u{1F4AA}', href: '/wellness/glp1-weight-management' },
 ];
 
 const TRUST_POINTS = [
@@ -125,10 +125,10 @@ export default function GetStartedPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} className="text-2xl md:text-3xl font-heading text-white mb-4">
-              Treatments from <span className="text-rani-gold">$89/month</span>
+              Flexible Payment Plans <span className="text-rani-gold">Available</span>
             </motion.h2>
             <motion.p variants={fadeUp} className="text-base font-body text-white/60 mb-2">
-              0% APR financing through PatientFi &amp; Cherry · Instant approval · No hard credit check
+              Flexible financing options · Instant approval · No hard credit check
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 mt-6">
               {['Afterpay', 'Cherry', 'PatientFi', 'HSA/FSA'].map((method) => (
