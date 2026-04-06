@@ -1,4 +1,14 @@
 {
+  "functions": {
+    "src/app/api/photo/upload/route.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "src/app/api/mastermind/scan/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "redirects": [
     {
       "source": "/:path((?!api).*)",

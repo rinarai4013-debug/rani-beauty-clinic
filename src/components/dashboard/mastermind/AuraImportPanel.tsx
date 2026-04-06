@@ -548,7 +548,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic"
+        accept="image/jpeg,image/png,image/webp,image/heic,application/pdf,.pdf"
         className="hidden"
         onChange={handleFileUpload}
       />

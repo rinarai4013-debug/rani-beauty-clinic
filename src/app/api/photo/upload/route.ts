@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 
+// Allow up to 30s for large file processing
+export const maxDuration = 30;
+
 // ─── Constants ──────────────────────────────────────────────────────────
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 const MAX_WIDTH = 1200;
 
 // ─── POST Handler ───────────────────────────────────────────────────────
@@ -21,10 +24,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    // Validate file type (also accept common PDF MIME variants)
+    const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+    if (!isPdf && !ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG and PNG are accepted.' },
+        { error: 'Invalid file type. Accepted: JPEG, PNG, WebP, HEIC, PDF.' },
         { status: 400 },
       );
     }
@@ -42,7 +46,8 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Process with sharp: resize if wider than MAX_WIDTH, output as JPEG
-    let image = sharp(buffer);
+    // For PDFs, sharp renders the first page via libvips
+    let image = sharp(buffer, isPdf ? { pages: 1, density: 200 } : undefined);
     const metadata = await image.metadata();
 
     if (metadata.width && metadata.width > MAX_WIDTH) {

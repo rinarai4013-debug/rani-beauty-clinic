@@ -785,7 +785,7 @@ export default function MastermindSessionPage() {
                 <input
                   ref={photoInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/heic"
+                  accept="image/jpeg,image/png,image/webp,image/heic,application/pdf,.pdf"
                   className="hidden"
                   onChange={handlePhotoUpload}
                 />
