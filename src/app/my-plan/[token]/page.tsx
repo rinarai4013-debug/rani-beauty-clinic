@@ -1593,8 +1593,47 @@ export default function PatientPlanPage() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-sm" style={{ color: `${COLORS.navy}30` }}>
-                            Simulation preview
+                          <div className="w-full h-full flex flex-col items-center justify-center p-6"
+                            style={{ background: `linear-gradient(135deg, ${COLORS.navy}08 0%, ${COLORS.gold}12 100%)` }}>
+                            {(() => {
+                              const frames = data.simulation.withTreatment.frames;
+                              const first = frames[0];
+                              const last = frames[frames.length - 1];
+                              return (
+                                <>
+                                  <div className="text-center mb-4">
+                                    <p className="text-xs font-bold tracking-[0.2em] uppercase mb-1" style={{ color: COLORS.gold }}>
+                                      Projected at {last.timepoint}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-6">
+                                    <div className="text-center">
+                                      <div className="w-20 h-20 rounded-full flex items-center justify-center mb-2"
+                                        style={{ backgroundColor: `${COLORS.gold}18`, border: `2px solid ${COLORS.gold}` }}>
+                                        <span className="text-2xl font-bold" style={{ color: COLORS.gold }}>{last.auraScoreProjection}</span>
+                                      </div>
+                                      <p className="text-[10px] font-bold tracking-wider uppercase" style={{ color: `${COLORS.navy}60` }}>Aura Score</p>
+                                      <p className="text-xs font-semibold" style={{ color: '#22C55E' }}>
+                                        +{last.auraScoreProjection - first.auraScoreProjection} pts
+                                      </p>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="w-20 h-20 rounded-full flex items-center justify-center mb-2"
+                                        style={{ backgroundColor: `${COLORS.navy}08`, border: `2px solid ${COLORS.navy}30` }}>
+                                        <span className="text-2xl font-bold" style={{ color: COLORS.navy }}>{last.skinAgeProjection}</span>
+                                      </div>
+                                      <p className="text-[10px] font-bold tracking-wider uppercase" style={{ color: `${COLORS.navy}60` }}>Skin Age</p>
+                                      <p className="text-xs font-semibold" style={{ color: '#22C55E' }}>
+                                        {last.skinAgeProjection - first.skinAgeProjection} yrs
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <p className="text-xs mt-4 text-center" style={{ color: `${COLORS.navy}50` }}>
+                                    {last.description}
+                                  </p>
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
                       </div>
@@ -1636,8 +1675,47 @@ export default function PatientPlanPage() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-sm" style={{ color: `${COLORS.navy}30` }}>
-                            Simulation preview
+                          <div className="w-full h-full flex flex-col items-center justify-center p-6"
+                            style={{ background: `linear-gradient(135deg, #EF535008 0%, #FF980012 100%)` }}>
+                            {(() => {
+                              const frames = data.simulation.withoutTreatment.frames;
+                              const first = frames[0];
+                              const last = frames[frames.length - 1];
+                              return (
+                                <>
+                                  <div className="text-center mb-4">
+                                    <p className="text-xs font-bold tracking-[0.2em] uppercase mb-1" style={{ color: '#EF5350' }}>
+                                      Projected at {last.timepoint}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-6">
+                                    <div className="text-center">
+                                      <div className="w-20 h-20 rounded-full flex items-center justify-center mb-2"
+                                        style={{ backgroundColor: '#EF535012', border: '2px solid #EF5350' }}>
+                                        <span className="text-2xl font-bold" style={{ color: '#EF5350' }}>{last.auraScoreProjection}</span>
+                                      </div>
+                                      <p className="text-[10px] font-bold tracking-wider uppercase" style={{ color: `${COLORS.navy}60` }}>Aura Score</p>
+                                      <p className="text-xs font-semibold" style={{ color: '#EF5350' }}>
+                                        {last.auraScoreProjection - first.auraScoreProjection} pts
+                                      </p>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="w-20 h-20 rounded-full flex items-center justify-center mb-2"
+                                        style={{ backgroundColor: '#FF980012', border: '2px solid #FF9800' }}>
+                                        <span className="text-2xl font-bold" style={{ color: '#FF9800' }}>{last.skinAgeProjection}</span>
+                                      </div>
+                                      <p className="text-[10px] font-bold tracking-wider uppercase" style={{ color: `${COLORS.navy}60` }}>Skin Age</p>
+                                      <p className="text-xs font-semibold" style={{ color: '#EF5350' }}>
+                                        +{last.skinAgeProjection - first.skinAgeProjection} yrs
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <p className="text-xs mt-4 text-center" style={{ color: `${COLORS.navy}50` }}>
+                                    {last.description}
+                                  </p>
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
                       </div>

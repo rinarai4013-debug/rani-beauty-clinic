@@ -79,6 +79,8 @@ async function saveTokenToAirtable(record: ShareTokenRecord): Promise<void> {
     if (!res.ok) {
       const errBody = await res.text().catch(() => '');
       console.error(`[Share] Airtable token save failed (${res.status}):`, errBody);
+    } else {
+      console.log(`[Share] Token persisted to Airtable: ${record.token.substring(0, 12)}...`);
     }
   } catch (err) {
     console.error('[Share] Airtable token save error:', err);
@@ -99,8 +101,10 @@ async function loadTokenFromAirtable(token: string): Promise<ShareTokenRecord | 
     const data = await res.json();
     const row = data?.records?.[0];
     if (row?.fields?.Details) {
+      console.log(`[Share] Token loaded from Airtable: ${token.substring(0, 12)}...`);
       return JSON.parse(row.fields.Details) as ShareTokenRecord;
     }
+    console.warn(`[Share] Token not found in Airtable: ${token.substring(0, 12)}... (${data?.records?.length || 0} records)`);
   } catch (err) {
     console.error('[Share] Airtable token load error:', err);
   }
@@ -232,10 +236,9 @@ export async function POST(request: NextRequest) {
 
     // Store the token (in-memory + Airtable for persistence across cold starts)
     tokenCache.set(token, record);
-    // Airtable write is non-blocking — cache ensures immediate availability
-    saveTokenToAirtable(record).catch((err) => {
-      console.error('[Share] Background token persist failed:', err);
-    });
+    // Airtable write MUST complete before response — fire-and-forget
+    // loses tokens when Vercel recycles the function instance.
+    await saveTokenToAirtable(record);
 
     // Build the patient-facing URL
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ranibeautyclinic.com';
