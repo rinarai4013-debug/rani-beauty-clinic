@@ -17,7 +17,7 @@ import { getAllSessionsAsync } from '@/lib/mastermind/session';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { requireAuth, unauthorized } from '@/lib/auth/middleware';
 import { apiSuccess, apiError } from '@/lib/mastermind/api-helpers';
-import type { MastermindSession, ClinicStatus, ActivityLogEntry } from '@/types/mastermind';
+import type { MastermindSession, ClinicStatus, ActivityLogEntry, ProviderReviewState, MastermindPhase } from '@/types/mastermind';
 
 // ── Unified record shape ──
 
@@ -46,10 +46,141 @@ export interface UnifiedConsultation {
   aiNextStep: string | null;
   treatmentValue: string | null;
   activityLog: ActivityLogEntry[];
+  // Provider review data
+  providerReview: ProviderReviewState | null;
+  needsReview: boolean;
+  medicalFlags: string[];
+  contraindications: string[];
+  // Communication signals
+  commStatus: 'unsent' | 'sent' | 'viewed' | 'clicked' | 'booked';
+  lastSentAt: string | null;
+  sendCount: number;
+  // Revenue model
+  estimatedValue: number; // Best estimated dollar value
+  weightedValue: number;  // Value × stage probability
+  revenueSource: 'package' | 'treatments' | 'ai_estimate' | 'none';
+  daysSinceCreated: number;
+  daysSinceLastActivity: number;
+  isStuck: boolean; // High value, no progress, >3 days
   // For mastermind sessions, keep session ID for detail actions
   sessionId: string | null;
   // For intake records, keep Airtable record ID
   airtableRecordId: string | null;
+}
+
+// ── Pipeline Analytics Summary ──
+
+export interface PipelineAnalytics {
+  totalPipelineValue: number;
+  weightedPipelineValue: number;
+  stageBreakdown: {
+    stage: string;
+    count: number;
+    totalValue: number;
+    weightedValue: number;
+    avgDaysInStage: number;
+  }[];
+  conversionRates: {
+    submittedToPlan: number;
+    planToApproved: number;
+    approvedToContacted: number;
+    contactedToBooked: number;
+    overallCloseRate: number;
+  };
+  stuckConsultations: {
+    id: string;
+    patientName: string;
+    estimatedValue: number;
+    stage: string;
+    daysSinceLastActivity: number;
+    reason: string;
+  }[];
+  sourcePerformance: {
+    source: string;
+    count: number;
+    totalValue: number;
+    closeRate: number;
+  }[];
+  dailyPriorities: {
+    id: string;
+    patientName: string;
+    estimatedValue: number;
+    action: string;
+    urgency: 'high' | 'medium' | 'low';
+  }[];
+}
+
+// ── Communication signal derivation ──
+
+function deriveCommSignals(
+  log: ActivityLogEntry[],
+  clinicStatus: ClinicStatus,
+  hasBooking: boolean
+): { commStatus: 'unsent' | 'sent' | 'viewed' | 'clicked' | 'booked'; lastSentAt: string | null; sendCount: number } {
+  if (hasBooking || clinicStatus === 'booked') {
+    const sends = log.filter(e => e.action === 'plan_sent' || e.action === 'note_updated' && e.detail?.includes('Plan sent'));
+    const lastSend = sends.length > 0 ? sends[sends.length - 1].timestamp : null;
+    return { commStatus: 'booked', lastSentAt: lastSend, sendCount: sends.length };
+  }
+
+  const sendEvents = log.filter(e =>
+    e.action === 'plan_sent' ||
+    (e.action === 'note_updated' && e.detail?.includes('Plan sent')) ||
+    (e.action === 'note_updated' && e.detail?.includes('Follow-up'))
+  );
+
+  if (sendEvents.length === 0) {
+    return { commStatus: 'unsent', lastSentAt: null, sendCount: 0 };
+  }
+
+  const lastSent = sendEvents[sendEvents.length - 1].timestamp;
+
+  // Check if plan was viewed (share_link_generated implies access was set up)
+  const hasView = log.some(e => e.action === 'share_link_generated');
+
+  return {
+    commStatus: hasView ? 'viewed' : 'sent',
+    lastSentAt: lastSent,
+    sendCount: sendEvents.length,
+  };
+}
+
+// ── Revenue estimation helpers ──
+
+const STAGE_PROBABILITIES: Record<string, number> = {
+  new: 0.1,
+  reviewed: 0.25,
+  contacted: 0.4,
+  booked: 0.8,
+  completed: 1.0,
+};
+
+function estimateSessionValue(s: MastermindSession): { estimatedValue: number; revenueSource: 'package' | 'treatments' | 'ai_estimate' | 'none' } {
+  // Best source: selected package price
+  if (s.selectedPackageTier && s.mastermindPlan?.packages) {
+    const pkg = s.mastermindPlan.packages.find(p => p.tier === s.selectedPackageTier);
+    if (pkg?.price) return { estimatedValue: pkg.price, revenueSource: 'package' };
+  }
+
+  // Next: sum of primary treatment estimates
+  if (s.mastermindPlan?.recommendations?.primary?.length) {
+    const total = s.mastermindPlan.recommendations.primary.reduce(
+      (sum, t) => sum + (t.totalEstimate || t.perSession || 0), 0
+    );
+    if (total > 0) return { estimatedValue: total, revenueSource: 'treatments' };
+  }
+
+  // Fallback: avg consultation value estimate
+  return { estimatedValue: 1500, revenueSource: 'ai_estimate' };
+}
+
+function estimateIntakeValue(fields: IntakeFields): { estimatedValue: number; revenueSource: 'ai_estimate' | 'none' } {
+  const treatmentValue = fields['Treatment Value (AI)'];
+  if (treatmentValue) {
+    const parsed = parseFloat(treatmentValue.replace(/[^0-9.]/g, ''));
+    if (!isNaN(parsed) && parsed > 0) return { estimatedValue: parsed, revenueSource: 'ai_estimate' };
+  }
+  return { estimatedValue: 0, revenueSource: 'none' };
 }
 
 // ── Normalize Mastermind session ──
@@ -65,6 +196,26 @@ function fromMastermindSession(s: MastermindSession): UnifiedConsultation {
     if (s.bookedAppointmentId) clinicStatus = 'booked';
     else if (s.phase === 'completed') clinicStatus = 'reviewed';
   }
+
+  // Determine if this consultation needs provider review
+  const reviewablePhases: MastermindPhase[] = ['plan_ready', 'provider_review'];
+  const needsReview = !!s.mastermindPlan && (
+    reviewablePhases.includes(s.phase) ||
+    (s.phase === 'provider_review' && s.providerReview?.approvalStatus === 'pending')
+  );
+
+  // Extract medical flags and contraindications for clinical oversight
+  const medicalFlags = s.auraScanResult?.medicalFlags?.map(f => f.flag) || [];
+  const contraindications = s.mastermindPlan?.contraindications?.map(c => `${c.treatment}: ${c.reason} (${c.severity})`) || [];
+
+  // Revenue estimation
+  const { estimatedValue, revenueSource } = estimateSessionValue(s);
+  const stageProbability = STAGE_PROBABILITIES[clinicStatus] ?? 0.1;
+  const now = new Date();
+  const createdDate = new Date(s.createdAt);
+  const updatedDate = new Date(s.updatedAt);
+  const daysSinceCreated = Math.floor((now.getTime() - createdDate.getTime()) / 86400000);
+  const daysSinceLastActivity = Math.floor((now.getTime() - updatedDate.getTime()) / 86400000);
 
   return {
     id: `ms_${s.id}`,
@@ -91,6 +242,17 @@ function fromMastermindSession(s: MastermindSession): UnifiedConsultation {
     aiNextStep: null,
     treatmentValue: null,
     activityLog: s.activityLog || [],
+    providerReview: s.providerReview || null,
+    needsReview,
+    medicalFlags,
+    contraindications,
+    ...deriveCommSignals(s.activityLog || [], s.clinicStatus || 'new', !!s.bookedAppointmentId),
+    estimatedValue,
+    weightedValue: Math.round(estimatedValue * stageProbability),
+    revenueSource,
+    daysSinceCreated,
+    daysSinceLastActivity,
+    isStuck: estimatedValue > 500 && daysSinceLastActivity > 3 && !['booked', 'contacted'].includes(clinicStatus),
     sessionId: s.id,
     airtableRecordId: null,
   };
@@ -176,6 +338,13 @@ function fromAirtableIntake(
     });
   }
 
+  // Revenue estimation for intake
+  const { estimatedValue, revenueSource } = estimateIntakeValue(f);
+  const stageProbability = STAGE_PROBABILITIES[clinicStatus] ?? 0.1;
+  const now = new Date();
+  const createdDate = record.createdTime ? new Date(record.createdTime) : now;
+  const daysSinceCreated = Math.floor((now.getTime() - createdDate.getTime()) / 86400000);
+
   return {
     id: `at_${record.id}`,
     source: 'intake_form',
@@ -201,6 +370,19 @@ function fromAirtableIntake(
     aiNextStep: f['Suggested Next Step (AI)'] || null,
     treatmentValue: f['Treatment Value (AI)'] || null,
     activityLog,
+    providerReview: null,
+    needsReview: false,
+    medicalFlags: [],
+    contraindications: [],
+    commStatus: procStatus === 'Responded' ? 'sent' : 'unsent' as const,
+    lastSentAt: procStatus === 'Responded' ? new Date().toISOString() : null,
+    sendCount: procStatus === 'Responded' ? 1 : 0,
+    estimatedValue,
+    weightedValue: Math.round(estimatedValue * stageProbability),
+    revenueSource,
+    daysSinceCreated,
+    daysSinceLastActivity: daysSinceCreated, // Intakes don't have updatedAt
+    isStuck: estimatedValue > 500 && daysSinceCreated > 3 && clinicStatus === 'new',
     sessionId: linkedSessionId,
     airtableRecordId: record.id,
   };

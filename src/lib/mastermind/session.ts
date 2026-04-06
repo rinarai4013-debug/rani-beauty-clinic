@@ -80,9 +80,19 @@ export function sessionReducer(
         updatedAt: now,
         phase: 'provider_review',
         providerReview: action.review,
+        activityLog: appendLog(
+          state.activityLog,
+          'provider_review_started',
+          `Provider review initiated by ${action.review.providerName || 'provider'}`,
+          action.review.providerName || undefined
+        ),
       };
 
-    case 'ADD_MODIFICATION':
+    case 'ADD_MODIFICATION': {
+      const modLabels: Record<string, string> = {
+        add: 'Treatment added', remove: 'Treatment removed', adjust_dosage: 'Dosage adjusted',
+        reorder: 'Treatment reordered', swap: 'Treatment swapped', note: 'Clinical note added',
+      };
       return {
         ...state,
         updatedAt: now,
@@ -95,9 +105,26 @@ export function sessionReducer(
               ],
             }
           : null,
+        activityLog: appendLog(
+          state.activityLog,
+          'modification_added',
+          `${modLabels[action.modification.type] || 'Plan modified'}: ${action.modification.details}`,
+          action.modification.providerId
+        ),
       };
+    }
 
-    case 'SET_APPROVAL_STATUS':
+    case 'SET_APPROVAL_STATUS': {
+      const statusLabels: Record<string, string> = {
+        approved: 'Plan approved by provider',
+        rejected: 'Plan rejected by provider',
+        modified: 'Provider requested changes to plan',
+        pending: 'Plan review status reset to pending',
+      };
+      const actionKey = action.status === 'approved' ? 'plan_approved'
+        : action.status === 'rejected' ? 'plan_rejected'
+        : action.status === 'modified' ? 'changes_requested'
+        : 'status_changed';
       return {
         ...state,
         updatedAt: now,
@@ -110,7 +137,14 @@ export function sessionReducer(
                 action.status === 'approved' ? now : state.providerReview.approvedAt,
             }
           : null,
+        activityLog: appendLog(
+          state.activityLog,
+          actionKey,
+          statusLabels[action.status] || `Plan status set to ${action.status}`,
+          action.actor || state.providerReview?.providerName || undefined
+        ),
       };
+    }
 
     case 'SET_SIMULATION':
       return {

@@ -139,6 +139,10 @@ async function enrichWithProviderIdentity(
     return { ...action, actor: providerName };
   }
 
-  // SET_APPROVAL_STATUS — no provider field to enrich, just return as-is
+  // SET_APPROVAL_STATUS — inject actor for activity log attribution
+  if (action.type === 'SET_APPROVAL_STATUS') {
+    return { ...action, actor: providerName };
+  }
+
   return action;
 }

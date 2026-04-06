@@ -952,19 +952,21 @@ export default function PatientPlanPage() {
   }
 
   // ── Date formatting ──
-  const consultDate = new Date(data.consultationDate).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const consultDate = data.consultationDate
+    ? new Date(data.consultationDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'Recent';
 
-  const firstName = data.patientName.split(' ')[0] || 'Your';
-  const skinAgeDelta = data.auraScore.skinAgeDelta;
+  const firstName = (data.patientName || 'there').split(' ')[0] || 'Your';
+  const skinAgeDelta = data.auraScore?.skinAgeDelta ?? 0;
   const skinAgeDirection = skinAgeDelta > 0 ? '+' : '';
 
   // Sort concerns by severity for top 3
   const severityOrder = { severe: 0, moderate: 1, mild: 2 };
-  const topConcerns = [...data.concerns]
+  const topConcerns = [...(data.concerns || [])]
     .sort(
       (a, b) =>
         (severityOrder[a.severity as keyof typeof severityOrder] ?? 3) -
@@ -974,7 +976,7 @@ export default function PatientPlanPage() {
 
   // Sort packages: Start, Transform, Elite
   const tierOrder = { Start: 0, Transform: 1, Elite: 2 };
-  const sortedPackages = [...data.packages].sort(
+  const sortedPackages = [...(data.packages || [])].sort(
     (a, b) =>
       (tierOrder[a.tier as keyof typeof tierOrder] ?? 0) -
       (tierOrder[b.tier as keyof typeof tierOrder] ?? 0)

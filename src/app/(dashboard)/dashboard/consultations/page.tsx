@@ -37,8 +37,20 @@ import {
   Send,
   TrendingUp,
   ArrowRight,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  ClipboardCheck,
+  Stethoscope,
+  UserCheck,
+  CircleDot,
+  MailCheck,
+  MailOpen,
+  MousePointerClick,
+  ChevronDown,
+  Repeat,
 } from 'lucide-react';
-import type { ClinicStatus, MastermindPhase, ActivityLogEntry } from '@/types/mastermind';
+import type { ClinicStatus, MastermindPhase, ActivityLogEntry, ProviderReviewState } from '@/types/mastermind';
 import type { UnifiedConsultation } from '@/app/api/dashboard/consultations/route';
 
 // ── DATA FETCHING ──
@@ -133,13 +145,15 @@ function formatTimelineTime(iso: string): string {
 export default function ConsultationPipelinePage() {
   const { consultations, isLoading, mutate } = useUnifiedConsultations();
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<ClinicStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<ClinicStatus | 'all' | 'needs_review'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filteredConsultations = useMemo(() => {
     let list = [...consultations];
 
-    if (statusFilter !== 'all') {
+    if (statusFilter === 'needs_review') {
+      list = list.filter(c => c.needsReview);
+    } else if (statusFilter !== 'all') {
       list = list.filter(c => c.clinicStatus === statusFilter);
     }
 
@@ -153,8 +167,10 @@ export default function ConsultationPipelinePage() {
       );
     }
 
-    // Sort: newest first, prioritize "new" status
+    // Sort: newest first, prioritize "new" and "needs review"
     list.sort((a, b) => {
+      if (a.needsReview && !b.needsReview) return -1;
+      if (b.needsReview && !a.needsReview) return 1;
       if (a.clinicStatus === 'new' && b.clinicStatus !== 'new') return -1;
       if (b.clinicStatus === 'new' && a.clinicStatus !== 'new') return 1;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -165,9 +181,12 @@ export default function ConsultationPipelinePage() {
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: consultations.length };
+    let reviewCount = 0;
     for (const c of consultations) {
       counts[c.clinicStatus] = (counts[c.clinicStatus] || 0) + 1;
+      if (c.needsReview) reviewCount++;
     }
+    counts.needs_review = reviewCount;
     return counts;
   }, [consultations]);
 
@@ -207,7 +226,10 @@ export default function ConsultationPipelinePage() {
               Consultation Pipeline
             </h1>
             <p className="text-sm mt-1" style={{ color: '#0F1D2C80' }}>
-              {consultations.length} consultation{consultations.length !== 1 ? 's' : ''} &middot; {statusCounts.new || 0} need attention
+              {consultations.length} consultation{consultations.length !== 1 ? 's' : ''} &middot; {statusCounts.new || 0} new
+              {(statusCounts.needs_review || 0) > 0 && (
+                <span style={{ color: '#D97706' }}> &middot; {statusCounts.needs_review} awaiting review</span>
+              )}
             </p>
           </div>
         </div>
@@ -257,6 +279,14 @@ export default function ConsultationPipelinePage() {
             active={statusFilter === 'all'}
             onClick={() => setStatusFilter('all')}
             color="#0F1D2C"
+          />
+          <StatusTab
+            label="Needs Review"
+            count={statusCounts.needs_review || 0}
+            active={statusFilter === 'needs_review'}
+            onClick={() => setStatusFilter('needs_review')}
+            color="#D97706"
+            icon={Stethoscope}
           />
           {ALL_STATUSES.map(st => (
             <StatusTab
@@ -318,9 +348,9 @@ export default function ConsultationPipelinePage() {
 // ── STATUS TAB ──
 
 function StatusTab({
-  label, count, active, onClick, color,
+  label, count, active, onClick, color, icon: TabIcon,
 }: {
-  label: string; count: number; active: boolean; onClick: () => void; color: string;
+  label: string; count: number; active: boolean; onClick: () => void; color: string; icon?: typeof Clock;
 }) {
   return (
     <button
@@ -334,6 +364,7 @@ function StatusTab({
         fontFamily: 'var(--font-body), Montserrat, sans-serif',
       }}
     >
+      {TabIcon && <TabIcon className="w-3 h-3" />}
       {label}
       {count > 0 && (
         <span
@@ -433,9 +464,31 @@ function ConsultationRow({
                 Plan Ready
               </span>
             )}
+            {c.needsReview && (
+              <span
+                className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 flex items-center gap-0.5"
+                style={{ backgroundColor: 'rgba(217,119,6,0.1)', color: '#D97706' }}
+              >
+                <Stethoscope className="w-2.5 h-2.5" />
+                Needs Review
+              </span>
+            )}
+            {c.providerReview?.approvalStatus === 'approved' && (
+              <span
+                className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 flex items-center gap-0.5"
+                style={{ backgroundColor: 'rgba(5,150,105,0.1)', color: '#059669' }}
+              >
+                <ShieldCheck className="w-2.5 h-2.5" />
+                Approved
+              </span>
+            )}
+            {c.medicalFlags.length > 0 && (
+              <AlertTriangle className="w-3 h-3 flex-shrink-0" style={{ color: '#EF4444' }} />
+            )}
             {c.hasShareLink && (
               <Link2 className="w-3 h-3 flex-shrink-0" style={{ color: '#C9A96E' }} />
             )}
+            {c.commStatus !== 'unsent' && <CommStatusIndicator status={c.commStatus} sendCount={c.sendCount} />}
           </div>
 
           {/* Contact + time */}
@@ -504,6 +557,12 @@ function ConsultationDetailDrawer({
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [notesDraft, setNotesDraft] = useState('');
+  const [reviewAction, setReviewAction] = useState<'idle' | 'approving' | 'rejecting' | 'requesting_changes'>('idle');
+  const [clinicalNote, setClinicalNote] = useState('');
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [sendingFollowUp, setSendingFollowUp] = useState<string | null>(null);
+  const [followUpSent, setFollowUpSent] = useState<string | null>(null);
+  const [showFollowUpPicker, setShowFollowUpPicker] = useState(false);
 
   const isMastermind = c.source === 'mastermind';
   const sourceConfig = SOURCE_CONFIG[c.source];
@@ -600,6 +659,91 @@ function ConsultationDetailDrawer({
       setSendingPlan(false);
     }
   }, [isMastermind, c.sessionId, c.email, onMutate]);
+
+  const handleProviderReview = useCallback(async (action: 'approved' | 'rejected' | 'modified') => {
+    if (!isMastermind || !c.sessionId) return;
+    const loadingMap = { approved: 'approving', rejected: 'rejecting', modified: 'requesting_changes' } as const;
+    setReviewAction(loadingMap[action]);
+    try {
+      // If no review exists yet, initialize it first
+      if (!c.providerReview) {
+        await fetch(`/api/mastermind/sessions/${c.sessionId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: {
+              type: 'SET_PROVIDER_REVIEW',
+              review: {
+                providerId: 'pending_auth',
+                providerName: 'Provider',
+                modifications: [],
+                clinicalNotes: clinicalNote.trim() ? [clinicalNote.trim()] : [],
+                approvalStatus: 'pending',
+              },
+            },
+          }),
+        });
+      } else if (clinicalNote.trim()) {
+        // Add clinical note as a modification
+        await fetch(`/api/mastermind/sessions/${c.sessionId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: {
+              type: 'ADD_MODIFICATION',
+              modification: {
+                id: `mod_${Date.now()}`,
+                timestamp: new Date().toISOString(),
+                type: 'note',
+                details: clinicalNote.trim(),
+                providerId: 'pending_auth',
+              },
+            },
+          }),
+        });
+      }
+
+      // Set the approval status
+      const res = await fetch(`/api/mastermind/sessions/${c.sessionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: { type: 'SET_APPROVAL_STATUS', status: action } }),
+      });
+      if (res.ok) {
+        onMutate();
+        setClinicalNote('');
+        setShowReviewForm(false);
+      }
+    } catch (err) {
+      console.error('[Consultations] Provider review action failed:', err);
+    } finally {
+      setReviewAction('idle');
+    }
+  }, [isMastermind, c.sessionId, c.providerReview, clinicalNote, onMutate]);
+
+  const handleSendFollowUp = useCallback(async (templateId: string) => {
+    if (!isMastermind || !c.sessionId) return;
+    setSendingFollowUp(templateId);
+    try {
+      const res = await fetch('/api/mastermind/follow-up', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: c.sessionId, templateId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFollowUpSent(templateId);
+        onMutate();
+        setTimeout(() => setFollowUpSent(null), 3000);
+      } else {
+        console.error('[Consultations] Follow-up send failed:', data.error);
+      }
+    } catch (err) {
+      console.error('[Consultations] Follow-up error:', err);
+    } finally {
+      setSendingFollowUp(null);
+    }
+  }, [isMastermind, c.sessionId, onMutate]);
 
   return (
     <DrawerShell onClose={onClose}>
@@ -868,6 +1012,212 @@ function ConsultationDetailDrawer({
           </DetailSection>
         )}
 
+        {/* Medical Caution Flags */}
+        {(c.medicalFlags.length > 0 || c.contraindications.length > 0) && (
+          <DetailSection title="Clinical Alerts">
+            <div className="space-y-2">
+              {c.medicalFlags.map((flag, i) => (
+                <div
+                  key={`flag-${i}`}
+                  className="flex items-start gap-2 text-xs p-2.5 rounded-lg"
+                  style={{ backgroundColor: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.12)' }}
+                >
+                  <AlertTriangle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: '#EF4444' }} />
+                  <span style={{ color: '#991B1B' }}>{flag}</span>
+                </div>
+              ))}
+              {c.contraindications.map((ci, i) => (
+                <div
+                  key={`ci-${i}`}
+                  className="flex items-start gap-2 text-xs p-2.5 rounded-lg"
+                  style={{ backgroundColor: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.12)' }}
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: '#D97706' }} />
+                  <span style={{ color: '#92400E' }}>{ci}</span>
+                </div>
+              ))}
+            </div>
+          </DetailSection>
+        )}
+
+        {/* Provider Review Panel */}
+        {isMastermind && c.hasPlan && (
+          <DetailSection title="Provider Review">
+            {c.providerReview ? (
+              <div className="space-y-3">
+                {/* Current review status */}
+                <div className="flex items-center gap-2">
+                  <ReviewStatusBadge status={c.providerReview.approvalStatus} />
+                  {c.providerReview.providerName && c.providerReview.providerName !== 'Provider' && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1" style={{ backgroundColor: '#0F1D2C06', color: '#0F1D2C60' }}>
+                      <UserCheck className="w-2.5 h-2.5" />
+                      {c.providerReview.providerName}
+                    </span>
+                  )}
+                  {c.providerReview.approvedAt && (
+                    <span className="text-[10px]" style={{ color: '#0F1D2C40' }}>
+                      {formatTimelineTime(c.providerReview.approvedAt)}
+                    </span>
+                  )}
+                </div>
+
+                {/* Clinical notes from review */}
+                {c.providerReview.clinicalNotes.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-medium" style={{ color: '#0F1D2C40' }}>Clinical Notes</p>
+                    {c.providerReview.clinicalNotes.map((note, i) => (
+                      <div key={i} className="text-xs p-2.5 rounded-lg" style={{ backgroundColor: '#0F1D2C04', color: '#0F1D2C80' }}>
+                        {note}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Modifications */}
+                {c.providerReview.modifications.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-medium" style={{ color: '#0F1D2C40' }}>Plan Modifications</p>
+                    {c.providerReview.modifications.map(mod => (
+                      <div key={mod.id} className="flex items-start gap-2 text-xs p-2.5 rounded-lg" style={{ backgroundColor: '#0F1D2C04' }}>
+                        <ModificationIcon type={mod.type} />
+                        <div className="flex-1 min-w-0">
+                          <p style={{ color: '#0F1D2C' }}>{mod.details}</p>
+                          <p className="text-[10px] mt-0.5" style={{ color: '#0F1D2C40' }}>
+                            {formatTimelineTime(mod.timestamp)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Re-review actions (if not yet approved) */}
+                {c.providerReview.approvalStatus !== 'approved' && c.sessionId && (
+                  <ProviderReviewActions
+                    clinicalNote={clinicalNote}
+                    onNoteChange={setClinicalNote}
+                    showForm={showReviewForm}
+                    onToggleForm={() => setShowReviewForm(!showReviewForm)}
+                    onApprove={() => handleProviderReview('approved')}
+                    onReject={() => handleProviderReview('rejected')}
+                    onRequestChanges={() => handleProviderReview('modified')}
+                    loading={reviewAction}
+                  />
+                )}
+              </div>
+            ) : c.needsReview ? (
+              /* No review yet — show initial review form */
+              <ProviderReviewActions
+                clinicalNote={clinicalNote}
+                onNoteChange={setClinicalNote}
+                showForm={showReviewForm}
+                onToggleForm={() => setShowReviewForm(!showReviewForm)}
+                onApprove={() => handleProviderReview('approved')}
+                onReject={() => handleProviderReview('rejected')}
+                onRequestChanges={() => handleProviderReview('modified')}
+                loading={reviewAction}
+              />
+            ) : (
+              <p className="text-xs" style={{ color: '#0F1D2C40' }}>
+                Plan must be generated before provider review.
+              </p>
+            )}
+          </DetailSection>
+        )}
+
+        {/* Communications */}
+        {isMastermind && c.hasPlan && (
+          <DetailSection title="Communications">
+            <div className="space-y-3">
+              {/* Current status */}
+              <div className="flex items-center gap-2">
+                <CommStatusBadge status={c.commStatus} />
+                {c.sendCount > 0 && (
+                  <span className="text-[10px]" style={{ color: '#0F1D2C40' }}>
+                    {c.sendCount} send{c.sendCount !== 1 ? 's' : ''}
+                    {c.lastSentAt && ` · Last: ${formatTimelineTime(c.lastSentAt)}`}
+                  </span>
+                )}
+              </div>
+
+              {/* Quick actions */}
+              <div className="flex flex-wrap gap-2">
+                {/* Primary: Send/Resend Plan */}
+                <button
+                  type="button"
+                  onClick={handleSendPlan}
+                  disabled={sendingPlan || !c.email}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+                  style={{ backgroundColor: planSent ? '#059669' : '#0F1D2C', color: '#fff' }}
+                >
+                  {sendingPlan ? (
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : planSent ? (
+                    <Check className="w-3.5 h-3.5" />
+                  ) : c.commStatus === 'unsent' ? (
+                    <Send className="w-3.5 h-3.5" />
+                  ) : (
+                    <Repeat className="w-3.5 h-3.5" />
+                  )}
+                  {planSent ? 'Sent!' : c.commStatus === 'unsent' ? 'Send Plan' : 'Resend Plan'}
+                </button>
+
+                {/* Template picker toggle */}
+                <button
+                  type="button"
+                  onClick={() => setShowFollowUpPicker(!showFollowUpPicker)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+                  style={{
+                    backgroundColor: showFollowUpPicker ? 'rgba(201,169,110,0.1)' : '#0F1D2C08',
+                    color: showFollowUpPicker ? '#C9A96E' : '#0F1D2C60',
+                    border: showFollowUpPicker ? '1px solid rgba(201,169,110,0.2)' : '1px solid transparent',
+                  }}
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Follow-Up Templates
+                  <ChevronDown className="w-3 h-3" style={{ transform: showFollowUpPicker ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
+              </div>
+
+              {/* Template picker */}
+              {showFollowUpPicker && (
+                <div className="space-y-1.5 p-3 rounded-lg" style={{ backgroundColor: '#0F1D2C03', border: '1px solid #0F1D2C08' }}>
+                  {FOLLOW_UP_OPTIONS.map(opt => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => handleSendFollowUp(opt.id)}
+                      disabled={!!sendingFollowUp || (opt.channel === 'email' && !c.email) || (opt.channel === 'sms' && !c.phone)}
+                      className="w-full flex items-start gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all hover:bg-black/[0.03] disabled:opacity-40"
+                    >
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{ backgroundColor: opt.color + '15' }}
+                      >
+                        {sendingFollowUp === opt.id ? (
+                          <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: opt.color }} />
+                        ) : followUpSent === opt.id ? (
+                          <Check className="w-3 h-3" style={{ color: '#059669' }} />
+                        ) : (
+                          <opt.icon className="w-3 h-3" style={{ color: opt.color }} />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium" style={{ color: followUpSent === opt.id ? '#059669' : '#0F1D2C' }}>
+                          {followUpSent === opt.id ? 'Sent!' : opt.label}
+                        </p>
+                        <p className="text-[10px] mt-0.5" style={{ color: '#0F1D2C40' }}>
+                          {opt.description} · {opt.channel === 'sms' ? 'SMS' : 'Email'}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </DetailSection>
+        )}
+
         {/* Activity Timeline */}
         {c.activityLog.length > 0 && (
           <DetailSection title="Activity Timeline">
@@ -971,6 +1321,12 @@ const TIMELINE_ICONS: Record<string, { icon: typeof Clock; color: string }> = {
   auto_responded: { icon: Mail, color: '#059669' },
   plan_sent: { icon: Send, color: '#6366F1' },
   booking_synced: { icon: CalendarCheck, color: '#059669' },
+  provider_review_started: { icon: Stethoscope, color: '#D97706' },
+  plan_approved: { icon: ShieldCheck, color: '#059669' },
+  plan_rejected: { icon: XCircle, color: '#EF4444' },
+  changes_requested: { icon: ClipboardCheck, color: '#D97706' },
+  modification_added: { icon: CircleDot, color: '#8B5CF6' },
+  follow_up_sent: { icon: Repeat, color: '#6366F1' },
 };
 
 function ActivityTimeline({ entries }: { entries: ActivityLogEntry[] }) {
@@ -1090,5 +1446,224 @@ function ActionLink({
       </div>
       <ExternalLink className="w-3 h-3 ml-auto flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#0F1D2C30' }} />
     </a>
+  );
+}
+
+// ── FOLLOW-UP TEMPLATE OPTIONS ──
+
+const FOLLOW_UP_OPTIONS = [
+  {
+    id: 'confidence_builder',
+    label: 'Confidence Builder',
+    description: 'Reassuring follow-up for clients who viewed their plan',
+    channel: 'email' as const,
+    icon: MessageSquare,
+    color: '#6366F1',
+  },
+  {
+    id: 'financing_followup',
+    label: 'Financing Follow-Up',
+    description: 'For clients who explored payment options',
+    channel: 'email' as const,
+    icon: TrendingUp,
+    color: '#059669',
+  },
+  {
+    id: 'plan_resend',
+    label: 'Plan Re-send',
+    description: 'Fresh framing — makes the plan feel new',
+    channel: 'email' as const,
+    icon: Repeat,
+    color: '#C9A96E',
+  },
+  {
+    id: 'reengagement',
+    label: 'Re-engagement',
+    description: 'Welcome back for clients who went quiet',
+    channel: 'email' as const,
+    icon: Sparkles,
+    color: '#8B5CF6',
+  },
+  {
+    id: 'plan_reminder_sms',
+    label: 'Plan Reminder SMS',
+    description: 'Quick SMS nudge with plan link',
+    channel: 'sms' as const,
+    icon: Phone,
+    color: '#D97706',
+  },
+];
+
+// ── COMM STATUS COMPONENTS ──
+
+const COMM_STATUS_CONFIG = {
+  unsent: { label: 'Not Sent', color: '#6B7280', icon: Mail },
+  sent: { label: 'Sent', color: '#3B82F6', icon: MailCheck },
+  viewed: { label: 'Viewed', color: '#8B5CF6', icon: MailOpen },
+  clicked: { label: 'Clicked', color: '#D97706', icon: MousePointerClick },
+  booked: { label: 'Booked', color: '#059669', icon: CalendarCheck },
+} as const;
+
+function CommStatusIndicator({ status, sendCount }: { status: string; sendCount: number }) {
+  const cfg = COMM_STATUS_CONFIG[status as keyof typeof COMM_STATUS_CONFIG] || COMM_STATUS_CONFIG.unsent;
+  const StatusIcon = cfg.icon;
+  return (
+    <span
+      className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 flex items-center gap-0.5"
+      style={{ backgroundColor: `${cfg.color}12`, color: cfg.color }}
+    >
+      <StatusIcon className="w-2.5 h-2.5" />
+      {cfg.label}
+      {sendCount > 1 && <span className="text-[9px] opacity-70">×{sendCount}</span>}
+    </span>
+  );
+}
+
+function CommStatusBadge({ status }: { status: string }) {
+  const cfg = COMM_STATUS_CONFIG[status as keyof typeof COMM_STATUS_CONFIG] || COMM_STATUS_CONFIG.unsent;
+  const StatusIcon = cfg.icon;
+  return (
+    <span
+      className="text-[11px] px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5"
+      style={{ backgroundColor: `${cfg.color}12`, color: cfg.color }}
+    >
+      <StatusIcon className="w-3 h-3" />
+      {cfg.label}
+    </span>
+  );
+}
+
+// ── REVIEW STATUS BADGE ──
+
+function ReviewStatusBadge({ status }: { status: ProviderReviewState['approvalStatus'] }) {
+  const config = {
+    pending: { label: 'Pending Review', color: '#D97706', bg: 'rgba(217,119,6,0.1)', icon: Clock },
+    approved: { label: 'Approved', color: '#059669', bg: 'rgba(5,150,105,0.1)', icon: ShieldCheck },
+    modified: { label: 'Changes Requested', color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)', icon: ClipboardCheck },
+    rejected: { label: 'Rejected', color: '#EF4444', bg: 'rgba(239,68,68,0.1)', icon: XCircle },
+  }[status];
+
+  const BadgeIcon = config.icon;
+
+  return (
+    <span
+      className="text-[11px] px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5"
+      style={{ backgroundColor: config.bg, color: config.color }}
+    >
+      <BadgeIcon className="w-3 h-3" />
+      {config.label}
+    </span>
+  );
+}
+
+// ── MODIFICATION ICON ──
+
+function ModificationIcon({ type }: { type: string }) {
+  const icons: Record<string, { color: string }> = {
+    add: { color: '#059669' },
+    remove: { color: '#EF4444' },
+    adjust_dosage: { color: '#D97706' },
+    reorder: { color: '#3B82F6' },
+    swap: { color: '#8B5CF6' },
+    note: { color: '#6B7280' },
+  };
+  const cfg = icons[type] || icons.note;
+  return <CircleDot className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: cfg.color }} />;
+}
+
+// ── PROVIDER REVIEW ACTIONS ──
+
+function ProviderReviewActions({
+  clinicalNote,
+  onNoteChange,
+  showForm,
+  onToggleForm,
+  onApprove,
+  onReject,
+  onRequestChanges,
+  loading,
+}: {
+  clinicalNote: string;
+  onNoteChange: (v: string) => void;
+  showForm: boolean;
+  onToggleForm: () => void;
+  onApprove: () => void;
+  onReject: () => void;
+  onRequestChanges: () => void;
+  loading: 'idle' | 'approving' | 'rejecting' | 'requesting_changes';
+}) {
+  const isLoading = loading !== 'idle';
+
+  return (
+    <div className="space-y-3">
+      {/* Toggle clinical notes form */}
+      {!showForm ? (
+        <button
+          type="button"
+          onClick={onToggleForm}
+          className="text-xs font-medium flex items-center gap-1.5"
+          style={{ color: '#C9A96E' }}
+        >
+          <Stethoscope className="w-3 h-3" />
+          Add clinical notes before reviewing
+        </button>
+      ) : (
+        <div>
+          <textarea
+            value={clinicalNote}
+            onChange={e => onNoteChange(e.target.value)}
+            placeholder="Clinical observations, dosage notes, contraindication considerations..."
+            className="w-full text-xs p-3 rounded-lg border resize-none focus:outline-none focus:ring-2"
+            style={{ borderColor: '#0F1D2C15', minHeight: 70, fontFamily: 'var(--font-body), Montserrat, sans-serif' }}
+            rows={3}
+          />
+        </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={onApprove}
+          disabled={isLoading}
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+          style={{ backgroundColor: '#059669', color: '#fff' }}
+        >
+          {loading === 'approving' ? (
+            <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <ShieldCheck className="w-3.5 h-3.5" />
+          )}
+          Approve
+        </button>
+        <button
+          type="button"
+          onClick={onRequestChanges}
+          disabled={isLoading}
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+          style={{ backgroundColor: 'rgba(139,92,246,0.1)', color: '#8B5CF6', border: '1px solid rgba(139,92,246,0.2)' }}
+        >
+          {loading === 'requesting_changes' ? (
+            <div className="w-3.5 h-3.5 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <ClipboardCheck className="w-3.5 h-3.5" />
+          )}
+          Request Changes
+        </button>
+        <button
+          type="button"
+          onClick={onReject}
+          disabled={isLoading}
+          className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+          style={{ backgroundColor: 'rgba(239,68,68,0.08)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.15)' }}
+        >
+          {loading === 'rejecting' ? (
+            <div className="w-3.5 h-3.5 border-2 border-[#EF4444] border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <XCircle className="w-3.5 h-3.5" />
+          )}
+        </button>
+      </div>
+    </div>
   );
 }

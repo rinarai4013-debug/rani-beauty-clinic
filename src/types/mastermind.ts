@@ -360,7 +360,7 @@ export type MastermindSessionAction =
   | { type: 'SET_PLAN'; plan: MastermindPlan }
   | { type: 'SET_PROVIDER_REVIEW'; review: ProviderReviewState }
   | { type: 'ADD_MODIFICATION'; modification: PlanModification }
-  | { type: 'SET_APPROVAL_STATUS'; status: ProviderReviewState['approvalStatus'] }
+  | { type: 'SET_APPROVAL_STATUS'; status: ProviderReviewState['approvalStatus']; actor?: string }
   | { type: 'SET_SIMULATION'; comparison: SimulationComparison }
   | { type: 'SELECT_PACKAGE'; tier: 'Start' | 'Transform' | 'Elite' }
   | { type: 'SET_PDF_URL'; url: string }

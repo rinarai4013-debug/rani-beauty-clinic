@@ -268,15 +268,16 @@ export async function GET(
     }
 
     // Collect all treatments for name lookups
+    const recs = plan.recommendations || { primary: [], complementary: [], maintenance: [] };
     const allTreatments = [
-      ...plan.recommendations.primary,
-      ...plan.recommendations.complementary,
-      ...plan.recommendations.maintenance,
+      ...(recs.primary || []),
+      ...(recs.complementary || []),
+      ...(recs.maintenance || []),
     ];
 
     // Build aftercare with treatment names
     const treatmentMap = new Map(allTreatments.map((t) => [t.id, t.treatmentName]));
-    const aftercare: PatientAftercare[] = plan.aftercarePreview.map((a) => ({
+    const aftercare: PatientAftercare[] = (plan.aftercarePreview || []).map((a) => ({
       treatmentName: treatmentMap.get(a.treatmentId) || 'Treatment',
       immediateAftercare: a.immediateAftercare,
       weekOneGuidance: a.weekOneGuidance,
@@ -284,8 +285,8 @@ export async function GET(
     }));
 
     const patientData: PatientPlanData = {
-      patientName: session.patientName,
-      consultationDate: session.createdAt,
+      patientName: session.patientName || (session.intakeData?.firstName as string) || 'Valued Client',
+      consultationDate: session.createdAt || new Date().toISOString(),
       auraScore: sanitizeAuraScore(scan.auraScore),
       deviceAnalysis: scan.auraDeviceAnalysis
         ? sanitizeDeviceAnalysis(scan.auraDeviceAnalysis)
