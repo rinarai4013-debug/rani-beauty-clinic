@@ -8,7 +8,7 @@
  * imported scan images in a diagnostic grid.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import type { MastermindSession } from '@/types/mastermind';
 
@@ -70,6 +70,67 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [importedImages, setImportedImages] = useState<ImportedScanImages | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ src: string; label: string } | null>(null);
+  const [fileUploading, setFileUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle file upload — upload photo then run AI scan
+  const handleFileUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) return;
+      setFileUploading(true);
+      setImportError(null);
+      try {
+        // Step 1: Upload and process the photo
+        const formData = new FormData();
+        formData.append('file', file);
+        const uploadRes = await fetch('/api/photo/upload', { method: 'POST', body: formData });
+        if (!uploadRes.ok) throw new Error('Photo upload failed');
+        const uploadJson = await uploadRes.json();
+        const dataUrl = uploadJson.dataUrl || uploadJson.url;
+        if (!dataUrl) throw new Error('No image URL returned');
+
+        // Step 2: Save photo to session
+        await fetch(`/api/mastermind/sessions/${session.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: { type: 'SET_SOURCE_PHOTO', url: dataUrl } }),
+        });
+
+        // Step 3: Run the AI scan with the uploaded photo
+        const scanRes = await fetch('/api/mastermind/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: session.id, sourcePhotoUrl: dataUrl }),
+        });
+        const scanJson = await scanRes.json();
+
+        if (scanJson.success !== false) {
+          onImportComplete?.({
+            scan: {
+              patientName: session.patientName || 'Patient',
+              scanDate: new Date().toISOString(),
+              imageKeys: ['front'],
+              expressionKeys: [],
+              handoutPdfPath: null,
+            },
+            scanResult: scanJson.data || scanJson,
+            session: { id: session.id, phase: 'scan_complete', updatedAt: new Date().toISOString() },
+          });
+        } else {
+          setImportError(scanJson.error || 'AI scan failed after photo upload');
+        }
+      } catch (err) {
+        console.error('File upload scan failed:', err);
+        setImportError('Failed to upload and analyze photo. Please try again.');
+      } finally {
+        setFileUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    },
+    [session.id, session.patientName, onImportComplete]
+  );
 
   // Determine if we already have a device scan imported
   const hasExistingScan = !!session.auraScanResult && !!session.sourcePhotoUrl;
@@ -212,7 +273,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
   // ── LOADING STATE ──
 
-  if (importing) {
+  if (importing || fileUploading) {
     return (
       <div className="rounded-xl border border-[#C9A96E]/30 bg-gradient-to-br from-[#0F1D2C] to-[#1A2D40] p-6">
         <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -232,10 +293,12 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
             </div>
           </div>
           <h3 className="font-display text-lg font-semibold text-[#F8F6F1] mb-2">
-            Importing Aura 3D Scan Data...
+            {fileUploading ? 'Analyzing Uploaded Photo...' : 'Importing Aura 3D Scan Data...'}
           </h3>
           <p className="font-body text-sm text-[#F8F6F1]/60 max-w-xs">
-            Analyzing medical-grade imaging with AI. This typically takes 15-30 seconds.
+            {fileUploading
+              ? 'AI is analyzing skin concerns, mapping facial zones, and calculating your Aura Score.'
+              : 'Analyzing medical-grade imaging with AI. This typically takes 15-30 seconds.'}
           </p>
           {/* Progress dots */}
           <div className="flex gap-1.5 mt-4">
@@ -481,22 +544,51 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         </div>
       </div>
 
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/heic"
+        className="hidden"
+        onChange={handleFileUpload}
+      />
+
       {/* Import buttons */}
       <div className="space-y-2">
+        {/* Upload from files */}
         <button
-          onClick={handleOpenSelector}
+          onClick={() => fileInputRef.current?.click()}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-[#C9A96E] to-[#B8964E] text-[#0F1D2C] font-body text-sm font-semibold hover:from-[#D4B87E] hover:to-[#C9A96E] transition-all shadow-lg shadow-[#C9A96E]/20"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
           </svg>
-          Import from Aura Scanner
+          Upload Scan Photo
+        </button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-[#F8F6F1]/10" />
+          <span className="font-body text-[10px] text-[#F8F6F1]/30 uppercase tracking-wider">or</span>
+          <div className="flex-1 h-px bg-[#F8F6F1]/10" />
+        </div>
+
+        {/* Import from device */}
+        <button
+          onClick={handleOpenSelector}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[#C9A96E]/30 text-[#C9A96E] font-body text-xs font-medium hover:bg-[#C9A96E]/10 transition-all"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+          </svg>
+          Import from Aura 3D Scanner
         </button>
 
         {session.patientName && (
           <button
             onClick={handleImportLatest}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[#C9A96E]/30 text-[#C9A96E] font-body text-xs font-medium hover:bg-[#C9A96E]/10 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[#F8F6F1]/10 text-[#F8F6F1]/50 font-body text-xs hover:bg-[#F8F6F1]/5 transition-all"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
