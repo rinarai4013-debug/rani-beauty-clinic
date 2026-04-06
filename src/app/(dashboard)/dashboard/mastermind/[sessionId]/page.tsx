@@ -39,6 +39,7 @@ import {
 import Link from 'next/link';
 import { useMastermindSession } from '@/hooks/useMastermindSessions';
 import ScanResultsPanel from '@/components/dashboard/mastermind/ScanResultsPanel';
+import AuraImportPanel from '@/components/dashboard/mastermind/AuraImportPanel';
 import PlanEditor from '@/components/dashboard/mastermind/PlanEditor';
 import CopilotSidebar from '@/components/dashboard/mastermind/CopilotSidebar';
 import type { MastermindPhase } from '@/types/mastermind';
@@ -119,6 +120,7 @@ export default function MastermindSessionPage() {
   const {
     session,
     isLoading,
+    mutate,
     dispatch,
     validate,
     hasScan,
@@ -1097,6 +1099,11 @@ export default function MastermindSessionPage() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25, ease: 'easeOut' }}
                 >
+                  {/* Aura Device Import — always available to (re)import */}
+                  <AuraImportPanel
+                    session={session}
+                    onImportComplete={() => mutate()}
+                  />
                   <ScanResultsPanel session={session} />
                 </motion.div>
               )}
