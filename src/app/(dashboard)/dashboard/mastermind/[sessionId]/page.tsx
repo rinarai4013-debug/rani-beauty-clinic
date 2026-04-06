@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -33,6 +33,8 @@ import {
   Download,
   ExternalLink,
   History,
+  Upload,
+  Camera,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useMastermindSession } from '@/hooks/useMastermindSessions';
@@ -130,6 +132,35 @@ export default function MastermindSessionPage() {
   const [quickNote, setQuickNote] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // ── PHOTO UPLOAD HANDLER ──
+  const handlePhotoUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) return;
+      setPhotoUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/photo/upload', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Upload failed');
+        const json = await res.json();
+        const dataUrl = json.dataUrl || json.url;
+        if (dataUrl) {
+          await dispatch({ type: 'SET_SOURCE_PHOTO', url: dataUrl });
+        }
+      } catch (err) {
+        console.error('Photo upload failed:', err);
+      } finally {
+        setPhotoUploading(false);
+        if (photoInputRef.current) photoInputRef.current.value = '';
+      }
+    },
+    [dispatch]
+  );
 
   // Auto-select best tab based on phase
   useEffect(() => {
@@ -565,13 +596,24 @@ export default function MastermindSessionPage() {
           >
             {/* Intake phase */}
             {session.phase === 'intake' && (
-              <ActionButton
-                onClick={handleRunScan}
-                loading={actionLoading}
-                icon={Scan}
-                label="Run Aura Scan"
-                variant="primary"
-              />
+              <>
+                {!session.sourcePhotoUrl && (
+                  <ActionButton
+                    onClick={() => photoInputRef.current?.click()}
+                    loading={photoUploading}
+                    icon={Upload}
+                    label="Upload Photo"
+                    variant="secondary"
+                  />
+                )}
+                <ActionButton
+                  onClick={handleRunScan}
+                  loading={actionLoading}
+                  icon={Scan}
+                  label="Run Aura Scan"
+                  variant="primary"
+                />
+              </>
             )}
 
             {/* Scan complete */}
@@ -737,20 +779,48 @@ export default function MastermindSessionPage() {
               }}
             >
               <div className="flex items-start gap-5">
-                {/* Photo / Avatar */}
+                {/* Photo / Avatar — clickable to upload */}
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/heic"
+                  className="hidden"
+                  onChange={handlePhotoUpload}
+                />
                 <div className="shrink-0">
                   {session.sourcePhotoUrl ? (
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden" style={{ border: '2px solid rgba(201,169,110,0.4)', boxShadow: '0 0 15px rgba(201,169,110,0.15)' }}>
+                    <button
+                      onClick={() => photoInputRef.current?.click()}
+                      className="w-16 h-16 rounded-2xl overflow-hidden relative group cursor-pointer"
+                      style={{ border: '2px solid rgba(201,169,110,0.4)', boxShadow: '0 0 15px rgba(201,169,110,0.15)' }}
+                      title="Click to change photo"
+                    >
                       <img
                         src={session.sourcePhotoUrl}
                         alt={session.patientName}
                         className="w-full h-full object-cover"
                       />
-                    </div>
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Camera className="w-5 h-5 text-white" />
+                      </div>
+                    </button>
                   ) : (
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.05))', border: '2px solid rgba(201,169,110,0.3)', boxShadow: '0 0 15px rgba(201,169,110,0.1)' }}>
-                      <User className="w-7 h-7 text-[#C9A96E]/50" />
-                    </div>
+                    <button
+                      onClick={() => photoInputRef.current?.click()}
+                      disabled={photoUploading}
+                      className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105"
+                      style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.05))', border: '2px dashed rgba(201,169,110,0.4)', boxShadow: '0 0 15px rgba(201,169,110,0.1)' }}
+                      title="Upload patient photo"
+                    >
+                      {photoUploading ? (
+                        <Loader2 className="w-5 h-5 text-[#C9A96E]/70 animate-spin" />
+                      ) : (
+                        <>
+                          <Camera className="w-5 h-5 text-[#C9A96E]/50" />
+                          <span className="text-[8px] text-[#C9A96E]/40 mt-0.5 font-medium">PHOTO</span>
+                        </>
+                      )}
+                    </button>
                   )}
                 </div>
 
