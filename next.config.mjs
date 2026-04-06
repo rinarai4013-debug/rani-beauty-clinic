@@ -65,6 +65,12 @@ const nextConfig = {
       { source: "/chemical-peels", destination: "/services/chemical-peels", permanent: true },
       { source: "/red-light-therapy", destination: "/services/red-light-therapy", permanent: true },
       { source: "/sofwave", destination: "/services/sofwave", permanent: true },
+      // ── GSC 404 fixes (Apr 2026) ──
+      { source: "/memberships", destination: "/membership", permanent: true },
+      { source: "/memberships/", destination: "/membership", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+      { source: "/services/laser-facials", destination: "/services/laser-acne-facial", permanent: true },
+      { source: "/services/laser-facials/", destination: "/services/laser-acne-facial", permanent: true },
       // ── Trailing slash cleanup (catch any indexed with trailing slash) ──
       { source: "/services/", destination: "/services", permanent: true },
       { source: "/wellness/", destination: "/wellness", permanent: true },
@@ -82,12 +88,8 @@ const nextConfig = {
       { source: "/posts/:slug", destination: "/blog/:slug", permanent: true },
       { source: "/articles/:slug", destination: "/blog/:slug", permanent: true },
       { source: "/news/:slug", destination: "/blog/:slug", permanent: true },
-      // ── /compare/ → /vs/ redirects (compare is a stub, vs has real content) ──
-      { source: "/compare/botox-vs-dysport", destination: "/vs/botox-vs-dysport", permanent: true },
-      { source: "/compare/semaglutide-vs-tirzepatide", destination: "/vs/semaglutide-vs-tirzepatide", permanent: true },
-      { source: "/compare/hydrafacial-vs-regular-facial", destination: "/vs/hydrafacial-vs-regular-facial", permanent: true },
-      { source: "/compare/rf-microneedling-vs-traditional-microneedling", destination: "/vs/rf-microneedling-vs-traditional-microneedling", permanent: true },
-      { source: "/compare/sofwave-vs-ultherapy", destination: "/vs/sofwave-vs-ultherapy", permanent: true },
+      // ── /compare/ → /vs/ catch-all redirect (compare is legacy, vs is canonical) ──
+      { source: "/compare/:slug", destination: "/vs/:slug", permanent: true },
     ];
   },
   async headers() {

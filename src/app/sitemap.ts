@@ -1,7 +1,5 @@
 import { MetadataRoute } from "next";
 import { geoPages } from "@/data/locations/geo-pages";
-// cost-pages and comparisons data files exist but templates are not yet built — excluded from sitemap
-// geo-service-data excluded — /locations/[slug]/[service] templates not yet built
 import { serviceVariations } from "@/data/services/service-variations";
 import { galleryPages } from "@/data/results/gallery";
 import { pillarGuides } from "@/data/guides/pillar-pages";
@@ -27,116 +25,153 @@ import { serviceGeoEntries } from "@/data/locations/service-geo";
 import { extendedServiceGeoEntries } from "@/data/locations/service-geo-extended";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
-const BUILD_DATE = new Date().toISOString();
+
+// Use fixed dates reflecting actual content updates, not build time.
+const CONTENT_LAST_UPDATED = "2026-04-05T00:00:00.000Z";
+const GEO_LAST_UPDATED = "2026-03-15T00:00:00.000Z";
+const BLOG_LAST_UPDATED = "2026-04-05T00:00:00.000Z";
 
 const aestheticSlugs = [
-  "laser-hair-removal",
-  "hydrafacial",
-  "rf-microneedling",
-  "biorepeel",
-  "botox-dysport",
-  "dermal-fillers",
-  "red-light-therapy",
-  "laser-acne-facial",
-  "chemical-peels",
-  "ai-skin-analysis",
-  "sofwave",
-  "scar-reduction",
+  "laser-hair-removal", "hydrafacial", "rf-microneedling", "biorepeel",
+  "botox-dysport", "dermal-fillers", "red-light-therapy", "laser-acne-facial",
+  "chemical-peels", "ai-skin-analysis", "sofwave", "scar-reduction",
 ];
 
 const wellnessSlugs = [
-  "glp1-weight-management",
-  "nad-injections",
-  "vitamin-injections",
-  "hormone-therapy",
-  "blood-work",
+  "glp1-weight-management", "nad-injections", "vitamin-injections",
+  "hormone-therapy", "blood-work",
 ];
 
-// Blog slugs are now dynamically pulled from the data
+/**
+ * Sitemap index strategy — splits ~3,100 URLs into categorized sub-sitemaps.
+ *
+ * This gives Google clear crawl-priority signals:
+ * - Sub-sitemap 0: Core pages (highest value, ~250 URLs)
+ * - Sub-sitemap 1: Blog posts (~192 URLs)
+ * - Sub-sitemap 2: SEO content pages (~307 URLs)
+ * - Sub-sitemap 3: Geo hub pages — /locations/ + /near/[city] (~175 URLs)
+ * - Sub-sitemap 4: Near service pages A-K (~850 URLs)
+ * - Sub-sitemap 5: Near service pages L-Z (~1,400 URLs)
+ *
+ * Google auto-discovers the index at /sitemap.xml → /sitemap/0.xml, /sitemap/1.xml, etc.
+ */
+export async function generateSitemaps() {
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
+}
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const now = BUILD_DATE;
+export default function sitemap({ id }: { id: number }): MetadataRoute.Sitemap {
+  switch (id) {
+    case 0:
+      return buildCoreSitemap();
+    case 1:
+      return buildBlogSitemap();
+    case 2:
+      return buildSeoContentSitemap();
+    case 3:
+      return buildGeoHubSitemap();
+    case 4:
+      return buildNearServiceSitemap("a-k");
+    case 5:
+      return buildNearServiceSitemap("l-z");
+    default:
+      return [];
+  }
+}
 
-  // Static pages
+// ── Sub-sitemap 0: Core pages (~250 URLs) ────────────────────────────
+function buildCoreSitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: now, priority: 1.0, changeFrequency: "weekly" },
-    { url: `${baseUrl}/about`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/services`, lastModified: now, priority: 0.9, changeFrequency: "weekly" },
-    { url: `${baseUrl}/wellness`, lastModified: now, priority: 0.9, changeFrequency: "weekly" },
-    { url: `${baseUrl}/blog`, lastModified: now, priority: 0.8, changeFrequency: "weekly" },
-    { url: `${baseUrl}/pricing`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/contact`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/results`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/locations`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${baseUrl}/membership`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/quiz`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/team`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/team/dr-landfield`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/safety`, lastModified: now, priority: 0.6, changeFrequency: "yearly" },
-    { url: `${baseUrl}/technology`, lastModified: now, priority: 0.6, changeFrequency: "yearly" },
-    { url: `${baseUrl}/the-reveal`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${baseUrl}/get-started`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/knowledge`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/faq`, lastModified: now, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${baseUrl}/team/providers`, lastModified: now, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/tools/botox-cost-calculator`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/tools/treatment-finder`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/guides`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${baseUrl}/press`, lastModified: now, priority: 0.6, changeFrequency: "monthly" },
-    { url: `${baseUrl}/privacy-policy`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
-    { url: `${baseUrl}/terms`, lastModified: now, priority: 0.3, changeFrequency: "yearly" },
+    { url: baseUrl, lastModified: CONTENT_LAST_UPDATED, priority: 1.0, changeFrequency: "weekly" },
+    { url: `${baseUrl}/about`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/services`, lastModified: CONTENT_LAST_UPDATED, priority: 0.9, changeFrequency: "weekly" },
+    { url: `${baseUrl}/wellness`, lastModified: CONTENT_LAST_UPDATED, priority: 0.9, changeFrequency: "weekly" },
+    { url: `${baseUrl}/blog`, lastModified: BLOG_LAST_UPDATED, priority: 0.8, changeFrequency: "weekly" },
+    { url: `${baseUrl}/pricing`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/contact`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/results`, lastModified: CONTENT_LAST_UPDATED, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/locations`, lastModified: CONTENT_LAST_UPDATED, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/membership`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/quiz`, lastModified: CONTENT_LAST_UPDATED, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/team`, lastModified: CONTENT_LAST_UPDATED, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/team/dr-landfield`, lastModified: CONTENT_LAST_UPDATED, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/safety`, lastModified: CONTENT_LAST_UPDATED, priority: 0.6, changeFrequency: "yearly" },
+    { url: `${baseUrl}/technology`, lastModified: CONTENT_LAST_UPDATED, priority: 0.6, changeFrequency: "yearly" },
+    { url: `${baseUrl}/the-reveal`, lastModified: CONTENT_LAST_UPDATED, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/get-started`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/knowledge`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/faq`, lastModified: CONTENT_LAST_UPDATED, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${baseUrl}/team/providers`, lastModified: CONTENT_LAST_UPDATED, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${baseUrl}/tools/botox-cost-calculator`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/tools/treatment-finder`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/guides`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/press`, lastModified: CONTENT_LAST_UPDATED, priority: 0.6, changeFrequency: "monthly" },
+    { url: `${baseUrl}/glp1`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/concerns`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/privacy-policy`, lastModified: CONTENT_LAST_UPDATED, priority: 0.3, changeFrequency: "yearly" },
+    { url: `${baseUrl}/terms`, lastModified: CONTENT_LAST_UPDATED, priority: 0.3, changeFrequency: "yearly" },
   ];
 
-  // Aesthetic service pages
   const servicePages: MetadataRoute.Sitemap = aestheticSlugs.map((slug) => ({
     url: `${baseUrl}/services/${slug}`,
-    lastModified: now,
+    lastModified: CONTENT_LAST_UPDATED,
     priority: 0.8,
     changeFrequency: "monthly",
   }));
 
-  // Wellness service pages
   const wellnessPages: MetadataRoute.Sitemap = wellnessSlugs.map((slug) => ({
     url: `${baseUrl}/wellness/${slug}`,
-    lastModified: now,
+    lastModified: CONTENT_LAST_UPDATED,
     priority: 0.8,
     changeFrequency: "monthly",
   }));
 
-  // Blog pages (dynamic from all posts)
-  const blogPageUrls: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
+  const aestheticVariationPages: MetadataRoute.Sitemap = serviceVariations
+    .filter((v) => v.category === "aesthetic")
+    .map((v) => ({
+      url: `${baseUrl}/services/${v.parentSlug}/${v.slug}`,
+      lastModified: CONTENT_LAST_UPDATED,
+      priority: 0.6,
+      changeFrequency: "monthly",
+    }));
 
-  // Gallery pages
+  const wellnessVariationPages: MetadataRoute.Sitemap = serviceVariations
+    .filter((v) => v.category === "wellness")
+    .map((v) => ({
+      url: `${baseUrl}/wellness/${v.parentSlug}/${v.slug}`,
+      lastModified: CONTENT_LAST_UPDATED,
+      priority: 0.6,
+      changeFrequency: "monthly",
+    }));
+
   const galleryPageUrls: MetadataRoute.Sitemap = galleryPages.map((page) => ({
     url: `${baseUrl}/results/${page.slug}`,
-    lastModified: now,
+    lastModified: CONTENT_LAST_UPDATED,
     priority: 0.6,
     changeFrequency: "monthly",
   }));
 
-  // Pillar guide pages
   const guidePageUrls: MetadataRoute.Sitemap = pillarGuides.map((guide) => ({
     url: `${baseUrl}/guides/${guide.slug}`,
-    lastModified: now,
+    lastModified: CONTENT_LAST_UPDATED,
     priority: 0.8,
     changeFrequency: "monthly",
   }));
 
-  // Geo location pages (48 cities/neighborhoods)
-  const locationPages: MetadataRoute.Sitemap = geoPages.map((page) => ({
-    url: `${baseUrl}/locations/${page.slug}`,
-    lastModified: now,
+  const concernPages: MetadataRoute.Sitemap = skinConcerns.map((concern) => ({
+    url: `${baseUrl}/concerns/${concern.slug}`,
+    lastModified: CONTENT_LAST_UPDATED,
     priority: 0.7,
     changeFrequency: "monthly",
   }));
 
-  // Geo-service combo pages — EXCLUDED: /locations/[slug]/[service] is a notFound() stub. Use /near/[city]/[service] instead (fully built).
-  // Cost/pricing pages — RESTORED: template built 2026-03-31
+  // Comparison pages — /vs/ URLs only (canonical). /compare/ 301-redirects here.
+  const vsPageUrls: MetadataRoute.Sitemap = vsPages.map((page) => ({
+    url: `${baseUrl}/vs/${page.slug}`,
+    lastModified: CONTENT_LAST_UPDATED,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
   const costPageUrls: MetadataRoute.Sitemap = [
     "laser-hair-removal-cost", "hydrafacial-cost", "rf-microneedling-cost", "botox-cost",
     "dermal-fillers-cost", "chemical-peels-cost", "biorepeel-cost", "sofwave-cost",
@@ -145,183 +180,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "vitamin-injections-cost", "blood-work-cost",
   ].map((slug) => ({
     url: `${baseUrl}/cost/${slug}`,
-    lastModified: now,
+    lastModified: CONTENT_LAST_UPDATED,
     priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-  // Comparison pages — RESTORED: template built 2026-03-31. Note: /vs/ pages also exist with different data; both serve distinct intents.
-  const comparisonPageUrls: MetadataRoute.Sitemap = [
-    "botox-vs-dysport", "semaglutide-vs-tirzepatide", "hydrafacial-vs-chemical-peel",
-    "rf-microneedling-vs-sofwave", "biorepeel-vs-vi-peel", "laser-hair-removal-vs-waxing",
-    "laser-hair-removal-vs-electrolysis", "botox-vs-dermal-fillers", "nad-vs-vitamin-b12",
-    "semaglutide-vs-liraglutide", "rf-microneedling-vs-traditional-microneedling",
-    "biorepeel-vs-prx-t33", "hydrafacial-vs-regular-facial", "sofwave-vs-ultherapy",
-    "peptide-therapy-vs-hgh",
-  ].map((slug) => ({
-    url: `${baseUrl}/compare/${slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Service variation pages (e.g., /services/laser-hair-removal/full-brazilian)
-  const aestheticVariationPages: MetadataRoute.Sitemap = serviceVariations
-    .filter((v) => v.category === "aesthetic")
-    .map((v) => ({
-      url: `${baseUrl}/services/${v.parentSlug}/${v.slug}`,
-      lastModified: now,
-      priority: 0.6,
-      changeFrequency: "monthly",
-    }));
-
-  // Wellness variation pages (e.g., /wellness/glp1-weight-management/semaglutide)
-  const wellnessVariationPages: MetadataRoute.Sitemap = serviceVariations
-    .filter((v) => v.category === "wellness")
-    .map((v) => ({
-      url: `${baseUrl}/wellness/${v.parentSlug}/${v.slug}`,
-      lastModified: now,
-      priority: 0.6,
-      changeFrequency: "monthly",
-    }));
-
-  // Skin concern pages
-  const concernPages: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/concerns`, lastModified: now, priority: 0.8, changeFrequency: "monthly" },
-    ...skinConcerns.map((concern) => ({
-      url: `${baseUrl}/concerns/${concern.slug}`,
-      lastModified: now,
-      priority: 0.7 as const,
-      changeFrequency: "monthly" as const,
-    })),
-  ];
-
-  // Aftercare guide pages
-  const aftercarePageUrls: MetadataRoute.Sitemap = aftercarePages.map((page) => ({
-    url: `${baseUrl}/aftercare/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Preparation guide pages
-  const preparationPageUrls: MetadataRoute.Sitemap = preparationPages.map((page) => ({
-    url: `${baseUrl}/preparation/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Demographic treatment pages
-  const demographicPageUrls: MetadataRoute.Sitemap = demographicPages.map((page) => ({
-    url: `${baseUrl}/treatments-for/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Side effects pages
-  const sideEffectsPageUrls: MetadataRoute.Sitemap = sideEffectsPages.map((page) => ({
-    url: `${baseUrl}/side-effects/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Worth-it decision pages
-  const worthItPageUrls: MetadataRoute.Sitemap = worthItPages.map((page) => ({
-    url: `${baseUrl}/worth-it/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // First-time experience pages
-  const firstTimePageUrls: MetadataRoute.Sitemap = firstTimePages.map((page) => ({
-    url: `${baseUrl}/first-time/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Results timeline pages
-  const resultsTimelinePageUrls: MetadataRoute.Sitemap = resultsTimelinePages.map((page) => ({
-    url: `${baseUrl}/results-timeline/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Seasonal treatment pages
-  const seasonalPageUrls: MetadataRoute.Sitemap = seasonalPages.map((page) => ({
-    url: `${baseUrl}/seasonal/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Financing info pages
-  const financingPageUrls: MetadataRoute.Sitemap = financingPages.map((page) => ({
-    url: `${baseUrl}/financing/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Body area treatment pages
-  const bodyAreaPageUrls: MetadataRoute.Sitemap = bodyAreaPages.map((page) => ({
-    url: `${baseUrl}/treatment-areas/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Men's treatment guide pages
-  const menPageUrls: MetadataRoute.Sitemap = menPages.map((page) => ({
-    url: `${baseUrl}/men/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Age-specific treatment pages
-  const agePageUrls: MetadataRoute.Sitemap = agePages.map((page) => ({
-    url: `${baseUrl}/age/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Treatment combination pages
-  const combinationPageUrls: MetadataRoute.Sitemap = combinationPages.map((page) => ({
-    url: `${baseUrl}/combinations/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Treatment comparison (vs) pages
-  const vsPageUrls: MetadataRoute.Sitemap = vsPages.map((page) => ({
-    url: `${baseUrl}/vs/${page.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Near [city] geo pages (50 PNW cities + 100 extended cities = 150 total)
-  const allNearbyCities = [...pnwCities, ...waCitiesExtended];
-  const nearCityPages: MetadataRoute.Sitemap = allNearbyCities.map((city) => ({
-    url: `${baseUrl}/near/${city.slug}`,
-    lastModified: now,
-    priority: 0.7,
-    changeFrequency: "monthly",
-  }));
-
-  // Near [city]/[service] geo-service pages (150 cities x 15 services = 2,250 total)
-  const allNearServiceEntries = [...serviceGeoEntries, ...extendedServiceGeoEntries];
-  const nearServicePages: MetadataRoute.Sitemap = allNearServiceEntries.map((entry) => ({
-    url: `${baseUrl}/near/${entry.citySlug}/${entry.serviceSlug}`,
-    lastModified: now,
-    priority: 0.6,
     changeFrequency: "monthly",
   }));
 
@@ -329,30 +189,97 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...staticPages,
     ...servicePages,
     ...wellnessPages,
-    ...blogPageUrls,
-    ...locationPages,
-    ...nearCityPages,
-    ...nearServicePages,
     ...aestheticVariationPages,
     ...wellnessVariationPages,
     ...galleryPageUrls,
     ...guidePageUrls,
     ...concernPages,
-    ...aftercarePageUrls,
-    ...preparationPageUrls,
-    ...demographicPageUrls,
-    ...sideEffectsPageUrls,
-    ...worthItPageUrls,
-    ...firstTimePageUrls,
-    ...resultsTimelinePageUrls,
-    ...seasonalPageUrls,
-    ...financingPageUrls,
-    ...bodyAreaPageUrls,
-    ...menPageUrls,
-    ...agePageUrls,
-    ...combinationPageUrls,
     ...vsPageUrls,
     ...costPageUrls,
-    ...comparisonPageUrls,
   ];
+}
+
+// ── Sub-sitemap 1: Blog posts (~192 URLs) ───────────────────────────
+function buildBlogSitemap(): MetadataRoute.Sitemap {
+  return blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: parseBlogDate(post.date) || BLOG_LAST_UPDATED,
+    priority: 0.7,
+    changeFrequency: "monthly" as const,
+  }));
+}
+
+/** Parse "January 15, 2026" → ISO date string, or null if unparseable */
+function parseBlogDate(dateStr: string): string | null {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString();
+  } catch {
+    return null;
+  }
+}
+
+// ── Sub-sitemap 2: SEO content pages (~307 URLs) ────────────────────
+function buildSeoContentSitemap(): MetadataRoute.Sitemap {
+  const allSeoPages: MetadataRoute.Sitemap = [
+    ...aftercarePages.map((p) => ({ url: `${baseUrl}/aftercare/${p.slug}` })),
+    ...preparationPages.map((p) => ({ url: `${baseUrl}/preparation/${p.slug}` })),
+    ...demographicPages.map((p) => ({ url: `${baseUrl}/treatments-for/${p.slug}` })),
+    ...sideEffectsPages.map((p) => ({ url: `${baseUrl}/side-effects/${p.slug}` })),
+    ...worthItPages.map((p) => ({ url: `${baseUrl}/worth-it/${p.slug}` })),
+    ...firstTimePages.map((p) => ({ url: `${baseUrl}/first-time/${p.slug}` })),
+    ...resultsTimelinePages.map((p) => ({ url: `${baseUrl}/results-timeline/${p.slug}` })),
+    ...seasonalPages.map((p) => ({ url: `${baseUrl}/seasonal/${p.slug}` })),
+    ...financingPages.map((p) => ({ url: `${baseUrl}/financing/${p.slug}` })),
+    ...bodyAreaPages.map((p) => ({ url: `${baseUrl}/treatment-areas/${p.slug}` })),
+    ...menPages.map((p) => ({ url: `${baseUrl}/men/${p.slug}` })),
+    ...agePages.map((p) => ({ url: `${baseUrl}/age/${p.slug}` })),
+    ...combinationPages.map((p) => ({ url: `${baseUrl}/combinations/${p.slug}` })),
+  ];
+
+  return allSeoPages.map((entry) => ({
+    ...entry,
+    lastModified: CONTENT_LAST_UPDATED,
+    priority: 0.6,
+    changeFrequency: "monthly" as const,
+  }));
+}
+
+// ── Sub-sitemap 3: Geo hub pages (~175 URLs) ────────────────────────
+function buildGeoHubSitemap(): MetadataRoute.Sitemap {
+  const locationPages: MetadataRoute.Sitemap = geoPages.map((page) => ({
+    url: `${baseUrl}/locations/${page.slug}`,
+    lastModified: GEO_LAST_UPDATED,
+    priority: 0.7,
+    changeFrequency: "monthly",
+  }));
+
+  const allNearbyCities = [...pnwCities, ...waCitiesExtended];
+  const nearCityPages: MetadataRoute.Sitemap = allNearbyCities.map((city) => ({
+    url: `${baseUrl}/near/${city.slug}`,
+    lastModified: GEO_LAST_UPDATED,
+    priority: 0.6,
+    changeFrequency: "monthly",
+  }));
+
+  return [...locationPages, ...nearCityPages];
+}
+
+// ── Sub-sitemaps 4-5: Near service pages (~2,250 URLs split A-K / L-Z) ─
+function buildNearServiceSitemap(range: "a-k" | "l-z"): MetadataRoute.Sitemap {
+  const allEntries = [...serviceGeoEntries, ...extendedServiceGeoEntries];
+
+  const filtered = allEntries.filter((entry) => {
+    const firstChar = entry.citySlug.charAt(0).toLowerCase();
+    if (range === "a-k") return firstChar >= "a" && firstChar <= "k";
+    return firstChar >= "l" && firstChar <= "z";
+  });
+
+  return filtered.map((entry) => ({
+    url: `${baseUrl}/near/${entry.citySlug}/${entry.serviceSlug}`,
+    lastModified: GEO_LAST_UPDATED,
+    priority: 0.4,
+    changeFrequency: "monthly" as const,
+  }));
 }
