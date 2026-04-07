@@ -414,8 +414,20 @@ export async function getAllSessionsAsync(): Promise<MastermindSession[]> {
   if (typeof window === 'undefined') {
     try {
       const { getAllSessionsFromAirtable } = await import('./session-store');
-      return getAllSessionsFromAirtable();
-    } catch { /* fall through */ }
+      const atSessions = await getAllSessionsFromAirtable();
+      console.log(`[Session] getAllSessionsAsync: ${atSessions.length} from Airtable, ${sessions.size} in memory`);
+      // Rehydrate in-memory cache from Airtable results
+      for (const s of atSessions) {
+        if (!sessions.has(s.id)) sessions.set(s.id, s);
+      }
+      // Return Airtable results (authoritative) merged with any memory-only sessions
+      const merged = new Map<string, MastermindSession>();
+      for (const s of atSessions) merged.set(s.id, s);
+      for (const [id, s] of sessions) { if (!merged.has(id)) merged.set(id, s); }
+      return Array.from(merged.values());
+    } catch (err) {
+      console.error('[Session] getAllSessionsAsync Airtable failed, falling back to memory:', err);
+    }
   }
   return getAllSessions();
 }

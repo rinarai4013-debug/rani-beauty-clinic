@@ -52,7 +52,36 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
     return;
   }
 
-  const sessionJson = JSON.stringify(session);
+  // Strip large base64 data before persisting to Airtable (100KB field limit)
+  // Keep a placeholder so we know an image exists
+  const stripped = { ...session };
+  if (stripped.sourcePhotoUrl && stripped.sourcePhotoUrl.length > 5000) {
+    stripped.sourcePhotoUrl = '[base64_stripped]';
+  }
+  if (stripped.simulation) {
+    stripped.simulation = {
+      ...stripped.simulation,
+      withTreatment: stripped.simulation.withTreatment ? {
+        ...stripped.simulation.withTreatment,
+        frames: stripped.simulation.withTreatment.frames.map(f => ({
+          ...f,
+          imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 5000 ? '[base64_stripped]' : f.imageDataUrl,
+        })),
+      } : stripped.simulation.withTreatment,
+      withoutTreatment: stripped.simulation.withoutTreatment ? {
+        ...stripped.simulation.withoutTreatment,
+        frames: stripped.simulation.withoutTreatment.frames.map(f => ({
+          ...f,
+          imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 5000 ? '[base64_stripped]' : f.imageDataUrl,
+        })),
+      } : stripped.simulation.withoutTreatment,
+    };
+  }
+  const sessionJson = JSON.stringify(stripped);
+  const jsonSize = sessionJson.length;
+  if (jsonSize > 90000) {
+    console.warn(`[SessionStore] Session JSON is ${(jsonSize / 1024).toFixed(0)}KB — may exceed Airtable field limit`);
+  }
   const cached = cache.get(session.id);
 
   try {
@@ -170,10 +199,15 @@ export async function getAllSessionsFromAirtable(): Promise<MastermindSession[]>
   try {
     const filter = encodeURIComponent(`{Workflow}='${WORKFLOW_KEY}'`);
     const res = await fetch(
-      `${airtableUrl()}?filterByFormula=${filter}&sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=desc&maxRecords=50`,
-      { headers: headers(), signal: AbortSignal.timeout(10000) }
+      `${airtableUrl()}?filterByFormula=${filter}&sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=desc&maxRecords=100`,
+      { headers: headers(), signal: AbortSignal.timeout(15000) }
     );
+    if (!res.ok) {
+      console.error(`[SessionStore] Airtable list HTTP ${res.status}`);
+      return Array.from(cache.values()).map(c => c.session);
+    }
     const data = await res.json();
+    console.log(`[SessionStore] Loaded ${data?.records?.length || 0} sessions from Airtable`);
     const sessions: MastermindSession[] = [];
 
     for (const record of data?.records || []) {

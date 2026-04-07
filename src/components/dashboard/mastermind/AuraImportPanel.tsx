@@ -73,38 +73,75 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   const [fileUploading, setFileUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load pdf.js library from CDN with retry
+  const loadPdfJs = useCallback(async (): Promise<any> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const win = window as any;
+    if (win.pdfjsLib) return win.pdfjsLib;
+
+    // Try loading the script
+    const PDFJS_VERSION = '3.11.174';
+    const CDN_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.min.js`;
+    const WORKER_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.js`;
+
+    await new Promise<void>((resolve, reject) => {
+      // Check if script already exists but hasn't initialized yet
+      const existing = document.querySelector(`script[src="${CDN_URL}"]`);
+      if (existing) {
+        // Script tag exists — wait for pdfjsLib to appear
+        let attempts = 0;
+        const check = setInterval(() => {
+          attempts++;
+          if (win.pdfjsLib) { clearInterval(check); resolve(); }
+          else if (attempts > 50) { clearInterval(check); reject(new Error('PDF.js load timeout')); }
+        }, 100);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = CDN_URL;
+      script.onload = () => {
+        // Wait for pdfjsLib to be available on window (may take a tick)
+        let attempts = 0;
+        const check = setInterval(() => {
+          attempts++;
+          if (win.pdfjsLib) { clearInterval(check); resolve(); }
+          else if (attempts > 30) { clearInterval(check); reject(new Error('PDF.js init timeout')); }
+        }, 100);
+      };
+      script.onerror = () => reject(new Error('Failed to load PDF renderer from CDN'));
+      document.head.appendChild(script);
+    });
+
+    const lib = win.pdfjsLib;
+    if (!lib) throw new Error('PDF renderer not available after load');
+    lib.GlobalWorkerOptions.workerSrc = WORKER_URL;
+    return lib;
+  }, []);
+
   // Convert a file to a JPEG data URL client-side (handles PDFs + large images)
   const fileToDataUrl = useCallback(async (file: File): Promise<string> => {
     const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
 
     if (isPdf) {
-      // Render PDF first page to canvas using pdf.js (classic build, exposes window.pdfjsLib)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if (!win.pdfjsLib) {
-        await new Promise<void>((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error('Failed to load PDF renderer'));
-          document.head.appendChild(script);
-        });
-      }
-      const pdfjsLib = win.pdfjsLib;
-      if (!pdfjsLib) throw new Error('PDF renderer not available');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      console.log('[AuraImport] Processing PDF client-side...', file.name, `${(file.size / 1024 / 1024).toFixed(1)}MB`);
+      const pdfjsLib = await loadPdfJs();
 
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      console.log('[AuraImport] PDF loaded into buffer, rendering first page...');
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 2.0 });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas context unavailable');
       await page.render({ canvasContext: ctx, viewport }).promise;
+      console.log('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
 
-      return canvas.toDataURL('image/jpeg', 0.85);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      console.log('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
+      return dataUrl;
     }
 
     // For images: load into canvas, resize if needed, compress to JPEG
@@ -118,14 +155,15 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
-        const ctx = canvas.getContext('2d')!;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas context unavailable')); return; }
         ctx.drawImage(img, 0, 0, w, h);
         resolve(canvas.toDataURL('image/jpeg', 0.85));
       };
       img.onerror = () => reject(new Error('Failed to load image'));
       img.src = URL.createObjectURL(file);
     });
-  }, []);
+  }, [loadPdfJs]);
 
   // Handle file upload — process client-side then run AI scan
   const handleFileUpload = useCallback(
@@ -150,19 +188,27 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         if (!saveRes.ok) throw new Error('Failed to save photo to session');
 
         // Step 3: Run the AI scan with the uploaded photo
+        console.log('[AuraImport] Running AI scan...');
         const scanRes = await fetch('/api/mastermind/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId: session.id, sourcePhotoUrl: dataUrl }),
         });
+        if (!scanRes.ok) {
+          const errText = await scanRes.text().catch(() => '');
+          throw new Error(`AI scan failed (${scanRes.status}): ${errText.slice(0, 200)}`);
+        }
         const scanJson = await scanRes.json();
+        console.log('[AuraImport] AI scan complete:', scanJson.success);
 
         // Step 4: Auto-trigger simulation so projections populate
-        await fetch('/api/mastermind/simulate', {
+        console.log('[AuraImport] Triggering simulation...');
+        const simRes = await fetch('/api/mastermind/simulate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId: session.id }),
         });
+        if (!simRes.ok) console.warn('[AuraImport] Simulation trigger failed:', simRes.status);
 
         if (scanJson.success !== false) {
           onImportComplete?.({
