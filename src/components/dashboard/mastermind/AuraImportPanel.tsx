@@ -73,32 +73,81 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   const [fileUploading, setFileUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle file upload — upload photo then run AI scan
+  // Convert a file to a JPEG data URL client-side (handles PDFs + large images)
+  const fileToDataUrl = useCallback(async (file: File): Promise<string> => {
+    const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+
+    if (isPdf) {
+      // Render PDF first page to canvas using pdf.js (classic build, exposes window.pdfjsLib)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const win = window as any;
+      if (!win.pdfjsLib) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load PDF renderer'));
+          document.head.appendChild(script);
+        });
+      }
+      const pdfjsLib = win.pdfjsLib;
+      if (!pdfjsLib) throw new Error('PDF renderer not available');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d')!;
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      return canvas.toDataURL('image/jpeg', 0.85);
+    }
+
+    // For images: load into canvas, resize if needed, compress to JPEG
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  }, []);
+
+  // Handle file upload — process client-side then run AI scan
   const handleFileUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      // Accept images AND PDFs
       const isValid = file.type.startsWith('image/') || file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
       if (!isValid) return;
       setFileUploading(true);
       setImportError(null);
       try {
-        // Step 1: Upload and process the photo/PDF
-        const formData = new FormData();
-        formData.append('file', file);
-        const uploadRes = await fetch('/api/photo/upload', { method: 'POST', body: formData });
-        if (!uploadRes.ok) throw new Error('Photo upload failed');
-        const uploadJson = await uploadRes.json();
-        const dataUrl = uploadJson.imageBase64 || uploadJson.dataUrl || uploadJson.url;
-        if (!dataUrl) throw new Error('No image URL returned');
+        // Step 1: Convert file to JPEG data URL client-side (handles PDFs + large images)
+        const dataUrl = await fileToDataUrl(file);
+        if (!dataUrl) throw new Error('Failed to process file');
 
         // Step 2: Save photo to session
-        await fetch(`/api/mastermind/sessions/${session.id}`, {
+        const saveRes = await fetch(`/api/mastermind/sessions/${session.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: { type: 'SET_SOURCE_PHOTO', url: dataUrl } }),
         });
+        if (!saveRes.ok) throw new Error('Failed to save photo to session');
 
         // Step 3: Run the AI scan with the uploaded photo
         const scanRes = await fetch('/api/mastermind/scan', {
@@ -132,13 +181,13 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         }
       } catch (err) {
         console.error('File upload scan failed:', err);
-        setImportError('Failed to upload and analyze photo. Please try again.');
+        setImportError(err instanceof Error ? err.message : 'Failed to upload and analyze. Please try again.');
       } finally {
         setFileUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [session.id, session.patientName, onImportComplete]
+    [session.id, session.patientName, onImportComplete, fileToDataUrl]
   );
 
   // Determine if we already have a device scan imported
@@ -302,7 +351,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
             </div>
           </div>
           <h3 className="font-display text-lg font-semibold text-[#F8F6F1] mb-2">
-            {fileUploading ? 'Analyzing Uploaded Photo...' : 'Importing Aura 3D Scan Data...'}
+            {fileUploading ? 'Processing & Analyzing Scan...' : 'Importing Aura 3D Scan Data...'}
           </h3>
           <p className="font-body text-sm text-[#F8F6F1]/60 max-w-xs">
             {fileUploading
