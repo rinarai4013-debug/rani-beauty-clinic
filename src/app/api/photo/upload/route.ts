@@ -14,7 +14,16 @@ const MAX_WIDTH = 1200;
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (parseErr) {
+      console.error('[API] /api/photo/upload formData parse error:', parseErr);
+      return NextResponse.json(
+        { error: 'File too large for server. Maximum ~4.5MB on this plan. Try a smaller image or compress the PDF.' },
+        { status: 413 },
+      );
+    }
     const file = formData.get('file');
 
     if (!file || !(file instanceof File)) {
@@ -23,6 +32,8 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+
+    console.log(`[API] /api/photo/upload — file: ${file.name}, type: ${file.type}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
 
     // Validate file type (also accept common PDF MIME variants)
     const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
@@ -45,9 +56,22 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Process with sharp: resize if wider than MAX_WIDTH, output as JPEG
-    // For PDFs, sharp renders the first page via libvips
-    let image = sharp(buffer, isPdf ? { pages: 1, density: 200 } : undefined);
+    if (isPdf) {
+      // PDFs: store as base64 directly (sharp/libvips PDF support not available on Vercel)
+      const base64 = buffer.toString('base64');
+      const dataUrl = `data:application/pdf;base64,${base64}`;
+
+      return NextResponse.json({
+        imageBase64: dataUrl,
+        originalName: file.name,
+        originalSize: file.size,
+        processedSize: buffer.length,
+        isPdf: true,
+      });
+    }
+
+    // Images: process with sharp — resize if wider than MAX_WIDTH, output as JPEG
+    let image = sharp(buffer);
     const metadata = await image.metadata();
 
     if (metadata.width && metadata.width > MAX_WIDTH) {
