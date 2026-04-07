@@ -78,17 +78,19 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      if (!file.type.startsWith('image/')) return;
+      // Accept images AND PDFs
+      const isValid = file.type.startsWith('image/') || file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+      if (!isValid) return;
       setFileUploading(true);
       setImportError(null);
       try {
-        // Step 1: Upload and process the photo
+        // Step 1: Upload and process the photo/PDF
         const formData = new FormData();
         formData.append('file', file);
         const uploadRes = await fetch('/api/photo/upload', { method: 'POST', body: formData });
         if (!uploadRes.ok) throw new Error('Photo upload failed');
         const uploadJson = await uploadRes.json();
-        const dataUrl = uploadJson.dataUrl || uploadJson.url;
+        const dataUrl = uploadJson.imageBase64 || uploadJson.dataUrl || uploadJson.url;
         if (!dataUrl) throw new Error('No image URL returned');
 
         // Step 2: Save photo to session
@@ -105,6 +107,13 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           body: JSON.stringify({ sessionId: session.id, sourcePhotoUrl: dataUrl }),
         });
         const scanJson = await scanRes.json();
+
+        // Step 4: Auto-trigger simulation so projections populate
+        await fetch('/api/mastermind/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: session.id }),
+        });
 
         if (scanJson.success !== false) {
           onImportComplete?.({

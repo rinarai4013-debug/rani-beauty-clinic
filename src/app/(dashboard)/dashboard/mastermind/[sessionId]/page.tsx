@@ -150,7 +150,7 @@ export default function MastermindSessionPage() {
         const res = await fetch('/api/photo/upload', { method: 'POST', body: formData });
         if (!res.ok) throw new Error('Upload failed');
         const json = await res.json();
-        const dataUrl = json.dataUrl || json.url;
+        const dataUrl = json.imageBase64 || json.dataUrl || json.url;
         if (dataUrl) {
           await dispatch({ type: 'SET_SOURCE_PHOTO', url: dataUrl });
         }
