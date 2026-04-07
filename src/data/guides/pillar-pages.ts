@@ -40,7 +40,7 @@ export const pillarGuides: PillarGuide[] = [
     relatedServices: [{ slug: "laser-hair-removal", title: "Laser Hair Removal", category: "aesthetic" }],
     faqs: [
       { question: "Is laser hair removal safe for all skin tones?", answer: "Yes. Our Candela GentleMax Pro Plus uses dual wavelengths to safely treat all Fitzpatrick skin types (I-VI), including darker skin tones that were historically difficult to treat." },
-      { question: "How long does each laser hair removal session take?", answer: "Small areas like the upper lip take under 10 minutes. Medium areas like underarms take 15-20 minutes. Large areas like full legs take 30-60 minutes per session." },
+      { question: "How long does each laser hair removal session take?", answer: "Small areas like the upper lip take under 10 minutes. Medium areas like underarms take 15-20 minutes. Large areas like full legs take about 20 minutes per session." },
       { question: "Can laser hair removal treat blonde or gray hair?", answer: "Laser targets melanin in the hair follicle, so very light blonde, gray, or white hairs have insufficient pigment for effective treatment. Dark blonde and red hair may respond partially." },
       { question: "What is the best time of year to start laser hair removal?", answer: "Fall and winter are ideal because sun exposure should be minimized during your treatment series. Starting in fall allows you to complete multiple sessions before summer." },
       { question: "Does laser hair removal work on facial hair?", answer: "Yes. We commonly treat the upper lip, chin, sideburns, and full face. Hormonal facial hair may require maintenance sessions over time, but significant reduction is achievable." },

@@ -27,7 +27,7 @@ export const costPages: CostPage[] = [
       { item: "Upper Lip or Chin", price: "$79", note: "Small facial areas" },
       { item: "Underarms", price: "$149" },
       { item: "Full Brazilian", price: "$225" },
-      { item: "Full Legs", price: "$375" },
+      { item: "Full Legs", price: "$400" },
       { item: "Full Back", price: "$375" },
       { item: "Full Body", price: "$1,199", note: "Best value - all areas included" },
     ],

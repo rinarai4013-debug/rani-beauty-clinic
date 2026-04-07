@@ -112,7 +112,7 @@ What truly sets our experience apart is the integrated Dynamic Cooling Device (D
         question:
           "How much does laser hair removal cost at Rani Beauty Clinic?",
         answer:
-          "Laser hair removal pricing starts at $79 for small areas like the upper lip, chin, or sideburns. Popular areas include underarms ($149), full Brazilian ($225), half legs ($225), and full legs ($375). Our best value is the Full Body treatment at $1,199. We also offer 6-session packages with built-in savings - for example, the Full Brazilian 6-Pack is $1,125 (saving $225) and the Full Body 6-Pack is $5,999 (saving $1,195). Call us at (425) 539-4440 to schedule a complimentary consultation.",
+          "Laser hair removal pricing starts at $79 for small areas like the upper lip, chin, or sideburns. Popular areas include underarms ($149), full Brazilian ($225), half legs ($225), and full legs ($400). Our best value is the Full Body treatment at $1,199. We also offer 6-session packages with built-in savings - for example, the Full Brazilian 6-Pack is $1,125 (saving $225) and the Full Body 6-Pack is $5,999 (saving $1,195). Call us at (425) 539-4440 to schedule a complimentary consultation.",
       },
     ],
     relatedSlugs: [

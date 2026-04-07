@@ -97,7 +97,7 @@ export const serviceVariations: ServiceVariation[] = [
       "People with folliculitis or keratosis pilaris aggravated by shaving"
     ],
     [
-      { question: "How long does a full legs laser session take?", answer: "A full legs session typically takes 45-60 minutes. Our large spot-size handpiece allows rapid treatment of the broad surface area while maintaining consistent energy delivery." },
+      { question: "How long does a full legs laser session take?", answer: "A full legs session typically takes about 20 minutes. Our large spot-size handpiece allows rapid coverage of the broad surface area while maintaining consistent energy delivery." },
       { question: "Should I shave before my leg laser appointment?", answer: "Yes, please shave the treatment area 12-24 hours before your appointment. This ensures the laser energy targets the follicle beneath the skin rather than surface hair." },
       { question: "When will I see results on my legs?", answer: "Treated hairs shed within 1-3 weeks after each session. Noticeable thinning is common after 2-3 sessions, with optimal results achieved after the full series of 6-8 treatments." }
     ]

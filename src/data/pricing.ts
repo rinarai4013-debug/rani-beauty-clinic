@@ -13,7 +13,7 @@ export const pricingData = {
     { name: "Pantyline", price: "$135", time: "13 min" },
     { name: "Buttocks", price: "$275", time: "18 min" },
     { name: "Half Legs", price: "$225", time: "23 min" },
-    { name: "Full Legs", price: "$375", time: "43 min" },
+    { name: "Full Legs", price: "$400", time: "20 min" },
     { name: "Feet & Toes", price: "$79", time: "5 min" },
     { name: "Hands & Fingers", price: "$79", time: "5 min" },
     { name: "Full Chest", price: "$225", time: "18 min" },
