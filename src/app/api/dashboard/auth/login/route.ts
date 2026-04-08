@@ -61,7 +61,7 @@ function safeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(aBuf, bBuf);
 }
 
-export function hashPassword(password: string, iterations = 100_000): string {
+function hashPassword(password: string, iterations = 100_000): string {
   const salt = crypto.randomBytes(16).toString('base64');
   const hash = crypto.pbkdf2Sync(password, salt, iterations, 32, 'sha256').toString('base64');
   return `pbkdf2$${iterations}$${salt}$${hash}`;
