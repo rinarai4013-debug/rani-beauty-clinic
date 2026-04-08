@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
@@ -11,6 +12,10 @@ const MAX_WIDTH = 1200;
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('photo-upload', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
+
     const formData = await request.formData();
     const file = formData.get('file');
 

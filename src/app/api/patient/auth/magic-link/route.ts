@@ -3,8 +3,14 @@ import { z } from 'zod';
 import { Resend } from 'resend';
 import { createMagicLinkToken } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  return new Resend(apiKey);
+}
 
 const requestSchema = z.object({
   email: z.string().email(),
@@ -12,6 +18,10 @@ const requestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('patient-magic-link', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 
@@ -28,10 +38,17 @@ export async function POST(request: NextRequest) {
     const client = await fetchFirst<{ Email: string }>(
       Tables.clients(),
       1,
-      { filterByFormula: `{Email} = '${email}'` }
+      { filterByFormula: `{Email} = '${sanitizeFormulaValue(email)}'` }
     );
 
     if (client) {
+      const resend = getResendClient();
+      if (!resend) {
+        return NextResponse.json(
+          { error: 'Email service not configured' },
+          { status: 503 }
+        );
+      }
       const token = await createMagicLinkToken(email);
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
       const magicLinkUrl = `${baseUrl}/portal?token=${token}`;

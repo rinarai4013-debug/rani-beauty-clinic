@@ -64,6 +64,11 @@ export interface TreatmentPackage {
   extras: string[];
   highlight?: boolean;
   savings?: string;
+  subtitle?: string;
+  savingsVsStandalone?: number;
+  resultIntensity?: string;
+  bestFor?: string;
+  whyBest?: string;
   monthlyPayment: number;
 }
 

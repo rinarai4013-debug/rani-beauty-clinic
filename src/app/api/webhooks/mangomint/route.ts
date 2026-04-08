@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
+import type Airtable from 'airtable';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
@@ -26,8 +27,9 @@ async function forwardToN8n(webhookPath: string, payload: unknown): Promise<void
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-  } catch {
-    // n8n forwarding is best-effort
+    logWebhookEvent('mangomint', 'n8n-forward', true, { webhookPath });
+  } catch (err) {
+    logWebhookEvent('mangomint', 'n8n-forward', false, { webhookPath, error: String(err) });
   }
 }
 
@@ -58,10 +60,12 @@ async function upsertRecord(
   existingId: string | null,
   fields: Record<string, unknown>
 ): Promise<void> {
+  const airtableFields = fields as Partial<Airtable.FieldSet>;
+
   if (existingId) {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.update([{ id: existingId, fields }], { typecast: true }, (err) => {
+        table.update([{ id: existingId, fields: airtableFields }], { typecast: true }, (err) => {
           if (err) reject(err);
           else resolve();
         });
@@ -70,7 +74,7 @@ async function upsertRecord(
   } else {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.create([{ fields }], { typecast: true }, (err) => {
+        table.create([{ fields: airtableFields }], { typecast: true }, (err) => {
           if (err) reject(err);
           else resolve();
         });

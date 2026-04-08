@@ -1,2 +1,19 @@
-import { NextResponse } from "next/server";
-export async function GET() { return NextResponse.json({ status: "not_implemented" }, { status: 501 }); }
+import { NextResponse } from 'next/server';
+import { COOKIE_NAME, getSession } from '@/lib/auth/session';
+import { captureAuthEvent } from '@/lib/sentry-utils';
+
+export async function POST() {
+  const session = await getSession();
+  const response = NextResponse.json({ success: true });
+  response.cookies.set({
+    name: COOKIE_NAME,
+    value: '',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 0,
+    path: '/',
+  });
+  captureAuthEvent('logout', session?.username ?? 'unknown', true);
+  return response;
+}

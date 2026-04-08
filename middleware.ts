@@ -1,5 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const PRODUCTION_CORS_ORIGINS = [
+  "https://ranibeautyclinic.com",
+  "https://www.ranibeautyclinic.com",
+];
+
+const DEVELOPMENT_CORS_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
+function getCorsOrigin(request: NextRequest): string {
+  const origin = request.headers.get("origin");
+  const allowedOrigins =
+    process.env.NODE_ENV === "development"
+      ? [...PRODUCTION_CORS_ORIGINS, ...DEVELOPMENT_CORS_ORIGINS]
+      : PRODUCTION_CORS_ORIGINS;
+
+  if (origin && allowedOrigins.includes(origin)) {
+    return origin;
+  }
+
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://www.ranibeautyclinic.com";
+}
+
+function setApiCorsHeaders(response: NextResponse, request: NextRequest) {
+  response.headers.set("Access-Control-Allow-Origin", getCorsOrigin(request));
+  response.headers.set("Access-Control-Allow-Credentials", "true");
+  response.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, DELETE, OPTIONS"
+  );
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+}
+
 /**
  * Middleware: Domain canonicalization + trailing-slash normalization + edge headers
  *
@@ -55,6 +92,12 @@ export function middleware(request: NextRequest) {
 
   // API routes: add CORS headers (restricted by route type)
   if (pathname.startsWith("/api")) {
+    if (request.method === "OPTIONS" && !pathname.startsWith("/api/webhooks/")) {
+      const response = new NextResponse(null, { status: 204 });
+      setApiCorsHeaders(response, request);
+      return response;
+    }
+
     const response = NextResponse.next();
 
     // Webhook routes (server-to-server) — no CORS headers needed
@@ -70,17 +113,7 @@ export function middleware(request: NextRequest) {
       // No Access-Control-Allow-Origin — webhooks are server-to-server
     } else {
       // All other API routes: restrict CORS to own origin only
-      const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || "https://ranibeautyclinic.com";
-      response.headers.set("Access-Control-Allow-Origin", allowedOrigin);
-      response.headers.set("Access-Control-Allow-Credentials", "true");
-      response.headers.set(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PATCH, DELETE, OPTIONS"
-      );
-      response.headers.set(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization"
-      );
+      setApiCorsHeaders(response, request);
     }
 
     return response;

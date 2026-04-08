@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { FIELDS } from '@/lib/airtable/tables';
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -19,12 +21,39 @@ interface TreatmentPlanFields {
   'Client Name'?: string;
 }
 
+function verifyCherrySignature(rawBody: string, signature: string | null): boolean {
+  const secret = process.env.CHERRY_WEBHOOK_SECRET;
+  if (!secret || !signature) return false;
+
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const normalizedSignature = signature.replace(/^sha256=/i, '');
+  const signatureBuffer = Buffer.from(normalizedSignature, 'utf8');
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+
+  return (
+    signatureBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(signatureBuffer, expectedBuffer)
+  );
+}
+
 // ─── POST Handler ─────────────────────────────────────────────────
 // Receives Cherry payment webhook events
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as CherryWebhookPayload;
+    const rawBody = await request.text();
+    if (!process.env.CHERRY_WEBHOOK_SECRET) {
+      console.error('[Cherry Webhook] CHERRY_WEBHOOK_SECRET is not configured');
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    }
+
+    const signature = request.headers.get('x-cherry-signature');
+    if (!verifyCherrySignature(rawBody, signature)) {
+      console.warn('[Cherry Webhook] Invalid or missing signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const body = JSON.parse(rawBody) as CherryWebhookPayload;
 
     // Log the event for audit
     console.log('[Cherry Webhook] Received event:', {
@@ -66,7 +95,7 @@ export async function POST(request: NextRequest) {
           Tables.treatmentPlans(),
           1,
           {
-            filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${customerId.replace(/'/g, "\\'")}')`,
+            filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${sanitizeFormulaValue(customerId)}')`,
             sort: [{ field: FIELDS.treatmentPlans.createdDate, direction: 'desc' }],
           },
           true

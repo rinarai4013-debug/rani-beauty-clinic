@@ -6,6 +6,8 @@ import {
   getPatientSessionCookieConfig,
 } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 const requestSchema = z.object({
   token: z.string().min(1),
@@ -19,6 +21,10 @@ interface ClientRecord {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('patient-magic-link-verify', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 
@@ -45,7 +51,7 @@ export async function POST(request: NextRequest) {
     const clientRecords = await fetchFirst<ClientRecord>(
       Tables.clients(),
       1,
-      { filterByFormula: `{Email} = '${payload.email}'` },
+      { filterByFormula: `{Email} = '${sanitizeFormulaValue(payload.email)}'` },
       true // skip cache to get fresh data
     );
 

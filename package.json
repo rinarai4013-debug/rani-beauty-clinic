@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
+    "typecheck:critical": "tsc --project tsconfig.critical.json --noEmit",
     "remotion:studio": "npx remotion studio remotion/index.ts",
     "remotion:render": "npx remotion render remotion/index.ts",
     "remotion:render:all": "npx remotion render remotion/index.ts --all"

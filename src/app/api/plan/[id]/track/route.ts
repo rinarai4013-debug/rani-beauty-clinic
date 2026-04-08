@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
@@ -23,9 +24,16 @@ const ACTION_TRIGGER_MAP: Record<string, string> = {
 
 const VALID_ACTIONS = Object.keys(ACTION_TRIGGER_MAP);
 
+function generateAccessCode(recordId: string): string {
+  const secret = process.env.DASHBOARD_JWT_SECRET;
+  if (!secret) throw new Error('DASHBOARD_JWT_SECRET is required');
+  const hash = crypto.createHmac('sha256', secret).update(recordId).digest('hex');
+  const numericHash = parseInt(hash.slice(0, 8), 16);
+  return String(numericHash % 1000000).padStart(6, '0');
+}
+
 // ─── POST Handler ─────────────────────────────────────────────────
 // Called from client viewer to track plan views and interactions
-// No auth required - this is a public tracking endpoint
 
 export async function POST(
   request: NextRequest,
@@ -38,15 +46,27 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
     }
 
+    let body: { action?: unknown; code?: unknown } = {};
+    try {
+      body = (await request.json()) as { action?: unknown; code?: unknown };
+    } catch {
+      body = {};
+    }
+
+    const providedCode =
+      typeof body.code === 'string'
+        ? body.code
+        : new URL(request.url).searchParams.get('code');
+    const expectedCode = generateAccessCode(id);
+
+    if (providedCode !== expectedCode) {
+      return NextResponse.json({ error: 'ACCESS_CODE_REQUIRED' }, { status: 403 });
+    }
+
     // Parse the action from the request body (defaults to 'view' for backward compat)
     let action = 'view';
-    try {
-      const body = await request.json();
-      if (body.action && VALID_ACTIONS.includes(body.action)) {
-        action = body.action;
-      }
-    } catch {
-      // No body or invalid JSON — default to 'view'
+    if (typeof body.action === 'string' && VALID_ACTIONS.includes(body.action)) {
+      action = body.action;
     }
 
     const trigger = ACTION_TRIGGER_MAP[action];
