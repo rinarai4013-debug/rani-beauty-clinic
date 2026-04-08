@@ -573,7 +573,7 @@ export function estimateMarketShare(
   competitors: Array<{ name: string; velocity: number; totalReviews: number }>
 ): MarketShareEstimate[] {
   const all = [
-    { name: 'Rani Beauty Clinic', velocity: raniVelocity, totalReviews: 127 },
+    { name: 'Rani Beauty Clinic', velocity: raniVelocity, totalReviews: 129 },
     ...competitors,
   ];
 
@@ -743,7 +743,7 @@ export async function generateCompetitorIntelligence(options: {
 } = {}): Promise<CompetitorIntelligence> {
   const raniMetrics = options.raniMetrics || {
     rating: 4.9,
-    reviewCount: 127,
+    reviewCount: 129,
     reviewVelocity30d: 8,
   };
 

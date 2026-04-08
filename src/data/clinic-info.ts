@@ -40,7 +40,7 @@ export const clinicInfo = {
   },
   reviews: {
     aggregateRating: 4.9,
-    reviewCount: 127,
+    reviewCount: 129,
     platform: "Google",
   },
   booking: {

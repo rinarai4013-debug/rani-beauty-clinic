@@ -9,7 +9,7 @@ const TRUST_SIGNALS = [
   },
   {
     icon: Star,
-    label: '4.9 Stars \u00b7 200+ Reviews',
+    label: '200+ Verified Five-Star Reviews',
   },
   {
     icon: Award,

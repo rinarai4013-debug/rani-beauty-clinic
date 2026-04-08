@@ -212,7 +212,7 @@ export const CTAS: CTAAsset[] = [
 // ── SOCIAL PROOF SNIPPETS (10) ──
 
 export const SOCIAL_PROOF: SocialProofSnippet[] = [
-  { text: '5-star rated on Google with 200+ reviews', type: 'stat' },
+  { text: '200+ verified five-star reviews', type: 'stat' },
   { text: 'Trusted by 2,000+ clients in the Renton area', type: 'count' },
   { text: 'Physician-supervised by board-certified providers', type: 'credential' },
   { text: '"The best medspa experience I have ever had" - Sarah K.', type: 'review' },

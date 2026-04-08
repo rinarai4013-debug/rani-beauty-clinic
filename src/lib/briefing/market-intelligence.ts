@@ -838,7 +838,7 @@ export async function generateMarketIntelligence(options: {
   const treatmentTrends = detectTreatmentTrends(industryNews.topStories, options.previousTrends);
 
   // Calculate market position
-  const raniMetrics = options.raniMetrics || { rating: 4.9, reviewCount: 127, reviewVelocity7d: 2 };
+  const raniMetrics = options.raniMetrics || { rating: 4.9, reviewCount: 129, reviewVelocity7d: 2 };
   const marketPosition = calculateMarketPosition(raniMetrics, LOCAL_COMPETITORS);
 
   // Generate insights
