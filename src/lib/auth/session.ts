@@ -5,30 +5,39 @@ import type { SessionPayload, UserRole } from '@/types/auth';
 
 const COOKIE_NAME = 'rani-session';
 
-if (!process.env.DASHBOARD_JWT_SECRET) {
-  throw new Error('DASHBOARD_JWT_SECRET is required');
+function getSecret(): Uint8Array {
+  const raw = process.env.DASHBOARD_JWT_SECRET;
+  if (!raw) {
+    throw new Error('DASHBOARD_JWT_SECRET is required');
+  }
+  return new TextEncoder().encode(raw);
 }
-const secret = new TextEncoder().encode(process.env.DASHBOARD_JWT_SECRET);
 
 const sessionPayloadSchema = z.object({
   username: z.string().min(1),
   role: z.enum(['ceo', 'frontdesk', 'provider', 'marketing', 'operations']),
   displayName: z.string().min(1),
+  tenantId: z.string().min(1).optional(),
 });
 
-export async function createSession(username: string, role: UserRole, displayName: string): Promise<string> {
-  const token = await new SignJWT({ username, role, displayName })
+export async function createSession(
+  username: string,
+  role: UserRole,
+  displayName: string,
+  tenantId?: string,
+): Promise<string> {
+  const token = await new SignJWT({ username, role, displayName, ...(tenantId ? { tenantId } : {}) })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('24h')
-    .sign(secret);
+    .sign(getSecret());
 
   return token;
 }
 
 export async function verifySession(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSecret());
     const parsed = sessionPayloadSchema.safeParse(payload);
     if (!parsed.success) return null;
     return payload as unknown as SessionPayload;
