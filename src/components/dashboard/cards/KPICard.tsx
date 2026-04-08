@@ -15,6 +15,13 @@ import {
 type TrendObject = {
   value: number;
   direction: 'up' | 'down';
+  label?: string;
+};
+
+type ProgressObject = {
+  current: number;
+  target: number;
+  label?: string;
 };
 
 type KPICardProps = {
@@ -26,6 +33,9 @@ type KPICardProps = {
   size?: 'hero' | 'compact';
   trend?: string | TrendObject;
   trendUp?: boolean;
+  progress?: ProgressObject;
+  sparklineData?: number[];
+  loading?: boolean;
 };
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -61,6 +71,8 @@ export default function KPICard({
   size = 'compact',
   trend,
   trendUp,
+  progress,
+  loading = false,
 }: KPICardProps) {
   const iconNode = renderIcon(icon);
   const isHero = size === 'hero';
@@ -68,10 +80,28 @@ export default function KPICard({
   const trendPositive = hasObjectTrend ? trend.direction === 'up' : trendUp;
   const TrendIcon = trendPositive ? TrendingUp : TrendingDown;
   const trendText = hasObjectTrend
-    ? `${trend.value}${suffix === '%' ? '%' : ''}`
+    ? `${trend.value}${suffix === '%' ? '%' : ''}${trend.label ? ` ${trend.label}` : ''}`
     : typeof trend === 'string'
       ? trend
       : null;
+  const progressPercentage = progress && progress.target > 0
+    ? Math.min((progress.current / progress.target) * 100, 100)
+    : null;
+
+  if (loading) {
+    return (
+      <div
+        className={[
+          'animate-pulse rounded-xl border border-rani-navy/10 bg-white shadow-sm',
+          isHero ? 'p-5 sm:p-6' : 'p-4',
+        ].join(' ')}
+      >
+        <div className="h-3 w-24 rounded bg-rani-navy/10" />
+        <div className="mt-3 h-8 w-32 rounded bg-rani-navy/10" />
+        <div className="mt-4 h-2 w-full rounded bg-rani-navy/10" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -102,6 +132,21 @@ export default function KPICard({
           <span className={trendPositive ? 'text-emerald-700' : 'text-amber-700'}>
             {trendText}
           </span>
+        </div>
+      )}
+
+      {progress && progressPercentage !== null && (
+        <div className="mt-4">
+          <div className="mb-1 flex items-center justify-between text-[11px] font-body text-rani-muted">
+            <span>{progress.label ?? 'Progress'}</span>
+            <span>{Math.round(progressPercentage)}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-rani-navy/10">
+            <div
+              className="h-full rounded-full bg-rani-gold transition-all"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
         </div>
       )}
     </div>
