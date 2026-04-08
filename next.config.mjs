@@ -95,6 +95,10 @@ const nextConfig = {
       { source: "/news/:slug", destination: "/blog/:slug", permanent: true },
       // ── /compare/ → /vs/ catch-all redirect (compare is legacy, vs is canonical) ──
       { source: "/compare/:slug", destination: "/vs/:slug", permanent: true },
+      // ── Bare route redirects (no index pages exist) ──
+      { source: "/vs", destination: "/compare", permanent: false },
+      { source: "/financing", destination: "/services", permanent: true },
+      { source: "/treatments-for", destination: "/services", permanent: true },
     ];
   },
   async headers() {

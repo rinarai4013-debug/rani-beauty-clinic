@@ -254,7 +254,7 @@ function generateServiceGeoEntries(): ServiceGeoEntry[] {
         serviceName: service.name,
         slug: `${city.slug}/${service.slug}`,
         title: `Best ${service.name} Near ${city.name} - ${service.priceRange} | Rani Beauty Clinic`,
-        metaDescription: `${service.name} near ${city.name}, ${city.county}. Physician-supervised at Rani Beauty Clinic — ${service.priceRange}. Just ${city.distanceFromRenton} (${city.drivingTime}). Board-certified Medical Director. Book today!`,
+        metaDescription: `${service.name} near ${city.name}. Physician-supervised, ${service.priceRange}. Just ${city.drivingTime} from Rani Beauty Clinic, Renton WA. Book today.`,
         content: service.generateContent(city.name, city.county, city.drivingTime, city.distanceFromRenton),
       });
     }

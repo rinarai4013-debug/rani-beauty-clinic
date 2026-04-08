@@ -19,6 +19,7 @@ import { menPages } from "@/data/seo/men-pages";
 import { agePages } from "@/data/seo/age-pages";
 import { combinationPages } from "@/data/seo/combination-pages";
 import { vsPages } from "@/data/seo/vs-pages";
+import { comparisonPages } from "@/data/comparisons";
 import { pnwCities } from "@/data/locations/pnw-cities";
 import { waCitiesExtended } from "@/data/locations/wa-cities-extended";
 import { serviceGeoEntries } from "@/data/locations/service-geo";
@@ -165,11 +166,16 @@ function buildCoreSitemap(): MetadataRoute.Sitemap {
   }));
 
   // Comparison pages — /vs/ URLs only (canonical). /compare/ 301-redirects here.
-  const vsPageUrls: MetadataRoute.Sitemap = vsPages.map((page) => ({
-    url: `${baseUrl}/vs/${page.slug}`,
+  // Include slugs from both vsPages and comparisonPages (deduplicated)
+  const allVsSlugs = new Set([
+    ...vsPages.map((p) => p.slug),
+    ...comparisonPages.map((p) => p.slug),
+  ]);
+  const vsPageUrls: MetadataRoute.Sitemap = Array.from(allVsSlugs).map((slug) => ({
+    url: `${baseUrl}/vs/${slug}`,
     lastModified: CONTENT_LAST_UPDATED,
     priority: 0.7,
-    changeFrequency: "monthly",
+    changeFrequency: "monthly" as const,
   }));
 
   const costPageUrls: MetadataRoute.Sitemap = [

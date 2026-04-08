@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { vsPages, VsPage } from "@/data/seo/vs-pages";
+import { comparisonPages } from "@/data/comparisons";
 import { clinicInfo } from "@/data/clinic-info";
 import StructuredData from "@/components/seo/StructuredData";
 
@@ -9,14 +10,75 @@ interface PageProps {
   params: { slug: string };
 }
 
+/**
+ * Look up VS page data by slug.
+ * 1. Check vsPages first (richer data with keywords, sections, etc.)
+ * 2. Fall back to comparisonPages, adapting the data to match VsPage shape
+ */
+function findVsData(slug: string): VsPage | null {
+  // Prefer vsPages — they have richer, hand-authored content
+  const vsPage = vsPages.find((p) => p.slug === slug);
+  if (vsPage) return vsPage;
+
+  // Fall back to comparisonPages and adapt to VsPage shape
+  const comp = comparisonPages.find((p) => p.slug === slug);
+  if (!comp) return null;
+
+  // Build sections from pros/cons
+  const sections: VsPage["sections"] = [];
+  if (comp.prosA.length > 0 || comp.consA.length > 0) {
+    sections.push({
+      heading: `Advantages & Drawbacks of ${comp.treatmentA}`,
+      content: [
+        ...(comp.prosA.length > 0
+          ? [`Advantages: ${comp.prosA.join(". ")}.`]
+          : []),
+        ...(comp.consA.length > 0
+          ? [`Considerations: ${comp.consA.join(". ")}.`]
+          : []),
+      ].join(" "),
+    });
+  }
+  if (comp.prosB.length > 0 || comp.consB.length > 0) {
+    sections.push({
+      heading: `Advantages & Drawbacks of ${comp.treatmentB}`,
+      content: [
+        ...(comp.prosB.length > 0
+          ? [`Advantages: ${comp.prosB.join(". ")}.`]
+          : []),
+        ...(comp.consB.length > 0
+          ? [`Considerations: ${comp.consB.join(". ")}.`]
+          : []),
+      ].join(" "),
+    });
+  }
+
+  return {
+    slug: comp.slug,
+    treatmentA: comp.treatmentA,
+    treatmentB: comp.treatmentB,
+    metaTitle: comp.metaTitle,
+    metaDescription: comp.metaDescription,
+    keywords: [`${comp.treatmentA} vs ${comp.treatmentB}`],
+    heroDescription: comp.intro,
+    comparisonTable: comp.comparisonTable,
+    sections,
+    expertRecommendation: comp.verdict,
+    faqs: comp.faqs,
+  };
+}
+
 export function generateStaticParams() {
-  return vsPages.map((page) => ({
-    slug: page.slug,
-  }));
+  // Collect all unique slugs from both data sources
+  const slugSet = new Set<string>();
+  vsPages.forEach((p) => slugSet.add(p.slug));
+  comparisonPages.forEach((p) => slugSet.add(p.slug));
+
+  return Array.from(slugSet).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const page = vsPages.find((p) => p.slug === params.slug);
+  const page = findVsData(params.slug);
 
   if (!page) {
     return {};
@@ -43,7 +105,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function VsComparisonPage({ params }: PageProps) {
-  const page = vsPages.find((p) => p.slug === params.slug);
+  const page = findVsData(params.slug);
 
   if (!page) {
     notFound();
