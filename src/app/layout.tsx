@@ -10,6 +10,7 @@ import ScrollProgress from "@/components/layout/ScrollProgress";
 import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
 import ConditionalPublicLayout from "@/components/layout/ConditionalPublicLayout";
 import PWAProvider from "@/components/pwa/PWAProvider";
+import SiteWideSchema from "@/components/seo/SiteWideSchema";
 
 // Dynamic imports - these are non-critical, below-fold or interaction-triggered components.
 // Loading them lazily reduces the initial JS bundle by ~60KB+ (framer-motion chunks, chat widget, etc.)
@@ -98,6 +99,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontVariables}>
       <head>
+        {/* Site-wide LocalBusiness + Organization structured data */}
+        <SiteWideSchema />
         {/* PWA - Apple touch icon */}
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         {/* AI Citation - llms.txt discovery for AI crawlers */}

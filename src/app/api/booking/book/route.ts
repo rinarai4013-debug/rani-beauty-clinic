@@ -4,6 +4,7 @@ import { AvailabilityEngine, DEFAULT_PROVIDERS, DEFAULT_SCHEDULING_CONFIG } from
 import { BOOKABLE_SERVICES } from '@/lib/booking/services';
 import { loadAppointmentsForDate, createAppointmentRecord, updateAppointmentRecord } from '@/lib/booking/data';
 import { logEvent } from '@/lib/logging/structured-logger';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import type { BookingRequest } from '@/lib/booking/types';
 import {
   createMangomintBooking,
@@ -54,6 +55,10 @@ const rescheduleSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('booking-book', ip, RATE_LIMITS.BOOKING);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   let body: unknown;
   try {
     body = await request.json();

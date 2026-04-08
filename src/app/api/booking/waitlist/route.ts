@@ -4,6 +4,7 @@ import { addDays, differenceInDays, format, parseISO } from 'date-fns';
 import type { WaitlistEntry, WaitlistPriority } from '@/lib/booking/types';
 import { loadWaitlistEntries, addWaitlistEntry, removeWaitlistEntry } from '@/lib/booking/data';
 import { logEvent } from '@/lib/logging/structured-logger';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 const createSchema = z.object({
   clientId: z.string().min(1),
@@ -74,6 +75,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('booking-waitlist', ip, RATE_LIMITS.FORM);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   let body: unknown;
   try {
     body = await request.json();

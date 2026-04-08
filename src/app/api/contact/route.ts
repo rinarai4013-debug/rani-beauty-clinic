@@ -3,6 +3,24 @@ import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
+// Simple in-memory dedup cache to prevent double-submit creating duplicate leads
+const DEDUP_TTL = 60_000; // 60 second window
+const dedup = new Map<string, number>();
+
+function isDuplicate(key: string): boolean {
+  const now = Date.now();
+  const expiresAt = dedup.get(key);
+  if (expiresAt && now < expiresAt) return true;
+  // Lazy cleanup: prune expired entries when map grows
+  if (dedup.size > 200) {
+    for (const [k, exp] of dedup) {
+      if (now >= exp) dedup.delete(k);
+    }
+  }
+  dedup.set(key, now + DEDUP_TTL);
+  return false;
+}
+
 const ContactSchema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email(),
@@ -39,6 +57,12 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, email, phone, service, message } = parsed.data;
+
+  // Dedup check — prevent double-click creating duplicate Airtable leads
+  const dedupeKey = `contact-form:${email}:${service}`;
+  if (isDuplicate(dedupeKey)) {
+    return NextResponse.json({ success: true }); // Silent success for dupes
+  }
 
   // Build intake summary for AI pipeline
   const intakeSummary = [

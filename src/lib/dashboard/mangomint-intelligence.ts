@@ -580,7 +580,11 @@ export async function getDashboardKpis(): Promise<KPIData> {
         operations: Math.max(45, 100 - fullAlerts.filter((item) => item.severity === 'critical').length * 15),
       },
       status: clinicScoreTotal >= 85 ? 'elite' : clinicScoreTotal >= 70 ? 'strong' : clinicScoreTotal >= 50 ? 'growing' : 'critical',
-      streak: 0, // TODO: Calculate from KPI Snapshots table (days above score 80)
+      // Streak = consecutive days with clinic score >= 80.
+      // Currently based on today's score only (1 if >= 80, else 0).
+      // Will become more accurate once daily KPI snapshots are written to the KPI Snapshots table,
+      // allowing lookback across previous days.
+      streak: clinicScoreTotal >= 80 ? 1 : 0,
     },
   };
 }

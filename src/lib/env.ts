@@ -79,6 +79,9 @@ const envSchema = z.object({
   CRON_SECRET: z.string().optional().default(''),
   N8N_API_KEY: z.string().optional().default(''),
 
+  // Patient portal
+  PATIENT_JWT_SECRET: z.string().optional().default(''),
+
   // External services
   REPLICATE_API_TOKEN: z.string().optional().default(''),
   HTML2PDF_API_KEY: z.string().optional().default(''),
