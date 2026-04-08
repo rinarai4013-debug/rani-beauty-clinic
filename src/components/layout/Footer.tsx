@@ -146,9 +146,17 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Distance framing */}
-        <div className="mt-12 border-t border-rani-gold/10 pt-6 text-center">
-          <p className="font-body text-[13px] text-gray-400">
+        {/* Booking CTA + Distance framing */}
+        <div className="mt-12 border-t border-rani-gold/10 pt-8 text-center">
+          <a
+            href={clinicInfo.booking.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-rani-gold px-8 py-3.5 font-body text-sm font-semibold text-white shadow-sm transition-all hover:bg-rani-gold/90 hover:shadow-md"
+          >
+            Book Your Consultation
+          </a>
+          <p className="mt-4 font-body text-[13px] text-gray-400">
             10 min from Bellevue &middot; 20 min from Seattle &middot; Serving
             all of King County
           </p>

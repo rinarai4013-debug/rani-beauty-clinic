@@ -233,7 +233,16 @@ export default function ContactPageClient() {
                       Your message has been sent successfully. Our team will contact
                       you within 24 hours to confirm your consultation.
                     </p>
-                    <div className="mt-6">
+                    <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                      <a
+                        href={clinicInfo.booking.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-rani-gold px-6 py-3 font-body text-sm font-semibold text-white shadow-sm transition-all hover:bg-rani-gold/90 hover:shadow-md"
+                      >
+                        <Calendar size={16} />
+                        Book Now
+                      </a>
                       <Button onClick={() => setIsSubmitted(false)}>
                         Send Another Message
                       </Button>

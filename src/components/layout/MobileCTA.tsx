@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackAnalyticsEvent } from "@/lib/analytics/events";
+import { clinicInfo } from "@/data/clinic-info";
 
 /**
  * Simplified sticky mobile CTA bar - single full-width gold booking button.
@@ -77,7 +78,7 @@ export default function MobileCTA() {
               }}
             >
               <a
-                href="https://booking.mangomint.com/ranibeautyclinic1"
+                href={clinicInfo.booking.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => {

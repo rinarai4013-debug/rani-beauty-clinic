@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackAnalyticsEvent } from "@/lib/analytics/events";
+import { clinicInfo } from "@/data/clinic-info";
 import {
   ArrowRight,
   ArrowLeft,
@@ -475,7 +476,7 @@ export default function SkinQuiz() {
                   </div>
 
                   <a
-                    href="https://booking.mangomint.com/ranibeautyclinic1"
+                    href={clinicInfo.booking.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg py-3 font-body text-sm font-semibold uppercase tracking-wider transition-all duration-300 ${

@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Star, Tag, CreditCard, ArrowRight } from "lucide-react";
+import { clinicInfo } from "@/data/clinic-info";
 
 /* ────────────────────────────────────────────────────────
    1. Most Popular Badge
@@ -160,7 +161,7 @@ export function CompareAndSave({
   subtitle = "See why packages deliver better value.",
   items,
   packageLabel = "Package Price",
-  bookingUrl = "https://booking.mangomint.com/ranibeautyclinic1",
+  bookingUrl = clinicInfo.booking.url,
   className = "",
 }: CompareAndSaveProps) {
   const totalIndividual = items.reduce((sum, it) => sum + it.individualPrice, 0);

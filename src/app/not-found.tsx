@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { clinicInfo } from "@/data/clinic-info";
 
 export const metadata: Metadata = {
   title: "Page Not Found | Rani Beauty Clinic",
@@ -13,7 +14,7 @@ const quickLinks = [
   { label: "Contact", href: "/contact" },
   {
     label: "Book Consultation",
-    href: "https://booking.mangomint.com/ranibeautyclinic1",
+    href: clinicInfo.booking.url,
     external: true,
   },
 ];
