@@ -104,8 +104,15 @@ function extractAppointmentFields(data: Record<string, unknown>, statusOverride?
 // ─── Event Handlers ───
 
 async function handleAppointmentCreated(data: Record<string, unknown>, payload: unknown) {
+  const mangomintId = String(data.id || '');
   const fields = extractAppointmentFields(data);
-  await upsertRecord(Tables.appointments(), null, fields);
+
+  // Idempotency: check if this Mangomint appointment already exists
+  const existingId = mangomintId
+    ? await findRecordByField(Tables.appointments(), 'MangoMint Appointment ID', mangomintId, ['MangoMint Appointment ID'])
+    : null;
+
+  await upsertRecord(Tables.appointments(), existingId, fields);
   cache.invalidatePrefix('schedule');
   cache.invalidatePrefix('kpi');
   await forwardToN8n('/webhook/booking-sync', payload);
@@ -246,6 +253,7 @@ async function handleAppointmentNoshow(data: Record<string, unknown>) {
 }
 
 async function handleSaleCompleted(data: Record<string, unknown>, payload: unknown) {
+  const mangomintSaleId = String(data.id || '');
   const services = (data.services as Array<Record<string, unknown>>) || [];
   const primaryService = services[0];
 
@@ -258,10 +266,15 @@ async function handleSaleCompleted(data: Record<string, unknown>, payload: unkno
     'Service Name': (primaryService?.name as string) || (data.serviceName as string) || 'Treatment',
     Provider: (primaryService?.provider_name as string) || '',
     'Source': 'Mangomint Webhook',
-    'MangoMint Sale ID': String(data.id || ''),
+    'MangoMint Sale ID': mangomintSaleId,
   };
 
-  await upsertRecord(Tables.transactions(), null, fields);
+  // Idempotency: check if this sale already exists
+  const existingId = mangomintSaleId
+    ? await findRecordByField(Tables.transactions(), 'MangoMint Sale ID', mangomintSaleId, ['MangoMint Sale ID'])
+    : null;
+
+  await upsertRecord(Tables.transactions(), existingId, fields);
 
   cache.invalidatePrefix('revenue');
   cache.invalidatePrefix('kpi');
@@ -296,11 +309,14 @@ async function handleClientUpdated(data: Record<string, unknown>) {
   const email = (data.email as string) || '';
   if (!name) return;
 
-  // Find by Mangomint Client ID first, then by email
+  // Find by Mangomint Client ID first, then fall back to email
   const mangomintId = String(data.id || '');
   let existingId: string | null = null;
 
-  if (email) {
+  if (mangomintId) {
+    existingId = await findRecordByField(Tables.clients(), 'MangoMint Client ID', mangomintId, ['MangoMint Client ID']);
+  }
+  if (!existingId && email) {
     existingId = await findRecordByField(Tables.clients(), 'Email', email, ['Email']);
   }
 
@@ -322,17 +338,24 @@ async function handleClientUpdated(data: Record<string, unknown>) {
 }
 
 async function handleMembershipCreated(data: Record<string, unknown>, payload: unknown) {
+  const mangomintMembershipId = String(data.id || '');
+
   const fields: Record<string, unknown> = {
     Tier: (data.membership_name as string) || (data.membershipName as string) || (data.membership_tier as string) || 'Unknown',
     'Monthly Price': (data.price as number) || (data.monthlyPrice as number) || 0,
     Status: 'Active',
     'Start Date': (data.start_date as string) || (data.startDate as string) || new Date().toISOString().split('T')[0],
     'Billing Frequency': (data.billing_frequency as string) || 'Monthly',
-    'MangoMint Membership ID': String(data.id || ''),
+    'MangoMint Membership ID': mangomintMembershipId,
     'Source': 'Mangomint Webhook',
   };
 
-  await upsertRecord(Tables.memberships(), null, fields);
+  // Idempotency: check if this membership already exists
+  const existingId = mangomintMembershipId
+    ? await findRecordByField(Tables.memberships(), 'MangoMint Membership ID', mangomintMembershipId, ['MangoMint Membership ID'])
+    : null;
+
+  await upsertRecord(Tables.memberships(), existingId, fields);
   cache.invalidatePrefix('kpi');
   cache.invalidatePrefix('clients');
   await forwardToN8n('/webhook/membership-started', payload);

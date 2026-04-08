@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     console.warn("[contact] N8N_WEBHOOK_URL not set — skipping webhook");
   } else {
     try {
-      await fetch(n8nUrl, {
+      await fetch(`${n8nUrl}/webhook/contact-form-intake`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
