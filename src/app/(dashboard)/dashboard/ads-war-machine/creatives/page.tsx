@@ -518,7 +518,7 @@ export default function CreativesPage() {
 
         {filteredCreatives.length === 0 && (
           <DashboardEmptyState
-            icon={<Paintbrush className="w-12 h-12 text-gray-600" />}
+            icon={Paintbrush}
             title="No creatives match your filters"
             description="Try adjusting your search or filter criteria."
           />

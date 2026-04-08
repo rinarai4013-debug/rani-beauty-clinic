@@ -551,7 +551,7 @@ export default function KeywordsPage() {
           {filteredKeywords.length === 0 && (
             <div className="p-8 text-center">
               <DashboardEmptyState
-                icon={<Key className="w-12 h-12 text-gray-600" />}
+                icon={Key}
                 title="No keywords match your filters"
                 description="Try adjusting your search or filter criteria."
               />
