@@ -4,25 +4,32 @@ import { motion } from 'framer-motion';
 import { getScoreColor } from '@/lib/utils/formatters';
 
 interface ProgressBarProps {
-  current: number;
-  target: number;
+  current?: number;
+  target?: number;
+  value?: number;
   label?: string;
   showPercentage?: boolean;
   height?: number;
   colorMode?: 'score' | 'gold' | 'green';
+  color?: string;
 }
 
 export default function ProgressBar({
   current,
   target,
+  value,
   label,
   showPercentage = true,
   height = 6,
   colorMode = 'gold',
+  color,
 }: ProgressBarProps) {
-  const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+  const normalizedCurrent = value ?? current ?? 0;
+  const normalizedTarget = value != null ? 100 : (target ?? 100);
+  const percentage = normalizedTarget > 0 ? Math.min((normalizedCurrent / normalizedTarget) * 100, 100) : 0;
 
   const getColor = () => {
+    if (color) return color;
     switch (colorMode) {
       case 'score': return getScoreColor(percentage);
       case 'green': return '#059669';
