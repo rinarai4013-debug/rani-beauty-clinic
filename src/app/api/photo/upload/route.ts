@@ -72,11 +72,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[API] /api/photo/upload error:', error);
 
-    const message =
-      error instanceof Error ? error.message : 'Photo upload processing failed';
-
     return NextResponse.json(
-      { error: message },
+      { error: 'Photo upload processing failed. Please try again.' },
       { status: 500 },
     );
   }

@@ -350,8 +350,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const message =
-      error instanceof Error ? error.message : 'Consultation submission failed unexpectedly.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[consultation/submit] Unexpected error:', error);
+    return NextResponse.json(
+      { error: 'Failed to submit consultation. Please try again.' },
+      { status: 500 },
+    );
   }
 }

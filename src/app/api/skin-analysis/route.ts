@@ -110,8 +110,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const message =
-      error instanceof Error ? error.message : 'Skin analysis failed unexpectedly.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[skin-analysis] Unexpected error:', error);
+    return NextResponse.json(
+      { error: 'Skin analysis failed. Please try again.' },
+      { status: 500 },
+    );
   }
 }
