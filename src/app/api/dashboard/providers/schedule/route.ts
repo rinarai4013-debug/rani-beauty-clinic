@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
+import { cache, TTL } from '@/lib/cache';
+import { getProviderScheduleSnapshot } from '@/lib/dashboard/mangomint-intelligence';
 
 export async function GET() {
   const session = await getSession();
@@ -10,5 +12,15 @@ export async function GET() {
   if (!hasPermission(session.role, 'view_providers')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
-  return NextResponse.json({ status: 'not_implemented' }, { status: 501 });
+
+  const cacheKey = 'provider-schedule-live';
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached);
+  }
+
+  const providers = await getProviderScheduleSnapshot();
+  const data = { providers };
+  cache.set(cacheKey, data, TTL.REALTIME);
+  return NextResponse.json(data);
 }

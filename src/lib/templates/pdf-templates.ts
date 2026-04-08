@@ -321,6 +321,206 @@ export function generateAftercareHTML(data: AftercareData): string {
   `;
 }
 
+export interface AuraSkinScanData {
+  clientName: string;
+  providerName: string;
+  date: string;
+  overallScore: number;
+  projectedScore?: number;
+  skinType: string;
+  ageRange: string;
+  summary: string;
+  concerns: Array<{
+    label: string;
+    severity: 'mild' | 'moderate' | 'significant';
+    score: number;
+    description: string;
+    areas: string[];
+  }>;
+  recommendations?: Array<{
+    name: string;
+    priority: 'primary' | 'complementary' | 'maintenance';
+    reason: string;
+    estimatedImprovement?: number;
+  }>;
+  nextSteps?: string;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function generateAuraSkinScanHTML(data: AuraSkinScanData): string {
+  const concernRows = data.concerns.length
+    ? data.concerns
+        .map(
+          (concern) => `
+            <div style="padding: 18px; border: 1px solid #ebe5dd; border-radius: 12px; margin-bottom: 14px; background: ${BRAND.white};">
+              <div style="display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px;">
+                <div>
+                  <h3 style="font-family: ${BRAND.font}; font-size: 16px; color: ${BRAND.navy}; margin: 0 0 4px;">
+                    ${escapeHtml(concern.label)}
+                  </h3>
+                  <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.gold}; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+                    ${escapeHtml(concern.severity)} severity
+                  </p>
+                </div>
+                <div style="text-align: right;">
+                  <p style="font-family: ${BRAND.bodyFont}; font-size: 10px; color: ${BRAND.muted}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px;">
+                    Score
+                  </p>
+                  <p style="font-family: ${BRAND.font}; font-size: 24px; color: ${BRAND.navy}; margin: 0;">
+                    ${concern.score}
+                  </p>
+                </div>
+              </div>
+              <p style="font-family: ${BRAND.bodyFont}; font-size: 13px; color: ${BRAND.navy}; margin: 0 0 10px; line-height: 1.6;">
+                ${escapeHtml(concern.description)}
+              </p>
+              <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.muted}; margin: 0;">
+                Areas observed: ${escapeHtml(concern.areas.join(', ') || 'overall')}
+              </p>
+            </div>
+          `
+        )
+        .join('')
+    : `
+        <div style="padding: 18px; border: 1px solid #ebe5dd; border-radius: 12px; background: ${BRAND.white};">
+          <p style="font-family: ${BRAND.bodyFont}; font-size: 13px; color: ${BRAND.navy}; margin: 0;">
+            No specific visible concerns were flagged in this scan.
+          </p>
+        </div>
+      `;
+
+  const recommendationRows =
+    data.recommendations && data.recommendations.length > 0
+      ? data.recommendations
+          .map(
+            (recommendation) => `
+              <div style="padding: 16px; border-radius: 12px; background: ${BRAND.cream}; margin-bottom: 12px; border-left: 3px solid ${BRAND.gold};">
+                <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+                  <h3 style="font-family: ${BRAND.font}; font-size: 15px; color: ${BRAND.navy}; margin: 0;">
+                    ${escapeHtml(recommendation.name)}
+                  </h3>
+                  <span style="font-family: ${BRAND.bodyFont}; font-size: 10px; color: ${BRAND.gold}; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">
+                    ${escapeHtml(recommendation.priority)}
+                  </span>
+                </div>
+                <p style="font-family: ${BRAND.bodyFont}; font-size: 12px; color: ${BRAND.navy}; margin: 0; line-height: 1.6;">
+                  ${escapeHtml(recommendation.reason)}
+                </p>
+                ${
+                  typeof recommendation.estimatedImprovement === 'number'
+                    ? `
+                      <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.muted}; margin: 8px 0 0;">
+                        Estimated improvement contribution: ${recommendation.estimatedImprovement}%
+                      </p>
+                    `
+                    : ''
+                }
+              </div>
+            `
+          )
+          .join('')
+      : `
+          <p style="font-family: ${BRAND.bodyFont}; font-size: 13px; color: ${BRAND.navy}; margin: 0;">
+            Personalized treatment recommendations will be finalized during your consultation review.
+          </p>
+        `;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: ${BRAND.white}; }
+      </style>
+    </head>
+    <body>
+      ${header('Aura Skin Scan Report')}
+
+      <div style="padding: 40px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid #e5e1dc;">
+          <div>
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.muted}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px;">Prepared For</p>
+            <p style="font-family: ${BRAND.font}; font-size: 20px; color: ${BRAND.navy}; margin: 0;">${escapeHtml(data.clientName)}</p>
+          </div>
+          <div style="text-align: right;">
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.muted}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px;">Reviewed By</p>
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 14px; color: ${BRAND.navy}; margin: 0;">${escapeHtml(data.providerName)}</p>
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 11px; color: ${BRAND.muted}; margin: 4px 0 0;">${escapeHtml(data.date)}</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px;">
+          <div style="padding: 18px; border-radius: 14px; background: linear-gradient(135deg, ${BRAND.navy} 0%, #1a2d42 100%); text-align: center;">
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 10px; color: ${BRAND.gold}; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1px;">Current Score</p>
+            <p style="font-family: ${BRAND.font}; font-size: 30px; color: ${BRAND.white}; margin: 0;">${data.overallScore}</p>
+          </div>
+          <div style="padding: 18px; border-radius: 14px; background: ${BRAND.cream}; text-align: center;">
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 10px; color: ${BRAND.gold}; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1px;">Projected Score</p>
+            <p style="font-family: ${BRAND.font}; font-size: 30px; color: ${BRAND.navy}; margin: 0;">${data.projectedScore ?? data.overallScore}</p>
+          </div>
+          <div style="padding: 18px; border-radius: 14px; background: ${BRAND.cream}; text-align: center;">
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 10px; color: ${BRAND.gold}; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1px;">Profile</p>
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 13px; color: ${BRAND.navy}; margin: 0 0 4px;">${escapeHtml(data.skinType)}</p>
+            <p style="font-family: ${BRAND.bodyFont}; font-size: 12px; color: ${BRAND.muted}; margin: 0;">Age range: ${escapeHtml(data.ageRange)}</p>
+          </div>
+        </div>
+
+        <div style="background: ${BRAND.cream}; border-radius: 14px; padding: 22px; margin-bottom: 28px;">
+          <h2 style="font-family: ${BRAND.font}; font-size: 16px; color: ${BRAND.navy}; margin: 0 0 10px;">
+            Clinical Summary
+          </h2>
+          <p style="font-family: ${BRAND.bodyFont}; font-size: 13px; color: ${BRAND.navy}; margin: 0; line-height: 1.7;">
+            ${escapeHtml(data.summary)}
+          </p>
+        </div>
+
+        <div style="margin-bottom: 28px;">
+          <h2 style="font-family: ${BRAND.font}; font-size: 16px; color: ${BRAND.gold}; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 2px;">
+            Visible Findings
+          </h2>
+          ${concernRows}
+        </div>
+
+        <div style="margin-bottom: 28px;">
+          <h2 style="font-family: ${BRAND.font}; font-size: 16px; color: ${BRAND.gold}; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 2px;">
+            Recommended Next Steps
+          </h2>
+          ${recommendationRows}
+        </div>
+
+        ${
+          data.nextSteps
+            ? `
+              <div style="background: linear-gradient(135deg, ${BRAND.navy} 0%, #1a2d42 100%); border-radius: 14px; padding: 24px;">
+                <h2 style="font-family: ${BRAND.font}; font-size: 16px; color: ${BRAND.white}; margin: 0 0 10px;">
+                  Next Step
+                </h2>
+                <p style="font-family: ${BRAND.bodyFont}; font-size: 13px; color: ${BRAND.white}; margin: 0; line-height: 1.7; opacity: 0.92;">
+                  ${escapeHtml(data.nextSteps)}
+                </p>
+              </div>
+            `
+            : ''
+        }
+      </div>
+
+      ${footer()}
+    </body>
+    </html>
+  `;
+}
+
 export function generateConsultSummaryHTML(data: {
   clientName: string;
   providerName: string;

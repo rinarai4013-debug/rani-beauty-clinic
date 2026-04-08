@@ -1,13 +1,14 @@
 // ── Legacy exports (preserved for backward compatibility) ─────────────
+export { default as DashboardSkeleton } from './DashboardSkeleton';
 export {
-  SkeletonBar,
-  KPICardSkeleton,
-  KPIRowSkeleton,
+  Shimmer as SkeletonBar,
+  StatCardSkeleton as KPICardSkeleton,
+  StatRowSkeleton as KPIRowSkeleton,
   PanelSkeleton as LegacyPanelSkeleton,
   TableSkeleton as LegacyTableSkeleton,
   ChartSkeleton as LegacyChartSkeleton,
   PageSkeleton as LegacyPageSkeleton,
-} from './DashboardSkeleton';
+} from './LoadingSkeleton';
 
 export { default as DashboardEmptyState } from './DashboardEmptyState';
 

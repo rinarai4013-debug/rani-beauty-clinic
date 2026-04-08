@@ -129,7 +129,9 @@ export async function POST(request: NextRequest) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ event: 'checkout.session.completed', planId, tier, clientName, amount, sessionId: session.id }),
-          }).catch(() => {});
+          }).catch((err) => {
+            logWebhookEvent('stripe', 'n8n-forward', false, { error: String(err) });
+          });
         }
 
         // Invalidate caches
@@ -186,7 +188,9 @@ export async function POST(request: NextRequest) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ event: 'checkout.session.expired', planId, tier, clientName }),
-          }).catch(() => {});
+          }).catch((err) => {
+            logWebhookEvent('stripe', 'n8n-forward', false, { error: String(err) });
+          });
         }
         break;
       }

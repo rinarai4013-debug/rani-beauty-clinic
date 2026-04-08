@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import MobileNav from '../shared/MobileNav';
 import type { UserRole } from '@/types/auth';
+import { isPathEnabled } from '@/lib/dashboard/features';
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -16,6 +18,8 @@ export default function DashboardShell({ children, role, displayName }: Dashboar
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
+  const pathname = usePathname();
+  const pathEnabled = isPathEnabled(pathname);
 
   useEffect(() => {
     const saved = localStorage.getItem('rani-dashboard-sound-muted');
@@ -68,7 +72,17 @@ export default function DashboardShell({ children, role, displayName }: Dashboar
         />
 
         <main className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-8">
-          {children}
+          {pathEnabled ? (
+            children
+          ) : (
+            <div className="bg-white border border-rani-border rounded-2xl p-6 sm:p-8 text-center">
+              <h1 className="text-xl font-heading text-rani-navy">Section Disabled</h1>
+              <p className="text-sm text-rani-muted mt-2">
+                This dashboard section is temporarily unavailable while backend data
+                integrations are being finalized.
+              </p>
+            </div>
+          )}
         </main>
       </div>
 
