@@ -23,7 +23,7 @@ interface PricingItem {
   note?: string;
 }
 
-interface TreatmentPricingCardProps {
+interface TreatmentPricingCardProps extends Record<string, unknown> {
   title: string;
   subtitle: string;
   items: PricingItem[];

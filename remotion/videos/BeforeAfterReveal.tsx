@@ -17,7 +17,7 @@ import {
   LogoWatermark,
 } from "../components/Background";
 
-interface BeforeAfterRevealProps {
+interface BeforeAfterRevealProps extends Record<string, unknown> {
   treatmentName: string;
   subtitle: string;
   beforeImageSrc?: string;

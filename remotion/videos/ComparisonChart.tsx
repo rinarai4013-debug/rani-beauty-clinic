@@ -22,7 +22,7 @@ interface ComparisonRow {
   optionB: string;
 }
 
-interface ComparisonChartProps {
+interface ComparisonChartProps extends Record<string, unknown> {
   title: string;
   optionAName: string;
   optionBName: string;

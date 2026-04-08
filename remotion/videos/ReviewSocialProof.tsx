@@ -22,7 +22,7 @@ interface Review {
   rating: number;
 }
 
-interface ReviewSocialProofProps {
+interface ReviewSocialProofProps extends Record<string, unknown> {
   reviews: Review[];
   overallRating?: string;
   reviewCount?: string;

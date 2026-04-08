@@ -23,7 +23,7 @@ interface WellnessItem {
   icon: string;
 }
 
-interface WellnessMenuProps {
+interface WellnessMenuProps extends Record<string, unknown> {
   title?: string;
   items: WellnessItem[];
   ctaText?: string;
