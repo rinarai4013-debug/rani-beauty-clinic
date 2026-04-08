@@ -18,6 +18,7 @@ import FunnelHealthPanel from '@/components/dashboard/panels/FunnelHealthPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
 import MorningBriefing from '@/components/dashboard/gamification/MorningBriefing';
 import DailyChallenges from '@/components/dashboard/gamification/DailyChallenges';
+import NinetyDayWarRoomPanel from '@/components/dashboard/panels/NinetyDayWarRoomPanel';
 import { DashboardErrorBoundary, InlineError } from '@/components/dashboard/shared';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
@@ -73,6 +74,9 @@ export default function ExecutiveHome() {
 
         {/* Morning Briefing */}
         <MorningBriefing />
+
+        {/* 90-Day Revenue Sprint */}
+        <NinetyDayWarRoomPanel />
 
         {/* Hero KPI Row */}
         {error ? (
