@@ -8,6 +8,12 @@ Use `scripts/smoke-preview.mjs` after deploying a Vercel preview.
 BASE_URL=https://your-preview.vercel.app node scripts/smoke-preview.mjs
 ```
 
+If the preview is protected by Vercel Deployment Protection, include the bypass token:
+
+```bash
+BASE_URL=https://your-preview.vercel.app VERCEL_PROTECTION_BYPASS=... node scripts/smoke-preview.mjs
+```
+
 The script checks:
 
 - `/api/health` responds with `200` or `503` and does not expose secret values

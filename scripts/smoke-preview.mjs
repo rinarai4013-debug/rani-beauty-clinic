@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const baseUrl = process.env.BASE_URL;
+const vercelBypassToken = process.env.VERCEL_PROTECTION_BYPASS;
 
 if (!baseUrl) {
   console.error('Set BASE_URL to the preview or production origin, for example:');
@@ -16,7 +17,12 @@ function addCheck(name, fn) {
 }
 
 function endpoint(path) {
-  return `${origin}${path}`;
+  const url = new URL(`${origin}${path}`);
+  if (vercelBypassToken) {
+    url.searchParams.set('x-vercel-set-bypass-cookie', 'true');
+    url.searchParams.set('x-vercel-protection-bypass', vercelBypassToken);
+  }
+  return url.toString();
 }
 
 async function readJson(response) {

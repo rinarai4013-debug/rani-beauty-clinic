@@ -44,6 +44,12 @@ After Vercel creates a preview URL:
 BASE_URL=https://your-preview.vercel.app node scripts/smoke-preview.mjs
 ```
 
+If Vercel Deployment Protection is enabled:
+
+```bash
+BASE_URL=https://your-preview.vercel.app VERCEL_PROTECTION_BYPASS=... node scripts/smoke-preview.mjs
+```
+
 Expected notes:
 
 - `/api/health` may return `503` if preview env vars are missing.
