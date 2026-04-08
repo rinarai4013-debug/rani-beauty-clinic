@@ -22,14 +22,14 @@ export default function ProgressBar({
   showPercentage = true,
   height = 6,
   colorMode = 'gold',
-  color,
+  color: customColor,
 }: ProgressBarProps) {
   const normalizedCurrent = value ?? current ?? 0;
   const normalizedTarget = value != null ? 100 : (target ?? 100);
   const percentage = normalizedTarget > 0 ? Math.min((normalizedCurrent / normalizedTarget) * 100, 100) : 0;
 
   const getColor = () => {
-    if (color) return color;
+    if (customColor) return customColor;
     switch (colorMode) {
       case 'score': return getScoreColor(percentage);
       case 'green': return '#059669';
@@ -38,7 +38,7 @@ export default function ProgressBar({
     }
   };
 
-  const color = getColor();
+  const resolvedColor = getColor();
 
   return (
     <div>
@@ -61,7 +61,7 @@ export default function ProgressBar({
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 1, ease: 'easeOut' }}
           className="h-full rounded-full"
-          style={{ backgroundColor: color }}
+          style={{ backgroundColor: resolvedColor }}
         />
       </div>
     </div>
