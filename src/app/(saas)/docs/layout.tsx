@@ -40,8 +40,6 @@ function CodeBlock({ children, language = 'typescript' }: { children: string; la
   );
 }
 
-export { CodeBlock };
-
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
