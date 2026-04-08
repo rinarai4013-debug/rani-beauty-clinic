@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { useCRMOverview } from '@/hooks/useCRMData';
+import { useCRMOverview, useStaleLeads } from '@/hooks/useCRMData';
 import { CRMStatsRow, PipelineFunnel, TaskBoard, StaleLeadAlert } from '@/components/dashboard/crm';
 import { DashboardErrorBoundary, PanelSkeleton, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
@@ -27,6 +27,7 @@ function useLastUpdated(data: unknown) {
 
 export default function CRMOverviewPage() {
   const { data, isLoading, error, mutate } = useCRMOverview();
+  const { data: staleLeads } = useStaleLeads();
   const overview = data as CRMOverviewData | undefined;
   const lastUpdated = useLastUpdated(data);
 
@@ -69,7 +70,7 @@ export default function CRMOverviewPage() {
             {/* Stale Lead Alerts */}
             {overview.pipeline.staleLeadCount > 0 && (
               <motion.div variants={item}>
-                <StaleLeadAlert leads={overview.pipeline.staleLeads ?? []} />
+                <StaleLeadAlert leads={staleLeads ?? []} />
               </motion.div>
             )}
 
