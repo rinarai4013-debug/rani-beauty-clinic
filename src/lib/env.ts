@@ -11,9 +11,9 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   // Required - app won't function without these
-  AIRTABLE_PAT: z.string().min(1, 'AIRTABLE_PAT is required'),
-  AIRTABLE_BASE_ID: z.string().min(1, 'AIRTABLE_BASE_ID is required'),
-  DASHBOARD_JWT_SECRET: z.string().min(1, 'DASHBOARD_JWT_SECRET is required'),
+  AIRTABLE_PAT: z.string().min(1, 'AIRTABLE_PAT is required').transform(v => v.trim()),
+  AIRTABLE_BASE_ID: z.string().min(1, 'AIRTABLE_BASE_ID is required').transform(v => v.trim()),
+  DASHBOARD_JWT_SECRET: z.string().min(1, 'DASHBOARD_JWT_SECRET is required').transform(v => v.trim()),
 
   // Required for AI features
   ANTHROPIC_API_KEY: z.string().optional().default(''),

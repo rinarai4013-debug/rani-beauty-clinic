@@ -18,7 +18,7 @@ let _base: ReturnType<InstanceType<typeof Airtable>['base']> | null = null;
 function getBase() {
   if (!_base) {
     const airtable = new Airtable({
-      apiKey: process.env.AIRTABLE_PAT,
+      apiKey: process.env.AIRTABLE_PAT?.trim(),
     });
     _base = airtable.base(process.env.AIRTABLE_BASE_ID!);
   }
