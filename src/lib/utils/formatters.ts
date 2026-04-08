@@ -77,16 +77,18 @@ export function getTrend(current: number, previous: number): { value: number; di
 
 // Score status color helper
 export function getScoreColor(score: number): string {
-  if (score >= 90) return '#F3D6BE'; // elite gold
-  if (score >= 80) return '#059669'; // green
-  if (score >= 60) return '#F59E0B'; // amber
+  // Aligned with mangomint-intelligence.ts clinic score thresholds
+  if (score >= 85) return '#F3D6BE'; // elite gold
+  if (score >= 70) return '#059669'; // green
+  if (score >= 50) return '#F59E0B'; // amber
   return '#EF4444'; // red
 }
 
 export function getScoreStatus(score: number): 'critical' | 'growing' | 'strong' | 'elite' {
-  if (score >= 90) return 'elite';
-  if (score >= 80) return 'strong';
-  if (score >= 60) return 'growing';
+  // Aligned with mangomint-intelligence.ts clinic score thresholds
+  if (score >= 85) return 'elite';
+  if (score >= 70) return 'strong';
+  if (score >= 50) return 'growing';
   return 'critical';
 }
 

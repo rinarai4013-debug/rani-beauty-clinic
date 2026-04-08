@@ -46,6 +46,7 @@ interface AirtableClientFields {
   [FIELDS.clients.status]?: string;
   [FIELDS.clients.appointments]?: string[] | number;
   [FIELDS.clients.memberships]?: string[] | number;
+  'Created Date'?: string;
 }
 
 interface AirtableAlertFields {
@@ -62,6 +63,13 @@ interface AirtableAlertFields {
 
 interface AirtableMembershipFields {
   [FIELDS.memberships.status]?: string;
+}
+
+interface AirtableReviewFields {
+  [FIELDS.reviews.platform]?: string;
+  [FIELDS.reviews.starRating]?: number;
+  [FIELDS.reviews.reviewDate]?: string;
+  [FIELDS.reviews.sentiment]?: string;
 }
 
 export interface MangomintHealth {
@@ -326,7 +334,7 @@ export async function getDashboardKpis(): Promise<KPIData> {
   const weekStart = formatDate(startOfWeek(now));
   const monthStart = formatDate(startOfMonth(now));
 
-  const [appointments, transactions, clients, memberships, activeAlerts] = await Promise.all([
+  const [appointments, transactions, clients, memberships, activeAlerts, recentReviews] = await Promise.all([
     fetchAll<AirtableAppointmentFields>(Tables.appointments(), {
       filterByFormula: `AND({Date} >= "${monthStart}", {Date} <= "${today}")`,
       sort: [{ field: 'Date', direction: 'asc' }, { field: 'Time', direction: 'asc' }],
@@ -340,6 +348,9 @@ export async function getDashboardKpis(): Promise<KPIData> {
     fetchFirst<AirtableAlertFields>(Tables.alerts(), 10, {
       filterByFormula: `{Status} = "active"`,
       sort: [{ field: 'Created Date', direction: 'desc' }],
+    }, true),
+    fetchAll<AirtableReviewFields>(Tables.reviews(), {
+      filterByFormula: `{${FIELDS.reviews.reviewDate}} >= "${monthStart}"`,
     }, true),
   ]);
 
@@ -386,10 +397,6 @@ export async function getDashboardKpis(): Promise<KPIData> {
     const status = (record.fields.Status || '').toLowerCase();
     return status !== 'churned';
   }).length;
-  const newThisWeek = clients.filter((record) => {
-    const status = (record.fields.Status || '').toLowerCase();
-    return status.includes('new');
-  }).length;
   const memberCount = memberships.filter((record) => (record.fields.Status || '').toLowerCase() === 'active').length;
 
   const clientVisitCounts = new Map<string, number>();
@@ -397,6 +404,24 @@ export async function getDashboardKpis(): Promise<KPIData> {
     const key = String(record.fields['Client ID'] || record.fields.Client || record.fields['Client Name'] || record.id);
     clientVisitCounts.set(key, (clientVisitCounts.get(key) || 0) + 1);
   });
+
+  // New clients this week: clients with status "New Lead" whose first appointment is this week,
+  // OR clients whose earliest appointment in this month falls within this week (first-time visitors)
+  const clientFirstSeenThisMonth = new Map<string, string>();
+  appointmentRecords.forEach((record) => {
+    const key = String(record.fields['Client ID'] || record.fields.Client || record.fields['Client Name'] || record.id);
+    const date = String(record.fields.Date || '');
+    if (!date) return;
+    const previous = clientFirstSeenThisMonth.get(key);
+    if (!previous || date < previous) {
+      clientFirstSeenThisMonth.set(key, date);
+    }
+  });
+  // Count clients whose first appointment this month is in the current week
+  // AND who only have 1 visit this month (likely genuinely new)
+  const newThisWeek = Array.from(clientFirstSeenThisMonth.entries())
+    .filter(([key, date]) => date >= weekStart && (clientVisitCounts.get(key) || 0) <= 1)
+    .length;
   const repeatingClients = Array.from(clientVisitCounts.values()).filter((count) => count > 1).length;
   const rebookRate = clientVisitCounts.size > 0 ? round((repeatingClients / clientVisitCounts.size) * 100) : 0;
   const avgTicket = appointmentRecords.filter((record) => isCompletedStatus(record.fields.Status)).length > 0
@@ -488,6 +513,18 @@ export async function getDashboardKpis(): Promise<KPIData> {
   }, noShowRisks)];
 
   const projectedMonth = round((revenueMtd / Math.max(daysElapsedInMonth(now), 1)) * daysInCurrentMonth(now));
+
+  // Calculate real review score from Airtable data
+  const reviewRatings = recentReviews
+    .map((r) => toNumber(r.fields[FIELDS.reviews.starRating]))
+    .filter((r) => r > 0);
+  const avgRating = reviewRatings.length > 0
+    ? reviewRatings.reduce((sum, r) => sum + r, 0) / reviewRatings.length
+    : 0;
+  // Score: 5-star = 100, 4-star = 80, etc. 0 reviews = 0 (unknown, not penalized in total)
+  const reviewScore = reviewRatings.length > 0 ? round((avgRating / 5) * 100) : 0;
+  const hasReviewData = reviewRatings.length > 0;
+
   const clinicScoreTotal = round(
     (
       Math.min(projectedMonth / getMonthlyRevenueTarget(), 1) * 30 +
@@ -495,7 +532,8 @@ export async function getDashboardKpis(): Promise<KPIData> {
       Math.min(closeRate / 65, 1) * 15 +
       Math.min(rebookRate / 70, 1) * 10 +
       Math.min(showRate / 90, 1) * 10 +
-      Math.max(0, 1 - noShowRisks.filter((item) => item.riskLevel === 'high').length / 5) * 10 +
+      (hasReviewData ? Math.min(reviewScore / 100, 1) * 5 : 0) +
+      Math.max(0, 1 - noShowRisks.filter((item) => item.riskLevel === 'high').length / 5) * (hasReviewData ? 5 : 10) +
       Math.max(0, 1 - fullAlerts.filter((item) => item.severity === 'critical').length / 4) * 10
     ) * 100 / 100,
   );
@@ -537,12 +575,12 @@ export async function getDashboardKpis(): Promise<KPIData> {
         utilization,
         consultConversion: closeRate,
         rebooks: rebookRate,
-        reviews: 70,
+        reviews: reviewScore,
         followUps: Math.max(40, 100 - noShowRisks.filter((item) => item.riskLevel === 'high').length * 12),
         operations: Math.max(45, 100 - fullAlerts.filter((item) => item.severity === 'critical').length * 15),
       },
       status: clinicScoreTotal >= 85 ? 'elite' : clinicScoreTotal >= 70 ? 'strong' : clinicScoreTotal >= 50 ? 'growing' : 'critical',
-      streak: clinicScoreTotal >= 80 ? 7 : 0,
+      streak: 0, // TODO: Calculate from KPI Snapshots table (days above score 80)
     },
   };
 }
