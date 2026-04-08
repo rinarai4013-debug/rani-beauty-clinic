@@ -9,7 +9,7 @@ const ContactSchema = z.object({
   phone: z.string().max(20).optional().default(""),
   service: z.string().min(1).max(100),
   message: z.string().max(2000).optional().default(""),
-  honeypot: z.string().max(0, "Bot detected"),
+  honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
 
 export async function POST(req: NextRequest) {
