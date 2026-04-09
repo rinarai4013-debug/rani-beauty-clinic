@@ -200,7 +200,10 @@ export default function CommunicationAnalytics({
               />
               <Tooltip
                 contentStyle={{ fontSize: 11, borderRadius: 8 }}
-                formatter={(v: number) => [`$${v.toLocaleString()}`, 'Revenue']}
+                formatter={(v) => {
+                  const amount = typeof v === 'number' ? v : Number(v ?? 0);
+                  return [`$${amount.toLocaleString()}`, 'Revenue'];
+                }}
               />
               <Bar dataKey="revenue" fill="#0F1D2C" radius={[0, 4, 4, 0]} />
             </BarChart>
