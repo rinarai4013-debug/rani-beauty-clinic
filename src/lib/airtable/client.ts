@@ -15,7 +15,7 @@ if (!process.env.AIRTABLE_BASE_ID) {
 // Lazy-initialized to avoid throwing during Next.js build (env vars unavailable at build time)
 let _base: ReturnType<InstanceType<typeof Airtable>['base']> | null = null;
 
-function getBase() {
+export function getAirtableBase() {
   if (!_base) {
     const airtable = new Airtable({
       apiKey: process.env.AIRTABLE_PAT,
@@ -108,20 +108,20 @@ async function drainExecutor(entry: { table: string; recordId?: string; fields: 
 }
 
 export const Tables = {
-  clients: () => getBase()('Clients'),
-  appointments: () => getBase()('Appointments'),
-  transactions: () => getBase()('Transactions'),
-  kpis: () => getBase()('KPI Snapshots'),
-  alerts: () => getBase()('Alerts'),
-  packages: () => getBase()('Packages'),
-  memberships: () => getBase()('Memberships'),
-  intakes: () => getBase()('Client Intakes'),
-  reviews: () => getBase()('Reviews'),
-  messagesLog: () => getBase()('Messages Log'),
-  competitorIntel: () => getBase()('Competitor Intelligence'),
-  intakeIntelligence: () => getBase()('Intake Intelligence'),
-  treatmentPlans: () => getBase()('Treatment Plans'),
-  chartNotes: () => getBase()('Chart Notes'),
+  clients: () => getAirtableBase()('Clients'),
+  appointments: () => getAirtableBase()('Appointments'),
+  transactions: () => getAirtableBase()('Transactions'),
+  kpis: () => getAirtableBase()('KPI Snapshots'),
+  alerts: () => getAirtableBase()('Alerts'),
+  packages: () => getAirtableBase()('Packages'),
+  memberships: () => getAirtableBase()('Memberships'),
+  intakes: () => getAirtableBase()('Client Intakes'),
+  reviews: () => getAirtableBase()('Reviews'),
+  messagesLog: () => getAirtableBase()('Messages Log'),
+  competitorIntel: () => getAirtableBase()('Competitor Intelligence'),
+  intakeIntelligence: () => getAirtableBase()('Intake Intelligence'),
+  treatmentPlans: () => getAirtableBase()('Treatment Plans'),
+  chartNotes: () => getAirtableBase()('Chart Notes'),
 } as const;
 
 // Resolve a table accessor key to its Airtable table name

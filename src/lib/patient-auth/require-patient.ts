@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getAirtableBase as getSharedAirtableBase } from '@/lib/airtable/client';
 import { getPatientSession, type PatientSessionPayload } from './session';
 
 /**
@@ -26,9 +27,6 @@ export async function requirePatientAuth(): Promise<
 /**
  * Get an Airtable base instance.
  */
-export async function getAirtableBase() {
-  const Airtable = (await import('airtable')).default;
-  return new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(
-    process.env.AIRTABLE_BASE_ID || 'app1SwhSfwe8GKUg4'
-  );
+export function getAirtableBase() {
+  return getSharedAirtableBase();
 }
