@@ -158,6 +158,11 @@ export function classifyChannel(source: string, medium: string, referrer?: strin
   const med = (medium || '').toLowerCase();
   const ref = (referrer || '').toLowerCase();
 
+  // Paid social should win over generic cpc handling for social platforms
+  if ((src === 'facebook' || src === 'instagram' || src === 'meta') && (med === 'cpc' || med === 'paid' || med === 'paid_social')) {
+    return 'paid_social';
+  }
+
   // Paid search
   if (med === 'cpc' || med === 'ppc' || med === 'paid_search') return 'paid_search';
   if (src === 'google' && med === 'cpc') return 'paid_search';
