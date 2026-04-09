@@ -90,7 +90,7 @@ export default function BudgetVsActual() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}K`} tick={{ fontSize: 10 }} />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Tooltip formatter={(value) => formatCurrency(typeof value === 'number' ? value : Number(value ?? 0))} />
                 <Legend wrapperStyle={{ fontSize: '11px' }} />
                 <Bar dataKey="target" name="Target" fill="#E5E7EB" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="actual" name="Actual" fill="#C9A96E" radius={[4, 4, 0, 0]} />
