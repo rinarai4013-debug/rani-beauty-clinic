@@ -17,27 +17,23 @@ import {
   buildN8nWebhookPayload,
   type ConsultationCompletionResult,
 } from '@/lib/mastermind/post-consultation';
+import { z } from 'zod';
+
+const CompletionBodySchema = z.object({
+  sessionId: z.string().min(1, 'sessionId is required'),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
+    const parsed = CompletionBodySchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON body' },
         { status: 400 }
       );
     }
 
-    const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
-
-    if (!sessionId) {
-      return NextResponse.json(
-        { success: false, error: 'Missing sessionId' },
-        { status: 400 }
-      );
-    }
+    const { sessionId } = parsed.data;
 
     // Load session
     const session = await getSessionByIdAsync(sessionId);

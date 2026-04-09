@@ -11,9 +11,13 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { mockSimulationComparison } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
+import { z } from 'zod';
 import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
 export const maxDuration = 30;
+const SimulateSessionSchema = z.object({
+  sessionId: z.string().min(1).optional(),
+});
 
 function buildDataDrivenSimulation(
   auraScore: number,
@@ -141,8 +145,15 @@ export async function POST(request: NextRequest) {
       return unauthorized();
     }
 
-    const body = await request.json();
-    const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
+    const parsed = SimulateSessionSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
+    const { sessionId } = parsed.data;
 
     let result: SimulationComparison;
     let renderMode = 'mock';

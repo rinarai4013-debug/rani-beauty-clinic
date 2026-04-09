@@ -19,10 +19,12 @@ import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
+import { z } from 'zod';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const IntakePayloadSchema = z.record(z.unknown());
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +41,14 @@ export async function POST(request: NextRequest) {
 
     let intakeData: Partial<ConsultationFormData>;
     try {
-      intakeData = JSON.parse(dataField);
+      const parsed = IntakePayloadSchema.safeParse(JSON.parse(dataField));
+      if (!parsed.success) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid form data payload' },
+          { status: 400 }
+        );
+      }
+      intakeData = parsed.data as Partial<ConsultationFormData>;
     } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid form data JSON' },
@@ -117,7 +126,7 @@ export async function POST(request: NextRequest) {
             'Phone Number': (intakeData.phone as string) || '',
             'Processing Status': 'New',
             'Intake Summary (AI)': intakeSummary,
-          } as any,
+          },
           { typecast: true }
         );
       });

@@ -16,9 +16,15 @@ import { unauthorized } from '@/lib/auth/middleware';
 import { FOLLOW_UP_TEMPLATES, renderTemplate } from '@/lib/plan-builder/follow-up-templates';
 import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token';
 import crypto from 'crypto';
+import { z } from 'zod';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const CLINIC_PHONE = '(425) 539-4440';
+const FollowUpBodySchema = z.object({
+  sessionId: z.string().min(1),
+  templateId: z.string().min(1),
+  channel: z.enum(['email', 'sms', 'internal']).optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,25 +35,12 @@ export async function POST(request: NextRequest) {
 
     const staffName = authSession?.name || 'Staff';
 
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
+    const parsed = FollowUpBodySchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json({ success: false, error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { sessionId, templateId, channel } = body as {
-      sessionId?: string;
-      templateId?: string;
-      channel?: 'email' | 'sms';
-    };
-
-    if (!sessionId || typeof sessionId !== 'string') {
-      return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });
-    }
-    if (!templateId || typeof templateId !== 'string') {
-      return NextResponse.json({ success: false, error: 'templateId required' }, { status: 400 });
-    }
+    const { sessionId, templateId, channel } = parsed.data;
 
     const template = FOLLOW_UP_TEMPLATES[templateId];
     if (!template) {

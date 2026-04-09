@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
 
@@ -50,16 +51,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: Record<string, unknown>;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  const parsed = z.record(z.unknown()).safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid consult request body' }, { status: 400 });
   }
 
   try {
     const generator = await getConsultGenerator();
-    const briefing = generator(body);
+    const briefing = generator(parsed.data);
     return NextResponse.json({ status: 'ok', briefing });
   } catch (error) {
     console.error('[dashboard/consult][POST]', error);

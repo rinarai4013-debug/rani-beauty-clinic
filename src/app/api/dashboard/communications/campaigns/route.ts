@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
 import { getAllCampaigns, createCampaign, getCampaignTypeDefaults } from '@/lib/communications';
+import type { MessageChannel } from '@/types/communications';
+
+const CampaignCreateSchema = z.object({
+  name: z.string().min(1, 'name is required'),
+  type: z.enum(['promotional', 'educational', 'reactivation', 'event', 'seasonal', 'birthday', 'direct']),
+  channel: z.enum(['sms', 'email', 'both']).optional(),
+  subject: z.string().trim().min(1).optional(),
+  body: z.string().trim().min(1).optional(),
+});
+
+const DEFAULT_AUDIENCE_FILTER = {
+  groups: [],
+  logic: 'OR' as const,
+  excludeUnsubscribed: true,
+  excludeRecentlyContacted: false,
+};
 
 export async function GET() {
   const session = await getSession();
@@ -40,23 +57,25 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const { name, type, channel } = body;
-
-    if (!name || !type) {
+    const parsed = CampaignCreateSchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, type' },
+        { error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
         { status: 400 }
       );
     }
 
+    const { name, type, channel, subject, body } = parsed.data;
     const defaults = getCampaignTypeDefaults(type);
+    const defaultChannel = defaults.defaultChannel as MessageChannel | 'both';
     const campaign = createCampaign({
       name,
       type,
-      channel: channel || 'email',
-      ...defaults,
-      ...body,
+      channel: (channel || defaultChannel) as MessageChannel | 'both',
+      subject: subject ?? defaults.suggestedSubject,
+      body: body ?? defaults.suggestedBody,
+      audienceFilter: DEFAULT_AUDIENCE_FILTER,
+      createdBy: session.username,
     });
 
     cache.invalidatePrefix('comms:campaigns');

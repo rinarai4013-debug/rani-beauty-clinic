@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { validatePlan } from '@/lib/plan-builder/constraints';
 import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
+import type { ServiceCategory } from '@/data/services/unified-catalog';
 
 export async function POST(
   _request: NextRequest,
@@ -46,25 +47,29 @@ export async function POST(
       { id: 3, ...PHASE_LABELS[3], services: [] },
     ];
 
-    allTreatments.forEach((tx, i) => {
+    allTreatments.forEach((tx) => {
       // Map urgency to phase
       const phase = tx.urgency === 'immediate' ? 1 : tx.urgency === 'within-3-months' ? 2 : 3;
+      const serviceCategory = typeof tx.category === 'string' ? tx.category as ServiceCategory : 'consultation';
       const selected: SelectedService = {
-        id: tx.id,
-        serviceId: tx.id,
+        id: String(tx.id),
+        serviceId: String(tx.id),
         service: {
-          id: tx.id,
+          id: String(tx.id),
           name: tx.treatmentName,
-          category: tx.category as any,
+          category: serviceCategory,
           description: tx.aiReasoning,
-          price: tx.perSession,
-          sessions: tx.sessionsRequired,
+          price: Number(tx.perSession) || 0,
+          sessions: Number(tx.sessionsRequired) || 1,
           downtime: tx.downtime,
           results: tx.timeToResults,
-          slug: tx.id,
-          parentSlug: null,
-        } as any,
-        quantity: tx.sessionsRequired,
+          parentSlug: undefined,
+          financingEligible: true,
+          concerns: [],
+          bodyAreas: [],
+          duration: 0,
+        },
+        quantity: Number(tx.sessionsRequired) || 1,
         notes: tx.clinicalRationale,
         phase: phase as 1 | 2 | 3,
       };

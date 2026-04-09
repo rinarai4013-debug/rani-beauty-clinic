@@ -5,6 +5,7 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getNextStatus, getAutoFollowUp } from '@/lib/plan-builder/plan-status';
 import type { PlanStatus } from '@/lib/plan-builder/plan-status';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { z } from 'zod';
 
 interface TreatmentPlanFields {
   [key: string]: unknown;
@@ -23,6 +24,9 @@ const ACTION_TRIGGER_MAP: Record<string, string> = {
 };
 
 const VALID_ACTIONS = Object.keys(ACTION_TRIGGER_MAP);
+const TrackBodySchema = z.object({
+  action: z.enum(VALID_ACTIONS as [string, ...string[]]).optional(),
+});
 
 // ─── POST Handler ─────────────────────────────────────────────────
 // Called from client viewer to track plan views and interactions
@@ -44,15 +48,12 @@ export async function POST(
     }
 
     // Parse the action from the request body (defaults to 'view' for backward compat)
-    let action = 'view';
-    try {
-      const body = await request.json();
-      if (body.action && VALID_ACTIONS.includes(body.action)) {
-        action = body.action;
-      }
-    } catch {
-      // No body or invalid JSON — default to 'view'
+    const parsed = TrackBodySchema.safeParse(await request.json().catch(() => ({})));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
+
+    const action = parsed.data.action || 'view';
 
     const trigger = ACTION_TRIGGER_MAP[action];
     if (!trigger) {

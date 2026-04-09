@@ -14,8 +14,12 @@ import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mas
 import { unauthorized } from '@/lib/auth/middleware';
 import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token';
 import crypto from 'crypto';
+import { z } from 'zod';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const PlanSendSchema = z.object({
+  sessionId: z.string().min(1, 'sessionId is required'),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,15 +30,17 @@ export async function POST(request: NextRequest) {
 
     const staffName = authSession?.name || 'Staff';
 
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json({ success: false, error: 'Invalid JSON' }, { status: 400 });
+    const parsed = PlanSendSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
+        { status: 400 }
+      );
     }
 
-    const { sessionId } = body as { sessionId?: string };
-    if (!sessionId || typeof sessionId !== 'string') {
+    const { sessionId } = parsed.data;
+
+    if (!sessionId) {
       return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });
     }
 

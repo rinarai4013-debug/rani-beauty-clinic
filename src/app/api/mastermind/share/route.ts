@@ -19,6 +19,7 @@ import {
   saveTokenToAirtable,
   type ShareTokenRecord,
 } from '@/lib/mastermind/share-token';
+import { z } from 'zod';
 
 // Re-export the type so existing `import type { ShareTokenRecord }` from sibling
 // routes that may have used `../route` still work at the type level.
@@ -28,33 +29,24 @@ export type { ShareTokenRecord };
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_EXPIRY_MS = 90 * 24 * 60 * 60 * 1000; // 90 days cap
+const ShareTokenCreateSchema = z.object({
+  sessionId: z.string().min(1),
+  expiresIn: z.number().positive().int().optional(),
+});
 
 // ── POST Handler ──
 
 export async function POST(request: NextRequest) {
   try {
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
+    const parsed = ShareTokenCreateSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: 'Invalid JSON body' },
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
         { status: 400 }
       );
     }
 
-    const { sessionId, expiresIn } = body as {
-      sessionId?: string;
-      expiresIn?: number;
-    };
-
-    // Validate sessionId
-    if (!sessionId || typeof sessionId !== 'string') {
-      return NextResponse.json(
-        { success: false, error: 'sessionId is required' },
-        { status: 400 }
-      );
-    }
+    const { sessionId, expiresIn } = parsed.data;
 
     // Validate expiresIn
     const ttl =

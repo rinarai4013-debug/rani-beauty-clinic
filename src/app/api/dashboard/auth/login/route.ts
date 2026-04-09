@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { COOKIE_NAME, createSession, getSessionCookieConfig } from '@/lib/auth/session';
 import type { UserRole } from '@/types/auth';
+import { z } from 'zod';
 
 interface DashboardUser {
   username: string;
@@ -99,16 +100,26 @@ function getUsers(): DashboardUser[] {
   }
 }
 
+const LoginBodySchema = z.object({
+  username: z.string().trim().min(1, 'Username is required'),
+  password: z.string().min(1, 'Password is required'),
+});
+
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
 
   try {
-    const body = await req.json();
-    const { username, password } = body as { username?: string; password?: string };
-
-    if (typeof username !== 'string' || typeof password !== 'string' || !username || !password) {
-      return NextResponse.json({ error: 'Username and password required' }, { status: 400 });
+    const parsed = LoginBodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
+        { status: 400 }
+      );
     }
+
+    const { username, password } = parsed.data;
+
+    const normalizedUsername = username.toLowerCase();
 
     if (isRateLimited(ip)) {
       return NextResponse.json(
@@ -119,7 +130,8 @@ export async function POST(req: NextRequest) {
 
     const users = getUsers();
     const user = users.find(
-      (u) => u.username.toLowerCase() === username.toLowerCase() && verifyPassword(password, u.password)
+      (u) =>
+        u.username.toLowerCase() === normalizedUsername && verifyPassword(password, u.password)
     );
 
     if (!user) {

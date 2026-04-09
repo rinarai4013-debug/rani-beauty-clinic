@@ -11,27 +11,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { generateConsultationPdf } from '@/lib/mastermind/pdf-generator';
 import { storePdf } from '@/lib/mastermind/pdf-storage';
+import { z } from 'zod';
+
+const PdfBodySchema = z.object({
+  sessionId: z.string().min(1),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
+    const parsed = PdfBodySchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON body' },
         { status: 400 }
       );
     }
 
-    const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
-
-    if (!sessionId) {
-      return NextResponse.json(
-        { success: false, error: 'Missing sessionId' },
-        { status: 400 }
-      );
-    }
+    const { sessionId } = parsed.data;
 
     // Load session
     const session = await getSessionByIdAsync(sessionId);
