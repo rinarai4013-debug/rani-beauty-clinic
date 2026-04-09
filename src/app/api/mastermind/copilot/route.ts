@@ -21,7 +21,12 @@ type CopilotContext =
   | 'closing'
   | 'general';
 
-const anthropic = getAnthropicClient();
+// Lazy init — avoids crashing at import time during `next build`
+let _anthropic: ReturnType<typeof getAnthropicClient> | null = null;
+function anthropic() {
+  if (!_anthropic) _anthropic = getAnthropicClient();
+  return _anthropic;
+}
 
 // ── SERVICE CATALOG ──
 
@@ -505,7 +510,7 @@ export async function POST(request: NextRequest) {
     const systemPrompt = buildSystemPrompt(session, context);
 
     // Create streaming response from Claude
-    const stream = await anthropic.messages.stream({
+    const stream = await anthropic().messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       system: systemPrompt,
