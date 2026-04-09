@@ -201,6 +201,39 @@ describe('buildExecutiveBriefing', () => {
           estimatedValue: 4200,
         },
       },
+      reactivation: {
+        totalRecoverableValue: 2400,
+        lapsed30: 2,
+        lapsed60: 1,
+        lapsed90: 1,
+        churned: 1,
+        highPriorityCount: 1,
+        topOpportunities: [
+          {
+            clientName: 'Maya Bloom',
+            status: 'Lapsed 90',
+            preferredContact: 'Text',
+            estimatedValue: 850,
+            priority: 'high',
+            action: 'Personal text outreach with a strong win-back offer',
+          },
+        ],
+      },
+      providerInsights: {
+        pressureProvider: 'Rina',
+        underfilledProviders: 1,
+        openGapCount: 3,
+        topEntries: [
+          {
+            provider: 'Rina',
+            noShowRate: 20,
+            revenuePerShow: 250,
+            gapCount: 3,
+            status: 'underfilled',
+            recommendation: 'Prioritize Rina for consult fill and same-day outreach.',
+          },
+        ],
+      },
       providerPerformance: {
         Rina: { revenue: 4000, appointments: 20, shows: 16, noShows: 4 },
         Mom: { revenue: 5200, appointments: 22, shows: 21, noShows: 1 },
@@ -214,12 +247,18 @@ describe('buildExecutiveBriefing', () => {
     expect(pressureLabels).toContain('Stalled consult value');
     expect(pressureLabels).toContain('Provider review backlog');
     expect(pressureLabels).toContain('Retention drag');
+    expect(pressureLabels).toContain('Reactivation backlog');
+    expect(pressureLabels).toContain('Underfilled provider capacity');
     expect(pressureLabels).toContain('Provider friction');
     expect(briefing.scorecard.consultPipelineValue).toBe(6800);
     expect(briefing.scorecard.stuckConsults).toBe(2);
+    expect(briefing.scorecard.reactivationValue).toBe(2400);
+    expect(briefing.scorecard.providerPressureProvider).toBe('Rina');
     expect(titles.some((title) => title.includes('Convert 5 fresh leads into consults'))).toBe(true);
     expect(titles.some((title) => title.includes('Move Aria Stone forward'))).toBe(true);
     expect(titles.some((title) => title.includes('Launch a member save push'))).toBe(true);
+    expect(titles.some((title) => title.includes('Win back Maya Bloom'))).toBe(true);
+    expect(titles.some((title) => title.includes("Fill Rina's open capacity"))).toBe(true);
     expect(titles.some((title) => title.includes("Stabilize Rina's schedule quality"))).toBe(true);
   });
 });

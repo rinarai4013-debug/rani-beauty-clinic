@@ -52,6 +52,9 @@ export interface ExecutiveScorecard {
   bankBalance: number | null;
   membershipMRR: number;
   referralRevenue: number;
+  reactivationValue: number;
+  highPriorityReactivationCount: number;
+  providerPressureProvider: string | null;
 }
 
 export interface ExecutiveBriefing {
@@ -94,6 +97,35 @@ export interface ExecutiveBriefingInput {
         }
       | null;
   };
+  reactivation?: {
+    totalRecoverableValue: number;
+    lapsed30: number;
+    lapsed60: number;
+    lapsed90: number;
+    churned: number;
+    highPriorityCount: number;
+    topOpportunities: {
+      clientName: string;
+      status: string;
+      preferredContact: string;
+      estimatedValue: number;
+      priority: 'high' | 'medium' | 'low';
+      action: string;
+    }[];
+  };
+  providerInsights?: {
+    pressureProvider: string | null;
+    underfilledProviders: number;
+    openGapCount: number;
+    topEntries: {
+      provider: string;
+      noShowRate: number;
+      revenuePerShow: number;
+      gapCount: number;
+      status: 'underfilled' | 'watch' | 'strong';
+      recommendation: string;
+    }[];
+  };
 }
 
 interface ProviderPressureSignal {
@@ -126,6 +158,9 @@ function buildScorecard(input: ExecutiveBriefingInput): ExecutiveScorecard {
     bankBalance: input.cashFlow.bankBalance,
     membershipMRR: input.loyalty.membershipMRR,
     referralRevenue: input.referrals.revenueAttributed,
+    reactivationValue: input.reactivation?.totalRecoverableValue ?? 0,
+    highPriorityReactivationCount: input.reactivation?.highPriorityCount ?? 0,
+    providerPressureProvider: input.providerInsights?.pressureProvider ?? null,
   };
 }
 
@@ -197,11 +232,28 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
   }
 
   const providerPressure = getProviderPressure(input.providerPerformance);
+  const providerInsight = input.providerInsights?.topEntries[0];
   if (providerPressure) {
     points.push({
       label: 'Provider friction',
       severity: providerPressure.noShowRate >= 20 ? 'warning' : 'info',
       detail: `${providerPressure.provider} is carrying a ${Math.round(providerPressure.noShowRate)}% no-show rate and ${formatCurrency(providerPressure.revenuePerAppointment)} per appointment.`,
+    });
+  }
+
+  if ((input.reactivation?.highPriorityCount ?? 0) > 0) {
+    points.push({
+      label: 'Reactivation backlog',
+      severity: input.reactivation!.highPriorityCount >= 3 ? 'warning' : 'info',
+      detail: `${input.reactivation!.highPriorityCount} high-priority win-back client${input.reactivation!.highPriorityCount === 1 ? '' : 's'} represent ${formatCurrency(input.reactivation!.totalRecoverableValue)} in recoverable value.`,
+    });
+  }
+
+  if (providerInsight && providerInsight.status === 'underfilled') {
+    points.push({
+      label: 'Underfilled provider capacity',
+      severity: 'warning',
+      detail: `${providerInsight.provider} has ${providerInsight.gapCount} open gap${providerInsight.gapCount === 1 ? '' : 's'} and ${providerInsight.noShowRate}% no-show exposure this week.`,
     });
   }
 
@@ -219,6 +271,7 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
 function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
   const moves: ExecutiveMove[] = [];
   const providerPressure = getProviderPressure(input.providerPerformance);
+  const providerInsight = input.providerInsights?.topEntries[0];
 
   if (input.schedule.gaps.length > 0) {
     const firstGap = input.schedule.gaps[0];
@@ -265,6 +318,18 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
     });
   }
 
+  if (input.reactivation?.topOpportunities[0]) {
+    const target = input.reactivation.topOpportunities[0];
+    moves.push({
+      title: `Win back ${target.clientName}`,
+      why: `${target.status} is sitting in the highest-value reactivation slot and prefers ${target.preferredContact.toLowerCase()} outreach.`,
+      owner: 'operations',
+      urgency: target.priority === 'high' ? 'today' : 'this_week',
+      estimatedImpact: `Recover ${formatCurrency(target.estimatedValue)} in lapsed value`,
+      actionType: 'retention',
+    });
+  }
+
   if (input.aiHighlights.highestNoShowRisk) {
     moves.push({
       title: `Confirm ${input.aiHighlights.highestNoShowRisk.clientName}'s appointment`,
@@ -283,6 +348,17 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
       owner: 'operations',
       urgency: providerPressure.noShowRate >= 20 ? 'today' : 'this_week',
       estimatedImpact: 'Recover provider utilization and schedule yield',
+      actionType: 'schedule_fill',
+    });
+  }
+
+  if (providerInsight && providerInsight.status === 'underfilled') {
+    moves.push({
+      title: `Fill ${providerInsight.provider}'s open capacity`,
+      why: providerInsight.recommendation,
+      owner: 'frontdesk',
+      urgency: 'today',
+      estimatedImpact: `${providerInsight.gapCount} gap${providerInsight.gapCount === 1 ? '' : 's'} available for recovery`,
       actionType: 'schedule_fill',
     });
   }
@@ -331,7 +407,22 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
     });
   }
 
-  return moves.slice(0, 5);
+  return moves
+    .sort((a, b) => scoreMove(b) - scoreMove(a))
+    .slice(0, 8);
+}
+
+function scoreMove(move: ExecutiveMove): number {
+  const urgencyScore = move.urgency === 'now' ? 30 : move.urgency === 'today' ? 20 : 10;
+  const actionScore =
+    move.actionType === 'revenue_recovery' ? 12 :
+    move.actionType === 'retention' ? 11 :
+    move.actionType === 'schedule_fill' ? 10 :
+    move.actionType === 'risk_control' ? 9 :
+    move.actionType === 'marketing' ? 7 :
+    5;
+
+  return urgencyScore + actionScore;
 }
 
 function buildWatchList(input: ExecutiveBriefingInput): string[] {
@@ -359,6 +450,10 @@ function buildWatchList(input: ExecutiveBriefingInput): string[] {
 
   if (input.clientGrowth && input.clientGrowth.netGrowth <= 0) {
     items.push('Client growth is flat to negative, so retention needs a closer daily look.');
+  }
+
+  if ((input.reactivation?.lapsed90 ?? 0) > 0) {
+    items.push(`${input.reactivation!.lapsed90} clients are in the 90-day lapse bucket and should not sit idle.`);
   }
 
   const providerPressure = getProviderPressure(input.providerPerformance);

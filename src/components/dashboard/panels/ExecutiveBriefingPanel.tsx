@@ -34,6 +34,9 @@ interface ExecutiveScorecard {
   warningAlerts: number;
   newLeads: number;
   bankBalance: number | null;
+  reactivationValue: number;
+  highPriorityReactivationCount: number;
+  providerPressureProvider: string | null;
 }
 
 interface ExecutiveBriefingResponse {
@@ -113,7 +116,7 @@ export default function ExecutiveBriefingPanel() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 lg:min-w-[420px] lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 lg:min-w-[560px] lg:grid-cols-4">
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Revenue</p>
             <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.yesterdayRevenue)}</p>
@@ -131,8 +134,16 @@ export default function ExecutiveBriefingPanel() {
             <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.consultPipelineValue)}</p>
           </div>
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Reactivation</p>
+            <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.reactivationValue)}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Stuck Consults</p>
             <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.stuckConsults}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Provider Pressure</p>
+            <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.providerPressureProvider ?? 'Stable'}</p>
           </div>
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Cash</p>
