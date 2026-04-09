@@ -27,7 +27,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const [revenue, schedule, alerts, marketing, cashFlow, aiHighlights, loyalty, referrals, providerPerformance, clientGrowth, consults, reactivation, providerInsights, fill] =
+  const [revenue, schedule, alerts, marketing, cashFlow, aiHighlights, loyalty, referrals, providerPerformance, clientGrowth, consults, reactivation, providerInsights] =
     await Promise.all([
       fetchRevenue(),
       fetchSchedule(),
@@ -42,10 +42,10 @@ export async function GET() {
       fetchConsultIntelligence(),
       fetchReactivationIntelligence(),
       fetchProviderIntelligence(),
-      fetchFillIntelligence(),
     ]);
 
   const growth = buildGrowthIntelligence(marketing, referrals, revenue);
+  const fill = await fetchFillIntelligence({ consults, reactivation });
 
   const briefing = buildExecutiveBriefing({
     revenue,

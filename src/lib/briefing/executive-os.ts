@@ -151,6 +151,8 @@ export interface ExecutiveBriefingInput {
       suggestedService: string;
       suggestedAction: 'outreach_lapsed' | 'book_consult' | 'offer_walkin';
       estimatedValue: number;
+      recommendedTarget?: string;
+      rationale: string;
     }[];
   };
   growth?: {
@@ -447,7 +449,9 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
     const slot = input.fill.topOpportunities[0];
     moves.push({
       title: `Recover ${slot.provider}'s ${slot.startTime} slot`,
-      why: `${slot.duration}-minute opening is best used for ${slot.suggestedService} with ${slot.suggestedAction.replace('_', ' ')} outreach.`,
+      why: slot.recommendedTarget
+        ? `${slot.duration}-minute opening is best used for ${slot.suggestedService} by targeting ${slot.recommendedTarget}. ${slot.rationale}`
+        : `${slot.duration}-minute opening is best used for ${slot.suggestedService} with ${slot.suggestedAction.replace('_', ' ')} outreach. ${slot.rationale}`,
       owner: 'frontdesk',
       urgency: 'today',
       estimatedImpact: `Recover ${formatCurrency(slot.estimatedValue)} of slot value`,
