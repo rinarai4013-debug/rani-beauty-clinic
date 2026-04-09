@@ -26,7 +26,8 @@ const ContactSchema = z.object({
   email: z.string().email(),
   phone: z.string().max(20).optional().default(""),
   service: z.string().min(1).max(100),
-  message: z.string().max(2000).optional().default(""),
+  message: z.string().max(2000).optional().default("")
+    .transform((val) => val.replace(/<[^>]*>/g, "")),
   honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
 

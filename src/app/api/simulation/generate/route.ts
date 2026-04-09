@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateAISimulation } from '@/lib/photo-simulation/ai-simulation';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 // ─── Request Schema ─────────────────────────────────────────────────────
 
@@ -14,6 +15,10 @@ const simulationRequestSchema = z.object({
 // ─── POST Handler ───────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('simulation', ip, RATE_LIMITS.AI);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   try {
     const body = await request.json();
 

@@ -1,2 +1,10 @@
-import { NextResponse } from "next/server";
-export async function GET() { return NextResponse.json({ status: "not_implemented" }, { status: 501 }); }
+import { NextRequest, NextResponse } from "next/server";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+
+export async function GET(req: NextRequest) {
+  const ip = getClientIP(req);
+  const { allowed, resetIn } = rateLimit("ai", ip, RATE_LIMITS.AI);
+  if (!allowed) return rateLimitResponse(resetIn);
+
+  return NextResponse.json({ status: "not_implemented" }, { status: 501 });
+}

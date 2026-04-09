@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getNextStatus, getAutoFollowUp } from '@/lib/plan-builder/plan-status';
@@ -39,6 +40,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('plan-track', ip, RATE_LIMITS.VIEW);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   try {
     const { id } = params;
 

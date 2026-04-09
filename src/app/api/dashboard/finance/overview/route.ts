@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
+import { getCouncilAgent, getCouncilSnapshot } from '@/lib/dashboard/agent-council';
 
 export async function GET() {
   const session = await getSession();
@@ -11,22 +12,12 @@ export async function GET() {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
+  const snapshot = getCouncilSnapshot();
+
   return NextResponse.json({
-    agent: {
-      id: 'finance-strategist',
-      name: 'Finance Strategist',
-      focus: 'Liquidity, margin protection, and revenue pacing',
-    },
-    executivePartner: {
-      id: 'ceo-chief-of-staff',
-      name: 'CEO Chief of Staff',
-      focus: 'Executive prioritization and daily action ranking',
-    },
-    criticalMoves: [
-      'Protect liquidity before expanding spend',
-      'Track hero-package margin and financed close quality weekly',
-      'Use service-line targets instead of one blended revenue number',
-    ],
+    agent: getCouncilAgent('finance-strategist'),
+    executivePartner: getCouncilAgent('ceo-chief-of-staff'),
+    criticalMoves: snapshot.criticalMoves.slice(0, 3),
     priorities: [
       'Protect liquidity before expanding spend',
       'Track hero-package margin and financed close quality weekly',

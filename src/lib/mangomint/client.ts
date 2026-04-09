@@ -1,12 +1,11 @@
-// Mangomint API client for booking & scheduling data
-// Mangomint uses API keys for authentication
-// Docs: https://api.mangomint.com/docs
+// Mangomint integration — webhook verification only
+// Mangomint does NOT expose a public REST API, so all outbound API
+// functions have been removed. Booking data comes from Airtable
+// (populated by inbound Mangomint webhooks via n8n).
 
 import crypto from 'crypto';
 
-const MANGOMINT_API_KEY = process.env.MANGOMINT_API_KEY;
 const MANGOMINT_WEBHOOK_SECRET = process.env.MANGOMINT_WEBHOOK_SECRET;
-const BASE_URL = 'https://api.mangomint.com';
 
 export interface MangomintAppointment {
   id: number;
@@ -70,72 +69,54 @@ export interface WebhookPayload {
   timestamp: string;
 }
 
-async function mangomintFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  if (!MANGOMINT_API_KEY) {
-    throw new Error('MANGOMINT_API_KEY not configured');
-  }
+// ─── Stubs for callers that check API availability ──────────────────────────
+// These functions are called by booking/data.ts and mangomint-intelligence.ts.
+// They gracefully degrade — callers fall back to Airtable when these return
+// empty results or when isConfigured() returns false.
 
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      Authorization: `Basic ${MANGOMINT_API_KEY}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...(options?.headers || {}),
-    },
-  });
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(`Mangomint API error: ${res.status} - ${errorBody}`);
-  }
-
-  return res.json() as Promise<T>;
+/**
+ * Always returns false — Mangomint has no public API.
+ * Callers use this to decide whether to try the API or fall back to Airtable.
+ */
+export function isConfigured(): boolean {
+  return false;
 }
 
-export async function getAppointments(options?: {
+export function isWebhookConfigured(): boolean {
+  return !!MANGOMINT_WEBHOOK_SECRET;
+}
+
+/** @deprecated Mangomint has no public API — always throws */
+export async function getAppointments(_options?: {
   startDate?: string;
   endDate?: string;
   status?: string;
   limit?: number;
   offset?: number;
 }): Promise<MangomintAppointment[]> {
-  const params = new URLSearchParams();
-  if (options?.startDate) params.set('startDate', options.startDate);
-  if (options?.endDate) params.set('endDate', options.endDate);
-  if (options?.status) params.set('status', options.status);
-  params.set('limit', String(options?.limit || 100));
-  if (options?.offset) params.set('offset', String(options.offset));
-
-  const query = params.toString();
-  return mangomintFetch<MangomintAppointment[]>(
-    `/appointments${query ? `?${query}` : ''}`
-  );
+  throw new Error('Mangomint does not expose a public API. Use Airtable data instead.');
 }
 
-export async function getClients(options?: {
+/** @deprecated Mangomint has no public API — always throws */
+export async function getClients(_options?: {
   limit?: number;
   offset?: number;
   search?: string;
 }): Promise<MangomintClient[]> {
-  const params = new URLSearchParams();
-  params.set('limit', String(options?.limit || 100));
-  if (options?.offset) params.set('offset', String(options.offset));
-  if (options?.search) params.set('search', options.search);
-
-  return mangomintFetch<MangomintClient[]>(
-    `/clients?${params.toString()}`
-  );
+  throw new Error('Mangomint does not expose a public API. Use Airtable data instead.');
 }
 
+/** @deprecated Mangomint has no public API — always throws */
 export async function getServices(): Promise<MangomintService[]> {
-  return mangomintFetch<MangomintService[]>('/services');
+  throw new Error('Mangomint does not expose a public API. Use Airtable data instead.');
 }
 
+/** @deprecated Mangomint has no public API — always throws */
 export async function getTodayAppointments(): Promise<MangomintAppointment[]> {
-  const today = new Date().toISOString().substring(0, 10);
-  return getAppointments({ startDate: today, endDate: today });
+  throw new Error('Mangomint does not expose a public API. Use Airtable data instead.');
 }
+
+// ─── Webhook Verification (active — this is how Mangomint data flows in) ────
 
 export function verifyWebhookSignature(
   body: string,
@@ -148,12 +129,4 @@ export function verifyWebhookSignature(
     .update(body)
     .digest('hex');
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
-}
-
-export function isConfigured(): boolean {
-  return !!MANGOMINT_API_KEY;
-}
-
-export function isWebhookConfigured(): boolean {
-  return !!MANGOMINT_WEBHOOK_SECRET;
 }

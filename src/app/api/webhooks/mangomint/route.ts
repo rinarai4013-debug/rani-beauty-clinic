@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import type Airtable from 'airtable';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
-import { cache } from '@/lib/cache';
+import { cache, TTL } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { captureWebhookEvent } from '@/lib/sentry-utils';
@@ -18,19 +18,67 @@ import { captureWebhookEvent } from '@/lib/sentry-utils';
 
 // ─── Helpers ───
 
+const WEBHOOK_DEDUPE_TTL_MS = TTL.MODERATE;
+const ALERT_DEDUPE_TTL_MS = 24 * 60 * 60 * 1000;
+
 async function forwardToN8n(webhookPath: string, payload: unknown): Promise<void> {
   const n8nUrl = process.env.N8N_WEBHOOK_URL;
   if (!n8nUrl) return;
   try {
-    await fetch(`${n8nUrl}${webhookPath}`, {
+    const response = await fetch(`${n8nUrl}${webhookPath}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
     });
-    logWebhookEvent('mangomint', 'n8n-forward', true, { webhookPath });
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      logWebhookEvent('mangomint', 'n8n-forward', false, {
+        webhookPath,
+        status: response.status,
+        responseBody: body.substring(0, 500),
+      });
+      return;
+    }
+    logWebhookEvent('mangomint', 'n8n-forward', true, { webhookPath, status: response.status });
   } catch (err) {
     logWebhookEvent('mangomint', 'n8n-forward', false, { webhookPath, error: String(err) });
   }
+}
+
+function buildWebhookDedupeKey(event: string, data: Record<string, unknown>): string {
+  const identity =
+    String(data.id || data.appointmentId || data.saleId || data.clientId || data.membershipId || 'unknown');
+  const freshness =
+    String(
+      data.updatedAt ||
+      data.completed_at ||
+      data.completedAt ||
+      data.cancel_date ||
+      data.cancelDate ||
+      data.startAt ||
+      data.status ||
+      '',
+    );
+
+  return `mangomint:webhook:${event}:${identity}:${freshness}`;
+}
+
+function shouldSkipDuplicateWebhook(event: string, data: Record<string, unknown>): boolean {
+  const key = buildWebhookDedupeKey(event, data);
+  if (cache.get<boolean>(key)) {
+    return true;
+  }
+  cache.set(key, true, WEBHOOK_DEDUPE_TTL_MS);
+  return false;
+}
+
+function shouldCreateAlertOnce(key: string): boolean {
+  if (cache.get<boolean>(key)) {
+    return false;
+  }
+  cache.set(key, true, ALERT_DEDUPE_TTL_MS);
+  return true;
 }
 
 async function findRecordByField(
@@ -165,9 +213,9 @@ async function handleAppointmentCancelled(data: Record<string, unknown>) {
     ['MangoMint Appointment ID']
   );
 
-  if (existingId) {
-    const cancelReason = (data.cancellationReason as string) || (data.cancelReason as string) || '';
-    const isLateCancellation = (data.isLateCancellation as boolean) || false;
+    if (existingId) {
+      const cancelReason = (data.cancellationReason as string) || (data.cancelReason as string) || '';
+      const isLateCancellation = (data.isLateCancellation as boolean) || false;
 
     await upsertRecord(Tables.appointments(), existingId, {
       Status: 'Cancelled',
@@ -175,7 +223,7 @@ async function handleAppointmentCancelled(data: Record<string, unknown>) {
     });
 
     // Create alert for late cancellations
-    if (isLateCancellation) {
+    if (isLateCancellation && shouldCreateAlertOnce(`mangomint:alert:late-cancellation:${mangomintId}`)) {
       try {
         await rateLimitedQuery(() =>
           new Promise<void>((resolve, reject) => {
@@ -226,26 +274,28 @@ async function handleAppointmentNoshow(data: Record<string, unknown>) {
   const clientName = [(data.clientFirstName as string), (data.clientLastName as string)].filter(Boolean).join(' ') || (data.clientName as string) || 'Client';
   const serviceName = (data.serviceName as string) || 'appointment';
 
-  try {
-    await rateLimitedQuery(() =>
-      new Promise<void>((resolve, reject) => {
-        Tables.alerts().create(
-          [{
-            fields: {
-              Type: 'no_show',
-              Severity: 'warning',
-              Message: `No-show: ${clientName} missed ${serviceName} - charge 100% fee`,
-              'Action Recommended': 'Charge no-show fee. Consider adding to watch list.',
-              Status: 'active',
-            },
-          }],
-          { typecast: true },
-          (err) => { if (err) reject(err); else resolve(); }
-        );
-      })
-    );
-  } catch {
-    // Alert creation is best-effort
+  if (shouldCreateAlertOnce(`mangomint:alert:no-show:${mangomintId}`)) {
+    try {
+      await rateLimitedQuery(() =>
+        new Promise<void>((resolve, reject) => {
+          Tables.alerts().create(
+            [{
+              fields: {
+                Type: 'no_show',
+                Severity: 'warning',
+                Message: `No-show: ${clientName} missed ${serviceName} - charge 100% fee`,
+                'Action Recommended': 'Charge no-show fee. Consider adding to watch list.',
+                Status: 'active',
+              },
+            }],
+            { typecast: true },
+            (err) => { if (err) reject(err); else resolve(); }
+          );
+        })
+      );
+    } catch {
+      // Alert creation is best-effort
+    }
   }
 
   cache.invalidatePrefix('schedule');
@@ -455,6 +505,12 @@ export async function POST(request: NextRequest) {
     const payload = JSON.parse(body);
     const event = payload.event || payload.type || 'unknown';
     const data = payload.data || payload;
+
+    if (shouldSkipDuplicateWebhook(event, data)) {
+      logWebhookEvent('mangomint', event, true, { note: 'Duplicate webhook skipped' });
+      captureWebhookEvent('mangomint', event, true, { duplicate: true });
+      return NextResponse.json({ received: true, event, duplicate: true });
+    }
 
     logWebhookEvent('mangomint', event, true, { dataPreview: JSON.stringify(data).substring(0, 200) });
 

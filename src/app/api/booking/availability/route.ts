@@ -4,6 +4,7 @@ import { AvailabilityEngine, DEFAULT_PROVIDERS, DEFAULT_SCHEDULING_CONFIG } from
 import { BOOKABLE_SERVICES } from '@/lib/booking/services';
 import { loadAppointmentsForDate } from '@/lib/booking/data';
 import { logEvent } from '@/lib/logging/structured-logger';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 const querySchema = z.object({
   serviceId: z.string().min(1),
@@ -15,6 +16,10 @@ const querySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('booking-availability', ip, RATE_LIMITS.BOOKING);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   const params = Object.fromEntries(new URL(request.url).searchParams.entries());
   const parsed = querySchema.safeParse(params);
   if (!parsed.success) {

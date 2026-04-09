@@ -5,12 +5,57 @@ import { BOOKABLE_SERVICES } from '@/lib/booking/services';
 import { loadAppointmentsForDate, createAppointmentRecord, updateAppointmentRecord } from '@/lib/booking/data';
 import { logEvent } from '@/lib/logging/structured-logger';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { cache, TTL } from '@/lib/cache';
 import type { BookingRequest } from '@/lib/booking/types';
 import {
   createMangomintBooking,
   cancelMangomintBooking,
   rescheduleMangomintBooking,
 } from '@/lib/mangomint/writeback';
+
+const BOOKING_LOCK_TTL_MS = TTL.STANDARD;
+const BOOKING_RESULT_TTL_MS = TTL.RELAXED;
+
+function buildBookingDebugContext(input: BookingRequest) {
+  return {
+    serviceId: input.serviceId,
+    providerId: input.providerId,
+    roomId: input.roomId,
+    date: input.date,
+    startTime: input.startTime,
+    source: input.source,
+    hasClientId: Boolean(input.clientId),
+    hasClientInfo: Boolean(input.clientInfo),
+    isRecurring: Boolean(input.recurringConfig),
+    combinedServiceCount: input.combinedServiceIds?.length || 0,
+  };
+}
+
+function buildBookingDedupKey(input: BookingRequest): string {
+  const clientIdentity = input.clientId
+    || input.clientInfo?.email?.toLowerCase()
+    || input.clientInfo?.phone
+    || 'anonymous';
+
+  return [
+    'booking',
+    clientIdentity,
+    input.serviceId,
+    input.providerId,
+    input.roomId,
+    input.date,
+    input.startTime,
+    input.source,
+  ].join(':');
+}
+
+function buildBookingLockKey(input: BookingRequest): string {
+  return `${buildBookingDedupKey(input)}:lock`;
+}
+
+function buildBookingResultKey(input: BookingRequest): string {
+  return `${buildBookingDedupKey(input)}:result`;
+}
 
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const timeSchema = z.string().regex(/^\d{2}:\d{2}$/);
@@ -137,6 +182,24 @@ export async function POST(request: NextRequest) {
   }
 
   const requestData = parsed.data as BookingRequest;
+  const lockKey = buildBookingLockKey(requestData);
+  const resultKey = buildBookingResultKey(requestData);
+  const cachedResult = cache.get<Record<string, unknown>>(resultKey);
+
+  if (cachedResult) {
+    logEvent('api', 'info', 'Duplicate booking submission resolved from cache', buildBookingDebugContext(requestData));
+    return NextResponse.json({ ...cachedResult, duplicate: true });
+  }
+
+  if (cache.get<boolean>(lockKey)) {
+    logEvent('api', 'warn', 'Duplicate booking submission suppressed', buildBookingDebugContext(requestData));
+    return NextResponse.json(
+      { error: 'Duplicate booking request detected. Please wait a moment before trying again.' },
+      { status: 409 },
+    );
+  }
+
+  cache.set(lockKey, true, BOOKING_LOCK_TTL_MS);
 
   try {
     const appointments = await loadAppointmentsForDate(requestData.date);
@@ -171,16 +234,24 @@ export async function POST(request: NextRequest) {
       date: result.appointment.date,
     });
 
-    return NextResponse.json({
+    const responsePayload = {
       ...result,
       sync,
       bookingMode: sync.bookingMode || 'api',
       operatorNote: sync.status === 'redirect_required'
         ? 'Use the hosted Mangomint booking flow for the final customer-facing booking confirmation.'
         : undefined,
-    });
+    };
+
+    cache.set(resultKey, responsePayload, BOOKING_RESULT_TTL_MS);
+    cache.invalidate(lockKey);
+    return NextResponse.json(responsePayload);
   } catch (error) {
-    logEvent('api', 'error', 'Booking failed', { error: String(error) });
+    cache.invalidate(lockKey);
+    logEvent('api', 'error', 'Booking failed', {
+      ...buildBookingDebugContext(requestData),
+      error: String(error),
+    });
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
   }
 }

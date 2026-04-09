@@ -3,8 +3,14 @@ import { addDays, format, subDays } from 'date-fns';
 import { buildReminderSchedule, processDueReminders, generateRebookingNudges } from '@/lib/booking/reminders';
 import { loadAppointmentsForRange } from '@/lib/booking/data';
 import { logEvent } from '@/lib/logging/structured-logger';
+import { getSession } from '@/lib/auth/session';
 
 export async function GET(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const type = new URL(request.url).searchParams.get('type');
   const today = new Date();
   const startDate = format(subDays(today, 365), 'yyyy-MM-dd');

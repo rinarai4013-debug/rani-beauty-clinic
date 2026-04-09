@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
+import { getCouncilAgent } from '@/lib/dashboard/agent-council';
 
 export async function GET() {
   const session = await getSession();
@@ -12,11 +13,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    agent: {
-      id: 'seo-queen',
-      name: 'SEO Queen',
-      focus: 'Local search visibility and geo-page growth',
-    },
+    agent: getCouncilAgent('seo-queen'),
     localSearchFocus: [
       'Service + city pages tied to the hero packages driving the current sprint',
       'Review capture and response loops that build local trust signals',

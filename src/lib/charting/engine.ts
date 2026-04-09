@@ -87,13 +87,7 @@ export interface ChartListFilter {
 const CHART_TABLE_NAME = 'Chart Notes';
 
 function getChartTable() {
-  // Access the Chart Notes table via the Airtable base
-  // We use a direct table reference since it is not yet in the Tables object
-  const Airtable = require('airtable');
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(
-    process.env.AIRTABLE_BASE_ID!
-  );
-  return base(CHART_TABLE_NAME);
+  return Tables.chartNotes();
 }
 
 // ─── Validation Engine ───

@@ -6,6 +6,7 @@ import { CalendarManager } from '@/lib/booking/calendar';
 import { loadAppointmentsForRange } from '@/lib/booking/data';
 import { logEvent } from '@/lib/logging/structured-logger';
 import { endOfMonth, endOfWeek, format, parseISO, startOfMonth, startOfWeek } from 'date-fns';
+import { getSession } from '@/lib/auth/session';
 
 const querySchema = z.object({
   view: z.enum(['day', 'week', 'month']).optional(),
@@ -15,6 +16,11 @@ const querySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const params = Object.fromEntries(new URL(request.url).searchParams.entries());
   const parsed = querySchema.safeParse(params);
   if (!parsed.success) {

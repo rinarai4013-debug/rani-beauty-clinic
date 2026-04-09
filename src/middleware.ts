@@ -125,6 +125,38 @@ async function extractTenantFromJWT(token: string): Promise<string | null> {
   }
 }
 
+// ─── Dashboard Rate Limiting ───────────────────────────────────────────────
+
+const DASHBOARD_LIMIT = 60; // requests per window
+const DASHBOARD_WINDOW_MS = 60_000; // 1 minute
+const dashboardIpCounts = new Map<string, { count: number; resetAt: number }>();
+
+function getDashboardRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  // Lazy cleanup when map grows too large
+  if (dashboardIpCounts.size > 1000) {
+    for (const [k, v] of dashboardIpCounts) {
+      if (now > v.resetAt) dashboardIpCounts.delete(k);
+    }
+  }
+  const entry = dashboardIpCounts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    dashboardIpCounts.set(ip, { count: 1, resetAt: now + DASHBOARD_WINDOW_MS });
+    return { allowed: true, remaining: DASHBOARD_LIMIT - 1, resetIn: DASHBOARD_WINDOW_MS };
+  }
+  if (entry.count >= DASHBOARD_LIMIT) {
+    return { allowed: false, remaining: 0, resetIn: entry.resetAt - now };
+  }
+  entry.count++;
+  return { allowed: true, remaining: DASHBOARD_LIMIT - entry.count, resetIn: entry.resetAt - now };
+}
+
+function getRequestIP(req: NextRequest): string {
+  const forwarded = req.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.headers.get('x-real-ip') ?? '127.0.0.1';
+}
+
 // ─── Middleware ──────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
@@ -171,8 +203,29 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  // ── 4. API routes: CORS + webhook headers ──
+  // ── 4. API routes: rate limiting, CORS + webhook headers ──
   if (pathname.startsWith('/api/')) {
+    // Dashboard rate limiting — 60 req/min per IP across all dashboard routes
+    if (pathname.startsWith('/api/dashboard')) {
+      const ip = getRequestIP(request);
+      const { allowed, remaining, resetIn } = getDashboardRateLimit(ip);
+      if (!allowed) {
+        return new NextResponse(
+          JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+          {
+            status: 429,
+            headers: {
+              'Content-Type': 'application/json',
+              'Retry-After': String(Math.ceil(resetIn / 1000)),
+              'X-RateLimit-Limit': String(DASHBOARD_LIMIT),
+              'X-RateLimit-Remaining': '0',
+            },
+          },
+        );
+      }
+      // Rate limit headers added to response at the end of this block
+    }
+
     // Webhook routes (server-to-server) — restricted headers, no browser CORS
     if (pathname.startsWith('/api/webhooks/')) {
       if (request.method === 'OPTIONS') {
@@ -277,6 +330,16 @@ export async function middleware(request: NextRequest) {
   // Add CORS headers to API responses
   if (pathname.startsWith('/api/')) {
     setApiCorsHeaders(response, request);
+  }
+
+  // Add rate limit headers to dashboard responses
+  if (pathname.startsWith('/api/dashboard')) {
+    const ip = getRequestIP(request);
+    const entry = dashboardIpCounts.get(ip);
+    if (entry) {
+      response.headers.set('X-RateLimit-Limit', String(DASHBOARD_LIMIT));
+      response.headers.set('X-RateLimit-Remaining', String(Math.max(0, DASHBOARD_LIMIT - entry.count)));
+    }
   }
 
   return response;
