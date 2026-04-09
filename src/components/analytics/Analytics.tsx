@@ -2,7 +2,7 @@ import Script from "next/script";
 import { clinicInfo } from "@/data/clinic-info";
 
 export default function Analytics() {
-  const { ga4, gtm, metaPixel, clarity, hotjar } = clinicInfo.analytics;
+  const { ga4, gtm, metaPixel, clarity } = clinicInfo.analytics;
 
   return (
     <>
