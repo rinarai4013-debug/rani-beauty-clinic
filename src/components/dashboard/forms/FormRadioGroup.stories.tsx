@@ -52,20 +52,22 @@ export const TwoColumns: Story = {
   },
 };
 
+function InteractiveRender() {
+  const [value, setValue] = useState('');
+  return (
+    <FormRadioGroup
+      value={value}
+      onChange={setValue}
+      options={[
+        { value: 'new', label: 'New Lead' },
+        { value: 'consult', label: 'Consulted' },
+        { value: 'booked', label: 'Booked' },
+      ]}
+      columns={3}
+    />
+  );
+}
+
 export const Interactive: StoryObj = {
-  render: () => {
-    const [value, setValue] = useState('');
-    return (
-      <FormRadioGroup
-        value={value}
-        onChange={setValue}
-        options={[
-          { value: 'new', label: 'New Lead' },
-          { value: 'consult', label: 'Consulted' },
-          { value: 'booked', label: 'Booked' },
-        ]}
-        columns={3}
-      />
-    );
-  },
+  render: () => <InteractiveRender />,
 };

@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { createMagicLinkToken } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -12,6 +13,10 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   try {
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);

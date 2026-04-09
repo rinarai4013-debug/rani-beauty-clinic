@@ -22,6 +22,8 @@ export const RATE_LIMITS = {
   AI: { limit: 10, windowMs: 60_000 },
   /** Plan viewing - relaxed: 30 per minute */
   VIEW: { limit: 30, windowMs: 60_000 },
+  /** Booking endpoints - moderate: 15 per minute */
+  BOOKING: { limit: 15, windowMs: 60_000 },
   /** Webhooks - generous: 100 per minute */
   WEBHOOK: { limit: 100, windowMs: 60_000 },
 } as const;

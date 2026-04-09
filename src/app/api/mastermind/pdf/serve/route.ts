@@ -8,8 +8,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { retrievePdf } from '@/lib/mastermind/pdf-storage';
+import { getSession } from "@/lib/auth/session";
 
 export async function GET(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const filename = request.nextUrl.searchParams.get('file');
 
   if (!filename) {

@@ -1,0 +1,143 @@
+{
+  "name": "Membership Canceled \u2192 Email Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "membership-canceled",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "id": "c3d4e5f6-3333-4ccc-b333-000000000001",
+      "name": "Webhook",
+      "webhookId": "c3d4e5f6-3333-4ccc-b333-100000000001"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f3000001-0001-4000-8000-000000000001",
+              "name": "clientName",
+              "value": "={{ $json.data?.client_name ?? $json.data?.clientName ?? 'Client' }}",
+              "type": "string"
+            },
+            {
+              "id": "f3000001-0001-4000-8000-000000000002",
+              "name": "membershipName",
+              "value": "={{ $json.data?.membership_name ?? $json.data?.membershipName ?? $json.data?.membership_tier ?? 'Membership' }}",
+              "type": "string"
+            },
+            {
+              "id": "f3000001-0001-4000-8000-000000000003",
+              "name": "cancelReason",
+              "value": "={{ $json.data?.cancel_reason ?? $json.data?.cancelReason ?? 'No reason provided' }}",
+              "type": "string"
+            },
+            {
+              "id": "f3000001-0001-4000-8000-000000000004",
+              "name": "cancelDate",
+              "value": "={{ $json.data?.cancel_date ?? $json.data?.cancelDate ?? new Date().toISOString().split('T')[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [440, 300],
+      "id": "c3d4e5f6-3333-4ccc-b333-000000000002",
+      "name": "Extract Cancel Fields"
+    },
+    {
+      "parameters": {
+        "fromEmail": "info@ranibeautyclinic.com",
+        "toEmail": "info@ranibeautyclinic.com",
+        "subject": "=\u26a0\ufe0f Membership Canceled \u2014 {{ $json.clientName }}",
+        "html": "=<div style=\"font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #fafafa; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a1a; margin: 0 0 20px 0; font-size: 22px;\">\u26a0\ufe0f Membership Canceled</h2>\n  <table style=\"width: 100%; border-collapse: collapse;\">\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Client</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px;\">{{ $json.clientName }}</td></tr>\n    <tr style=\"background: #fff;\"><td style=\"padding: 10px; color: #666; font-size: 14px;\">Membership</td><td style=\"padding: 10px; font-weight: 600; font-size: 14px;\">{{ $json.membershipName }}</td></tr>\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Reason</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px; color: #dc2626;\">{{ $json.cancelReason }}</td></tr>\n    <tr style=\"background: #fff;\"><td style=\"padding: 10px; color: #666; font-size: 14px;\">Cancel Date</td><td style=\"padding: 10px; font-weight: 600; font-size: 14px;\">{{ $json.cancelDate }}</td></tr>\n  </table>\n  <div style=\"margin-top: 20px; padding: 16px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #dc2626;\">\n    <p style=\"margin: 0 0 8px 0; font-size: 14px; color: #991b1b; font-weight: 600;\">Action Required:</p>\n    <ul style=\"margin: 0; padding-left: 20px; font-size: 14px; color: #991b1b;\">\n      <li>Reach out to {{ $json.clientName }} within 24 hours</li>\n      <li>Offer retention: 1 free month or tier downgrade</li>\n      <li>Document outcome in Mangomint notes</li>\n    </ul>\n  </div>\n  <p style=\"color: #999; font-size: 12px; margin-top: 20px; text-align: center;\">Rani Beauty Clinic \u2022 Automated via n8n</p>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 300],
+      "id": "c3d4e5f6-3333-4ccc-b333-000000000003",
+      "name": "Send Cancel Email",
+      "credentials": {
+        "smtp": {
+          "id": "de861Fmy6gbefBzY",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [920, 300],
+      "id": "c3d4e5f6-3333-4ccc-b333-000000000004",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Cancel Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Cancel Fields": {
+      "main": [
+        [
+          {
+            "node": "Send Cancel Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Cancel Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Rani Beauty Clinic",
+      "id": "rani-tag-001"
+    },
+    {
+      "name": "Memberships",
+      "id": "rani-tag-003"
+    }
+  ],
+  "triggerCount": 1,
+  "id": "wf-rani-membership-canceled-001",
+  "meta": {
+    "instanceId": "rani-beauty-clinic-n8n"
+  }
+}

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getSession } from "@/lib/auth/session";
 
 /**
  * GET /api/dashboard/revenue-optimizer
@@ -9,6 +10,11 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // In production, these would pull from Airtable and compute in real-time.
     // For now, return structured mock data that matches engine output types.
     const summary = {
