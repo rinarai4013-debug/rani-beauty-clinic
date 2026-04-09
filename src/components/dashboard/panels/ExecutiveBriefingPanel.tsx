@@ -37,6 +37,10 @@ interface ExecutiveScorecard {
   reactivationValue: number;
   highPriorityReactivationCount: number;
   providerPressureProvider: string | null;
+  fillValue: number;
+  financingReadyConsults: number;
+  avgConsultCloseProbability: number;
+  topGrowthChannel: string | null;
 }
 
 interface ExecutiveBriefingResponse {
@@ -116,7 +120,7 @@ export default function ExecutiveBriefingPanel() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 lg:min-w-[560px] lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 lg:min-w-[700px] lg:grid-cols-5">
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Revenue</p>
             <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.yesterdayRevenue)}</p>
@@ -138,12 +142,24 @@ export default function ExecutiveBriefingPanel() {
             <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.reactivationValue)}</p>
           </div>
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Fill Value</p>
+            <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.fillValue)}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Stuck Consults</p>
             <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.stuckConsults}</p>
           </div>
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Financing Ready</p>
+            <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.financingReadyConsults}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Provider Pressure</p>
             <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.providerPressureProvider ?? 'Stable'}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Top Channel</p>
+            <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.topGrowthChannel ?? 'Unknown'}</p>
           </div>
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Cash</p>

@@ -55,6 +55,10 @@ export interface ExecutiveScorecard {
   reactivationValue: number;
   highPriorityReactivationCount: number;
   providerPressureProvider: string | null;
+  fillValue: number;
+  financingReadyConsults: number;
+  avgConsultCloseProbability: number;
+  topGrowthChannel: string | null;
 }
 
 export interface ExecutiveBriefing {
@@ -126,6 +130,29 @@ export interface ExecutiveBriefingInput {
       recommendation: string;
     }[];
   };
+  fill?: {
+    openGapCount: number;
+    totalRecoverableValue: number;
+    topOpportunities: {
+      provider: string;
+      startTime: string;
+      duration: number;
+      suggestedService: string;
+      suggestedAction: 'outreach_lapsed' | 'book_consult' | 'offer_walkin';
+      estimatedValue: number;
+    }[];
+  };
+  growth?: {
+    topChannel: string | null;
+    weakestChannel: string | null;
+    referralRevenue: number;
+    topChannels: {
+      channel: string;
+      leads: number;
+      estimatedRevenue: number;
+      efficiency: 'strong' | 'watch' | 'weak';
+    }[];
+  };
 }
 
 interface ProviderPressureSignal {
@@ -161,6 +188,10 @@ function buildScorecard(input: ExecutiveBriefingInput): ExecutiveScorecard {
     reactivationValue: input.reactivation?.totalRecoverableValue ?? 0,
     highPriorityReactivationCount: input.reactivation?.highPriorityCount ?? 0,
     providerPressureProvider: input.providerInsights?.pressureProvider ?? null,
+    fillValue: input.fill?.totalRecoverableValue ?? 0,
+    financingReadyConsults: input.consults?.financingReadyCount ?? 0,
+    avgConsultCloseProbability: input.consults?.avgCloseProbability ?? 0,
+    topGrowthChannel: input.growth?.topChannel ?? null,
   };
 }
 
@@ -223,6 +254,14 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
     });
   }
 
+  if ((input.consults?.financingReadyCount ?? 0) > 0) {
+    points.push({
+      label: 'Financing-ready consults',
+      severity: 'info',
+      detail: `${input.consults!.financingReadyCount} consult${input.consults!.financingReadyCount === 1 ? '' : 's'} are large enough to warrant financing-forward follow-up.`,
+    });
+  }
+
   if (input.clientGrowth && input.clientGrowth.churnedClients > input.clientGrowth.newClients) {
     points.push({
       label: 'Retention drag',
@@ -254,6 +293,22 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
       label: 'Underfilled provider capacity',
       severity: 'warning',
       detail: `${providerInsight.provider} has ${providerInsight.gapCount} open gap${providerInsight.gapCount === 1 ? '' : 's'} and ${providerInsight.noShowRate}% no-show exposure this week.`,
+    });
+  }
+
+  if ((input.fill?.openGapCount ?? 0) > 0) {
+    points.push({
+      label: 'Recoverable schedule value',
+      severity: input.fill!.openGapCount >= 3 ? 'warning' : 'info',
+      detail: `${input.fill!.openGapCount} open slot${input.fill!.openGapCount === 1 ? '' : 's'} hold ${formatCurrency(input.fill!.totalRecoverableValue)} in same-day recovery potential.`,
+    });
+  }
+
+  if (input.growth?.weakestChannel) {
+    points.push({
+      label: 'Channel softness',
+      severity: 'info',
+      detail: `${input.growth.weakestChannel} is the weakest current channel and may need message or spend adjustment.`,
     });
   }
 
@@ -318,6 +373,20 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
     });
   }
 
+  if (input.consults?.topOpportunities[0]?.financingReady) {
+    const financingTarget = input.consults.topOpportunities.find((consult) => consult.financingReady);
+    if (financingTarget) {
+      moves.push({
+        title: `Close ${financingTarget.patientName} with financing`,
+        why: `${financingTarget.patientName} is ${financingTarget.clinicStatus} with ${financingTarget.closeProbability}% close probability and a financing-sized plan.`,
+        owner: 'provider',
+        urgency: 'today',
+        estimatedImpact: `Protect ${formatCurrency(financingTarget.estimatedValue)} with a payment-path follow-up`,
+        actionType: 'revenue_recovery',
+      });
+    }
+  }
+
   if (input.reactivation?.topOpportunities[0]) {
     const target = input.reactivation.topOpportunities[0];
     moves.push({
@@ -363,6 +432,18 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
     });
   }
 
+  if (input.fill?.topOpportunities[0]) {
+    const slot = input.fill.topOpportunities[0];
+    moves.push({
+      title: `Recover ${slot.provider}'s ${slot.startTime} slot`,
+      why: `${slot.duration}-minute opening is best used for ${slot.suggestedService} with ${slot.suggestedAction.replace('_', ' ')} outreach.`,
+      owner: 'frontdesk',
+      urgency: 'today',
+      estimatedImpact: `Recover ${formatCurrency(slot.estimatedValue)} of slot value`,
+      actionType: 'schedule_fill',
+    });
+  }
+
   if (input.clientGrowth && input.clientGrowth.churnedClients > input.clientGrowth.newClients) {
     moves.push({
       title: 'Launch a member save push',
@@ -381,6 +462,17 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
       owner: 'marketing',
       urgency: 'today',
       estimatedImpact: 'Higher consult and booking conversion',
+      actionType: 'marketing',
+    });
+  }
+
+  if (input.growth?.topChannels[0]) {
+    moves.push({
+      title: `Double down on ${input.growth.topChannels[0].channel}`,
+      why: `${input.growth.topChannels[0].channel} is currently the top growth channel by estimated value.`,
+      owner: 'marketing',
+      urgency: 'this_week',
+      estimatedImpact: `Protect ${formatCurrency(input.growth.topChannels[0].estimatedRevenue)} of channel momentum`,
       actionType: 'marketing',
     });
   }
@@ -409,7 +501,7 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
 
   return moves
     .sort((a, b) => scoreMove(b) - scoreMove(a))
-    .slice(0, 8);
+    .slice(0, 10);
 }
 
 function scoreMove(move: ExecutiveMove): number {
@@ -454,6 +546,14 @@ function buildWatchList(input: ExecutiveBriefingInput): string[] {
 
   if ((input.reactivation?.lapsed90 ?? 0) > 0) {
     items.push(`${input.reactivation!.lapsed90} clients are in the 90-day lapse bucket and should not sit idle.`);
+  }
+
+  if ((input.consults?.staleCount ?? 0) > 0) {
+    items.push(`${input.consults!.staleCount} consult${input.consults!.staleCount === 1 ? '' : 's'} have been quiet for a week or more.`);
+  }
+
+  if (input.growth?.weakestChannel) {
+    items.push(`${input.growth.weakestChannel} is currently the weakest growth channel.`);
   }
 
   const providerPressure = getProviderPressure(input.providerPerformance);

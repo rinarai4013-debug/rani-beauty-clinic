@@ -6,8 +6,11 @@ export interface ConsultIntelligence {
   activeConsults: number;
   weightedPipelineValue: number;
   stuckCount: number;
+  staleCount: number;
   reviewNeededCount: number;
   bookedCount: number;
+  financingReadyCount: number;
+  avgCloseProbability: number;
   topPriority:
     | {
         patientName: string;
@@ -15,6 +18,14 @@ export interface ConsultIntelligence {
         estimatedValue: number;
       }
     | null;
+  topOpportunities: {
+    patientName: string;
+    clinicStatus: ClinicStatus;
+    estimatedValue: number;
+    closeProbability: number;
+    financingReady: boolean;
+    action: string;
+  }[];
 }
 
 interface IntakeFields {
@@ -58,6 +69,13 @@ function deriveClinicStatus(session: MastermindSession): ClinicStatus {
   return 'new';
 }
 
+function getCloseProbability(clinicStatus: ClinicStatus, needsReview: boolean, isStuck: boolean): number {
+  const base = STAGE_PROBABILITIES[clinicStatus] ?? 0.1;
+  if (needsReview) return Math.max(0.15, base - 0.1);
+  if (isStuck) return Math.max(0.1, base - 0.15);
+  return base;
+}
+
 function normalizeSessionConsult(session: MastermindSession) {
   const clinicStatus = deriveClinicStatus(session);
   const estimatedValue = estimateSessionValue(session);
@@ -68,14 +86,22 @@ function normalizeSessionConsult(session: MastermindSession) {
     (REVIEWABLE_PHASES.includes(session.phase) ||
       (session.phase === 'provider_review' && session.providerReview?.approvalStatus === 'pending'));
 
+  const isStuck = estimatedValue > 500 && daysSinceLastActivity > 3 && !['booked', 'contacted'].includes(clinicStatus);
+  const closeProbability = getCloseProbability(clinicStatus, needsReview, isStuck);
+  const financingReady =
+    estimatedValue >= 2000 &&
+    (clinicStatus === 'reviewed' || clinicStatus === 'contacted' || clinicStatus === 'booked');
+
   return {
     patientName: session.patientName || 'Unknown',
     clinicStatus,
     estimatedValue,
-    weightedValue: Math.round(estimatedValue * (STAGE_PROBABILITIES[clinicStatus] ?? 0.1)),
+    weightedValue: Math.round(estimatedValue * closeProbability),
+    closeProbability,
     daysSinceLastActivity,
-    isStuck: estimatedValue > 500 && daysSinceLastActivity > 3 && !['booked', 'contacted'].includes(clinicStatus),
+    isStuck,
     needsReview,
+    financingReady,
   };
 }
 
@@ -100,14 +126,20 @@ function normalizeIntakeConsult(record: { id: string; fields: IntakeFields; crea
   const createdAt = record.createdTime ? new Date(record.createdTime).getTime() : Date.now();
   const daysSinceLastActivity = Math.floor((Date.now() - createdAt) / 86400000);
 
+  const isStuck = estimatedValue > 500 && daysSinceLastActivity > 3 && clinicStatus === 'new';
+  const closeProbability = getCloseProbability(clinicStatus, false, isStuck);
+  const financingReady = estimatedValue >= 1800 && clinicStatus !== 'new';
+
   return {
     patientName: record.fields['Full Name'] || 'Unknown',
     clinicStatus,
     estimatedValue,
-    weightedValue: Math.round(estimatedValue * (STAGE_PROBABILITIES[clinicStatus] ?? 0.1)),
+    weightedValue: Math.round(estimatedValue * closeProbability),
+    closeProbability,
     daysSinceLastActivity,
-    isStuck: estimatedValue > 500 && daysSinceLastActivity > 3 && clinicStatus === 'new',
+    isStuck,
     needsReview: false,
+    financingReady,
   };
 }
 
@@ -117,8 +149,10 @@ function getPriorityAction(consult: {
   isStuck: boolean;
   needsReview: boolean;
   estimatedValue: number;
+  financingReady?: boolean;
 }): string {
   if (consult.needsReview) return 'Provider review needed';
+  if (consult.financingReady && consult.clinicStatus === 'reviewed') return 'Send plan and financing follow-up';
   if (consult.isStuck) return 'Personal follow-up needed';
   if (consult.clinicStatus === 'new') return 'Convert to consult call';
   if (consult.clinicStatus === 'reviewed') return 'Send plan and financing follow-up';
@@ -152,17 +186,35 @@ export async function fetchConsultIntelligence(): Promise<ConsultIntelligence> {
     const stuckConsults = allConsults
       .filter((consult) => consult.isStuck)
       .sort((a, b) => b.estimatedValue - a.estimatedValue);
+    const staleConsults = allConsults.filter((consult) => consult.daysSinceLastActivity >= 7);
     const reviewNeeded = allConsults.filter((consult) => consult.needsReview);
+    const financingReady = allConsults.filter((consult) => consult.financingReady);
     const bookedCount = allConsults.filter((consult) => consult.clinicStatus === 'booked').length;
     const topPriorityCandidate = [...reviewNeeded, ...stuckConsults, ...allConsults]
       .sort((a, b) => b.estimatedValue - a.estimatedValue)[0];
+    const topOpportunities = [...allConsults]
+      .sort((a, b) => (b.weightedValue - a.weightedValue) || (b.estimatedValue - a.estimatedValue))
+      .slice(0, 5)
+      .map((consult) => ({
+        patientName: consult.patientName,
+        clinicStatus: consult.clinicStatus,
+        estimatedValue: consult.estimatedValue,
+        closeProbability: consult.closeProbability,
+        financingReady: consult.financingReady,
+        action: getPriorityAction(consult),
+      }));
 
     return {
       activeConsults,
       weightedPipelineValue,
       stuckCount: stuckConsults.length,
+      staleCount: staleConsults.length,
       reviewNeededCount: reviewNeeded.length,
       bookedCount,
+      financingReadyCount: financingReady.length,
+      avgCloseProbability: allConsults.length > 0
+        ? Math.round((allConsults.reduce((sum, consult) => sum + consult.closeProbability, 0) / allConsults.length) * 100)
+        : 0,
       topPriority: topPriorityCandidate
         ? {
             patientName: topPriorityCandidate.patientName,
@@ -170,6 +222,7 @@ export async function fetchConsultIntelligence(): Promise<ConsultIntelligence> {
             estimatedValue: topPriorityCandidate.estimatedValue,
           }
         : null,
+      topOpportunities,
     };
   } catch (error) {
     console.error('[Briefing] Failed to fetch consult intelligence:', error);
@@ -177,9 +230,13 @@ export async function fetchConsultIntelligence(): Promise<ConsultIntelligence> {
       activeConsults: 0,
       weightedPipelineValue: 0,
       stuckCount: 0,
+      staleCount: 0,
       reviewNeededCount: 0,
       bookedCount: 0,
+      financingReadyCount: 0,
+      avgCloseProbability: 0,
       topPriority: null,
+      topOpportunities: [],
     };
   }
 }

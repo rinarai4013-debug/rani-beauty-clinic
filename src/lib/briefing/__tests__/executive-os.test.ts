@@ -193,13 +193,26 @@ describe('buildExecutiveBriefing', () => {
         activeConsults: 7,
         weightedPipelineValue: 6800,
         stuckCount: 2,
+        staleCount: 1,
         reviewNeededCount: 1,
         bookedCount: 1,
+        financingReadyCount: 2,
+        avgCloseProbability: 47,
         topPriority: {
           patientName: 'Aria Stone',
           action: 'Provider review needed',
           estimatedValue: 4200,
         },
+        topOpportunities: [
+          {
+            patientName: 'Aria Stone',
+            clinicStatus: 'reviewed',
+            estimatedValue: 4200,
+            closeProbability: 55,
+            financingReady: true,
+            action: 'Provider review needed',
+          },
+        ],
       },
       reactivation: {
         totalRecoverableValue: 2400,
@@ -234,6 +247,29 @@ describe('buildExecutiveBriefing', () => {
           },
         ],
       },
+      fill: {
+        openGapCount: 3,
+        totalRecoverableValue: 975,
+        topOpportunities: [
+          {
+            provider: 'Rina',
+            startTime: '14:00',
+            duration: 60,
+            suggestedService: 'HydraFacial',
+            suggestedAction: 'outreach_lapsed',
+            estimatedValue: 275,
+          },
+        ],
+      },
+      growth: {
+        topChannel: 'phone',
+        weakestChannel: 'email',
+        referralRevenue: 950,
+        topChannels: [
+          { channel: 'phone', leads: 5, estimatedRevenue: 2400, efficiency: 'watch' },
+          { channel: 'email', leads: 2, estimatedRevenue: 400, efficiency: 'weak' },
+        ],
+      },
       providerPerformance: {
         Rina: { revenue: 4000, appointments: 20, shows: 16, noShows: 4 },
         Mom: { revenue: 5200, appointments: 22, shows: 21, noShows: 1 },
@@ -249,16 +285,24 @@ describe('buildExecutiveBriefing', () => {
     expect(pressureLabels).toContain('Retention drag');
     expect(pressureLabels).toContain('Reactivation backlog');
     expect(pressureLabels).toContain('Underfilled provider capacity');
+    expect(pressureLabels).toContain('Recoverable schedule value');
+    expect(pressureLabels).toContain('Financing-ready consults');
+    expect(pressureLabels).toContain('Channel softness');
     expect(pressureLabels).toContain('Provider friction');
     expect(briefing.scorecard.consultPipelineValue).toBe(6800);
     expect(briefing.scorecard.stuckConsults).toBe(2);
     expect(briefing.scorecard.reactivationValue).toBe(2400);
     expect(briefing.scorecard.providerPressureProvider).toBe('Rina');
+    expect(briefing.scorecard.fillValue).toBe(975);
+    expect(briefing.scorecard.financingReadyConsults).toBe(2);
+    expect(briefing.scorecard.topGrowthChannel).toBe('phone');
     expect(titles.some((title) => title.includes('Convert 5 fresh leads into consults'))).toBe(true);
     expect(titles.some((title) => title.includes('Move Aria Stone forward'))).toBe(true);
+    expect(titles.some((title) => title.includes('Close Aria Stone with financing'))).toBe(true);
     expect(titles.some((title) => title.includes('Launch a member save push'))).toBe(true);
     expect(titles.some((title) => title.includes('Win back Maya Bloom'))).toBe(true);
     expect(titles.some((title) => title.includes("Fill Rina's open capacity"))).toBe(true);
+    expect(titles.some((title) => title.includes("Recover Rina's 14:00 slot"))).toBe(true);
     expect(titles.some((title) => title.includes("Stabilize Rina's schedule quality"))).toBe(true);
   });
 });

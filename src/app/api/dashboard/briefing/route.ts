@@ -17,6 +17,8 @@ import {
 import { fetchConsultIntelligence } from '@/lib/briefing/consult-intelligence';
 import { fetchReactivationIntelligence } from '@/lib/briefing/reactivation-intelligence';
 import { fetchProviderIntelligence } from '@/lib/briefing/provider-intelligence';
+import { fetchFillIntelligence } from '@/lib/briefing/fill-intelligence';
+import { buildGrowthIntelligence } from '@/lib/briefing/growth-intelligence';
 import { buildExecutiveBriefing } from '@/lib/briefing/executive-os';
 
 export async function GET() {
@@ -25,7 +27,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const [revenue, schedule, alerts, marketing, cashFlow, aiHighlights, loyalty, referrals, providerPerformance, clientGrowth, consults, reactivation, providerInsights] =
+  const [revenue, schedule, alerts, marketing, cashFlow, aiHighlights, loyalty, referrals, providerPerformance, clientGrowth, consults, reactivation, providerInsights, fill] =
     await Promise.all([
       fetchRevenue(),
       fetchSchedule(),
@@ -40,7 +42,10 @@ export async function GET() {
       fetchConsultIntelligence(),
       fetchReactivationIntelligence(),
       fetchProviderIntelligence(),
+      fetchFillIntelligence(),
     ]);
+
+  const growth = buildGrowthIntelligence(marketing, referrals, revenue);
 
   const briefing = buildExecutiveBriefing({
     revenue,
@@ -56,6 +61,8 @@ export async function GET() {
     consults,
     reactivation,
     providerInsights,
+    fill,
+    growth,
   });
 
   return NextResponse.json({
