@@ -1,6 +1,9 @@
 // Square API client for live payment/transaction data
-const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
 const BASE_URL = 'https://connect.squareup.com/v2';
+
+function getSquareAccessToken() {
+  return process.env.SQUARE_ACCESS_TOKEN;
+}
 
 export interface SquarePayment {
   id: string;
@@ -53,14 +56,15 @@ export interface ParsedTransaction {
 }
 
 async function squareFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  if (!SQUARE_ACCESS_TOKEN) {
+  const squareAccessToken = getSquareAccessToken();
+  if (!squareAccessToken) {
     throw new Error('SQUARE_ACCESS_TOKEN not configured');
   }
 
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${squareAccessToken}`,
       'Content-Type': 'application/json',
       'Square-Version': '2024-01-18',
       ...(options?.headers || {}),
@@ -192,5 +196,5 @@ export async function getAll2026Payments(): Promise<ParsedTransaction[]> {
 }
 
 export function isConfigured(): boolean {
-  return !!SQUARE_ACCESS_TOKEN;
+  return !!getSquareAccessToken();
 }

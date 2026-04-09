@@ -9,7 +9,9 @@ import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { captureWebhookEvent, captureCheckoutEvent } from '@/lib/sentry-utils';
 
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+function getWebhookSecret() {
+  return process.env.STRIPE_WEBHOOK_SECRET;
+}
 
 // POST - receive Stripe webhook events
 // Webhook URL to configure in Stripe Dashboard:
@@ -22,6 +24,8 @@ export async function POST(request: NextRequest) {
 
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
+
+  const endpointSecret = getWebhookSecret();
 
   if (!signature || !endpointSecret) {
     logWebhookEvent('stripe', 'unknown', false, { error: 'Missing signature or webhook secret' });

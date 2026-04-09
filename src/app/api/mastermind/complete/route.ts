@@ -126,7 +126,10 @@ export async function POST(request: NextRequest) {
 
 // ── Webhook Helper ──
 
-const WEBHOOK_TIMEOUT_MS = parseInt(process.env.WEBHOOK_TIMEOUT_MS || '10000', 10);
+function getWebhookTimeoutMs(): number {
+  const parsed = Number(process.env.WEBHOOK_TIMEOUT_MS);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 10_000;
+}
 
 async function fireWebhook(url: string, payload: unknown): Promise<void> {
   const webhookEndpoint = url.endsWith('/')
@@ -137,7 +140,7 @@ async function fireWebhook(url: string, payload: unknown): Promise<void> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
+    signal: AbortSignal.timeout(getWebhookTimeoutMs()),
   });
 
   if (!response.ok) {

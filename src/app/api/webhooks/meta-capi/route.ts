@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { z } from 'zod';
 
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "769852657929598";
-const ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
+function getMetaPixelId() {
+  return process.env.NEXT_PUBLIC_META_PIXEL_ID || "769852657929598";
+}
+
+function getMetaAccessToken() {
+  return process.env.META_CAPI_ACCESS_TOKEN;
+}
 
 const MetaUserDataSchema = z.object({
   email: z.string().trim().toLowerCase().min(1).optional(),
@@ -25,7 +30,10 @@ function sha256(value: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  if (!ACCESS_TOKEN) {
+  const accessToken = getMetaAccessToken();
+  const pixelId = getMetaPixelId();
+
+  if (!accessToken) {
     return NextResponse.json({ error: "META_CAPI_ACCESS_TOKEN not configured" }, { status: 500 });
   }
 
@@ -60,7 +68,7 @@ export async function POST(req: NextRequest) {
     };
 
     const response = await fetch(
-      `https://graph.facebook.com/v18.0/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`,
+      `https://graph.facebook.com/v18.0/${pixelId}/events?access_token=${accessToken}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

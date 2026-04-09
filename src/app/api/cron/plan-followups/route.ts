@@ -8,7 +8,10 @@ import { Resend } from 'resend';
 // ─── Constants ───────────────────────────────────────────────────────
 const CLINIC_PHONE = '(425) 539-4440';
 const RINA_EMAIL = 'info@ranibeautyclinic.com';
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+
+function getBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+}
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface TreatmentPlanRecord {
@@ -249,7 +252,9 @@ async function executeFollowUp(
   const clientName = (planFields['Client Name'] as string) || 'Valued Client';
   const clientEmail = planFields['Client Email'] as string;
   const clientPhone = planFields['Client Phone'] as string;
-  const planUrl = (planFields['Plan URL'] as string) || `${BASE_URL}/plan/${planFields['Intake Record ID'] || planId}`;
+  const planUrl =
+    (planFields['Plan URL'] as string) ||
+    `${getBaseUrl()}/plan/${planFields['Intake Record ID'] || planId}`;
   const viewCount = String((planFields['View Count'] as number) || 0);
   const lastViewedAt = (planFields['Last Viewed At'] as string) || 'Unknown';
 
