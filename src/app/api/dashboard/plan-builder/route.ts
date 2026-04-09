@@ -70,7 +70,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid request', details: { body: ['Invalid JSON'] } }, { status: 400 });
+    }
+
     const parsed = SavePlanSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -114,7 +119,12 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid update data', details: { body: ['Invalid JSON'] } }, { status: 400 });
+    }
+
     const parsed = UpdatePlanSchema.safeParse(body);
 
     if (!parsed.success) {

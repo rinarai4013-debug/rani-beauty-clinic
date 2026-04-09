@@ -120,7 +120,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse & validate body
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json(
+        { error: 'Invalid request body', details: { body: ['Invalid JSON'] } },
+        { status: 400 }
+      );
+    }
+
     const parsed = SendPlanSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

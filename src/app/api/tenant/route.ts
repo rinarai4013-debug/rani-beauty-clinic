@@ -77,7 +77,15 @@ export async function POST(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: [{ path: ['body'], message: 'Invalid JSON' }] },
+        { status: 400 }
+      );
+    }
+
     const parsed = createTenantSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -142,7 +150,15 @@ export async function PATCH(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: [{ path: ['body'], message: 'Invalid JSON' }] },
+        { status: 400 }
+      );
+    }
+
     const parsed = updateTenantSchema.safeParse(body);
 
     if (!parsed.success) {

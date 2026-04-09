@@ -46,7 +46,12 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid input format' }, { status: 400 });
+    }
+
     const parsed = updateSchema.safeParse(body);
 
     if (!parsed.success) {
