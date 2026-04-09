@@ -101,7 +101,7 @@ export async function GET() {
       topLeadSources: [],
     };
 
-    cache.set(cacheKey, data, TTL.HOURLY);
+    cache.set(cacheKey, data, TTL.MODERATE);
     return NextResponse.json(data);
   } catch (error) {
     console.error('Leads route error:', error);
