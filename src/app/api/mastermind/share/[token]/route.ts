@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
-import { resolveToken } from '../route';
+import { resolveToken } from '@/lib/mastermind/share-token';
 import type {
   MastermindSession,
   AuraScore,

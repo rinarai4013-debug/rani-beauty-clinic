@@ -14,7 +14,7 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { FOLLOW_UP_TEMPLATES, renderTemplate } from '@/lib/plan-builder/follow-up-templates';
-import { resolveToken } from '../share/route';
+import { resolveToken } from '@/lib/mastermind/share-token';
 import crypto from 'crypto';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;

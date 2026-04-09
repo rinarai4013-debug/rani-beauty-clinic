@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveToken } from '../route';
+import { resolveToken } from '@/lib/mastermind/share-token';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { Tables } from '@/lib/airtable/client';
 import { rateLimitedQuery } from '@/lib/airtable/client';

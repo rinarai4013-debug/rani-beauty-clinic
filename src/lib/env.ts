@@ -85,8 +85,24 @@ const envSchema = z.object({
 
 /* ── Parse & export ─────────────────────────────────────────── */
 
+/**
+ * During `next build`, env vars aren't available so we fall back to a
+ * permissive schema that defaults everything to empty strings.
+ * At runtime the strict schema is used and will throw on missing required vars.
+ */
+const isBuildPhase =
+  process.env.NEXT_PHASE === 'phase-production-build' ||
+  process.env.npm_lifecycle_event === 'build';
+
+const buildSafeSchema = envSchema.extend({
+  AIRTABLE_PAT: z.string().optional().default(''),
+  AIRTABLE_BASE_ID: z.string().optional().default(''),
+  DASHBOARD_JWT_SECRET: z.string().optional().default(''),
+});
+
 function validateEnv() {
-  const result = envSchema.safeParse(process.env);
+  const schema = isBuildPhase ? buildSafeSchema : envSchema;
+  const result = schema.safeParse(process.env);
 
   if (!result.success) {
     const formatted = result.error.issues
@@ -107,7 +123,22 @@ function validateEnv() {
   return result.data;
 }
 
-export const env = validateEnv();
+/** Lazy-initialised env — avoids crashing at import time during `next build`. */
+let _env: ReturnType<typeof validateEnv> | null = null;
+function getEnv() {
+  if (!_env) _env = validateEnv();
+  return _env;
+}
+
+/**
+ * Proxy-backed env export. Defers validation until first property access,
+ * so the module can be imported during `next build` without crashing.
+ */
+export const env = new Proxy({} as ReturnType<typeof validateEnv>, {
+  get(_target, prop: string) {
+    return getEnv()[prop as keyof ReturnType<typeof validateEnv>];
+  },
+});
 
 /* ── Helper: check if an optional feature is configured ─────── */
 

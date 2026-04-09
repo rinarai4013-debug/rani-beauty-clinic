@@ -6,10 +6,17 @@ import type { SessionPayload, UserRole } from '@/types/auth';
 
 const COOKIE_NAME = 'rani-session';
 
-if (!process.env.DASHBOARD_JWT_SECRET) {
-  throw new Error('DASHBOARD_JWT_SECRET is required');
+/** Lazy-initialised JWT secret — avoids crashing at import time during `next build`. */
+let _secret: Uint8Array | null = null;
+function getSecret(): Uint8Array {
+  if (!_secret) {
+    if (!process.env.DASHBOARD_JWT_SECRET) {
+      throw new Error('DASHBOARD_JWT_SECRET is required');
+    }
+    _secret = new TextEncoder().encode(process.env.DASHBOARD_JWT_SECRET);
+  }
+  return _secret;
 }
-const secret = new TextEncoder().encode(process.env.DASHBOARD_JWT_SECRET);
 
 const sessionPayloadSchema = z.object({
   username: z.string().min(1),
@@ -22,14 +29,14 @@ export async function createSession(username: string, role: UserRole, displayNam
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('24h')
-    .sign(secret);
+    .sign(getSecret());
 
   return token;
 }
 
 export async function verifySession(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSecret());
     const parsed = sessionPayloadSchema.safeParse(payload);
     if (!parsed.success) return null;
     return payload as unknown as SessionPayload;
