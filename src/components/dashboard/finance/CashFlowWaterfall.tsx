@@ -39,10 +39,11 @@ export default function CashFlowWaterfall({ projections, height = 320 }: CashFlo
           <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6B7280' }} />
           <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12, fill: '#6B7280' }} />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              `$${Math.abs(value).toLocaleString()}`,
-              name === 'inflow' ? 'Inflow' : name === 'outflow' ? 'Outflow' : 'Net',
-            ]}
+            formatter={(value, name) => {
+              const amount = typeof value === 'number' ? value : Number(value ?? 0);
+              const label = name === 'inflow' ? 'Inflow' : name === 'outflow' ? 'Outflow' : 'Net';
+              return [`$${Math.abs(amount).toLocaleString()}`, label];
+            }}
             contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }}
           />
           <ReferenceLine y={0} stroke="#9CA3AF" />
