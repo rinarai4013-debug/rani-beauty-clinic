@@ -1,5 +1,6 @@
+import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { createSession, getSessionCookieConfig } from '@/lib/auth/session';
+import { COOKIE_NAME, createSession, getSessionCookieConfig } from '@/lib/auth/session';
 import type { UserRole } from '@/types/auth';
 
 interface DashboardUser {
@@ -7,6 +8,83 @@ interface DashboardUser {
   password: string;
   role: UserRole;
   displayName: string;
+}
+
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const MAX_FAILED_ATTEMPTS = 5;
+const failedLoginAttempts = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(request: Request) {
+  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+}
+
+function getFailedAttemptState(ip: string) {
+  const now = Date.now();
+  const existing = failedLoginAttempts.get(ip);
+  if (!existing || existing.resetAt <= now) {
+    const nextState = { count: 0, resetAt: now + LOGIN_WINDOW_MS };
+    failedLoginAttempts.set(ip, nextState);
+    return nextState;
+  }
+  return existing;
+}
+
+function recordFailedAttempt(ip: string) {
+  const state = getFailedAttemptState(ip);
+  state.count += 1;
+  return state.count;
+}
+
+function clearFailedAttempts(ip: string) {
+  failedLoginAttempts.delete(ip);
+}
+
+function isRateLimited(ip: string) {
+  return getFailedAttemptState(ip).count >= MAX_FAILED_ATTEMPTS;
+}
+
+function isHashedPassword(value: string) {
+  return value.startsWith('pbkdf2$');
+}
+
+export function hashPassword(password: string) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const iterations = 100_000;
+  const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha512').toString('hex');
+  return `pbkdf2$${iterations}$${salt}$${hash}`;
+}
+
+function verifyPassword(password: string, storedPassword: string) {
+  if (!isHashedPassword(storedPassword)) {
+    return storedPassword === password;
+  }
+
+  const [, iterationString, salt, expectedHash] = storedPassword.split('$');
+  const iterations = Number(iterationString);
+  if (!salt || !expectedHash || !Number.isFinite(iterations)) {
+    return false;
+  }
+
+  const actualHash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha512').toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(actualHash, 'hex'), Buffer.from(expectedHash, 'hex'));
+}
+
+function getCookieConfig(token: string) {
+  const config = getSessionCookieConfig(token);
+
+  if (!config || typeof config.name !== 'string' || typeof config.value !== 'string') {
+    return {
+      name: COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict' as const,
+      maxAge: 86400,
+      path: '/',
+    };
+  }
+
+  return config;
 }
 
 function getUsers(): DashboardUser[] {
@@ -29,36 +107,57 @@ function getUsers(): DashboardUser[] {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+
   try {
     const body = await req.json();
     const { username, password } = body as { username?: string; password?: string };
 
-    if (!username || !password) {
+    if (typeof username !== 'string' || typeof password !== 'string' || !username || !password) {
       return NextResponse.json({ error: 'Username and password required' }, { status: 400 });
+    }
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Too many failed attempts. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     const users = getUsers();
     const user = users.find(
-      (u) => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+      (u) => u.username.toLowerCase() === username.toLowerCase() && verifyPassword(password, u.password)
     );
 
     if (!user) {
+      recordFailedAttempt(ip);
       // Consistent timing to prevent username enumeration
       await new Promise((r) => setTimeout(r, 200 + Math.random() * 100));
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
+    clearFailedAttempts(ip);
     const token = await createSession(user.username, user.role, user.displayName);
-    const cookieConfig = getSessionCookieConfig(token);
+    const cookieConfig = getCookieConfig(token);
 
     const response = NextResponse.json({
-      ok: true,
+      success: true,
       user: { username: user.username, role: user.role, displayName: user.displayName },
     });
 
-    response.cookies.set(cookieConfig);
+    response.cookies.set(cookieConfig.name, cookieConfig.value, {
+      httpOnly: cookieConfig.httpOnly,
+      secure: cookieConfig.secure,
+      sameSite: cookieConfig.sameSite,
+      maxAge: cookieConfig.maxAge,
+      path: cookieConfig.path,
+    });
     return response;
   } catch (err) {
+    if (err instanceof SyntaxError) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
+
     console.error('[auth/login]', err);
     return NextResponse.json({ error: 'Login failed' }, { status: 500 });
   }
