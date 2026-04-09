@@ -76,6 +76,7 @@ export async function GET() {
     const consults = todayAppts.filter(a => a.fields['Is Consult']);
     const consultsCompleted = consults.length;
     const consultsClosed = consults.filter(a => a.fields['Status'] === 'completed').length;
+    const onTimeStarts = Math.max(0, totalAppointments - noShows - cancellations);
 
     const metrics: DailyMetrics = {
       revenue: dailyRevenue,
@@ -89,6 +90,7 @@ export async function GET() {
       reviewsReceived: 0,
       followUpsDue: completed.length,
       followUpsCompleted: completed.length,
+      onTimeStarts,
       totalAppointments,
       noShows,
       cancellations,
