@@ -1,7 +1,9 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   images: {
     formats: ["image/avif", "image/webp"],
@@ -24,4 +26,13 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Suppress source map upload warnings when SENTRY_AUTH_TOKEN is not set
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+  // Upload source maps for better stack traces in Sentry dashboard
+  widenClientFileUpload: true,
+  // Hide source maps from users
+  hideSourceMaps: true,
+  // Disable Sentry telemetry
+  disableLogger: true,
+});
