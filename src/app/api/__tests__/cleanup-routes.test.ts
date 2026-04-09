@@ -4,6 +4,7 @@ import {
   MARKETING_SESSION,
   airtableRecord,
   buildGetRequest,
+  buildPostRequest,
   expectForbidden,
   expectUnauthorized,
 } from './helpers';
@@ -33,6 +34,7 @@ vi.mock('@/lib/airtable/client', () => ({
     transactions: vi.fn(() => 'transactions'),
     appointments: vi.fn(() => 'appointments'),
     alerts: vi.fn(() => 'alerts'),
+    messagesLog: vi.fn(() => 'messagesLog'),
   },
   fetchAll: (...args: unknown[]) => mockFetchAll(...args),
   createRecord: (...args: unknown[]) => mockCreateRecord(...args),
@@ -154,6 +156,30 @@ describe('cleanup routes', () => {
         ];
       }
 
+      if (table === 'messagesLog') {
+        return [
+          airtableRecord('msg_1', {
+            Type: 'email',
+            Direction: 'Outbound',
+            Status: 'Queued',
+            Message: 'Your consultation plan is ready.',
+            Subject: 'Treatment plan',
+            Date: '2026-04-09T10:00:00.000Z',
+            'Client Name': 'Ava',
+            'Client Email': 'ava@example.com',
+          }),
+          airtableRecord('msg_2', {
+            Type: 'sms',
+            Direction: 'Inbound',
+            Status: 'Unread',
+            Message: 'Can I move my appointment?',
+            Date: '2026-04-09T11:00:00.000Z',
+            'Client Name': 'Mia',
+            'Client Phone': '+14255550123',
+          }),
+        ];
+      }
+
       return [];
     });
     mockGatherDailyData.mockResolvedValue({
@@ -162,7 +188,9 @@ describe('cleanup routes', () => {
       schedule: { totalAppointments: 12, consultCount: 3 },
       marketing: { newLeads: 4, reviewCount: 2, avgRating: 4.5 },
     });
-    mockCreateRecord.mockResolvedValue('rec_kpi_001');
+    mockCreateRecord.mockImplementation(async (table: unknown) =>
+      table === 'messagesLog' ? 'rec_msg_001' : 'rec_kpi_001'
+    );
   });
 
   it('GET /api/dashboard/reviews returns review summary', async () => {
@@ -256,6 +284,46 @@ describe('cleanup routes', () => {
     expect(data.categories[0].category).toBe('wellness_supplies');
     expect(data.recentMovements).toHaveLength(2);
     expect(data.recentMovements[0].itemName).toBe('Semaglutide Pen');
+  });
+
+  it('GET /api/dashboard/communications/templates returns live template catalog', async () => {
+    mockGetSession.mockResolvedValue(CEO_SESSION);
+    const { GET } = await import('@/app/api/dashboard/communications/templates/route');
+    const response = await GET(buildGetRequest('/api/dashboard/communications/templates') as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.some((template: { id: string }) => template.id === 'tpl-review-request')).toBe(true);
+  });
+
+  it('GET /api/dashboard/communications/inbox summarizes queued and inbound messages', async () => {
+    mockGetSession.mockResolvedValue(CEO_SESSION);
+    const { GET } = await import('@/app/api/dashboard/communications/inbox/route');
+    const response = await GET(buildGetRequest('/api/dashboard/communications/inbox') as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.data.total).toBe(2);
+    expect(data.data.unread).toBe(1);
+    expect(data.data.channels[0].count + data.data.channels[1].count).toBe(2);
+  });
+
+  it('POST /api/dashboard/communications/send queues an outbound message', async () => {
+    mockGetSession.mockResolvedValue(CEO_SESSION);
+    const { POST } = await import('@/app/api/dashboard/communications/send/route');
+    const response = await POST(buildPostRequest('/api/dashboard/communications/send', {
+      clientName: 'Ava',
+      clientEmail: 'ava@example.com',
+      channel: 'email',
+      subject: 'Treatment plan ready',
+      body: 'Your treatment plan is ready to review.',
+    }) as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.queued).toBe(true);
+    expect(data.recordId).toBe('rec_msg_001');
   });
 
   it('still returns 401 when unauthenticated', async () => {
