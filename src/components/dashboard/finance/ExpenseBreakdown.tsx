@@ -141,7 +141,7 @@ export default function ExpenseBreakdown() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value) => formatCurrency(typeof value === 'number' ? value : Number(value ?? 0))}
                   contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 />
               </PieChart>
