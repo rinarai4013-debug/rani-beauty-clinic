@@ -75,7 +75,6 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
   // Load pdf.js library from CDN with retry
   const loadPdfJs = useCallback(async (): Promise<any> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const win = window as any;
     if (win.pdfjsLib) return win.pdfjsLib;
 

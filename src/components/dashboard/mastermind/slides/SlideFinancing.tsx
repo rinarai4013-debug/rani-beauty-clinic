@@ -44,15 +44,18 @@ export default function SlideFinancing({ packages, selectedTier }: SlideFinancin
 
   // Default to Transform if none selected
   const pkg = packages.find((p) => p.tier === (selectedTier || 'Transform')) || packages[0];
-  if (!pkg) return null;
 
   // Simple financing calculation (0% APR promo simplification)
+  // Must be called before any early return to satisfy Rules of Hooks
   const monthlyPayment = useMemo(() => {
+    if (!pkg) return 0;
     if (term === 12) return pkg.monthlyPayment12;
     if (term === 24) return pkg.monthlyPayment24;
     // Approximate for other terms
     return Math.round(pkg.price / term);
   }, [pkg, term]);
+
+  if (!pkg) return null;
 
   return (
     <div className="relative flex flex-col h-full w-full bg-[#0F1D2C] px-8 py-10 overflow-hidden items-center justify-center">

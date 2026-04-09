@@ -8,12 +8,10 @@ const nextConfig = {
     },
   },
   eslint: {
-    // TODO: Fix ESLint errors and set this to false
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    // TODO: Fix TypeScript errors and set this to false
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     formats: ["image/avif", "image/webp"],

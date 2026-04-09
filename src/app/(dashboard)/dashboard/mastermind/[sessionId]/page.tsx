@@ -375,7 +375,6 @@ export default function MastermindSessionPage() {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const intake = session.intakeData as (Record<string, any> | null);
   const scan = session.auraScanResult;
   const flags = scan?.medicalFlags || [];

@@ -36,7 +36,6 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
     ],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     screenshots: [
       {
         src: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720"><rect width="1280" height="720" fill="#0F1D2C"/><text x="640" y="320" font-family="serif" font-size="64" font-weight="bold" fill="#C9A96E" text-anchor="middle">Rani Beauty Clinic</text><text x="640" y="400" font-family="sans-serif" font-size="28" fill="#F8F6F1" text-anchor="middle">Premier Medspa &amp; Wellness in Renton, WA</text></svg>`)}`,
