@@ -28,7 +28,7 @@ const ContactSchema = z.object({
   utm_campaign: z.string().max(150).optional(),
   utm_content: z.string().max(150).optional(),
   utm_term: z.string().max(150).optional(),
-  honeypot: z.string().max(0, "Bot detected"),
+  honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
 
 function appendAttributionLines(lines: Array<string | null>, attribution: Record<string, string | undefined>) {
