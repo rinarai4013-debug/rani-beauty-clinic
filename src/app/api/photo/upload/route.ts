@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
 // Allow up to 30s for large file processing
 export const maxDuration = 30;
@@ -13,6 +14,10 @@ const MAX_WIDTH = 1200;
 // ─── POST Handler ───────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   try {
     let formData: FormData;
     try {

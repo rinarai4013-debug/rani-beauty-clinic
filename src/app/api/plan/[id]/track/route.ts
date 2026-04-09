@@ -4,6 +4,7 @@ import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getNextStatus, getAutoFollowUp } from '@/lib/plan-builder/plan-status';
 import type { PlanStatus } from '@/lib/plan-builder/plan-status';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
 interface TreatmentPlanFields {
   [key: string]: unknown;
@@ -31,6 +32,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit("view", ip, RATE_LIMITS.VIEW);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   try {
     const { id } = params;
 

@@ -1,0 +1,244 @@
+{
+  "name": "Stripe Payment \u2192 Email Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-payment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000001",
+      "name": "Webhook",
+      "webhookId": "d4e5f6a7-4444-4ddd-b444-100000000001"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f4000001-0001-4000-8000-000000000001",
+              "name": "event",
+              "value": "={{ $json.event ?? 'unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "f4000001-0001-4000-8000-000000000002",
+              "name": "amount",
+              "value": "={{ $json.amount ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "f4000001-0001-4000-8000-000000000003",
+              "name": "clientName",
+              "value": "={{ $json.clientName ?? 'Unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "f4000001-0001-4000-8000-000000000004",
+              "name": "tier",
+              "value": "={{ $json.tier ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f4000001-0001-4000-8000-000000000005",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId ?? 'N/A' }}",
+              "type": "string"
+            },
+            {
+              "id": "f4000001-0001-4000-8000-000000000006",
+              "name": "planId",
+              "value": "={{ $json.planId ?? '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [440, 300],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000002",
+      "name": "Extract Stripe Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-stripe-001",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "checkout.session.completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [680, 300],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000003",
+      "name": "Is Completed?"
+    },
+    {
+      "parameters": {
+        "fromEmail": "info@ranibeautyclinic.com",
+        "toEmail": "info@ranibeautyclinic.com",
+        "subject": "=\u2705 Stripe Payment Received \u2014 ${{ $json.amount }}",
+        "html": "=<div style=\"font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #fafafa; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a1a; margin: 0 0 20px 0; font-size: 22px;\">\u2705 Stripe Payment Received</h2>\n  <table style=\"width: 100%; border-collapse: collapse;\">\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Client</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px;\">{{ $json.clientName }}</td></tr>\n    <tr style=\"background: #fff;\"><td style=\"padding: 10px; color: #666; font-size: 14px;\">Amount</td><td style=\"padding: 10px; font-weight: 600; font-size: 14px; color: #16a34a;\">${{ $json.amount }}</td></tr>\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Tier</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px;\">{{ $json.tier }}</td></tr>\n    <tr style=\"background: #fff;\"><td style=\"padding: 10px; color: #666; font-size: 14px;\">Plan ID</td><td style=\"padding: 10px; font-weight: 600; font-size: 14px; font-family: monospace;\">{{ $json.planId }}</td></tr>\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Session ID</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px; font-family: monospace; font-size: 12px;\">{{ $json.sessionId }}</td></tr>\n  </table>\n  <div style=\"margin-top: 20px; padding: 16px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #16a34a;\">\n    <p style=\"margin: 0; font-size: 14px; color: #166534;\"><strong>Payment confirmed.</strong> Treatment plan deposit received. Client is ready to schedule.</p>\n  </div>\n  <p style=\"color: #999; font-size: 12px; margin-top: 20px; text-align: center;\">Rani Beauty Clinic \u2022 Automated via n8n</p>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [940, 180],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000004",
+      "name": "Email - Payment Received",
+      "credentials": {
+        "smtp": {
+          "id": "de861Fmy6gbefBzY",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "info@ranibeautyclinic.com",
+        "toEmail": "info@ranibeautyclinic.com",
+        "subject": "=\u274c Stripe Checkout Expired \u2014 {{ $json.clientName }}",
+        "html": "=<div style=\"font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #fafafa; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a1a; margin: 0 0 20px 0; font-size: 22px;\">\u274c Checkout Expired</h2>\n  <table style=\"width: 100%; border-collapse: collapse;\">\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Client</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px;\">{{ $json.clientName }}</td></tr>\n    <tr style=\"background: #fff;\"><td style=\"padding: 10px; color: #666; font-size: 14px;\">Tier</td><td style=\"padding: 10px; font-weight: 600; font-size: 14px;\">{{ $json.tier }}</td></tr>\n    <tr><td style=\"padding: 10px 0; color: #666; font-size: 14px;\">Plan ID</td><td style=\"padding: 10px 0; font-weight: 600; font-size: 14px; font-family: monospace;\">{{ $json.planId }}</td></tr>\n  </table>\n  <div style=\"margin-top: 20px; padding: 16px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #dc2626;\">\n    <p style=\"margin: 0 0 8px 0; font-size: 14px; color: #991b1b; font-weight: 600;\">Abandoned Checkout \u2014 Action Required:</p>\n    <ul style=\"margin: 0; padding-left: 20px; font-size: 14px; color: #991b1b;\">\n      <li>Client started checkout but did not complete payment</li>\n      <li>Follow up within 2 hours with a gentle reminder</li>\n      <li>Offer to answer any questions about the treatment plan</li>\n    </ul>\n  </div>\n  <p style=\"color: #999; font-size: 12px; margin-top: 20px; text-align: center;\">Rani Beauty Clinic \u2022 Automated via n8n</p>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [940, 420],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000005",
+      "name": "Email - Checkout Expired",
+      "credentials": {
+        "smtp": {
+          "id": "de861Fmy6gbefBzY",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 180],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000006",
+      "name": "Respond - Completed"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 420],
+      "id": "d4e5f6a7-4444-4ddd-b444-000000000007",
+      "name": "Respond - Expired"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Stripe Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Stripe Fields": {
+      "main": [
+        [
+          {
+            "node": "Is Completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Completed?": {
+      "main": [
+        [
+          {
+            "node": "Email - Payment Received",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email - Checkout Expired",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Payment Received": {
+      "main": [
+        [
+          {
+            "node": "Respond - Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Checkout Expired": {
+      "main": [
+        [
+          {
+            "node": "Respond - Expired",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Rani Beauty Clinic",
+      "id": "rani-tag-001"
+    },
+    {
+      "name": "Payments",
+      "id": "rani-tag-004"
+    }
+  ],
+  "triggerCount": 1,
+  "id": "wf-rani-stripe-payment-001",
+  "meta": {
+    "instanceId": "rani-beauty-clinic-n8n"
+  }
+}

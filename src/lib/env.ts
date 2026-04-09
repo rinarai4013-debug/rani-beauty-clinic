@@ -39,9 +39,8 @@ const envSchema = z.object({
   PATIENTFI_API_KEY: z.string().optional().default(''),
   PATIENTFI_WEBHOOK_SECRET: z.string().optional().default(''),
 
-  // Booking
+  // Booking (webhook-only — Mangomint has no public API)
   MANGOMINT_WEBHOOK_SECRET: z.string().optional().default(''),
-  MANGOMINT_API_KEY: z.string().optional().default(''),
 
   // Automation
   N8N_WEBHOOK_URL: z.string().optional().default(''),

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
 const ContactSchema = z.object({
   name: z.string().min(1).max(100),
@@ -12,6 +13,10 @@ const ContactSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIP(req);
+  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   let body: unknown;
   try {
     body = await req.json();

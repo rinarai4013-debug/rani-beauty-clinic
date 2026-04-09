@@ -37,9 +37,11 @@ export const WithDescription: Story = {
   },
 };
 
+function InteractiveRender() {
+  const [checked, setChecked] = useState(false);
+  return <FormToggle label="Notification enabled" description="Toggle to try" checked={checked} onChange={setChecked} />;
+}
+
 export const Interactive: StoryObj = {
-  render: () => {
-    const [checked, setChecked] = useState(false);
-    return <FormToggle label="Notification enabled" description="Toggle to try" checked={checked} onChange={setChecked} />;
-  },
+  render: () => <InteractiveRender />,
 };
