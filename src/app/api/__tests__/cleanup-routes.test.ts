@@ -133,6 +133,18 @@ describe('cleanup routes', () => {
     expect(data).toHaveProperty('requestedUrl');
   });
 
+  it('GET /api/dashboard/gamification/wins returns real daily win summaries', async () => {
+    mockGetSession.mockResolvedValue(CEO_SESSION);
+    const { GET } = await import('@/app/api/dashboard/gamification/wins/route');
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.wins).toHaveLength(4);
+    expect(data.wins[0].label).toContain('$4,200');
+    expect(data.wins[2].label).toContain('4 new leads');
+  });
+
   it('still returns 401 when unauthenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const { GET } = await import('@/app/api/dashboard/reviews/route');
