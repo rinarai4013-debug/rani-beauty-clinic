@@ -104,7 +104,11 @@ export default function CostAnalysis({ loading = false }: CostAnalysisProps) {
               <YAxis tick={{ fontSize: 10, fill: '#8B8680' }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} />
               <Tooltip
                 contentStyle={{ backgroundColor: 'white', border: '1px solid #E2E0DC', borderRadius: '8px', fontSize: 11 }}
-                formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name === 'cost' ? 'Product Cost' : 'Revenue']}
+                formatter={(value, name) => {
+                  const amount = typeof value === 'number' ? value : Number(value ?? 0);
+                  const label = name === 'cost' ? 'Product Cost' : 'Revenue';
+                  return [`$${amount.toLocaleString()}`, label];
+                }}
               />
               <Bar dataKey="revenue" fill="#C9A96E" radius={[2, 2, 0, 0]} name="Revenue" />
               <Bar dataKey="cost" fill="#0F1D2C" radius={[2, 2, 0, 0]} name="Product Cost" />
