@@ -147,7 +147,7 @@ export async function fetchConsultIntelligence(): Promise<ConsultIntelligence> {
       .filter((consult): consult is NonNullable<typeof consult> => consult !== null);
 
     const allConsults = [...sessionConsults, ...intakeConsults];
-    const activeConsults = allConsults.filter((consult) => consult.clinicStatus !== 'completed').length;
+    const activeConsults = allConsults.filter((consult) => consult.clinicStatus !== 'closed').length;
     const weightedPipelineValue = allConsults.reduce((sum, consult) => sum + consult.weightedValue, 0);
     const stuckConsults = allConsults
       .filter((consult) => consult.isStuck)
