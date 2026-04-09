@@ -44,10 +44,15 @@ export default function ForecastChart({ projections, confidenceIntervals, height
           <XAxis dataKey="month" tickFormatter={formatMonth} tick={{ fontSize: 12, fill: '#6B7280' }} />
           <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12, fill: '#6B7280' }} />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              `$${value.toLocaleString()}`,
-              name === 'expected' ? 'Expected' : name === 'optimistic' ? 'Optimistic' : name === 'conservative' ? 'Conservative' : name,
-            ]}
+            formatter={(value, name) => {
+              const amount = typeof value === 'number' ? value : Number(value ?? 0);
+              const label =
+                name === 'expected' ? 'Expected'
+                  : name === 'optimistic' ? 'Optimistic'
+                  : name === 'conservative' ? 'Conservative'
+                  : name;
+              return [`$${amount.toLocaleString()}`, label];
+            }}
             contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }}
             labelFormatter={(label) => formatMonth(label as string)}
           />
