@@ -281,7 +281,7 @@ export function renderDailyHtml(data: DailyBriefingData): string {
     { label: "Yesterday's Revenue", value: formatCurrency(data.revenue.total), sublabel: `${data.revenue.transactionCount} transactions` },
     { label: 'Avg Ticket', value: formatCurrencyDetailed(data.revenue.avgTicket) },
     { label: "Today's Appointments", value: String(data.schedule.totalAppointments), sublabel: `${data.schedule.consultCount} consults` },
-    { label: 'Active Alerts', value: String(data.alerts.total), sublabel: `${data.alerts.bySeverity.critical} critical` },
+    { label: 'Alerts', value: String(data.alerts.total), sublabel: `${data.alerts.bySeverity.critical} critical` },
   ]);
   sections.push(section('Performance Snapshot', revenueContent, '&#128200;'));
 

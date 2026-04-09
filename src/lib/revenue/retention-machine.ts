@@ -248,7 +248,7 @@ const SERVICE_REBOOK_DAYS: Record<string, number> = {
   'PicoWay': 42,
   'Sofwave': 365,
   'Laser Hair Removal': 42,
-  'GLP-1': 30,
+  'GLP-1': 7,
   'B12 Injection': 14,
   'Glutathione Injection': 14,
   'Vitamin D3 Injection': 30,

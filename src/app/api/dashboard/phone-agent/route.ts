@@ -1,9 +1,27 @@
-import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth/session";
+import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth/session';
+import { cache, TTL } from '@/lib/cache';
+import * as phoneAgent from '@/lib/phone/vapi-agent';
+
 export async function GET() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return NextResponse.json({ status: "not_implemented" }, { status: 501 });
+
+  const cacheKey = 'dashboard-phone-agent';
+  const cached = cache.get(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
+  try {
+    const payload = (
+      (phoneAgent as { getPhoneAgentConfig?: () => unknown }).getPhoneAgentConfig
+      ?? phoneAgent.configurePhoneAgent
+    )();
+    cache.set(cacheKey, payload, TTL.STANDARD);
+    return NextResponse.json(payload);
+  } catch (error) {
+    console.error('[dashboard/phone-agent]', error);
+    return NextResponse.json({ error: 'Failed to load phone agent config' }, { status: 500 });
+  }
 }

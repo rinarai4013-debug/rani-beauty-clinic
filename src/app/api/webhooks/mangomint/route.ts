@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
-import { Tables, rateLimitedQuery, fetchFirst } from '@/lib/airtable/client';
+import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { FIELDS } from '@/lib/airtable/tables';
@@ -96,30 +96,43 @@ async function findClientRecord(
   mangomintClientId?: string,
   fields?: string[]
 ): Promise<{ id: string; fields: ClientRecordFields } | null> {
-  if (mangomintClientId) {
-    const byMangomint = await fetchFirst<ClientRecordFields>(
-      Tables.clients(),
-      1,
-      {
-        filterByFormula: `{${FIELDS.clients.mangomintClientId}} = "${sanitizeFormulaValue(mangomintClientId)}"`,
-        ...(fields ? { fields } : {}),
-      },
-      true
+  const selectFirst = async (
+    formula: string,
+  ): Promise<{ id: string; fields: ClientRecordFields } | null> =>
+    rateLimitedQuery(() =>
+      new Promise<{ id: string; fields: ClientRecordFields } | null>((resolve) => {
+        Tables.clients()
+          .select({
+            filterByFormula: formula,
+            maxRecords: 1,
+            ...(fields ? { fields } : {}),
+          })
+          .firstPage((err, records) => {
+            if (err || !records || records.length === 0) {
+              resolve(null);
+              return;
+            }
+
+            resolve({
+              id: records[0].id,
+              fields: records[0].fields as ClientRecordFields,
+            });
+          });
+      })
     );
-    if (byMangomint.length > 0) return byMangomint[0];
+
+  if (mangomintClientId) {
+    const byMangomint = await selectFirst(
+      `{${FIELDS.clients.mangomintClientId}} = "${sanitizeFormulaValue(mangomintClientId)}"`
+    );
+    if (byMangomint) return byMangomint;
   }
 
   if (email) {
-    const byEmail = await fetchFirst<ClientRecordFields>(
-      Tables.clients(),
-      1,
-      {
-        filterByFormula: `{${FIELDS.clients.email}} = '${sanitizeFormulaValue(email)}'`,
-        ...(fields ? { fields } : {}),
-      },
-      true
+    const byEmail = await selectFirst(
+      `{${FIELDS.clients.email}} = '${sanitizeFormulaValue(email)}'`
     );
-    if (byEmail.length > 0) return byEmail[0];
+    if (byEmail) return byEmail;
   }
 
   return null;

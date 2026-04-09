@@ -141,12 +141,12 @@ export function evaluateAudienceFilter(
   client: ClientRecord,
   filter: AudienceFilter
 ): boolean {
-  if (filter.groups.length === 0) return true;
-
   // Check unsubscribe exclusion
   if (filter.excludeUnsubscribed && !client.smsOptIn && !client.emailOptIn) {
     return false;
   }
+
+  if (filter.groups.length === 0) return true;
 
   const groupResults = filter.groups.map(g => evaluateGroup(client, g));
 

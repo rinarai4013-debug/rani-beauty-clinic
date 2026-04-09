@@ -30,8 +30,7 @@ export type ApiScope =
   | 'reviews:read'
   | 'reviews:write'
   | 'schedule:read'
-  | 'schedule:write'
-  | 'billing:read';
+  | 'schedule:write';
 
 export const ALL_SCOPES: ApiScope[] = [
   'clients:read', 'clients:write',
@@ -43,7 +42,6 @@ export const ALL_SCOPES: ApiScope[] = [
   'inventory:read', 'inventory:write',
   'reviews:read', 'reviews:write',
   'schedule:read', 'schedule:write',
-  'billing:read',
 ];
 
 export const SCOPE_DESCRIPTIONS: Record<ApiScope, string> = {
@@ -64,7 +62,6 @@ export const SCOPE_DESCRIPTIONS: Record<ApiScope, string> = {
   'reviews:write': 'Respond to reviews',
   'schedule:read': 'View provider schedules and availability',
   'schedule:write': 'Modify schedules and block times',
-  'billing:read': 'View billing and subscription details',
 };
 
 export interface ApiKey {
@@ -157,7 +154,6 @@ export const CreateKeySchema = z.object({
     'inventory:read', 'inventory:write',
     'reviews:read', 'reviews:write',
     'schedule:read', 'schedule:write',
-    'billing:read',
   ])).min(1, 'At least one scope required'),
   rateLimit: z.number().int().min(1).max(10000).nullable().optional(),
   ipAllowlist: z.array(z.string().ip()).optional().default([]),
@@ -325,7 +321,7 @@ export function rotateKey(
   oldKey.updatedAt = Date.now();
 
   // Generate new key with same config
-  const result = generateApiKey({
+  const { key: newKey, plainTextKey } = generateApiKey({
     tenantId: oldKey.tenantId,
     name: oldKey.name,
     environment: oldKey.environment,
@@ -336,17 +332,17 @@ export function rotateKey(
     createdBy: performedBy,
   });
 
-  result.key.rotatingFrom = keyId;
+  newKey.rotatingFrom = keyId;
 
   addAuditEntry({
-    keyId: result.key.id,
+    keyId: newKey.id,
     tenantId: oldKey.tenantId,
     action: 'rotated',
     performedBy,
     details: { oldKeyId: keyId, gracePeriodMs },
   });
 
-  return result;
+  return { newKey: { ...newKey }, plainTextKey };
 }
 
 // ─── Key Revocation ───────────────────────────────────────────────
@@ -514,11 +510,15 @@ export function rotateWebhookSigningKey(keyId: string): WebhookSigningKey | null
   const key = webhookKeys.get(keyId);
   if (!key) return null;
 
-  key.previousSecret = key.secret;
-  key.secret = `whsec_${generateRandomString(48)}`;
-  key.rotatedAt = Date.now();
+  const rotated: WebhookSigningKey = {
+    ...key,
+    previousSecret: key.secret,
+    secret: `whsec_${generateRandomString(48)}`,
+    rotatedAt: Date.now(),
+  };
 
-  return { ...key };
+  webhookKeys.set(keyId, rotated);
+  return rotated;
 }
 
 export function signWebhookPayload(

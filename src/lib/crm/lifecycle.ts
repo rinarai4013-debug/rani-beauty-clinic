@@ -193,6 +193,10 @@ export function evaluateLifecycle(input: LifecycleInput): ClientLifecycle {
  * Determine the correct lifecycle stage based on transition rules.
  */
 export function determineStage(input: LifecycleInput): LifecycleStage {
+  if (input.totalVisits <= 0) {
+    return 'prospect';
+  }
+
   // Sort rules by priority (highest first)
   const sortedRules = [...TRANSITION_RULES].sort((a, b) => b.priority - a.priority);
 
