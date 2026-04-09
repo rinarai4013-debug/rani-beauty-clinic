@@ -426,12 +426,16 @@ export async function fetchMarketing(): Promise<MarketingSnapshot> {
       totalRating += Number(r.fields[FIELDS.reviews.starRating]) || 0;
     }
 
+    const leadsBySource = newLeads.reduce<Record<string, number>>((acc, lead) => {
+      const rawSource = String(lead.fields[FIELDS.clients.leadSource] || '').trim();
+      const source = rawSource || 'Unknown';
+      acc[source] = (acc[source] || 0) + 1;
+      return acc;
+    }, {});
+
     return {
       newLeads: newLeads.length,
-      // We do not have a true lead-source field on Clients yet.
-      // Returning an empty map is more honest than treating preferred contact
-      // method as acquisition channel.
-      leadsBySource: {},
+      leadsBySource,
       avgLeadScore: 0,
       reviewCount: reviews.length,
       avgRating: reviews.length > 0 ? totalRating / reviews.length : 0,
