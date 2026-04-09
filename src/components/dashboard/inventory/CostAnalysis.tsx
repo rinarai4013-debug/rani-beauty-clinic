@@ -74,7 +74,11 @@ export default function CostAnalysis({ loading = false }: CostAnalysisProps) {
             <YAxis tick={{ fontSize: 11, fill: '#8B8680' }} tickFormatter={(v) => `$${v}`} />
             <Tooltip
               contentStyle={{ backgroundColor: 'white', border: '1px solid #E2E0DC', borderRadius: '8px', fontSize: 11 }}
-              formatter={(value: number, name: string) => [`$${value}`, name.charAt(0).toUpperCase() + name.slice(1)]}
+              formatter={(value, name) => {
+                const amount = typeof value === 'number' ? value : Number(value ?? 0);
+                const label = typeof name === 'string' ? name.charAt(0).toUpperCase() + name.slice(1) : String(name ?? '');
+                return [`$${amount}`, label];
+              }}
             />
             <Line type="monotone" dataKey="botox" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3 }} name="Botox/100U" />
             <Line type="monotone" dataKey="dysport" stroke="#EC4899" strokeWidth={2} dot={{ r: 3 }} name="Dysport/300U" />
