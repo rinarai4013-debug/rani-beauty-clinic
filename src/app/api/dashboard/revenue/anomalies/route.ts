@@ -49,13 +49,14 @@ export async function GET() {
     const transactions = await fetchAll<TransactionFields>(Tables.transactions(), {
       filterByFormula: `IS_AFTER({Date}, '${cutoff}')`,
       sort: [{ field: 'Date', direction: 'desc' }],
-    }).catch(() => []);
+    });
 
     if (transactions.length === 0) {
       return NextResponse.json({
-        success: true,
-        data: null,
-        message: 'No transaction data found for anomaly detection.',
+        anomalies: [],
+        healthScore: 100,
+        summary: 'No transaction data found for anomaly detection.',
+        projectedMonthEnd: 0,
         generatedAt: new Date().toISOString(),
       });
     }
@@ -119,8 +120,7 @@ export async function GET() {
     const anomalyResult = detectRevenueAnomalies(anomalyInput);
 
     const result = {
-      success: true,
-      data: anomalyResult,
+      ...anomalyResult,
       generatedAt: new Date().toISOString(),
     };
 
@@ -129,7 +129,7 @@ export async function GET() {
   } catch (error) {
     console.error('Revenue anomaly detection error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to detect revenue anomalies' },
+      { error: 'Failed to detect revenue anomalies' },
       { status: 500 }
     );
   }
