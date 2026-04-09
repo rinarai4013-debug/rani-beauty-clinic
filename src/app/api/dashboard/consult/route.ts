@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
-import * as consultEngine from '@/lib/consult/copilot-engine';
+
+async function getConsultGenerator() {
+  const consultEngine = await import('@/lib/consult/copilot-engine');
+  return (
+    ('generateConsultBriefing' in consultEngine && typeof consultEngine.generateConsultBriefing === 'function'
+      ? consultEngine.generateConsultBriefing
+      : consultEngine.generateConsultCopilot) as (input: unknown) => unknown
+  );
+}
 
 export async function GET() {
   const session = await getSession();
@@ -14,9 +22,7 @@ export async function GET() {
   if (cached) return NextResponse.json(cached);
 
   try {
-    const generator =
-      (consultEngine as { generateConsultBriefing?: (input: unknown) => unknown }).generateConsultBriefing
-      ?? consultEngine.generateConsultCopilot;
+    const generator = await getConsultGenerator();
     const consult = generator({
       client: {
         name: 'Sample Client',
@@ -52,10 +58,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const generator =
-      (consultEngine as { generateConsultBriefing?: (input: unknown) => unknown }).generateConsultBriefing
-      ?? consultEngine.generateConsultCopilot;
-    const briefing = (generator as (input: unknown) => unknown)(body);
+    const generator = await getConsultGenerator();
+    const briefing = generator(body);
     return NextResponse.json({ status: 'ok', briefing });
   } catch (error) {
     console.error('[dashboard/consult][POST]', error);

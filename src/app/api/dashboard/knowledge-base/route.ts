@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
-import * as knowledgeBase from '@/lib/rag/knowledge-base';
 
 export async function GET(request: NextRequest) {
   const session = await getSession();
@@ -16,11 +15,13 @@ export async function GET(request: NextRequest) {
   if (cached) return NextResponse.json(cached);
 
   try {
+    const knowledgeBase = await import('@/lib/rag/knowledge-base');
     const payload = query
       ? knowledgeBase.searchKnowledgeBase(query)
       : (
-          (knowledgeBase as { getKnowledgeBaseStats?: () => unknown }).getKnowledgeBaseStats
-          ?? knowledgeBase.buildKnowledgeBase
+          ('getKnowledgeBaseStats' in knowledgeBase && typeof knowledgeBase.getKnowledgeBaseStats === 'function'
+            ? knowledgeBase.getKnowledgeBaseStats
+            : knowledgeBase.buildKnowledgeBase)
         )();
 
     cache.set(cacheKey, payload, TTL.STANDARD);

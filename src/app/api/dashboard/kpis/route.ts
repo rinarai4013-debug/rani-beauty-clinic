@@ -121,14 +121,14 @@ function pctChange(current: number, previous: number): number | null {
 
 // ── Route handler ──
 
-export async function GET(req?: NextRequest) {
+export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!hasPermission(session.role, 'view_executive')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const searchParams = req ? new URL(req.url).searchParams : new URL('http://localhost/api/dashboard/kpis').searchParams;
+  const searchParams = new URL(req.url).searchParams;
   const range = searchParams.get('range') || 'today';
   const cacheKey = 'kpis';
 

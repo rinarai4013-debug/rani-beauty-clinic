@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
-import * as phoneAgent from '@/lib/phone/vapi-agent';
 
 export async function GET() {
   const session = await getSession();
@@ -14,9 +13,11 @@ export async function GET() {
   if (cached) return NextResponse.json(cached);
 
   try {
+    const phoneAgent = await import('@/lib/phone/vapi-agent');
     const payload = (
-      (phoneAgent as { getPhoneAgentConfig?: () => unknown }).getPhoneAgentConfig
-      ?? phoneAgent.configurePhoneAgent
+      ('getPhoneAgentConfig' in phoneAgent && typeof phoneAgent.getPhoneAgentConfig === 'function'
+        ? phoneAgent.getPhoneAgentConfig
+        : phoneAgent.configurePhoneAgent)
     )();
     cache.set(cacheKey, payload, TTL.STANDARD);
     return NextResponse.json(payload);

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
-import * as socialEngine from '@/lib/social/auto-post-engine';
 
 export async function GET() {
   const session = await getSession();
@@ -14,9 +13,12 @@ export async function GET() {
   if (cached) return NextResponse.json(cached);
 
   try {
-    const generator =
-      (socialEngine as { generateWeeklyPlan?: (input: unknown) => unknown }).generateWeeklyPlan
-      ?? socialEngine.generateSocialPlan;
+    const socialEngine = await import('@/lib/social/auto-post-engine');
+    const generator = (
+      'generateWeeklyPlan' in socialEngine && typeof socialEngine.generateWeeklyPlan === 'function'
+        ? socialEngine.generateWeeklyPlan
+        : socialEngine.generateSocialPlan
+    ) as (input: unknown) => unknown;
 
     const payload = generator({
       services: [],
