@@ -44,7 +44,7 @@ export function withTenant(handler: TenantHandler, options?: { requiredFeature?:
       }
 
       // 2. Resolve tenant
-      const tenantId = (session as Record<string, unknown>).tenantId as string || 'rani-beauty-clinic';
+      const tenantId = session.tenantId || 'rani-beauty-clinic';
       const tenant = await resolveTenant({ tenantId });
 
       if (!tenant) {
