@@ -51,7 +51,7 @@ import {
   Repeat,
 } from 'lucide-react';
 import type { ClinicStatus, MastermindPhase, ActivityLogEntry, ProviderReviewState } from '@/types/mastermind';
-import type { UnifiedConsultation } from '@/app/api/dashboard/consultations/route';
+import type { UnifiedConsultation } from '@/types/consultations';
 
 // ── DATA FETCHING ──
 

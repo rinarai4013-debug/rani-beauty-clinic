@@ -14,7 +14,7 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { FOLLOW_UP_TEMPLATES, renderTemplate } from '@/lib/plan-builder/follow-up-templates';
-import { resolveToken } from '@/lib/mastermind/share-token';
+import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token';
 import crypto from 'crypto';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -93,7 +93,6 @@ export async function POST(request: NextRequest) {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + SEVEN_DAYS_MS);
 
-      const { saveTokenToAirtable } = await importTokenPersistence();
       await saveTokenToAirtable({
         token: newToken,
         sessionId,
@@ -239,37 +238,4 @@ export async function GET(request: NextRequest) {
   }));
 
   return NextResponse.json({ success: true, templates });
-}
-
-// ── Token persistence (same pattern as plan-send) ──
-
-async function importTokenPersistence() {
-  const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
-  const TABLE_NAME = 'Automation%20Log';
-  const SHARE_WORKFLOW_KEY = 'mastermind_share_token';
-
-  const pat = process.env.AIRTABLE_PAT;
-  if (!pat) throw new Error('AIRTABLE_PAT not configured');
-
-  return {
-    saveTokenToAirtable: async (record: { token: string; sessionId: string; createdAt: string; expiresAt: string }) => {
-      await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${TABLE_NAME}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${pat}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          typecast: true,
-          records: [{
-            fields: {
-              Workflow: SHARE_WORKFLOW_KEY,
-              Action: record.token,
-              Status: 'active',
-              Details: JSON.stringify(record),
-              Timestamp: record.createdAt,
-            },
-          }],
-        }),
-        signal: AbortSignal.timeout(8000),
-      });
-    },
-  };
 }
