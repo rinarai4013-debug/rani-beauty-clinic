@@ -6,6 +6,21 @@ import { Tables, createRecord } from "@/lib/airtable/client";
 const SubscribeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   source: z.string().max(100).optional().default("unknown"),
+  leadSource: z.string().max(100).optional(),
+  leadMedium: z.string().max(100).optional(),
+  leadCampaign: z.string().max(150).optional(),
+  leadAdSet: z.string().max(150).optional(),
+  leadAd: z.string().max(150).optional(),
+  leadOffer: z.string().max(150).optional(),
+  leadLandingPage: z.string().max(500).optional(),
+  leadKeyword: z.string().max(150).optional(),
+  leadReferrer: z.string().max(500).optional(),
+  attributionId: z.string().max(150).optional(),
+  utm_source: z.string().max(150).optional(),
+  utm_medium: z.string().max(150).optional(),
+  utm_campaign: z.string().max(150).optional(),
+  utm_content: z.string().max(150).optional(),
+  utm_term: z.string().max(150).optional(),
   honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
 
@@ -84,14 +99,49 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { email, source } = parsed.data;
+  const {
+    email,
+    source,
+    leadSource,
+    leadMedium,
+    leadCampaign,
+    leadAdSet,
+    leadAd,
+    leadOffer,
+    leadLandingPage,
+    leadKeyword,
+    leadReferrer,
+    attributionId,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_content,
+    utm_term,
+  } = parsed.data;
 
   // 5. Write to Airtable Intake table
   // Field names verified against live Airtable schema (matches contact/route.ts)
   const airtablePayload = {
     Email: email,
     "Processing Status": "New",
-    "Intake Summary (AI)": `Newsletter signup from ${source}`,
+    "Intake Summary (AI)": [
+      `Newsletter signup from ${source}`,
+      leadSource ? `Lead Source: ${leadSource}` : null,
+      leadMedium ? `Lead Medium: ${leadMedium}` : null,
+      leadCampaign ? `Lead Campaign: ${leadCampaign}` : null,
+      leadAdSet ? `Lead Ad Set: ${leadAdSet}` : null,
+      leadAd ? `Lead Ad: ${leadAd}` : null,
+      leadOffer ? `Lead Offer: ${leadOffer}` : null,
+      leadLandingPage ? `Lead Landing Page: ${leadLandingPage}` : null,
+      leadKeyword ? `Lead Keyword: ${leadKeyword}` : null,
+      leadReferrer ? `Lead Referrer: ${leadReferrer}` : null,
+      attributionId ? `Attribution ID: ${attributionId}` : null,
+      utm_source ? `UTM Source: ${utm_source}` : null,
+      utm_medium ? `UTM Medium: ${utm_medium}` : null,
+      utm_campaign ? `UTM Campaign: ${utm_campaign}` : null,
+      utm_content ? `UTM Content: ${utm_content}` : null,
+      utm_term ? `UTM Term: ${utm_term}` : null,
+    ].filter(Boolean).join("\n"),
   };
 
   try {
@@ -125,6 +175,21 @@ export async function POST(req: NextRequest) {
           source: "email_subscribe",
           email,
           signupSource: source,
+          leadSource,
+          leadMedium,
+          leadCampaign,
+          leadAdSet,
+          leadAd,
+          leadOffer,
+          leadLandingPage,
+          leadKeyword,
+          leadReferrer,
+          attributionId,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term,
           submittedAt: new Date().toISOString(),
         }),
         signal: AbortSignal.timeout(5000),

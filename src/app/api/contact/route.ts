@@ -9,8 +9,51 @@ const ContactSchema = z.object({
   phone: z.string().max(20).optional().default(""),
   service: z.string().min(1).max(100),
   message: z.string().max(2000).optional().default(""),
+  source: z.string().max(100).optional().default("contact_form"),
+  leadSource: z.string().max(100).optional(),
+  leadMedium: z.string().max(100).optional(),
+  leadCampaign: z.string().max(150).optional(),
+  leadAdSet: z.string().max(150).optional(),
+  leadAd: z.string().max(150).optional(),
+  leadOffer: z.string().max(150).optional(),
+  leadLandingPage: z.string().max(500).optional(),
+  leadKeyword: z.string().max(150).optional(),
+  leadReferrer: z.string().max(500).optional(),
+  attributionId: z.string().max(150).optional(),
+  utm_source: z.string().max(150).optional(),
+  utm_medium: z.string().max(150).optional(),
+  utm_campaign: z.string().max(150).optional(),
+  utm_content: z.string().max(150).optional(),
+  utm_term: z.string().max(150).optional(),
   honeypot: z.string().max(0, "Bot detected"),
 });
+
+function appendAttributionLines(lines: Array<string | null>, attribution: Record<string, string | undefined>) {
+  const labelMap: Record<string, string> = {
+    source: 'Source',
+    leadSource: 'Lead Source',
+    leadMedium: 'Lead Medium',
+    leadCampaign: 'Lead Campaign',
+    leadAdSet: 'Lead Ad Set',
+    leadAd: 'Lead Ad',
+    leadOffer: 'Lead Offer',
+    leadLandingPage: 'Lead Landing Page',
+    leadKeyword: 'Lead Keyword',
+    leadReferrer: 'Lead Referrer',
+    attributionId: 'Attribution ID',
+    utm_source: 'UTM Source',
+    utm_medium: 'UTM Medium',
+    utm_campaign: 'UTM Campaign',
+    utm_content: 'UTM Content',
+    utm_term: 'UTM Term',
+  };
+
+  for (const [key, value] of Object.entries(attribution)) {
+    if (!value) continue;
+    const label = labelMap[key] || key;
+    lines.push(`${label}: ${value}`);
+  }
+}
 
 export async function POST(req: NextRequest) {
   const ip = getClientIP(req);
@@ -38,16 +81,54 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { name, email, phone, service, message } = parsed.data;
+  const {
+    name,
+    email,
+    phone,
+    service,
+    message,
+    source,
+    leadSource,
+    leadMedium,
+    leadCampaign,
+    leadAdSet,
+    leadAd,
+    leadOffer,
+    leadLandingPage,
+    leadKeyword,
+    leadReferrer,
+    attributionId,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_content,
+    utm_term,
+  } = parsed.data;
 
   // Build intake summary for AI pipeline
-  const intakeSummary = [
+  const intakeLines = [
     `Service Interest: ${service}`,
     message ? `Message: ${message}` : null,
-    `Source: Contact Form`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  ];
+  appendAttributionLines(intakeLines, {
+    source,
+    leadSource,
+    leadMedium,
+    leadCampaign,
+    leadAdSet,
+    leadAd,
+    leadOffer,
+    leadLandingPage,
+    leadKeyword,
+    leadReferrer,
+    attributionId,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_content,
+    utm_term,
+  });
+  const intakeSummary = intakeLines.filter(Boolean).join("\n");
 
   // 1. Write to Airtable Client Intakes
   // Field names verified against live Airtable schema 2026-03-28
@@ -128,6 +209,21 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           source: "contact_form",
+          leadSource,
+          leadMedium,
+          leadCampaign,
+          leadAdSet,
+          leadAd,
+          leadOffer,
+          leadLandingPage,
+          leadKeyword,
+          leadReferrer,
+          attributionId,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term,
           name,
           email,
           phone,
