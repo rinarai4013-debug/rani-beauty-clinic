@@ -39,6 +39,10 @@ export interface ExecutiveScorecard {
   avgTicket: number;
   appointmentsToday: number;
   consultsToday: number;
+  activeConsults: number;
+  consultPipelineValue: number;
+  stuckConsults: number;
+  reviewNeeded: number;
   openGaps: number;
   criticalAlerts: number;
   warningAlerts: number;
@@ -76,6 +80,20 @@ export interface ExecutiveBriefingInput {
     churnedClients: number;
     netGrowth: number;
   };
+  consults?: {
+    activeConsults: number;
+    weightedPipelineValue: number;
+    stuckCount: number;
+    reviewNeededCount: number;
+    bookedCount: number;
+    topPriority:
+      | {
+          patientName: string;
+          action: string;
+          estimatedValue: number;
+        }
+      | null;
+  };
 }
 
 interface ProviderPressureSignal {
@@ -95,6 +113,10 @@ function buildScorecard(input: ExecutiveBriefingInput): ExecutiveScorecard {
     avgTicket: input.revenue.avgTicket,
     appointmentsToday: input.schedule.totalAppointments,
     consultsToday: input.schedule.consultCount,
+    activeConsults: input.consults?.activeConsults ?? 0,
+    consultPipelineValue: input.consults?.weightedPipelineValue ?? 0,
+    stuckConsults: input.consults?.stuckCount ?? 0,
+    reviewNeeded: input.consults?.reviewNeededCount ?? 0,
     openGaps: input.schedule.gaps.length,
     criticalAlerts: input.alerts.bySeverity.critical,
     warningAlerts: input.alerts.bySeverity.warning,
@@ -147,6 +169,22 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
       label: 'Consult bottleneck',
       severity: 'warning',
       detail: `${input.marketing.newLeads} fresh lead${input.marketing.newLeads === 1 ? '' : 's'} surfaced, but no consults are visible in today’s schedule.`,
+    });
+  }
+
+  if ((input.consults?.stuckCount ?? 0) > 0) {
+    points.push({
+      label: 'Stalled consult value',
+      severity: input.consults!.stuckCount >= 3 ? 'warning' : 'info',
+      detail: `${input.consults!.stuckCount} consult${input.consults!.stuckCount === 1 ? '' : 's'} are stalled in the pipeline with ${formatCurrency(input.consults!.weightedPipelineValue)} still in play.`,
+    });
+  }
+
+  if ((input.consults?.reviewNeededCount ?? 0) > 0) {
+    points.push({
+      label: 'Provider review backlog',
+      severity: 'warning',
+      detail: `${input.consults!.reviewNeededCount} consult plan${input.consults!.reviewNeededCount === 1 ? '' : 's'} need provider review before they can advance.`,
     });
   }
 
@@ -213,6 +251,17 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
       urgency: 'today',
       estimatedImpact: 'Protect near-term conversion momentum',
       actionType: 'marketing',
+    });
+  }
+
+  if (input.consults?.topPriority) {
+    moves.push({
+      title: `Move ${input.consults.topPriority.patientName} forward`,
+      why: `${input.consults.topPriority.action} on a consult worth ${formatCurrency(input.consults.topPriority.estimatedValue)}.`,
+      owner: input.consults.reviewNeededCount > 0 ? 'provider' : 'frontdesk',
+      urgency: 'today',
+      estimatedImpact: `Protect ${formatCurrency(input.consults.topPriority.estimatedValue)} of consult value`,
+      actionType: 'revenue_recovery',
     });
   }
 
@@ -298,6 +347,10 @@ function buildWatchList(input: ExecutiveBriefingInput): string[] {
 
   if (input.schedule.consultCount === 0) {
     items.push('No consults are visible in today’s schedule snapshot.');
+  }
+
+  if ((input.consults?.reviewNeededCount ?? 0) > 0) {
+    items.push(`${input.consults!.reviewNeededCount} consult review${input.consults!.reviewNeededCount === 1 ? '' : 's'} are waiting on provider action.`);
   }
 
   if (input.cashFlow.bankBalance != null && input.cashFlow.bankBalance < 10000) {

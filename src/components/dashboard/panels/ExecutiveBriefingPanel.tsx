@@ -25,6 +25,10 @@ interface ExecutiveScorecard {
   avgTicket: number;
   appointmentsToday: number;
   consultsToday: number;
+  activeConsults: number;
+  consultPipelineValue: number;
+  stuckConsults: number;
+  reviewNeeded: number;
   openGaps: number;
   criticalAlerts: number;
   warningAlerts: number;
@@ -109,7 +113,7 @@ export default function ExecutiveBriefingPanel() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:min-w-[260px]">
+        <div className="grid grid-cols-2 gap-2 lg:min-w-[420px] lg:grid-cols-3">
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Revenue</p>
             <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.yesterdayRevenue)}</p>
@@ -121,6 +125,14 @@ export default function ExecutiveBriefingPanel() {
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Appointments</p>
             <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.appointmentsToday}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Consult Pipeline</p>
+            <p className="text-sm font-semibold text-rani-text">{formatCurrency(briefing.scorecard.consultPipelineValue)}</p>
+          </div>
+          <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
+            <p className="text-[10px] uppercase tracking-wide text-rani-muted">Stuck Consults</p>
+            <p className="text-sm font-semibold text-rani-text">{briefing.scorecard.stuckConsults}</p>
           </div>
           <div className="rounded-lg border border-rani-border bg-rani-cream/40 p-3">
             <p className="text-[10px] uppercase tracking-wide text-rani-muted">Cash</p>

@@ -189,6 +189,18 @@ describe('buildExecutiveBriefing', () => {
         churnedClients: 5,
         netGrowth: -3,
       },
+      consults: {
+        activeConsults: 7,
+        weightedPipelineValue: 6800,
+        stuckCount: 2,
+        reviewNeededCount: 1,
+        bookedCount: 1,
+        topPriority: {
+          patientName: 'Aria Stone',
+          action: 'Provider review needed',
+          estimatedValue: 4200,
+        },
+      },
       providerPerformance: {
         Rina: { revenue: 4000, appointments: 20, shows: 16, noShows: 4 },
         Mom: { revenue: 5200, appointments: 22, shows: 21, noShows: 1 },
@@ -199,9 +211,14 @@ describe('buildExecutiveBriefing', () => {
     const titles = briefing.topMoves.map((move) => move.title);
 
     expect(pressureLabels).toContain('Consult bottleneck');
+    expect(pressureLabels).toContain('Stalled consult value');
+    expect(pressureLabels).toContain('Provider review backlog');
     expect(pressureLabels).toContain('Retention drag');
     expect(pressureLabels).toContain('Provider friction');
+    expect(briefing.scorecard.consultPipelineValue).toBe(6800);
+    expect(briefing.scorecard.stuckConsults).toBe(2);
     expect(titles.some((title) => title.includes('Convert 5 fresh leads into consults'))).toBe(true);
+    expect(titles.some((title) => title.includes('Move Aria Stone forward'))).toBe(true);
     expect(titles.some((title) => title.includes('Launch a member save push'))).toBe(true);
     expect(titles.some((title) => title.includes("Stabilize Rina's schedule quality"))).toBe(true);
   });
