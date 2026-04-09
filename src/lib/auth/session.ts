@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import type { SessionPayload, UserRole } from '@/types/auth';
 
@@ -42,6 +43,23 @@ export async function getSession(): Promise<SessionPayload | null> {
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
   return verifySession(token);
+}
+
+export async function getSessionFromRequest(
+  request: NextRequest,
+  allowedRoles?: UserRole[]
+): Promise<SessionPayload | null> {
+  const token = request.cookies.get(COOKIE_NAME)?.value;
+  if (!token) return null;
+
+  const session = await verifySession(token);
+  if (!session) return null;
+
+  if (allowedRoles && !allowedRoles.includes(session.role)) {
+    return null;
+  }
+
+  return session;
 }
 
 export function getSessionCookieConfig(token: string) {

@@ -48,7 +48,7 @@ export default function ForecastChart({ projections, confidence, monthlyTarget }
               tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
             />
             <Tooltip
-              formatter={(val: number, name: string) => [`$${val.toLocaleString()}`, name]}
+              formatter={((val: number, name: string) => [`$${val.toLocaleString()}`, name]) as any}
               contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
             />
             <ReferenceLine y={monthlyTarget} stroke="#C9A96E" strokeDasharray="5 5" label={{ value: 'Target', fill: '#C9A96E', fontSize: 10 }} />

@@ -14,19 +14,21 @@ import type { GeneratedPackage } from '@/lib/plan-builder/types';
 
 interface PackageSelectorProps {
   packages: GeneratedPackage[];
-  selectedTier: 'Start' | 'Transform' | 'Elite' | null;
-  onSelect: (tier: 'Start' | 'Transform' | 'Elite') => void;
+  selectedTier: 'Start' | 'Transform' | 'Elite' | 'Essential' | null;
+  onSelect: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   variant?: 'light' | 'dark';
 }
 
-const TIER_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+const TIER_ICONS: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
+  Essential: Star,
   Start: Star,
   Transform: Sparkles,
   Elite: Crown,
 };
 
-const TIER_COLORS = {
+const TIER_COLORS: Record<string, { accent: string; bg: string; border: string }> = {
   Start: { accent: '#3B82F6', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.2)' },
+  Essential: { accent: '#3B82F6', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.2)' },
   Transform: { accent: '#C9A96E', bg: 'rgba(201,169,110,0.1)', border: 'rgba(201,169,110,0.3)' },
   Elite: { accent: '#8B5CF6', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.2)' },
 };
@@ -44,7 +46,7 @@ export default function PackageSelector({
       {packages.map((pkg, i) => {
         const isSelected = selectedTier === pkg.tier;
         const colors = TIER_COLORS[pkg.tier] || TIER_COLORS.Start;
-        const Icon = TIER_ICONS[pkg.tier] || Star;
+        const Icon = TIER_ICONS[pkg.tier] ?? TIER_ICONS.Start;
 
         return (
           <motion.button

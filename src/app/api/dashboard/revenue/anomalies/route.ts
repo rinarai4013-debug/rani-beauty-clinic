@@ -90,7 +90,7 @@ export async function GET() {
 
     // Build sorted daily revenue array (newest first)
     const dailyRevenue = Array.from(dailyMap.entries())
-      .map(([date, revenue]) => ({ date, revenue }))
+      .map(([date, revenue]) => ({ date, amount: revenue }))
       .sort((a, b) => b.date.localeCompare(a.date));
 
     const anomalyInput: AnomalyInput = {
@@ -124,7 +124,7 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.NORMAL);
+    cache.set(cacheKey, result, TTL.STANDARD);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Revenue anomaly detection error:', error);

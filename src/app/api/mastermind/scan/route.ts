@@ -12,10 +12,11 @@
  */
 
 import { NextRequest } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
@@ -23,7 +24,7 @@ import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
 export async function POST(request: NextRequest) {
   try {
     // Auth check
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }

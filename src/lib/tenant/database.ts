@@ -229,7 +229,7 @@ export function createTenantDatabase(tenantConfig: TenantConfig): TenantDatabase
   // Build typed table accessors
   const Tables: TenantTables = {} as TenantTables;
   for (const [key, defaultName] of Object.entries(DEFAULT_TABLE_NAMES)) {
-    (Tables as Record<string, () => AirtableTable>)[key] = () => table(defaultName);
+    (Tables as unknown as Record<string, () => AirtableTable>)[key] = () => table(defaultName);
   }
 
   // fetchAll with tenant scoping

@@ -7,8 +7,9 @@
  */
 
 import { NextRequest } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { ConsentRecord } from '@/types/consent';
 
@@ -17,7 +18,7 @@ import type { ConsentRecord } from '@/types/consent';
 export async function POST(request: NextRequest) {
   try {
     // Auth check — allow unauthenticated in development
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     // Store consent records in session — use a consent extension on the session object.
     // We store them as a JSON array in a custom property that gets serialized with the session.
-    const sessionAny = session as Record<string, unknown>;
+    const sessionAny = session as unknown as Record<string, unknown>;
     const existingConsents: ConsentRecord[] = Array.isArray(sessionAny._consentRecords)
       ? (sessionAny._consentRecords as ConsentRecord[])
       : [];
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Auth check — allow unauthenticated in development
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }
@@ -136,7 +137,7 @@ export async function GET(request: NextRequest) {
       return apiError('Session not found', 404);
     }
 
-    const sessionAny = session as Record<string, unknown>;
+    const sessionAny = session as unknown as Record<string, unknown>;
     const consents: ConsentRecord[] = Array.isArray(sessionAny._consentRecords)
       ? (sessionAny._consentRecords as ConsentRecord[])
       : [];

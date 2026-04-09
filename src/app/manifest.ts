@@ -54,7 +54,7 @@ export default function manifest(): MetadataRoute.Manifest {
         ...({ form_factor: "narrow" } as Record<string, string>),
         label: "Rani Beauty Clinic mobile view",
       },
-    ] as MetadataRoute.Manifest["screenshots"],
+    ] as any,
     shortcuts: [
       {
         name: "Book Appointment",

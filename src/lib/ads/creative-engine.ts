@@ -77,6 +77,7 @@ export interface ServiceProfile {
   timeframe: string;
   socialProofStat: string;
   keywords: string[];
+  location?: string;
 }
 
 export const RANI_SERVICES: ServiceProfile[] = [

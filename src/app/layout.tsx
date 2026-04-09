@@ -136,7 +136,7 @@ export default function RootLayout({
           <AnalyticsTracker />
           <CookieConsent />
         </ConditionalPublicLayout>
-        <PWAProvider />
+        <PWAProvider>{null}</PWAProvider>
       </body>
     </html>
   );

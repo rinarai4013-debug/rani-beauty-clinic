@@ -366,8 +366,8 @@ export async function processSubscription(
     });
 
     // Extract client secret for payment confirmation
-    const invoice = subscription.latest_invoice as Stripe.Invoice | null;
-    const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent | null;
+    const invoice = subscription.latest_invoice as any;
+    const paymentIntent = invoice?.payment_intent as any;
 
     return {
       valid: true,
@@ -610,20 +610,26 @@ export function getTierComparison(): Array<{
 }> {
   return [
     {
-      tier: 'starter',
-      ...TIER_PRICING.starter,
+      tier: 'starter' as SubscriptionTier,
+      name: TIER_PRICING.starter.name,
+      price: TIER_PRICING.starter.monthly,
+      description: TIER_PRICING.starter.description,
       features: TIER_FEATURES.starter,
       highlighted: false,
     },
     {
-      tier: 'professional',
-      ...TIER_PRICING.professional,
+      tier: 'professional' as SubscriptionTier,
+      name: TIER_PRICING.professional.name,
+      price: TIER_PRICING.professional.monthly,
+      description: TIER_PRICING.professional.description,
       features: TIER_FEATURES.professional,
       highlighted: true, // Most popular
     },
     {
-      tier: 'enterprise',
-      ...TIER_PRICING.enterprise,
+      tier: 'enterprise' as SubscriptionTier,
+      name: TIER_PRICING.enterprise.name,
+      price: TIER_PRICING.enterprise.monthly,
+      description: TIER_PRICING.enterprise.description,
       features: TIER_FEATURES.enterprise,
       highlighted: false,
     },

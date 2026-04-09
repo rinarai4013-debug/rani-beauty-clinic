@@ -21,6 +21,7 @@ import type {
   ReminderScheduleItem,
   ReminderTiming,
 } from './types';
+export type { RebookingNudge };
 import { REBOOKING_INTERVALS } from './scheduler';
 
 // ── PRE-APPOINTMENT INSTRUCTIONS ──

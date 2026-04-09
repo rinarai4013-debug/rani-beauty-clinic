@@ -35,7 +35,7 @@ function TermButton({
 
 interface SlideFinancingProps {
   packages: GeneratedPackage[];
-  selectedTier: 'Start' | 'Transform' | 'Elite' | null;
+  selectedTier: 'Start' | 'Transform' | 'Elite' | 'Essential' | null;
 }
 
 export default function SlideFinancing({ packages, selectedTier }: SlideFinancingProps) {

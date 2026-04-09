@@ -8,6 +8,7 @@ import KPICard from '@/components/dashboard/cards/KPICard';
 import ClinicScoreMeter from '@/components/dashboard/gamification/ClinicScoreMeter';
 import DailyWinsBanner from '@/components/dashboard/gamification/DailyWinsBanner';
 import AttentionPanel from '@/components/dashboard/panels/AttentionPanel';
+import ExecutiveBriefingPanel from '@/components/dashboard/panels/ExecutiveBriefingPanel';
 import QuickActions from '@/components/dashboard/panels/QuickActions';
 import RecentActivity from '@/components/dashboard/panels/RecentActivity';
 import AtRiskClientsPanel from '@/components/dashboard/panels/AtRiskClientsPanel';
@@ -73,6 +74,9 @@ export default function ExecutiveHome() {
 
         {/* Morning Briefing */}
         <MorningBriefing />
+
+        {/* Executive Briefing */}
+        <ExecutiveBriefingPanel />
 
         {/* Hero KPI Row */}
         {error ? (

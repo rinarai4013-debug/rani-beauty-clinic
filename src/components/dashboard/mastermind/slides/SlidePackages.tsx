@@ -168,12 +168,12 @@ function PackageCard({
 
 interface SlidePackagesProps {
   packages: GeneratedPackage[];
-  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite') => void;
+  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
 }
 
 export default function SlidePackages({ packages, onSelectPackage }: SlidePackagesProps) {
   // Sort: Start, Transform, Elite
-  const tierOrder = { Start: 0, Transform: 1, Elite: 2 };
+  const tierOrder: Record<string, number> = { Start: 0, Essential: 0, Transform: 1, Elite: 2 };
   const sorted = [...packages].sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]);
 
   return (

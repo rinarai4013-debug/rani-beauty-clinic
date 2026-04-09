@@ -1,1 +1,1 @@
-export default function BookServiceFlow() { return null; }
+export default function BookServiceFlow(props: Record<string, unknown>) { return null; }

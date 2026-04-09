@@ -54,10 +54,10 @@ export default function PointsHistory({ analytics }: PointsHistoryProps) {
               />
               <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} />
               <Tooltip
-                formatter={(value: number, name: string) => [
+                formatter={((value: number, name: string) => [
                   formatNumber(value),
                   name === 'earned' ? 'Earned' : 'Redeemed',
-                ]}
+                ]) as any}
               />
               <Legend />
               <Bar dataKey="earned" fill="#C9A96E" name="Earned" radius={[4, 4, 0, 0]} />

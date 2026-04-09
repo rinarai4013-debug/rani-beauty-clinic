@@ -7,6 +7,8 @@ export interface PlanWarning {
   message: string;
   affectedServices: string[]; // service instance IDs
   suggestion: string;
+  serviceName?: string;
+  type?: string;
 }
 
 // ─── Constraint definitions ───────────────────────────────────────────

@@ -40,7 +40,7 @@ export default function RevenueChart({ hourlyRevenue }: RevenueChartProps) {
             <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#6B7280' }} />
             <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} tickFormatter={v => `$${v}`} />
             <Tooltip
-              formatter={(value: number) => [`$${value}`, 'Revenue']}
+              formatter={((value: number) => [`$${value}`, 'Revenue']) as any}
               contentStyle={{ borderRadius: '8px', border: '1px solid #E8E4DF' }}
             />
             <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>

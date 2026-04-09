@@ -9,7 +9,7 @@
  */
 
 import { NextRequest } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicClient } from '@/lib/ai/client';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { parseJsonBody, apiError } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/mastermind';
@@ -21,9 +21,7 @@ type CopilotContext =
   | 'closing'
   | 'general';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const anthropic = getAnthropicClient();
 
 // ── SERVICE CATALOG ──
 
@@ -300,7 +298,7 @@ function formatScanResults(scan: AuraScanResult): string {
   if (scan.medicalFlags.length > 0) {
     lines.push(`\n### Medical Flags`);
     for (const f of scan.medicalFlags) {
-      lines.push(`- ${f.flag}: ${f.severity} — ${f.recommendation}`);
+      lines.push(`- ${f.flag}: ${f.severity} — ${f.recommendation || f.action}`);
     }
   }
 
@@ -356,11 +354,12 @@ function formatPlanData(plan: MastermindPlan): string {
     lines.push(`\n### Packages`);
     for (const pkg of plan.packages) {
       const highlighted = 'highlighted' in pkg && pkg.highlighted ? ' ★ RECOMMENDED' : '';
-      lines.push(`- ${pkg.name}${highlighted}: $${pkg.totalPrice} (${pkg.discount || 0}% savings)`);
+      const pkgTotal = pkg.totalPrice ?? pkg.price;
+      lines.push(`- ${pkg.name}${highlighted}: $${pkgTotal} (${pkg.discount || 0}% savings)`);
       if ('services' in pkg && Array.isArray(pkg.services)) {
         lines.push(`  Includes: ${pkg.services.map((s: { name?: string }) => s.name || 'treatment').join(', ')}`);
       }
-      lines.push(`  Monthly financing: ~$${Math.round(pkg.totalPrice / 24)}/mo (24mo) or ~$${Math.round(pkg.totalPrice / 12)}/mo (12mo)`);
+      lines.push(`  Monthly financing: ~$${Math.round(pkgTotal / 24)}/mo (24mo) or ~$${Math.round(pkgTotal / 12)}/mo (12mo)`);
     }
   }
 
@@ -376,7 +375,7 @@ function formatPlanData(plan: MastermindPlan): string {
   if (plan.contraindications.length > 0) {
     lines.push(`\n### Contraindications`);
     for (const c of plan.contraindications) {
-      lines.push(`- ${c.condition}: ${c.severity} — ${c.recommendation}`);
+      lines.push(`- ${c.condition || c.treatment}: ${c.severity} — ${c.recommendation}`);
     }
   }
 

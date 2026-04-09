@@ -135,7 +135,7 @@ export function useMastermindFlow(sessionId: string | null) {
   );
 
   const selectPackage = useCallback(
-    async (tier: 'Start' | 'Transform' | 'Elite') => {
+    async (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => {
       await dispatch({ type: 'SELECT_PACKAGE', tier });
     },
     [dispatch]

@@ -7,9 +7,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { mockSimulationComparison } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
 export const maxDuration = 30;
@@ -135,7 +136,7 @@ function buildDataDrivenSimulation(
 export async function POST(request: NextRequest) {
   try {
     // Auth check — allow unauthenticated in development
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }
@@ -159,8 +160,10 @@ export async function POST(request: NextRequest) {
       if (session.auraScanResult?.auraScore) {
         const scan = session.auraScanResult;
         const concerns = scan.detectedConcerns?.map((c: { concern: string }) => c.concern) || [];
-        const chronoAge = session.intakeData?.age
-          ? Number(session.intakeData.age)
+        const dobStr = session.intakeData?.dob;
+        const dobAge = dobStr ? Math.floor((Date.now() - new Date(dobStr).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : NaN;
+        const chronoAge = !isNaN(dobAge)
+          ? dobAge
           : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
 
         // Get plan cost if available

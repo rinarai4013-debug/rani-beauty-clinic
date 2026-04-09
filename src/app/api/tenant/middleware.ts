@@ -44,8 +44,8 @@ export function withTenant(handler: TenantHandler, options?: { requiredFeature?:
       }
 
       // 2. Resolve tenant
-      const tenantId = (session as Record<string, unknown>).tenantId as string || 'rani-beauty-clinic';
-      const tenant = await resolveTenant({ tenantId });
+      const tenantId = (session as unknown as Record<string, unknown>).tenantId as string || 'rani-beauty-clinic';
+      const tenant = await resolveTenant({ hostname: 'localhost', sessionTenantId: tenantId });
 
       if (!tenant) {
         return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });

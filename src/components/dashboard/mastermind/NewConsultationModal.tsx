@@ -90,9 +90,10 @@ const TREATMENT_CATEGORIES = [
   },
 ] as const;
 
-const ALL_TREATMENTS = TREATMENT_CATEGORIES.flatMap((cat) => cat.treatments);
+const ALL_TREATMENTS: ReadonlyArray<{ value: string; label: string; requiresLabs?: boolean }> =
+  TREATMENT_CATEGORIES.flatMap((cat) => cat.treatments as ReadonlyArray<{ value: string; label: string; requiresLabs?: boolean }>);
 const LAB_REQUIRED_TREATMENTS = ALL_TREATMENTS
-  .filter((t) => 'requiresLabs' in t && t.requiresLabs)
+  .filter((t) => t.requiresLabs)
   .map((t) => t.value);
 
 const SMOKING_OPTIONS = [

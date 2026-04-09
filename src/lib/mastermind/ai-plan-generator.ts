@@ -8,7 +8,7 @@
  * Falls back to rule-based generator if AI call fails.
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicClient } from '@/lib/ai/client';
 import type {
   AuraScanResult,
   MastermindPlan,
@@ -49,16 +49,6 @@ export function calculateMonthlyPayment(
   const payment = principal * (monthlyRate * compoundFactor) / (compoundFactor - 1);
 
   return Math.round(payment);
-}
-
-// ── Anthropic Client ──
-
-function getAnthropicClient(): Anthropic {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is not set');
-  }
-  return new Anthropic({ apiKey });
 }
 
 // ── Catalog Formatter ──

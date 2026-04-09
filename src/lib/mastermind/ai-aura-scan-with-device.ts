@@ -19,6 +19,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
 import type { AuraDeviceScan } from '@/lib/mastermind/aura-device-integration';
 import type { AuraScanResult } from '@/types/mastermind';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
@@ -250,7 +251,7 @@ export async function runAIAuraScanWithDevice(
   const startTime = Date.now();
 
   // Guard: no API key
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!hasAnthropicClient()) {
     console.warn(`${LOG_PREFIX} ANTHROPIC_API_KEY not set — falling back to rule-based scan`);
     return fallbackScan(intakeData, scanId);
   }
@@ -259,9 +260,7 @@ export async function runAIAuraScanWithDevice(
     console.info(`${LOG_PREFIX} Starting device-image AI analysis (scan ${scanId})`);
     console.info(`${LOG_PREFIX} Patient: ${deviceScan.patientName}, Date: ${deviceScan.scanDate}`);
 
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+    const anthropic = getAnthropicClient();
 
     // Build the content blocks — images first, then the text prompt
     const contentBlocks: Anthropic.Messages.ContentBlockParam[] = [];

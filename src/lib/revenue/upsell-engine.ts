@@ -227,6 +227,10 @@ export function generateUpsellRecommendations(input: UpsellInput): UpsellResult 
   };
 }
 
+function getCrossSellReason(currentService: string, crossSell: string): string {
+  return `Clients who love ${currentService} also see great results with ${crossSell}`;
+}
+
 // ── UPSELL OPPORTUNITY FINDER ──
 
 function findUpsellOpportunities(input: UpsellInput): UpsellRecommendation[] {

@@ -15,7 +15,7 @@
  *   - Timestamp: updatedAt
  */
 
-import type { MastermindSession, MastermindPhase } from '@/types/mastermind';
+import type { MastermindSession, MastermindPhase, SimulationFrame } from '@/types/mastermind';
 
 const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
 const TABLE_NAME = 'Automation%20Log';
@@ -58,23 +58,23 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
   if (stripped.sourcePhotoUrl && stripped.sourcePhotoUrl.length > 5000) {
     stripped.sourcePhotoUrl = '[base64_stripped]';
   }
-  if (stripped.simulation) {
-    stripped.simulation = {
-      ...stripped.simulation,
-      withTreatment: stripped.simulation.withTreatment ? {
-        ...stripped.simulation.withTreatment,
-        frames: stripped.simulation.withTreatment.frames.map(f => ({
+  if (stripped.simulationComparison) {
+    stripped.simulationComparison = {
+      ...stripped.simulationComparison,
+      withTreatment: stripped.simulationComparison.withTreatment ? {
+        ...stripped.simulationComparison.withTreatment,
+        frames: stripped.simulationComparison.withTreatment.frames.map((f: SimulationFrame) => ({
           ...f,
           imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 5000 ? '[base64_stripped]' : f.imageDataUrl,
         })),
-      } : stripped.simulation.withTreatment,
-      withoutTreatment: stripped.simulation.withoutTreatment ? {
-        ...stripped.simulation.withoutTreatment,
-        frames: stripped.simulation.withoutTreatment.frames.map(f => ({
+      } : stripped.simulationComparison.withTreatment,
+      withoutTreatment: stripped.simulationComparison.withoutTreatment ? {
+        ...stripped.simulationComparison.withoutTreatment,
+        frames: stripped.simulationComparison.withoutTreatment.frames.map((f: SimulationFrame) => ({
           ...f,
           imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 5000 ? '[base64_stripped]' : f.imageDataUrl,
         })),
-      } : stripped.simulation.withoutTreatment,
+      } : stripped.simulationComparison.withoutTreatment,
     };
   }
   const sessionJson = JSON.stringify(stripped);

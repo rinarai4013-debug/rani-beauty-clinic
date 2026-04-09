@@ -32,6 +32,7 @@ export interface SessionPayload {
   username: string;
   role: UserRole;
   name: string;
+  displayName: string;
   iat?: number;
   exp?: number;
 }

@@ -24,7 +24,7 @@ function getStripe(): Stripe {
   if (!_stripe) {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) throw new Error('STRIPE_SECRET_KEY is not configured');
-    _stripe = new Stripe(key, { apiVersion: '2025-03-31.basil' });
+    _stripe = new Stripe(key, { apiVersion: '2026-02-25.clover' });
   }
   return _stripe;
 }
@@ -126,7 +126,7 @@ export async function createSubscription(params: CreateSubscriptionParams): Prom
   }
 
   if (params.couponId) {
-    subscriptionParams.coupon = params.couponId;
+    (subscriptionParams as any).coupon = params.couponId;
   }
 
   return stripe.subscriptions.create(subscriptionParams);
@@ -288,7 +288,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
           tier,
           stripeSubscriptionId: subscription.id,
           status: mapStripeStatus(subscription.status),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
           trialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : undefined,
@@ -315,7 +315,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
           ...config.subscription,
           tier,
           status: mapStripeStatus(subscription.status),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
           trialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : undefined,
@@ -368,8 +368,8 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
 
     case 'invoice.paid': {
       const invoice = event.data.object as Stripe.Invoice;
-      const tenantId = invoice.subscription_details?.metadata?.tenantId
-        || (typeof invoice.subscription === 'string' ? undefined : undefined);
+      const tenantId = (invoice as any).subscription_details?.metadata?.tenantId
+        || (typeof (invoice as any).subscription === 'string' ? undefined : undefined);
 
       if (!tenantId) {
         // Try to find tenant by customer ID

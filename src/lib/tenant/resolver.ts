@@ -177,13 +177,13 @@ export class AirtableTenantStore implements TenantStore {
       updatedAt: now,
     };
 
-    await this.table().create({
+    await (this.table().create as any)({
       'Tenant ID': fullConfig.id,
       Slug: fullConfig.slug,
       'Custom Domain': fullConfig.customDomain || '',
       'Config JSON': JSON.stringify(fullConfig),
       Active: fullConfig.active,
-    } as Record<string, unknown>);
+    });
 
     return fullConfig;
   }
@@ -209,12 +209,12 @@ export class AirtableTenantStore implements TenantStore {
 
     if (records.length === 0) throw new Error(`Tenant record not found for ${id}`);
 
-    await this.table().update(records[0].id, {
+    await (this.table().update as any)(records[0].id, {
       Slug: updated.slug,
       'Custom Domain': updated.customDomain || '',
       'Config JSON': JSON.stringify(updated),
       Active: updated.active,
-    } as Record<string, unknown>);
+    });
 
     invalidateTenantCache(id);
     return updated;

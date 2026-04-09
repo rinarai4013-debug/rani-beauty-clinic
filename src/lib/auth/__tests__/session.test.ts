@@ -21,6 +21,7 @@ import {
   createSession,
   verifySession,
   getSession,
+  getSessionFromRequest,
   getSessionCookieConfig,
   COOKIE_NAME,
 } from '../session';
@@ -217,6 +218,55 @@ describe('getSession', () => {
     mockCookieStore.get.mockReturnValue(undefined);
     await getSession();
     expect(mockCookieStore.get).toHaveBeenCalledWith('rani-session');
+  });
+});
+
+// ── getSessionFromRequest ──
+
+describe('getSessionFromRequest', () => {
+  function makeRequestWithCookie(token?: string) {
+    return {
+      cookies: {
+        get: vi.fn((name: string) =>
+          name === COOKIE_NAME && token ? { value: token } : undefined
+        ),
+      },
+    } as any;
+  }
+
+  it('returns null when the request has no auth cookie', async () => {
+    const request = makeRequestWithCookie();
+    const result = await getSessionFromRequest(request);
+    expect(result).toBeNull();
+  });
+
+  it('returns the session payload when the request has a valid auth cookie', async () => {
+    const token = await createSession('rina', 'ceo', 'Rina');
+    const request = makeRequestWithCookie(token);
+
+    const result = await getSessionFromRequest(request);
+
+    expect(result).not.toBeNull();
+    expect(result!.username).toBe('rina');
+    expect(result!.role).toBe('ceo');
+  });
+
+  it('returns null when the request cookie contains an invalid token', async () => {
+    const request = makeRequestWithCookie('not-a-real-token');
+    const result = await getSessionFromRequest(request);
+    expect(result).toBeNull();
+  });
+
+  it('enforces allowedRoles when provided', async () => {
+    const token = await createSession('sarah', 'frontdesk', 'Sarah');
+    const request = makeRequestWithCookie(token);
+
+    const allowed = await getSessionFromRequest(request, ['frontdesk', 'operations']);
+    const denied = await getSessionFromRequest(request, ['ceo']);
+
+    expect(allowed).not.toBeNull();
+    expect(allowed!.role).toBe('frontdesk');
+    expect(denied).toBeNull();
   });
 });
 

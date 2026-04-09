@@ -80,7 +80,7 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.FAST);
+    cache.set(cacheKey, result, TTL.REALTIME);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Alerts fetch error:', error);
