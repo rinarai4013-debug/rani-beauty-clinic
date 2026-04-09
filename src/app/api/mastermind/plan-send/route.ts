@@ -9,8 +9,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import { resolveToken } from '../share/route';
 import crypto from 'crypto';
 
@@ -18,7 +19,7 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }

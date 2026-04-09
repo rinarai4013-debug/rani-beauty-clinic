@@ -10,8 +10,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import { FOLLOW_UP_TEMPLATES, renderTemplate } from '@/lib/plan-builder/follow-up-templates';
 import { resolveToken } from '../share/route';
 import crypto from 'crypto';
@@ -21,7 +22,7 @@ const CLINIC_PHONE = '(425) 539-4440';
 
 export async function POST(request: NextRequest) {
   try {
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }
@@ -224,7 +225,7 @@ export async function POST(request: NextRequest) {
 // ── Available templates endpoint (GET) ──
 
 export async function GET(request: NextRequest) {
-  const authSession = await requireAuth(request).catch(() => null);
+  const authSession = await getSessionFromRequest(request).catch(() => null);
   if (!authSession && process.env.NODE_ENV !== 'development') {
     return unauthorized();
   }

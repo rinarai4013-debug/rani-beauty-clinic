@@ -13,9 +13,10 @@
  */
 
 import { NextRequest } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getAllSessionsAsync } from '@/lib/mastermind/session';
 import { Tables, fetchAll } from '@/lib/airtable/client';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import { apiSuccess, apiError } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession, ClinicStatus, ActivityLogEntry, ProviderReviewState, MastermindPhase } from '@/types/mastermind';
 
@@ -392,7 +393,7 @@ function fromAirtableIntake(
 
 export async function GET(request: NextRequest) {
   try {
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }

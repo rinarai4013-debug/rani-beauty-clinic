@@ -4,15 +4,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { createSession, saveSessionAsync, getAllSessionsAsync } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession } from '@/types/mastermind';
 
 export async function GET(request: NextRequest) {
   try {
     // Auth check — allow unauthenticated in development
-    const session = await requireAuth(request).catch(() => null);
+    const session = await getSessionFromRequest(request).catch(() => null);
     if (!session && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Auth check — allow unauthenticated in development
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }

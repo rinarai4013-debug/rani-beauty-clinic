@@ -7,9 +7,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { mockSimulationComparison } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { requireAuth, unauthorized } from '@/lib/auth/middleware';
+import { unauthorized } from '@/lib/auth/middleware';
 import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
 export const maxDuration = 30;
@@ -135,7 +136,7 @@ function buildDataDrivenSimulation(
 export async function POST(request: NextRequest) {
   try {
     // Auth check — allow unauthenticated in development
-    const authSession = await requireAuth(request).catch(() => null);
+    const authSession = await getSessionFromRequest(request).catch(() => null);
     if (!authSession && process.env.NODE_ENV !== 'development') {
       return unauthorized();
     }
