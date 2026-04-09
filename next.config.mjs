@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -111,7 +113,7 @@ const nextConfig = {
       // Allow all HTTPS images (Airtable CDN, GA, Meta, etc.)
       "img-src 'self' data: blob: https:",
       // Restrict fetch/XHR to known API endpoints
-      "connect-src 'self' https://api.airtable.com https://www.google-analytics.com https://stats.g.doubleclick.net https://www.clarity.ms https://connect.facebook.net https://www.facebook.com https://booking.mangomint.com",
+      "connect-src 'self' https://api.airtable.com https://www.google-analytics.com https://stats.g.doubleclick.net https://www.clarity.ms https://connect.facebook.net https://www.facebook.com https://booking.mangomint.com https://*.ingest.us.sentry.io",
       // Mangomint overlay + GTM noscript iframe
       "frame-src 'self' https://www.googletagmanager.com https://booking.mangomint.com https://app.mangomint.com",
       // Block framing of this site (redundant with X-Frame-Options but belt+suspenders)
@@ -139,4 +141,13 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Suppress source map upload warnings when SENTRY_AUTH_TOKEN is not set
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+  // Upload source maps for better stack traces in Sentry dashboard
+  widenClientFileUpload: true,
+  // Hide source maps from users
+  hideSourceMaps: true,
+  // Disable Sentry telemetry
+  disableLogger: true,
+});
