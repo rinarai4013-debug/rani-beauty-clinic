@@ -44,6 +44,12 @@ const STAGE_PROBABILITIES: Record<string, number> = {
 };
 
 const REVIEWABLE_PHASES: MastermindPhase[] = ['plan_ready', 'provider_review'];
+const FINANCING_READY_THRESHOLD = 2000;
+const STUCK_DAYS_BY_STATUS: Partial<Record<ClinicStatus, number>> = {
+  new: 5,
+  reviewed: 5,
+  contacted: 7,
+};
 
 function estimateSessionValue(session: MastermindSession): number {
   if (session.selectedPackageTier && session.mastermindPlan?.packages) {
@@ -59,7 +65,7 @@ function estimateSessionValue(session: MastermindSession): number {
     if (total > 0) return total;
   }
 
-  return 1500;
+  return 0;
 }
 
 function deriveClinicStatus(session: MastermindSession): ClinicStatus {
@@ -76,6 +82,10 @@ function getCloseProbability(clinicStatus: ClinicStatus, needsReview: boolean, i
   return base;
 }
 
+function getStuckThresholdDays(clinicStatus: ClinicStatus): number | null {
+  return STUCK_DAYS_BY_STATUS[clinicStatus] ?? null;
+}
+
 function normalizeSessionConsult(session: MastermindSession) {
   const clinicStatus = deriveClinicStatus(session);
   const estimatedValue = estimateSessionValue(session);
@@ -86,10 +96,14 @@ function normalizeSessionConsult(session: MastermindSession) {
     (REVIEWABLE_PHASES.includes(session.phase) ||
       (session.phase === 'provider_review' && session.providerReview?.approvalStatus === 'pending'));
 
-  const isStuck = estimatedValue > 500 && daysSinceLastActivity > 3 && !['booked', 'contacted'].includes(clinicStatus);
+  const stuckThresholdDays = getStuckThresholdDays(clinicStatus);
+  const isStuck =
+    estimatedValue > 0 &&
+    stuckThresholdDays !== null &&
+    daysSinceLastActivity >= stuckThresholdDays;
   const closeProbability = getCloseProbability(clinicStatus, needsReview, isStuck);
   const financingReady =
-    estimatedValue >= 2000 &&
+    estimatedValue >= FINANCING_READY_THRESHOLD &&
     (clinicStatus === 'reviewed' || clinicStatus === 'contacted' || clinicStatus === 'booked');
 
   return {
@@ -126,9 +140,13 @@ function normalizeIntakeConsult(record: { id: string; fields: IntakeFields; crea
   const createdAt = record.createdTime ? new Date(record.createdTime).getTime() : Date.now();
   const daysSinceLastActivity = Math.floor((Date.now() - createdAt) / 86400000);
 
-  const isStuck = estimatedValue > 500 && daysSinceLastActivity > 3 && clinicStatus === 'new';
+  const stuckThresholdDays = getStuckThresholdDays(clinicStatus);
+  const isStuck =
+    estimatedValue > 0 &&
+    stuckThresholdDays !== null &&
+    daysSinceLastActivity >= stuckThresholdDays;
   const closeProbability = getCloseProbability(clinicStatus, false, isStuck);
-  const financingReady = estimatedValue >= 1800 && clinicStatus !== 'new';
+  const financingReady = estimatedValue >= FINANCING_READY_THRESHOLD && clinicStatus !== 'new';
 
   return {
     patientName: record.fields['Full Name'] || 'Unknown',
@@ -191,7 +209,7 @@ export async function fetchConsultIntelligence(): Promise<ConsultIntelligence> {
     const financingReady = allConsults.filter((consult) => consult.financingReady);
     const bookedCount = allConsults.filter((consult) => consult.clinicStatus === 'booked').length;
     const topPriorityCandidate = [...reviewNeeded, ...stuckConsults, ...allConsults]
-      .sort((a, b) => b.estimatedValue - a.estimatedValue)[0];
+      .sort((a, b) => (b.weightedValue - a.weightedValue) || (b.estimatedValue - a.estimatedValue))[0];
     const topOpportunities = [...allConsults]
       .sort((a, b) => (b.weightedValue - a.weightedValue) || (b.estimatedValue - a.estimatedValue))
       .slice(0, 5)

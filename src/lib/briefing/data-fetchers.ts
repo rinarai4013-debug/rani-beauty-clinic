@@ -144,7 +144,7 @@ export async function fetchRevenueRange(startDate: string, endDate: string): Pro
     const transactions = await fetchAll<Record<string, unknown>>(
       Tables.transactions(),
       {
-        filterByFormula: `AND(IS_AFTER({${FIELDS.transactions.date}}, '${startDate}'), IS_BEFORE({${FIELDS.transactions.date}}, '${endDate}'), {${FIELDS.transactions.status}} = 'Completed')`,
+        filterByFormula: `AND(OR({${FIELDS.transactions.date}} = '${startDate}', {${FIELDS.transactions.date}} = '${endDate}', AND(IS_AFTER({${FIELDS.transactions.date}}, '${startDate}'), IS_BEFORE({${FIELDS.transactions.date}}, '${endDate}'))), {${FIELDS.transactions.status}} = 'Completed')`,
       }
     );
 
@@ -413,7 +413,7 @@ export async function fetchMarketing(): Promise<MarketingSnapshot> {
     const reviews = await fetchAll<Record<string, unknown>>(
       Tables.reviews(),
       {
-        filterByFormula: `IS_AFTER({${FIELDS.reviews.reviewDate}}, '${sevenDaysAgo}')`,
+        filterByFormula: `OR({${FIELDS.reviews.reviewDate}} = '${sevenDaysAgo}', IS_AFTER({${FIELDS.reviews.reviewDate}}, '${sevenDaysAgo}'))`,
       }
     );
 
@@ -506,7 +506,7 @@ export async function fetchAIHighlights(): Promise<AIHighlights> {
       };
     }
 
-    // Highest no-show risk - check today's appointments for high-risk ones
+    // Highest no-show risk - derive a signal from actual appointment attributes
     const today = getToday();
     const appointments = await fetchFirst<Record<string, unknown>>(
       Tables.appointments(),
@@ -518,16 +518,23 @@ export async function fetchAIHighlights(): Promise<AIHighlights> {
     );
 
     let highestNoShowRisk: AIHighlights['highestNoShowRisk'] = null;
-    // Without no-show prediction scores stored in Airtable, we flag appointments
-    // without deposits as higher risk
     for (const appt of appointments) {
       const depositPaid = Boolean(appt.fields[FIELDS.appointments.depositPaid]);
-      if (!depositPaid) {
+      const isConsult = Boolean(appt.fields[FIELDS.appointments.isConsult]);
+      const bookingSource = String(appt.fields[FIELDS.appointments.bookingSource] || '').toLowerCase();
+      const amountQuoted = Number(appt.fields[FIELDS.appointments.amountQuoted]) || 0;
+      const riskScore =
+        (depositPaid ? 0 : 25) +
+        (isConsult ? 10 : 0) +
+        (bookingSource.includes('new') ? 10 : 0) +
+        (amountQuoted >= 500 ? 10 : 0);
+
+      if (riskScore >= 25) {
         highestNoShowRisk = {
-          clientName: 'Appointment (no deposit)',
+          clientName: 'Appointment needing confirmation',
           service: String(appt.fields[FIELDS.appointments.service] || 'Unknown'),
           time: String(appt.fields[FIELDS.appointments.time] || ''),
-          score: 65,
+          score: Math.min(85, riskScore),
         };
         break;
       }
@@ -570,7 +577,7 @@ export async function fetchProviderPerformance(startDate: string, endDate: strin
     const appointments = await fetchAll<Record<string, unknown>>(
       Tables.appointments(),
       {
-        filterByFormula: `AND(IS_AFTER({${FIELDS.appointments.date}}, '${startDate}'), IS_BEFORE({${FIELDS.appointments.date}}, '${endDate}'))`,
+        filterByFormula: `OR({${FIELDS.appointments.date}} = '${startDate}', {${FIELDS.appointments.date}} = '${endDate}', AND(IS_AFTER({${FIELDS.appointments.date}}, '${startDate}'), IS_BEFORE({${FIELDS.appointments.date}}, '${endDate}')))`,
       }
     );
 
