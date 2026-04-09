@@ -123,8 +123,8 @@ export default function ExpenseBreakdown() {
                   outerRadius={90}
                   paddingAngle={2}
                   dataKey="value"
-                  onClick={(entry) => {
-                    const category = (entry as ExpenseChartDatum | undefined)?.category;
+                  onClick={(_, index) => {
+                    const category = chartData[index]?.category;
                     if (!category) return;
                     setSelectedCategory(selectedCategory === category ? null : category);
                   }}
