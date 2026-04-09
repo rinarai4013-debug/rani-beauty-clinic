@@ -121,9 +121,11 @@ export default function UsageAnalytics({ loading = false }: UsageAnalyticsProps)
                   borderRadius: '8px',
                   fontSize: 11,
                 }}
-                formatter={(value: number, name: string) =>
-                  [`$${value.toFixed(2)}`, name === 'productCost' ? 'Product Cost' : 'Revenue']
-                }
+                formatter={(value, name) => {
+                  const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+                  const label = name === 'productCost' ? 'Product Cost' : 'Revenue';
+                  return [`$${numericValue.toFixed(2)}`, label];
+                }}
               />
               <Bar dataKey="productCost" fill="#EF4444" radius={[0, 2, 2, 0]} name="Product Cost" />
               <Bar dataKey="totalRevenue" fill="#10B981" radius={[0, 2, 2, 0]} name="Revenue" />
@@ -181,7 +183,10 @@ export default function UsageAnalytics({ loading = false }: UsageAnalyticsProps)
                 borderRadius: '8px',
                 fontSize: 12,
               }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Spend']}
+              formatter={(value) => {
+                const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+                return [`$${numericValue.toLocaleString()}`, 'Spend'];
+              }}
             />
             <Line
               type="monotone"
