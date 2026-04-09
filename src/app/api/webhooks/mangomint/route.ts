@@ -282,7 +282,7 @@ async function syncConsultationBooking(data: Record<string, unknown>): Promise<v
           actor: 'Mangomint sync',
         });
         await saveSessionAsync(updated);
-        console.log(`[Mangomint] Auto-linked booking ${mangomintId} to consultation ${session.id} (${session.patientName})`);
+        console.error(`[Mangomint] Auto-linked booking ${mangomintId} to consultation ${session.id} (${session.patientName})`);
         break; // Only link to the most recent matching session
       }
     }

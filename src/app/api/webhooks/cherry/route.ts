@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const body = parsed.data;
 
     // Log the event for audit
-    console.log('[Cherry Webhook] Received event:', {
+    console.error('[Cherry Webhook] Received event:', {
       event: body.event,
       customerId: body.data?.customerId,
       applicationId: body.data?.applicationId,
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       if (applicationId) {
         // First try matching by applicationId if Cherry stores it somewhere
         // For now, log it and fall back to customerId
-        console.log('[Cherry Webhook] Application ID:', applicationId);
+        console.error('[Cherry Webhook] Application ID:', applicationId);
       }
 
       if (customerId) {
@@ -88,13 +88,13 @@ export async function POST(request: NextRequest) {
           [FIELDS.treatmentPlans.status]: 'Booked',
         });
 
-        console.log('[Cherry Webhook] Updated treatment plan to Booked:', {
+        console.error('[Cherry Webhook] Updated treatment plan to Booked:', {
           planId: plan.id,
           clientName: plan.fields['Client Name'],
           amount: body.data.amount,
         });
       } else {
-        console.log('[Cherry Webhook] No matching treatment plan found for:', {
+        console.error('[Cherry Webhook] No matching treatment plan found for:', {
           customerId,
           applicationId,
         });

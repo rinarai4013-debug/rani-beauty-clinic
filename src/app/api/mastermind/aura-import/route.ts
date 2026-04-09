@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Import the Aura scan (specific date or latest)
-    console.log(
+    console.error(
       `[Aura Import API] Importing scan for "${patientName}"${scanDate ? ` on ${scanDate}` : ' (latest)'}`
     );
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     await saveSessionToAirtable(session);
 
     // 4. Run AI analysis on the device scan images
-    console.log('[Aura Import API] Running AI analysis on device scan images...');
+    console.error('[Aura Import API] Running AI analysis on device scan images...');
 
     const useMock = process.env.USE_MOCK_AI === 'true';
     let scanResult;
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       // In mock mode, use the existing mock scan result
       const { mockAuraScanResult } = await import('@/lib/mastermind/mock-data');
       scanResult = mockAuraScanResult();
-      console.log('[Aura Import API] Using mock scan result (USE_MOCK_AI=true)');
+      console.error('[Aura Import API] Using mock scan result (USE_MOCK_AI=true)');
     } else {
       // Run the real AI analysis with device images
       scanResult = await runAIAuraScanWithDevice(
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     session.updatedAt = new Date().toISOString();
     await saveSessionToAirtable(session);
 
-    console.log(
+    console.error(
       `[Aura Import API] Import complete. Aura Score: ${scanResult.auraScore.overall}/100 (${scanResult.auraScore.grade})`
     );
 

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[API] /api/photo/upload — file: ${file.name}, type: ${file.type}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+    console.error(`[API] /api/photo/upload — file: ${file.name}, type: ${file.type}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
 
     // Validate file type (also accept common PDF MIME variants)
     const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');

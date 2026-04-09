@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
           result: scanResult,
         });
         await saveSessionAsync(scanned);
-        console.log(`[Consultation Submit] Auto-scan completed for session ${session.id}`);
+        console.error(`[Consultation Submit] Auto-scan completed for session ${session.id}`);
       } catch (err) {
         console.error('[Consultation Submit] Auto-scan failed:', err);
       }

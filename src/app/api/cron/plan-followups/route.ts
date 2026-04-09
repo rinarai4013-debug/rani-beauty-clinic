@@ -398,7 +398,7 @@ export async function GET(req: NextRequest) {
       true // skip "Is Test" filter — Treatment Plans table doesn't have it
     );
 
-    console.log(`[Plan Follow-Ups] Evaluating ${plans.length} actionable plans`);
+    console.error(`[Plan Follow-Ups] Evaluating ${plans.length} actionable plans`);
 
     // Evaluate rules for each plan
     const actions: FollowUpAction[] = [];
@@ -409,7 +409,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    console.log(`[Plan Follow-Ups] ${actions.length} follow-ups to send`);
+    console.error(`[Plan Follow-Ups] ${actions.length} follow-ups to send`);
 
     // Execute follow-ups sequentially to respect Airtable rate limits
     const results: { planId: string; templateId: string; success: boolean; error?: string; reason: string }[] = [];
@@ -425,7 +425,7 @@ export async function GET(req: NextRequest) {
       });
 
       if (result.success) {
-        console.log(`[Plan Follow-Ups] Sent ${action.templateId} for plan ${action.planId}: ${action.reason}`);
+        console.error(`[Plan Follow-Ups] Sent ${action.templateId} for plan ${action.planId}: ${action.reason}`);
       } else {
         console.warn(`[Plan Follow-Ups] Failed ${action.templateId} for plan ${action.planId}: ${result.error}`);
       }
