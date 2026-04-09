@@ -18,6 +18,7 @@ export const ClientSchema = z.object({
   'Phone': z.string().optional(),
   'Preferred Contact': z.enum(['Email', 'Phone', 'Text']).optional(),
   'Status': z.enum(['New Lead', 'Active', 'Lapsed 30', 'Lapsed 60', 'Lapsed 90', 'Churned']).optional(),
+  'MangoMint Client ID': z.string().optional(),
   'Lead Source': z.string().optional(),
   'Lead Medium': z.string().optional(),
   'Lead Campaign': z.string().optional(),

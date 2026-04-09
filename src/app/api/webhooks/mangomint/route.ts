@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
-import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
+import { Tables, rateLimitedQuery, fetchFirst } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
+import { FIELDS } from '@/lib/airtable/tables';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { captureWebhookEvent } from '@/lib/sentry-utils';
 
@@ -79,6 +80,126 @@ async function upsertRecord(
   }
 }
 
+type ClientRecordFields = Record<string, unknown>;
+
+function getMangomintClientId(data: Record<string, unknown>): string {
+  return String(
+    data.clientId ||
+    data.client_id ||
+    (data.client as Record<string, unknown> | undefined)?.id ||
+    ''
+  );
+}
+
+async function findClientRecord(
+  email?: string,
+  mangomintClientId?: string,
+  fields?: string[]
+): Promise<{ id: string; fields: ClientRecordFields } | null> {
+  if (mangomintClientId) {
+    const byMangomint = await fetchFirst<ClientRecordFields>(
+      Tables.clients(),
+      1,
+      {
+        filterByFormula: `{${FIELDS.clients.mangomintClientId}} = "${sanitizeFormulaValue(mangomintClientId)}"`,
+        ...(fields ? { fields } : {}),
+      },
+      true
+    );
+    if (byMangomint.length > 0) return byMangomint[0];
+  }
+
+  if (email) {
+    const byEmail = await fetchFirst<ClientRecordFields>(
+      Tables.clients(),
+      1,
+      {
+        filterByFormula: `{${FIELDS.clients.email}} = '${sanitizeFormulaValue(email)}'`,
+        ...(fields ? { fields } : {}),
+      },
+      true
+    );
+    if (byEmail.length > 0) return byEmail[0];
+  }
+
+  return null;
+}
+
+function inferFirstBookingSource(
+  data: Record<string, unknown>,
+  clientFields: ClientRecordFields
+): string {
+  const rawBookingSource = String(
+    data.bookingSource ||
+    data.booking_source ||
+    data.source ||
+    ''
+  ).toLowerCase();
+
+  if (rawBookingSource.includes('walk')) return 'Walk-In';
+  if (rawBookingSource.includes('phone') || rawBookingSource.includes('call')) return 'Phone Call';
+  if (rawBookingSource.includes('mango')) return 'Mangomint Direct';
+
+  const landingPage = String(clientFields[FIELDS.clients.leadLandingPage] || '').toLowerCase();
+  const leadOffer = String(clientFields[FIELDS.clients.leadOffer] || '').toLowerCase();
+  const leadMedium = String(clientFields[FIELDS.clients.leadMedium] || '').toLowerCase();
+
+  if (landingPage.includes('/tv')) return 'TV Landing Page';
+  if (landingPage.includes('/glp1')) return 'GLP-1 Landing Page';
+  if (landingPage.includes('/weight-loss')) return 'Weight Loss Landing';
+  if (landingPage.includes('/contact')) return 'Website Contact Form';
+  if (leadOffer.includes('newsletter') || leadMedium === 'email') return 'Newsletter';
+  if (leadOffer.includes('ai concierge')) return 'AI Chat';
+  if (leadOffer.includes('15-minute phone consultation')) return 'Quick Consult';
+  if (leadOffer.includes('skin treatment plan')) return 'Skin Quiz';
+
+  return 'Mangomint Direct';
+}
+
+async function backfillClientBookingAttribution(data: Record<string, unknown>) {
+  const clientEmail = String(data.clientEmail || data.email || '').trim();
+  const mangomintClientId = getMangomintClientId(data);
+  if (!clientEmail && !mangomintClientId) return;
+
+  const client = await findClientRecord(clientEmail, mangomintClientId, [
+    FIELDS.clients.email,
+    FIELDS.clients.leadLandingPage,
+    FIELDS.clients.leadOffer,
+    FIELDS.clients.leadMedium,
+    FIELDS.clients.firstBookingSource,
+    FIELDS.clients.firstBookingOffer,
+    FIELDS.clients.mangomintClientId,
+  ]);
+
+  if (!client) return;
+
+  const updates: Record<string, unknown> = {};
+
+  if (mangomintClientId && !client.fields[FIELDS.clients.mangomintClientId]) {
+    updates[FIELDS.clients.mangomintClientId] = mangomintClientId;
+  }
+
+  if (!client.fields[FIELDS.clients.firstBookingSource]) {
+    updates[FIELDS.clients.firstBookingSource] = inferFirstBookingSource(data, client.fields);
+  }
+
+  if (!client.fields[FIELDS.clients.firstBookingOffer]) {
+    const leadOffer = String(client.fields[FIELDS.clients.leadOffer] || '').trim();
+    const serviceName =
+      String(data.serviceName || (data.service as Record<string, unknown> | undefined)?.name || '').trim();
+    if (leadOffer) {
+      updates[FIELDS.clients.firstBookingOffer] = leadOffer;
+    } else if (serviceName) {
+      updates[FIELDS.clients.firstBookingOffer] = serviceName;
+    }
+  }
+
+  if (Object.keys(updates).length > 0) {
+    await upsertRecord(Tables.clients(), client.id, updates);
+    cache.invalidatePrefix('clients');
+  }
+}
+
 function extractAppointmentFields(data: Record<string, unknown>, statusOverride?: string) {
   const date = (data.startAt as string)?.substring(0, 10) || (data.date as string) || new Date().toISOString().substring(0, 10);
   const clientName = [(data.clientFirstName as string), (data.clientLastName as string)].filter(Boolean).join(' ') || (data.clientName as string) || 'Walk-in';
@@ -93,6 +214,7 @@ function extractAppointmentFields(data: Record<string, unknown>, statusOverride?
     'Start Time': (data.startAt as string) || '',
     'End Time': (data.endAt as string) || '',
     Notes: (data.notes as string) || '',
+    'Booking Source': (data.bookingSource as string) || (data.booking_source as string) || '',
     'MangoMint Appointment ID': String(data.id || ''),
   };
 }
@@ -102,6 +224,7 @@ function extractAppointmentFields(data: Record<string, unknown>, statusOverride?
 async function handleAppointmentCreated(data: Record<string, unknown>, payload: unknown) {
   const fields = extractAppointmentFields(data);
   await upsertRecord(Tables.appointments(), null, fields);
+  await backfillClientBookingAttribution(data);
   cache.invalidatePrefix('schedule');
   cache.invalidatePrefix('kpi');
   await forwardToN8n('/webhook/booking-sync', payload);
@@ -185,6 +308,7 @@ async function handleAppointmentCompleted(data: Record<string, unknown>, payload
     await upsertRecord(Tables.appointments(), null, fields);
   }
 
+  await backfillClientBookingAttribution(data);
   cache.invalidatePrefix('schedule');
   cache.invalidatePrefix('kpi');
   cache.invalidatePrefix('revenue');
@@ -317,21 +441,20 @@ async function handleClientCreated(data: Record<string, unknown>) {
   const email = (data.email as string) || '';
   if (!name) return;
 
-  // Check for existing client by email to prevent duplicates
-  if (email) {
-    const existingId = await findRecordByField(Tables.clients(), 'Email', email, ['Email']);
-    if (existingId) return;
-  }
+  const existing = await findClientRecord(email, String(data.id || ''), [
+    FIELDS.clients.email,
+    FIELDS.clients.mangomintClientId,
+  ]);
 
   const fields: Record<string, unknown> = {
     Client: name,
     Email: email,
     Phone: (data.mobilePhone as string) || (data.phone as string) || '',
     Status: 'Active',
-    'MangoMint Client ID': String(data.id || ''),
+    [FIELDS.clients.mangomintClientId]: String(data.id || ''),
   };
 
-  await upsertRecord(Tables.clients(), null, fields);
+  await upsertRecord(Tables.clients(), existing?.id || null, fields);
   cache.invalidatePrefix('clients');
 }
 
@@ -353,7 +476,7 @@ async function handleClientUpdated(data: Record<string, unknown>) {
     Email: email,
     Phone: (data.mobilePhone as string) || (data.phone as string) || '',
     Status: 'Active',
-    'MangoMint Client ID': mangomintId,
+    [FIELDS.clients.mangomintClientId]: mangomintId,
   };
 
   if (existingId) {

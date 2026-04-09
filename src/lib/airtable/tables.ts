@@ -25,6 +25,7 @@ export const FIELDS = {
     phone: 'Phone',
     preferredContact: 'Preferred Contact',
     status: 'Status',         // Single select
+    mangomintClientId: 'MangoMint Client ID',
     leadSource: 'Lead Source',
     leadMedium: 'Lead Medium',
     leadCampaign: 'Lead Campaign',
