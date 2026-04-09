@@ -41,7 +41,10 @@ export default function RoomUtilizationChart({ rooms }: RoomUtilizationChartProp
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number) => `${value}%`}
+                formatter={(value) => {
+                  const percent = typeof value === 'number' ? value : Number(value ?? 0);
+                  return `${percent}%`;
+                }}
                 contentStyle={{ borderRadius: '8px', border: '1px solid #E8E4DF' }}
               />
             </PieChart>
