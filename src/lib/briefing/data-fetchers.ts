@@ -21,6 +21,10 @@ import {
   AIHighlights,
 } from './types';
 
+export interface BookingAttributionSnapshot {
+  bySource: Record<string, { bookings: number; revenue: number }>;
+}
+
 // ── Date helpers ─────────────────────────────────────────────
 
 function formatDate(date: Date): string {
@@ -442,6 +446,46 @@ export async function fetchMarketing(): Promise<MarketingSnapshot> {
       newLeads: 0, leadsBySource: {}, avgLeadScore: 0,
       reviewCount: 0, avgRating: 0, reviewVelocity: 0,
     };
+  }
+}
+
+export async function fetchBookingAttribution(startDate: string, endDate: string): Promise<BookingAttributionSnapshot> {
+  try {
+    const appointments = await fetchAll<Record<string, unknown>>(
+      Tables.appointments(),
+      {
+        filterByFormula: `OR({${FIELDS.appointments.date}} = '${startDate}', {${FIELDS.appointments.date}} = '${endDate}', AND(IS_AFTER({${FIELDS.appointments.date}}, '${startDate}'), IS_BEFORE({${FIELDS.appointments.date}}, '${endDate}')))`,
+        fields: [
+          FIELDS.appointments.date,
+          FIELDS.appointments.status,
+          FIELDS.appointments.bookingSource,
+          FIELDS.appointments.amountPaid,
+        ],
+      }
+    );
+
+    const bySource: Record<string, { bookings: number; revenue: number }> = {};
+
+    for (const appt of appointments) {
+      const status = String(appt.fields[FIELDS.appointments.status] || '');
+      if (status === 'Cancelled' || status === 'No-Show') continue;
+
+      const rawSource = String(appt.fields[FIELDS.appointments.bookingSource] || 'Unknown');
+      const source = rawSource.trim() || 'Unknown';
+      const amountPaid = Number(appt.fields[FIELDS.appointments.amountPaid]) || 0;
+
+      if (!bySource[source]) {
+        bySource[source] = { bookings: 0, revenue: 0 };
+      }
+
+      bySource[source].bookings += 1;
+      bySource[source].revenue += amountPaid;
+    }
+
+    return { bySource };
+  } catch (err) {
+    console.error('[Briefing] Failed to fetch booking attribution:', err);
+    return { bySource: {} };
   }
 }
 
