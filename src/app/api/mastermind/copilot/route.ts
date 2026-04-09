@@ -9,7 +9,7 @@
  */
 
 import { NextRequest } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicClient } from '@/lib/ai/client';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { parseJsonBody, apiError } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/mastermind';
@@ -21,9 +21,7 @@ type CopilotContext =
   | 'closing'
   | 'general';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const anthropic = getAnthropicClient();
 
 // ── SERVICE CATALOG ──
 

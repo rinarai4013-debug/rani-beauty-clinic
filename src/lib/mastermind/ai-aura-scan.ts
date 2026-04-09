@@ -10,7 +10,7 @@
  * the existing rule-based runAuraScan().
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
 import type {
@@ -460,7 +460,7 @@ export async function runAIAuraScan(
   const startTime = Date.now();
 
   // Guard: no API key
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!hasAnthropicClient()) {
     console.warn(`${LOG_PREFIX} ANTHROPIC_API_KEY not set — falling back to rule-based scan`);
     return toAIResult(await runAuraScan(intakeData, medicalData), false, scanId);
   }
@@ -478,9 +478,7 @@ export async function runAIAuraScan(
     const { base64, mediaType } = parseDataUrl(sourcePhotoUrl);
 
     // Initialize Anthropic client
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+    const anthropic = getAnthropicClient();
 
     // Build the multi-modal message
     const response = await Promise.race([
