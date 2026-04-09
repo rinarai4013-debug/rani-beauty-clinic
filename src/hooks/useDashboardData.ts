@@ -153,6 +153,12 @@ export function useAlerts() {
   });
 }
 
+export function useBriefing() {
+  return useDashboardData('/briefing', {
+    refreshInterval: 60000,
+  });
+}
+
 export function useClinicScore() {
   return useDashboardData('/gamification/score', {
     refreshInterval: 30000,
