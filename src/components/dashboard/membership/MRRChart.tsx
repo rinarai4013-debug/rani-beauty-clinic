@@ -39,10 +39,14 @@ export default function MRRChart({ data, height = 300 }: MRRChartProps) {
           <XAxis dataKey="month" tickFormatter={formatMonth} tick={{ fontSize: 11, fill: '#6B7280' }} />
           <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#6B7280' }} />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              name === 'mrr' ? formatCurrency(value) : value,
-              name === 'mrr' ? 'MRR' : 'Members',
-            ]}
+            formatter={(value, name) => {
+              const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+              const nameKey = String(name ?? '');
+              return [
+                nameKey === 'mrr' ? formatCurrency(numericValue) : numericValue,
+                nameKey === 'mrr' ? 'MRR' : 'Members',
+              ];
+            }}
             labelFormatter={formatMonth}
             contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }}
           />

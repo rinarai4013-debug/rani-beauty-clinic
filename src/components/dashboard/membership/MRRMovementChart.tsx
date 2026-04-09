@@ -33,12 +33,14 @@ export default function MRRMovementChart({ movements, height = 300 }: MRRMovemen
           <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B7280' }} />
           <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#6B7280' }} />
           <Tooltip
-            formatter={(value: number, name: string) => {
+            formatter={(value, name) => {
+              const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+              const nameKey = String(name ?? '');
               const labels: Record<string, string> = {
                 newMRR: 'New', expansionMRR: 'Expansion',
                 reactivationMRR: 'Reactivation', contractionMRR: 'Contraction', churnedMRR: 'Churned',
               };
-              return [formatCurrency(Math.abs(value)), labels[name] || name];
+              return [formatCurrency(Math.abs(numericValue)), labels[nameKey] || nameKey];
             }}
             contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }}
           />

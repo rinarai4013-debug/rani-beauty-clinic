@@ -53,10 +53,13 @@ export default function TierDistribution({ distribution }: TierDistributionProps
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number, name: string) => [
-                  `${value} members (${total > 0 ? Math.round((value / total) * 100) : 0}%)`,
-                  name,
-                ]}
+                formatter={(value, name) => {
+                  const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+                  return [
+                    `${numericValue} members (${total > 0 ? Math.round((numericValue / total) * 100) : 0}%)`,
+                    String(name ?? ''),
+                  ];
+                }}
               />
             </PieChart>
           </ResponsiveContainer>
