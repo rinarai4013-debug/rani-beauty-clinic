@@ -125,6 +125,7 @@ export const FIELDS = {
     planUrl: 'Plan URL',           // URL
     status: 'Status',              // Single select: Sent, Viewed, Selected, Booked, Expired
     createdDate: 'Created Date',   // Date
+    sentAt: 'Sent At',
     intakeRecordId: 'Intake Record ID', // Single-line text (for linking back)
     clientName: 'Client Name',     // Single-line text (denormalized for easy access)
     lastViewedAt: 'Last Viewed At',
