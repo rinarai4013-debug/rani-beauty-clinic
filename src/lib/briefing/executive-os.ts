@@ -91,8 +91,11 @@ export interface ExecutiveBriefingInput {
     activeConsults: number;
     weightedPipelineValue: number;
     stuckCount: number;
+    staleCount: number;
     reviewNeededCount: number;
     bookedCount: number;
+    financingReadyCount: number;
+    avgCloseProbability: number;
     topPriority:
       | {
           patientName: string;
@@ -100,6 +103,14 @@ export interface ExecutiveBriefingInput {
           estimatedValue: number;
         }
       | null;
+    topOpportunities: {
+      patientName: string;
+      action: string;
+      estimatedValue: number;
+      closeProbability: number;
+      clinicStatus: string;
+      financingReady?: boolean;
+    }[];
   };
   reactivation?: {
     totalRecoverableValue: number;
