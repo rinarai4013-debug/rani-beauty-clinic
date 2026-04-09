@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
+import { upsertClientAttribution } from "@/lib/attribution/upsert-client-attribution";
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
 const ContactSchema = z.object({
@@ -20,6 +21,8 @@ const ContactSchema = z.object({
   leadKeyword: z.string().max(150).optional(),
   leadReferrer: z.string().max(500).optional(),
   attributionId: z.string().max(150).optional(),
+  firstTouchAt: z.string().datetime().optional(),
+  lastTouchAt: z.string().datetime().optional(),
   utm_source: z.string().max(150).optional(),
   utm_medium: z.string().max(150).optional(),
   utm_campaign: z.string().max(150).optional(),
@@ -98,6 +101,8 @@ export async function POST(req: NextRequest) {
     leadKeyword,
     leadReferrer,
     attributionId,
+    firstTouchAt,
+    lastTouchAt,
     utm_source,
     utm_medium,
     utm_campaign,
@@ -122,6 +127,8 @@ export async function POST(req: NextRequest) {
     leadKeyword,
     leadReferrer,
     attributionId,
+    firstTouchAt,
+    lastTouchAt,
     utm_source,
     utm_medium,
     utm_campaign,
@@ -161,6 +168,33 @@ export async function POST(req: NextRequest) {
       { error: "We couldn't save your request. Please try again or call us directly." },
       { status: 502 }
     );
+  }
+
+  try {
+    await upsertClientAttribution({
+      name,
+      email,
+      phone,
+      leadSource,
+      leadMedium,
+      leadCampaign,
+      leadAdSet,
+      leadAd,
+      leadOffer,
+      leadLandingPage,
+      leadKeyword,
+      leadReferrer,
+      attributionId,
+      firstTouchAt,
+      lastTouchAt,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+    });
+  } catch (err) {
+    console.error("[contact] Client attribution upsert failed:", err instanceof Error ? err.message : err);
   }
 
   // 2. Send notification email via Resend
@@ -219,6 +253,8 @@ export async function POST(req: NextRequest) {
           leadKeyword,
           leadReferrer,
           attributionId,
+          firstTouchAt,
+          lastTouchAt,
           utm_source,
           utm_medium,
           utm_campaign,

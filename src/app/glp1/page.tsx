@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAttribution } from '@/hooks/useAttribution';
 
 const TIERS = [
   {
@@ -108,6 +109,10 @@ export default function GLP1LandingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const attribution = useAttribution({
+    source: 'glp1-landing-page',
+    leadOffer: 'Brand-Name GLP-1 Weight Management Program',
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,8 +126,10 @@ export default function GLP1LandingPage() {
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
+          service: 'GLP-1 Weight Management',
           message: `GLP-1 Weight Management Lead — Current: ${formData.currentWeight} lbs, Goal: ${formData.goalWeight} lbs. Interested in brand-name Zepbound/Wegovy program.`,
           source: 'glp1-landing-page',
+          ...attribution,
         }),
       });
       if (!res.ok) {

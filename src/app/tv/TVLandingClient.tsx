@@ -2,18 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { clinicInfo } from "@/data/clinic-info";
-
-/* ─── UTM capture ─── */
-function getUTMParams(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  const params = new URLSearchParams(window.location.search);
-  const utm: Record<string, string> = {};
-  ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach((key) => {
-    const val = params.get(key);
-    if (val) utm[key] = val;
-  });
-  return utm;
-}
+import { useAttribution } from "@/hooks/useAttribution";
 
 /* ─── Intersection Observer fade-in ─── */
 function useFadeIn() {
@@ -91,9 +80,12 @@ function ClockIcon() {
 
 /* ─── Main Component ─── */
 export default function TVLandingClient() {
-  const [utmParams, setUtmParams] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", service: "Brazilian Laser Hair Removal" });
   const [submitted, setSubmitted] = useState(false);
+  const attribution = useAttribution({
+    source: "tv-landing-page",
+    leadOffer: "$99 Brazilian Laser Hair Removal + Free Underarm",
+  });
 
   /* Hide parent layout chrome */
   useEffect(() => {
@@ -113,7 +105,6 @@ export default function TVLandingClient() {
       (mobileCTA as HTMLElement).style.display = "none";
       hidden.push(mobileCTA as HTMLElement);
     }
-    setUtmParams(getUTMParams());
     return () => {
       hidden.forEach((el) => (el.style.display = ""));
     };
@@ -136,6 +127,7 @@ export default function TVLandingClient() {
           phone: formData.phone,
           service: formData.service || "TV Landing Page Lead",
           message: `Hulu TV ad lead - interested in: ${formData.service || "General inquiry"}`,
+          ...attribution,
         }),
       });
     } catch {
@@ -553,7 +545,9 @@ export default function TVLandingClient() {
                       </div>
 
                       {/* Hidden UTM fields */}
-                      {Object.entries(utmParams).map(([key, val]) => (
+                      {Object.entries(attribution)
+                        .filter(([, val]) => typeof val === "string" && val.length > 0)
+                        .map(([key, val]) => (
                         <input key={key} type="hidden" name={key} value={val} />
                       ))}
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAttribution } from '@/hooks/useAttribution';
 
 const PRODUCTS = [
   {
@@ -124,6 +125,10 @@ export default function RxSkincarePage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const attribution = useAttribution({
+    source: 'rx-skincare-landing-page',
+    leadOffer: formData.concern || 'Rx Skincare Consultation',
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,8 +141,10 @@ export default function RxSkincarePage() {
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
+          service: formData.concern || 'Rx Skincare Consultation',
           message: `Rx Skincare Lead — Primary concern: ${formData.concern}`,
           source: 'rx-skincare-landing-page',
+          ...attribution,
         }),
       });
     } catch {

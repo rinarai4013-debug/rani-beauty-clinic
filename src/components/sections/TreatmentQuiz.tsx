@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Sparkles, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useAttribution } from "@/hooks/useAttribution";
 
 interface QuizOption {
   label: string;
@@ -62,6 +63,12 @@ export default function TreatmentQuiz() {
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState("");
   const [aiRecommendation, setAiRecommendation] = useState<Record<string, unknown> | null>(null);
+  const selectedGoal =
+    quizSteps[0].options.find((o) => o.value === answers[0])?.label || "Personalized Treatment Plan";
+  const attribution = useAttribution({
+    source: "treatment-quiz",
+    leadOffer: selectedGoal,
+  });
 
   const progress = ((currentStep + 1) / TOTAL_STEPS) * 100;
   const isContactStep = currentStep === quizSteps.length;
@@ -101,6 +108,7 @@ export default function TreatmentQuiz() {
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim() || undefined,
+      service: selectedGoal,
       quizAnswers: {
         primaryGoal:
           quizSteps[0].options.find((o) => o.value === answers[0])?.label || "",
@@ -111,6 +119,7 @@ export default function TreatmentQuiz() {
       },
       source: "treatment-quiz",
       smsConsent,
+      ...attribution,
     };
 
     try {

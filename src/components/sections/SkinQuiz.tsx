@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackAnalyticsEvent } from "@/lib/analytics/events";
+import { useAttribution } from "@/hooks/useAttribution";
 import {
   ArrowRight,
   ArrowLeft,
@@ -340,6 +341,11 @@ export default function SkinQuiz() {
     setDirection(-1);
     setStep((s) => s - 1);
   };
+  const recommendedPlan = concern ? getRecommendations(concern) : null;
+  const attribution = useAttribution({
+    source: "skin-quiz",
+    leadOffer: recommendedPlan?.best.treatment || "Personalized Skin Treatment Plan",
+  });
 
   const handleSubmit = async () => {
     if (!lead.firstName.trim() || !lead.email.trim()) {
@@ -363,6 +369,7 @@ export default function SkinQuiz() {
           name: lead.firstName.trim(),
           email: lead.email.trim(),
           phone: lead.phone.trim() || undefined,
+          service: recommendedPlan?.best.treatment || "Skin Consultation",
           source: "skin-quiz",
           quizAnswers: {
             concern,
@@ -370,6 +377,7 @@ export default function SkinQuiz() {
             budget,
             timeline,
           },
+          ...attribution,
         }),
       });
     } catch {

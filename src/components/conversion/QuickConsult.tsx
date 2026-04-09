@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Phone, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import { trackAnalyticsEvent } from "@/lib/analytics/events";
+import { useAttribution } from "@/hooks/useAttribution";
 
 const SERVICES = [
   "Botox & Dysport",
@@ -30,6 +31,10 @@ export default function QuickConsult() {
   const [callTime, setCallTime] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<FormStatus>("idle");
+  const attribution = useAttribution({
+    source: "quick_consult",
+    leadOffer: service || "Free 15-Minute Phone Consultation",
+  });
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -48,6 +53,7 @@ export default function QuickConsult() {
           service: service || "General Consultation",
           message: `Callback request — preferred time: ${callTime || "Any time"}. Submitted via Quick Consult form.`,
           honeypot,
+          ...attribution,
         }),
       });
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
+import { upsertClientAttribution } from "@/lib/attribution/upsert-client-attribution";
 
 // ── Zod schema ───────────────────────────────────────────────────
 const SubscribeSchema = z.object({
@@ -16,6 +17,8 @@ const SubscribeSchema = z.object({
   leadKeyword: z.string().max(150).optional(),
   leadReferrer: z.string().max(500).optional(),
   attributionId: z.string().max(150).optional(),
+  firstTouchAt: z.string().datetime().optional(),
+  lastTouchAt: z.string().datetime().optional(),
   utm_source: z.string().max(150).optional(),
   utm_medium: z.string().max(150).optional(),
   utm_campaign: z.string().max(150).optional(),
@@ -112,6 +115,8 @@ export async function POST(req: NextRequest) {
     leadKeyword,
     leadReferrer,
     attributionId,
+    firstTouchAt,
+    lastTouchAt,
     utm_source,
     utm_medium,
     utm_campaign,
@@ -136,6 +141,8 @@ export async function POST(req: NextRequest) {
       leadKeyword ? `Lead Keyword: ${leadKeyword}` : null,
       leadReferrer ? `Lead Referrer: ${leadReferrer}` : null,
       attributionId ? `Attribution ID: ${attributionId}` : null,
+      firstTouchAt ? `First Touch At: ${firstTouchAt}` : null,
+      lastTouchAt ? `Last Touch At: ${lastTouchAt}` : null,
       utm_source ? `UTM Source: ${utm_source}` : null,
       utm_medium ? `UTM Medium: ${utm_medium}` : null,
       utm_campaign ? `UTM Campaign: ${utm_campaign}` : null,
@@ -164,6 +171,31 @@ export async function POST(req: NextRequest) {
     // Don't block the user — still attempt n8n
   }
 
+  try {
+    await upsertClientAttribution({
+      email,
+      leadSource,
+      leadMedium,
+      leadCampaign,
+      leadAdSet,
+      leadAd,
+      leadOffer,
+      leadLandingPage,
+      leadKeyword,
+      leadReferrer,
+      attributionId,
+      firstTouchAt,
+      lastTouchAt,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+    });
+  } catch (err) {
+    console.error("[subscribe] Client attribution upsert failed:", err instanceof Error ? err.message : err);
+  }
+
   // 6. Forward to n8n webhook if configured
   const n8nUrl = process.env.N8N_WEBHOOK_URL;
   if (n8nUrl) {
@@ -185,6 +217,8 @@ export async function POST(req: NextRequest) {
           leadKeyword,
           leadReferrer,
           attributionId,
+          firstTouchAt,
+          lastTouchAt,
           utm_source,
           utm_medium,
           utm_campaign,

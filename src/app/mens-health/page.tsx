@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAttribution } from '@/hooks/useAttribution';
 
 const TIERS = [
   {
@@ -124,6 +125,10 @@ export default function MensHealthPage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const attribution = useAttribution({
+    source: 'mens-health-landing-page',
+    leadOffer: formData.interest || "Men's Health Consultation",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,8 +141,10 @@ export default function MensHealthPage() {
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
+          service: formData.interest || "Men's Health Consultation",
           message: `Men's Health Lead — Interested in: ${formData.interest}`,
           source: 'mens-health-landing-page',
+          ...attribution,
         }),
       });
     } catch {

@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { trackAnalyticsEvent, trackCTAClick, trackBookingOpen, trackPhoneClick } from "@/lib/analytics/events";
+import { useAttribution } from "@/hooks/useAttribution";
 import { MapPin, Phone, Clock, Mail, CheckCircle, Calendar } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -93,6 +94,10 @@ export default function ContactPageClient() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const attribution = useAttribution({
+    source: "contact_page",
+    leadOffer: formData.service || "Consultation Request",
+  });
 
   // Pre-fill service from query param (e.g. /contact?service=GLP-1+Weight+Loss)
   useEffect(() => {
@@ -124,7 +129,10 @@ export default function ContactPageClient() {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          ...attribution,
+        }),
       });
 
       const result = await response.json();

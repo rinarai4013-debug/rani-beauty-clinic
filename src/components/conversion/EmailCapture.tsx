@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { trackAnalyticsEvent } from "@/lib/analytics/events";
+import { useAttribution } from "@/hooks/useAttribution";
 
 interface EmailCaptureProps {
   /** "compact" for footer placement, "full" for standalone section */
@@ -27,6 +28,10 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const attribution = useAttribution({
+    source: `newsletter_${variant}`,
+    leadOffer: "Exclusive Beauty Intelligence Newsletter",
+  });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -43,6 +48,7 @@ export default function EmailCapture({ variant = "full" }: EmailCaptureProps) {
           email,
           source: `newsletter_${variant}`,
           honeypot,
+          ...attribution,
         }),
       });
 
