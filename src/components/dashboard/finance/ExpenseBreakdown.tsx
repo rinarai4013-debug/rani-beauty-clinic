@@ -37,6 +37,13 @@ const CATEGORY_LABELS: Record<ClinicExpenseCategory, string> = {
   professional_services: 'Professional Services',
 };
 
+type ExpenseChartDatum = {
+  name: string;
+  value: number;
+  percentage: number;
+  category: ClinicExpenseCategory;
+};
+
 export default function ExpenseBreakdown() {
   const [period, setPeriod] = useState<'monthly' | 'quarterly' | 'annual'>('monthly');
   const [selectedCategory, setSelectedCategory] = useState<ClinicExpenseCategory | null>(null);
@@ -50,7 +57,7 @@ export default function ExpenseBreakdown() {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
-  const chartData = data
+  const chartData: ExpenseChartDatum[] = data
     ? Object.entries(data.byCategory)
         .filter(([, v]) => v.amount > 0)
         .map(([key, value]) => ({
@@ -116,9 +123,11 @@ export default function ExpenseBreakdown() {
                   outerRadius={90}
                   paddingAngle={2}
                   dataKey="value"
-                  onClick={(entry) => setSelectedCategory(
-                    selectedCategory === entry.category ? null : entry.category,
-                  )}
+                  onClick={(entry) => {
+                    const category = (entry as ExpenseChartDatum | undefined)?.category;
+                    if (!category) return;
+                    setSelectedCategory(selectedCategory === category ? null : category);
+                  }}
                   style={{ cursor: 'pointer' }}
                 >
                   {chartData.map((entry) => (
