@@ -14,73 +14,35 @@ import { resolveToken } from '@/lib/mastermind/share-token';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { Tables } from '@/lib/airtable/client';
 import { rateLimitedQuery } from '@/lib/airtable/client';
+import { z } from 'zod';
 
 // ── Validation ──
 
-interface InterestPayload {
-  token: string;
-  name: string;
-  phone: string;
-  packageTier: 'Start' | 'Transform' | 'Elite';
-  message?: string;
-}
-
-function validatePayload(body: unknown): { valid: true; data: InterestPayload } | { valid: false; error: string } {
-  if (!body || typeof body !== 'object') {
-    return { valid: false, error: 'Request body is required' };
-  }
-
-  const b = body as Record<string, unknown>;
-
-  if (!b.token || typeof b.token !== 'string') {
-    return { valid: false, error: 'token is required' };
-  }
-  if (!b.name || typeof b.name !== 'string' || b.name.trim().length < 2) {
-    return { valid: false, error: 'name is required (minimum 2 characters)' };
-  }
-  if (!b.phone || typeof b.phone !== 'string' || b.phone.replace(/\D/g, '').length < 10) {
-    return { valid: false, error: 'A valid phone number is required' };
-  }
-  if (!b.packageTier || !['Start', 'Transform', 'Elite'].includes(b.packageTier as string)) {
-    return { valid: false, error: 'packageTier must be Start, Transform, or Elite' };
-  }
-
-  return {
-    valid: true,
-    data: {
-      token: b.token as string,
-      name: (b.name as string).trim(),
-      phone: (b.phone as string).trim(),
-      packageTier: b.packageTier as InterestPayload['packageTier'],
-      message: typeof b.message === 'string' ? b.message.trim() : undefined,
-    },
-  };
-}
+const InterestPayloadSchema = z.object({
+  token: z.string().trim().min(1, 'token is required'),
+  name: z.string().trim().min(2, 'name is required (minimum 2 characters)'),
+  phone: z
+    .string()
+    .trim()
+    .transform((value) => value.replace(/\D/g, ''))
+    .refine((value) => value.length >= 10, 'A valid phone number is required'),
+  packageTier: z.enum(['Start', 'Transform', 'Elite']),
+  message: z.string().trim().optional().transform((value) => value || undefined),
+});
 
 // ── POST Handler ──
 
 export async function POST(request: NextRequest) {
   try {
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
+  const parsed = InterestPayloadSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: 'Invalid JSON body' },
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid JSON body' },
         { status: 400 }
       );
     }
 
-    // Validate payload
-    const validation = validatePayload(body);
-    if (!validation.valid) {
-      return NextResponse.json(
-        { success: false, error: validation.error },
-        { status: 400 }
-      );
-    }
-
-    const { token, name, phone, packageTier, message } = validation.data;
+    const { token, name, phone, packageTier, message } = parsed.data;
 
     // Validate token (checks cache, falls back to Airtable)
     const tokenRecord = await resolveToken(token);

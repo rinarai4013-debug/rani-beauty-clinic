@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
+import { z } from 'zod';
 import {
   buildAnalytics,
   determineTier,
@@ -11,9 +12,27 @@ import {
   type LoyaltyMember,
   type PointsTransaction,
   type LoyaltyAnalytics,
-  type BonusType,
 } from '@/lib/loyalty/engine';
 import { getAvailableRewards } from '@/lib/loyalty/rewards';
+
+const LoyaltyTierSchema = z.enum(['Silver', 'Gold', 'Platinum']);
+const AwardBonusSchema = z.object({
+  action: z.literal('award_bonus'),
+  clientId: z.string().trim().min(1, 'clientId required'),
+  bonusType: z.enum(['birthday', 'review', 'referral', 'visit_streak', 'tier_up']),
+});
+const ProcessSpendSchema = z.object({
+  action: z.literal('process_spend'),
+  clientId: z.string().trim().min(1, 'clientId required'),
+  amount: z.number().positive('amount must be greater than 0'),
+  serviceType: z.string().trim().min(1, 'serviceType required'),
+});
+const LoyaltyPostSchema = z.discriminatedUnion('action', [AwardBonusSchema, ProcessSpendSchema]);
+
+const LoyaltyRewardsQuerySchema = z.object({
+  tier: LoyaltyTierSchema.optional().default('Silver'),
+  balance: z.coerce.number().int().min(0).optional().default(0),
+});
 
 /**
  * GET /api/dashboard/loyalty
@@ -76,8 +95,16 @@ export async function GET(req: NextRequest) {
     }
 
     if (action === 'rewards') {
-      const tier = (searchParams.get('tier') || 'Silver') as 'Silver' | 'Gold' | 'Platinum';
-      const balance = parseInt(searchParams.get('balance') || '0', 10);
+      const rewardsQuery = LoyaltyRewardsQuerySchema.safeParse({
+        tier: searchParams.get('tier'),
+        balance: searchParams.get('balance') ?? undefined,
+      });
+
+      if (!rewardsQuery.success) {
+        return NextResponse.json({ error: 'Invalid rewards query parameters' }, { status: 400 });
+      }
+
+      const { tier, balance } = rewardsQuery.data;
       const rewards = getAvailableRewards(tier, balance);
       return NextResponse.json({ rewards });
     }
@@ -108,32 +135,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await req.json();
-    const { action, clientId } = body;
-
-    if (!action || !clientId) {
-      return NextResponse.json({ error: 'action and clientId required' }, { status: 400 });
+    const parsed = LoyaltyPostSchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 
-    if (action === 'award_bonus') {
-      const { bonusType } = body;
-      if (!bonusType) {
-        return NextResponse.json({ error: 'bonusType required' }, { status: 400 });
-      }
+    const { action, clientId } = parsed.data;
 
+    if (action === 'award_bonus') {
       // In production: fetch member from Airtable, update, save
       const member = generateSampleMembers().find(m => m.clientId === clientId);
       if (!member) {
         return NextResponse.json({ error: 'Member not found' }, { status: 404 });
       }
 
-      const result = awardBonus(member, bonusType as BonusType);
+      const result = awardBonus(member, parsed.data.bonusType);
       cache.invalidate('loyalty:analytics');
 
       return NextResponse.json({
         success: true,
         ...result,
       });
+    }
+
+    if (action === 'process_spend') {
+      return NextResponse.json(
+        { error: 'process_spend is not implemented yet' },
+        { status: 501 }
+      );
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

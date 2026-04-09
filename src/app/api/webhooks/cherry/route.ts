@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { z } from 'zod';
 
 // ─── Types ────────────────────────────────────────────────────────
-interface CherryWebhookPayload {
-  event: string;
-  data: {
-    amount?: number;
-    customerId?: string;
-    status?: string;
-    applicationId?: string;
-  };
-}
+const CherryWebhookDataSchema = z.object({
+  amount: z.number().nonnegative().optional(),
+  customerId: z.string().trim().min(1).optional(),
+  status: z.string().trim().min(1).optional(),
+  applicationId: z.string().trim().min(1).optional(),
+});
+
+const CherryWebhookPayloadSchema = z.object({
+  event: z.string().trim().min(1),
+  data: CherryWebhookDataSchema,
+});
 
 interface TreatmentPlanFields {
   [key: string]: unknown;
@@ -24,7 +27,13 @@ interface TreatmentPlanFields {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as CherryWebhookPayload;
+    const parsed = CherryWebhookPayloadSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      console.warn('[Cherry Webhook] Invalid payload:', parsed.error.issues[0]?.message);
+      return NextResponse.json({ received: true, warning: 'Invalid payload' }, { status: 200 });
+    }
+
+    const body = parsed.data;
 
     // Log the event for audit
     console.log('[Cherry Webhook] Received event:', {
