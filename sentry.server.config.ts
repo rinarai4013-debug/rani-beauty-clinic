@@ -1,3 +1,5 @@
+export {};
+
 try {
   const Sentry = require("@sentry/nextjs");
   if (process.env.NEXT_PUBLIC_SENTRY_DSN) {

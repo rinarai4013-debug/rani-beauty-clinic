@@ -70,7 +70,7 @@ async function upsertRecord(
   } else {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.create([{ fields }] as Parameters<typeof table.create>[0], { typecast: true }, (err: unknown) => {
+        table.create([{ fields }] as unknown as Parameters<typeof table.create>[0], { typecast: true }, (err: unknown) => {
           if (err) reject(err);
           else resolve();
         });

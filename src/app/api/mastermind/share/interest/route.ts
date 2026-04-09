@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
           'Treatment Value (AI)': selectedPackage
             ? `$${selectedPackage.price.toLocaleString()}`
             : '',
-        } as Record<string, unknown>)
+        } as any)
       );
       airtableSuccess = true;
     } catch (err) {

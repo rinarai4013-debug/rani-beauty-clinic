@@ -339,7 +339,7 @@ export interface MastermindSession {
   simulationComparison: SimulationComparison | null;
 
   // Phase 6: Presentation
-  selectedPackageTier: 'Start' | 'Transform' | 'Elite' | null;
+  selectedPackageTier: 'Start' | 'Transform' | 'Elite' | 'Essential' | null;
   pdfUrl: string | null;
   bookedAppointmentId: string | null;
 
@@ -362,7 +362,7 @@ export type MastermindSessionAction =
   | { type: 'ADD_MODIFICATION'; modification: PlanModification }
   | { type: 'SET_APPROVAL_STATUS'; status: ProviderReviewState['approvalStatus']; actor?: string }
   | { type: 'SET_SIMULATION'; comparison: SimulationComparison }
-  | { type: 'SELECT_PACKAGE'; tier: 'Start' | 'Transform' | 'Elite' }
+  | { type: 'SELECT_PACKAGE'; tier: 'Start' | 'Transform' | 'Elite' | 'Essential' }
   | { type: 'SET_PDF_URL'; url: string }
   | { type: 'SET_BOOKED'; appointmentId: string }
   | { type: 'COMPLETE' }

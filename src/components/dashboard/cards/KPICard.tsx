@@ -1,1 +1,1 @@
-export default function KPICard() { return null; }
+export default function KPICard(props: Record<string, unknown>) { return null; }

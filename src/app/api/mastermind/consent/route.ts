@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     // Store consent records in session — use a consent extension on the session object.
     // We store them as a JSON array in a custom property that gets serialized with the session.
-    const sessionAny = session as Record<string, unknown>;
+    const sessionAny = session as unknown as Record<string, unknown>;
     const existingConsents: ConsentRecord[] = Array.isArray(sessionAny._consentRecords)
       ? (sessionAny._consentRecords as ConsentRecord[])
       : [];
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
       return apiError('Session not found', 404);
     }
 
-    const sessionAny = session as Record<string, unknown>;
+    const sessionAny = session as unknown as Record<string, unknown>;
     const consents: ConsentRecord[] = Array.isArray(sessionAny._consentRecords)
       ? (sessionAny._consentRecords as ConsentRecord[])
       : [];

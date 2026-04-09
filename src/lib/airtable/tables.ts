@@ -127,6 +127,13 @@ export const FIELDS = {
     createdDate: 'Created Date',   // Date
     intakeRecordId: 'Intake Record ID', // Single-line text (for linking back)
     clientName: 'Client Name',     // Single-line text (denormalized for easy access)
+    lastViewedAt: 'Last Viewed At', // Date/time
+    viewCount: 'View Count',       // Number
+    financingClickedAt: 'Financing Clicked At', // Date/time
+    sentAt: 'Sent At',             // Date/time
+    clientEmail: 'Client Email',   // Email
+    clientPhone: 'Client Phone',   // Phone
+    followUpsSent: 'Follow Ups Sent', // Long text (JSON)
   },
   packages: {
     name: 'Package Name',

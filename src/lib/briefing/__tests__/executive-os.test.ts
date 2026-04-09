@@ -164,4 +164,45 @@ describe('buildExecutiveBriefing', () => {
     expect(titles.some((title) => title.includes('Re-engage'))).toBe(true);
     expect(titles.some((title) => title.includes('Confirm'))).toBe(true);
   });
+
+  it('surfaces consult bottleneck, retention drag, and provider friction when enrichment signals exist', () => {
+    const briefing = buildExecutiveBriefing({
+      revenue: baseRevenue,
+      schedule: { ...baseSchedule, consultCount: 0 },
+      alerts: {
+        total: 0,
+        bySeverity: { critical: 0, warning: 0, info: 0 },
+        items: [],
+      },
+      marketing: { ...baseMarketing, newLeads: 5 },
+      cashFlow: baseCashFlow,
+      aiHighlights: {
+        topChurnRiskClient: null,
+        highestNoShowRisk: null,
+        revenueAnomaly: null,
+      },
+      loyalty: { ...baseLoyalty, newMembers: 1, churnedMembers: 3 },
+      referrals: baseReferrals,
+      clientGrowth: {
+        totalClients: 120,
+        newClients: 2,
+        churnedClients: 5,
+        netGrowth: -3,
+      },
+      providerPerformance: {
+        Rina: { revenue: 4000, appointments: 20, shows: 16, noShows: 4 },
+        Mom: { revenue: 5200, appointments: 22, shows: 21, noShows: 1 },
+      },
+    });
+
+    const pressureLabels = briefing.pressurePoints.map((point) => point.label);
+    const titles = briefing.topMoves.map((move) => move.title);
+
+    expect(pressureLabels).toContain('Consult bottleneck');
+    expect(pressureLabels).toContain('Retention drag');
+    expect(pressureLabels).toContain('Provider friction');
+    expect(titles.some((title) => title.includes('Convert 5 fresh leads into consults'))).toBe(true);
+    expect(titles.some((title) => title.includes('Launch a member save push'))).toBe(true);
+    expect(titles.some((title) => title.includes("Stabilize Rina's schedule quality"))).toBe(true);
+  });
 });

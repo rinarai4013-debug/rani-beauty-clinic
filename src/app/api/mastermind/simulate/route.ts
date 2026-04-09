@@ -160,8 +160,10 @@ export async function POST(request: NextRequest) {
       if (session.auraScanResult?.auraScore) {
         const scan = session.auraScanResult;
         const concerns = scan.detectedConcerns?.map((c: { concern: string }) => c.concern) || [];
-        const chronoAge = session.intakeData?.age
-          ? Number(session.intakeData.age)
+        const dobStr = session.intakeData?.dob;
+        const dobAge = dobStr ? Math.floor((Date.now() - new Date(dobStr).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : NaN;
+        const chronoAge = !isNaN(dobAge)
+          ? dobAge
           : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
 
         // Get plan cost if available

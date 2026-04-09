@@ -188,7 +188,7 @@ function FloatingParticles({ count = 20 }: { count?: number }) {
 
 // ── STAGGER ANIMATION VARIANTS ──
 
-const containerVariants = {
+const containerVariants: import('framer-motion').Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -196,7 +196,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: import('framer-motion').Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -205,7 +205,7 @@ const itemVariants = {
   },
 };
 
-const cardHover = {
+const cardHover: import('framer-motion').Variants = {
   rest: { scale: 1, y: 0 },
   hover: {
     scale: 1.02,

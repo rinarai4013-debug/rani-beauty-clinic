@@ -17,10 +17,12 @@ export interface PlanPhase {
 }
 
 export interface GeneratedPackage {
-  tier: 'Start' | 'Transform' | 'Elite';
+  tier: 'Start' | 'Transform' | 'Elite' | 'Essential';
   name: string;
   subtitle: string;
   price: number;
+  /** Alias for price — used in plan presentation and copilot contexts */
+  totalPrice?: number;
   originalPrice: number;
   discount: number; // percentage
   sessions: number;

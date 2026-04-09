@@ -495,6 +495,11 @@ export function getCampaignTypeDefaults(type: CampaignType): {
       suggestedBody: 'Happy Birthday, {{clientName}}! As our gift to you, enjoy a special birthday treat at Rani Beauty Clinic.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'both',
     },
+    direct: {
+      suggestedSubject: 'Message from Rani Beauty Clinic',
+      suggestedBody: 'Hi {{clientName}}, we wanted to reach out personally.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      defaultChannel: 'both',
+    },
   };
 
   return defaults[type];

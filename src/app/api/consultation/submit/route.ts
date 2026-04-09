@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             'Phone Number': (intakeData.phone as string) || '',
             'Processing Status': 'New',
             'Intake Summary (AI)': intakeSummary,
-          } as Record<string, unknown>,
+          } as any,
           { typecast: true }
         );
       });

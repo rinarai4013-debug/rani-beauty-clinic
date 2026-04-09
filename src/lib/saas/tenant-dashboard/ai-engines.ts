@@ -252,7 +252,7 @@ export async function runChurnPrediction(
     const memScore = hasMembership ? 10 : 60;
 
     const score = Math.round(recencyScore * 0.4 + freqScore * 0.2 + moneyScore * 0.15 + memScore * 0.15 + 30 * 0.1);
-    const risk = score >= 75 ? 'critical' : score >= 50 ? 'high' : score >= 30 ? 'moderate' : 'low';
+    const risk: TenantChurnPrediction['risk'] = score >= 75 ? 'critical' : score >= 50 ? 'high' : score >= 30 ? 'moderate' : 'low';
 
     const actions: Record<string, string> = {
       critical: 'Immediate personal call from provider',
@@ -273,6 +273,7 @@ export async function runChurnPrediction(
         { name: 'Membership', score: memScore, weight: 15, detail: hasMembership ? 'Active member' : 'No membership' },
       ],
       recommendation: `Client is ${risk} risk. ${actions[risk]}`,
+      predictedChurnDate: risk === 'critical' ? new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10) : undefined,
       suggestedAction: actions[risk],
       automationAvailable: risk !== 'critical',
     };

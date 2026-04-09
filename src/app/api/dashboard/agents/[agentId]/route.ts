@@ -51,7 +51,7 @@ export async function GET(
     // Build report by fetching from the agent's internal API routes
     const report = await buildAgentReport(agentId as AgentId, request);
 
-    cache.set(cacheKey, report, TTL.NORMAL);
+    cache.set(cacheKey, report, TTL.STANDARD);
     return NextResponse.json({ success: true, data: report });
   } catch (error) {
     console.error(`Agent report error:`, error);

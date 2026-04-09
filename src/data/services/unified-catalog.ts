@@ -32,6 +32,8 @@ export interface UnifiedService {
   financingEligible: boolean;
   packageDiscounts?: { qty: number; discount: number }[];
   note?: string;
+  results?: string;
+  downtime?: string;
 }
 
 // ─── Full Service Catalog ───────────────────────────────────────────

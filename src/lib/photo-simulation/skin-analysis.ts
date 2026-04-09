@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk';
 import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
 import { UNIFIED_CATALOG, getServicesByConcern, type UnifiedService } from '@/data/services/unified-catalog';
 import { getPresetsForService } from './filter-presets';

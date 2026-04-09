@@ -68,8 +68,10 @@ export async function GET() {
         endTime: a.fields['End Time'] || '10:00',
         service: a.fields['Service Name'] || 'Unknown',
         provider: a.fields['Provider'] || 'Unknown',
-        client: a.fields['Client'] || 'Unknown',
-        status: a.fields['Status'] || 'Scheduled',
+        clientName: a.fields['Client'] || 'Unknown',
+        clientType: 'returning' as const,
+        estimatedRevenue: 0,
+        status: (a.fields['Status'] === 'Scheduled' ? 'confirmed' : a.fields['Status']?.toLowerCase() || 'confirmed') as AppointmentData['status'],
         room: a.fields['Room'] || undefined,
       }));
 
@@ -80,16 +82,18 @@ export async function GET() {
       appointments: appointmentData,
       providers: uniqueProviders.map(name => ({
         name,
+        role: 'provider' as const,
+        workingDays: [1, 2, 3, 4, 5], // Mon-Fri default
         startTime: '09:00',
         endTime: '18:00',
-        breakStart: '12:00',
-        breakEnd: '13:00',
-        daysAvailable: [1, 2, 3, 4, 5], // Mon-Fri default
+        services: [],
+        maxDailyAppointments: 10,
+        preferredBreakTime: '12:00',
       })),
       rooms: [
-        { id: 'room-1', name: 'Treatment Room 1', equipment: ['laser', 'hydrafacial'] },
-        { id: 'room-2', name: 'Treatment Room 2', equipment: ['rf-microneedling'] },
-        { id: 'room-3', name: 'Consultation Room', equipment: [] },
+        { name: 'Treatment Room 1', equipment: ['laser', 'hydrafacial'], suitableServices: [] },
+        { name: 'Treatment Room 2', equipment: ['rf-microneedling'], suitableServices: [] },
+        { name: 'Consultation Room', equipment: [], suitableServices: [] },
       ],
       historicalPatterns: [], // Future: aggregate from past data
       serviceConfig: [], // Future: map from service catalog
@@ -104,7 +108,7 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.NORMAL);
+    cache.set(cacheKey, result, TTL.STANDARD);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Schedule optimization error:', error);

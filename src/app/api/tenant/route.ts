@@ -13,7 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTenantStore } from '@/lib/tenant/resolver';
-import { isValidSlug, TIER_FEATURES, type SubscriptionTier } from '@/lib/tenant/config';
+import { isValidSlug, TIER_FEATURES, type SubscriptionTier, type TenantConfig } from '@/lib/tenant/config';
 import { getSession } from '@/lib/auth/session';
 import { createNewTenant } from '@/lib/tenant/onboarding';
 import { z } from 'zod';
@@ -231,7 +231,7 @@ export async function DELETE(request: NextRequest) {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function sanitizeTenantForResponse(tenant: Record<string, unknown> | { id: string; name: string; slug: string; airtable: { baseId: string; pat: string }; [key: string]: unknown }) {
+function sanitizeTenantForResponse(tenant: TenantConfig | Record<string, unknown>) {
   // Remove sensitive fields from API responses
   const safe = { ...tenant } as Record<string, unknown>;
 

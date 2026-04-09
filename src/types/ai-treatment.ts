@@ -174,6 +174,7 @@ export interface PaymentOption {
 
 export interface Contraindication {
   treatment: string;
+  condition?: string;
   reason: string;
   severity: 'absolute' | 'relative' | 'caution';
   medicalFactor: string;
@@ -320,6 +321,7 @@ export interface MedicalFlag {
   flag: string;
   severity: 'info' | 'warning' | 'critical';
   action: string;
+  recommendation?: string;
   relatedTreatments: string[];
 }
 

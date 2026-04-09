@@ -69,6 +69,19 @@ export interface ExecutiveBriefingInput {
   aiHighlights: AIHighlights;
   loyalty: LoyaltySnapshot;
   referrals: ReferralSnapshot;
+  providerPerformance?: Record<string, { revenue: number; appointments: number; shows: number; noShows: number }>;
+  clientGrowth?: {
+    totalClients: number;
+    newClients: number;
+    churnedClients: number;
+    netGrowth: number;
+  };
+}
+
+interface ProviderPressureSignal {
+  provider: string;
+  noShowRate: number;
+  revenuePerAppointment: number;
 }
 
 function formatCurrency(value: number | null): string {
@@ -129,6 +142,31 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
     });
   }
 
+  if (input.marketing.newLeads >= 3 && input.schedule.consultCount === 0) {
+    points.push({
+      label: 'Consult bottleneck',
+      severity: 'warning',
+      detail: `${input.marketing.newLeads} fresh lead${input.marketing.newLeads === 1 ? '' : 's'} surfaced, but no consults are visible in today’s schedule.`,
+    });
+  }
+
+  if (input.clientGrowth && input.clientGrowth.churnedClients > input.clientGrowth.newClients) {
+    points.push({
+      label: 'Retention drag',
+      severity: 'warning',
+      detail: `${input.clientGrowth.churnedClients} churned client${input.clientGrowth.churnedClients === 1 ? '' : 's'} outpaced ${input.clientGrowth.newClients} new client${input.clientGrowth.newClients === 1 ? '' : 's'}.`,
+    });
+  }
+
+  const providerPressure = getProviderPressure(input.providerPerformance);
+  if (providerPressure) {
+    points.push({
+      label: 'Provider friction',
+      severity: providerPressure.noShowRate >= 20 ? 'warning' : 'info',
+      detail: `${providerPressure.provider} is carrying a ${Math.round(providerPressure.noShowRate)}% no-show rate and ${formatCurrency(providerPressure.revenuePerAppointment)} per appointment.`,
+    });
+  }
+
   if (input.marketing.newLeads === 0) {
     points.push({
       label: 'Lead flow softness',
@@ -142,6 +180,7 @@ function buildPressurePoints(input: ExecutiveBriefingInput): ExecutivePressurePo
 
 function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
   const moves: ExecutiveMove[] = [];
+  const providerPressure = getProviderPressure(input.providerPerformance);
 
   if (input.schedule.gaps.length > 0) {
     const firstGap = input.schedule.gaps[0];
@@ -166,6 +205,17 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
     });
   }
 
+  if (input.marketing.newLeads >= 3 && input.schedule.consultCount === 0) {
+    moves.push({
+      title: `Convert ${input.marketing.newLeads} fresh leads into consults`,
+      why: 'Lead volume is showing up, but the consult calendar is not catching it yet.',
+      owner: 'frontdesk',
+      urgency: 'today',
+      estimatedImpact: 'Protect near-term conversion momentum',
+      actionType: 'marketing',
+    });
+  }
+
   if (input.aiHighlights.highestNoShowRisk) {
     moves.push({
       title: `Confirm ${input.aiHighlights.highestNoShowRisk.clientName}'s appointment`,
@@ -174,6 +224,28 @@ function buildTopMoves(input: ExecutiveBriefingInput): ExecutiveMove[] {
       urgency: 'now',
       estimatedImpact: 'Protect one vulnerable booking',
       actionType: 'risk_control',
+    });
+  }
+
+  if (providerPressure) {
+    moves.push({
+      title: `Stabilize ${providerPressure.provider}'s schedule quality`,
+      why: `${providerPressure.provider} is showing elevated no-show pressure and softer yield per appointment.`,
+      owner: 'operations',
+      urgency: providerPressure.noShowRate >= 20 ? 'today' : 'this_week',
+      estimatedImpact: 'Recover provider utilization and schedule yield',
+      actionType: 'schedule_fill',
+    });
+  }
+
+  if (input.clientGrowth && input.clientGrowth.churnedClients > input.clientGrowth.newClients) {
+    moves.push({
+      title: 'Launch a member save push',
+      why: `Client churn is outrunning new growth (${input.clientGrowth.churnedClients} churned vs ${input.clientGrowth.newClients} new).`,
+      owner: 'operations',
+      urgency: 'today',
+      estimatedImpact: 'Reduce retention drag before it compounds',
+      actionType: 'retention',
     });
   }
 
@@ -232,7 +304,33 @@ function buildWatchList(input: ExecutiveBriefingInput): string[] {
     items.push('Cash position is below the preferred comfort threshold.');
   }
 
+  if (input.clientGrowth && input.clientGrowth.netGrowth <= 0) {
+    items.push('Client growth is flat to negative, so retention needs a closer daily look.');
+  }
+
+  const providerPressure = getProviderPressure(input.providerPerformance);
+  if (providerPressure && providerPressure.noShowRate >= 15) {
+    items.push(`${providerPressure.provider} has a rising no-show pattern worth tightening up.`);
+  }
+
   return items.slice(0, 4);
+}
+
+function getProviderPressure(
+  providerPerformance?: Record<string, { revenue: number; appointments: number; shows: number; noShows: number }>
+): ProviderPressureSignal | null {
+  if (!providerPerformance) return null;
+
+  const ranked = Object.entries(providerPerformance)
+    .map(([provider, stats]) => {
+      const noShowRate = stats.appointments > 0 ? (stats.noShows / stats.appointments) * 100 : 0;
+      const revenuePerAppointment = stats.shows > 0 ? stats.revenue / stats.shows : 0;
+      return { provider, noShowRate, revenuePerAppointment };
+    })
+    .filter((signal) => signal.noShowRate > 0 || signal.revenuePerAppointment > 0)
+    .sort((a, b) => (b.noShowRate - a.noShowRate) || (a.revenuePerAppointment - b.revenuePerAppointment));
+
+  return ranked[0] ?? null;
 }
 
 function deriveStatus(scorecard: ExecutiveScorecard, pressurePoints: ExecutivePressurePoint[]): ExecutiveStatus {

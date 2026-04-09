@@ -369,9 +369,9 @@ export async function getChartForAppointment(
             filterByFormula: `{Appointment ID} = "${sanitizeFormulaValue(appointmentId)}"`,
             maxRecords: 1,
           })
-          .firstPage((err: Error | null, recs: Array<{ id: string; fields: Record<string, unknown> }>) => {
+          .firstPage((err: Error | null, recs?: readonly any[]) => {
             if (err) reject(err);
-            else resolve(recs || []);
+            else resolve((recs || []).map((r: any) => ({ id: r.id, fields: r.fields as Record<string, unknown> })));
           });
       });
     });
@@ -409,11 +409,11 @@ export async function createChart(chart: Omit<ChartNote, 'id'>): Promise<string>
   return rateLimitedQuery(async () => {
     return new Promise<string>((resolve, reject) => {
       table.create(
-        [{ fields }],
+        [{ fields }] as any,
         { typecast: true },
-        (err: Error | null, records: Array<{ id: string }>) => {
+        (err: Error | null, records?: readonly any[]) => {
           if (err) reject(err);
-          else resolve(records[0].id);
+          else resolve(records![0].id);
         }
       );
     });
@@ -449,7 +449,7 @@ export async function updateChart(
   await rateLimitedQuery(async () => {
     return new Promise<void>((resolve, reject) => {
       table.update(
-        [{ id: recordId, fields }],
+        [{ id: recordId, fields }] as any,
         { typecast: true },
         (err: Error | null) => {
           if (err) reject(err);
@@ -503,8 +503,8 @@ export async function listCharts(filters: ChartListFilter): Promise<ChartNote[]>
           maxRecords: filters.limit || 50,
         })
         .eachPage(
-          (pageRecords: Array<{ id: string; fields: Record<string, unknown> }>, fetchNext: () => void) => {
-            pageRecords.forEach((r: { id: string; fields: Record<string, unknown> }) => allRecords.push({ id: r.id, fields: r.fields }));
+          (pageRecords: readonly any[], fetchNext: () => void) => {
+            pageRecords.forEach((r: any) => allRecords.push({ id: r.id, fields: r.fields as Record<string, unknown> }));
             fetchNext();
           },
           (err: Error | null) => {
@@ -523,9 +523,9 @@ export async function getChartById(recordId: string): Promise<ChartNote | null> 
     const table = getChartTable();
     const record = await rateLimitedQuery(async () => {
       return new Promise<{ id: string; fields: Record<string, unknown> }>((resolve, reject) => {
-        table.find(recordId, (err: Error | null, rec: { id: string; fields: Record<string, unknown> }) => {
+        table.find(recordId, (err: Error | null, rec?: any) => {
           if (err) reject(err);
-          else resolve({ id: rec.id, fields: rec.fields });
+          else resolve({ id: rec!.id, fields: rec!.fields as Record<string, unknown> });
         });
       });
     });

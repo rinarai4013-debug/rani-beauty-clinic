@@ -176,7 +176,7 @@ function SlideCounter({ current, total }: { current: number; total: number }) {
 
 interface PresentationModeProps {
   session: MastermindSession;
-  onSelectPackage?: (tier: 'Start' | 'Transform' | 'Elite') => void;
+  onSelectPackage?: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   onBookSession?: () => void;
   onShareLink?: () => void;
   onClose?: () => void;
@@ -283,7 +283,7 @@ export default function PresentationMode({
     }),
   };
 
-  const handleSelectPackage = (tier: 'Start' | 'Transform' | 'Elite') => {
+  const handleSelectPackage = (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => {
     onSelectPackage?.(tier);
     // Auto-advance to financing slide
     goTo(8);

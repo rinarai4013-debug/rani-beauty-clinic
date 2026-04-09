@@ -45,7 +45,7 @@ interface PresentationModeProps {
   onNext: () => void;
   onPrev: () => void;
   onExit: () => void;
-  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite') => void;
+  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   onGeneratePdf: () => Promise<string | null>;
   onComplete: () => Promise<unknown>;
   selectedPackage: GeneratedPackage | null;
@@ -304,7 +304,7 @@ interface SlideProps {
   selectedPackage: GeneratedPackage | null;
   financingOptions: FinancingOption[];
   selectedFinancing: FinancingOption | null;
-  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite') => void;
+  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   onSelectFinancing: (months: number | null) => void;
   onGeneratePdf: () => Promise<string | null>;
   onComplete: () => Promise<unknown>;

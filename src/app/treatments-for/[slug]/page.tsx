@@ -5,7 +5,7 @@ import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
 import {
   demographicPages,
-  DemographicPage,
+  type DemographicPage,
 } from "@/data/seo/demographic-pages";
 
 export function generateStaticParams() {

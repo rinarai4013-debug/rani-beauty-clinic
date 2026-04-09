@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, feed, TTL.FAST);
+    cache.set(cacheKey, feed, TTL.REALTIME);
     return NextResponse.json({ success: true, data: feed });
   } catch (error) {
     console.error('Agent feed error:', error);

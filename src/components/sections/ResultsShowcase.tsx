@@ -32,7 +32,7 @@ const targetSlugs: { slug: string; label: string; sessions: string }[] = [
   { slug: "sofwave", label: "Sofwave Skin Tightening", sessions: "1 session" },
 ];
 
-const homepagePairs: BeforeAfterPair[] = targetSlugs
+const homepagePairs = targetSlugs
   .map(({ slug, label, sessions }) => {
     const page = galleryPages.find((p) => p.slug === slug);
     if (!page || page.images.length < 2) return null;
@@ -41,7 +41,7 @@ const homepagePairs: BeforeAfterPair[] = targetSlugs
       after: page.images[1],
       label,
       sessions,
-    };
+    } as BeforeAfterPair;
   })
   .filter((p): p is BeforeAfterPair => p !== null);
 

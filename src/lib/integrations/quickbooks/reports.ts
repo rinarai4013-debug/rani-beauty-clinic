@@ -200,7 +200,7 @@ export async function getBalanceSheet(asOfDate?: string): Promise<BalanceSheetRe
   const asOf = asOfDate || new Date().toISOString().split('T')[0];
 
   const report = await qboClient.report('BalanceSheet', {
-    date_macro: asOfDate ? undefined : 'Today',
+    ...(asOfDate ? {} : { date_macro: 'Today' }),
     end_date: asOf,
   });
 
@@ -354,7 +354,7 @@ export async function getARAgingSummary(asOfDate?: string): Promise<AgingReport>
   const asOf = asOfDate || new Date().toISOString().split('T')[0];
 
   const report = await qboClient.report('AgedReceivables', {
-    date_macro: asOfDate ? undefined : 'Today',
+    ...(asOfDate ? {} : { date_macro: 'Today' }),
     report_date: asOf,
   });
 
@@ -389,7 +389,7 @@ export async function getAPAgingSummary(asOfDate?: string): Promise<AgingReport>
   const asOf = asOfDate || new Date().toISOString().split('T')[0];
 
   const report = await qboClient.report('AgedPayables', {
-    date_macro: asOfDate ? undefined : 'Today',
+    ...(asOfDate ? {} : { date_macro: 'Today' }),
     report_date: asOf,
   });
 

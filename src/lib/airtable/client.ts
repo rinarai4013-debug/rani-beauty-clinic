@@ -99,7 +99,7 @@ export function rateLimitedQuery<T>(fn: () => Promise<T>): Promise<T> {
 
 /** Executor used by writeQueue.drain() to replay failed writes */
 async function drainExecutor(entry: { table: string; recordId?: string; fields: Record<string, unknown>; operation: string }) {
-  const table = getBase()(entry.table);
+  const table = getAirtableBase()(entry.table);
   if (entry.operation === 'create') {
     await table.create(entry.fields as Partial<Airtable.FieldSet>);
   } else if (entry.operation === 'update' && entry.recordId) {

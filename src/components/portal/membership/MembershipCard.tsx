@@ -1,1 +1,1 @@
-export default function MembershipCard() { return null; }
+export default function MembershipCard(props: Record<string, unknown>) { return null; }

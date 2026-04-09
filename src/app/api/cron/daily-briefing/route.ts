@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       'New Leads': newLeads,
       'Snapshot Type': 'Daily Briefing',
       'Created At': new Date().toISOString(),
-    } as Record<string, unknown>);
+    } as any);
 
     // Optional morning SMS to owner
     const ownerPhone = process.env.OWNER_PHONE;

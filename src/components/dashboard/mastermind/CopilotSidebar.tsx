@@ -215,11 +215,12 @@ function getSuggestedAction(session: MastermindSession): string | null {
     );
     if (recommended) {
       const budget = intake?.budget;
-      const monthly12 = Math.round(recommended.totalPrice / 12);
-      const monthly24 = Math.round(recommended.totalPrice / 24);
+      const recTotal = recommended.totalPrice ?? recommended.price;
+      const monthly12 = Math.round(recTotal / 12);
+      const monthly24 = Math.round(recTotal / 24);
       return budget
-        ? `Patient budget: ${budget} -- suggest the ${recommended.name} at $${recommended.totalPrice.toLocaleString()} with financing at $${monthly24}/mo (24mo) or $${monthly12}/mo (12mo)`
-        : `Recommend ${recommended.name} at $${recommended.totalPrice.toLocaleString()} -- financing: $${monthly24}/mo (24mo) or $${monthly12}/mo (12mo)`;
+        ? `Patient budget: ${budget} -- suggest the ${recommended.name} at $${recTotal.toLocaleString()} with financing at $${monthly24}/mo (24mo) or $${monthly12}/mo (12mo)`
+        : `Recommend ${recommended.name} at $${recTotal.toLocaleString()} -- financing: $${monthly24}/mo (24mo) or $${monthly12}/mo (12mo)`;
     }
   }
 

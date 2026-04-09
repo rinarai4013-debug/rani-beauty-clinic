@@ -92,7 +92,8 @@ export async function GET() {
         service: t.fields['Service Name'] || 'Unknown',
         category: t.fields['Category'] || 'Other',
         provider: t.fields['Provider'] || 'Unknown',
-        paymentMethod: t.fields['Payment Method'] || 'card',
+        paymentMethod: (t.fields['Payment Method'] || 'card') as RevenueEntry['paymentMethod'],
+        clientType: 'returning' as const,
       }));
 
     // Parse expense alerts into ExpenseEntry format
@@ -104,7 +105,7 @@ export async function GET() {
         return {
           date: r.fields['Created Date'] || periodStart,
           amount,
-          category: 'operating' as const,
+          category: 'misc' as const,
           description: msg,
           vendor: '',
         };
