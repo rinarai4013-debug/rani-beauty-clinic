@@ -219,7 +219,7 @@ export interface ControlledSubstance {
   expirationDate: string;
   lastReconciliationDate: string;
   lastReconciliationBy: string;
-  status: 'in_stock' | 'low' | 'expired' | 'recalled' | 'destroyed';
+  status: 'in_stock' | 'low' | 'expired' | 'recalled' | 'destroyed' | 'depleted';
 }
 
 export interface SubstanceReconciliation {

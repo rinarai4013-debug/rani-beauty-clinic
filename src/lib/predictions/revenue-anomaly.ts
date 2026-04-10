@@ -77,6 +77,22 @@ const THRESHOLDS = {
   financingSpikeThreshold: 40, // Financing > 40% of transactions
 };
 
+// ── DATE HELPERS ──
+
+/**
+ * Parse a bare YYYY-MM-DD string and return its day-of-week in UTC (0=Sun..6=Sat).
+ *
+ * Why: `new Date('YYYY-MM-DD').getDay()` parses the string as UTC midnight,
+ * then calls the LOCAL getter. On a non-UTC host (e.g. PT/PDT), local
+ * midnight of the previous day is returned, shifting the weekday by one
+ * and silently misclassifying DOW anomalies. Parsing + reading in UTC
+ * keeps the result stable across runtimes.
+ */
+function getDayOfWeekUTC(dateStr: string): number {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+}
+
 // ── DETECTION FUNCTIONS ──
 
 function detectTargetDeviation(todayRevenue: number, dailyTarget: number): Anomaly | null {
@@ -178,11 +194,12 @@ function detectRollingAvgAnomaly(todayRevenue: number, dailyRevenue: RevenueData
 
 function detectDowAnomaly(todayRevenue: number, dailyRevenue: RevenueDataPoint[]): Anomaly | null {
   const today = new Date();
-  const todayDow = today.getDay();
+  const todayDow = today.getUTCDay();
 
-  // Get same day-of-week from last 4 weeks
+  // Get same day-of-week from last 4 weeks.
+  // Use UTC parsing helper so weekday is stable regardless of host TZ.
   const sameDow = dailyRevenue.filter(d => {
-    const dow = new Date(d.date).getDay();
+    const dow = getDayOfWeekUTC(d.date);
     return dow === todayDow;
   }).slice(0, 4);
 
@@ -210,8 +227,8 @@ function detectDowAnomaly(todayRevenue: number, dailyRevenue: RevenueDataPoint[]
   return null;
 }
 
-function detectProviderImbalance(byProvider: { provider: string; revenue: number }[]): Anomaly | null {
-  if (byProvider.length < 2) return null;
+function detectProviderImbalance(byProvider: { provider: string; revenue: number }[]): Anomaly[] {
+  if (byProvider.length < 2) return [];
 
   // With only 2 providers, a 75% split is normal variation - raise threshold
   const effectiveThreshold = byProvider.length === 2
@@ -219,12 +236,16 @@ function detectProviderImbalance(byProvider: { provider: string; revenue: number
     : THRESHOLDS.providerImbalance;
 
   const total = byProvider.reduce((s, p) => s + p.revenue, 0);
-  if (total === 0) return null;
+  if (total === 0) return [];
 
+  // Collect every provider breaching the threshold so multi-provider
+  // concentration patterns are surfaced instead of short-circuiting on
+  // the first match.
+  const anomalies: Anomaly[] = [];
   for (const provider of byProvider) {
     const share = (provider.revenue / total) * 100;
     if (share >= effectiveThreshold) {
-      return {
+      anomalies.push({
         type: 'provider_imbalance',
         severity: 'warning',
         metric: 'Provider Revenue Split',
@@ -233,20 +254,25 @@ function detectProviderImbalance(byProvider: { provider: string; revenue: number
         deviation: Math.round(share - (100 / byProvider.length)),
         message: `${provider.provider} is generating ${Math.round(share)}% of today's revenue`,
         recommendation: 'Revenue is heavily concentrated. Consider capacity planning and cross-training.',
-      };
+      });
     }
   }
 
-  return null;
+  return anomalies;
 }
 
 function detectFinancingSpike(byPaymentMethod: { method: string; amount: number; count: number }[]): Anomaly | null {
   const totalCount = byPaymentMethod.reduce((s, p) => s + p.count, 0);
   if (totalCount < 3) return null;
 
-  const financingMethods = ['Cherry', 'PatientFi', 'Afterpay'];
+  // Normalize to lowercase on both sides so POS variants like "cherry",
+  // "CHERRY FINANCING", or "PatientFi Express" still match.
+  const financingMethods = ['cherry', 'patientfi', 'afterpay'];
   const financingCount = byPaymentMethod
-    .filter(p => financingMethods.some(f => p.method.includes(f)))
+    .filter(p => {
+      const method = p.method.toLowerCase();
+      return financingMethods.some(f => method.includes(f));
+    })
     .reduce((s, p) => s + p.count, 0);
 
   const financingRate = (financingCount / totalCount) * 100;
@@ -330,10 +356,10 @@ export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
   const dowAnomaly = detectDowAnomaly(input.todayRevenue, input.dailyRevenue);
   if (dowAnomaly) anomalies.push(dowAnomaly);
 
-  // 4. Provider imbalance
+  // 4. Provider imbalance (may surface multiple providers)
   if (input.byProvider) {
-    const providerAnomaly = detectProviderImbalance(input.byProvider);
-    if (providerAnomaly) anomalies.push(providerAnomaly);
+    const providerAnomalies = detectProviderImbalance(input.byProvider);
+    anomalies.push(...providerAnomalies);
   }
 
   // 5. Category drop
@@ -356,7 +382,12 @@ export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
   // Project month-end
   const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
   const dayOfMonth = new Date().getDate();
-  const last7Avg = input.dailyRevenue.slice(0, 7).reduce((s, d) => s + d.amount, 0) / Math.max(input.dailyRevenue.slice(0, 7).length, 1);
+  // Defensively sort a COPY newest-first before taking the last-7 window,
+  // so that a caller violating the "sorted newest first" contract can't
+  // contaminate the projection with stale history. Never mutates input.
+  const sortedHistory = [...input.dailyRevenue].sort((a, b) => b.date.localeCompare(a.date));
+  const last7 = sortedHistory.slice(0, 7);
+  const last7Avg = last7.reduce((s, d) => s + d.amount, 0) / Math.max(last7.length, 1);
   const mtdRevenue = input.dailyRevenue
     .filter(d => {
       const dt = new Date(d.date);

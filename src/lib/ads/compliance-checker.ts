@@ -62,12 +62,37 @@ export interface CorrectedCopy {
   callToAction: string;
   disclaimers: string[];
   changes: { original: string; corrected: string; reason: string }[];
+  /**
+   * Matches the checker found but could NOT auto-replace from the safe-
+   * replacement dictionary. Surfaced so callers see visible failure instead
+   * of a silent pass-through of the original (uncorrected) copy.
+   */
+  unreplaced: string[];
 }
 
 export interface DisclaimerRequirement {
   service: string;
   disclaimers: string[];
   category: ComplianceCategory;
+}
+
+// ── ISSUE ID COUNTER ──
+// Bug 10 fix: module-scoped monotonic counter so issue ids can never
+// collide. The previous scheme `${category}_${violations.length + warnings.length}`
+// produced duplicate ids any time two issues in the same category landed
+// in the same bucket (e.g. two 'fda' warnings in sequence).
+let issueIdCounter = 0;
+function nextIssueId(category: ComplianceCategory): string {
+  return `${category}_${++issueIdCounter}`;
+}
+
+/**
+ * Test-only reset for the module-scoped id counter. Exported so tests can
+ * assert deterministic ids without cross-test bleed-through. Not part of
+ * the public runtime API.
+ */
+export function _resetIssueCounter(): void {
+  issueIdCounter = 0;
 }
 
 // ── PROHIBITED CLAIMS ──
@@ -108,7 +133,9 @@ const PROHIBITED_CLAIMS: ProhibitedClaim[] = [
     suggestedAlternative: 'Use specific success rates if supported by data, with "results may vary"',
   },
   {
-    pattern: /cure[sd]?\s*(aging|wrinkles|obesity|fat|disease)/i,
+    // Bug 4 fix: anchor with \b so "obscure disease" / "procure disease" don't
+    // false-positive, and require \s+ so "cureaging" can't match either.
+    pattern: /\bcure[sd]?\s+(aging|wrinkles|obesity|fat|disease)\b/i,
     category: 'fda',
     severity: 'violation',
     description: 'Cannot use the word "cure" for cosmetic or weight loss treatments.',
@@ -125,7 +152,10 @@ const PROHIBITED_CLAIMS: ProhibitedClaim[] = [
   },
   // HIPAA
   {
-    pattern: /patient[s']?\s*(name|photo|story|testimonial)(?!\s*\(with\s*consent\))/i,
+    // Bug 6 fix: allow plural-possessive ("patients' testimonial"), straight
+    // or curly apostrophe, and require a real space between patient[s']? and
+    // the disclosure noun so it can't fuse across words.
+    pattern: /\bpatients?['\u2019]?\s+(name|photo|story|testimonial)(?!\s*\(with\s*consent\))/i,
     category: 'hipaa',
     severity: 'violation',
     description: 'Patient-identifiable information requires written consent. Never use real patient names/photos without documented consent.',
@@ -142,7 +172,9 @@ const PROHIBITED_CLAIMS: ProhibitedClaim[] = [
   },
   // FTC
   {
-    pattern: /doctor\s*recommend/i,
+    // Bug 7 fix: catch both singular and plural ("doctor recommends" AND
+    // "doctors recommend"). Require \s+ to prevent cross-word fusion.
+    pattern: /\bdoctors?\s+recommend/i,
     category: 'ftc',
     severity: 'warning',
     description: 'Claims that "doctors recommend" require substantiation. Generic claims may be misleading.',
@@ -209,7 +241,9 @@ const PROHIBITED_CLAIMS: ProhibitedClaim[] = [
     suggestedAlternative: 'Focus on aspirational outcomes rather than current dissatisfaction',
   },
   {
-    pattern: /injection site|needle/i,
+    // Bug 5 fix: strict word boundary on "needle(s)" so "needlepoint" and
+    // "needleless" don't false-positive. Plural OK.
+    pattern: /injection site|\bneedles?\b/i,
     category: 'platform_meta',
     severity: 'warning',
     description: 'Avoid showing or describing needles/injection sites in Meta ad creative.',
@@ -328,7 +362,9 @@ export function checkCompliance(input: ComplianceCheckInput): ComplianceResult {
     const match = allText.match(claim.pattern);
     if (match) {
       const issue: ComplianceIssue = {
-        id: `${claim.category}_${violations.length + warnings.length}`,
+        // Bug 10 fix: use the module-scoped unique counter instead of the
+        // collision-prone length-based id.
+        id: nextIssueId(claim.category),
         category: claim.category,
         severity: claim.severity,
         title: `${claim.category.toUpperCase()} ${claim.severity}: Prohibited claim detected`,
@@ -507,7 +543,12 @@ function checkServiceCompliance(
 // ── GET REQUIRED DISCLAIMERS ──
 
 export function getRequiredDisclaimers(service: string): string[] {
-  const requirement = DISCLAIMER_REQUIREMENTS.find(d => d.service === service);
+  // Bug 8 fix: normalize the lookup so "Botox" / "BOTOX" / " botox "
+  // don't silently fall through to the generic fallback.
+  const key = (service ?? '').trim().toLowerCase();
+  const requirement = DISCLAIMER_REQUIREMENTS.find(
+    d => d.service.toLowerCase() === key
+  );
   const genericDisclaimers = [
     'All treatments at Rani Beauty Clinic are physician-supervised.',
     'Rani Beauty Clinic | 401 Olympia Ave NE, Suite 101, Renton, WA 98056',
@@ -533,34 +574,62 @@ function generateCorrectedCopy(
   let correctedBody = input.bodyText;
   let correctedCTA = input.callToAction;
   const changes: CorrectedCopy['changes'] = [];
+  const unreplaced: string[] = [];
 
   for (const issue of issues) {
     const pattern = new RegExp(escapeRegex(issue.affectedText), 'gi');
+    const replacement = getSafeReplacement(issue);
 
-    // Apply fixes to headline
-    if (correctedHeadline.match(pattern)) {
+    const appearsInHeadline = pattern.test(correctedHeadline);
+    pattern.lastIndex = 0;
+    const appearsInBody = pattern.test(correctedBody);
+    pattern.lastIndex = 0;
+    const appearsInCTA = pattern.test(correctedCTA);
+    pattern.lastIndex = 0;
+
+    if (replacement === null) {
+      // Bug 9 fix: visible failure for un-auto-fixable matches. Track the
+      // original and annotate the corrected field with a manual-review
+      // comment so callers never silently publish un-fixed copy.
+      if (appearsInHeadline || appearsInBody || appearsInCTA) {
+        if (!unreplaced.includes(issue.affectedText)) {
+          unreplaced.push(issue.affectedText);
+        }
+        const marker = `// NEEDS MANUAL REVIEW: could not auto-replace "${issue.affectedText}"`;
+        if (appearsInHeadline && !correctedHeadline.includes(marker)) {
+          correctedHeadline = `${marker}\n${correctedHeadline}`;
+        }
+        if (appearsInBody && !correctedBody.includes(marker)) {
+          correctedBody = `${marker}\n${correctedBody}`;
+        }
+        if (appearsInCTA && !correctedCTA.includes(marker)) {
+          correctedCTA = `${marker}\n${correctedCTA}`;
+        }
+      }
+      continue;
+    }
+
+    if (appearsInHeadline) {
       const original = correctedHeadline;
-      correctedHeadline = correctedHeadline.replace(pattern, getSafeReplacement(issue));
+      correctedHeadline = correctedHeadline.replace(pattern, replacement);
       if (correctedHeadline !== original) {
-        changes.push({ original: issue.affectedText, corrected: getSafeReplacement(issue), reason: issue.description });
+        changes.push({ original: issue.affectedText, corrected: replacement, reason: issue.description });
       }
     }
 
-    // Apply fixes to body
-    if (correctedBody.match(pattern)) {
+    if (appearsInBody) {
       const original = correctedBody;
-      correctedBody = correctedBody.replace(pattern, getSafeReplacement(issue));
+      correctedBody = correctedBody.replace(pattern, replacement);
       if (correctedBody !== original) {
-        changes.push({ original: issue.affectedText, corrected: getSafeReplacement(issue), reason: issue.description });
+        changes.push({ original: issue.affectedText, corrected: replacement, reason: issue.description });
       }
     }
 
-    // Apply fixes to CTA
-    if (correctedCTA.match(pattern)) {
+    if (appearsInCTA) {
       const original = correctedCTA;
-      correctedCTA = correctedCTA.replace(pattern, getSafeReplacement(issue));
+      correctedCTA = correctedCTA.replace(pattern, replacement);
       if (correctedCTA !== original) {
-        changes.push({ original: issue.affectedText, corrected: getSafeReplacement(issue), reason: issue.description });
+        changes.push({ original: issue.affectedText, corrected: replacement, reason: issue.description });
       }
     }
   }
@@ -573,11 +642,18 @@ function generateCorrectedCopy(
     callToAction: correctedCTA,
     disclaimers,
     changes,
+    unreplaced,
   };
 }
 
-function getSafeReplacement(issue: ComplianceIssue): string {
-  // Common replacements
+/**
+ * Looks up a safe replacement for an issue's affectedText.
+ *
+ * Returns `null` when no replacement exists so callers can surface the
+ * failure instead of silently passing the original text through as a
+ * "corrected" value (Bug 9).
+ */
+function getSafeReplacement(issue: ComplianceIssue): string | null {
   const replacements: Record<string, string> = {
     'infusion': 'injection',
     'cure': 'treat',
@@ -593,10 +669,12 @@ function getSafeReplacement(issue: ComplianceIssue): string {
     'permanent': 'long-lasting',
   };
 
-  const lowerText = issue.affectedText.toLowerCase();
+  const lowerText = issue.affectedText.toLowerCase().trim();
   if (replacements[lowerText]) return replacements[lowerText];
 
-  return issue.affectedText; // return original if no safe replacement
+  // Explicit null signals "no safe replacement available" — caller must
+  // handle this visibly rather than pretending the text is fixed.
+  return null;
 }
 
 function escapeRegex(string: string): string {

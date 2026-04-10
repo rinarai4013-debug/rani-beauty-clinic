@@ -20,6 +20,33 @@ let reconciliations: SubstanceReconciliation[] = [];
 let wasteLogs: WasteLog[] = [];
 let custodyChain: ChainOfCustody[] = [];
 
+// ── Internal helpers ─────────────────────────────────────────────────
+
+/**
+ * Recompute a substance's derived status from its currentQuantity.
+ * Rules: qty <= 0 → 'depleted', qty <= 5 → 'low', else 'in_stock'.
+ * NOTE: Only applies to quantity-derived states. Does NOT overwrite
+ * 'expired' / 'recalled' / 'destroyed', which are independent lifecycle
+ * states set by other flows.
+ */
+function recomputeSubstanceStatus(
+  substance: ControlledSubstance
+): ControlledSubstance {
+  // Preserve lifecycle states that aren't quantity-derived.
+  if (
+    substance.status === 'expired' ||
+    substance.status === 'recalled' ||
+    substance.status === 'destroyed'
+  ) {
+    return substance;
+  }
+  let nextStatus: ControlledSubstance['status'];
+  if (substance.currentQuantity <= 0) nextStatus = 'depleted';
+  else if (substance.currentQuantity <= 5) nextStatus = 'low';
+  else nextStatus = 'in_stock';
+  return { ...substance, status: nextStatus };
+}
+
 // ── Substance Management ─────────────────────────────────────────────
 
 export function addSubstance(params: Omit<ControlledSubstance, 'id'>): ControlledSubstance {
@@ -70,6 +97,11 @@ export function getSubstanceAlerts(): {
     expiringSoon: substances.filter(
       (s) => s.status !== 'expired' && new Date(s.expirationDate) <= thirtyDaysOut && new Date(s.expirationDate) > now
     ),
+    // Bug 2 fix: 'expired' means the substance's expirationDate has passed.
+    // Depleted (qty=0) substances are NOT expired and must not poison this
+    // count — otherwise alert banners conflate "ran out" with "past date".
+    // The filter is purely date-based so 'depleted'-status substances with
+    // a future expiration date are correctly excluded.
     expired: substances.filter(
       (s) => new Date(s.expirationDate) <= now
     ),
@@ -97,12 +129,15 @@ export function performReconciliation(params: Omit<SubstanceReconciliation, 'id'
   // Update substance last reconciliation date
   const substanceIndex = substances.findIndex((s) => s.id === params.substanceId);
   if (substanceIndex !== -1) {
-    substances[substanceIndex] = {
+    const updated: ControlledSubstance = {
       ...substances[substanceIndex],
       lastReconciliationDate: params.date,
       lastReconciliationBy: params.performedBy,
       currentQuantity: params.actualCount,
     };
+    // Bug 1 fix: recompute status from the new quantity so a reconciliation
+    // back to a full count clears a stale 'low' flag (and vice versa).
+    substances[substanceIndex] = recomputeSubstanceStatus(updated);
   }
 
   createAuditEntry({
@@ -165,11 +200,13 @@ export function logWaste(params: Omit<WasteLog, 'id'>): WasteLog {
   const substanceIndex = substances.findIndex((s) => s.id === params.substanceId);
   if (substanceIndex !== -1) {
     const newQty = substances[substanceIndex].currentQuantity - params.quantityWasted;
-    substances[substanceIndex] = {
+    // Bug 2 fix: depletion-to-zero is NOT expiration. Use the shared
+    // recompute helper so qty=0 maps to 'depleted', not 'expired'.
+    const updated: ControlledSubstance = {
       ...substances[substanceIndex],
       currentQuantity: Math.max(0, newQty),
-      status: newQty <= 0 ? 'expired' : newQty <= 5 ? 'low' : 'in_stock',
     };
+    substances[substanceIndex] = recomputeSubstanceStatus(updated);
   }
 
   createAuditEntry({
@@ -207,11 +244,13 @@ export function recordCustodyEvent(params: Omit<ChainOfCustody, 'id'>): ChainOfC
     const substanceIndex = substances.findIndex((s) => s.id === params.substanceId);
     if (substanceIndex !== -1) {
       const newQty = substances[substanceIndex].currentQuantity - params.quantity;
-      substances[substanceIndex] = {
+      // Bug 2 fix: depletion-to-zero is NOT expiration. Use the shared
+      // recompute helper so qty=0 maps to 'depleted', not 'expired'.
+      const updated: ControlledSubstance = {
         ...substances[substanceIndex],
         currentQuantity: Math.max(0, newQty),
-        status: newQty <= 0 ? 'expired' : newQty <= 5 ? 'low' : 'in_stock',
       };
+      substances[substanceIndex] = recomputeSubstanceStatus(updated);
     }
 
     createAuditEntry({
@@ -240,9 +279,14 @@ export function getCustodyChain(substanceId: string): ChainOfCustody[] {
 }
 
 export function getFullCustodyChain(): ChainOfCustody[] {
-  return [...custodyChain].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  // Bug 3 fix: standardize on ASC (oldest-first) to match getCustodyChain.
+  // Legal chain-of-custody reads chronologically; asymmetric sort between
+  // the scoped and full queries is a correctness hazard.
+  return [...custodyChain].sort((a, b) => {
+    const dateCompare = new Date(a.date).getTime() - new Date(b.date).getTime();
+    if (dateCompare !== 0) return dateCompare;
+    return a.time.localeCompare(b.time);
+  });
 }
 
 // ── DEA Compliance Score ─────────────────────────────────────────────

@@ -99,6 +99,17 @@ export function classifyGlogauScale(input: GlogauInput): { scale: GlogauScale; d
 
   if (input.age < 30 && !input.wrinklesAtRest && !input.sunDamageVisible && !input.keratoses) {
     scale = 1;
+  } else if (
+    input.age >= 30 &&
+    !input.wrinklesAtRest &&
+    !input.wrinklesWithMovement &&
+    !input.sunDamageVisible &&
+    !input.keratoses
+  ) {
+    // Pristine skin in an older client still classifies as Scale 1 (Type I).
+    // Without this branch, a 30-49yo with no wrinkles of any kind fell
+    // through to the final else and was incorrectly labeled Scale 4.
+    scale = 1;
   } else if (input.age < 50 && input.wrinklesWithMovement && !input.wrinklesAtRest && !input.keratoses) {
     scale = 2;
   } else if (input.wrinklesAtRest && !input.keratoses) {

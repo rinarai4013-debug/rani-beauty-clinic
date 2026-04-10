@@ -10,6 +10,10 @@ function getMetaAccessToken() {
   return process.env.META_CAPI_ACCESS_TOKEN;
 }
 
+function getMetaWebhookSecret() {
+  return process.env.META_CAPI_WEBHOOK_SECRET;
+}
+
 const MetaUserDataSchema = z.object({
   email: z.string().trim().toLowerCase().min(1).optional(),
   phone: z.string().trim().min(1).optional(),
@@ -37,8 +41,40 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "META_CAPI_ACCESS_TOKEN not configured" }, { status: 500 });
   }
 
+  // Read raw body for HMAC verification
+  const body = await req.text();
+
+  // HMAC-SHA256 signature verification (Meta's x-hub-signature-256 header)
+  const webhookSecret = getMetaWebhookSecret();
+  if (webhookSecret) {
+    const signature = req.headers.get("x-hub-signature-256");
+    if (!signature) {
+      console.error("[Meta CAPI] Missing x-hub-signature-256 header");
+      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+    }
+
+    const expectedSig = "sha256=" + crypto
+      .createHmac("sha256", webhookSecret)
+      .update(body)
+      .digest("hex");
+    const sigBuf = Buffer.from(signature, "utf8");
+    const expBuf = Buffer.from(expectedSig, "utf8");
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+      console.error("[Meta CAPI] Invalid webhook signature");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+  } else {
+    console.error("[Meta CAPI] WARNING: META_CAPI_WEBHOOK_SECRET not set — skipping signature verification");
+  }
+
   try {
-    const parsed = MetaCapiPayloadSchema.safeParse(await req.json().catch(() => null));
+    let jsonBody: unknown = null;
+    try {
+      jsonBody = JSON.parse(body);
+    } catch {
+      // invalid JSON
+    }
+    const parsed = MetaCapiPayloadSchema.safeParse(jsonBody);
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid META CAPI payload' },

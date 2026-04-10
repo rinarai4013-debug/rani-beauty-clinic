@@ -86,13 +86,22 @@ export function addMaintenanceRecord(params: Omit<MaintenanceRecord, 'id'>): Mai
   // Update device maintenance dates
   const deviceIndex = devices.findIndex((d) => d.id === params.deviceId);
   if (deviceIndex !== -1 && params.status === 'completed') {
+    const currentStatus = devices[deviceIndex].status;
+    // A recalled device must NOT be auto-restored to operational by a routine
+    // maintenance record. Recall clearance is an explicit, separate workflow.
+    const nextStatus = currentStatus === 'recalled' ? 'recalled' : 'operational';
     devices[deviceIndex] = {
       ...devices[deviceIndex],
       lastMaintenanceDate: params.date,
       nextMaintenanceDate: params.nextScheduledDate,
-      status: 'operational',
+      status: nextStatus,
     };
   }
+
+  const isRecalledDevice =
+    deviceIndex !== -1 &&
+    params.status === 'completed' &&
+    devices[deviceIndex].status === 'recalled';
 
   createAuditEntry({
     userId: params.performedBy,
@@ -101,7 +110,9 @@ export function addMaintenanceRecord(params: Omit<MaintenanceRecord, 'id'>): Mai
     action: 'device_maintenance',
     resourceType: 'medical_device',
     resourceId: params.deviceId,
-    details: `${params.type} maintenance on ${params.deviceName}: ${params.description}`,
+    details: isRecalledDevice
+      ? `${params.type} maintenance on ${params.deviceName}: ${params.description} — NOTE: device is under recall; maintenance does not clear recall status, explicit recall clearance required.`
+      : `${params.type} maintenance on ${params.deviceName}: ${params.description}`,
     ipAddress: '0.0.0.0',
   });
 
@@ -141,11 +152,22 @@ export function addCalibrationLog(params: Omit<CalibrationLog, 'id'>): Calibrati
   // Update device calibration dates
   const deviceIndex = devices.findIndex((d) => d.id === params.deviceId);
   if (deviceIndex !== -1) {
+    const currentStatus = devices[deviceIndex].status;
+    let nextStatus = currentStatus;
+    if (params.overallPass && currentStatus === 'under_repair') {
+      // A successful re-calibration clears a prior under_repair state.
+      nextStatus = 'operational';
+    } else if (!params.overallPass) {
+      // Any failed calibration marks the device under_repair.
+      nextStatus = 'under_repair';
+    }
+    // Otherwise (PASS + status is recalled/decommissioned/operational/etc.),
+    // leave status unchanged.
     devices[deviceIndex] = {
       ...devices[deviceIndex],
       lastCalibrationDate: params.calibrationDate,
       nextCalibrationDate: params.nextCalibrationDate,
-      status: params.overallPass ? devices[deviceIndex].status : 'under_repair',
+      status: nextStatus,
     };
   }
 
@@ -216,7 +238,8 @@ export function getAdverseEvents(deviceId?: string): AdverseEventReport[] {
 
 /**
  * FDA MDR (Medical Device Report) requirements:
- * - Serious injury or death: report within 30 days to FDA
+ * - Death: report within 5 days to FDA (21 CFR 803.10(c)(1))
+ * - Serious injury: report within 30 days to FDA (21 CFR 803.10(c)(2))
  * - Malfunction that could cause injury: report within 30 days
  * - Must also report to device manufacturer within 10 days
  */
@@ -228,8 +251,13 @@ export function assessMDRRequirements(event: AdverseEventReport): {
   reportType: string;
 } {
   const eventDate = new Date(event.eventDate);
-  const thirtyDaysOut = new Date(eventDate);
-  thirtyDaysOut.setDate(thirtyDaysOut.getDate() + 30);
+  // Death events require a 5-day FDA MDR; serious injury / malfunction use 30 days.
+  const fdaDeadlineDate = new Date(eventDate);
+  if (event.severity === 'death') {
+    fdaDeadlineDate.setDate(fdaDeadlineDate.getDate() + 5);
+  } else {
+    fdaDeadlineDate.setDate(fdaDeadlineDate.getDate() + 30);
+  }
   const tenDaysOut = new Date(eventDate);
   tenDaysOut.setDate(tenDaysOut.getDate() + 10);
 
@@ -238,7 +266,7 @@ export function assessMDRRequirements(event: AdverseEventReport): {
   return {
     requiresFDAReport: requiresFDA,
     requiresManufacturerReport: true, // Always notify manufacturer
-    fdaDeadline: thirtyDaysOut.toISOString().split('T')[0],
+    fdaDeadline: fdaDeadlineDate.toISOString().split('T')[0],
     manufacturerDeadline: tenDaysOut.toISOString().split('T')[0],
     reportType: event.severity === 'death'
       ? '5-Day Report (Death)'

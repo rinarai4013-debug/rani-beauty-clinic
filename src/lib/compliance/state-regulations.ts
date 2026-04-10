@@ -164,8 +164,16 @@ export function validateProcedureScope(
     return { allowed: false, reason: 'Unknown provider type', requiresSupervision: false };
   }
 
+  // Both restricted and allowed lookups use strict case-insensitive equality.
+  // Substring matching would let an ambiguous request (e.g. bare "Chemical Peels")
+  // slip past a restricted entry ("Medium/deep chemical peels") and match an
+  // allowed entry ("Superficial Chemical Peels") — silently approving a
+  // medium/deep procedure for a provider whose scope forbids it. Callers must
+  // pass the exact procedure name; anything else is considered out of scope.
+  const normalizedQuery = procedure.toLowerCase();
+
   const isRestricted = scope.restrictedProcedures.some(
-    (p) => p.toLowerCase() === procedure.toLowerCase()
+    (p) => p.toLowerCase() === normalizedQuery
   );
   if (isRestricted) {
     return {
@@ -176,8 +184,7 @@ export function validateProcedureScope(
   }
 
   const isAllowed = scope.allowedProcedures.some(
-    (p) => p.toLowerCase().includes(procedure.toLowerCase()) ||
-           procedure.toLowerCase().includes(p.toLowerCase())
+    (p) => p.toLowerCase() === normalizedQuery
   );
   if (!isAllowed) {
     return {
@@ -290,12 +297,20 @@ export function getLicenseAlerts(): {
   alertDate.setDate(alertDate.getDate() + alertDays);
 
   return {
+    // Expired and expiringSoon surface every license past or nearing its
+    // expiration date regardless of the status field. An operator who flips
+    // a license to 'expired', 'suspended', or 'revoked' as their primary
+    // workflow must still see it on the alert board — gating on status would
+    // silently hide non-current licenses from the compliance dashboard.
     expired: providerLicenses.filter(
-      (l) => l.status === 'active' && new Date(l.expirationDate) <= now
+      (l) => new Date(l.expirationDate) <= now
     ),
     expiringSoon: providerLicenses.filter(
-      (l) => l.status === 'active' && new Date(l.expirationDate) > now && new Date(l.expirationDate) <= alertDate
+      (l) => new Date(l.expirationDate) > now && new Date(l.expirationDate) <= alertDate
     ),
+    // CE deficiency only applies to active providers: inactive (expired /
+    // suspended / revoked) providers are not practicing and therefore do
+    // not need to meet the CE credit requirement.
     ceDeficient: providerLicenses.filter(
       (l) => l.status === 'active' && l.ceCreditsCompleted < l.ceCreditsRequired
     ),
@@ -306,6 +321,29 @@ export function getDaysUntilExpiry(license: ProviderLicense): number {
   const now = new Date();
   const expiry = new Date(license.expirationDate);
   return Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+// ── Provider Name Normalization ──────────────────────────────────────
+
+/**
+ * Normalize a provider name for equality comparison across sources.
+ * Delegation agreements are often stored with a credential suffix
+ * ("Rina Rai, RN") while the provider license record may carry the
+ * bare legal name ("Rina Rai"). A strict string match would then fail
+ * to link a signed, active delegation to its delegate and the
+ * licensing score would penalize a provider that is actually covered.
+ *
+ * Strips whitespace, lowercases, and drops trailing credential suffixes
+ * like ", RN" / ", MD" / ", NP" / ", PA" / ", LPN" / ", MA" (including
+ * variants with periods such as ", M.D.").
+ */
+export function normalizeProviderName(name: string): string {
+  return name
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/,\s*(rn|md|do|np|arnp|pa|pa-c|lpn|ma|m\.d\.|d\.o\.|r\.n\.|n\.p\.|p\.a\.|l\.p\.n\.|m\.a\.)\s*$/i, '')
+    .trim()
+    .toLowerCase();
 }
 
 // ── Licensing Compliance Score ───────────────────────────────────────
@@ -358,8 +396,12 @@ export function calculateLicensingScore(): {
     return scope?.requiresSupervision;
   });
   for (const provider of supervisedProviders) {
+    const normalizedProvider = normalizeProviderName(provider.providerName);
     const hasDelegation = delegationAgreements.some(
-      (d) => d.delegateName === provider.providerName && d.status === 'active' && new Date(d.expirationDate) > now
+      (d) =>
+        normalizeProviderName(d.delegateName) === normalizedProvider &&
+        d.status === 'active' &&
+        new Date(d.expirationDate) > now
     );
     if (!hasDelegation) {
       delegScore -= 10;

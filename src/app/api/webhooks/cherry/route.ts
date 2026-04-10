@@ -3,6 +3,11 @@ import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { z } from 'zod';
 
+// ─── Env ──────────────────────────────────────────────────────────
+function getCherryWebhookSecret(): string {
+  return process.env.CHERRY_WEBHOOK_SECRET || '';
+}
+
 // ─── Types ────────────────────────────────────────────────────────
 const CherryWebhookDataSchema = z.object({
   amount: z.number().nonnegative().optional(),
@@ -27,10 +32,47 @@ interface TreatmentPlanFields {
 
 export async function POST(request: NextRequest) {
   try {
-    const parsed = CherryWebhookPayloadSchema.safeParse(await request.json().catch(() => null));
+    // Read raw body for HMAC verification
+    const rawBody = await request.text();
+
+    // ── HMAC-SHA256 Signature Verification ──
+    const secret = getCherryWebhookSecret();
+    if (!secret) {
+      console.error('[Cherry Webhook] CHERRY_WEBHOOK_SECRET not set — skipping signature verification');
+    } else {
+      const signature = request.headers.get('x-webhook-signature');
+      if (!signature) {
+        console.error('[Cherry Webhook] Missing x-webhook-signature header');
+        return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+      }
+
+      const crypto = await import('crypto');
+      const expected = crypto
+        .createHmac('sha256', secret)
+        .update(rawBody)
+        .digest('hex');
+      const sigBuf = Buffer.from(signature, 'utf8');
+      const expBuf = Buffer.from(expected, 'utf8');
+
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        console.error('[Cherry Webhook] Invalid signature');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+    }
+
+    // ── Zod Payload Validation ──
+    let jsonBody: unknown;
+    try {
+      jsonBody = JSON.parse(rawBody);
+    } catch {
+      console.error('[Cherry Webhook] Malformed JSON body');
+      return NextResponse.json({ error: 'Malformed JSON' }, { status: 422 });
+    }
+
+    const parsed = CherryWebhookPayloadSchema.safeParse(jsonBody);
     if (!parsed.success) {
-      console.warn('[Cherry Webhook] Invalid payload:', parsed.error.issues[0]?.message);
-      return NextResponse.json({ received: true, warning: 'Invalid payload' }, { status: 200 });
+      console.error('[Cherry Webhook] Invalid payload:', parsed.error.issues[0]?.message);
+      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.issues }, { status: 422 });
     }
 
     const body = parsed.data;
