@@ -155,6 +155,60 @@ export interface AgentRecommendation {
   expectedImpact: string;
 }
 
+interface VapiCallStructuredData {
+  intent?: string;
+  booked?: boolean;
+}
+
+interface VapiCallAnalysis {
+  intent?: string;
+  successEvaluation?: string | boolean;
+  structuredData?: VapiCallStructuredData;
+}
+
+interface VapiCallLog {
+  status?: string;
+  endedReason?: string;
+  duration?: number | string;
+  costBreakdown?: {
+    duration?: number | string;
+  };
+  analysis?: VapiCallAnalysis;
+  createdAt?: string;
+  startedAt?: string;
+}
+
+type VapiCallLogsApiResponse = VapiCallLog[] | {
+  calls?: unknown;
+  data?: unknown;
+  records?: unknown;
+  items?: unknown;
+};
+
+function parseVapiCallLogs(value: unknown): VapiCallLog[] {
+  if (Array.isArray(value)) {
+    return value.filter((entry): entry is VapiCallLog => {
+      return !!entry && typeof entry === 'object' && !Array.isArray(entry);
+    });
+  }
+
+  if (value && typeof value === 'object') {
+    const { calls, data, records, items } = value as {
+      calls?: unknown;
+      data?: unknown;
+      records?: unknown;
+      items?: unknown;
+    };
+
+    if (Array.isArray(calls)) return calls.filter((entry): entry is VapiCallLog => !!entry && typeof entry === 'object' && !Array.isArray(entry));
+    if (Array.isArray(data)) return data.filter((entry): entry is VapiCallLog => !!entry && typeof entry === 'object' && !Array.isArray(entry));
+    if (Array.isArray(records)) return records.filter((entry): entry is VapiCallLog => !!entry && typeof entry === 'object' && !Array.isArray(entry));
+    if (Array.isArray(items)) return items.filter((entry): entry is VapiCallLog => !!entry && typeof entry === 'object' && !Array.isArray(entry));
+  }
+
+  return [];
+}
+
 // ── CONSTANTS ──
 
 const RANI_HOURS: ClinicHours = {
@@ -455,7 +509,7 @@ function buildCallFlows(config: PhoneAgentConfig): CallFlow[] {
 /**
  * Compute real analytics from Vapi call log data.
  */
-export function computeAnalyticsFromCallLogs(calls: any[]): CallAnalytics { // eslint-disable-line
+export function computeAnalyticsFromCallLogs(calls: readonly VapiCallLog[]): CallAnalytics {
   const totalCalls = calls.length;
   let answeredCalls = 0;
   let missedCalls = 0;
@@ -469,7 +523,7 @@ export function computeAnalyticsFromCallLogs(calls: any[]): CallAnalytics { // e
 
   for (const call of calls) {
     const status = call.status || call.endedReason || '';
-    const duration = call.duration || call.costBreakdown?.duration || 0;
+    const duration = Number(call.duration || call.costBreakdown?.duration || 0);
 
     if (status === 'ended' || status === 'completed' || duration > 0) {
       answeredCalls++;
@@ -485,7 +539,10 @@ export function computeAnalyticsFromCallLogs(calls: any[]): CallAnalytics { // e
     }
     intentCounts[intent].count++;
     intentCounts[intent].totalDuration += duration;
-    if (call.analysis?.successEvaluation === 'true' || call.analysis?.structuredData?.booked) {
+    const successEvaluation = call.analysis?.successEvaluation;
+    const bookingSignal =
+      successEvaluation === true || successEvaluation === 'true' || call.analysis?.structuredData?.booked === true;
+    if (bookingSignal) {
       intentCounts[intent].conversions++;
       bookingCount++;
     }
@@ -494,6 +551,7 @@ export function computeAnalyticsFromCallLogs(calls: any[]): CallAnalytics { // e
     const createdAt = call.createdAt || call.startedAt;
     if (createdAt) {
       const date = new Date(createdAt);
+      if (Number.isNaN(date.getTime())) continue;
       const hour = date.getHours();
       hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       const dayName = dayNames[date.getDay()];
@@ -529,7 +587,7 @@ export function computeAnalyticsFromCallLogs(calls: any[]): CallAnalytics { // e
   }));
 
   // Estimate satisfaction from successful call ratio and avg duration
-  const successRate = answeredCalls > 0 ? (answeredCalls - missedCalls) / answeredCalls : 0;
+  const successRate = totalCalls > 0 ? answeredCalls / totalCalls : 0;
   const satisfaction = Math.min(100, Math.round(successRate * 85 + (bookingConversion > 30 ? 10 : 5)));
 
   return {
@@ -767,7 +825,7 @@ export async function syncAssistantToVapi(
 export async function getVapiCallLogs(
   apiKey: string,
   limit: number = 100
-): Promise<{ success: boolean; calls: unknown[]; message: string }> {
+): Promise<{ success: boolean; calls: VapiCallLog[]; message: string }> {
   try {
     const response = await fetch(`https://api.vapi.ai/call?limit=${limit}`, {
       headers: {
@@ -780,8 +838,9 @@ export async function getVapiCallLogs(
       return { success: false, calls: [], message: 'Failed to fetch call logs' };
     }
 
-    const calls = await response.json();
-    return { success: true, calls, message: `Retrieved ${Array.isArray(calls) ? calls.length : 0} call logs` };
+    const callsResponse = await response.json() as VapiCallLogsApiResponse;
+    const calls = parseVapiCallLogs(callsResponse);
+    return { success: true, calls, message: `Retrieved ${calls.length} call logs` };
   } catch (error) {
     return { success: false, calls: [], message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` };
   }

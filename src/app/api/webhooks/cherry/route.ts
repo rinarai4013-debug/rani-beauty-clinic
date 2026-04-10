@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   try {
     const parsed = CherryWebhookPayloadSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
-      console.warn('[Cherry Webhook] Invalid payload:', parsed.error.issues[0]?.message);
+      console.error('[Cherry Webhook] Invalid payload:', parsed.error.issues[0]?.message);
       return NextResponse.json({ received: true, warning: 'Invalid payload' }, { status: 200 });
     }
 
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Validate basic structure
     if (!body.event || !body.data) {
-      console.warn('[Cherry Webhook] Invalid payload: missing event or data');
+      console.error('[Cherry Webhook] Invalid payload: missing event or data');
       return NextResponse.json({ received: true, warning: 'Invalid payload' }, { status: 200 });
     }
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       const { customerId, applicationId } = body.data;
 
       if (!customerId && !applicationId) {
-        console.warn('[Cherry Webhook] checkout.completed missing customerId and applicationId');
+        console.error('[Cherry Webhook] checkout.completed missing customerId and applicationId');
         return NextResponse.json({ received: true, warning: 'No customer identifier' }, { status: 200 });
       }
 
