@@ -153,6 +153,7 @@ const LOW_DEMAND_THRESHOLD = 40; // % utilization
 const HIGH_DEMAND_THRESHOLD = 85; // % utilization
 const MAX_PRICE_INCREASE = 15; // % max single adjustment
 const MAX_PRICE_DECREASE = 20; // % max discount
+const RECOMMENDATION_THRESHOLD = 1; // minimum % change to emit recommendation
 
 // ── ENGINE ──
 
@@ -183,7 +184,7 @@ function generatePriceRecommendations(input: PricingInput): PricingRecommendatio
     const factors = analyzeServiceFactors(service, input);
     const adjustment = calculatePriceAdjustment(factors);
 
-    if (Math.abs(adjustment.change) >= 2) {
+    if (Math.abs(adjustment.change) >= RECOMMENDATION_THRESHOLD) {
       let suggestedPrice = Math.round(service.basePrice * (1 + adjustment.change / 100));
 
       // GUARDRAIL: Never price below cost - enforce minimum 10% margin
@@ -234,7 +235,8 @@ function analyzeServiceFactors(
   // Margin analysis
   const currentMargin = (service.basePrice - service.cost) / service.basePrice;
   const targetMargin = MARGIN_TARGETS[service.category] || 0.70;
-  const marginScore = Math.min(100, Math.round((currentMargin / targetMargin) * 100));
+  const rawMarginScore = Math.round((currentMargin / targetMargin) * 100);
+  const marginScore = Math.max(0, Math.min(100, rawMarginScore));
 
   // Competitive position
   let competitivePosition = 0;
@@ -296,7 +298,8 @@ function calculatePriceAdjustment(
 
   // High demand + growing trend → premium pricing
   if (factors.demandScore > 75 && factors.trendDirection === 'growing') {
-    change += Math.min(factors.seasonalFactor * 8, MAX_PRICE_INCREASE);
+    const seasonalDemandBoost = Math.min(Math.max(factors.seasonalFactor - 1, 0) * 60, 7);
+    change += Math.min(8 + seasonalDemandBoost, MAX_PRICE_INCREASE);
     reason = 'High demand with growing trend supports premium pricing';
     confidence = 80;
     strategy = 'demand_premium';
@@ -304,7 +307,7 @@ function calculatePriceAdjustment(
 
   // Low demand + declining → capacity fill discount
   if (factors.demandScore < 30 && factors.trendDirection === 'declining') {
-    change -= Math.min(10, MAX_PRICE_DECREASE);
+    change -= MAX_PRICE_DECREASE;
     reason = 'Low demand - recommend promotional pricing to fill capacity';
     confidence = 70;
     strategy = 'capacity_fill';
@@ -332,9 +335,25 @@ function calculatePriceAdjustment(
     strategy = 'competitive_adjustment';
   }
 
+  // Significantly above competitors → room to discount competitively
+  if (factors.competitivePosition > 15) {
+    const premiumOvermarket = Math.max(factors.competitivePosition - 15, 0);
+    const compDiscount = Math.min(premiumOvermarket * 0.4, MAX_PRICE_DECREASE);
+    change -= compDiscount;
+    reason = reason
+      ? `${reason}. Priced above market - competitive discount needed`
+      : 'Priced above competitors';
+    confidence = Math.max(confidence, 85);
+    strategy = 'competitive_adjustment';
+  }
+
   // Seasonal boost
   if (factors.seasonalFactor > 1.05) {
-    change *= factors.seasonalFactor;
+    if (change > 0) {
+      change *= factors.seasonalFactor;
+    } else if (change < 0) {
+      change /= factors.seasonalFactor;
+    }
     reason = reason
       ? `${reason} (seasonal demand boost applied)`
       : 'Seasonal demand increase supports higher pricing';
@@ -356,8 +375,11 @@ function estimateRevenueImpact(
   const monthlyBookings = service.popularity;
   const priceDiff = suggestedPrice - service.basePrice;
 
-  // Elasticity: higher prices slightly reduce demand
-  const elasticity = priceDiff > 0 ? 0.85 : 1.1; // conservative
+  // Elasticity: higher prices can reduce demand; lower prices can lift demand.
+  const priceDeltaRatio = priceDiff / service.basePrice;
+  const elasticity = priceDiff > 0
+    ? Math.max(0.75, 1 - priceDeltaRatio * 0.5)
+    : 1 + Math.min(0.3, Math.abs(priceDeltaRatio) * 0.5);
   const adjustedBookings = Math.round(monthlyBookings * elasticity);
 
   const currentRevenue = monthlyBookings * service.basePrice;

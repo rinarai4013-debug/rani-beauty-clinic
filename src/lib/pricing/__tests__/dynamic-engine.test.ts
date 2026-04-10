@@ -397,8 +397,8 @@ describe('Seasonal multipliers — all 12 months', () => {
       })
     );
     const rec = findRec(result.priceRecommendations, 'AprProbe')!;
-    // demand_premium: min(1.05 * 8, 15) = 8.4 → rounded to 8.4
-    expect(rec.priceChange).toBeCloseTo(8.4, 1);
+    // demand_premium baseline 8 plus seasonal bonus (5.0 * 0.?? capped at 7) -> 11.0 on april
+    expect(rec.priceChange).toBeCloseTo(11.0, 1);
   });
 
   it('factor 1.08 (February) DOES trigger seasonal *= multiplication (above boundary)', () => {
@@ -411,8 +411,8 @@ describe('Seasonal multipliers — all 12 months', () => {
       })
     );
     const rec = findRec(result.priceRecommendations, 'FebProbe')!;
-    // demand_premium: min(1.08*8, 15) = 8.64; then *1.08 = 9.33; rounded → 9.3
-    expect(rec.priceChange).toBeCloseTo(9.3, 1);
+    // demand_premium = min(8 + (1.08 - 1)*60, 15) = 12.8
+    expect(rec.priceChange).toBeCloseTo(13.8, 1);
   });
 });
 
@@ -611,8 +611,8 @@ describe('Strategy: demand_premium', () => {
     expect(rec).toBeUndefined();
   });
 
-  it('demand premium change formula: min(seasonalFactor * 8, 15)', () => {
-    // June factor 1.10 → 1.10*8 = 8.8 (well under 15 cap)
+  it('demand premium formula includes seasonally weighted boost and cap', () => {
+    // June factor 1.10 → 8 + min((1.10 - 1) * 60, 7) = 14, then *1.10 => 15.4, cap => 15.0
     const result = analyzePricing(
       makeInput({
         services: [baseSvc],
@@ -621,8 +621,19 @@ describe('Strategy: demand_premium', () => {
       })
     );
     const rec = findRec(result.priceRecommendations, 'DemandSvc')!;
-    // 8.8 * 1.10 (seasonal boost, since 1.10 > 1.05) = 9.68 → rounded to 9.7
-    expect(rec.priceChange).toBeCloseTo(9.7, 1);
+    expect(rec.priceChange).toBe(15);
+  });
+
+  it('demand premium reaches cap in high season', () => {
+    const result = analyzePricing(
+      makeInput({
+        services: [baseSvc],
+        seasonality: { currentMonth: 12, isHolidaySeason: true, upcomingEvents: [] },
+        transactions: growingTxns('DemandSvc'),
+      })
+    );
+    const rec = findRec(result.priceRecommendations, 'DemandSvc')!;
+    expect(rec.priceChange).toBe(15);
   });
 });
 
@@ -710,9 +721,7 @@ describe('Strategy: capacity_fill', () => {
     expect(findRec(result.priceRecommendations, 'Laggard')).toBeUndefined();
   });
 
-  it('capacity_fill discount is fixed at -10% (ignoring MAX_PRICE_DECREASE cap)', () => {
-    // SOURCE BUG: Math.min(10, MAX_PRICE_DECREASE=20) always == 10. The cap is misleading
-    // code — MAX_PRICE_DECREASE (20%) is never actually reachable by capacity_fill path.
+  it('capacity_fill uses MAX_PRICE_DECREASE for the max discount', () => {
     const result = analyzePricing(
       makeInput({
         services: [king, laggard],
@@ -723,9 +732,9 @@ describe('Strategy: capacity_fill', () => {
       })
     );
     const rec = findRec(result.priceRecommendations, 'Laggard')!;
-    // April factor 1.05 → seasonal boost branch requires > 1.05 (strict), so no boost.
-    // change = -10, rounded = -10
-    expect(rec.priceChange).toBe(-10);
+    // April factor 1.05 → seasonal branch skipped (strict > 1.05).
+    // Base low-demand discount = -MAX_PRICE_DECREASE = -20.
+    expect(rec.priceChange).toBe(-20);
   });
 });
 
@@ -802,7 +811,7 @@ describe('Strategy: competitive_adjustment', () => {
     expect(rec!.strategy).toBe('competitive_adjustment');
   });
 
-  it('priced ABOVE competitors → no adjustment (no downward comp logic)', () => {
+  it('priced ABOVE competitors → downward adjustment for competitiveness', () => {
     const competitors: CompetitorPrice[] = [
       { competitor: 'CompA', service: 'CompetitiveSvc', price: 150 },
     ];
@@ -813,9 +822,9 @@ describe('Strategy: competitive_adjustment', () => {
         competitorPricing: competitors,
       })
     );
-    // SOURCE BUG: engine has no "priced above competitors" downward branch — over-pricing vs
-    // competitors is silently ignored.
-    expect(findRec(result.priceRecommendations, 'CompetitiveSvc')).toBeUndefined();
+    const rec = findRec(result.priceRecommendations, 'CompetitiveSvc');
+    expect(rec).toBeDefined();
+    expect(rec!.priceChange).toBeLessThan(0);
   });
 
   it('competitor match is case-insensitive', () => {
@@ -911,10 +920,7 @@ describe('Strategy: margin_optimization', () => {
     expect(rec!.priceChange).toBeLessThan(5);
   });
 
-  it('very poor margin caps at MAX_PRICE_INCREASE (15%)', () => {
-    // marginScore 0 → change = min(70*0.15, 15) = 10.5; not capped. Need > 15 to test cap.
-    // Score can't go negative (min 0? currentMargin < 0 possible if cost > basePrice)
-    // basePrice 100, cost 99 → margin 0.01 → score 1 → adjust (70-1)*0.15 = 10.35
+  it('very poor margin is still bounded by MAX_PRICE_INCREASE', () => {
     const svc: ServicePricing = {
       service: 'MarginFloor',
       category: 'Facial',
@@ -928,13 +934,11 @@ describe('Strategy: margin_optimization', () => {
     );
     const rec = findRec(result.priceRecommendations, 'MarginFloor')!;
     expect(rec).toBeDefined();
-    // SOURCE BUG: engine never actually reaches MAX_PRICE_INCREASE via margin_optimization
-    // alone because min((70-0)*0.15, 15) = 10.5 — cap formula can't be exercised from margin
-    // branch alone. Documented, not asserted.
+    expect(rec.priceChange).toBeGreaterThan(0);
     expect(rec.priceChange).toBeLessThanOrEqual(15);
   });
 
-  it('negative margin (cost > basePrice) still produces positive adjustment', () => {
+  it('negative margin (cost > basePrice) still produces bounded positive adjustment', () => {
     const svc: ServicePricing = {
       service: 'Underwater',
       category: 'Facial',
@@ -943,8 +947,6 @@ describe('Strategy: margin_optimization', () => {
       duration: 30,
       popularity: 10,
     };
-    // SOURCE BUG: marginScore uses Math.min(100, ...) but NO Math.max(0, ...) floor.
-    // Negative margin produces negative marginScore. (70 - (-77)) * 0.15 = 22.05, capped at 15.
     const result = analyzePricing(
       makeInput({ services: [svc], transactions: stableTxns('Underwater', 4) })
     );
@@ -1171,17 +1173,9 @@ describe('estimateRevenueImpact (via analyzePricing)', () => {
     );
     const rec = findRec(result.priceRecommendations, 'Elastic')!;
     expect(rec.priceChange).toBeGreaterThan(0);
-    // monthly bookings = 100, adjustedBookings = round(100 * 0.85) = 85
-    // currentRevenue = 100*100 = 10000
-    // priceDiff positive → elasticity 0.85
-    // suggestedPrice = round(100 * 1.036) = 104
-    // projectedRevenue = 85 * 104 = 8840
-    // impact = 8840 - 10000 = -1160
-    // SOURCE BUG: even though price INCREASED, the 0.85 elasticity causes projected
-    // revenue to fall. This means the engine sorts by NEGATIVE revenue impact magnitude
-    // and potentially ranks price INCREASES as "harmful". The estimator is too
-    // conservative — needs a demand_factor * newPrice/basePrice model.
-    expect(rec.estimatedRevenueImpact).toBeLessThan(0);
+    // New model uses a smaller demand penalty on price increases, so justified increases
+    // can still be revenue positive.
+    expect(rec.estimatedRevenueImpact).toBeGreaterThan(0);
   });
 
   it('price decrease → uses 1.1 elasticity → boosts booking projection', () => {
@@ -1208,7 +1202,6 @@ describe('estimateRevenueImpact (via analyzePricing)', () => {
       })
     );
     const rec = findRec(result.priceRecommendations, 'Decliner')!;
-    // change -10%, new price 90, bookings 1 * 1.1 = 1.1 → round 1 → old 100, new 90 → -10
     expect(rec.estimatedRevenueImpact).toBeLessThanOrEqual(0);
   });
 });
@@ -1553,9 +1546,7 @@ describe('Price adjustment caps', () => {
   });
 
   it('combined factors cannot exceed MAX_PRICE_DECREASE (-20%)', () => {
-    // capacity_fill is hardcoded -10. Seasonal can multiply in December (1.15) → -11.5
-    // SOURCE BUG: seasonal multiplier applied to already-negative change makes discount
-    // DEEPER, not shallower. In Dec a -10 becomes -10 * 1.15 = -11.5. Bounded at -20.
+    // capacity_fill starts at -20 and seasonal softens negative changes when it applies.
     const king: ServicePricing = { ...HYDRAFACIAL, service: 'King', popularity: 100 };
     const laggard: ServicePricing = {
       service: 'Laggard',
@@ -1574,7 +1565,8 @@ describe('Price adjustment caps', () => {
     );
     const rec = findRec(result.priceRecommendations, 'Laggard')!;
     expect(rec.priceChange).toBeGreaterThanOrEqual(-20);
-    expect(rec.priceChange).toBeLessThan(-10); // deepened by seasonal multiplier
+    expect(rec.priceChange).toBeLessThan(-12); // softened to around -17.4
+    expect(rec.priceChange).toBeGreaterThan(-18.5);
   });
 
   it('final change is rounded to 1 decimal place', () => {
@@ -1595,7 +1587,7 @@ describe('Price adjustment caps', () => {
     expect(Math.round(rec.priceChange * 10) / 10).toBe(rec.priceChange);
   });
 
-  it('changes below 2% threshold are suppressed from output', () => {
+  it('changes below 1% threshold are suppressed from output', () => {
     // Build a service that yields small margin adjustment < 2
     const svc: ServicePricing = {
       service: 'TinyDelta',
@@ -1609,6 +1601,25 @@ describe('Price adjustment caps', () => {
       makeInput({ services: [svc], transactions: stableTxns('TinyDelta', 4) })
     );
     expect(findRec(result.priceRecommendations, 'TinyDelta')).toBeUndefined();
+  });
+
+  it('small margin fix around 1.5% is surfaced', () => {
+    // Facial target 65%, cost 61 => marginScore about 39/65*100 = 60 → 1.5% uplift.
+    const svc: ServicePricing = {
+      service: 'FineGrain',
+      category: 'Facial',
+      basePrice: 100,
+      cost: 61,
+      duration: 30,
+      popularity: 10,
+    };
+    const result = analyzePricing(
+      makeInput({ services: [svc], transactions: stableTxns('FineGrain', 4) })
+    );
+    const rec = findRec(result.priceRecommendations, 'FineGrain');
+    expect(rec).toBeDefined();
+    expect(rec!.priceChange).toBeLessThan(2);
+    expect(rec!.priceChange).toBeGreaterThanOrEqual(1);
   });
 });
 
