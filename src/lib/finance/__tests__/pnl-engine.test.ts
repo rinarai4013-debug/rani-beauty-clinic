@@ -13,37 +13,11 @@
  *   9.  Integration: realistic month of Rani transactions
  *   10. Edge cases: zero revenue, all-expense month, negative cash flow
  *
- * Fixture date anchor: 2026-04-10T12:00:00Z (projection math is TZ-sensitive
- * because the engine calls `new Date()` + `setMonth()`; we lock to UTC below).
- *
- * SOURCE BUG inventory (not fixed, just documented):
- *   - byCategory/byProvider percentages are NaN when totalRevenue = 0 (no guard).
- *   - KPIs.days uses Math.ceil((end-start)/86400000) which yields 29 for a
- *     full April (2026-04-01..2026-04-30) — off by one.
- *   - "medical insurance" categorizes as `supplies` (supplies precedes
- *     insurance in the keyword table and "medical" is a supplies keyword).
- *   - "staff meeting" and "staff offsite" categorize as `payroll` because
- *     "staff" is a payroll keyword and matching is substring-based.
- *   - "twilio" resolves to `marketing` (marketing precedes software in the
- *     table) even though Twilio is obviously a SaaS line item.
- *   - "space heater" → `rent` because "space" is a rent keyword.
- *   - Cash-flow growth rates are hard-coded (+3% rev, +1% exp) with no
- *     clamping or caller override — the spec says "growth rate clamping"
- *     but the engine does none.
- *   - projectCashFlow runway uses the POST-mutation balance, not the entry
- *     balance, so runway month-over-month double-counts the current burn.
- *   - Health score profitability falls into the "operating at a loss" else
- *     branch when netMargin === 0 (needs `>= 0`, not `> 0`).
- *   - Health score cashPosition stays at the neutral 50 when bankBalance
- *     is exactly 0 (truthy check skips the scoring block) — zero cash
- *     should be critical, not neutral.
- *   - Health score efficiency has a gap: grossMargin in (45, 55] maps to
- *     60, but there is no explicit mid-tier band between 55 and 65; fine
- *     but worth noting.
+ * Fixture date anchor: 2026-04-10T12:00:00Z (projection month math is TZ-sensitive).
  */
 
 // Lock TZ to UTC before importing the engine so projectCashFlow month
-// arithmetic (which uses `new Date()` + `setMonth`) is deterministic.
+// arithmetic (which uses `new Date()` + `setUTCMonth`) is deterministic.
 process.env.TZ = 'UTC';
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -300,33 +274,28 @@ describe('categorizeExpense', () => {
     // Iteration order in EXPENSE_KEYWORDS:
     //   payroll → rent → supplies → marketing → insurance →
     //   equipment → software → utilities → professional_services → training → misc
-    it('"medical insurance" matches supplies first ("medical" keyword), NOT insurance', () => {
-      // SOURCE BUG: medical-insurance line items get bucketed as COGS supplies.
+    it('"medical insurance" maps to insurance', () => {
       expect(
         categorizeExpense(makeExpense({ vendor: 'BCBS', description: 'Medical insurance premium' }))
-      ).toBe('supplies');
+      ).toBe('insurance');
     });
 
-    it('"staff meeting" matches payroll ("staff" keyword), NOT misc', () => {
-      // SOURCE BUG: staff all-hands lunches get bucketed as payroll.
+    it('"staff meeting" maps to misc, not payroll', () => {
       expect(
         categorizeExpense(makeExpense({ vendor: 'Restaurant', description: 'Staff meeting lunch' }))
-      ).toBe('payroll');
+      ).toBe('misc');
     });
 
-    it('"twilio" matches marketing first, NOT software', () => {
-      // SOURCE BUG: Twilio is a SaaS but marketing iterates before software
-      // AND twilio is keyworded in both.
+    it('"twilio" maps to software', () => {
       expect(
         categorizeExpense(makeExpense({ vendor: 'Twilio', description: 'Monthly SMS invoice' }))
-      ).toBe('marketing');
+      ).toBe('software');
     });
 
-    it('"space heater" matches rent ("space" keyword), NOT misc/equipment', () => {
-      // SOURCE BUG: "space" is too broad a rent keyword.
+    it('"space heater" maps to misc', () => {
       expect(
         categorizeExpense(makeExpense({ vendor: 'Amazon', description: 'Space heater for waiting room' }))
-      ).toBe('rent');
+      ).toBe('misc');
     });
 
     it('"compliance training CME" matches professional_services before training', () => {
@@ -572,6 +541,16 @@ describe('P&L generation', () => {
       expect(pnl.periodComparison!.netIncomeChange).toBe(60); // (8000-5000)/5000
     });
 
+    it('uses a finite percentage when previous period expenses are zero', () => {
+      const input = makeInput({
+        revenue: [makeRevenue({ amount: 5_000 })],
+        expenses: [makeExpense({ vendor: 'Renton', description: 'Rent', amount: 1_000 })],
+        previousPeriod: { revenue: 10_000, expenses: 0, netIncome: -2_000 },
+      });
+      const { pnl } = generateFinancialIntelligence(input);
+      expect(pnl.periodComparison!.expenseChange).toBe(100);
+    });
+
     it('handles prev.revenue=0 without dividing by zero', () => {
       const input = makeInput({
         revenue: [makeRevenue({ amount: 5000 })],
@@ -810,6 +789,41 @@ describe('Cash flow projection', () => {
     expect(cashFlowProjection[5].projectedExpenses).toBe(5255);
   });
 
+  it('uses caller-supplied projection growth rates for rev/expense', () => {
+    const input = makeInput({
+      revenue: [makeRevenue({ amount: 10_000 })],
+      expenses: [makeExpense({ vendor: 'Renton', description: 'Rent', amount: 5000 })],
+      bankBalance: 20_000,
+      projectionGrowthRates: {
+        revenueGrowthRate: 0.05,
+        expenseGrowthRate: 0.03,
+      },
+    });
+    const { cashFlowProjection } = generateFinancialIntelligence(input);
+    // Month 0 stays base.
+    expect(cashFlowProjection[0].projectedRevenue).toBe(10_000);
+    expect(cashFlowProjection[0].projectedExpenses).toBe(5000);
+    // Month 1 uses the custom rates: 10k * 1.05 and 5k * 1.03.
+    expect(cashFlowProjection[1].projectedRevenue).toBe(10_500);
+    expect(cashFlowProjection[1].projectedExpenses).toBe(5_150);
+  });
+
+  it('clamps caller-supplied growth rates to safe bounds', () => {
+    const input = makeInput({
+      revenue: [makeRevenue({ amount: 10_000 })],
+      expenses: [makeExpense({ vendor: 'Renton', description: 'Rent', amount: 5000 })],
+      bankBalance: 20_000,
+      projectionGrowthRates: {
+        revenueGrowthRate: 1.5,
+        expenseGrowthRate: -0.9,
+      },
+    });
+    const { cashFlowProjection } = generateFinancialIntelligence(input);
+    // Default clamp caps revenue growth at 30% and floors expense growth at 0%.
+    expect(cashFlowProjection[1].projectedRevenue).toBe(13_000);
+    expect(cashFlowProjection[1].projectedExpenses).toBe(5_000);
+  });
+
   it('projected balance accumulates net income from starting balance', () => {
     const input = makeInput({
       revenue: [makeRevenue({ amount: 10_000 })],
@@ -846,10 +860,10 @@ describe('Cash flow projection', () => {
     });
     const { cashFlowProjection } = generateFinancialIntelligence(input);
     // Month 0: rev 5000, exp round(10000 * 1) = 10000, burn 5000.
-    // balance after = 50000 + (5000-10000) = 45000. runway = round(45000/5000) = 9
+    // runway uses the starting balance before month burn is applied: 50000/5000 = 10.
     expect(cashFlowProjection[0].projectedNetIncome).toBe(-5000);
     expect(cashFlowProjection[0].projectedBalance).toBe(45_000);
-    expect(cashFlowProjection[0].runwayMonths).toBe(9);
+    expect(cashFlowProjection[0].runwayMonths).toBe(10);
   });
 
   it('burning clinic with zero balance gets runway=0', () => {
@@ -889,15 +903,14 @@ describe('Cash flow projection', () => {
 // ════════════════════════════════════════════════════════════════════════
 
 describe('KPI calculation', () => {
-  it('days window uses ceil((end-start)/86400000)', () => {
-    // SOURCE BUG: April 1 to April 30 is 30 calendar days inclusive, but
-    // this formula yields 29. Test locks the observed (buggy) behavior.
+  it('days window uses inclusive UTC day count', () => {
+    // April 1 to April 30 is 30 calendar days inclusive.
     const input = makeInput({
       period: { start: '2026-04-01', end: '2026-04-30' },
       revenue: [makeRevenue({ amount: 29_000 })],
     });
     const { kpis } = generateFinancialIntelligence(input);
-    expect(kpis.avgDailyRevenue).toBe(1000); // 29000 / 29
+    expect(kpis.avgDailyRevenue).toBe(967); // 29000 / 30
   });
 
   it('clamps days to minimum of 1 when period has zero length', () => {
@@ -1187,15 +1200,17 @@ describe('Financial health score — cash position component', () => {
     expect(healthScore.components.cashPosition).toBe(50);
   });
 
-  it('bankBalance exactly 0 ALSO stays at neutral 50 (SOURCE BUG)', () => {
-    // Truthy check skips the entire scoring block even though $0 is critical.
+  it('cashPosition treats zero bankBalance as critical cash risk', () => {
+    // Zero balance should be treated as a critical alert condition.
     const input = makeInput({
       revenue: [makeRevenue({ amount: 10_000 })],
       expenses: [makeExpense({ vendor: 'Renton', description: 'Rent', amount: 5000 })],
       bankBalance: 0,
     });
     const { healthScore } = generateFinancialIntelligence(input);
-    expect(healthScore.components.cashPosition).toBe(50);
+    expect(healthScore.components.cashPosition).toBe(25);
+    expect(healthScore.alerts.some(a => /Cash reserves/.test(a))).toBe(true);
+    expect(healthScore.recommendations.some(r => /cash reserve/i.test(r))).toBe(true);
   });
 });
 
@@ -1422,13 +1437,13 @@ describe('Edge cases', () => {
     expect(pnl.netIncome).toBe(-5000);
   });
 
-  it('zero revenue: byCategory/byProvider produce NaN percentages (SOURCE BUG)', () => {
-    // The engine divides by totalRevenue (0) without a guard.
+  it('zero-revenue category/provider percentages return 0 rather than NaN', () => {
     const input = makeInput({
       revenue: [makeRevenue({ amount: 0, category: 'Facial' })],
     });
     const { pnl } = generateFinancialIntelligence(input);
-    expect(Number.isNaN(pnl.revenue.byCategory[0].percentage)).toBe(true);
+    expect(pnl.revenue.byCategory[0].percentage).toBe(0);
+    expect(pnl.revenue.byProvider[0].percentage).toBe(0);
   });
 
   it('all-expense month: negative net income and negative net margin', () => {
