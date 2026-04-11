@@ -556,12 +556,12 @@ describe('Strategy 2: Category gap filling', () => {
     expect(recs.find(r => r.service === 'HydraFacial')).toBeDefined();
   });
 
-  // SOURCE BUG: Gap detection uses `sorted[0]?.category` (the MOST RECENT treatment's
-  // category) as "primary category" to pick a cross-sell bucket, despite the comment
-  // "Find a cross-sell from their most-used category". A client whose history is
-  // 10x Facial + 1x Wellness (last visit) would be treated as a Wellness client.
+  // Post-Wave-11: gap detection now uses the client's *most-used* category as
+  // the cross-sell bucket, not whichever category they happened to book last.
+  // The previous source bug tagged a "10x Facial + 1 Wellness" client as a
+  // Wellness client and returned Laser Hair Removal (from CROSS_SELL['Wellness']).
 
-  it('SOURCE BUG demo: 10x Facial history + 1 recent Wellness visit uses Wellness cross-sell bucket, not Facial', () => {
+  it('cross-sell uses most-used category (10x Facial + 1 Wellness → Facial bucket)', () => {
     const history: TreatmentRecord[] = [];
     for (let i = 0; i < 10; i++) {
       history.push(makeTreatment({ service: 'HydraFacial', category: 'Facial', date: daysAgo(60 + i * 30) }));
@@ -569,10 +569,14 @@ describe('Strategy 2: Category gap filling', () => {
     history.push(makeTreatment({ service: 'GLP-1', category: 'Wellness', date: daysAgo(2) }));
 
     const result = recommendNextTreatment(makeInput({ treatmentHistory: history }));
-    // The gap-fill should suggest Botox (from Facial cross-sell) if it was "most-used"-based.
-    // But because it's last-visit-based, it uses CROSS_SELL['Wellness'] → suggests Laser Hair Removal.
     const recs = allRecs(result);
-    expect(recs.some(r => r.service === 'Laser Hair Removal')).toBe(true);
+    // Most-used = Facial → CROSS_SELL['Facial'] = [Botox, GLP-1]. Gaps =
+    // [Laser, Injectable, Body]. Only Botox matches the Injectable gap (GLP-1
+    // targets Wellness, which isn't a gap for this client). The previously
+    // buggy output — Laser Hair Removal from the Wellness bucket — should no
+    // longer appear.
+    expect(recs.some(r => r.service === 'Botox')).toBe(true);
+    expect(recs.some(r => r.service === 'Laser Hair Removal')).toBe(false);
   });
 });
 
@@ -747,10 +751,44 @@ describe('Strategy 5: Membership upsell insight', () => {
     expect(result.insights.some(i => /Angel Glow Up/.test(i))).toBe(false);
   });
 
-  // SOURCE BUG: Membership upsell only pushes to `insights`, never to
-  // `recommendations`. So there is no actual actionable rec — the CEO dashboard
-  // has to rely on insight copy for this strategy. Considered a design choice,
-  // but "5 strategies" implies 5 rec-producers; only 4 actually produce recs.
+  // Post-Wave-11: the membership upsell strategy now produces an actual rec
+  // in addition to the insight, restoring the "5 strategies → 5 rec producers"
+  // contract documented at the top of engine.ts.
+  it('upsell produces an actionable "Angel Glow Up Membership" recommendation at confidence 55', () => {
+    const result = recommendNextTreatment(
+      makeInput({
+        treatmentHistory: history3,
+        avgSpend: 465,
+        membershipTier: undefined,
+      }),
+    );
+    const upsellRec = findRec(result, 'Angel Glow Up Membership');
+    expect(upsellRec).toBeDefined();
+    expect(upsellRec!.category).toBe('Membership');
+    expect(upsellRec!.confidence).toBe(55);
+    // Confidence floor keeps it below pathway (65) / overdue (85) so it never
+    // displaces a legitimate treatment rec as `primary` unless nothing else
+    // qualifies.
+    expect(result.primary.service).not.toBe('Angel Glow Up Membership');
+  });
+
+  it('upsell rec is absent when the client already has a membership tier', () => {
+    const result = recommendNextTreatment(
+      makeInput({
+        treatmentHistory: history3,
+        avgSpend: 900,
+        membershipTier: 'Angel Glow Up',
+      }),
+    );
+    expect(findRec(result, 'Angel Glow Up Membership')).toBeUndefined();
+  });
+
+  it('upsell rec is absent when avgSpend is at or below the 300 threshold', () => {
+    const result = recommendNextTreatment(
+      makeInput({ treatmentHistory: history3, avgSpend: 300 }),
+    );
+    expect(findRec(result, 'Angel Glow Up Membership')).toBeUndefined();
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -788,8 +826,10 @@ describe('Ranking & dedupe', () => {
     }
   });
 
-  it('alternatives array length is capped at 3', () => {
-    // Craft an input that produces many unique recs
+  it('alternatives array length is capped at 5', () => {
+    // Post-Wave-11: the alternatives window was widened from 3 → 5 so that
+    // cross-sell gap-fill recs (conf 50) aren't crowded out by a full pathway
+    // triplet (conf 65). Consumers that only want the top 3 can slice.
     const result = recommendNextTreatment(
       makeInput({
         treatmentHistory: [
@@ -797,15 +837,16 @@ describe('Ranking & dedupe', () => {
         ],
       }),
     );
-    expect(result.alternatives.length).toBeLessThanOrEqual(3);
+    expect(result.alternatives.length).toBeLessThanOrEqual(5);
   });
 
-  it('dedupe: a service suggested by multiple strategies appears once, with the first (highest-conf) variant', () => {
+  it('dedupe: a service suggested by multiple strategies appears once, with the cross-sell variant winning', () => {
     // Botox recent (2d ago) → pathway next puts Dermal Fillers + HydraFacial.
-    // HydraFacial could ALSO come from gap-fill if Facial is a gap. Here Facial is
-    // already a gap (client is Injectable-only), so gap-fill would try to push
-    // HydraFacial at confidence 50, but the pathway loop already pushed it at 65.
-    // Dedupe should keep only the 65-variant.
+    // Gap-fill also suggests HydraFacial because Facial is a gap for an
+    // Injectable-only client. Post-Wave-11: cross-sell recs are pushed BEFORE
+    // pathway recs so first-wins dedupe preserves the more-specific cross-sell
+    // reason ("Maintain glowing skin between injectable visits") instead of
+    // the generic "Great complement to your Botox" pathway copy.
     const result = recommendNextTreatment(
       makeInput({
         treatmentHistory: [
@@ -817,8 +858,10 @@ describe('Ranking & dedupe', () => {
     expect(hydraCount).toBeLessThanOrEqual(1);
     const hydra = findRec(result, 'HydraFacial');
     if (hydra) {
-      // The 65 pathway-next variant wins over the 50 gap-fill variant
-      expect(hydra.confidence).toBe(65);
+      // Cross-sell variant wins — confidence 50, reason references "glowing skin"
+      // from CROSS_SELL['Injectable'].
+      expect(hydra.confidence).toBe(50);
+      expect(hydra.reason).toMatch(/glowing skin/i);
     }
   });
 
@@ -1088,10 +1131,10 @@ describe('Edge cases & safety', () => {
     expect(services).toContain('Dermal Fillers');
   });
 
-  // SOURCE BUG: matchService iterates PATHWAYS keys in insertion order and returns
-  // the FIRST substring hit. "Botox + Fillers" → matches "Botox" (inserted earlier)
-  // and never reaches "Dermal Fillers", so the engine treats the visit as pure Botox.
-  it('SOURCE BUG: "Botox + Dermal Fillers combo" matches Botox only (insertion-order bias)', () => {
+  // Post-Wave-11: matchService sorts PATHWAYS keys by length DESC so the
+  // most specific key wins. "Botox + Dermal Fillers combo" now resolves to
+  // "Dermal Fillers" (14 chars) instead of "Botox" (5 chars).
+  it('longest-match: "Botox + Dermal Fillers combo" resolves to the Dermal Fillers pathway', () => {
     const result = recommendNextTreatment(
       makeInput({
         treatmentHistory: [
@@ -1099,12 +1142,12 @@ describe('Edge cases & safety', () => {
         ],
       }),
     );
-    // It should be using Botox pathway → Dermal Fillers is in next → present at conf 65
-    const df = findRec(result, 'Dermal Fillers');
-    expect(df).toBeDefined();
-    // But if ordering were different we might get Fillers pathway which recommends Botox at 65 instead.
-    // Assert Botox pathway chosen by checking the "complement your Botox" reason.
-    expect(df!.reason).toMatch(/botox/i);
+    // Dermal Fillers pathway.next = [Botox, HydraFacial, RF Microneedling] →
+    // Botox shows up as a pathway-next rec with a reason that references the
+    // Dermal Fillers anchor, not the other way around.
+    const botox = findRec(result, 'Botox');
+    expect(botox).toBeDefined();
+    expect(botox!.reason).toMatch(/dermal fillers/i);
   });
 
   it('history with gibberish service name and no categories -> default fallback', () => {
@@ -1138,8 +1181,10 @@ describe('Edge cases & safety', () => {
     expect(result.primary).toBeDefined();
   });
 
-  it('category gap uses last visit category as the cross-sell bucket (not most-used)', () => {
-    // 3 HydraFacial (Facial), most recent is GLP-1 (Wellness)
+  it('category gap uses the most-used category as the cross-sell bucket (not last visit)', () => {
+    // 3 HydraFacial (Facial) + 1 GLP-1 (Wellness, most recent). Post-Wave-11,
+    // the engine picks Facial (most-used, 3 visits) as the cross-sell bucket
+    // rather than Wellness (most-recent, 1 visit).
     const result = recommendNextTreatment(
       makeInput({
         treatmentHistory: [
@@ -1150,9 +1195,13 @@ describe('Edge cases & safety', () => {
         ],
       }),
     );
-    // CROSS_SELL['Wellness'] is used → should see Laser Hair Removal for Laser gap
-    const lhr = findRec(result, 'Laser Hair Removal');
-    expect(lhr).toBeDefined();
+    // CROSS_SELL['Facial'] = [Botox, GLP-1]. Gaps = [Laser, Injectable, Body].
+    // Botox matches the Injectable gap; GLP-1 is already in history (not a gap).
+    // The old "Wellness bucket" would have fired Laser Hair Removal — that
+    // rec should now be absent.
+    const botox = findRec(result, 'Botox');
+    expect(botox).toBeDefined();
+    expect(findRec(result, 'Laser Hair Removal')).toBeUndefined();
   });
 
   it('avgSpend default of 0 with empty history does not crash', () => {
@@ -1162,33 +1211,41 @@ describe('Edge cases & safety', () => {
     expect(result.primary).toBeDefined();
   });
 
-  it('daysSinceLastVisit is decorative — not used in the engine math (engine uses treatment dates)', () => {
-    // daysSinceLastVisit is destructured but never read downstream (pathway timing
-    // uses getDaysSince on the actual record date). So passing a wildly wrong
-    // value should NOT change the recommendations.
-    const a = recommendNextTreatment(
+  it('daysSinceLastVisit: default (0) falls back to treatment-date math', () => {
+    // Callers that haven't computed a freshness signal just pass 0. The
+    // engine should behave exactly as if the field were absent and compute
+    // the day-delta from the most recent treatment record.
+    const result = recommendNextTreatment(
       makeInput({
         treatmentHistory: [makeTreatment({ service: 'Botox', category: 'Injectable', date: daysAgo(150) })],
         daysSinceLastVisit: 0,
       }),
     );
-    const b = recommendNextTreatment(
-      makeInput({
-        treatmentHistory: [makeTreatment({ service: 'Botox', category: 'Injectable', date: daysAgo(150) })],
-        daysSinceLastVisit: 9999,
-      }),
-    );
-    expect(a.primary.service).toBe(b.primary.service);
-    expect(a.primary.confidence).toBe(b.primary.confidence);
-    expect(a.primary.urgency).toBe(b.primary.urgency);
+    // 150 days > Botox maintenance (100) → overdue insight + Botox primary.
+    expect(result.insights.some(i => /Overdue for Botox/.test(i))).toBe(true);
+    expect(result.primary.service).toBe('Botox');
   });
 
-  // SOURCE BUG: `daysSinceLastVisit` is part of the public input contract but the
-  // engine computes its own day-delta from the treatment record date and ignores
-  // the caller-provided value entirely. Either the field should be removed from
-  // the input type or the engine should respect it (e.g. when the caller has a
-  // more accurate value from Airtable's "Last Visit" column than from the
-  // transaction log).
+  it('daysSinceLastVisit: positive caller value overrides treatment-date math', () => {
+    // Post-Wave-11: the engine now respects a caller-provided `daysSinceLastVisit`
+    // when it's a positive finite number (e.g. the dashboard profile reads
+    // Airtable's "Last Visit" column, which may be fresher than the
+    // reconstructed transaction log). Botox maintenance threshold = 100 days.
+    const notOverdue = recommendNextTreatment(
+      makeInput({
+        treatmentHistory: [makeTreatment({ service: 'Botox', category: 'Injectable', date: daysAgo(150) })],
+        daysSinceLastVisit: 30, // caller knows the client came back 30 days ago
+      }),
+    );
+    const stillOverdue = recommendNextTreatment(
+      makeInput({
+        treatmentHistory: [makeTreatment({ service: 'Botox', category: 'Injectable', date: daysAgo(150) })],
+        daysSinceLastVisit: 200, // caller confirms it really has been 200 days
+      }),
+    );
+    expect(notOverdue.insights.some(i => /Overdue for Botox/.test(i))).toBe(false);
+    expect(stillOverdue.insights.some(i => /Overdue for Botox/.test(i))).toBe(true);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

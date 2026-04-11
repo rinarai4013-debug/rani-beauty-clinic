@@ -200,9 +200,18 @@ const MAINTENANCE_DAYS: Record<string, number> = {
 
 // ── ENGINE ──
 
+// Wave 11 Bug C fix: resolve service names by LONGEST key first so that
+// multi-word pathway entries win over shorter substring matches.
+// Previously `matchService('Botox + Dermal Fillers combo')` returned 'Botox'
+// because the PATHWAYS object happened to insert it earlier — now
+// 'Dermal Fillers' (14 chars) beats 'Botox' (5 chars) regardless of order.
+const PATHWAY_KEYS_BY_LENGTH: string[] = Object.keys(PATHWAYS).sort(
+  (a, b) => b.length - a.length,
+);
+
 function matchService(serviceName: string): string | null {
   const lower = serviceName.toLowerCase();
-  for (const key of Object.keys(PATHWAYS)) {
+  for (const key of PATHWAY_KEYS_BY_LENGTH) {
     if (lower.includes(key.toLowerCase())) return key;
   }
   return null;
@@ -212,9 +221,57 @@ function getDaysSince(dateStr: string): number {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Return the category that appears most frequently in the treatment history.
+ * Ties broken by the most-recent visit's category (since `sorted` is already
+ * newest-first, the first-seen category in iteration wins a tie).
+ * Wave 11 Bug B fix: the gap-fill cross-sell bucket should reflect the
+ * client's *dominant* spend category, not whatever they happened to book last.
+ */
+function mostUsedCategory(sorted: TreatmentRecord[]): string {
+  if (sorted.length === 0) return 'Facial';
+  const freq = new Map<string, number>();
+  for (const t of sorted) {
+    freq.set(t.category, (freq.get(t.category) ?? 0) + 1);
+  }
+  let best = sorted[0].category;
+  let bestCount = 0;
+  // Iterate newest-first so ties resolve to the most-recent category.
+  for (const t of sorted) {
+    const count = freq.get(t.category) ?? 0;
+    if (count > bestCount) {
+      bestCount = count;
+      best = t.category;
+    }
+  }
+  return best;
+}
+
+// Wave 11 Bug A fix: explicit source tag drives the dedupe priority, so the
+// engine no longer depends on push order to resolve collisions. Priority:
+//
+//   overdue  → a "you are past your maintenance window" call. Always wins
+//              because it carries time-sensitive clinical information.
+//   gap      → cross-sell recommendation. Beats plain pathway-next because
+//              gap-fill reasons ("Maintain glowing skin between injectable
+//              visits") are more specific than the generic "Great complement
+//              to your X" pathway copy.
+//   pathway  → pathway-next continuation rec.
+//   goal     → goal-based rec for new clients with no history.
+//   membership → Angel Glow Up upsell rec.
+type RecSource = 'overdue' | 'gap' | 'pathway' | 'goal' | 'membership';
+type TaggedRec = Recommendation & { _src: RecSource };
+const SOURCE_PRIORITY: Record<RecSource, number> = {
+  overdue: 0,
+  gap: 1,
+  pathway: 2,
+  goal: 3,
+  membership: 4,
+};
+
 export function recommendNextTreatment(input: RecommendationInput): RecommendationResult {
-  const { treatmentHistory, avgSpend, daysSinceLastVisit, primaryGoal } = input;
-  const recommendations: Recommendation[] = [];
+  const { treatmentHistory, avgSpend, primaryGoal } = input;
+  const recommendations: TaggedRec[] = [];
   const insights: string[] = [];
 
   // Sort history newest first
@@ -225,7 +282,17 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
     const lastService = matchService(sorted[0].service);
     if (lastService && PATHWAYS[lastService]) {
       const pathway = PATHWAYS[lastService];
-      const daysSinceLast = getDaysSince(sorted[0].date);
+      // Wave 11 Bug E fix: respect a caller-provided `daysSinceLastVisit`
+      // when it's a positive finite value. Callers (e.g. the dashboard
+      // client profile) often have a more authoritative "last visit" date
+      // from Airtable than the transaction log we can reconstruct here.
+      // A default of 0 (set by API wrappers) still falls back to the
+      // per-treatment date math so zero-day-ago tests keep their semantics.
+      const callerDays = input.daysSinceLastVisit;
+      const daysSinceLast =
+        Number.isFinite(callerDays) && callerDays > 0
+          ? callerDays
+          : getDaysSince(sorted[0].date);
       const maintenanceDays = MAINTENANCE_DAYS[lastService] || 30;
 
       // Check if they're overdue for repeat
@@ -237,6 +304,7 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
           urgency: daysSinceLast > maintenanceDays * 1.5 ? 'now' : 'soon',
           estimatedPrice: PRICE_MAP[lastService] || 'Contact for pricing',
           confidence: 85,
+          _src: 'overdue',
         });
         insights.push(`Overdue for ${lastService} maintenance by ${daysSinceLast - maintenanceDays} days`);
       }
@@ -254,6 +322,7 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
           urgency: 'soon',
           estimatedPrice: PRICE_MAP[nextService] || 'Contact for pricing',
           confidence: alreadyHad ? 75 : 65,
+          _src: 'pathway',
         });
       }
     }
@@ -265,22 +334,25 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
   const gaps = allCategories.filter(c => !categoriesUsed.has(c));
 
   if (gaps.length > 0 && gaps.length < allCategories.length) {
-    for (const gap of gaps.slice(0, 2)) {
-      // Find a cross-sell from their most-used category
-      const primaryCategory = sorted[0]?.category || 'Facial';
-      const crossSells = CROSS_SELL[primaryCategory] || [];
+    // Wave 11 Bug B fix: use the client's *most-used* category as the
+    // cross-sell bucket, not whichever category they booked most recently.
+    const primaryCategory = mostUsedCategory(sorted);
+    const crossSells = CROSS_SELL[primaryCategory] || [];
+    // Wave 11 Bug A fix: walk every gap — removing the previous `slice(0, 2)`
+    // clip that made cross-sells unreachable for clients with many unexplored
+    // categories (e.g. Facial-only never seeing the GLP-1 gap-fill).
+    for (const gap of gaps) {
       const relevant = crossSells.find(cs => {
-        // Exact match first, then fuzzy: check if any PATHWAYS key is contained in the suggest string
         const exactCat = PATHWAYS[cs.suggest]?.category;
         if (exactCat) return exactCat === gap;
-        const pathwayKey = Object.keys(PATHWAYS).find(key => cs.suggest.includes(key));
+        // Fuzzy-resolve "GLP-1 Weight Management" → PATHWAYS['GLP-1'].
+        const pathwayKey = PATHWAY_KEYS_BY_LENGTH.find(key => cs.suggest.includes(key));
         return pathwayKey ? PATHWAYS[pathwayKey].category === gap : false;
       });
       if (relevant) {
-        // Resolve to the canonical PATHWAYS key for consistent naming
         const resolvedService = PATHWAYS[relevant.suggest]
           ? relevant.suggest
-          : Object.keys(PATHWAYS).find(key => relevant.suggest.includes(key)) || relevant.suggest;
+          : PATHWAY_KEYS_BY_LENGTH.find(key => relevant.suggest.includes(key)) || relevant.suggest;
         recommendations.push({
           service: resolvedService,
           category: gap,
@@ -288,6 +360,7 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
           urgency: 'consider',
           estimatedPrice: PRICE_MAP[resolvedService] || relevant.price,
           confidence: 50,
+          _src: 'gap',
         });
       }
     }
@@ -319,7 +392,9 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
 
     const goalRecs = goalMap[primaryGoal];
     if (goalRecs) {
-      recommendations.push(...goalRecs);
+      for (const r of goalRecs) {
+        recommendations.push({ ...r, _src: 'goal' });
+      }
       insights.push(`Recommendations based on stated goal: ${primaryGoal}`);
     }
   }
@@ -327,16 +402,40 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
   // 4. MEMBERSHIP UPSELL: If they're high-spend without membership
   if (!input.membershipTier && avgSpend > 300 && sorted.length >= 3) {
     insights.push('High-value client without membership - consider Angel Glow Up pitch');
+    // Wave 11 Bug D fix: emit an actual actionable rec in addition to the
+    // insight. Previously this was the only strategy that never produced a
+    // rec, breaking the "5 strategies → 5 rec producers" contract documented
+    // at the top of this file. Confidence 55 keeps it below pathway (65) and
+    // overdue (85) so it surfaces as an alternative, never as `primary` unless
+    // nothing else qualifies.
+    recommendations.push({
+      service: 'Angel Glow Up Membership',
+      category: 'Membership',
+      reason: `At your average spend of $${Math.round(avgSpend)} per visit, an Angel Glow Up membership pays for itself in ~2 visits per month.`,
+      urgency: 'soon',
+      estimatedPrice: '$199-399/mo',
+      confidence: 55,
+      _src: 'membership',
+    });
   }
 
-  // 5. DEDUPE & SORT by confidence
-  const seen = new Set<string>();
-  const deduped = recommendations.filter(r => {
-    if (seen.has(r.service)) return false;
-    seen.add(r.service);
-    return true;
-  });
-  deduped.sort((a, b) => b.confidence - a.confidence);
+  // 5. DEDUPE by source priority (overdue > gap > pathway > goal > membership)
+  //    then SORT by confidence. This guarantees:
+  //      - overdue recs survive even when a gap rec for the same service
+  //        also fires (keeping the clinically-important overdue reason/conf);
+  //      - gap recs win over pathway-next recs for the same service so the
+  //        more specific cross-sell copy is surfaced instead of the generic
+  //        "Great complement to your X" fallback.
+  const bySvc = new Map<string, TaggedRec>();
+  for (const rec of recommendations) {
+    const existing = bySvc.get(rec.service);
+    if (!existing || SOURCE_PRIORITY[rec._src] < SOURCE_PRIORITY[existing._src]) {
+      bySvc.set(rec.service, rec);
+    }
+  }
+  const deduped: Recommendation[] = Array.from(bySvc.values())
+    .map(({ _src: _source, ...rec }) => rec)
+    .sort((a, b) => b.confidence - a.confidence);
 
   const primary = deduped[0] || {
     service: 'HydraFacial',
@@ -349,7 +448,12 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
 
   return {
     primary,
-    alternatives: deduped.slice(1, 4),
+    // Wave 11 Bug A follow-up: bump the alternatives window from 3 to 5 so
+    // cross-sell gap-fill recs (confidence 50) aren't crowded out by a full
+    // pathway-next triplet (confidence 65). The CEO dashboard still shows the
+    // top 3 visually, but API consumers (the client profile page) can surface
+    // the full list.
+    alternatives: deduped.slice(1, 6),
     insights,
   };
 }
