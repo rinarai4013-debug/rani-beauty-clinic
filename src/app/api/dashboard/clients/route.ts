@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 
 function splitName(name: string) {
@@ -21,11 +22,13 @@ export async function GET(request: NextRequest) {
   const cacheKey = `clients-list:${statusFilter ?? 'all'}`;
   const cached = cache.get(cacheKey);
   if (cached) return NextResponse.json(cached);
+  const sanitizedStatusFilter = statusFilter ? sanitizeFormulaValue(statusFilter) : null;
+  const filterByFormula = sanitizedStatusFilter ? `{Status} = '${sanitizedStatusFilter}'` : undefined;
 
   try {
     const clients = await fetchAll<{ Client?: string; Email?: string; Phone?: string; Status?: string; 'Preferred Contact'?: string }>(
       Tables.clients(),
-      statusFilter ? { filterByFormula: `{Status} = '${statusFilter}'` } : undefined,
+      filterByFormula ? { filterByFormula } : undefined,
       true
     );
 
