@@ -1,3 +1,11 @@
+// @vitest-environment node
+// ^ REQUIRED: jose v5 `SignJWT.sign()` uses an `instanceof Uint8Array` check
+// inside its `FlattenedSign` constructor. Under vitest's default jsdom
+// environment, Uint8Array comes from the jsdom sandbox realm and fails the
+// identity check against the one jose sees, producing
+// "TypeError: payload must be an instance of Uint8Array". The staff session
+// suite (`src/lib/auth/__tests__/session.test.ts`) has the same pragma for
+// the same reason.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SignJWT } from 'jose';
 
@@ -31,7 +39,16 @@ describe('magic link token', () => {
     const token = await createMagicLinkToken(email);
 
     const verified = await verifyMagicLinkToken(token);
-    expect(verified).toEqual({ email, purpose: 'magic-link' });
+    // Verified payload always includes JWT standard claims (iat, exp).
+    // Use a field-by-field check instead of `toEqual` (which asserts
+    // exact shape).
+    expect(verified).not.toBeNull();
+    expect(verified!.email).toBe(email);
+    expect(verified!.purpose).toBe('magic-link');
+    expect(typeof verified!.iat).toBe('number');
+    expect(typeof verified!.exp).toBe('number');
+    // Magic link should expire exactly 15 minutes after issue.
+    expect(verified!.exp! - verified!.iat!).toBe(15 * 60);
   });
 
   it('rejects non-matching purpose payload', async () => {
@@ -51,11 +68,17 @@ describe('patient session token', () => {
     const token = await createPatientSession('p-1', 'jane@example.com', 'Jane Patient');
     const verified = await verifyPatientSession(token);
 
-    expect(verified).toEqual({
-      patientId: 'p-1',
-      email: 'jane@example.com',
-      name: 'Jane Patient',
-    });
+    // Verified payload always includes JWT standard claims (iat, exp).
+    // Field-by-field check (not `toEqual`) since the shape also carries
+    // the JWT-standard iat/exp claims that SignJWT adds.
+    expect(verified).not.toBeNull();
+    expect(verified!.patientId).toBe('p-1');
+    expect(verified!.email).toBe('jane@example.com');
+    expect(verified!.name).toBe('Jane Patient');
+    expect(typeof verified!.iat).toBe('number');
+    expect(typeof verified!.exp).toBe('number');
+    // Patient session expires exactly 7 days after issue.
+    expect(verified!.exp! - verified!.iat!).toBe(7 * 24 * 60 * 60);
   });
 
   it('rejects malformed payload', async () => {
