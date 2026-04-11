@@ -217,6 +217,29 @@ const fullSchema = step1Schema
 
 export type ConsultationFormData = z.infer<typeof fullSchema>;
 
+/**
+ * Server-side submit schema — what `/api/consultation/submit` validates
+ * against after it parses the multipart `data` field. Photos travel
+ * separately as binary multipart parts, so this schema drops step 7
+ * (which uses `z.instanceof(File)` and wouldn't survive JSON transit
+ * anyway) and is `.partial()` so users who bail out mid-wizard don't
+ * get 422'd — the route still enforces what it actually needs (name,
+ * email) at the handler level.
+ *
+ * Tier 1 zod upgrade (2026-04-11): replaced the previous
+ * `z.record(z.unknown())` payload schema, which was accepting
+ * arbitrary shapes and relying on `as Partial<...>` casts downstream.
+ */
+export const submitIntakeSchema = step1Schema
+  .merge(step2Schema)
+  .merge(step3Schema)
+  .merge(step4Schema)
+  .merge(step5Schema)
+  .merge(step6Schema)
+  .merge(step8Schema)
+  .partial()
+  .passthrough();
+
 /** Validate a single step's data. Returns { success, errors } */
 export function validateStep(
   step: number,

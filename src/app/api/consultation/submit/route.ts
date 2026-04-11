@@ -18,13 +18,12 @@ import { createSession, saveSessionAsync, sessionReducer } from '@/lib/mastermin
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
+import { submitIntakeSchema } from '@/lib/consultation/schema';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
-import { z } from 'zod';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-const IntakePayloadSchema = z.record(z.unknown());
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,22 +38,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Tier 1 zod (2026-04-11): upgrade from z.record(z.unknown()) to
+    // submitIntakeSchema — this locks name/email/phone/skinConcerns/
+    // targetAreas/etc. to their declared types when present. Still
+    // .partial() + .passthrough() so wizards that bail out mid-way
+    // don't get rejected, and unknown keys flow through for logging.
     let intakeData: Partial<ConsultationFormData>;
+    let rawIntakeJson: unknown;
     try {
-      const parsed = IntakePayloadSchema.safeParse(JSON.parse(dataField));
-      if (!parsed.success) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid form data payload' },
-          { status: 400 }
-        );
-      }
-      intakeData = parsed.data as Partial<ConsultationFormData>;
+      rawIntakeJson = JSON.parse(dataField);
     } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid form data JSON' },
         { status: 400 }
       );
     }
+
+    const parsed = submitIntakeSchema.safeParse(rawIntakeJson);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid form data payload',
+          details: parsed.error.issues,
+        },
+        { status: 422 }
+      );
+    }
+    intakeData = parsed.data as Partial<ConsultationFormData>;
 
     // 2. Process photos — extract first valid photo as source
     let sourcePhotoUrl: string | null = null;

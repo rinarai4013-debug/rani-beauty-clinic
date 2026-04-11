@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
+import { z } from 'zod';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache } from '@/lib/cache';
@@ -11,6 +12,25 @@ import { captureWebhookEvent, captureCheckoutEvent } from '@/lib/sentry-utils';
 
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET;
+}
+
+// Tier 1 zod (2026-04-11): the Stripe SDK already validates the
+// envelope shape via constructEvent, but session.metadata is a free
+// text/value map that any checkout creator can set — metadata
+// injection flows into our Airtable writes. Lock shape + lengths.
+const StripeMetadataSchema = z
+  .object({
+    planId: z.string().trim().max(120).optional(),
+    tier: z.string().trim().max(40).optional(),
+    clientName: z.string().trim().max(200).optional(),
+  })
+  .passthrough();
+
+function validateMetadata(
+  raw: Stripe.Metadata | null | undefined,
+): z.infer<typeof StripeMetadataSchema> {
+  const parsed = StripeMetadataSchema.safeParse(raw || {});
+  return parsed.success ? parsed.data : {};
 }
 
 // POST - receive Stripe webhook events
@@ -47,7 +67,7 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const metadata = session.metadata || {};
+        const metadata = validateMetadata(session.metadata);
         const planId = metadata.planId || '';
         const tier = metadata.tier || '';
         const clientName = metadata.clientName || session.customer_details?.name || 'Unknown';
@@ -147,7 +167,7 @@ export async function POST(request: NextRequest) {
 
       case 'checkout.session.expired': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const metadata = session.metadata || {};
+        const metadata = validateMetadata(session.metadata);
         const planId = metadata.planId || '';
         const tier = metadata.tier || '';
         const clientName = metadata.clientName || session.customer_details?.name || 'Unknown';

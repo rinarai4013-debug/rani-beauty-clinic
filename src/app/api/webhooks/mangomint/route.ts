@@ -1,11 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
+import { z } from 'zod';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { FIELDS } from '@/lib/airtable/tables';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { captureWebhookEvent } from '@/lib/sentry-utils';
+import { parseTextWithSchema } from '@/lib/validation/parse-body';
+
+// Envelope-level validation for Mangomint webhooks. Mangomint rolls
+// new event types over time, so `event`/`type` stays a loose string
+// rather than a strict enum; but we reject non-object bodies and
+// ensure `data` is either missing or an object before the switch
+// statement runs. Handlers accept `Record<string, unknown>` as before.
+const MangomintWebhookEnvelopeSchema = z
+  .object({
+    event: z.string().min(1).optional(),
+    type: z.string().min(1).optional(),
+    data: z.record(z.unknown()).optional(),
+  })
+  .passthrough();
 
 // ─── Mangomint Webhook Handler ───
 // Handles ALL Mangomint webhook events:
@@ -609,9 +624,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-    const payload = JSON.parse(body);
-    const event = payload.event || payload.type || 'unknown';
-    const data = payload.data || payload;
+    // Tier 1 zod (2026-04-11): validate envelope before routing.
+    // Rejects null / non-object bodies / bad event-type fields with
+    // a 422 + details that the HMAC-verified caller can use to
+    // self-correct.
+    const parsed = parseTextWithSchema(body, MangomintWebhookEnvelopeSchema);
+    if (!parsed.ok) {
+      logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid envelope' });
+      return parsed.response;
+    }
+
+    const payload = parsed.data as Record<string, unknown>;
+    const event = (payload.event as string) || (payload.type as string) || 'unknown';
+    const data = (payload.data as Record<string, unknown>) || payload;
 
     logWebhookEvent('mangomint', event, true, { dataPreview: JSON.stringify(data).substring(0, 200) });
 
