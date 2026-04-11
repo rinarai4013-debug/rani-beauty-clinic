@@ -12,12 +12,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import {
+  getPlatformDomains,
+  getDefaultTenantId,
+  getDefaultHostname,
+  getCorsAllowedOrigins,
+} from '@/lib/tenant/env';
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
-const PLATFORM_DOMAINS = ['ranios.com', 'ranios.dev', 'localhost'];
+// Platform domains / default tenant / default hostname / CORS allow-list
+// are all resolved from env at call time via getters in @/lib/tenant/env.
+// This keeps middleware.ts and the server-side resolver in sync without
+// duplicating the arrays in two places, and lets deployments override
+// any value without a code change.
 const SESSION_COOKIE = 'rani-session';
-const DEFAULT_TENANT_ID = 'rani-beauty-clinic';
 
 // Paths that skip tenant resolution
 const PUBLIC_PATHS = [
@@ -34,8 +43,9 @@ const PUBLIC_PATHS = [
 
 function extractSubdomain(hostname: string): string | null {
   const host = hostname.split(':')[0];
+  const platformDomains = getPlatformDomains();
 
-  for (const domain of PLATFORM_DOMAINS) {
+  for (const domain of platformDomains) {
     if (host === domain) return null;
     if (host.endsWith(`.${domain}`)) {
       const sub = host.slice(0, -(domain.length + 1));
@@ -49,7 +59,8 @@ function extractSubdomain(hostname: string): string | null {
 
 function isCustomDomain(hostname: string): boolean {
   const host = hostname.split(':')[0];
-  for (const domain of PLATFORM_DOMAINS) {
+  const platformDomains = getPlatformDomains();
+  for (const domain of platformDomains) {
     if (host === domain || host.endsWith(`.${domain}`)) return false;
   }
   return host.includes('.');
@@ -86,7 +97,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const hostname = request.headers.get('host') || 'localhost:3000';
+  const hostname = request.headers.get('host') || getDefaultHostname();
   let tenantId: string | null = null;
   let tenantSlug: string | null = null;
   let tenantSource: string = 'default';
@@ -131,7 +142,7 @@ export async function middleware(request: NextRequest) {
 
   // 5. Fallback to default tenant
   if (!tenantId && !tenantSlug) {
-    tenantId = DEFAULT_TENANT_ID;
+    tenantId = getDefaultTenantId();
     tenantSource = 'default';
   }
 
@@ -147,20 +158,16 @@ export async function middleware(request: NextRequest) {
   response.headers.set('x-tenant-source', tenantSource);
   response.headers.set('x-tenant-host', hostname);
 
-  // CORS for API routes — restrict to known origins
+  // CORS for API routes — restrict to known origins from env allow-list
   if (pathname.startsWith('/api/')) {
     const origin = request.headers.get('origin') || '';
-    const allowedOrigins = [
-      'https://ranibeautyclinic.com',
-      'https://www.ranibeautyclinic.com',
-      'https://ranios.com',
-      'https://ranios.dev',
-    ];
-    // Allow localhost in development
-    if (process.env.NODE_ENV === 'development') {
-      allowedOrigins.push('http://localhost:3000', 'http://localhost:3001');
-    }
-    const corsOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+    const allowedOrigins = getCorsAllowedOrigins();
+    // Fall back to the first allowed origin on mismatch so we still send a
+    // legal header instead of echoing an arbitrary caller's origin. First
+    // entry is always the canonical production origin in the default list.
+    const corsOrigin = allowedOrigins.includes(origin)
+      ? origin
+      : (allowedOrigins[0] ?? '');
     response.headers.set('Access-Control-Allow-Origin', corsOrigin);
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant-ID');
