@@ -65,13 +65,10 @@ function makeProvider(overrides: Partial<ProviderAvailability> = {}): ProviderAv
   return {
     name: 'Rina',
     role: 'injector',
-    // NOTE: default includes all 7 days so day-of-week math stays
-    // TZ-independent for the bulk of tests. Tests that specifically
-    // exercise the workingDays filter override this field.
-    // SOURCE BUG risk: new Date('YYYY-MM-DD').getDay() is timezone
-    // dependent — parsed as UTC midnight, rendered in local TZ —
-    // so the optimizer's provider-day filter can skip the wrong day
-    // in negative UTC offsets. See the workingDays-specific tests.
+    // Post-Wave-11: the optimizer anchors all YYYY-MM-DD parsing to UTC
+    // (`utcDayOfWeek`) so day-of-week math is TZ-independent. The default
+    // still includes all 7 days so per-fixture tests that don't care about
+    // the filter keep working unchanged.
     workingDays: [0, 1, 2, 3, 4, 5, 6],
     startTime: '09:00',
     endTime: '19:00',
@@ -586,17 +583,40 @@ describe('Conflict detection — room conflict', () => {
     expect(result.conflicts.filter(c => c.type === 'room_conflict')).toEqual([]);
   });
 
-  // SOURCE BUG: the optimizer has no equipment_conflict detection code —
-  // the type is declared in the ScheduleConflict union but never emitted.
-  // Two bookings that both need the sole Sofwave device go undetected
-  // unless they share a room. We assert the current (buggy) behavior.
-  it('equipment_conflict type is declared but never emitted (source bug)', () => {
-    // SOURCE BUG: detectConflicts never creates an equipment_conflict
-    // entry. Two Sofwave bookings with different rooms slip through.
+  // Post-Wave-11: equipment_conflict fires when two overlapping
+  // appointments both need a device the clinic owns in insufficient
+  // quantity. Room 1 is the only room with a Sofwave device, so two
+  // concurrent Sofwave bookings can never both happen — regardless of
+  // which room they were booked into.
+  it('equipment_conflict fires when concurrent bookings exceed device instances', () => {
     const result = optimizeSchedule(makeInput({
       appointments: [
         makeAppt({ id: 'e1', provider: 'Rina', service: 'Sofwave', room: 'Room 1', startTime: '10:00', endTime: '11:00' }),
         makeAppt({ id: 'e2', provider: 'Mom',  service: 'Sofwave', room: 'Room 2', startTime: '10:00', endTime: '11:00' }),
+      ],
+    }));
+    const equipConflicts = result.conflicts.filter(c => c.type === 'equipment_conflict');
+    expect(equipConflicts.length).toBeGreaterThan(0);
+    expect(equipConflicts[0].severity).toBe('high');
+    expect(equipConflicts[0].description.toLowerCase()).toContain('sofwave');
+    expect(equipConflicts[0].appointments).toEqual(expect.arrayContaining(['e1', 'e2']));
+  });
+
+  it('equipment_conflict does NOT fire for non-overlapping Sofwave bookings', () => {
+    const result = optimizeSchedule(makeInput({
+      appointments: [
+        makeAppt({ id: 'e1', provider: 'Rina', service: 'Sofwave', room: 'Room 1', startTime: '10:00', endTime: '11:00' }),
+        makeAppt({ id: 'e2', provider: 'Mom',  service: 'Sofwave', room: 'Room 1', startTime: '11:30', endTime: '12:30' }),
+      ],
+    }));
+    expect(result.conflicts.filter(c => c.type === 'equipment_conflict')).toEqual([]);
+  });
+
+  it('equipment_conflict does NOT fire when the service has no required equipment', () => {
+    const result = optimizeSchedule(makeInput({
+      appointments: [
+        makeAppt({ id: 'b1', provider: 'Rina', service: 'Botox', room: 'Room 1', startTime: '10:00', endTime: '11:00' }),
+        makeAppt({ id: 'b2', provider: 'Mom',  service: 'Botox', room: 'Room 3', startTime: '10:00', endTime: '11:00' }),
       ],
     }));
     expect(result.conflicts.filter(c => c.type === 'equipment_conflict')).toEqual([]);
@@ -894,17 +914,80 @@ describe('Revenue opportunities — per type', () => {
     }
   });
 
-  // SOURCE BUG: reschedule and waitlist opportunity types are declared
-  // in the RevenueOpportunity union but never produced by the engine.
-  it('reschedule and waitlist types are declared but never emitted (source bug)', () => {
-    // SOURCE BUG: findRevenueOpportunities never emits type='reschedule'
-    // or type='waitlist'. The union is aspirational.
+  // Post-Wave-11: reschedule + waitlist opportunities now fire under
+  // specific conditions tied to their union-type intent. The earlier
+  // "never emitted" source bug was fixed by adding explicit heuristics:
+  //   reschedule → high-value ($500+) appointments booked into off-peak
+  //                hours (suggest moving to peak for better show rate).
+  //   waitlist   → high no-show-risk (≥70) appointments (stage a backup
+  //                client to keep the slot revenue protected).
+  it('reschedule fires for high-value appointments in off-peak slots', () => {
     const result = optimizeSchedule(makeInput({
       appointments: [
-        makeAppt({ startTime: '10:00', endTime: '11:00', estimatedRevenue: 100 }),
+        // 12:00 is off-peak (OFF_PEAK_HOURS = [12, 13, 17, 18]);
+        // $2750 Sofwave is well above the $500 high-value threshold.
+        makeAppt({
+          id: 'rs1',
+          clientName: 'Off-Peak Sofwave Client',
+          service: 'Sofwave',
+          startTime: '12:00',
+          endTime: '13:00',
+          estimatedRevenue: 2750,
+        }),
+      ],
+    }));
+    const reschedule = result.revenueOpportunities.filter(o => o.type === 'reschedule');
+    expect(reschedule.length).toBeGreaterThan(0);
+    expect(reschedule[0].suggestedClient).toBe('Off-Peak Sofwave Client');
+    expect(reschedule[0].description.toLowerCase()).toContain('off-peak');
+    // Estimated upside is ~15% of ticket value.
+    expect(reschedule[0].potentialRevenue).toBe(Math.round(2750 * 0.15));
+  });
+
+  it('reschedule does NOT fire for off-peak low-value appointments', () => {
+    const result = optimizeSchedule(makeInput({
+      appointments: [
+        makeAppt({ startTime: '12:30', endTime: '13:00', estimatedRevenue: 150 }),
       ],
     }));
     expect(result.revenueOpportunities.filter(o => o.type === 'reschedule')).toEqual([]);
+  });
+
+  it('reschedule does NOT fire for high-value peak appointments', () => {
+    const result = optimizeSchedule(makeInput({
+      appointments: [
+        makeAppt({ startTime: '10:00', endTime: '11:00', estimatedRevenue: 2750 }),
+      ],
+    }));
+    expect(result.revenueOpportunities.filter(o => o.type === 'reschedule')).toEqual([]);
+  });
+
+  it('waitlist fires for high no-show-risk appointments (≥70)', () => {
+    const result = optimizeSchedule(makeInput({
+      appointments: [
+        makeAppt({
+          id: 'ns1',
+          clientName: 'Risky Client',
+          startTime: '10:00',
+          endTime: '10:30',
+          noShowRisk: 75,
+          estimatedRevenue: 650,
+        }),
+      ],
+    }));
+    const waitlist = result.revenueOpportunities.filter(o => o.type === 'waitlist');
+    expect(waitlist.length).toBeGreaterThan(0);
+    expect(waitlist[0].suggestedClient).toBe('Risky Client');
+    expect(waitlist[0].potentialRevenue).toBe(650);
+    expect(waitlist[0].description).toContain('75');
+  });
+
+  it('waitlist does NOT fire for appointments under the 70% risk threshold', () => {
+    const result = optimizeSchedule(makeInput({
+      appointments: [
+        makeAppt({ noShowRisk: 69, startTime: '10:00', endTime: '10:30' }),
+      ],
+    }));
     expect(result.revenueOpportunities.filter(o => o.type === 'waitlist')).toEqual([]);
   });
 });
@@ -979,19 +1062,45 @@ describe('Daily summaries', () => {
     expect(mom.revenue).toBe(275);
   });
 
-  // SOURCE BUG: gapCount is calculated as Math.floor(gapMinutes / 30)
-  // which treats every 30 minutes of unscheduled time as a discrete gap.
-  // A day with one 8-hour block of openness gets reported as 16 gaps.
-  it('gapCount uses rough floor(gapMinutes/30) estimate (source bug)', () => {
-    // SOURCE BUG: daily summary gapCount is a bogus count — it bucket-izes
-    // total empty minutes into 30-min chunks rather than counting actual
-    // contiguous gaps. The Schedule Optimizer UI reports inflated numbers.
+  // Post-Wave-11: gapCount counts actual contiguous gap regions across
+  // active providers for the day. A single empty 10-hour shift is 1 gap,
+  // not 20 chunks. The UI now shows a number that matches what a human
+  // reading the schedule would say.
+  it('gapCount counts a single all-day empty as ONE gap (not 30-min chunks)', () => {
     const result = optimizeSchedule(makeInput({
       providers: [RINA],
       appointments: [],
     }));
-    // 600 min empty → "20 gaps" reported even though it's one block.
-    expect(result.dailySummaries[0].gapCount).toBe(20);
+    // Rina's 600-min empty shift = 1 contiguous gap.
+    expect(result.dailySummaries[0].gapCount).toBe(1);
+    // gapMinutes still reports the total empty minutes.
+    expect(result.dailySummaries[0].gapMinutes).toBe(600);
+  });
+
+  it('gapCount counts each contiguous open region once across providers', () => {
+    const result = optimizeSchedule(makeInput({
+      providers: [RINA, MOM],
+      appointments: [
+        // Rina: start-of-day gap + mid-day gap + end-of-day gap = 3 gaps
+        makeAppt({ provider: 'Rina', startTime: '10:00', endTime: '11:00' }),
+        makeAppt({ provider: 'Rina', startTime: '13:00', endTime: '14:00' }),
+        // Mom: fully empty = 1 gap
+      ],
+    }));
+    // Rina contributes 3 gaps (before 10:00, between 11:00-13:00, after 14:00).
+    // Mom contributes 1 all-day gap.
+    expect(result.dailySummaries[0].gapCount).toBe(4);
+  });
+
+  it('gapCount is 0 when a provider is booked front-to-back with no openings', () => {
+    const result = optimizeSchedule(makeInput({
+      providers: [RINA],
+      appointments: [
+        makeAppt({ provider: 'Rina', startTime: '09:00', endTime: '19:00' }),
+      ],
+    }));
+    expect(result.dailySummaries[0].gapCount).toBe(0);
+    expect(result.dailySummaries[0].gapMinutes).toBe(0);
   });
 });
 

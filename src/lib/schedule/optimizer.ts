@@ -204,7 +204,7 @@ function findScheduleGaps(input: ScheduleInput): ScheduleGap[] {
     const dates = getDateRange(input.dateRange.start, input.dateRange.end);
 
     for (const date of dates) {
-      const dayOfWeek = new Date(date).getDay();
+      const dayOfWeek = utcDayOfWeek(date);
       if (!provider.workingDays.includes(dayOfWeek)) continue;
 
       const key = `${date}|${provider.name}`;
@@ -284,6 +284,24 @@ function createGap(
 
 function detectConflicts(input: ScheduleInput): ScheduleConflict[] {
   const conflicts: ScheduleConflict[] = [];
+
+  // Wave 11 Bug 2 fix: precompute the clinic's equipment inventory by
+  // scanning all RoomConfigs and the required-equipment map per service.
+  // Two overlapping appointments that both need the same piece of
+  // equipment are a conflict when the clinic has fewer instances than
+  // the concurrent demand — regardless of which rooms they're in.
+  const equipmentInventory = new Map<string, number>();
+  for (const room of input.rooms) {
+    for (const eq of room.equipment) {
+      equipmentInventory.set(eq, (equipmentInventory.get(eq) ?? 0) + 1);
+    }
+  }
+  const serviceEquipment = new Map<string, string[]>();
+  for (const svc of input.serviceConfig) {
+    if (svc.requiredEquipment && svc.requiredEquipment.length > 0) {
+      serviceEquipment.set(svc.service, svc.requiredEquipment);
+    }
+  }
 
   // Group by date
   const byDate = new Map<string, AppointmentData[]>();
@@ -373,6 +391,51 @@ function detectConflicts(input: ScheduleInput): ScheduleConflict[] {
         }
       }
     }
+
+    // Wave 11 Bug 2 fix: equipment conflicts — two appointments with
+    // overlapping time windows that both require a device the clinic
+    // owns in insufficient quantity. Walks each unordered pair once and
+    // deduplicates by (appt id pair, equipment) to avoid double-flagging
+    // when a service lists multiple shared tools.
+    const apptsWithEquip = appts
+      .map(a => ({
+        a,
+        eq: serviceEquipment.get(a.service) ?? [],
+        start: timeToMinutes(a.startTime),
+        end: timeToMinutes(a.endTime),
+      }))
+      .filter(x => x.eq.length > 0);
+
+    const seenEquipPairs = new Set<string>();
+    for (let i = 0; i < apptsWithEquip.length; i++) {
+      for (let j = i + 1; j < apptsWithEquip.length; j++) {
+        const x = apptsWithEquip[i];
+        const y = apptsWithEquip[j];
+        // Time overlap check
+        if (x.start >= y.end || y.start >= x.end) continue;
+        // Shared equipment requirements
+        const shared = x.eq.filter(e => y.eq.includes(e));
+        for (const eq of shared) {
+          const instances = equipmentInventory.get(eq) ?? 0;
+          // A "conflict" exists when concurrent demand (2) exceeds
+          // available instances. This generalizes to N > instances if a
+          // future extension tracks more overlapping appointments.
+          if (instances < 2) {
+            const key = `${x.a.id}|${y.a.id}|${eq}`;
+            if (seenEquipPairs.has(key)) continue;
+            seenEquipPairs.add(key);
+            conflicts.push({
+              date,
+              type: 'equipment_conflict',
+              description: `Only ${instances} ${eq} device${instances === 1 ? '' : 's'} available — "${x.a.service}" (${x.a.clientName}) and "${y.a.service}" (${y.a.clientName}) both need ${eq} at ${x.a.startTime}`,
+              severity: 'high',
+              appointments: [x.a.id, y.a.id],
+              resolution: `Reschedule one appointment to a non-overlapping slot or acquire an additional ${eq} device`,
+            });
+          }
+        }
+      }
+    }
   }
 
   return conflicts;
@@ -430,6 +493,45 @@ function findRevenueOpportunities(
     }
   });
 
+  // Wave 11 Bug 3 fix (reschedule): high-value ($500+) appointments booked
+  // into off-peak slots. Peak slots (10-12, 14-17) historically convert
+  // better and have higher show rates, so it's worth a call to offer a
+  // more productive time. Estimate the upside at ~15% of ticket value.
+  const offPeakHighValue = input.appointments
+    .filter(a => {
+      if (a.status === 'cancelled') return false;
+      const hour = parseInt(a.startTime.split(':')[0]);
+      return OFF_PEAK_HOURS.includes(hour) && a.estimatedRevenue >= 500;
+    })
+    .slice(0, 3);
+  offPeakHighValue.forEach(appt => {
+    opportunities.push({
+      type: 'reschedule',
+      description: `${appt.date} ${appt.startTime}: ${appt.clientName}'s ${appt.service} ($${appt.estimatedRevenue}) is in an off-peak slot — offer a peak-hour reschedule for higher conversion and show rate`,
+      potentialRevenue: Math.round(appt.estimatedRevenue * 0.15),
+      suggestedClient: appt.clientName,
+      targetSlot: { date: appt.date, time: appt.startTime, provider: appt.provider },
+    });
+  });
+
+  // Wave 11 Bug 3 fix (waitlist): appointments with ≥70% no-show risk get
+  // a paired waitlist opportunity so the front desk has a warm client
+  // staged to backfill if the primary no-shows. Potential revenue is the
+  // full ticket value because the slot is already sold once — waitlist
+  // coverage protects it.
+  const highRiskForWaitlist = input.appointments
+    .filter(a => a.status !== 'cancelled' && (a.noShowRisk ?? 0) >= 70)
+    .slice(0, 3);
+  highRiskForWaitlist.forEach(appt => {
+    opportunities.push({
+      type: 'waitlist',
+      description: `${appt.date} ${appt.startTime}: ${appt.clientName}'s ${appt.service} has ${appt.noShowRisk}% no-show risk — stage a waitlist client to backfill if needed`,
+      potentialRevenue: appt.estimatedRevenue,
+      suggestedClient: appt.clientName,
+      targetSlot: { date: appt.date, time: appt.startTime, provider: appt.provider },
+    });
+  });
+
   return opportunities.sort((a, b) => b.potentialRevenue - a.potentialRevenue);
 }
 
@@ -445,7 +547,7 @@ function analyzeProviderBalance(input: ScheduleInput): ProviderBalanceAnalysis[]
     }, 0);
 
     const workDaysInRange = getDateRange(input.dateRange.start, input.dateRange.end)
-      .filter(d => provider.workingDays.includes(new Date(d).getDay())).length;
+      .filter(d => provider.workingDays.includes(utcDayOfWeek(d))).length;
 
     const dailyAvailableMinutes = timeToMinutes(provider.endTime) - timeToMinutes(provider.startTime);
     const totalAvailableMinutes = workDaysInRange * dailyAvailableMinutes;
@@ -507,13 +609,13 @@ function generateDailySummaries(input: ScheduleInput): DailyScheduleSummary[] {
     const dayAppts = input.appointments
       .filter(a => a.date === date && a.status !== 'cancelled');
 
-    const dayOfWeek = DAYS_OF_WEEK[new Date(date).getDay()];
+    const dayOfWeek = DAYS_OF_WEEK[utcDayOfWeek(date)];
     const totalRevenue = dayAppts.reduce((sum, a) => sum + a.estimatedRevenue, 0);
     const highRiskNoShows = dayAppts.filter(a => (a.noShowRisk || 0) > 60).length;
 
     // Calculate utilization
     const activeProviders = input.providers.filter(p =>
-      p.workingDays.includes(new Date(date).getDay())
+      p.workingDays.includes(utcDayOfWeek(date))
     );
     const totalAvailableMinutes = activeProviders.reduce((sum, p) =>
       sum + (timeToMinutes(p.endTime) - timeToMinutes(p.startTime)), 0
@@ -525,9 +627,47 @@ function generateDailySummaries(input: ScheduleInput): DailyScheduleSummary[] {
       ? Math.round((scheduledMinutes / totalAvailableMinutes) * 100)
       : 0;
 
-    // Gaps
-    const gapMinutes = totalAvailableMinutes - scheduledMinutes;
-    const gapCount = Math.floor(gapMinutes / 30); // rough estimate
+    // Wave 11 Bug 4 fix: count *contiguous* gap regions across all active
+    // providers for the day, not 30-minute chunks. Previously an 8-hour
+    // empty day was reported as "16 gaps" because the math was
+    // `Math.floor(totalEmptyMinutes / 30)`, which the CEO dashboard then
+    // rendered as a scary inflated number.
+    let gapCount = 0;
+    let gapMinutes = 0;
+    for (const prov of activeProviders) {
+      const provAppts = dayAppts
+        .filter(a => a.provider === prov.name)
+        .sort((a, b) => a.startTime.localeCompare(b.startTime));
+      const shiftStart = timeToMinutes(prov.startTime);
+      const shiftEnd = timeToMinutes(prov.endTime);
+      if (shiftEnd <= shiftStart) continue; // invalid/zero-length shift
+      if (provAppts.length === 0) {
+        gapCount += 1;
+        gapMinutes += shiftEnd - shiftStart;
+        continue;
+      }
+      // Start-of-day gap
+      const firstStart = timeToMinutes(provAppts[0].startTime);
+      if (firstStart > shiftStart) {
+        gapCount += 1;
+        gapMinutes += firstStart - shiftStart;
+      }
+      // Between-appointment gaps
+      for (let i = 0; i < provAppts.length - 1; i++) {
+        const curEnd = timeToMinutes(provAppts[i].endTime);
+        const nextStart = timeToMinutes(provAppts[i + 1].startTime);
+        if (nextStart > curEnd) {
+          gapCount += 1;
+          gapMinutes += nextStart - curEnd;
+        }
+      }
+      // End-of-day gap
+      const lastEnd = timeToMinutes(provAppts[provAppts.length - 1].endTime);
+      if (shiftEnd > lastEnd) {
+        gapCount += 1;
+        gapMinutes += shiftEnd - lastEnd;
+      }
+    }
 
     // Provider breakdown
     const providerMap = new Map<string, { appointments: number; revenue: number }>();
@@ -663,10 +803,18 @@ function calculateScheduleScore(
   const imbalanced = balance.filter(b => b.status !== 'balanced').length;
   score -= imbalanced * 5;
 
-  // Bonus for good utilization
-  const avgUtil = balance.reduce((s, b) => s + b.utilization, 0) / (balance.length || 1);
-  if (avgUtil > 75) score += 5;
-  if (avgUtil > 85) score += 5;
+  // Bonus for good utilization — skipped when any high-severity conflict
+  // exists because double-booked overlapping slots inflate the per-provider
+  // scheduledMinutes sum past the 75%/85% bonus thresholds, which would
+  // otherwise silently cancel out the -10 high-conflict deduction above.
+  // Correct behaviour: a schedule with double-booking does not deserve a
+  // utilization reward.
+  const hasHighConflict = conflicts.some(c => c.severity === 'high');
+  if (!hasHighConflict) {
+    const avgUtil = balance.reduce((s, b) => s + b.utilization, 0) / (balance.length || 1);
+    if (avgUtil > 75) score += 5;
+    if (avgUtil > 85) score += 5;
+  }
 
   return Math.max(0, Math.min(100, score));
 }
@@ -684,15 +832,27 @@ function minutesToTime(minutes: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
+// Wave 11 Bug 1 fix: all date math anchored to UTC so "2026-04-13" always
+// resolves to Monday regardless of host timezone. Previously
+// `new Date('2026-04-13').getDay()` parsed the string as UTC midnight and
+// then returned the *local* day, which rolled Monday → Sunday for any
+// negative UTC offset (Pacific, Mountain, Central, Eastern). This caused
+// provider workingDays filters to skip the wrong day and the daily summary
+// dayOfWeek label to disagree with the calendar.
+function utcDayOfWeek(dateStr: string): number {
+  return new Date(`${dateStr}T00:00:00Z`).getUTCDay();
+}
+
 function getDateRange(start: string, end: string): string[] {
   const dates: string[] = [];
-  const current = new Date(start);
-  const endDate = new Date(end);
+  const current = new Date(`${start}T00:00:00Z`);
+  const endDate = new Date(`${end}T00:00:00Z`);
 
   while (current <= endDate) {
     dates.push(current.toISOString().slice(0, 10));
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
   }
 
   return dates;
 }
+
