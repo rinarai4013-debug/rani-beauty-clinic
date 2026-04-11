@@ -3,7 +3,7 @@
 ## Business
 - **Name:** Rani Beauty Clinic
 - **Type:** Luxury medical aesthetics clinic (physician-supervised medspa)
-- **Location:** 401 Olympia Ave NE, Suite 101, Renton, WA 98056
+- **Location:** 401 Olympia Ave NE #101, Renton, WA 98056
 - **Owner:** Rina (CEO) + Mom (Provider)
 - **Brand Voice:** Luxury, confident, clinically-assured. Educational + aspirational (never discount-first). "Transformation journey" not "treatment list."
 - **CRITICAL:** Rani does IM INJECTIONS only. NEVER use the word "infusion." Always say "injection."
@@ -16,11 +16,8 @@
 - **Email:** Resend (transactional), SendGrid (marketing via n8n)
 - **SMS:** Twilio (via n8n)
 - **Payments:** Square (POS — all transactions), Stripe (not yet connected)
-- **Pharmacy — GLP-1/Peptides:** QualiphyRx (app.qualiphy.me — tirzepatide, semaglutide, exclusive peptides via Greenwich)
-- **Pharmacy — HRT/Skincare/ED:** Olympia Pharmacy (testosterone, estradiol, progesterone, GHK-Cu skincare, sexual health, supplies)
-- **Pharmacy — Troches/Bella:** Hallandale Pharmacy (Sermorelin/NAD+ troches, Bella #1 SR)
 - **Booking:** Mangomint (app.mangomint.com/876418, CompanyID: 876418, 2,181 clients, booking widget in layout.tsx)
-- **Intake Forms:** Website contact form (/contact → /api/contact → Airtable + Resend + n8n)
+- **Intake Forms:** Typeform (form ID: Ecgz85JA)
 - **Client Portal:** Softr (treatment plan viewer)
 - **AI:** Anthropic Claude API
 - **Voice AI:** Vapi.ai (AI phone receptionist)
@@ -32,7 +29,7 @@
 | Table | Accessor | Key Use |
 |-------|----------|---------|
 | Clients | `Tables.clients()` | CRM — lead status, LTV, segments |
-| Client Intakes | `Tables.intakes()` | Contact form submissions + AI analysis |
+| Client Intakes | `Tables.intakes()` | Typeform submissions + AI analysis |
 | Intake Intelligence | `Tables.intakeIntelligence()` | AI-processed intake data |
 | Appointments | `Tables.appointments()` | Schedule, utilization, consults |
 | Packages | `Tables.packages()` | Treatment packages sold |
@@ -44,9 +41,9 @@
 | Alerts | `Tables.alerts()` | System alerts + thresholds |
 | Competitor Intelligence | `Tables.competitorIntel()` | Competitor monitoring |
 
-### Client Intakes — Real Field Names (verified from live Airtable 2026-03-28)
-These are the ACTUAL field names in the Client Intakes table. Code and n8n workflows MUST use these exact names:
-- `Full Name` (NOT "First Name"/"Last Name" — single field), `Email`, `Phone Number` (NOT "Phone")
+### Client Intakes — Real Field Names (from live Airtable)
+These are the ACTUAL field names in the Client Intakes table. n8n workflows MUST use these exact names:
+- `First Name`, `Last Name`, `Email`, `Phone`
 - `Intake Summary (AI)` — NOT "AI Summary"
 - `Program Plan (AI)`, `Cost Breakdown (AI)`, `Timeline (AI)`
 - `Suggested Next Step (AI)`, `Treatment Value (AI)`
@@ -62,16 +59,9 @@ These are the ACTUAL field names in the Client Intakes table. Code and n8n workf
 - Laser Hair Removal: packages from $800
 - Botox/Fillers: injectable specialist
 - Wellness Injections: Vitamin D3 $50, Tri-Immune $75, Glutathione $100, B12 $35, NAD+ $150–500
-- GLP-1 Weight Loss: $399–599/mo (QualiphyRx Greenwich)
-- HRT — Men's TRT: $349/mo (Olympia)
-- HRT — Women's (Estradiol/Progesterone): $199–349/mo (Olympia)
-- Rx Skincare: GHK-Cu Tighten $149–199, NADvantage $149, Retinoids $99–149 (Olympia)
-- Sexual Health: Men's ED $149–599/mo, Women's Wellness $129–149 (Olympia)
-- Peptides: NAD+ $299, Sermorelin $299 (Olympia), CJC/Ipamorelin $349 (QualiphyRx)
-- Troches: Sermorelin $199, NAD+ $149 (Hallandale)
-- Bella #1 SR: $199/mo (Hallandale)
+- GLP-1 Weight Loss: $399–599/mo
+- Rx Skincare: Tretinoin $99/mo
 - Folix Hair Restoration
-- See: SOURCING-STRATEGY.md, OLYMPIA-CATALOG.md, MANGOMINT-NEW-SERVICES.md, SEXUAL-HEALTH-VERTICAL.md
 
 ## Dashboard Architecture
 - **Auth:** JWT sessions, 5 roles (ceo, frontdesk, provider, marketing, operations), 49 permissions
@@ -276,8 +266,8 @@ See `N8N-WORKFLOW-STATUS.md` for complete details, webhook URLs, and fix history
 - `mo5nubnsK16sfDgG` W17 — Post-Treatment (`/webhook/post-treatment-trigger` — Mangomint appointment.completed)
 - `zHJCkAf0ehhTzOfY` W2 — Document Architect (`/webhook/pdf-generator-trigger`)
 
-### Legacy (Can Disable)
-- `yxKBbrqJHd2jtwnr` Intake to CRM (was Typeform-triggered — replaced by /api/contact route)
+### Typeform-Triggered (1)
+- `yxKBbrqJHd2jtwnr` Intake to CRM (Typeform submission)
 
 ## Scheduled Tasks (7 for Rani)
 - `weekly-content-batch` — Sunday 6 AM: Full week's content (IG, Reels, Stories, GBP)

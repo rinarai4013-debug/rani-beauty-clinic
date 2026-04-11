@@ -26,6 +26,3 @@
 - Each churned patient = $3,588-7,188/year lost
 - A 2-minute text at Day 0 prevents most churn
 - Always offer to address concerns before accepting cancellation
-
----
-**COMPLIANCE:** Rina does NOT diagnose or prescribe. All Rx refills require active Qualiphy GFE. Quarterly labs must be current before refill processing.

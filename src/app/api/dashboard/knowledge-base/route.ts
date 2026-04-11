@@ -1,33 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
+import { buildKnowledgeBase } from '@/lib/rag/knowledge-base';
 import { cache, TTL } from '@/lib/cache';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  if (!hasPermission(session.role, 'view_executive')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
-  const searchParams = new URL(request.url).searchParams;
-  const query = searchParams.get('q');
-  const cacheKey = query ? `knowledge-base-search:${query}` : 'knowledge-base-stats';
+  const cacheKey = 'dashboard-knowledge-base';
   const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+  if (cached) {
+    return NextResponse.json(cached);
+  }
 
   try {
-    const knowledgeBase = await import('@/lib/rag/knowledge-base');
-    const payload = query
-      ? knowledgeBase.searchKnowledgeBase(query)
-      : (
-          ('getKnowledgeBaseStats' in knowledgeBase && typeof knowledgeBase.getKnowledgeBaseStats === 'function'
-            ? knowledgeBase.getKnowledgeBaseStats
-            : knowledgeBase.buildKnowledgeBase)
-        )();
-
-    cache.set(cacheKey, payload, TTL.STANDARD);
+    const payload = buildKnowledgeBase();
+    cache.set(cacheKey, payload, TTL.RELAXED);
     return NextResponse.json(payload);
   } catch (error) {
     console.error('[dashboard/knowledge-base]', error);
-    return NextResponse.json({ error: 'Failed to load knowledge base data' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to load knowledge base' }, { status: 500 });
   }
 }

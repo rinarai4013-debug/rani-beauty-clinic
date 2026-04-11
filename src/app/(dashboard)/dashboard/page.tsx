@@ -8,7 +8,6 @@ import KPICard from '@/components/dashboard/cards/KPICard';
 import ClinicScoreMeter from '@/components/dashboard/gamification/ClinicScoreMeter';
 import DailyWinsBanner from '@/components/dashboard/gamification/DailyWinsBanner';
 import AttentionPanel from '@/components/dashboard/panels/AttentionPanel';
-import ExecutiveBriefingPanel from '@/components/dashboard/panels/ExecutiveBriefingPanel';
 import QuickActions from '@/components/dashboard/panels/QuickActions';
 import RecentActivity from '@/components/dashboard/panels/RecentActivity';
 import AtRiskClientsPanel from '@/components/dashboard/panels/AtRiskClientsPanel';
@@ -19,6 +18,7 @@ import FunnelHealthPanel from '@/components/dashboard/panels/FunnelHealthPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
 import MorningBriefing from '@/components/dashboard/gamification/MorningBriefing';
 import DailyChallenges from '@/components/dashboard/gamification/DailyChallenges';
+import NinetyDayWarRoomPanel from '@/components/dashboard/panels/NinetyDayWarRoomPanel';
 import { DashboardErrorBoundary, InlineError } from '@/components/dashboard/shared';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
@@ -75,8 +75,8 @@ export default function ExecutiveHome() {
         {/* Morning Briefing */}
         <MorningBriefing />
 
-        {/* Executive Briefing */}
-        <ExecutiveBriefingPanel />
+        {/* 90-Day Revenue Sprint */}
+        <NinetyDayWarRoomPanel />
 
         {/* Hero KPI Row */}
         {error ? (

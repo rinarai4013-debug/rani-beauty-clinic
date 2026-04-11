@@ -21,10 +21,6 @@ import {
   AIHighlights,
 } from './types';
 
-export interface BookingAttributionSnapshot {
-  bySource: Record<string, { bookings: number; revenue: number }>;
-}
-
 // ── Date helpers ─────────────────────────────────────────────
 
 function formatDate(date: Date): string {
@@ -148,7 +144,7 @@ export async function fetchRevenueRange(startDate: string, endDate: string): Pro
     const transactions = await fetchAll<Record<string, unknown>>(
       Tables.transactions(),
       {
-        filterByFormula: `AND(OR({${FIELDS.transactions.date}} = '${startDate}', {${FIELDS.transactions.date}} = '${endDate}', AND(IS_AFTER({${FIELDS.transactions.date}}, '${startDate}'), IS_BEFORE({${FIELDS.transactions.date}}, '${endDate}'))), {${FIELDS.transactions.status}} = 'Completed')`,
+        filterByFormula: `AND(IS_AFTER({${FIELDS.transactions.date}}, '${startDate}'), IS_BEFORE({${FIELDS.transactions.date}}, '${endDate}'), {${FIELDS.transactions.status}} = 'Completed')`,
       }
     );
 
@@ -417,7 +413,7 @@ export async function fetchMarketing(): Promise<MarketingSnapshot> {
     const reviews = await fetchAll<Record<string, unknown>>(
       Tables.reviews(),
       {
-        filterByFormula: `OR({${FIELDS.reviews.reviewDate}} = '${sevenDaysAgo}', IS_AFTER({${FIELDS.reviews.reviewDate}}, '${sevenDaysAgo}'))`,
+        filterByFormula: `IS_AFTER({${FIELDS.reviews.reviewDate}}, '${sevenDaysAgo}')`,
       }
     );
 
@@ -426,12 +422,12 @@ export async function fetchMarketing(): Promise<MarketingSnapshot> {
       totalRating += Number(r.fields[FIELDS.reviews.starRating]) || 0;
     }
 
-    const leadsBySource = newLeads.reduce<Record<string, number>>((acc, lead) => {
-      const rawSource = String(lead.fields[FIELDS.clients.leadSource] || '').trim();
-      const source = rawSource || 'Unknown';
-      acc[source] = (acc[source] || 0) + 1;
-      return acc;
-    }, {});
+    const leadsBySource: Record<string, number> = {};
+    for (const l of newLeads) {
+      const source = String(l.fields[FIELDS.clients.leadSource] || '').trim();
+      if (!source) continue;
+      leadsBySource[source] = (leadsBySource[source] || 0) + 1;
+    }
 
     return {
       newLeads: newLeads.length,
@@ -447,46 +443,6 @@ export async function fetchMarketing(): Promise<MarketingSnapshot> {
       newLeads: 0, leadsBySource: {}, avgLeadScore: 0,
       reviewCount: 0, avgRating: 0, reviewVelocity: 0,
     };
-  }
-}
-
-export async function fetchBookingAttribution(startDate: string, endDate: string): Promise<BookingAttributionSnapshot> {
-  try {
-    const appointments = await fetchAll<Record<string, unknown>>(
-      Tables.appointments(),
-      {
-        filterByFormula: `OR({${FIELDS.appointments.date}} = '${startDate}', {${FIELDS.appointments.date}} = '${endDate}', AND(IS_AFTER({${FIELDS.appointments.date}}, '${startDate}'), IS_BEFORE({${FIELDS.appointments.date}}, '${endDate}')))`,
-        fields: [
-          FIELDS.appointments.date,
-          FIELDS.appointments.status,
-          FIELDS.appointments.bookingSource,
-          FIELDS.appointments.amountPaid,
-        ],
-      }
-    );
-
-    const bySource: Record<string, { bookings: number; revenue: number }> = {};
-
-    for (const appt of appointments) {
-      const status = String(appt.fields[FIELDS.appointments.status] || '');
-      if (status === 'Cancelled' || status === 'No-Show') continue;
-
-      const rawSource = String(appt.fields[FIELDS.appointments.bookingSource] || 'Unknown');
-      const source = rawSource.trim() || 'Unknown';
-      const amountPaid = Number(appt.fields[FIELDS.appointments.amountPaid]) || 0;
-
-      if (!bySource[source]) {
-        bySource[source] = { bookings: 0, revenue: 0 };
-      }
-
-      bySource[source].bookings += 1;
-      bySource[source].revenue += amountPaid;
-    }
-
-    return { bySource };
-  } catch (err) {
-    console.error('[Briefing] Failed to fetch booking attribution:', err);
-    return { bySource: {} };
   }
 }
 
@@ -551,7 +507,7 @@ export async function fetchAIHighlights(): Promise<AIHighlights> {
       };
     }
 
-    // Highest no-show risk - derive a signal from actual appointment attributes
+    // Highest no-show risk - check today's appointments for high-risk ones
     const today = getToday();
     const appointments = await fetchFirst<Record<string, unknown>>(
       Tables.appointments(),
@@ -563,23 +519,16 @@ export async function fetchAIHighlights(): Promise<AIHighlights> {
     );
 
     let highestNoShowRisk: AIHighlights['highestNoShowRisk'] = null;
+    // Without no-show prediction scores stored in Airtable, we flag appointments
+    // without deposits as higher risk
     for (const appt of appointments) {
       const depositPaid = Boolean(appt.fields[FIELDS.appointments.depositPaid]);
-      const isConsult = Boolean(appt.fields[FIELDS.appointments.isConsult]);
-      const bookingSource = String(appt.fields[FIELDS.appointments.bookingSource] || '').toLowerCase();
-      const amountQuoted = Number(appt.fields[FIELDS.appointments.amountQuoted]) || 0;
-      const riskScore =
-        (depositPaid ? 0 : 25) +
-        (isConsult ? 10 : 0) +
-        (bookingSource.includes('new') ? 10 : 0) +
-        (amountQuoted >= 500 ? 10 : 0);
-
-      if (riskScore >= 25) {
+      if (!depositPaid) {
         highestNoShowRisk = {
-          clientName: 'Appointment needing confirmation',
+          clientName: 'Appointment (no deposit)',
           service: String(appt.fields[FIELDS.appointments.service] || 'Unknown'),
           time: String(appt.fields[FIELDS.appointments.time] || ''),
-          score: Math.min(85, riskScore),
+          score: 65,
         };
         break;
       }
@@ -622,7 +571,7 @@ export async function fetchProviderPerformance(startDate: string, endDate: strin
     const appointments = await fetchAll<Record<string, unknown>>(
       Tables.appointments(),
       {
-        filterByFormula: `OR({${FIELDS.appointments.date}} = '${startDate}', {${FIELDS.appointments.date}} = '${endDate}', AND(IS_AFTER({${FIELDS.appointments.date}}, '${startDate}'), IS_BEFORE({${FIELDS.appointments.date}}, '${endDate}')))`,
+        filterByFormula: `AND(IS_AFTER({${FIELDS.appointments.date}}, '${startDate}'), IS_BEFORE({${FIELDS.appointments.date}}, '${endDate}'))`,
       }
     );
 

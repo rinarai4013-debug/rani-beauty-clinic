@@ -864,7 +864,7 @@ I understand that:
 - I have the right to an accounting of disclosures
 
 Rani Beauty Clinic
-401 Olympia Ave NE, Suite 101, Renton, WA 98056`;
+401 Olympia Ave NE #101, Renton, WA 98056`;
 
 const PHOTO_CONSENT = `PHOTOGRAPHY AND MEDIA CONSENT
 

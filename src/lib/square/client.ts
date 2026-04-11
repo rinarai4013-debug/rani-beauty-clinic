@@ -1,8 +1,10 @@
 // Square API client for live payment/transaction data
+import { env } from '../env';
+
 const BASE_URL = 'https://connect.squareup.com/v2';
 
 function getSquareAccessToken() {
-  return process.env.SQUARE_ACCESS_TOKEN;
+  return env.SQUARE_ACCESS_TOKEN;
 }
 
 export interface SquarePayment {
@@ -196,5 +198,5 @@ export async function getAll2026Payments(): Promise<ParsedTransaction[]> {
 }
 
 export function isConfigured(): boolean {
-  return !!getSquareAccessToken();
+  return Boolean(getSquareAccessToken());
 }

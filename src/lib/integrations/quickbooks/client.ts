@@ -12,6 +12,7 @@ import type {
   QBOReport,
   QBOCDCResponse,
 } from './types';
+import { env } from '@/lib/env';
 
 /* ─── Constants ─────────────────────────────────────────────── */
 
@@ -132,9 +133,9 @@ export function getStoredTokens(): QBOTokens | null {
   if (tokenStore) return tokenStore;
 
   // Fallback to env vars for initial load
-  const accessToken = process.env.QBO_ACCESS_TOKEN;
-  const refreshToken = process.env.QBO_REFRESH_TOKEN;
-  const realmId = process.env.QBO_REALM_ID;
+  const accessToken = env.QBO_ACCESS_TOKEN;
+  const refreshToken = env.QBO_REFRESH_TOKEN;
+  const realmId = env.QBO_REALM_ID;
 
   if (accessToken && refreshToken && realmId) {
     return {
@@ -162,11 +163,11 @@ export function clearTokens(): void {
 /* ─── Configuration ─────────────────────────────────────────── */
 
 export function getQBOConfig(): QBOConfig {
-  const clientId = process.env.QBO_CLIENT_ID;
-  const clientSecret = process.env.QBO_CLIENT_SECRET;
-  const redirectUri = process.env.QBO_REDIRECT_URI;
-  const realmId = process.env.QBO_REALM_ID;
-  const environment = (process.env.QBO_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
+  const clientId = env.QBO_CLIENT_ID;
+  const clientSecret = env.QBO_CLIENT_SECRET;
+  const redirectUri = env.QBO_REDIRECT_URI;
+  const realmId = env.QBO_REALM_ID;
+  const environment = (env.QBO_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
 
   if (!clientId || !clientSecret || !redirectUri) {
     throw new QBOAuthError('Missing QBO configuration. Set QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI.');
@@ -345,7 +346,7 @@ function getBaseUrl(): string {
 
 function getRealmId(): string {
   const tokens = getStoredTokens();
-  const realmId = tokens?.realmId || process.env.QBO_REALM_ID;
+  const realmId = tokens?.realmId || env.QBO_REALM_ID;
   if (!realmId) throw new QBOAuthError('No realm ID available. Connect to QuickBooks first.');
   return realmId;
 }

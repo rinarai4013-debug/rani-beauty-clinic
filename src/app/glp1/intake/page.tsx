@@ -1,5 +1,2 @@
-import { redirect } from 'next/navigation';
-
-export default function Page() {
-  redirect('/contact?service=GLP-1+Weight+Loss');
-}
+export { placeholderNoindexMetadata as metadata } from "@/lib/seo/placeholder-page";
+export { default } from "@/lib/seo/placeholder-page";

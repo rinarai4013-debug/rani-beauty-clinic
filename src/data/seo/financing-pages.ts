@@ -27,7 +27,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Financing: Monthly Payment Plans",
         content:
-          "Cherry is our preferred financing partner, offering flexible monthly payment plans for aesthetic treatments. Applications take less than 60 seconds with no hard credit check on your score. Approved clients can split their treatment cost into manageable monthly payments. Cherry plans are available for individual treatments or bundled packages, making comprehensive treatment plans more attainable.",
+          "Cherry is our preferred financing partner, offering flexible monthly payment plans for aesthetic treatments. Applications take less than 60 seconds with no hard credit check on your score. Approved clients can split their treatment cost into manageable monthly payments, often starting as low as $50 per month. Cherry plans are available for individual treatments or bundled packages, making comprehensive treatment plans more attainable.",
       },
       {
         heading: "HSA and FSA: Using Pre-Tax Dollars",
@@ -57,7 +57,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Does Rani Beauty Clinic offer payment plans?",
         answer:
-          "Yes. We partner with Cherry to offer flexible monthly payment plans. Approval takes less than 60 seconds with no hard credit check. You can spread your treatment cost into manageable monthly payments.",
+          "Yes. We partner with Cherry to offer flexible monthly payment plans. Approval takes less than 60 seconds with no hard credit check. You can spread your treatment cost into monthly payments, often starting as low as $50 per month.",
       },
       {
         question: "Can I use my HSA or FSA card at Rani Beauty Clinic?",
@@ -93,7 +93,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "What Is Cherry Financing?",
         content:
-          "Cherry is a patient financing platform built specifically for healthcare and aesthetic providers. Unlike traditional credit cards or medical loans, Cherry offers transparent terms with no hidden fees, no compounding interest surprises, and no hard pull on your credit score during the application process. Cherry allows you to split your treatment cost into fixed monthly payments with flexible terms that fit your budget.",
+          "Cherry is a patient financing platform built specifically for healthcare and aesthetic providers. Unlike traditional credit cards or medical loans, Cherry offers transparent terms with no hidden fees, no compounding interest surprises, and no hard pull on your credit score during the application process. Cherry allows you to split your treatment cost into fixed monthly payments over 3, 6, 12, or 24 months.",
       },
       {
         heading: "How to Apply for Cherry at Rani Beauty Clinic",
@@ -103,7 +103,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Payment Plan Options",
         content:
-          "Cherry offers a range of plan lengths, giving you flexibility based on the size of your investment. Shorter plans and longer plans are available to match your budget and treatment goals. Your exact terms depend on the plan you select and your approval amount.",
+          "Cherry offers plans from 3 to 24 months, giving you flexibility based on the size of your investment. Shorter plans typically have lower or no interest, while longer plans spread the cost further for larger treatment plans. For example, a $2,750 Sofwave treatment could be structured at approximately $230 per month over 12 months. Your exact terms depend on the plan length and approval amount.",
       },
       {
         heading: "What Treatments Can I Finance with Cherry?",
@@ -118,7 +118,7 @@ export const financingPages: FinancingPage[] = [
     ],
     keyTakeaways: [
       "Cherry approval takes under 60 seconds with no hard credit check on your score",
-      "Flexible payment plan terms available with fixed monthly amounts",
+      "Payment plans range from 3 to 24 months with fixed monthly amounts",
       "All treatments at Rani Beauty Clinic are eligible for Cherry financing",
       "You can apply in advance with no obligation to use your approved amount",
       "Cherry does not impact your credit utilization ratio like a credit card charge",
@@ -453,7 +453,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Financing for Botox",
         content:
-          "Cherry makes Botox treatments immediately accessible with monthly payment plans. Applications take under 60 seconds with no hard credit check, and you receive an instant approval decision. Cherry plans can cover individual sessions or multi-session treatment plans, so you can lock in your full-year Botox maintenance with a single financing plan. For regular Botox clients who treat every 3 to 4 months, an annual plan through Cherry can cover all four sessions.",
+          "Cherry makes Botox treatments immediately accessible with monthly payment plans. A $600 Botox session could be split into 6 monthly payments of approximately $100, or 12 monthly payments of approximately $50. Applications take under 60 seconds with no hard credit check, and you receive an instant approval decision. Cherry plans can cover individual sessions or multi-session treatment plans, so you can lock in your full-year Botox maintenance with a single financing plan. For regular Botox clients who treat every 3 to 4 months, an annual plan through Cherry can cover all four sessions.",
       },
       {
         heading: "Membership Savings on Botox",
@@ -473,7 +473,7 @@ export const financingPages: FinancingPage[] = [
     ],
     keyTakeaways: [
       "Botox sessions at Rani typically range from $240 to $900 depending on areas treated and units required",
-      "Cherry financing can split a Botox session into manageable monthly payments",
+      "Cherry financing can split a Botox session into monthly payments starting as low as $50 per month",
       "Membership clients save 20 to 30 percent on Botox annually compared to pay-per-visit pricing",
       "Medical Botox for TMJ, migraines, or hyperhidrosis may qualify for HSA or FSA payment",
       "Annual Botox maintenance costs $1,200 to $3,600, which is competitive with premium skincare regimens",
@@ -488,7 +488,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Can I finance Botox with Cherry?",
         answer:
-          "Yes. Cherry financing is available for all Botox treatments at Rani Beauty Clinic. You can split your session cost into monthly payments with a timeline that works for your budget. Approval takes under 60 seconds with no hard credit check on your score.",
+          "Yes. Cherry financing is available for all Botox treatments at Rani Beauty Clinic. You can split your session cost into monthly payments over 3, 6, 12, or 24 months. Approval takes under 60 seconds with no hard credit check on your score.",
       },
       {
         question: "Is Botox covered by insurance or HSA?",
@@ -524,7 +524,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Financing for Sofwave",
         content:
-          "Cherry financing makes Sofwave accessible through predictable monthly payments. Whether you are investing in a single-area or comprehensive treatment, Cherry allows you to spread the cost into comfortable monthly payments with flexible terms. The application takes under 60 seconds with no hard credit check, and you can apply before your appointment to know your options in advance. Cherry plans for Sofwave are among our most popular because clients appreciate knowing their monthly commitment before scheduling.",
+          "Cherry financing makes Sofwave accessible through predictable monthly payments. A $2,750 Sofwave treatment could be split into 12 monthly payments of approximately $230, or 24 monthly payments of approximately $115. A comprehensive $4,500 treatment could be financed at approximately $375 per month over 12 months or $188 per month over 24 months. The application takes under 60 seconds with no hard credit check, and you can apply before your appointment to know your options in advance. Cherry plans for Sofwave are among our most popular because clients appreciate knowing their monthly commitment before scheduling.",
       },
       {
         heading: "Sofwave vs. Surgical Facelift: The Financial Comparison",
@@ -544,7 +544,7 @@ export const financingPages: FinancingPage[] = [
     ],
     keyTakeaways: [
       "Sofwave ranges from $2,750 to $4,500 depending on treatment areas at Rani Beauty Clinic",
-      "Cherry financing can split Sofwave into comfortable monthly payments with flexible terms",
+      "Cherry financing can split Sofwave into payments as low as $115 per month over 24 months",
       "A single Sofwave session costs a fraction of a surgical facelift ($12,000 to $25,000) with zero downtime",
       "Results last 12 months or longer, with collagen remodeling continuing for 3 to 6 months post-treatment",
       "Combination treatment plans covering Sofwave plus other services can be financed together",
@@ -559,7 +559,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Can I finance Sofwave with monthly payments?",
         answer:
-          "Yes. Cherry financing allows you to split your Sofwave investment into manageable monthly payments with flexible terms that fit your budget. Approval takes under 60 seconds with no hard credit check.",
+          "Yes. Cherry financing allows you to split your Sofwave investment into monthly payments over 3, 6, 12, or 24 months. A $2,750 treatment could be approximately $230 per month over 12 months. Approval takes under 60 seconds with no hard credit check.",
       },
       {
         question: "Is Sofwave cheaper than a facelift?",
@@ -600,7 +600,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Financing for Your RF Microneedling Series",
         content:
-          "Cherry financing allows you to spread your entire RF Microneedling series into monthly payments. Whether you are investing in a 3-session or 4-session series, Cherry lets you split the total into comfortable monthly payments with a timeline that works for your budget. Cherry approval takes under 60 seconds with no hard credit check, and you can finance your complete treatment plan in a single application.",
+          "Cherry financing allows you to spread your entire RF Microneedling series into monthly payments. A 3-session package at approximately $1,400 could be financed at roughly $117 per month over 12 months or $233 per month over 6 months. A comprehensive 4-session series at approximately $2,800 could be split into approximately $233 per month over 12 months. Cherry approval takes under 60 seconds with no hard credit check, and you can finance your complete treatment plan in a single application.",
       },
       {
         heading: "RF Microneedling vs. Alternative Treatments: Value Comparison",
@@ -616,7 +616,7 @@ export const financingPages: FinancingPage[] = [
     keyTakeaways: [
       "RF Microneedling sessions range from $495 to $850, with complete series totaling $1,485 to $3,400",
       "Treatment packages offer reduced per-session pricing for the recommended 3 to 4 session series",
-      "Cherry financing can split a complete series into manageable monthly payments",
+      "Cherry financing can split a complete series into payments as low as $117 per month",
       "RF Microneedling offers superior value compared to fractional laser or surgical alternatives",
       "Completing the full series is essential for optimal collagen remodeling and lasting results",
       "Membership pricing provides additional annual savings for ongoing maintenance treatments",
@@ -630,7 +630,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Can I finance RF Microneedling treatments?",
         answer:
-          "Yes. Cherry financing is available for individual sessions, series packages, or comprehensive treatment plans that include RF Microneedling. You can finance your complete series with one application, making flexible monthly payments on a timeline that fits your budget.",
+          "Yes. Cherry financing is available for individual sessions, series packages, or comprehensive treatment plans that include RF Microneedling. You can finance your complete series with one application, making monthly payments over 3 to 24 months.",
       },
       {
         question: "Is one RF Microneedling session enough?",
@@ -671,7 +671,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Financing for Laser Hair Removal",
         content:
-          "Cherry financing allows you to start your laser hair removal journey immediately and pay over time. Whether you are treating a single area or investing in a comprehensive multi-area plan, Cherry can spread the cost into predictable monthly payments with flexible terms. No hard credit check, and approval takes under 60 seconds.",
+          "Cherry financing allows you to start your laser hair removal journey immediately and pay over time. Whether you are treating a single area or investing in a comprehensive multi-area plan, Cherry can spread the cost into predictable monthly payments. A 6-session underarm package could be financed at a modest monthly payment, while a comprehensive multi-area package could be spread over 12 to 24 months for comfortable monthly installments. No hard credit check, and approval takes under 60 seconds.",
       },
       {
         heading: "Laser Hair Removal vs. Shaving and Waxing: The Lifetime Cost",
@@ -701,7 +701,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Can I finance laser hair removal monthly?",
         answer:
-          "Yes. Cherry financing allows you to spread your laser hair removal package into monthly payments with flexible terms. You can finance a single area or a comprehensive multi-area treatment plan with one application. Approval is instant with no hard credit check.",
+          "Yes. Cherry financing allows you to spread your laser hair removal package into monthly payments over 3 to 24 months. You can finance a single area or a comprehensive multi-area treatment plan with one application. Approval is instant with no hard credit check.",
       },
       {
         question: "Is laser hair removal cheaper than waxing long-term?",
@@ -884,7 +884,7 @@ export const financingPages: FinancingPage[] = [
       {
         heading: "Cherry Financing for Chemical Peel Series",
         content:
-          "Cherry financing is ideal for clients investing in a multi-session chemical peel series. Cherry allows you to lock in package pricing while spreading the cost into comfortable monthly payments with flexible terms. The application takes under 60 seconds with no hard credit check. You can also finance a combination plan that includes chemical peels alongside other treatments.",
+          "Cherry financing is ideal for clients investing in a multi-session chemical peel series. A 3-session VI Peel package at approximately $1,100 to $1,200 could be financed at roughly $100 per month over 12 months. Cherry allows you to lock in package pricing while spreading the cost into comfortable monthly payments. The application takes under 60 seconds with no hard credit check. You can also finance a combination plan that includes chemical peels alongside other treatments.",
       },
       {
         heading: "Chemical Peels vs. Over-the-Counter Alternatives",
@@ -900,7 +900,7 @@ export const financingPages: FinancingPage[] = [
     keyTakeaways: [
       "VI Peel at $395 and BioRePeel at $495 are our most popular chemical peel options",
       "Series packages of 3 to 4 peels reduce the per-session cost for optimal results",
-      "Cherry financing can spread a peel series into manageable monthly payments",
+      "Cherry financing can spread a peel series into payments as low as $100 per month",
       "Professional peels deliver results that over-the-counter products cannot match at a comparable annual cost",
       "Maintenance peels every 2 to 3 months preserve your investment and sustain results",
       "Combination plans with HydraFacial and other treatments can be financed together through Cherry",
@@ -919,7 +919,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Can I finance a chemical peel series?",
         answer:
-          "Yes. Cherry financing allows you to spread a multi-session peel package into manageable monthly payments with flexible terms. Approval takes under 60 seconds.",
+          "Yes. Cherry financing allows you to spread a multi-session peel package into manageable monthly payments. A 3-session package can typically be financed at approximately $100 per month. Approval takes under 60 seconds.",
       },
       {
         question: "Which chemical peel is right for my skin?",
@@ -1132,7 +1132,7 @@ export const financingPages: FinancingPage[] = [
       {
         question: "Can I finance an NAD+ protocol?",
         answer:
-          "Yes. Cherry financing allows you to pre-pay for a multi-session NAD+ protocol with flexible monthly payments. You can combine NAD+ financing with other wellness services in a single application.",
+          "Yes. Cherry financing allows you to pre-pay for a multi-session NAD+ protocol with monthly payments over 3 to 24 months. You can combine NAD+ financing with other wellness services in a single application.",
       },
       {
         question: "Why IM injection instead of IV for NAD+?",

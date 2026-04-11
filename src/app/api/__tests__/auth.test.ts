@@ -231,8 +231,7 @@ describe('POST /api/dashboard/auth/login', () => {
   });
 
   it('should accept hashed password format (pbkdf2)', async () => {
-    const { hashPassword } = await import('@/lib/auth/password');
-    const { POST } = await import('@/app/api/dashboard/auth/login/route');
+    const { POST, hashPassword } = await import('@/app/api/dashboard/auth/login/route');
     const hashed = hashPassword('securepass');
 
     process.env.DASHBOARD_USERS = JSON.stringify({
@@ -253,7 +252,7 @@ describe('POST /api/dashboard/auth/login', () => {
   });
 
   it('should reject wrong password against hashed credential', async () => {
-    const { hashPassword } = await import('@/lib/auth/password');
+    const { hashPassword } = await import('@/app/api/dashboard/auth/login/route');
     const hashed = hashPassword('securepass');
 
     process.env.DASHBOARD_USERS = JSON.stringify({

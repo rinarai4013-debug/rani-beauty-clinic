@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
-import { FIELDS } from '@/lib/airtable/tables';
+import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import crypto from 'crypto';
+import { env } from '@/lib/env';
+import { z } from 'zod';
 
 // ─── Rate Limiting ──────────────────────────────────────────────────
 const viewAttempts = new Map<string, { count: number; resetAt: number }>();
@@ -33,7 +34,7 @@ function isRateLimited(ip: string): boolean {
 // ─── Access Code Generation ─────────────────────────────────────────
 // Generates a deterministic 6-digit access code from record ID + secret
 function generateAccessCode(recordId: string): string {
-  const secret = process.env.DASHBOARD_JWT_SECRET;
+  const secret = env.DASHBOARD_JWT_SECRET;
   if (!secret) throw new Error('DASHBOARD_JWT_SECRET is required');
   const hash = crypto.createHmac('sha256', secret).update(recordId).digest('hex');
   // Take first 6 digits from hash
@@ -91,6 +92,10 @@ interface IntelligenceFields {
   'Client Intakes'?: string[];
 }
 
+const planAccessQuerySchema = z.object({
+  code: z.string().regex(/^\d{6}$/).optional(),
+});
+
 // ─── GET Handler ────────────────────────────────────────────────────
 
 export async function GET(
@@ -117,7 +122,13 @@ export async function GET(
 
     // ── Access Code Verification ──
     const url = new URL(request.url);
-    const providedCode = url.searchParams.get('code');
+    const parsedQuery = planAccessQuerySchema.safeParse(
+      Object.fromEntries(url.searchParams.entries())
+    );
+    if (!parsedQuery.success) {
+      return NextResponse.json({ error: 'Invalid access code format' }, { status: 400 });
+    }
+    const providedCode = parsedQuery.data.code;
     const expectedCode = generateAccessCode(id);
 
     if (providedCode !== expectedCode) {
@@ -260,29 +271,6 @@ export async function GET(
         ? new Date(new Date(createdDate).getTime() + PLAN_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
         : null,
     };
-
-    // ── Fire-and-forget: Track plan view ──
-    // Update Treatment Plans status from 'Sent' to 'Viewed' if applicable
-    // This looks up the Treatment Plans record linked to this intake record
-    const trackViewAsync = async () => {
-      try {
-        const treatmentPlans = await fetchFirst<{ Status?: string; 'Intake Record ID'?: string }>(
-          Tables.treatmentPlans(),
-          1,
-          { filterByFormula: `{Intake Record ID} = '${sanitizedId}'` },
-          true
-        );
-        if (treatmentPlans.length > 0 && treatmentPlans[0].fields.Status === 'Sent') {
-          await updateRecord(Tables.treatmentPlans(), treatmentPlans[0].id, {
-            [FIELDS.treatmentPlans.status]: 'Viewed',
-          });
-        }
-      } catch (trackErr) {
-        console.error('[Plan View Tracking] Failed to update status:', trackErr);
-      }
-    };
-    // Don't await - fire and forget so we don't block the response
-    trackViewAsync();
 
     return NextResponse.json({ plan });
   } catch (error) {

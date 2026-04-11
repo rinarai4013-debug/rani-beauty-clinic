@@ -15,7 +15,7 @@ import type { TenantDatabaseClient } from '@/lib/tenant/database';
 function createMockDb(): TenantDatabaseClient {
   return {
     tenantId: 'test-tenant',
-    fetchAll: vi.fn(async (tableName: string) => {
+    fetchAll: jest.fn(async (tableName: string) => {
       if (tableName === 'Messages Log') return [
         { id: 'm1', fields: { 'Client Email': 'alice@test.com', 'Client Name': 'Alice', Type: 'sms', Direction: 'outbound', Subject: '', Preview: 'Reminder: Your appointment tomorrow', Status: 'delivered', Date: new Date().toISOString() } },
         { id: 'm2', fields: { 'Client Email': 'alice@test.com', 'Client Name': 'Alice', Type: 'email', Direction: 'inbound', Subject: 'Re: Appointment', Preview: 'I will be there!', Status: 'delivered', Date: new Date().toISOString() } },
@@ -28,10 +28,10 @@ function createMockDb(): TenantDatabaseClient {
       ];
       return [];
     }),
-    createRecord: vi.fn(async () => 'new-msg-id'),
-    updateRecord: vi.fn(async () => {}),
-    deleteRecord: vi.fn(async () => {}),
-    fetchFirst: vi.fn(async () => []),
+    createRecord: jest.fn(async () => 'new-msg-id'),
+    updateRecord: jest.fn(async () => {}),
+    deleteRecord: jest.fn(async () => {}),
+    fetchFirst: jest.fn(async () => []),
   } as unknown as TenantDatabaseClient;
 }
 

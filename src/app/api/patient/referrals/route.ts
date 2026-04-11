@@ -21,7 +21,7 @@ export async function GET() {
         successfulReferrals: 0,
         pendingReferrals: 0,
         rewardsEarned: 0,
-        link: `https://www.ranibeautyclinic.com?ref=${code}`,
+        link: `https://ranibeautyclinic.com?ref=${code}`,
       },
     });
   } catch (error) {

@@ -123,7 +123,7 @@ export default function PnLChart() {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis type="number" tickFormatter={v => formatCurrency(v)} tick={{ fontSize: 11 }} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
-              <Tooltip formatter={((value: number) => formatCurrency(value)) as any} />
+              <Tooltip formatter={(value: number) => formatCurrency(value)} />
               <Bar dataKey="amount" radius={[0, 4, 4, 0]}>
                 {chartData.map((entry, idx) => (
                   <Cell key={idx} fill={entry.color} />

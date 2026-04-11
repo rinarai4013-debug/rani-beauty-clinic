@@ -622,15 +622,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: { body: ['Invalid JSON'] } },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json();
     const parsed = RequestSchema.safeParse(body);
 
     if (!parsed.success) {

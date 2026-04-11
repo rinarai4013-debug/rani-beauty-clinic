@@ -69,7 +69,7 @@ export default function CRMOverviewPage() {
             {/* Stale Lead Alerts */}
             {overview.pipeline.staleLeadCount > 0 && (
               <motion.div variants={item}>
-                <StaleLeadAlert leads={(overview.pipeline.staleLeads ?? []) as any} />
+                <StaleLeadAlert leads={overview.pipeline.staleLeads ?? []} />
               </motion.div>
             )}
 

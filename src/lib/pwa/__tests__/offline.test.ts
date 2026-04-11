@@ -1,6 +1,6 @@
 /**
  * Tests for PWA offline detection and request queuing.
- * @vitest-environment jsdom
+ * @jest-environment jsdom
  */
 
 import { renderHook, act } from "@testing-library/react";
@@ -17,14 +17,14 @@ import {
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: vi.fn((key: string) => store[key] ?? null),
-    setItem: vi.fn((key: string, value: string) => {
+    getItem: jest.fn((key: string) => store[key] ?? null),
+    setItem: jest.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: vi.fn((key: string) => {
+    removeItem: jest.fn((key: string) => {
       delete store[key];
     }),
-    clear: vi.fn(() => {
+    clear: jest.fn(() => {
       store = {};
     }),
   };
@@ -33,11 +33,11 @@ const localStorageMock = (() => {
 Object.defineProperty(window, "localStorage", { value: localStorageMock });
 
 // Mock fetch
-const mockFetch = vi.fn();
+const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  jest.clearAllMocks();
   localStorageMock.clear();
 
   // Default: online
@@ -90,7 +90,7 @@ describe("useOnlineStatus", () => {
   });
 
   test("cleans up event listeners on unmount", () => {
-    const removeSpy = vi.spyOn(window, "removeEventListener");
+    const removeSpy = jest.spyOn(window, "removeEventListener");
     const { unmount } = renderHook(() => useOnlineStatus());
 
     unmount();

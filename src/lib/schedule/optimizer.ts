@@ -204,7 +204,7 @@ function findScheduleGaps(input: ScheduleInput): ScheduleGap[] {
     const dates = getDateRange(input.dateRange.start, input.dateRange.end);
 
     for (const date of dates) {
-      const dayOfWeek = new Date(date).getDay();
+      const dayOfWeek = parseDate(date).getUTCDay();
       if (!provider.workingDays.includes(dayOfWeek)) continue;
 
       const key = `${date}|${provider.name}`;
@@ -284,6 +284,15 @@ function createGap(
 
 function detectConflicts(input: ScheduleInput): ScheduleConflict[] {
   const conflicts: ScheduleConflict[] = [];
+  const serviceConfigByService = new Map<string, ServiceScheduleConfig>();
+  input.serviceConfig.forEach(config => {
+    serviceConfigByService.set(config.service.toLowerCase(), config);
+  });
+
+  const getRequiredEquipment = (appointment: AppointmentData): string[] => {
+    const match = serviceConfigByService.get(appointment.service.toLowerCase());
+    return match?.requiredEquipment ? [...match.requiredEquipment] : [];
+  };
 
   // Group by date
   const byDate = new Map<string, AppointmentData[]>();
@@ -345,6 +354,33 @@ function detectConflicts(input: ScheduleInput): ScheduleConflict[] {
             severity: 'medium',
             appointments: [sorted[sorted.length - 1].id],
             resolution: 'Reschedule to earlier slot or confirm provider overtime approval',
+          });
+        }
+      }
+    }
+
+    // Equipment conflicts (single shared device used by concurrent appointments)
+    const sortedByTime = [...appts].sort((a, b) => a.startTime.localeCompare(b.startTime));
+    for (let i = 0; i < sortedByTime.length - 1; i++) {
+      for (let j = i + 1; j < sortedByTime.length; j++) {
+        const first = sortedByTime[i];
+        const second = sortedByTime[j];
+        const firstEnd = timeToMinutes(first.endTime);
+        const secondStart = timeToMinutes(second.startTime);
+        if (firstEnd <= secondStart) {
+          break;
+        }
+        const firstEquipment = getRequiredEquipment(first);
+        const secondEquipment = getRequiredEquipment(second);
+        const sharedEquipment = firstEquipment.filter(eq => secondEquipment.includes(eq));
+        if (sharedEquipment.length > 0) {
+          conflicts.push({
+            date,
+            type: 'equipment_conflict',
+            description: `${first.service} and ${second.service} overlap (${first.startTime}-${first.endTime}) and both require ${sharedEquipment.join(', ')}.`,
+            severity: 'high',
+            appointments: [first.id, second.id],
+            resolution: `Only one ${sharedEquipment[0]} unit can run at once. Stagger one appointment or assign to off-peak.`,
           });
         }
       }
@@ -430,6 +466,51 @@ function findRevenueOpportunities(
     }
   });
 
+  // Reschedule opportunities: move lower-yield clients out of premium windows
+  const highPotentialGaps = topGaps.filter(g => g.durationMinutes >= 60);
+  if (highPotentialGaps.length > 0) {
+    const lowYieldHighValue = input.appointments
+      .filter(a => parseInt(a.startTime.split(':')[0]) >= 14 && a.estimatedRevenue > 250)
+      .sort((a, b) => b.estimatedRevenue - a.estimatedRevenue)
+      .slice(0, 2);
+
+    lowYieldHighValue.forEach((appt, index) => {
+      const targetGap = highPotentialGaps[index % highPotentialGaps.length];
+      opportunities.push({
+        type: 'reschedule',
+        description: `${appt.date}: Move ${appt.clientName}'s ${appt.service} from ${appt.startTime} to ${targetGap.startTime}-${targetGap.endTime} (${targetGap.provider})`,
+        potentialRevenue: Math.round((appt.estimatedRevenue * 0.15)),
+        targetSlot: {
+          date: targetGap.date,
+          time: targetGap.startTime,
+          provider: targetGap.provider,
+        },
+        suggestedClient: appt.clientName,
+      });
+    });
+  }
+
+  // Waitlist opportunities: capture demand when gaps remain after first fill pass
+  const saturatedSlots = topGaps.filter(g => g.potentialRevenue > 350).length;
+  if (saturatedSlots >= 3 && input.appointments.length > 0) {
+    const nextServices = input.serviceConfig
+      .sort((a, b) => b.revenuePerMinute - a.revenuePerMinute)
+      .slice(0, 3)
+      .map(s => s.service)
+      .join(', ');
+
+    opportunities.push({
+      type: 'waitlist',
+      description: `Open demand remains: invite top-waitlist clients for ${nextServices}`,
+      potentialRevenue: Math.round(topGaps.slice(0, 3).reduce((s, g) => s + g.potentialRevenue * 0.6, 0)),
+      targetSlot: {
+        date: topGaps[0]?.date || input.dateRange.start,
+        time: topGaps[0]?.startTime || '09:00',
+        provider: topGaps[0]?.provider || input.providers[0]?.name || 'Unassigned',
+      },
+    });
+  }
+
   return opportunities.sort((a, b) => b.potentialRevenue - a.potentialRevenue);
 }
 
@@ -445,7 +526,7 @@ function analyzeProviderBalance(input: ScheduleInput): ProviderBalanceAnalysis[]
     }, 0);
 
     const workDaysInRange = getDateRange(input.dateRange.start, input.dateRange.end)
-      .filter(d => provider.workingDays.includes(new Date(d).getDay())).length;
+      .filter(d => provider.workingDays.includes(parseDate(d).getUTCDay())).length;
 
     const dailyAvailableMinutes = timeToMinutes(provider.endTime) - timeToMinutes(provider.startTime);
     const totalAvailableMinutes = workDaysInRange * dailyAvailableMinutes;
@@ -507,13 +588,13 @@ function generateDailySummaries(input: ScheduleInput): DailyScheduleSummary[] {
     const dayAppts = input.appointments
       .filter(a => a.date === date && a.status !== 'cancelled');
 
-    const dayOfWeek = DAYS_OF_WEEK[new Date(date).getDay()];
+    const dayOfWeek = DAYS_OF_WEEK[parseDate(date).getUTCDay()];
     const totalRevenue = dayAppts.reduce((sum, a) => sum + a.estimatedRevenue, 0);
     const highRiskNoShows = dayAppts.filter(a => (a.noShowRisk || 0) > 60).length;
 
     // Calculate utilization
     const activeProviders = input.providers.filter(p =>
-      p.workingDays.includes(new Date(date).getDay())
+      p.workingDays.includes(parseDate(date).getUTCDay())
     );
     const totalAvailableMinutes = activeProviders.reduce((sum, p) =>
       sum + (timeToMinutes(p.endTime) - timeToMinutes(p.startTime)), 0
@@ -525,9 +606,10 @@ function generateDailySummaries(input: ScheduleInput): DailyScheduleSummary[] {
       ? Math.round((scheduledMinutes / totalAvailableMinutes) * 100)
       : 0;
 
-    // Gaps
-    const gapMinutes = totalAvailableMinutes - scheduledMinutes;
-    const gapCount = Math.floor(gapMinutes / 30); // rough estimate
+    // Gaps by provider/day blocks
+    const providerGapStats = calculateDailyGapStats(date, dayAppts, activeProviders);
+    const gapMinutes = providerGapStats.gapMinutes;
+    const gapCount = providerGapStats.gapCount;
 
     // Provider breakdown
     const providerMap = new Map<string, { appointments: number; revenue: number }>();
@@ -684,14 +766,72 @@ function minutesToTime(minutes: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
+function calculateDailyGapStats(
+  date: string,
+  dayAppts: AppointmentData[],
+  activeProviders: ProviderAvailability[]
+): { gapMinutes: number; gapCount: number } {
+  let gapMinutes = 0;
+  let gapCount = 0;
+
+  activeProviders.forEach(provider => {
+    const providerAppts = dayAppts
+      .filter(a => a.provider === provider.name)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+    const providerStart = timeToMinutes(provider.startTime);
+    const providerEnd = timeToMinutes(provider.endTime);
+
+    if (providerAppts.length === 0) {
+      const dayGap = Math.max(0, providerEnd - providerStart);
+      if (dayGap > 0) {
+        gapMinutes += dayGap;
+        gapCount += 1;
+      }
+      return;
+    }
+
+    const firstStart = timeToMinutes(providerAppts[0].startTime);
+    if (firstStart > providerStart) {
+      gapMinutes += firstStart - providerStart;
+      gapCount += 1;
+    }
+
+    for (let i = 0; i < providerAppts.length - 1; i++) {
+      const endCurrent = timeToMinutes(providerAppts[i].endTime);
+      const startNext = timeToMinutes(providerAppts[i + 1].startTime);
+      if (startNext > endCurrent) {
+        gapMinutes += startNext - endCurrent;
+        gapCount += 1;
+      }
+    }
+
+    const lastEnd = timeToMinutes(providerAppts[providerAppts.length - 1].endTime);
+    if (providerEnd > lastEnd) {
+      gapMinutes += providerEnd - lastEnd;
+      gapCount += 1;
+    }
+  });
+
+  return { gapMinutes, gapCount };
+}
+
+function parseDate(date: string): Date {
+  const [year, month, day] = date.split('T')[0].split('-').map((value) => Number(value));
+  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) {
+    return new Date(date);
+  }
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
 function getDateRange(start: string, end: string): string[] {
   const dates: string[] = [];
-  const current = new Date(start);
-  const endDate = new Date(end);
+  let current = parseDate(start);
+  const endDate = parseDate(end);
 
   while (current <= endDate) {
     dates.push(current.toISOString().slice(0, 10));
-    current.setDate(current.getDate() + 1);
+    current = new Date(current.getTime() + 24 * 60 * 60 * 1000);
   }
 
   return dates;

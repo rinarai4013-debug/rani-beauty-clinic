@@ -86,7 +86,7 @@ const POINTS_EARNED: NotificationTemplate = {
 // ── Points Redeemed ──────────────────────────────────────────────────────
 
 const POINTS_REDEEMED: NotificationTemplate = {
-  sms: `you redeemed {{pointsRedeemed}} points for {{rewardName}} (${'$'}{{creditAmount}} value)! your new balance is {{totalBalance}} points. enjoy! - Rani Beauty Clinic`,
+  sms: `you redeemed {{pointsRedeemed}} points for {{rewardName}} (${{creditAmount}} value)! your new balance is {{totalBalance}} points. enjoy! - Rani Beauty Clinic`,
   emailSubject: `reward redeemed: {{rewardName}}`,
   emailBody: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -98,7 +98,7 @@ const POINTS_REDEEMED: NotificationTemplate = {
     </p>
     <div style="background: linear-gradient(135deg, #0F1D2C, #1a2d40); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
       <p style="color: #C9A96E; font-size: 20px; font-weight: 600; margin: 0;">{{rewardName}}</p>
-      <p style="color: #ffffff; font-size: 14px; margin: 8px 0 0;">${'$'}{{creditAmount}} value</p>
+      <p style="color: #ffffff; font-size: 14px; margin: 8px 0 0;">${{creditAmount}} value</p>
     </div>
     <p style="color: #333; font-size: 16px; line-height: 1.6;">
       your remaining balance is <strong>{{totalBalance}} points</strong>. this credit will be applied to your next visit.

@@ -13,28 +13,6 @@ import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 import { geoPages } from "@/data/locations/geo-pages";
 import { skinConcerns } from "@/data/skin-concerns";
-import { costPages } from "@/data/cost-pages";
-
-// Map /locations/ slugs to corresponding /near/ slugs for cross-linking
-const locationToNearSlug: Record<string, string> = {
-  "bellevue-wa": "bellevue",
-  "kent-wa": "kent",
-  "tukwila-wa": "tukwila",
-  "newcastle-wa": "newcastle",
-  "mercer-island-wa": "mercer-island",
-  "auburn-wa": "auburn",
-  "federal-way-wa": "federal-way",
-  "seatac-wa": "seatac",
-  "burien-wa": "burien",
-  "covington-wa": "covington",
-  "maple-valley-wa": "maple-valley",
-  "des-moines-wa": "des-moines",
-  "capitol-hill-seattle-wa": "capitol-hill",
-  "beacon-hill-seattle-wa": "beacon-hill",
-  "columbia-city-seattle-wa": "columbia-city",
-  "south-seattle-wa": "west-seattle",
-  "black-diamond-wa": "black-diamond",
-};
 
 interface PageProps {
   params: { slug: string };
@@ -194,7 +172,7 @@ export default function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="bg-white py-10 md:py-16 lg:py-24">
+      <section className="bg-white py-16 md:py-24">
         <div className="mx-auto max-w-4xl px-6">
           <FadeInOnScroll>
             <div>
@@ -208,7 +186,7 @@ export default function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="bg-rani-cream py-10 md:py-16 lg:py-24">
+      <section className="bg-rani-cream py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-6">
           <FadeInOnScroll>
             <SectionLabel label={`SERVICES FOR ${page.city.toUpperCase()} RESIDENTS`} />
@@ -225,7 +203,7 @@ export default function LocationPage({ params }: PageProps) {
                 <ul className="space-y-3">
                   {aestheticServiceSlugs.map((service) => (
                     <li key={service.slug}>
-                      <Link href={`/services/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors min-h-[44px]">
+                      <Link href={`/services/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
                         <ChevronRight size={14} className="text-rani-gold transition-transform group-hover:translate-x-1" />
                         <span>{service.name}</span>
                       </Link>
@@ -242,7 +220,7 @@ export default function LocationPage({ params }: PageProps) {
                 <ul className="space-y-3">
                   {wellnessServiceSlugs.map((service) => (
                     <li key={service.slug}>
-                      <Link href={`/wellness/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors min-h-[44px]">
+                      <Link href={`/wellness/${service.slug}`} className="group flex items-center gap-3 font-body text-rani-text hover:text-rani-navy transition-colors">
                         <ChevronRight size={14} className="text-rani-gold transition-transform group-hover:translate-x-1" />
                         <span>{service.name}</span>
                       </Link>
@@ -276,61 +254,16 @@ export default function LocationPage({ params }: PageProps) {
               <Link
                 key={concern.slug}
                 href={`/concerns/${concern.slug}`}
-                className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
+                className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
               >
                 {concern.title} →
               </Link>
             ))}
             <Link
               href="/concerns"
-              className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-gold transition-all hover:border-rani-gold hover:shadow-sm"
+              className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-gold transition-all hover:border-rani-gold hover:shadow-sm"
             >
               View All Concerns →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Cross-link to /near/ city guide if available */}
-      {locationToNearSlug[page.slug] && (
-        <section className="bg-rani-cream/50 py-10">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <FadeInOnScroll>
-              <p className="font-body text-sm text-rani-muted mb-3">Explore more for {page.city}</p>
-              <Link
-                href={`/near/${locationToNearSlug[page.slug]}`}
-                className="inline-flex items-center gap-2 rounded-lg bg-rani-navy px-6 py-3 font-body text-sm font-semibold text-white transition-all hover:bg-rani-navy/90"
-              >
-                Full City Guide: {page.city} <ChevronRight size={16} />
-              </Link>
-            </FadeInOnScroll>
-          </div>
-        </section>
-      )}
-
-      {/* Treatment Pricing Quick Links */}
-      <section className="bg-white py-12">
-        <div className="mx-auto max-w-4xl px-6">
-          <FadeInOnScroll>
-            <h3 className="text-center font-body text-lg font-bold text-rani-navy mb-6">
-              Treatment Pricing
-            </h3>
-          </FadeInOnScroll>
-          <div className="flex flex-wrap justify-center gap-3">
-            {costPages.slice(0, 8).map((cp) => (
-              <Link
-                key={cp.slug}
-                href={`/cost/${cp.slug}`}
-                className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
-              >
-                {cp.service} Cost →
-              </Link>
-            ))}
-            <Link
-              href="/pricing"
-              className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2.5 min-h-[44px] flex items-center font-body text-xs font-semibold text-rani-gold transition-all hover:border-rani-gold hover:shadow-sm"
-            >
-              All Pricing →
             </Link>
           </div>
         </div>

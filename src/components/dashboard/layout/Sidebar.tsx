@@ -8,16 +8,16 @@ import {
   LayoutDashboard, Trophy, DollarSign, Filter, Calendar, Wallet,
   PenSquare, Settings, ChevronLeft, ChevronRight, Sparkles, Megaphone, Plug,
   TrendingUp, BarChart2, Zap, Package, MessageCircle, BookOpen, Phone, UserMinus,
-  FileText, Radar, Star, Bell,
 } from 'lucide-react';
 import { NAV_ITEMS, NAV_GROUPS, type NavItem } from '@/data/dashboard/nav-items';
 import type { UserRole } from '@/types/auth';
 import { hasPermission } from '@/lib/auth/roles';
+import { isFeatureEnabled } from '@/lib/dashboard/features';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, Trophy, DollarSign, Filter, Calendar, Wallet,
   PenSquare, Settings, Megaphone, Plug, TrendingUp, BarChart2, Zap, Package, MessageCircle,
-  BookOpen, Phone, UserMinus, FileText, Radar, Star, Bell,
+  BookOpen, Phone, UserMinus,
 };
 
 interface SidebarProps {
@@ -30,7 +30,9 @@ export default function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
 
   const filteredItems = NAV_ITEMS.filter(
-    (item) => !item.permission || hasPermission(role, item.permission)
+    (item) =>
+      (!item.permission || hasPermission(role, item.permission)) &&
+      (!item.feature || isFeatureEnabled(item.feature))
   );
 
   const groupedItems = NAV_GROUPS.map((group) => ({

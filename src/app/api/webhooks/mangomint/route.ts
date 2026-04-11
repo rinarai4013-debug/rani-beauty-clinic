@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
+import type Airtable from 'airtable';
+import crypto from 'node:crypto';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
-import { FIELDS } from '@/lib/airtable/tables';
+import { env } from '@/lib/env';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { captureWebhookEvent } from '@/lib/sentry-utils';
+import { verifyWebhookSignature } from '@/lib/webhooks/verify-signature';
+import { z } from 'zod';
 
 // ─── Mangomint Webhook Handler ───
 // Handles ALL Mangomint webhook events:
@@ -18,18 +22,99 @@ import { captureWebhookEvent } from '@/lib/sentry-utils';
 
 // ─── Helpers ───
 
+const WEBHOOK_DEDUPE_TTL_MS = 24 * 60 * 60 * 1000;
+const WEBHOOK_TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000;
+const ALERT_DEDUPE_TTL_MS = 24 * 60 * 60 * 1000;
+const mangomintPayloadSchema = z.object({
+  event: z.string().trim().min(1).optional(),
+  type: z.string().trim().min(1).optional(),
+  data: z.unknown().optional(),
+});
+
 async function forwardToN8n(webhookPath: string, payload: unknown): Promise<void> {
-  const n8nUrl = process.env.N8N_WEBHOOK_URL;
+  const n8nUrl = env.N8N_WEBHOOK_URL;
   if (!n8nUrl) return;
   try {
-    await fetch(`${n8nUrl}${webhookPath}`, {
+    const response = await fetch(`${n8nUrl}${webhookPath}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
     });
-  } catch {
-    // n8n forwarding is best-effort
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      logWebhookEvent('mangomint', 'n8n-forward', false, {
+        webhookPath,
+        status: response.status,
+        responseBody: body.substring(0, 500),
+      });
+      return;
+    }
+    logWebhookEvent('mangomint', 'n8n-forward', true, { webhookPath, status: response.status });
+  } catch (err) {
+    logWebhookEvent('mangomint', 'n8n-forward', false, { webhookPath, error: String(err) });
   }
+}
+
+function getMangomintId(data: Record<string, unknown>, fallbackEvent: string): string {
+  return String(
+    data.id ||
+      data.appointmentId ||
+      data.saleId ||
+      data.clientId ||
+      data.membershipId ||
+      fallbackEvent
+  );
+}
+
+function buildWebhookDedupeKey(
+  event: string,
+  data: Record<string, unknown>,
+  requestBody: string,
+  requestId: string | null
+): string {
+  const identity = String(getMangomintId(data, requestId || event));
+  const freshness =
+    String(
+      data.updatedAt ||
+      data.completed_at ||
+      data.completedAt ||
+      data.cancel_date ||
+      data.cancelDate ||
+      data.startAt ||
+      data.status ||
+      '',
+    );
+
+  const payloadHash = crypto
+    .createHash('sha256')
+    .update(requestBody)
+    .digest('hex')
+    .slice(0, 12);
+
+  return `mangomint:webhook:${event}:${identity}:${freshness}:${payloadHash}`;
+}
+
+function shouldSkipDuplicateWebhook(
+  event: string,
+  data: Record<string, unknown>,
+  requestBody: string,
+  requestId: string | null
+): boolean {
+  const key = buildWebhookDedupeKey(event, data, requestBody, requestId);
+  if (cache.get<boolean>(key)) {
+    return true;
+  }
+  cache.set(key, true, WEBHOOK_DEDUPE_TTL_MS);
+  return false;
+}
+
+function shouldCreateAlertOnce(key: string): boolean {
+  if (cache.get<boolean>(key)) {
+    return false;
+  }
+  cache.set(key, true, ALERT_DEDUPE_TTL_MS);
+  return true;
 }
 
 async function findRecordByField(
@@ -59,10 +144,12 @@ async function upsertRecord(
   existingId: string | null,
   fields: Record<string, unknown>
 ): Promise<void> {
+  const airtableFields = fields as Partial<Airtable.FieldSet>;
+
   if (existingId) {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.update([{ id: existingId, fields }] as Parameters<typeof table.update>[0], { typecast: true }, (err: unknown) => {
+        table.update([{ id: existingId, fields: airtableFields }], { typecast: true }, (err) => {
           if (err) reject(err);
           else resolve();
         });
@@ -71,145 +158,12 @@ async function upsertRecord(
   } else {
     await rateLimitedQuery(() =>
       new Promise<void>((resolve, reject) => {
-        table.create([{ fields }] as unknown as Parameters<typeof table.create>[0], { typecast: true }, (err: unknown) => {
+        table.create([{ fields: airtableFields }], { typecast: true }, (err) => {
           if (err) reject(err);
           else resolve();
         });
       })
     );
-  }
-}
-
-type ClientRecordFields = Record<string, unknown>;
-
-function getMangomintClientId(data: Record<string, unknown>): string {
-  return String(
-    data.clientId ||
-    data.client_id ||
-    (data.client as Record<string, unknown> | undefined)?.id ||
-    ''
-  );
-}
-
-async function findClientRecord(
-  email?: string,
-  mangomintClientId?: string,
-  fields?: string[]
-): Promise<{ id: string; fields: ClientRecordFields } | null> {
-  const selectFirst = async (
-    formula: string,
-  ): Promise<{ id: string; fields: ClientRecordFields } | null> =>
-    rateLimitedQuery(() =>
-      new Promise<{ id: string; fields: ClientRecordFields } | null>((resolve) => {
-        Tables.clients()
-          .select({
-            filterByFormula: formula,
-            maxRecords: 1,
-            ...(fields ? { fields } : {}),
-          })
-          .firstPage((err, records) => {
-            if (err || !records || records.length === 0) {
-              resolve(null);
-              return;
-            }
-
-            resolve({
-              id: records[0].id,
-              fields: records[0].fields as ClientRecordFields,
-            });
-          });
-      })
-    );
-
-  if (mangomintClientId) {
-    const byMangomint = await selectFirst(
-      `{${FIELDS.clients.mangomintClientId}} = "${sanitizeFormulaValue(mangomintClientId)}"`
-    );
-    if (byMangomint) return byMangomint;
-  }
-
-  if (email) {
-    const byEmail = await selectFirst(
-      `{${FIELDS.clients.email}} = '${sanitizeFormulaValue(email)}'`
-    );
-    if (byEmail) return byEmail;
-  }
-
-  return null;
-}
-
-function inferFirstBookingSource(
-  data: Record<string, unknown>,
-  clientFields: ClientRecordFields
-): string {
-  const rawBookingSource = String(
-    data.bookingSource ||
-    data.booking_source ||
-    data.source ||
-    ''
-  ).toLowerCase();
-
-  if (rawBookingSource.includes('walk')) return 'Walk-In';
-  if (rawBookingSource.includes('phone') || rawBookingSource.includes('call')) return 'Phone Call';
-  if (rawBookingSource.includes('mango')) return 'Mangomint Direct';
-
-  const landingPage = String(clientFields[FIELDS.clients.leadLandingPage] || '').toLowerCase();
-  const leadOffer = String(clientFields[FIELDS.clients.leadOffer] || '').toLowerCase();
-  const leadMedium = String(clientFields[FIELDS.clients.leadMedium] || '').toLowerCase();
-
-  if (landingPage.includes('/tv')) return 'TV Landing Page';
-  if (landingPage.includes('/glp1')) return 'GLP-1 Landing Page';
-  if (landingPage.includes('/weight-loss')) return 'Weight Loss Landing';
-  if (landingPage.includes('/contact')) return 'Website Contact Form';
-  if (leadOffer.includes('newsletter') || leadMedium === 'email') return 'Newsletter';
-  if (leadOffer.includes('ai concierge')) return 'AI Chat';
-  if (leadOffer.includes('15-minute phone consultation')) return 'Quick Consult';
-  if (leadOffer.includes('skin treatment plan')) return 'Skin Quiz';
-
-  return 'Mangomint Direct';
-}
-
-async function backfillClientBookingAttribution(data: Record<string, unknown>) {
-  const clientEmail = String(data.clientEmail || data.email || '').trim();
-  const mangomintClientId = getMangomintClientId(data);
-  if (!clientEmail && !mangomintClientId) return;
-
-  const client = await findClientRecord(clientEmail, mangomintClientId, [
-    FIELDS.clients.email,
-    FIELDS.clients.leadLandingPage,
-    FIELDS.clients.leadOffer,
-    FIELDS.clients.leadMedium,
-    FIELDS.clients.firstBookingSource,
-    FIELDS.clients.firstBookingOffer,
-    FIELDS.clients.mangomintClientId,
-  ]);
-
-  if (!client) return;
-
-  const updates: Record<string, unknown> = {};
-
-  if (mangomintClientId && !client.fields[FIELDS.clients.mangomintClientId]) {
-    updates[FIELDS.clients.mangomintClientId] = mangomintClientId;
-  }
-
-  if (!client.fields[FIELDS.clients.firstBookingSource]) {
-    updates[FIELDS.clients.firstBookingSource] = inferFirstBookingSource(data, client.fields);
-  }
-
-  if (!client.fields[FIELDS.clients.firstBookingOffer]) {
-    const leadOffer = String(client.fields[FIELDS.clients.leadOffer] || '').trim();
-    const serviceName =
-      String(data.serviceName || (data.service as Record<string, unknown> | undefined)?.name || '').trim();
-    if (leadOffer) {
-      updates[FIELDS.clients.firstBookingOffer] = leadOffer;
-    } else if (serviceName) {
-      updates[FIELDS.clients.firstBookingOffer] = serviceName;
-    }
-  }
-
-  if (Object.keys(updates).length > 0) {
-    await upsertRecord(Tables.clients(), client.id, updates);
-    cache.invalidatePrefix('clients');
   }
 }
 
@@ -227,7 +181,6 @@ function extractAppointmentFields(data: Record<string, unknown>, statusOverride?
     'Start Time': (data.startAt as string) || '',
     'End Time': (data.endAt as string) || '',
     Notes: (data.notes as string) || '',
-    'Booking Source': (data.bookingSource as string) || (data.booking_source as string) || '',
     'MangoMint Appointment ID': String(data.id || ''),
   };
 }
@@ -235,60 +188,18 @@ function extractAppointmentFields(data: Record<string, unknown>, statusOverride?
 // ─── Event Handlers ───
 
 async function handleAppointmentCreated(data: Record<string, unknown>, payload: unknown) {
+  const mangomintId = String(data.id || '');
   const fields = extractAppointmentFields(data);
-  await upsertRecord(Tables.appointments(), null, fields);
-  await backfillClientBookingAttribution(data);
+
+  // Idempotency: check if this Mangomint appointment already exists
+  const existingId = mangomintId
+    ? await findRecordByField(Tables.appointments(), 'MangoMint Appointment ID', mangomintId, ['MangoMint Appointment ID'])
+    : null;
+
+  await upsertRecord(Tables.appointments(), existingId, fields);
   cache.invalidatePrefix('schedule');
   cache.invalidatePrefix('kpi');
   await forwardToN8n('/webhook/booking-sync', payload);
-
-  // Consultation-to-booking sync: auto-mark matching consultation as "booked"
-  syncConsultationBooking(data).catch(err => {
-    console.error('[Mangomint] Consultation booking sync failed (non-blocking):', err);
-  });
-}
-
-/**
- * When a Mangomint booking comes in, find any matching consultation
- * (by email or phone) and auto-mark it as "booked" with a log entry.
- */
-async function syncConsultationBooking(data: Record<string, unknown>): Promise<void> {
-  const clientEmail = (data.clientEmail as string) || (data.email as string) || '';
-  const clientPhone = (data.clientPhone as string) || (data.mobilePhone as string) || (data.phone as string) || '';
-  const mangomintId = String(data.id || '');
-
-  if (!clientEmail && !clientPhone) return;
-
-  try {
-    const { getAllSessionsAsync, getSessionByIdAsync, saveSessionAsync, sessionReducer } = await import('@/lib/mastermind/session');
-    const sessions = await getAllSessionsAsync();
-
-    // Find matching sessions that aren't already booked
-    for (const session of sessions) {
-      if (session.clinicStatus === 'booked' || session.bookedAppointmentId) continue;
-
-      const sessionEmail = session.patientEmail || (session.intakeData?.email as string) || '';
-      const sessionPhone = (session.intakeData?.phone as string) || '';
-
-      const emailMatch = clientEmail && sessionEmail && clientEmail.toLowerCase() === sessionEmail.toLowerCase();
-      const phoneMatch = clientPhone && sessionPhone && clientPhone.replace(/\D/g, '') === sessionPhone.replace(/\D/g, '');
-
-      if (emailMatch || phoneMatch) {
-        // Mark as booked via reducer for proper activity logging
-        let updated = sessionReducer(session, { type: 'SET_BOOKED', appointmentId: mangomintId });
-        updated = sessionReducer(updated, {
-          type: 'SET_CLINIC_STATUS',
-          status: 'booked',
-          actor: 'Mangomint sync',
-        });
-        await saveSessionAsync(updated);
-        console.error(`[Mangomint] Auto-linked booking ${mangomintId} to consultation ${session.id} (${session.patientName})`);
-        break; // Only link to the most recent matching session
-      }
-    }
-  } catch (err) {
-    console.warn('[Mangomint] Consultation sync lookup failed:', err);
-  }
 }
 
 async function handleAppointmentUpdated(data: Record<string, unknown>) {
@@ -321,7 +232,6 @@ async function handleAppointmentCompleted(data: Record<string, unknown>, payload
     await upsertRecord(Tables.appointments(), null, fields);
   }
 
-  await backfillClientBookingAttribution(data);
   cache.invalidatePrefix('schedule');
   cache.invalidatePrefix('kpi');
   cache.invalidatePrefix('revenue');
@@ -339,9 +249,9 @@ async function handleAppointmentCancelled(data: Record<string, unknown>) {
     ['MangoMint Appointment ID']
   );
 
-  if (existingId) {
-    const cancelReason = (data.cancellationReason as string) || (data.cancelReason as string) || '';
-    const isLateCancellation = (data.isLateCancellation as boolean) || false;
+    if (existingId) {
+      const cancelReason = (data.cancellationReason as string) || (data.cancelReason as string) || '';
+      const isLateCancellation = (data.isLateCancellation as boolean) || false;
 
     await upsertRecord(Tables.appointments(), existingId, {
       Status: 'Cancelled',
@@ -349,7 +259,7 @@ async function handleAppointmentCancelled(data: Record<string, unknown>) {
     });
 
     // Create alert for late cancellations
-    if (isLateCancellation) {
+    if (isLateCancellation && shouldCreateAlertOnce(`mangomint:alert:late-cancellation:${mangomintId}`)) {
       try {
         await rateLimitedQuery(() =>
           new Promise<void>((resolve, reject) => {
@@ -400,26 +310,28 @@ async function handleAppointmentNoshow(data: Record<string, unknown>) {
   const clientName = [(data.clientFirstName as string), (data.clientLastName as string)].filter(Boolean).join(' ') || (data.clientName as string) || 'Client';
   const serviceName = (data.serviceName as string) || 'appointment';
 
-  try {
-    await rateLimitedQuery(() =>
-      new Promise<void>((resolve, reject) => {
-        Tables.alerts().create(
-          [{
-            fields: {
-              Type: 'no_show',
-              Severity: 'warning',
-              Message: `No-show: ${clientName} missed ${serviceName} - charge 100% fee`,
-              'Action Recommended': 'Charge no-show fee. Consider adding to watch list.',
-              Status: 'active',
-            },
-          }],
-          { typecast: true },
-          (err) => { if (err) reject(err); else resolve(); }
-        );
-      })
-    );
-  } catch {
-    // Alert creation is best-effort
+  if (shouldCreateAlertOnce(`mangomint:alert:no-show:${mangomintId}`)) {
+    try {
+      await rateLimitedQuery(() =>
+        new Promise<void>((resolve, reject) => {
+          Tables.alerts().create(
+            [{
+              fields: {
+                Type: 'no_show',
+                Severity: 'warning',
+                Message: `No-show: ${clientName} missed ${serviceName} - charge 100% fee`,
+                'Action Recommended': 'Charge no-show fee. Consider adding to watch list.',
+                Status: 'active',
+              },
+            }],
+            { typecast: true },
+            (err) => { if (err) reject(err); else resolve(); }
+          );
+        })
+      );
+    } catch {
+      // Alert creation is best-effort
+    }
   }
 
   cache.invalidatePrefix('schedule');
@@ -427,6 +339,7 @@ async function handleAppointmentNoshow(data: Record<string, unknown>) {
 }
 
 async function handleSaleCompleted(data: Record<string, unknown>, payload: unknown) {
+  const mangomintSaleId = String(data.id || '');
   const services = (data.services as Array<Record<string, unknown>>) || [];
   const primaryService = services[0];
 
@@ -439,10 +352,15 @@ async function handleSaleCompleted(data: Record<string, unknown>, payload: unkno
     'Service Name': (primaryService?.name as string) || (data.serviceName as string) || 'Treatment',
     Provider: (primaryService?.provider_name as string) || '',
     'Source': 'Mangomint Webhook',
-    'MangoMint Sale ID': String(data.id || ''),
+    'MangoMint Sale ID': mangomintSaleId,
   };
 
-  await upsertRecord(Tables.transactions(), null, fields);
+  // Idempotency: check if this sale already exists
+  const existingId = mangomintSaleId
+    ? await findRecordByField(Tables.transactions(), 'MangoMint Sale ID', mangomintSaleId, ['MangoMint Sale ID'])
+    : null;
+
+  await upsertRecord(Tables.transactions(), existingId, fields);
 
   cache.invalidatePrefix('revenue');
   cache.invalidatePrefix('kpi');
@@ -454,20 +372,21 @@ async function handleClientCreated(data: Record<string, unknown>) {
   const email = (data.email as string) || '';
   if (!name) return;
 
-  const existing = await findClientRecord(email, String(data.id || ''), [
-    FIELDS.clients.email,
-    FIELDS.clients.mangomintClientId,
-  ]);
+  // Check for existing client by email to prevent duplicates
+  if (email) {
+    const existingId = await findRecordByField(Tables.clients(), 'Email', email, ['Email']);
+    if (existingId) return;
+  }
 
   const fields: Record<string, unknown> = {
     Client: name,
     Email: email,
     Phone: (data.mobilePhone as string) || (data.phone as string) || '',
     Status: 'Active',
-    [FIELDS.clients.mangomintClientId]: String(data.id || ''),
+    'MangoMint Client ID': String(data.id || ''),
   };
 
-  await upsertRecord(Tables.clients(), existing?.id || null, fields);
+  await upsertRecord(Tables.clients(), null, fields);
   cache.invalidatePrefix('clients');
 }
 
@@ -476,11 +395,14 @@ async function handleClientUpdated(data: Record<string, unknown>) {
   const email = (data.email as string) || '';
   if (!name) return;
 
-  // Find by Mangomint Client ID first, then by email
+  // Find by Mangomint Client ID first, then fall back to email
   const mangomintId = String(data.id || '');
   let existingId: string | null = null;
 
-  if (email) {
+  if (mangomintId) {
+    existingId = await findRecordByField(Tables.clients(), 'MangoMint Client ID', mangomintId, ['MangoMint Client ID']);
+  }
+  if (!existingId && email) {
     existingId = await findRecordByField(Tables.clients(), 'Email', email, ['Email']);
   }
 
@@ -489,7 +411,7 @@ async function handleClientUpdated(data: Record<string, unknown>) {
     Email: email,
     Phone: (data.mobilePhone as string) || (data.phone as string) || '',
     Status: 'Active',
-    [FIELDS.clients.mangomintClientId]: mangomintId,
+    'MangoMint Client ID': mangomintId,
   };
 
   if (existingId) {
@@ -502,17 +424,24 @@ async function handleClientUpdated(data: Record<string, unknown>) {
 }
 
 async function handleMembershipCreated(data: Record<string, unknown>, payload: unknown) {
+  const mangomintMembershipId = String(data.id || '');
+
   const fields: Record<string, unknown> = {
     Tier: (data.membership_name as string) || (data.membershipName as string) || (data.membership_tier as string) || 'Unknown',
     'Monthly Price': (data.price as number) || (data.monthlyPrice as number) || 0,
     Status: 'Active',
     'Start Date': (data.start_date as string) || (data.startDate as string) || new Date().toISOString().split('T')[0],
     'Billing Frequency': (data.billing_frequency as string) || 'Monthly',
-    'MangoMint Membership ID': String(data.id || ''),
+    'MangoMint Membership ID': mangomintMembershipId,
     'Source': 'Mangomint Webhook',
   };
 
-  await upsertRecord(Tables.memberships(), null, fields);
+  // Idempotency: check if this membership already exists
+  const existingId = mangomintMembershipId
+    ? await findRecordByField(Tables.memberships(), 'MangoMint Membership ID', mangomintMembershipId, ['MangoMint Membership ID'])
+    : null;
+
+  await upsertRecord(Tables.memberships(), existingId, fields);
   cache.invalidatePrefix('kpi');
   cache.invalidatePrefix('clients');
   await forwardToN8n('/webhook/membership-started', payload);
@@ -585,33 +514,66 @@ async function handleMembershipCancelled(data: Record<string, unknown>, payload:
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
+    const mangomintTimestamp = parseMangomintTimestamp(request.headers.get('x-mangomint-timestamp'));
 
-    // MANDATORY: verify webhook signature
-    if (!process.env.MANGOMINT_WEBHOOK_SECRET) {
+    if (!env.MANGOMINT_WEBHOOK_SECRET) {
+      Sentry.captureMessage('Mangomint webhook secret is not configured', { level: 'warning' });
       return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
     }
 
     const signature = request.headers.get('x-mangomint-signature');
-    if (!signature) {
-      logWebhookEvent('mangomint', 'unknown', false, { error: 'Missing signature' });
-      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    const requestId = getMangomintRequestId(request);
+
+    if (!verifyWebhookSignature({
+      rawBody: body,
+      signature,
+      secret: env.MANGOMINT_WEBHOOK_SECRET,
+      signaturePrefix: null,
+    })) {
+      const hasSignature = Boolean(request.headers.get('x-mangomint-signature'));
+      logWebhookEvent(
+        'mangomint',
+        'unknown',
+        false,
+        { error: hasSignature ? 'Invalid signature' : 'Missing signature' },
+      );
+      if (hasSignature) {
+        Sentry.captureMessage('Mangomint webhook received invalid signature', { level: 'warning' });
+      }
+      return NextResponse.json(
+        { error: hasSignature ? 'Invalid signature' : 'Missing signature' },
+        { status: 401 },
+      );
     }
 
-    const crypto = await import('crypto');
-    const expected = crypto
-      .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
-      .update(body)
-      .digest('hex');
-    const sigBuf = Buffer.from(signature, 'utf8');
-    const expBuf = Buffer.from(expected, 'utf8');
-    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
-      logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid signature' });
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    if (isMangomintTimestampReplay(mangomintTimestamp)) {
+      logWebhookEvent('mangomint', 'replay', false, {
+        error: 'Stale or invalid replay timestamp',
+        timestamp: mangomintTimestamp ? String(mangomintTimestamp) : null,
+      });
+      Sentry.captureMessage('Mangomint webhook replay timestamp outside tolerance', { level: 'warning' });
+      return NextResponse.json({ error: 'Webhook replay window expired' }, { status: 401 });
     }
 
-    const payload = JSON.parse(body);
+    let payload;
+    try {
+      payload = mangomintPayloadSchema.parse(JSON.parse(body));
+    } catch {
+      logWebhookEvent('mangomint', 'parse', false, { error: 'Invalid JSON payload' });
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    logWebhookEvent('mangomint', 'parse', true, { bodySize: body.length });
     const event = payload.event || payload.type || 'unknown';
-    const data = payload.data || payload;
+    const data = payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data)
+      ? payload.data as Record<string, unknown>
+      : {};
+
+    if (shouldSkipDuplicateWebhook(event, data, body, requestId)) {
+      logWebhookEvent('mangomint', event, true, { note: 'Duplicate webhook skipped' });
+      captureWebhookEvent('mangomint', event, true, { duplicate: true });
+      return NextResponse.json({ received: true, event, duplicate: true });
+    }
 
     logWebhookEvent('mangomint', event, true, { dataPreview: JSON.stringify(data).substring(0, 200) });
 
@@ -681,4 +643,30 @@ export async function POST(request: NextRequest) {
 // GET - reject non-POST requests (no health check info exposed)
 export async function GET() {
   return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+}
+function parseMangomintTimestamp(value: string | null): number | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const timestamp = Number(trimmed);
+  if (!Number.isFinite(timestamp)) return null;
+
+  return trimmed.length <= 10 ? timestamp * 1000 : timestamp;
+}
+
+function isMangomintTimestampReplay(timestamp: number | null): boolean {
+  if (!timestamp) return false;
+
+  const now = Date.now();
+  return Math.abs(now - timestamp) > WEBHOOK_TIMESTAMP_TOLERANCE_MS;
+}
+
+function getMangomintRequestId(request: NextRequest): string | null {
+  return (
+    request.headers.get('x-mangomint-request-id') ??
+    request.headers.get('x-mangomint-delivery-id') ??
+    request.headers.get('x-request-id') ??
+    null
+  );
 }

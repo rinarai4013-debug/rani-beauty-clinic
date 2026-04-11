@@ -1,1 +1,1 @@
-export default function BenefitsUsage(props: Record<string, unknown>) { return null; }
+export default function BenefitsUsage() { return null; }

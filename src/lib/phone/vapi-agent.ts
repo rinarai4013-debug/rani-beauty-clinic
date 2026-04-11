@@ -1,3 +1,5 @@
+import { env } from '@/lib/env';
+
 /**
  * Vapi AI Phone Agent Engine
  *
@@ -188,7 +190,8 @@ type VapiCallLogsApiResponse = VapiCallLog[] | {
 function parseVapiCallLogs(value: unknown): VapiCallLog[] {
   if (Array.isArray(value)) {
     return value.filter((entry): entry is VapiCallLog => {
-      return !!entry && typeof entry === 'object' && !Array.isArray(entry);
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false;
+      return true;
     });
   }
 
@@ -260,7 +263,7 @@ export function configurePhoneAgent(
   overrides?: Partial<PhoneAgentConfig>
 ): PhoneAgentSetup {
   const config: PhoneAgentConfig = {
-    assistantId: process.env.VAPI_ASSISTANT_ID || '',
+    assistantId: env.VAPI_ASSISTANT_ID || '',
     clinicName: 'Rani Beauty Clinic',
     clinicPhone: '(425) 539-4440',
     clinicAddress: '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
@@ -540,8 +543,7 @@ export function computeAnalyticsFromCallLogs(calls: readonly VapiCallLog[]): Cal
     intentCounts[intent].count++;
     intentCounts[intent].totalDuration += duration;
     const successEvaluation = call.analysis?.successEvaluation;
-    const bookingSignal =
-      successEvaluation === true || successEvaluation === 'true' || call.analysis?.structuredData?.booked === true;
+    const bookingSignal = successEvaluation === true || successEvaluation === 'true' || call.analysis?.structuredData?.booked === true;
     if (bookingSignal) {
       intentCounts[intent].conversions++;
       bookingCount++;

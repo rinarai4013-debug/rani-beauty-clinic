@@ -89,7 +89,7 @@ export default function PayrollSummary() {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}K`} tick={{ fontSize: 10 }} />
-              <Tooltip formatter={((value: number) => formatCurrency(value)) as any} />
+              <Tooltip formatter={(value: number) => formatCurrency(value)} />
               <Legend wrapperStyle={{ fontSize: '11px' }} />
               <Bar dataKey="revenue" name="Service Revenue" fill="#2CA01C" radius={[4, 4, 0, 0]} />
               <Bar dataKey="baseSalary" name="Base Salary" fill="#3B82F6" radius={[4, 4, 0, 0]} />

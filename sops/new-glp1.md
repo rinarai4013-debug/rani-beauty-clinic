@@ -67,5 +67,5 @@
 - No Rx without completed Qualiphy GFE
 - No GFE without required labs
 - Quarterly labs required for ongoing patients
-- Always say "compounded medication" — never reference brand names
+- "Compounded medication" not "generic Ozempic"
 - Rina does NOT diagnose or prescribe

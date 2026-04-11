@@ -38,20 +38,6 @@
   ],
   "exclude": [
     "node_modules",
-    "scripts",
-    "src/stories",
-    "remotion",
-    "**/__tests__/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.stories.ts",
-    "**/*.stories.tsx",
-    "src/lib/saas",
-    "src/lib/sdk",
-    "src/lib/tenant",
-    "src/lib/integrations/quickbooks",
-    "src/app/api/tenant"
+    "scripts"
   ]
 }

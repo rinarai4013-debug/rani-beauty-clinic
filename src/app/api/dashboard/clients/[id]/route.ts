@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { z } from 'zod';
 
 interface AppointmentFields {
   'Service Name': string;
@@ -50,6 +51,10 @@ interface ReviewFields {
   'Sentiment': string;
 }
 
+const clientQuerySchema = z.object({
+  full: z.enum(['true', 'false']).optional(),
+});
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -65,7 +70,14 @@ export async function GET(
 
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const full = searchParams.get('full') === 'true';
+    const parsedQuery = clientQuerySchema.safeParse(
+      Object.fromEntries(searchParams.entries())
+    );
+    if (!parsedQuery.success) {
+      return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+    }
+
+    const full = parsedQuery.data.full === 'true';
 
     const cacheKey = full ? `client-full-${id}` : `client-${id}`;
     const cached = cache.get<unknown>(cacheKey);

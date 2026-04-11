@@ -93,7 +93,7 @@ export default function CommunicationAnalytics({
               <YAxis tick={{ fontSize: 10, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #E5E7EB' }}
-                labelFormatter={((d: any) => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })) as any}
+                labelFormatter={(d) => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               />
               <Area type="monotone" dataKey="sent" stroke="#0F1D2C" fill="url(#colorSent)" strokeWidth={2} name="Sent" />
               <Area type="monotone" dataKey="opened" stroke="#C9A96E" fill="url(#colorOpened)" strokeWidth={2} name="Opened" />
@@ -200,7 +200,7 @@ export default function CommunicationAnalytics({
               />
               <Tooltip
                 contentStyle={{ fontSize: 11, borderRadius: 8 }}
-                formatter={((v: number) => [`$${v.toLocaleString()}`, 'Revenue']) as any}
+                formatter={(v: number) => [`$${v.toLocaleString()}`, 'Revenue']}
               />
               <Bar dataKey="revenue" fill="#0F1D2C" radius={[0, 4, 4, 0]} />
             </BarChart>

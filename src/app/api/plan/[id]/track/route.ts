@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { z } from 'zod';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
+import { env } from '@/lib/env';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getNextStatus, getAutoFollowUp } from '@/lib/plan-builder/plan-status';
 import type { PlanStatus } from '@/lib/plan-builder/plan-status';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
-import { z } from 'zod';
 
 interface TreatmentPlanFields {
   [key: string]: unknown;
@@ -24,20 +26,32 @@ const ACTION_TRIGGER_MAP: Record<string, string> = {
 };
 
 const VALID_ACTIONS = Object.keys(ACTION_TRIGGER_MAP);
-const TrackBodySchema = z.object({
-  action: z.enum(VALID_ACTIONS as [string, ...string[]]).optional(),
+const TRACK_BODY_SCHEMA = z.object({
+  action: z.enum(['view', 'financing_clicked', 'booking_clicked']).optional(),
+  code: z.string().trim().regex(/^\d{6}$/).optional(),
 });
+
+const TRACK_QUERY_SCHEMA = z.object({
+  code: z.string().trim().regex(/^\d{6}$/).optional(),
+});
+
+function generateAccessCode(recordId: string): string {
+  const secret = env.DASHBOARD_JWT_SECRET;
+  if (!secret) throw new Error('DASHBOARD_JWT_SECRET is required');
+  const hash = crypto.createHmac('sha256', secret).update(recordId).digest('hex');
+  const numericHash = parseInt(hash.slice(0, 8), 16);
+  return String(numericHash % 1000000).padStart(6, '0');
+}
 
 // ─── POST Handler ─────────────────────────────────────────────────
 // Called from client viewer to track plan views and interactions
-// No auth required - this is a public tracking endpoint
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit("view", ip, RATE_LIMITS.VIEW);
+  const { allowed, resetIn } = rateLimit('plan-track', ip, RATE_LIMITS.VIEW);
   if (!allowed) return rateLimitResponse(resetIn);
 
   try {
@@ -47,13 +61,48 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
     }
 
-    // Parse the action from the request body (defaults to 'view' for backward compat)
-    const parsed = TrackBodySchema.safeParse(await request.json().catch(() => ({})));
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    let body = {};
+    try {
+      const rawBody = await request.json();
+      const parsed = TRACK_BODY_SCHEMA.safeParse(rawBody);
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: 'Invalid request payload', details: parsed.error.flatten().fieldErrors },
+          { status: 400 }
+        );
+      }
+      body = parsed.data;
+    } catch {
+      body = {};
     }
 
-    const action = parsed.data.action || 'view';
+    const parsedBody = body as z.infer<typeof TRACK_BODY_SCHEMA>;
+    const queryCode = TRACK_QUERY_SCHEMA.safeParse({
+      code: new URL(request.url).searchParams.get('code'),
+    });
+
+    if (!queryCode.success) {
+      return NextResponse.json(
+        { error: 'Invalid access code in query parameters' },
+        { status: 400 }
+      );
+    }
+
+    const providedCode =
+      typeof parsedBody.code === 'string'
+        ? parsedBody.code
+        : queryCode.data.code;
+    const expectedCode = generateAccessCode(id);
+
+    if (providedCode !== expectedCode) {
+      return NextResponse.json({ error: 'ACCESS_CODE_REQUIRED' }, { status: 403 });
+    }
+
+    // Parse the action from the request body (defaults to 'view' for backward compat)
+    let action = 'view';
+    if (typeof parsedBody.action === 'string' && VALID_ACTIONS.includes(parsedBody.action)) {
+      action = parsedBody.action;
+    }
 
     const trigger = ACTION_TRIGGER_MAP[action];
     if (!trigger) {

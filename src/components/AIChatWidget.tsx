@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Loader2, Sparkles, Calendar } from 'lucide-react';
-import { useAttribution } from '@/hooks/useAttribution';
 
 interface ChatAction {
   type: 'book_now';
@@ -30,10 +29,6 @@ export default function AIChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const attribution = useAttribution({
-    source: 'ai_chat_widget',
-    leadOffer: 'AI Concierge Consultation',
-  });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -94,7 +89,6 @@ export default function AIChatWidget() {
             service: 'AI Chat Lead',
             message: `Captured from AI chat. Last message: ${trimmed}`,
             smsConsent,
-            ...attribution,
           }),
         }).catch(() => {});
       }

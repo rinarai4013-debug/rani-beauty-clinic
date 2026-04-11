@@ -60,7 +60,7 @@ export const menPages: MenPage[] = [
       {
         heading: "How Much Does Botox Cost for Men?",
         content:
-          "Because male facial muscles are stronger and require more units, men should budget approximately 20 to 30 percent more than the female average for Botox. At Rani Beauty Clinic, a typical male forehead and frown line treatment requires 30 to 50 units, while adding crow's feet brings the total to 50 to 80 units. At our competitive per-unit pricing, a comprehensive male Botox session generally ranges from $400 to $1,200 depending on the number of areas treated. Membership pricing reduces per-unit costs, and Flexible financing is available to spread the investment into monthly payments. Many men find that the confidence and professional edge Botox provides makes it one of their best investments in personal presentation.",
+          "Because male facial muscles are stronger and require more units, men should budget approximately 20 to 30 percent more than the female average for Botox. At Rani Beauty Clinic, a typical male forehead and frown line treatment requires 30 to 50 units, while adding crow's feet brings the total to 50 to 80 units. At our competitive per-unit pricing, a comprehensive male Botox session generally ranges from $400 to $1,200 depending on the number of areas treated. Membership pricing reduces per-unit costs, and Cherry financing is available to spread the investment into monthly payments. Many men find that the confidence and professional edge Botox provides makes it one of their best investments in personal presentation.",
       },
       {
         heading: "Maintaining Your Results: The Male Botox Schedule",
@@ -136,7 +136,7 @@ export const menPages: MenPage[] = [
       {
         heading: "Cost and Financing for Male Laser Hair Removal",
         content:
-          "Male laser hair removal costs more per session for large body areas due to the increased treatment zone, but delivers exceptional long-term value compared to a lifetime of grooming. Individual session pricing depends on the treatment area size. Package pricing for a 6-session series provides significant per-session savings. Multi-area packages combining back, chest, and shoulders deliver the best overall value. Flexible financing allows you to spread your investment into monthly payments, and membership pricing further reduces per-session costs for ongoing maintenance treatments.",
+          "Male laser hair removal costs more per session for large body areas due to the increased treatment zone, but delivers exceptional long-term value compared to a lifetime of grooming. Individual session pricing depends on the treatment area size. Package pricing for a 6-session series provides significant per-session savings. Multi-area packages combining back, chest, and shoulders deliver the best overall value. Cherry financing allows you to spread your investment into monthly payments, and membership pricing further reduces per-session costs for ongoing maintenance treatments.",
       },
     ],
     resultsExpectations: [
@@ -278,7 +278,7 @@ export const menPages: MenPage[] = [
       {
         heading: "Cost, Duration, and Financing",
         content:
-          "Physician-supervised GLP-1 programs at Rani Beauty Clinic range from $399 to $599 per month, which includes medication, bloodwork, monitoring, and physician oversight. Most men are on the program for 6 to 12 months depending on their weight loss goals. Some patients transition to a lower maintenance dose after reaching their goal weight. Flexible financing is available for pre-paid multi-month programs, and HSA/FSA accounts may cover physician-supervised medical weight management when documented as medically necessary.",
+          "Physician-supervised GLP-1 programs at Rani Beauty Clinic range from $399 to $599 per month, which includes medication, bloodwork, monitoring, and physician oversight. Most men are on the program for 6 to 12 months depending on their weight loss goals. Some patients transition to a lower maintenance dose after reaching their goal weight. Cherry financing is available for pre-paid multi-month programs, and HSA/FSA accounts may cover physician-supervised medical weight management when documented as medically necessary.",
       },
     ],
     resultsExpectations: [
@@ -349,7 +349,7 @@ export const menPages: MenPage[] = [
       {
         heading: "Cost and Treatment Schedule",
         content:
-          "Peptide therapy pricing depends on the specific peptides prescribed and treatment frequency. Protocols are personalized, so costs vary based on your individual plan. Most initial protocols involve weekly or bi-weekly IM injections for 8 to 12 weeks, with the option to continue on a maintenance schedule. Flexible financing is available for multi-week protocols, and membership pricing reduces the per-injection cost for ongoing treatment. Schedule a consultation to receive a personalized protocol recommendation with transparent pricing.",
+          "Peptide therapy pricing depends on the specific peptides prescribed and treatment frequency. Protocols are personalized, so costs vary based on your individual plan. Most initial protocols involve weekly or bi-weekly IM injections for 8 to 12 weeks, with the option to continue on a maintenance schedule. Cherry financing is available for multi-week protocols, and membership pricing reduces the per-injection cost for ongoing treatment. Schedule a consultation to receive a personalized protocol recommendation with transparent pricing.",
       },
     ],
     resultsExpectations: [
@@ -509,7 +509,7 @@ export const menPages: MenPage[] = [
       { question: "Can I combine NAD+ with testosterone therapy?", answer: "Yes. NAD+ and testosterone optimization are complementary therapies. NAD+ supports the enzymatic pathways that influence hormone production and cellular sensitivity to hormones. Many of our male patients maintain both therapies as part of a comprehensive wellness protocol." },
       { question: "How often do I need NAD+ injections?", answer: "After a loading phase of more frequent injections during the first 2 to 4 weeks, most men transition to weekly or bi-weekly maintenance injections. Some patients maintain monthly sessions. Your optimal schedule depends on your goals, activity level, and response to treatment." },
       { question: "Is NAD+ therapy safe?", answer: "NAD+ is a naturally occurring molecule in your body. Supplementing with pharmaceutical-grade NAD+ through IM injection has a favorable safety profile when administered under physician supervision. Most patients experience no side effects. Dr. Landfield monitors all patients to ensure safe, effective treatment." },
-      { question: "What is the cost of NAD+ injections?", answer: "NAD+ IM injections at Rani Beauty Clinic range from $150 to $500 per session depending on the dose prescribed. Membership pricing and multi-session packages reduce the per-injection cost. Flexible financing is available for pre-paid protocols." },
+      { question: "What is the cost of NAD+ injections?", answer: "NAD+ IM injections at Rani Beauty Clinic range from $150 to $500 per session depending on the dose prescribed. Membership pricing and multi-session packages reduce the per-injection cost. Cherry financing is available for pre-paid protocols." },
     ],
   },
   {
@@ -562,7 +562,7 @@ export const menPages: MenPage[] = [
       {
         heading: "Testosterone Therapy Cost and Investment",
         content:
-          "Testosterone therapy at Rani Beauty Clinic is structured as a comprehensive program including initial bloodwork, ongoing monitoring labs, physician consultations, and medication management. Monthly costs depend on the delivery method and monitoring frequency. HSA and FSA accounts often cover testosterone therapy when prescribed for documented low testosterone, and we provide complete documentation for your benefits provider. Flexible financing is available for initial bloodwork and startup costs. When you consider that optimized testosterone improves every dimension of male health and performance, the investment delivers substantial return in quality of life.",
+          "Testosterone therapy at Rani Beauty Clinic is structured as a comprehensive program including initial bloodwork, ongoing monitoring labs, physician consultations, and medication management. Monthly costs depend on the delivery method and monitoring frequency. HSA and FSA accounts often cover testosterone therapy when prescribed for documented low testosterone, and we provide complete documentation for your benefits provider. Cherry financing is available for initial bloodwork and startup costs. When you consider that optimized testosterone improves every dimension of male health and performance, the investment delivers substantial return in quality of life.",
       },
     ],
     resultsExpectations: [

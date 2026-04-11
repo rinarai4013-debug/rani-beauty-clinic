@@ -3,7 +3,6 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { trackAnalyticsEvent, trackCTAClick, trackBookingOpen, trackPhoneClick } from "@/lib/analytics/events";
-import { useAttribution } from "@/hooks/useAttribution";
 import { MapPin, Phone, Clock, Mail, CheckCircle, Calendar } from "lucide-react";
 import Hero from "@/components/sections/Hero";
 import SectionLabel from "@/components/ui/SectionLabel";
@@ -94,10 +93,6 @@ export default function ContactPageClient() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const attribution = useAttribution({
-    source: "contact_page",
-    leadOffer: formData.service || "Consultation Request",
-  });
 
   // Pre-fill service from query param (e.g. /contact?service=GLP-1+Weight+Loss)
   useEffect(() => {
@@ -129,10 +124,7 @@ export default function ContactPageClient() {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          ...attribution,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
@@ -241,7 +233,16 @@ export default function ContactPageClient() {
                       Your message has been sent successfully. Our team will contact
                       you within 24 hours to confirm your consultation.
                     </p>
-                    <div className="mt-6">
+                    <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                      <a
+                        href={clinicInfo.booking.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-rani-gold px-6 py-3 font-body text-sm font-semibold text-white shadow-sm transition-all hover:bg-rani-gold/90 hover:shadow-md"
+                      >
+                        <Calendar size={16} />
+                        Book Now
+                      </a>
                       <Button onClick={() => setIsSubmitted(false)}>
                         Send Another Message
                       </Button>

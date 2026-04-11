@@ -2,6 +2,45 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readStorage } from '@/lib/plaid/storage';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
+import { z } from 'zod';
+
+const plaidTransactionsQuerySchema = z
+  .object({
+    page: z.coerce.number().int().min(1).max(500).optional(),
+    limit: z.coerce.number().int().min(1).max(200).optional(),
+    status: z.string().trim().min(1).max(120).optional(),
+    category: z.string().trim().min(1).max(120).optional(),
+    startDate: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    endDate: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    search: z.string().trim().max(200).optional(),
+  })
+  .partial()
+  .transform((value) => ({
+    page: value.page ?? 1,
+    limit: value.limit ?? 50,
+    status: value.status,
+    category: value.category,
+    startDate: value.startDate,
+    endDate: value.endDate,
+    search: value.search,
+  }))
+  .superRefine((data, context) => {
+    if (data.startDate && data.endDate && data.startDate > data.endDate) {
+      context.addIssue({
+        code: 'custom',
+        message: 'startDate must be before or equal to endDate',
+        path: ['startDate'],
+      });
+    }
+  });
 
 export async function GET(request: NextRequest) {
   const session = await getSession();
@@ -12,13 +51,22 @@ export async function GET(request: NextRequest) {
     const storage = await readStorage();
     const { searchParams } = new URL(request.url);
 
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const status = searchParams.get('status'); // unmatched, auto-matched, manually-matched, excluded, categorized
-    const category = searchParams.get('category');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const search = searchParams.get('search');
+    const parsedQuery = plaidTransactionsQuerySchema.safeParse(
+      Object.fromEntries(searchParams.entries())
+    );
+    if (!parsedQuery.success) {
+      return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+    }
+
+    const {
+      page,
+      limit,
+      status,
+      category,
+      startDate,
+      endDate,
+      search,
+    } = parsedQuery.data;
 
     let transactions = [...storage.transactions];
 

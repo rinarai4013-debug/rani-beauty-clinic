@@ -21,7 +21,7 @@ export const BRAND = {
   },
   clinic: {
     phone: "(425) 539-4440",
-    address: "401 Olympia Ave NE, Suite 101, Renton, WA 98056",
+    address: "401 Olympia Ave NE #101, Renton, WA 98056",
     website: "ranibeautyclinic.com",
     rating: "4.9",
     reviewCount: "127+",

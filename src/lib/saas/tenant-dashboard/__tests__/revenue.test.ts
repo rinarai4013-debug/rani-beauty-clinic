@@ -34,11 +34,11 @@ function createMockDb(transactionCount = 10): TenantDatabaseClient {
 
   return {
     tenantId: 'test-tenant',
-    fetchAll: vi.fn(async () => transactions),
-    fetchFirst: vi.fn(async () => []),
-    createRecord: vi.fn(async () => 'new-id'),
-    updateRecord: vi.fn(async () => {}),
-    deleteRecord: vi.fn(async () => {}),
+    fetchAll: jest.fn(async () => transactions),
+    fetchFirst: jest.fn(async () => []),
+    createRecord: jest.fn(async () => 'new-id'),
+    updateRecord: jest.fn(async () => {}),
+    deleteRecord: jest.fn(async () => {}),
   } as unknown as TenantDatabaseClient;
 }
 

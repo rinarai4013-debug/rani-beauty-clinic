@@ -39,7 +39,7 @@ const CLINIC_BASE = {
       closes: "19:00",
     },
   ],
-  priceRange: "$$",
+  priceRange: "$$$",
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: clinicInfo.reviews.aggregateRating,
@@ -142,7 +142,7 @@ export function HomepageSchema() {
   const localBusiness = {
     "@context": "https://schema.org",
     ...CLINIC_BASE,
-    "@type": ["LocalBusiness", "MedicalBusiness"] as const,
+    "@type": ["LocalBusiness", "MedicalBusiness", "HealthAndBeautyBusiness"] as const,
     "@id": `${clinicInfo.website}/#localbusiness`,
     name: clinicInfo.name,
     alternateName: "Rani Medspa Renton WA",
@@ -586,7 +586,7 @@ export function LocationSchema({ location, services }: LocationSchemaProps) {
 
   const localBusiness = {
     "@context": "https://schema.org",
-    "@type": ["LocalBusiness", "MedicalBusiness"],
+    "@type": ["LocalBusiness", "MedicalBusiness", "HealthAndBeautyBusiness"],
     "@id": `${locationUrl}/#localbusiness`,
     name: `${clinicInfo.name} - Serving ${location.city}, ${location.state}`,
     description:
@@ -602,7 +602,7 @@ export function LocationSchema({ location, services }: LocationSchemaProps) {
       longitude: clinicInfo.geo.longitude,
     },
     openingHoursSpecification: CLINIC_BASE.openingHoursSpecification,
-    priceRange: "$$",
+    priceRange: "$$$",
     aggregateRating: CLINIC_BASE.aggregateRating,
     sameAs: CLINIC_BASE.sameAs,
     areaServed: {

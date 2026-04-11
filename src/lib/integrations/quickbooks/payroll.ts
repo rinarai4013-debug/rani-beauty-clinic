@@ -12,23 +12,6 @@ import type {
   PayrollSummary,
 } from './types';
 
-function parseIsoDate(value: string): Date {
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(Date.UTC(year, (month || 1) - 1, day || 1, 12));
-}
-
-function getInclusiveMonthCount(startDate: string, endDate: string): number {
-  const start = parseIsoDate(startDate);
-  const end = parseIsoDate(endDate);
-  return Math.max(1, (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + end.getUTCMonth() - start.getUTCMonth() + 1);
-}
-
-function getWeekSpan(startDate: string, endDate: string): number {
-  const start = parseIsoDate(startDate);
-  const end = parseIsoDate(endDate);
-  return Math.max(1, (end.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
-}
-
 /* ─── Provider Configuration ────────────────────────────────── */
 
 export interface ProviderConfig {
@@ -149,7 +132,11 @@ export function estimatePayrollTaxes(
   endDate: string,
 ): PayrollTaxEstimate {
   const commissions = calculateCommissions(startDate, endDate);
-  const months = getInclusiveMonthCount(startDate, endDate);
+
+  // Calculate months in period
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const months = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth() + 1);
 
   let totalGrossPayroll = 0;
 
@@ -203,7 +190,9 @@ export function getBenefitsCostAllocation(
   startDate: string,
   endDate: string,
 ): BenefitsCost[] {
-  const months = getInclusiveMonthCount(startDate, endDate);
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const months = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth() + 1);
 
   return providerConfigs.map(config => {
     const monthlyBenefits = config.benefitsCostMonthly;
@@ -249,7 +238,9 @@ export function getRevenuePerEmployeeHour(
   endDate: string,
 ): RevenuePerHour[] {
   const commissions = calculateCommissions(startDate, endDate);
-  const weeks = getWeekSpan(startDate, endDate);
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const weeks = Math.max(1, (end.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
 
   return providerConfigs.map(config => {
     const commission = commissions.find(c => c.providerName === config.name);
@@ -306,8 +297,10 @@ export async function getLaborCostAnalysis(
   const commissions = calculateCommissions(startDate, endDate);
   const taxes = estimatePayrollTaxes(startDate, endDate);
   const benefits = getBenefitsCostAllocation(startDate, endDate);
-  const start = parseIsoDate(startDate);
-  const months = getInclusiveMonthCount(startDate, endDate);
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const months = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth() + 1);
 
   let totalRevenue = 0;
   let totalLaborCost = 0;
@@ -384,7 +377,9 @@ export async function getPayrollSummary(
   const benefits = getBenefitsCostAllocation(startDate, endDate);
   const revenuePerHour = getRevenuePerEmployeeHour(startDate, endDate);
 
-  const months = getInclusiveMonthCount(startDate, endDate);
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const months = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth() + 1);
   const weeks = months * 4.33;
 
   let totalPayroll = 0;

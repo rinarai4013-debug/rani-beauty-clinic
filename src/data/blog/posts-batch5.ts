@@ -202,7 +202,7 @@ How does Sofwave pricing compare to alternatives? A surgical facelift in the Sea
 
 The value calculation depends on what you are comparing Sofwave to. If your alternative is doing nothing and accepting the current state of your skin, then Sofwave is a discretionary expense that you need to weigh against other financial priorities. If your alternative is a surgical procedure, Sofwave represents a fraction of the cost with no downtime, no surgical risks, and no recovery period.
 
-We also offer financing options to make the investment more manageable. Afterpay, Cherry, and PatientFi are available for qualified applicants. These are not gimmicks. They are practical tools that allow patients to invest in treatments that would otherwise be out of reach for a single payment.
+We also offer financing options to make the investment more manageable. Afterpay allows you to split the cost into four interest-free payments over six weeks for treatments up to $2,000. Cherry offers financing up to 24 months at competitive rates. PatientFi provides longer-term financing options for higher-value treatment plans. These are not gimmicks. They are practical tools that allow patients to invest in treatments that would otherwise be out of reach for a single payment.
 
 Is Sofwave worth it? Based on our clinical experience and patient feedback, the answer for most patients is yes, but with a condition. Sofwave is worth it if you are an appropriate candidate with realistic expectations. If you have mild to moderate skin laxity and understand that results develop gradually over three to six months, the improvement in skin firmness, facial contour, and overall appearance represents genuine value. If you expect instant, dramatic results equivalent to a surgical facelift, you will be disappointed regardless of the treatment you choose.
 
@@ -214,7 +214,7 @@ The best way to determine if Sofwave is worth it for your specific situation is 
       },
       {
         question: "Does insurance cover Sofwave?",
-        answer: "Sofwave is considered a cosmetic procedure and is not covered by health insurance. However, we offer several financing options to make the investment more accessible, including Afterpay, Cherry, and PatientFi. Ask us about flexible payment plans during your consultation."
+        answer: "Sofwave is considered a cosmetic procedure and is not covered by health insurance. However, we offer several financing options to make the investment more accessible. Afterpay splits payments into four interest-free installments. Cherry offers up to 24 months of financing. PatientFi provides longer-term options for comprehensive treatment plans."
       },
       {
         question: "Is Sofwave cheaper than a facelift?",

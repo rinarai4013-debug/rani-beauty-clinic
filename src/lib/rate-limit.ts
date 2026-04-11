@@ -5,6 +5,22 @@
 
 const stores = new Map<string, Map<string, { count: number; resetAt: number }>>();
 
+export interface RateLimitStore {
+  get(routeKey: string): Map<string, { count: number; resetAt: number }> | undefined;
+  set(routeKey: string, store: Map<string, { count: number; resetAt: number }>): void;
+}
+
+let storeImpl: RateLimitStore = {
+  get: (routeKey) => stores.get(routeKey),
+  set: (routeKey, store) => {
+    stores.set(routeKey, store);
+  },
+};
+
+export function setRateLimitStore(store: RateLimitStore) {
+  storeImpl = store;
+}
+
 interface RateLimitConfig {
   /** Max requests allowed in the window */
   limit: number;
@@ -22,17 +38,17 @@ export const RATE_LIMITS = {
   AI: { limit: 10, windowMs: 60_000 },
   /** Plan viewing - relaxed: 30 per minute */
   VIEW: { limit: 30, windowMs: 60_000 },
-  /** Booking endpoints - moderate: 15 per minute */
-  BOOKING: { limit: 15, windowMs: 60_000 },
+  /** Booking actions - moderate: 10 per minute */
+  BOOKING: { limit: 10, windowMs: 60_000 },
   /** Webhooks - generous: 100 per minute */
   WEBHOOK: { limit: 100, windowMs: 60_000 },
 } as const;
 
 function getStore(routeKey: string): Map<string, { count: number; resetAt: number }> {
-  let store = stores.get(routeKey);
+  let store = storeImpl.get(routeKey);
   if (!store) {
     store = new Map();
-    stores.set(routeKey, store);
+    storeImpl.set(routeKey, store);
   }
   return store;
 }

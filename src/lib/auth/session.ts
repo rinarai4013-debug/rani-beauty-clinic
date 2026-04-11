@@ -1,31 +1,33 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import type { SessionPayload, UserRole } from '@/types/auth';
+import { env } from '@/lib/env';
 
 const COOKIE_NAME = 'rani-session';
 
-/** Lazy-initialised JWT secret — avoids crashing at import time during `next build`. */
-let _secret: Uint8Array | null = null;
 function getSecret(): Uint8Array {
-  if (!_secret) {
-    if (!process.env.DASHBOARD_JWT_SECRET) {
-      throw new Error('DASHBOARD_JWT_SECRET is required');
-    }
-    _secret = new TextEncoder().encode(process.env.DASHBOARD_JWT_SECRET);
+  const raw = env.DASHBOARD_JWT_SECRET;
+  if (!raw) {
+    throw new Error('DASHBOARD_JWT_SECRET is required');
   }
-  return _secret;
+  return new TextEncoder().encode(raw);
 }
 
 const sessionPayloadSchema = z.object({
   username: z.string().min(1),
   role: z.enum(['ceo', 'frontdesk', 'provider', 'marketing', 'operations']),
   displayName: z.string().min(1),
+  tenantId: z.string().min(1).optional(),
 });
 
-export async function createSession(username: string, role: UserRole, displayName: string): Promise<string> {
-  const token = await new SignJWT({ username, role, displayName })
+export async function createSession(
+  username: string,
+  role: UserRole,
+  displayName: string,
+  tenantId?: string,
+): Promise<string> {
+  const token = await new SignJWT({ username, role, displayName, ...(tenantId ? { tenantId } : {}) })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('24h')
@@ -52,29 +54,12 @@ export async function getSession(): Promise<SessionPayload | null> {
   return verifySession(token);
 }
 
-export async function getSessionFromRequest(
-  request: NextRequest,
-  allowedRoles?: UserRole[]
-): Promise<SessionPayload | null> {
-  const token = request.cookies.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-
-  const session = await verifySession(token);
-  if (!session) return null;
-
-  if (allowedRoles && !allowedRoles.includes(session.role)) {
-    return null;
-  }
-
-  return session;
-}
-
 export function getSessionCookieConfig(token: string) {
   return {
     name: COOKIE_NAME,
     value: token,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'strict' as const,
     maxAge: 86400, // 24 hours
     path: '/',

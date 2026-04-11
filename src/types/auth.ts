@@ -15,7 +15,6 @@ export type Permission =
   | 'view_settings'
   | 'manage_settings'
   | 'dismiss_alerts'
-  | 'manage_bank_connections'
   | 'entry_lead'
   | 'entry_consult_notes'
   | 'entry_sale'
@@ -26,13 +25,14 @@ export type Permission =
   | 'entry_eod_recap'
   | 'entry_room_issue'
   | 'entry_ceo_note'
+  | 'manage_bank_connections'
   | 'entry_plan_builder';
 
 export interface SessionPayload {
   username: string;
   role: UserRole;
-  name: string;
   displayName: string;
+  tenantId?: string;
   iat?: number;
   exp?: number;
 }

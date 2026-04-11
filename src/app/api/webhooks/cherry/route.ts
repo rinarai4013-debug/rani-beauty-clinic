@@ -1,20 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { FIELDS } from '@/lib/airtable/tables';
+import { env } from '@/lib/env';
+import { verifyWebhookSignature } from '@/lib/webhooks/verify-signature';
 import { z } from 'zod';
 
 // ─── Types ────────────────────────────────────────────────────────
-const CherryWebhookDataSchema = z.object({
-  amount: z.number().nonnegative().optional(),
-  customerId: z.string().trim().min(1).optional(),
-  status: z.string().trim().min(1).optional(),
-  applicationId: z.string().trim().min(1).optional(),
-});
-
-const CherryWebhookPayloadSchema = z.object({
-  event: z.string().trim().min(1),
-  data: CherryWebhookDataSchema,
-});
+interface CherryWebhookPayload {
+  event: string;
+  data: {
+    amount?: number;
+    customerId?: string;
+    status?: string;
+    applicationId?: string;
+  };
+}
 
 interface TreatmentPlanFields {
   [key: string]: unknown;
@@ -22,14 +23,46 @@ interface TreatmentPlanFields {
   'Client Name'?: string;
 }
 
+const checkoutCompletedDataSchema = z.object({
+  customerId: z.string().optional(),
+  applicationId: z.string().optional(),
+  amount: z.number().optional(),
+  status: z.string().optional(),
+});
+
+const cherryWebhookSchema = z.object({
+  event: z.string().min(1),
+  data: checkoutCompletedDataSchema,
+});
+
 // ─── POST Handler ─────────────────────────────────────────────────
 // Receives Cherry payment webhook events
 
 export async function POST(request: NextRequest) {
   try {
-    const parsed = CherryWebhookPayloadSchema.safeParse(await request.json().catch(() => null));
+    const rawBody = await request.text();
+    if (!env.CHERRY_WEBHOOK_SECRET) {
+      console.error('[Cherry Webhook] CHERRY_WEBHOOK_SECRET is not configured');
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    }
+
+    const signature = request.headers.get('x-cherry-signature');
+    if (!verifyWebhookSignature({
+      rawBody,
+      signature,
+      secret: env.CHERRY_WEBHOOK_SECRET,
+      signaturePrefix: 'sha256=',
+    })) {
+      console.error('[Cherry Webhook] Invalid or missing signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const json = JSON.parse(rawBody) as unknown;
+    const parsed = cherryWebhookSchema.safeParse(json);
     if (!parsed.success) {
-      console.error('[Cherry Webhook] Invalid payload:', parsed.error.issues[0]?.message);
+      console.error('[Cherry Webhook] Invalid payload shape', {
+        error: parsed.error.issues,
+      });
       return NextResponse.json({ received: true, warning: 'Invalid payload' }, { status: 200 });
     }
 
@@ -75,7 +108,7 @@ export async function POST(request: NextRequest) {
           Tables.treatmentPlans(),
           1,
           {
-            filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${customerId.replace(/'/g, "\\'")}')`,
+            filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${sanitizeFormulaValue(customerId)}')`,
             sort: [{ field: FIELDS.treatmentPlans.createdDate, direction: 'desc' }],
           },
           true

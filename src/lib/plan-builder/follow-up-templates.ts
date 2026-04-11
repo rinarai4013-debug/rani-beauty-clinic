@@ -59,7 +59,7 @@ export const FOLLOW_UP_TEMPLATES: Record<string, FollowUpTemplate> = {
       </div>
     </div>
     <p style="text-align:center;color:#999;font-size:12px;margin-top:32px;">
-      Rani Beauty Clinic · 401 Olympia Ave NE, Suite 101, Renton, WA 98056<br>
+      Rani Beauty Clinic · 401 Olympia Ave NE #101, Renton, WA 98056<br>
       <a href="tel:+14255394440" style="color:#C9A96E;text-decoration:none;">{{clinicPhone}}</a>
     </p>
   </div>
@@ -119,7 +119,7 @@ export const FOLLOW_UP_TEMPLATES: Record<string, FollowUpTemplate> = {
       </p>
     </div>
     <p style="text-align:center;color:#999;font-size:12px;margin-top:32px;">
-      Rani Beauty Clinic · 401 Olympia Ave NE, Suite 101, Renton, WA 98056<br>
+      Rani Beauty Clinic · 401 Olympia Ave NE #101, Renton, WA 98056<br>
       <a href="tel:+14255394440" style="color:#C9A96E;text-decoration:none;">{{clinicPhone}}</a>
     </p>
   </div>
@@ -193,7 +193,7 @@ Action Required: Reach out within the next 2 hours for highest conversion probab
       </div>
     </div>
     <p style="text-align:center;color:#999;font-size:12px;margin-top:32px;">
-      Rani Beauty Clinic · 401 Olympia Ave NE, Suite 101, Renton, WA 98056<br>
+      Rani Beauty Clinic · 401 Olympia Ave NE #101, Renton, WA 98056<br>
       <a href="tel:+14255394440" style="color:#C9A96E;text-decoration:none;">{{clinicPhone}}</a>
     </p>
   </div>
@@ -248,7 +248,7 @@ Action Required: Reach out within the next 2 hours for highest conversion probab
       </p>
     </div>
     <p style="text-align:center;color:#999;font-size:12px;margin-top:32px;">
-      Rani Beauty Clinic · 401 Olympia Ave NE, Suite 101, Renton, WA 98056<br>
+      Rani Beauty Clinic · 401 Olympia Ave NE #101, Renton, WA 98056<br>
       <a href="tel:+14255394440" style="color:#C9A96E;text-decoration:none;">{{clinicPhone}}</a>
     </p>
   </div>

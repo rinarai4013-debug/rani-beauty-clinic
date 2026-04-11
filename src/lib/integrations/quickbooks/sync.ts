@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { qboClient } from './client';
+import { env } from '@/lib/env';
 import type {
   QBOAccount,
   QBOInvoice,
@@ -450,7 +451,7 @@ export async function handleWebhook(
 
   for (const event of notification.eventNotifications) {
     const realmId = event.realmId;
-    const currentRealmId = process.env.QBO_REALM_ID;
+    const currentRealmId = env.QBO_REALM_ID;
 
     if (currentRealmId && realmId !== currentRealmId) {
       errors.push(`Realm ID mismatch: expected ${currentRealmId}, got ${realmId}`);

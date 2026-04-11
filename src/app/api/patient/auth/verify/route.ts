@@ -7,7 +7,7 @@ import {
 } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 const requestSchema = z.object({
   token: z.string().min(1),
@@ -20,17 +20,12 @@ interface ClientRecord {
 }
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
-  if (!allowed) return rateLimitResponse(resetIn);
-
   try {
-    const body = await request.json().catch(() => null);
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('patient-magic-link-verify', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-    }
-
+    const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 
     if (!parsed.success) {

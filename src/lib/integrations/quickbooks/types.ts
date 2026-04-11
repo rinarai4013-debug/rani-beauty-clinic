@@ -647,9 +647,9 @@ export interface QBOReport {
 export interface QBOCDCResponse {
   CDCResponse: Array<{
     QueryResponse: Array<{
-      [entityType: string]: Array<Record<string, unknown>> | undefined;
-      startPosition?: undefined;
-      maxResults?: undefined;
+      [entityType: string]: Array<Record<string, unknown>>;
+      startPosition?: never;
+      maxResults?: never;
     }>;
   }>;
   time: string;
@@ -659,10 +659,10 @@ export interface QBOCDCResponse {
 
 export interface QBOQueryResponse<T> {
   QueryResponse: {
-    [key: string]: T[] | undefined;
-    startPosition?: undefined;
-    maxResults?: undefined;
-    totalCount?: undefined;
+    [key: string]: T[];
+    startPosition?: never;
+    maxResults?: never;
+    totalCount?: never;
   };
   time: string;
 }

@@ -132,9 +132,9 @@ describe('buildReminderSchedule', () => {
 
 describe('generateReminderContent', () => {
   const urls = {
-    confirm: 'https://www.ranibeautyclinic.com/confirm/apt-1',
-    reschedule: 'https://www.ranibeautyclinic.com/reschedule/apt-1',
-    cancel: 'https://www.ranibeautyclinic.com/cancel/apt-1',
+    confirm: 'https://ranibeautyclinic.com/confirm/apt-1',
+    reschedule: 'https://ranibeautyclinic.com/reschedule/apt-1',
+    cancel: 'https://ranibeautyclinic.com/cancel/apt-1',
   };
 
   it('generates 7-day email content', () => {
@@ -238,7 +238,7 @@ describe('checkLateArrivals', () => {
 
 describe('createNoShowFollowUp', () => {
   it('creates 3-step follow-up sequence', () => {
-    const followUp = createNoShowFollowUp(mockAppointment, 'https://www.ranibeautyclinic.com/book');
+    const followUp = createNoShowFollowUp(mockAppointment, 'https://ranibeautyclinic.com/book');
 
     expect(followUp.sequence.length).toBe(3);
     expect(followUp.sequence[0].channel).toBe('sms');
@@ -247,7 +247,7 @@ describe('createNoShowFollowUp', () => {
   });
 
   it('includes client name in messages', () => {
-    const followUp = createNoShowFollowUp(mockAppointment, 'https://www.ranibeautyclinic.com/book');
+    const followUp = createNoShowFollowUp(mockAppointment, 'https://ranibeautyclinic.com/book');
 
     for (const step of followUp.sequence) {
       expect(step.message).toContain('Jane');
@@ -255,7 +255,7 @@ describe('createNoShowFollowUp', () => {
   });
 
   it('includes service name in messages', () => {
-    const followUp = createNoShowFollowUp(mockAppointment, 'https://www.ranibeautyclinic.com/book');
+    const followUp = createNoShowFollowUp(mockAppointment, 'https://ranibeautyclinic.com/book');
 
     for (const step of followUp.sequence) {
       expect(step.message).toContain('Botox');
@@ -263,7 +263,7 @@ describe('createNoShowFollowUp', () => {
   });
 
   it('all steps start as pending', () => {
-    const followUp = createNoShowFollowUp(mockAppointment, 'https://www.ranibeautyclinic.com/book');
+    const followUp = createNoShowFollowUp(mockAppointment, 'https://ranibeautyclinic.com/book');
 
     for (const step of followUp.sequence) {
       expect(step.status).toBe('pending');

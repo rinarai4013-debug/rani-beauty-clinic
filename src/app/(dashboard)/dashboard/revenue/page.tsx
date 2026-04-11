@@ -1,1 +1,5 @@
-export default function Page() { return null; }
+import NinetyDayWarRoom from '@/components/dashboard/revenue/NinetyDayWarRoom';
+
+export default function RevenuePage() {
+  return <NinetyDayWarRoom />;
+}

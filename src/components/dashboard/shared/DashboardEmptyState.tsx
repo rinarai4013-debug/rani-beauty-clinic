@@ -39,7 +39,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 interface DashboardEmptyStateProps {
-  icon?: keyof typeof ICON_MAP | LucideIcon | React.ReactNode;
+  icon?: keyof typeof ICON_MAP | LucideIcon;
   title: string;
   description?: string;
   action?: {
@@ -61,17 +61,13 @@ export default function DashboardEmptyState({
   action,
   compact = false,
 }: DashboardEmptyStateProps) {
-  // If icon is a string key, look it up; if it's a LucideIcon component, use directly; otherwise treat as ReactNode
-  const isLucideIcon = typeof icon === 'function';
-  const isStringKey = typeof icon === 'string';
-  const IconComponent = isStringKey ? ICON_MAP[icon] ?? BarChart3 : isLucideIcon ? icon as LucideIcon : null;
-  const iconNode = IconComponent ? null : (icon as React.ReactNode);
+  const Icon = typeof icon === 'string' ? ICON_MAP[icon] ?? BarChart3 : icon;
 
   if (compact) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
         <div className="w-10 h-10 rounded-full bg-rani-cream flex items-center justify-center mb-3">
-          {IconComponent ? <IconComponent className="w-5 h-5 text-rani-muted" /> : iconNode}
+          <Icon className="w-5 h-5 text-rani-muted" />
         </div>
         <p className="text-sm font-body text-rani-muted">{title}</p>
         {description && (
@@ -84,7 +80,7 @@ export default function DashboardEmptyState({
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rani-cream to-rani-gold-light flex items-center justify-center mb-5">
-        {IconComponent ? <IconComponent className="w-8 h-8 text-rani-navy/40" /> : iconNode}
+        <Icon className="w-8 h-8 text-rani-navy/40" />
       </div>
       <h3 className="text-lg font-heading text-rani-navy mb-2">{title}</h3>
       {description && (

@@ -23,7 +23,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     state: 'WA',
     slug: 'medical-weight-loss-renton-wa',
     metaTitle: 'Medical Weight Loss in Renton, WA | GLP-1 Program | Rani Beauty Clinic',
-    metaDescription: 'Physician-supervised GLP-1 weight loss in Renton, WA. Semaglutide and Tirzepatide injection programs with in-house blood work. The Rani Protocol starting from $399.',
+    metaDescription: 'Physician-supervised GLP-1 weight loss in Renton, WA. Semaglutide and Tirzepatide injection programs with in-house blood work. The Rani Protocol starts at $399/mo.',
     heroHeading: 'Medical Weight Loss in Renton, WA',
     heroSubheading: 'Physician-supervised GLP-1 injection programs with The Rani Protocol',
     content: `<p>Rani Beauty Clinic is Renton's trusted destination for physician-supervised medical weight loss. Located at 401 Olympia Ave NE, Suite 101, our clinic offers The Rani Protocol, a comprehensive GLP-1 weight management program featuring Semaglutide and Tirzepatide injections under the medical direction of Dr. Alexander Landfield, our board-certified Medical Director.</p>
@@ -36,7 +36,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Renton residents love the convenience of our location near the Renton Highlands and just minutes from The Landing shopping center. Our clinic is open seven days a week from 10 AM to 7 PM, making it easy to fit weekly injection appointments into your schedule. Free on-site parking is available, and most appointments take just 15-20 minutes.</p>
 
-<p>The Rani Protocol with Semaglutide starts from $399, and our Tirzepatide program is available from $599. Both programs include medication, weekly injections, monthly blood work, and all provider consultations. Flexible payment options available for qualified applicants. Call (425) 539-4440 or book your weight management consultation online to start your transformation.</p>`,
+<p>The Rani Protocol with Semaglutide starts at $399 per month, and our Tirzepatide program is available from $599 per month. Both programs include medication, weekly injections, monthly blood work, and all provider consultations. Financing through PatientFi and Cherry is available for qualified applicants. Call (425) 539-4440 or book your weight management consultation online to start your transformation.</p>`,
     nearbyAreas: ['bellevue-wa', 'kent-wa', 'tukwila-wa', 'newcastle-wa', 'mercer-island-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -56,7 +56,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Our GLP-1 program includes a comprehensive initial consultation with health assessment, in-house blood work (CMP, lipid panel, thyroid, A1C), custom medication selection between Semaglutide and Tirzepatide, weekly injection appointments with weight and vitals tracking, and monthly lab monitoring. Many Bellevue patients appreciate that they never need to visit a separate lab facility since we handle all blood draws in-clinic.</p>
 
-<p>Bellevue is a city that values excellence in everything from its restaurants along Bellevue Way to the technology campuses that line the 520 corridor. At Rani Beauty Clinic, we bring that same standard of excellence to medical weight management. The Rani Protocol with Semaglutide starts from $399, and Tirzepatide programs begin from $599. Flexible payment options available for qualified applicants.</p>
+<p>Bellevue is a city that values excellence in everything from its restaurants along Bellevue Way to the technology campuses that line the 520 corridor. At Rani Beauty Clinic, we bring that same standard of excellence to medical weight management. The Rani Protocol with Semaglutide starts at $399/month, and Tirzepatide programs begin at $599/month. Financing is available through PatientFi and Cherry for qualified applicants.</p>
 
 <p>Ready to start your physician-supervised weight loss journey? Call (425) 539-4440 or book your consultation online. We look forward to helping Bellevue residents achieve meaningful, sustainable results with The Rani Protocol.</p>`,
     nearbyAreas: ['kirkland-wa', 'redmond-wa', 'newcastle-wa', 'mercer-island-wa', 'issaquah-wa'],
@@ -76,7 +76,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Our program starts with a thorough consultation and baseline blood work drawn right in our clinic. We test your metabolic panel, lipid levels, thyroid function, and A1C before recommending a medication. Semaglutide and Tirzepatide are both injectable GLP-1 receptor agonists, but they work through slightly different mechanisms. Dr. Landfield will recommend the best option based on your health profile, goals, and insurance considerations.</p>
 
-<p>From downtown Kirkland, take I-405 South toward Renton. Exit at NE 44th Street and head east to reach our clinic at 401 Olympia Ave NE, Suite 101. Free parking is available and we are open seven days a week. Semaglutide programs start from $399 and Tirzepatide from $599. Call (425) 539-4440 to schedule your consultation.</p>`,
+<p>From downtown Kirkland, take I-405 South toward Renton. Exit at NE 44th Street and head east to reach our clinic at 401 Olympia Ave NE, Suite 101. Free parking is available and we are open seven days a week. Semaglutide programs start at $399/month and Tirzepatide at $599/month. Call (425) 539-4440 to schedule your consultation.</p>`,
     nearbyAreas: ['bellevue-wa', 'redmond-wa', 'bothell-wa', 'woodinville-wa', 'kenmore-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -94,7 +94,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Whether you work near the Microsoft campus, in Redmond Town Center, or in the Marymoor area, our Renton location is an easy commute down I-405. We draw all blood work in-house and handle medication administration on-site, so Redmond patients never need to coordinate between multiple providers. Weekly injection visits take about 15-20 minutes.</p>
 
-<p>Our clinic is open seven days a week from 10 AM to 7 PM with free parking. Semaglutide starts from $399 and Tirzepatide from $599, including medication, injections, labs, and all consultations. Flexible payment options available. Call (425) 539-4440 or book online.</p>`,
+<p>Our clinic is open seven days a week from 10 AM to 7 PM with free parking. Semaglutide starts at $399/month and Tirzepatide at $599/month, including medication, injections, labs, and all consultations. Financing is available through PatientFi and Cherry. Call (425) 539-4440 or book online.</p>`,
     nearbyAreas: ['kirkland-wa', 'bellevue-wa', 'sammamish-wa', 'woodinville-wa', 'bothell-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -112,7 +112,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>From Kent Station or the East Hill neighborhoods, head north on WA-167 to reach our clinic at 401 Olympia Ave NE, Suite 101 in Renton. The short drive makes it easy to fit weekly injection appointments into your routine. We are open seven days a week from 10 AM to 7 PM with free parking on-site.</p>
 
-<p>Programs start from $399 for Semaglutide and from $599 for Tirzepatide, including all medication, injections, labs, and consultations. Flexible payment options available. Call (425) 539-4440 to get started.</p>`,
+<p>Programs start at $399/month for Semaglutide and $599/month for Tirzepatide, including all medication, injections, labs, and consultations. Financing available through PatientFi and Cherry. Call (425) 539-4440 to get started.</p>`,
     nearbyAreas: ['auburn-wa', 'covington-wa', 'renton-wa', 'tukwila-wa', 'federal-way-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -128,7 +128,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Auburn sits in the heart of the Green River Valley, a community that values hard work and practical results. Our medical weight loss program aligns with those values. We start every patient with a full health assessment and blood work, select the right medication for your profile, and guide you through a proven titration schedule with weekly check-ins.</p>
 
-<p>From downtown Auburn or the Muckleshoot area, take WA-167 North to Renton. Our clinic at 401 Olympia Ave NE, Suite 101 has free parking and is open seven days a week. Semaglutide starts from $399, Tirzepatide from $599. Call (425) 539-4440 to book your consultation.</p>`,
+<p>From downtown Auburn or the Muckleshoot area, take WA-167 North to Renton. Our clinic at 401 Olympia Ave NE, Suite 101 has free parking and is open seven days a week. Semaglutide starts at $399/month, Tirzepatide at $599/month. Call (425) 539-4440 to book your consultation.</p>`,
     nearbyAreas: ['kent-wa', 'federal-way-wa', 'covington-wa', 'maple-valley-wa', 'enumclaw-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -144,7 +144,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Federal Way is a growing community near the shores of Puget Sound, home to the Wild Waves Theme Park and Dash Point State Park. Our patients from Federal Way appreciate that Rani Beauty Clinic provides a complete weight management experience without needing to visit multiple providers or labs.</p>
 
-<p>Dr. Landfield oversees every aspect of the program, from initial assessment through dose titration and maintenance. Programs start from $399 for Semaglutide and from $599 for Tirzepatide. Open seven days a week at 401 Olympia Ave NE, Suite 101, Renton. Call (425) 539-4440.</p>`,
+<p>Dr. Landfield oversees every aspect of the program, from initial assessment through dose titration and maintenance. Programs start at $399/month for Semaglutide and $599/month for Tirzepatide. Open seven days a week at 401 Olympia Ave NE, Suite 101, Renton. Call (425) 539-4440.</p>`,
     nearbyAreas: ['kent-wa', 'auburn-wa', 'des-moines-wa', 'tukwila-wa', 'normandy-park-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -160,7 +160,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Our proximity to Tukwila makes weekly injection appointments incredibly convenient. The entire visit, from check-in to injection to checkout, typically takes 15-20 minutes. We handle all blood work in-house and provide ongoing monitoring under Dr. Landfield's medical direction.</p>
 
-<p>Programs start from $399 for Semaglutide, from $599 for Tirzepatide. Open seven days a week with free parking. Call (425) 539-4440 or book online.</p>`,
+<p>Programs start at $399/month for Semaglutide, $599/month for Tirzepatide. Open seven days a week with free parking. Call (425) 539-4440 or book online.</p>`,
     nearbyAreas: ['renton-wa', 'seatac-wa', 'burien-wa', 'kent-wa', 'newcastle-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -176,7 +176,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>The SeaTac community deserves access to the same caliber of physician-supervised weight management available anywhere in the region. At Rani Beauty Clinic, every patient receives a comprehensive health assessment, in-house blood work, and a customized treatment plan. We track your progress weekly and adjust your protocol as needed.</p>
 
-<p>Located at 401 Olympia Ave NE, Suite 101 in Renton. Programs from $399. Open seven days a week, 10 AM to 7 PM. Call (425) 539-4440.</p>`,
+<p>Located at 401 Olympia Ave NE, Suite 101 in Renton. Programs from $399/month. Open seven days a week, 10 AM to 7 PM. Call (425) 539-4440.</p>`,
     nearbyAreas: ['tukwila-wa', 'burien-wa', 'des-moines-wa', 'renton-wa', 'normandy-park-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -192,7 +192,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Burien is a close-knit community with a growing downtown and easy access to regional amenities. Our Renton clinic provides everything Burien residents need for medical weight loss: initial consultation, blood work, weekly injections, and monthly lab monitoring, all under one roof.</p>
 
-<p>Dr. Landfield oversees every patient's protocol, ensuring safe dose titration and effective results. Programs from $399. Call (425) 539-4440 or visit us at 401 Olympia Ave NE, Suite 101. Open seven days a week.</p>`,
+<p>Dr. Landfield oversees every patient's protocol, ensuring safe dose titration and effective results. Programs from $399/month. Call (425) 539-4440 or visit us at 401 Olympia Ave NE, Suite 101. Open seven days a week.</p>`,
     nearbyAreas: ['seatac-wa', 'tukwila-wa', 'normandy-park-wa', 'des-moines-wa', 'renton-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -208,7 +208,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Mercer Island is one of the most affluent communities in the Pacific Northwest, and our patients from the island expect the highest standards of medical care. Dr. Alexander Landfield personally oversees every GLP-1 protocol, from initial assessment through maintenance dosing. Our in-house blood work capabilities mean you never need to schedule separate lab visits.</p>
 
-<p>Programs start from $399 for Semaglutide and from $599 for Tirzepatide. Located at 401 Olympia Ave NE, Suite 101, with free parking. Open seven days a week. Call (425) 539-4440.</p>`,
+<p>Programs start at $399/month for Semaglutide and $599/month for Tirzepatide. Located at 401 Olympia Ave NE, Suite 101, with free parking. Open seven days a week. Call (425) 539-4440.</p>`,
     nearbyAreas: ['bellevue-wa', 'renton-wa', 'newcastle-wa', 'issaquah-wa', 'kirkland-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -224,7 +224,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>GLP-1 medications work alongside your existing healthy habits. Many Issaquah patients report that the appetite regulation from Semaglutide or Tirzepatide allows them to make better food choices and fuel their outdoor activities more effectively. All protocols are supervised by Dr. Alexander Landfield with in-house blood work and weekly monitoring.</p>
 
-<p>Programs from $399. Visit us at 401 Olympia Ave NE, Suite 101, Renton. Open seven days a week. Call (425) 539-4440.</p>`,
+<p>Programs from $399/month. Visit us at 401 Olympia Ave NE, Suite 101, Renton. Open seven days a week. Call (425) 539-4440.</p>`,
     nearbyAreas: ['sammamish-wa', 'bellevue-wa', 'snoqualmie-wa', 'north-bend-wa', 'mercer-island-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -240,7 +240,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Sammamish Plateau residents value health and wellness, from the trails around Beaver Lake to the Pine Lake community. Our program fits naturally into that lifestyle, providing medical support that enhances your existing commitment to healthy living. Weekly injection appointments take just 15-20 minutes.</p>
 
-<p>Programs from $399. Open seven days a week at 401 Olympia Ave NE, Suite 101, Renton. Call (425) 539-4440 or book online.</p>`,
+<p>Programs from $399/month. Open seven days a week at 401 Olympia Ave NE, Suite 101, Renton. Call (425) 539-4440 or book online.</p>`,
     nearbyAreas: ['issaquah-wa', 'redmond-wa', 'bellevue-wa', 'snoqualmie-wa', 'fall-city-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -256,7 +256,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Woodinville is known for its tasting rooms and scenic trails along the Sammamish River. Our patients from this area appreciate a medical weight loss program that fits their lifestyle without demanding extreme dietary restrictions. GLP-1 medications help regulate appetite naturally, so you can still enjoy Woodinville's culinary scene while making progress toward your weight goals.</p>
 
-<p>Programs from $399. Open seven days a week at 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
+<p>Programs from $399/month. Open seven days a week at 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
     nearbyAreas: ['bothell-wa', 'kirkland-wa', 'redmond-wa', 'kenmore-wa', 'sammamish-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -272,7 +272,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Bothell sits at the northern edge of our service area, where the Sammamish River meets the urban centers of the Eastside. Our patients from Bothell and the Canyon Park area appreciate the comprehensive nature of our program: consultation, labs, injections, and follow-ups all happen at one clinic.</p>
 
-<p>Programs from $399. Open seven days, 10 AM to 7 PM, at 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
+<p>Programs from $399/month. Open seven days, 10 AM to 7 PM, at 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
     nearbyAreas: ['kenmore-wa', 'kirkland-wa', 'woodinville-wa', 'shoreline-wa', 'redmond-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -288,7 +288,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Kenmore's location near Burke-Gilman Trail and Log Boom Park makes it a community of active residents who value their health. Our GLP-1 program supports your lifestyle by providing medical-grade appetite regulation that complements exercise and healthy eating.</p>
 
-<p>Programs from $399. Call (425) 539-4440 or visit 401 Olympia Ave NE, Suite 101, Renton. Open seven days a week.</p>`,
+<p>Programs from $399/month. Call (425) 539-4440 or visit 401 Olympia Ave NE, Suite 101, Renton. Open seven days a week.</p>`,
     nearbyAreas: ['bothell-wa', 'shoreline-wa', 'kirkland-wa', 'lake-forest-park-wa', 'woodinville-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -304,7 +304,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
 
 <p>Shoreline is a residential community between Seattle and the north end, home to families and professionals who prioritize quality healthcare. Our program includes initial consultation, in-house blood work, weekly injections, and monthly lab monitoring, all supervised by Dr. Alexander Landfield.</p>
 
-<p>Programs from $399. Open seven days a week at 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
+<p>Programs from $399/month. Open seven days a week at 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
     nearbyAreas: ['lake-forest-park-wa', 'kenmore-wa', 'bothell-wa', 'renton-wa', 'tukwila-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -318,7 +318,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 programs for Lake Forest Park residents',
     content: `<p>Lake Forest Park residents can find physician-supervised GLP-1 weight loss at Rani Beauty Clinic in Renton, about 30 minutes south. This charming lakeside community values quality of life, and The Rani Protocol supports that with medically guided weight management using Semaglutide or Tirzepatide.</p>
 
-<p>Our program includes everything under one roof: consultation, blood work, weekly injections, and ongoing monitoring by Dr. Alexander Landfield. Programs start from $399. Visit 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
+<p>Our program includes everything under one roof: consultation, blood work, weekly injections, and ongoing monitoring by Dr. Alexander Landfield. Programs start at $399/month. Visit 401 Olympia Ave NE, Suite 101. Call (425) 539-4440.</p>`,
     nearbyAreas: ['kenmore-wa', 'shoreline-wa', 'bothell-wa', 'kirkland-wa', 'renton-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -332,7 +332,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Just 10 minutes from Newcastle to GLP-1 care at Rani',
     content: `<p>Newcastle residents are among our closest neighbors, just 10 minutes from Rani Beauty Clinic in Renton via Coal Creek Parkway. The Rani Protocol offers physician-supervised GLP-1 weight management with Semaglutide and Tirzepatide, including in-house blood work and weekly injection appointments.</p>
 
-<p>Newcastle's hillside community overlooks Lake Washington and the Eastside, home to professionals and families who value both health and convenience. Our proximity makes weekly injection visits effortless. Programs from $399. Call (425) 539-4440.</p>`,
+<p>Newcastle's hillside community overlooks Lake Washington and the Eastside, home to professionals and families who value both health and convenience. Our proximity makes weekly injection visits effortless. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['bellevue-wa', 'renton-wa', 'mercer-island-wa', 'issaquah-wa', 'tukwila-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -346,7 +346,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 programs for Covington residents',
     content: `<p>Covington residents can access The Rani Protocol at our Renton clinic, approximately 20 minutes northwest via Kent-Kangley Road. Our GLP-1 program features Semaglutide and Tirzepatide with full medical supervision from Dr. Alexander Landfield, including in-house blood work and weekly injection appointments.</p>
 
-<p>Covington is a growing community in southeast King County where residents value practical, results-driven care. Programs from $399. Visit 401 Olympia Ave NE, Suite 101 in Renton. Call (425) 539-4440.</p>`,
+<p>Covington is a growing community in southeast King County where residents value practical, results-driven care. Programs from $399/month. Visit 401 Olympia Ave NE, Suite 101 in Renton. Call (425) 539-4440.</p>`,
     nearbyAreas: ['kent-wa', 'maple-valley-wa', 'auburn-wa', 'black-diamond-wa', 'renton-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -360,7 +360,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'GLP-1 injection programs for Maple Valley families',
     content: `<p>Maple Valley residents surrounded by the foothills of the Cascades can access physician-supervised GLP-1 weight management at Rani Beauty Clinic in Renton, about 25 minutes northwest via Maple Valley Highway. The Rani Protocol combines Semaglutide or Tirzepatide with comprehensive medical oversight.</p>
 
-<p>Maple Valley's outdoor-oriented community values health and family. Our GLP-1 program supports your active lifestyle with medical-grade weight management. Programs from $399. Call (425) 539-4440.</p>`,
+<p>Maple Valley's outdoor-oriented community values health and family. Our GLP-1 program supports your active lifestyle with medical-grade weight management. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['covington-wa', 'black-diamond-wa', 'kent-wa', 'renton-wa', 'issaquah-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -374,7 +374,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 programs for Black Diamond residents',
     content: `<p>Black Diamond residents can access The Rani Protocol at Rani Beauty Clinic in Renton, approximately 30 minutes northwest. This small town at the edge of the Cascades foothills may feel remote, but physician-supervised GLP-1 weight management is within reach. Our program features Semaglutide and Tirzepatide with in-house labs and weekly injections supervised by Dr. Landfield.</p>
 
-<p>Programs from $399. Open seven days a week at 401 Olympia Ave NE, Suite 101, Renton. Call (425) 539-4440.</p>`,
+<p>Programs from $399/month. Open seven days a week at 401 Olympia Ave NE, Suite 101, Renton. Call (425) 539-4440.</p>`,
     nearbyAreas: ['maple-valley-wa', 'covington-wa', 'enumclaw-wa', 'auburn-wa', 'kent-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -388,7 +388,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'GLP-1 programs for Enumclaw and Plateau residents',
     content: `<p>Enumclaw residents at the gateway to Mount Rainier can access physician-supervised GLP-1 weight management at Rani Beauty Clinic in Renton, about 40 minutes northwest via WA-169. The Rani Protocol provides Semaglutide and Tirzepatide with complete medical oversight.</p>
 
-<p>The Enumclaw Plateau is home to ranchers, families, and outdoor enthusiasts who deserve access to quality medical weight loss care. Programs from $399 with in-house blood work and weekly injections. Call (425) 539-4440.</p>`,
+<p>The Enumclaw Plateau is home to ranchers, families, and outdoor enthusiasts who deserve access to quality medical weight loss care. Programs from $399/month with in-house blood work and weekly injections. Call (425) 539-4440.</p>`,
     nearbyAreas: ['black-diamond-wa', 'auburn-wa', 'maple-valley-wa', 'covington-wa', 'kent-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -402,7 +402,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 care for Snoqualmie Valley residents',
     content: `<p>Snoqualmie residents living near the iconic Snoqualmie Falls can access physician-supervised GLP-1 weight management at Rani Beauty Clinic in Renton, about 35 minutes west via I-90. The Rani Protocol with Semaglutide or Tirzepatide provides medically guided weight loss with in-house labs and weekly injection appointments.</p>
 
-<p>The Snoqualmie Valley's natural beauty inspires a healthy lifestyle, and our GLP-1 program supports those goals with medical-grade weight management. Programs from $399. Call (425) 539-4440.</p>`,
+<p>The Snoqualmie Valley's natural beauty inspires a healthy lifestyle, and our GLP-1 program supports those goals with medical-grade weight management. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['north-bend-wa', 'issaquah-wa', 'sammamish-wa', 'fall-city-wa', 'bellevue-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -416,7 +416,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'GLP-1 programs for North Bend outdoor enthusiasts',
     content: `<p>North Bend hikers and outdoor enthusiasts can access physician-supervised GLP-1 weight management at Rani Beauty Clinic in Renton, about 40 minutes west via I-90. Near the trailheads of Mount Si and Rattlesnake Ledge, North Bend residents value fitness, and our GLP-1 program complements an active lifestyle.</p>
 
-<p>The Rani Protocol offers Semaglutide and Tirzepatide with in-house blood work and weekly monitoring by Dr. Landfield. Programs from $399. Call (425) 539-4440.</p>`,
+<p>The Rani Protocol offers Semaglutide and Tirzepatide with in-house blood work and weekly monitoring by Dr. Landfield. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['snoqualmie-wa', 'issaquah-wa', 'sammamish-wa', 'fall-city-wa', 'bellevue-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -430,7 +430,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 care, 15 minutes from Des Moines waterfront',
     content: `<p>Des Moines residents along the Puget Sound waterfront can access The Rani Protocol at Rani Beauty Clinic in Renton, about 15 minutes east via WA-516. Our GLP-1 program features Semaglutide and Tirzepatide with physician supervision and in-house blood work.</p>
 
-<p>Des Moines Marina and the surrounding community attract residents who value a balanced, healthy lifestyle. Our medical weight loss program provides the clinical support to help you reach your goals. Programs from $399. Call (425) 539-4440.</p>`,
+<p>Des Moines Marina and the surrounding community attract residents who value a balanced, healthy lifestyle. Our medical weight loss program provides the clinical support to help you reach your goals. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['seatac-wa', 'burien-wa', 'federal-way-wa', 'normandy-park-wa', 'kent-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -444,7 +444,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'GLP-1 programs for the Normandy Park community',
     content: `<p>Normandy Park residents can access physician-supervised GLP-1 weight management at Rani Beauty Clinic in Renton, about 18 minutes east. This quiet, coastal community values quality of life, and The Rani Protocol supports your health goals with medically guided Semaglutide or Tirzepatide programs.</p>
 
-<p>In-house blood work, weekly injections, and physician oversight from Dr. Landfield. Programs from $399. Call (425) 539-4440.</p>`,
+<p>In-house blood work, weekly injections, and physician oversight from Dr. Landfield. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['des-moines-wa', 'burien-wa', 'seatac-wa', 'federal-way-wa', 'tukwila-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -458,7 +458,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 programs at Rani Beauty Clinic',
     content: `<p>Skykomish area residents seeking physician-supervised GLP-1 weight management can visit Rani Beauty Clinic in Renton. While the drive from the Skykomish corridor is longer, our comprehensive program means fewer total trips: initial consultation, labs, and injection schedules are optimized for patients traveling from greater distances.</p>
 
-<p>The Rani Protocol with Semaglutide or Tirzepatide. Programs from $399. Call (425) 539-4440.</p>`,
+<p>The Rani Protocol with Semaglutide or Tirzepatide. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['snoqualmie-wa', 'north-bend-wa', 'fall-city-wa', 'issaquah-wa', 'redmond-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -472,7 +472,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'GLP-1 programs for the Fall City and Snoqualmie Valley community',
     content: `<p>Fall City residents in the scenic Snoqualmie Valley can access physician-supervised GLP-1 weight management at Rani Beauty Clinic in Renton, about 35 minutes west. Our clinic offers The Rani Protocol with Semaglutide and Tirzepatide, complete with in-house blood work and medical oversight from Dr. Alexander Landfield.</p>
 
-<p>Fall City's rural character and proximity to hiking trails draw health-conscious residents. Our GLP-1 program supports your active lifestyle with medical-grade weight management. Programs from $399. Call (425) 539-4440.</p>`,
+<p>Fall City's rural character and proximity to hiking trails draw health-conscious residents. Our GLP-1 program supports your active lifestyle with medical-grade weight management. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['snoqualmie-wa', 'carnation-wa', 'north-bend-wa', 'issaquah-wa', 'sammamish-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },
@@ -486,7 +486,7 @@ export const medicalWeightLossGeoPages: ServiceGeoPage[] = [
     heroSubheading: 'Physician-supervised GLP-1 care for the Carnation community',
     content: `<p>Carnation residents in the upper Snoqualmie Valley can access The Rani Protocol at Rani Beauty Clinic in Renton, approximately 35-40 minutes southwest. Known for Remlinger Farms and the Tolt River, Carnation is a farming community where residents value straightforward, practical care.</p>
 
-<p>Our GLP-1 program offers exactly that: no gimmicks, just physician-supervised Semaglutide or Tirzepatide with in-house labs and weekly monitoring. Programs from $399. Call (425) 539-4440.</p>`,
+<p>Our GLP-1 program offers exactly that: no gimmicks, just physician-supervised Semaglutide or Tirzepatide with in-house labs and weekly monitoring. Programs from $399/month. Call (425) 539-4440.</p>`,
     nearbyAreas: ['fall-city-wa', 'snoqualmie-wa', 'woodinville-wa', 'redmond-wa', 'sammamish-wa'],
     services: ['GLP-1 Weight Management', 'Semaglutide', 'Tirzepatide', 'Blood Work', 'The Rani Protocol'],
   },

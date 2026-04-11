@@ -15,7 +15,6 @@ interface ButtonProps {
   icon?: boolean;
   type?: "button" | "submit";
   target?: string;
-  disabled?: boolean;
 }
 
 const variants = {
@@ -36,7 +35,6 @@ export default function Button({
   icon = false,
   type = "button",
   target,
-  disabled = false,
 }: ButtonProps) {
   const baseStyles =
     variant === "ghost"
@@ -66,7 +64,6 @@ export default function Button({
           href={href}
           target={target}
           rel={target === "_blank" ? "noopener noreferrer" : undefined}
-          onClick={onClick}
           className={`${baseStyles} ${variants[variant]} relative ${className}`}
         >
           {content}
@@ -76,7 +73,6 @@ export default function Button({
     return (
       <Link
         href={href}
-        onClick={onClick}
         className={`${baseStyles} ${variants[variant]} relative ${className}`}
       >
         {content}
@@ -88,7 +84,6 @@ export default function Button({
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
       className={`${baseStyles} ${variants[variant]} relative ${className}`}
     >
       {content}

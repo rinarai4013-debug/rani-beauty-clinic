@@ -555,7 +555,7 @@ function buildScenarios(input: ForecastInput, baseline: MonthlyForecast): Scenar
     description: 'Hire an additional esthetician or injector to expand capacity',
     assumptions: ['40 hours/week availability', '$180/hr avg revenue', '70% utilization after ramp'],
     monthlyRevenue: Math.round(baseline.predicted + additionalProviderRevenue * 4.33),
-    annualRevenue: 0,
+    annualRevenue: Math.round((baseline.predicted + additionalProviderRevenue * 4.33) * annualFactor),
     delta: Math.round(additionalProviderRevenue * 4.33),
     deltaPercent: Math.round((additionalProviderRevenue * 4.33 / Math.max(1, baseline.predicted)) * 100),
     feasibility: 'moderate',
@@ -567,7 +567,7 @@ function buildScenarios(input: ForecastInput, baseline: MonthlyForecast): Scenar
     description: 'Increase all service prices by 10% across the board',
     assumptions: ['10% price increase', '5% volume decrease from price sensitivity', 'Net ~5% revenue increase'],
     monthlyRevenue: Math.round(baseline.predicted * 1.05),
-    annualRevenue: 0,
+    annualRevenue: Math.round(baseline.predicted * 1.05 * annualFactor),
     delta: Math.round(baseline.predicted * 0.05),
     deltaPercent: 5,
     feasibility: 'high',
@@ -582,7 +582,7 @@ function buildScenarios(input: ForecastInput, baseline: MonthlyForecast): Scenar
     description: 'Double monthly marketing budget with optimized channel mix',
     assumptions: [`Current ~$${Math.round(currentMonthlyMarketing).toLocaleString()}/mo`, `3.5x ROAS assumption`, 'Diminishing returns above 2x'],
     monthlyRevenue: Math.round(baseline.predicted + additionalRev * 0.7),
-    annualRevenue: 0,
+    annualRevenue: Math.round((baseline.predicted + additionalRev * 0.7) * annualFactor),
     delta: Math.round(additionalRev * 0.7),
     deltaPercent: Math.round((additionalRev * 0.7 / Math.max(1, baseline.predicted)) * 100),
     feasibility: 'moderate',
@@ -596,7 +596,7 @@ function buildScenarios(input: ForecastInput, baseline: MonthlyForecast): Scenar
     description: 'Aggressive membership acquisition campaign (20 new members)',
     assumptions: ['20 new members at avg $249/mo', 'Members visit 2x more than non-members', '85% retention at 12 months'],
     monthlyRevenue: Math.round(baseline.predicted + memberRevIncrease),
-    annualRevenue: 0,
+    annualRevenue: Math.round((baseline.predicted + memberRevIncrease * 2) * annualFactor),
     delta: Math.round(memberRevIncrease),
     deltaPercent: Math.round((memberRevIncrease / Math.max(1, baseline.predicted)) * 100),
     feasibility: 'aggressive',
@@ -609,16 +609,13 @@ function buildScenarios(input: ForecastInput, baseline: MonthlyForecast): Scenar
     description: 'All growth levers activated: new provider, price increase, marketing, memberships',
     assumptions: ['Partial execution of all strategies', 'Conservative overlap assumptions', '6-month ramp period'],
     monthlyRevenue: Math.round(baseline.predicted + allDelta),
-    annualRevenue: 0,
+    annualRevenue: Math.round((baseline.predicted + allDelta) * annualFactor),
     delta: Math.round(allDelta),
     deltaPercent: Math.round((allDelta / Math.max(1, baseline.predicted)) * 100),
     feasibility: 'aggressive',
   });
 
-  return scenarios.map((scenario) => ({
-    ...scenario,
-    annualRevenue: Math.round(scenario.monthlyRevenue * annualFactor),
-  }));
+  return scenarios;
 }
 
 // ── GOAL DECOMPOSITION ──

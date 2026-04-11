@@ -58,18 +58,18 @@ export interface LineItem {
 export interface TreatmentPackage {
   tier: string;
   name: string;
-  subtitle?: string;
   price: number;
   sessions: number;
   lineItems: LineItem[];
   extras: string[];
   highlight?: boolean;
   savings?: string;
-  monthlyPayment: number;
-  bestFor?: string;
-  resultIntensity?: string;
-  whyBest?: string;
+  subtitle?: string;
   savingsVsStandalone?: number;
+  resultIntensity?: string;
+  bestFor?: string;
+  whyBest?: string;
+  monthlyPayment: number;
 }
 
 /* ═══════════════════════════════════════════════════════════════

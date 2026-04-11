@@ -285,7 +285,7 @@ describe('Waitlist Notifications', () => {
         clientPhone: '555-1234',
         serviceName: 'Botox',
         availableSlots: [{ date: '2026-04-02', time: '10:00', provider: 'Dr. Landfield' }],
-        bookingUrl: 'https://www.ranibeautyclinic.com/book/botox',
+        bookingUrl: 'https://ranibeautyclinic.com/book/botox',
         expiresIn: '24 hours',
       };
 
@@ -305,7 +305,7 @@ describe('Waitlist Notifications', () => {
         clientPhone: '555-1234',
         serviceName: 'Botox',
         availableSlots: [{ date: '2026-04-02', time: '10:00', provider: 'Dr. Landfield' }],
-        bookingUrl: 'https://www.ranibeautyclinic.com/book/botox',
+        bookingUrl: 'https://ranibeautyclinic.com/book/botox',
         expiresIn: '24 hours',
       };
 

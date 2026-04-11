@@ -40,7 +40,7 @@ export const clinicInfo = {
   },
   reviews: {
     aggregateRating: 4.9,
-    reviewCount: 127,
+    reviewCount: 129,
     platform: "Google",
   },
   booking: {
@@ -50,8 +50,8 @@ export const clinicInfo = {
     companyId: 876418,
   },
   consultation: {
-    url: "https://booking.mangomint.com/ranibeautyclinic1",
-    provider: "Mangomint",
+    url: "/contact",
+    provider: "Website",
   },
   financing: {
     patientfi: {

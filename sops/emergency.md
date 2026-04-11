@@ -11,7 +11,7 @@
 
 ## Steps
 1. **INSTRUCT PATIENT TO CALL 911 OR GO TO ER IMMEDIATELY**
-2. **NOTIFY RINA IMMEDIATELY** (call, not text) **AND escalate to Medical Director**
+2. **NOTIFY RINA IMMEDIATELY** (call, not text)
 3. Document the interaction in patient file with exact timestamp
 4. Do NOT advise on medical treatment (that is the MD/ER's role)
 5. Follow up with patient within 24 hours after ER visit

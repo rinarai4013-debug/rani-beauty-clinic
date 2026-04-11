@@ -403,7 +403,7 @@ function createGBPUpdate(input: SocialInput, seasonal: { theme: string; services
     type: 'gbp_update',
     category: 'service_highlight',
     title: `${seasonal.theme} at Rani Beauty Clinic`,
-    caption: `${seasonal.hooks[0]}. Visit us at 401 Olympia Ave NE, Suite 101, Renton, WA 98056. Book online at ranibeautyclinic.com`,
+    caption: `${seasonal.hooks[0]}. Visit us at 401 Olympia Ave NE #101, Renton, WA 98056. Book online at ranibeautyclinic.com`,
     hashtags: [],
     callToAction: 'Book Online',
     suggestedImageDesc: 'Professional clinic photo showcasing treatment room or provider',

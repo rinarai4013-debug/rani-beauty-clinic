@@ -15,6 +15,10 @@ const SavePlanSchema = z.object({
   intakeRecordId: z.string().optional(),
 });
 
+const planBuilderQuerySchema = z.object({
+  id: z.string().trim().min(1).optional(),
+});
+
 const UpdatePlanSchema = z.object({
   id: z.string().min(1),
   planTier: z.string().optional(),
@@ -31,7 +35,12 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const planId = searchParams.get('id');
+  const parsedQuery = planBuilderQuerySchema.safeParse(Object.fromEntries(searchParams.entries()));
+  if (!parsedQuery.success) {
+    return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+  }
+
+  const { id: planId } = parsedQuery.data;
 
   try {
     if (planId) {
@@ -70,12 +79,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid request', details: { body: ['Invalid JSON'] } }, { status: 400 });
-    }
-
+    const body = await request.json();
     const parsed = SavePlanSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -119,12 +123,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid update data', details: { body: ['Invalid JSON'] } }, { status: 400 });
-    }
-
+    const body = await request.json();
     const parsed = UpdatePlanSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -161,7 +160,12 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const planId = searchParams.get('id');
+    const parsedQuery = planBuilderQuerySchema.safeParse(Object.fromEntries(searchParams.entries()));
+    if (!parsedQuery.success) {
+      return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+    }
+
+    const { id: planId } = parsedQuery.data;
 
     if (!planId) {
       return NextResponse.json({ error: 'Plan ID required' }, { status: 400 });

@@ -216,7 +216,7 @@ const TARGET_KEYWORDS: Omit<KeywordRanking, 'position' | 'previousPosition' | 'c
 /** GMB optimization checklist */
 const GMB_CHECKLIST_ITEMS: Omit<GMBCheckItem, 'status'>[] = [
   { name: 'Business Name', detail: 'Matches exact legal business name', priority: 'high' },
-  { name: 'Address', detail: '401 Olympia Ave NE, Suite 101, Renton, WA 98056', priority: 'high' },
+  { name: 'Address', detail: '401 Olympia Ave NE #101, Renton, WA 98056', priority: 'high' },
   { name: 'Phone Number', detail: 'Primary phone number listed', priority: 'high' },
   { name: 'Website URL', detail: 'Links to ranibeautyclinic.com', priority: 'high' },
   { name: 'Business Hours', detail: 'All days of the week listed', priority: 'high' },

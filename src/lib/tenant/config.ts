@@ -5,6 +5,8 @@
  * features, subscription tiers, and module access controls.
  */
 
+import { env } from './env';
+
 // ─── Subscription Tiers ─────────────────────────────────────────────────────
 
 export type SubscriptionTier = 'starter' | 'professional' | 'enterprise';
@@ -235,8 +237,8 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   slug: 'rani',
   ownerId: 'rina',
   airtable: {
-    baseId: process.env.AIRTABLE_BASE_ID || 'app1SwhSfwe8GKUg4',
-    pat: process.env.AIRTABLE_PAT || '',
+    baseId: env.AIRTABLE_BASE_ID,
+    pat: env.AIRTABLE_PAT,
   },
   branding: {
     clinicName: 'Rani Beauty Clinic',
@@ -257,7 +259,7 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
     supportEmail: 'info@ranibeautyclinic.com',
     supportPhone: '(425) 555-0100',
     website: 'https://www.ranibeautyclinic.com',
-    address: '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
+    address: '401 Olympia Ave NE #101, Renton, WA 98056',
   },
   features: TIER_FEATURES.enterprise, // Rani gets all features
   subscription: {

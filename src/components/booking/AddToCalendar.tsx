@@ -14,8 +14,8 @@ export default function AddToCalendar({ appointment }: AddToCalendarProps) {
       action: 'TEMPLATE',
       text: `${appointment.serviceName} - Rani Beauty Clinic`,
       dates: `${start}/${end}`,
-      details: `Provider: ${appointment.providerName}\nRoom: ${appointment.roomId}\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056`,
-      location: '401 Olympia Ave NE, Suite 101, Renton, WA 98056',
+      details: `Provider: ${appointment.providerName}\nRoom: ${appointment.roomId}\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056`,
+      location: '401 Olympia Ave NE #101, Renton, WA 98056',
     });
     return `https://calendar.google.com/calendar/render?${params}`;
   };
@@ -31,7 +31,7 @@ export default function AddToCalendar({ appointment }: AddToCalendarProps) {
       `DTEND:${end}`,
       `SUMMARY:${appointment.serviceName} - Rani Beauty Clinic`,
       `DESCRIPTION:Provider: ${appointment.providerName}`,
-      'LOCATION:401 Olympia Ave NE, Suite 101\\, Renton\\, WA 98056',
+      'LOCATION:401 Olympia Ave NE #101\\, Renton\\, WA 98056',
       'END:VEVENT',
       'END:VCALENDAR',
     ].join('\n');

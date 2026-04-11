@@ -10,10 +10,14 @@ import { z } from 'zod';
 /* ── Schema ─────────────────────────────────────────────────── */
 
 const envSchema = z.object({
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default(process.env.NODE_ENV ?? 'development'),
+
   // Required - app won't function without these
-  AIRTABLE_PAT: z.string().min(1, 'AIRTABLE_PAT is required'),
-  AIRTABLE_BASE_ID: z.string().min(1, 'AIRTABLE_BASE_ID is required'),
-  DASHBOARD_JWT_SECRET: z.string().min(1, 'DASHBOARD_JWT_SECRET is required'),
+  AIRTABLE_PAT: z.string().min(1, 'AIRTABLE_PAT is required').transform(v => v.trim()),
+  AIRTABLE_BASE_ID: z.string().min(1, 'AIRTABLE_BASE_ID is required').transform(v => v.trim()),
+  DASHBOARD_JWT_SECRET: z.string().min(1, 'DASHBOARD_JWT_SECRET is required').transform(v => v.trim()),
 
   // Required for AI features
   ANTHROPIC_API_KEY: z.string().optional().default(''),
@@ -34,6 +38,9 @@ const envSchema = z.object({
   // Payments
   STRIPE_SECRET_KEY: z.string().optional().default(''),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(''),
+  STRIPE_PRICE_STARTER: z.string().optional().default(''),
+  STRIPE_PRICE_PROFESSIONAL: z.string().optional().default(''),
+  STRIPE_PRICE_ENTERPRISE: z.string().optional().default(''),
   CHERRY_API_KEY: z.string().optional().default(''),
   CHERRY_WEBHOOK_SECRET: z.string().optional().default(''),
   PATIENTFI_API_KEY: z.string().optional().default(''),
@@ -63,6 +70,11 @@ const envSchema = z.object({
   // Ads
   META_ACCESS_TOKEN: z.string().optional().default(''),
   META_AD_ACCOUNT_ID: z.string().optional().default(''),
+  META_CAPI_WEBHOOK_SECRET: z.string().optional().default(''),
+
+  // Google Ads OAuth (optional)
+  GOOGLE_ADS_CLIENT_ID: z.string().optional().default(''),
+  GOOGLE_ADS_CLIENT_SECRET: z.string().optional().default(''),
 
   // Integrations
   SQUARE_ACCESS_TOKEN: z.string().optional().default(''),
@@ -78,31 +90,38 @@ const envSchema = z.object({
   CRON_SECRET: z.string().optional().default(''),
   N8N_API_KEY: z.string().optional().default(''),
 
+  // Public/runtime feature and site defaults
+  NEXT_PUBLIC_DASHBOARD_FEATURES: z.string().optional().default(''),
+  DASHBOARD_FEATURES: z.string().optional().default(''),
+  INDEXNOW_KEY_PATH: z.string().optional().default(''),
+  NEXT_PUBLIC_SITE_URL: z.string().optional().default('https://www.ranibeautyclinic.com'),
+  NEXT_PUBLIC_BASE_URL: z.string().optional().default('https://ranibeautyclinic.com'),
+
+  // Patient portal
+  PATIENT_JWT_SECRET: z.string().optional().default(''),
+
   // External services
   REPLICATE_API_TOKEN: z.string().optional().default(''),
   HTML2PDF_API_KEY: z.string().optional().default(''),
+
+  // Master base for multi-tenant mode (optional override)
+  RANIOS_MASTER_PAT: z.string().optional().default(''),
+  RANIOS_MASTER_BASE_ID: z.string().optional().default(''),
+
+  // Square catalog IDs
+  SQUARE_LOCATION_ID: z.string().optional().default(''),
+  SQUARE_PLAN_HALO_MONTHLY: z.string().optional().default('plan_halo_monthly'),
+  SQUARE_PLAN_HALO_ANNUAL: z.string().optional().default('plan_halo_annual'),
+  SQUARE_PLAN_GLOW_MONTHLY: z.string().optional().default('plan_glow_monthly'),
+  SQUARE_PLAN_GLOW_ANNUAL: z.string().optional().default('plan_glow_annual'),
+  SQUARE_PLAN_ELITE_MONTHLY: z.string().optional().default('plan_elite_monthly'),
+  SQUARE_PLAN_ELITE_ANNUAL: z.string().optional().default('plan_elite_annual'),
 });
 
 /* ── Parse & export ─────────────────────────────────────────── */
 
-/**
- * During `next build`, env vars aren't available so we fall back to a
- * permissive schema that defaults everything to empty strings.
- * At runtime the strict schema is used and will throw on missing required vars.
- */
-const isBuildPhase =
-  process.env.NEXT_PHASE === 'phase-production-build' ||
-  process.env.npm_lifecycle_event === 'build';
-
-const buildSafeSchema = envSchema.extend({
-  AIRTABLE_PAT: z.string().optional().default(''),
-  AIRTABLE_BASE_ID: z.string().optional().default(''),
-  DASHBOARD_JWT_SECRET: z.string().optional().default(''),
-});
-
 function validateEnv() {
-  const schema = isBuildPhase ? buildSafeSchema : envSchema;
-  const result = schema.safeParse(process.env);
+  const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
     const formatted = result.error.issues
@@ -123,22 +142,7 @@ function validateEnv() {
   return result.data;
 }
 
-/** Lazy-initialised env — avoids crashing at import time during `next build`. */
-let _env: ReturnType<typeof validateEnv> | null = null;
-function getEnv() {
-  if (!_env) _env = validateEnv();
-  return _env;
-}
-
-/**
- * Proxy-backed env export. Defers validation until first property access,
- * so the module can be imported during `next build` without crashing.
- */
-export const env = new Proxy({} as ReturnType<typeof validateEnv>, {
-  get(_target, prop: string) {
-    return getEnv()[prop as keyof ReturnType<typeof validateEnv>];
-  },
-});
+export const env = validateEnv();
 
 /* ── Helper: check if an optional feature is configured ─────── */
 

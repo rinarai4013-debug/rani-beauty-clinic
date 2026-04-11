@@ -1,63 +1,11 @@
-import { z } from 'zod';
-import { NextRequest, NextResponse } from 'next/server';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
-import { getPreConsultTemplate, getAllPreConsultTemplates } from '@/lib/templates/pre-consult';
+import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth/session";
 
-const Schema = z.object({
-  step: z.string().optional().default('booking-confirmation'),
-  firstName: z.string().min(1),
-  serviceName: z.string().min(1),
-  providerName: z.string().min(1),
-  appointmentDate: z.string().optional(),
-  appointmentTime: z.string().optional(),
-  duration: z.number().optional(),
-  isNewClient: z.boolean().optional(),
-  depositAmount: z.number().optional(),
-});
-
-export async function POST(request: NextRequest) {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit('templates-pre-consult', ip, RATE_LIMITS.WEBHOOK);
-  if (!allowed) return rateLimitResponse(resetIn);
-
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+export async function GET() {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const parsed = Schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten().fieldErrors }, { status: 400 });
-  }
-
-  if (parsed.data.step === 'all') {
-    return NextResponse.json({
-      templates: getAllPreConsultTemplates({
-        ...parsed.data,
-        serviceCategory: 'consult',
-        appointmentDate: parsed.data.appointmentDate ?? '',
-        appointmentTime: parsed.data.appointmentTime ?? '',
-        duration: parsed.data.duration ?? 60,
-        isNewClient: parsed.data.isNewClient ?? true,
-        depositPaid: false,
-      }),
-    });
-  }
-
-  const template = getPreConsultTemplate(parsed.data.step, {
-    ...parsed.data,
-    serviceCategory: 'consult',
-    appointmentDate: parsed.data.appointmentDate ?? '',
-    appointmentTime: parsed.data.appointmentTime ?? '',
-    duration: parsed.data.duration ?? 60,
-    isNewClient: parsed.data.isNewClient ?? true,
-    depositPaid: false,
-  });
-  if (!template) {
-    return NextResponse.json({ error: 'Unknown step' }, { status: 400 });
-  }
-
-  return NextResponse.json(template);
+  return NextResponse.json({ status: "not_implemented" }, { status: 501 });
 }

@@ -128,8 +128,7 @@ export type CampaignType =
   | 'reactivation'
   | 'event'
   | 'seasonal'
-  | 'birthday'
-  | 'direct';
+  | 'birthday';
 
 export type CampaignStatus =
   | 'draft'

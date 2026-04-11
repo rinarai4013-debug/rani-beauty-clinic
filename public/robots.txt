@@ -1,43 +1,7 @@
-# Rani Beauty Clinic — robots.txt
-# Updated: 2026-04-03
-
 User-agent: *
 Allow: /
-
-# Block API routes (server-only endpoints)
 Disallow: /api/
-
-# Block protected/private routes
 Disallow: /dashboard/
-Disallow: /portal/
-Disallow: /admin/
-Disallow: /provider/
-Disallow: /m/
-Disallow: /tv/
-Disallow: /offline/
-Disallow: /plan/
-Disallow: /lp/
-Disallow: /thank-you
-
-# Block legacy WordPress paths (site migrated to Next.js — saves crawl budget)
-Disallow: /wp-content/
-Disallow: /wp-includes/
-Disallow: /wp-admin/
-Disallow: /wp-json/
-Disallow: /wp-login.php
-Disallow: /wp-*.php
-Disallow: /product/
-Disallow: /product-category/
-Disallow: /category/
-Disallow: /cart/
-Disallow: /checkout/
-Disallow: /my-account/
-Disallow: /shop/
-
-# Block Next.js build artifacts (data JSON) but allow static assets for rendering
-Disallow: /_next/data/
-
-# Allow CSS/JS/images that Googlebot needs to render pages
-Allow: /_next/static/
+Disallow: /_next/
 
 Sitemap: https://www.ranibeautyclinic.com/sitemap.xml

@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 
 export default function GlobalError({
   error,
@@ -9,6 +10,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   if (process.env.NODE_ENV === "development") {
     console.error("Global error:", error);
   }
@@ -42,11 +47,9 @@ export default function GlobalError({
           }}
         >
           {/* Logo */}
-          <Image
+          <img
             src="/logo/rani-logo.png"
             alt="Rani Beauty Clinic"
-            width={160}
-            height={48}
             style={{
               width: "160px",
               height: "auto",

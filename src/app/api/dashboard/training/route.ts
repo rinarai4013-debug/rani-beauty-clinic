@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { TRAINING_MODULES, ROLE_LABELS, ROLE_COLORS } from '@/data/training/modules';
 import type { TrainingRole } from '@/data/training/modules';
+import { z } from 'zod';
+
+const trainingQuerySchema = z.object({
+  role: z
+    .enum(['front-desk', 'provider', 'all-staff', 'management'])
+    .optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,7 +18,14 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const roleFilter = searchParams.get('role') as TrainingRole | null;
+    const parsedQuery = trainingQuerySchema.safeParse(
+      Object.fromEntries(searchParams.entries())
+    );
+    if (!parsedQuery.success) {
+      return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+    }
+
+    const roleFilter = parsedQuery.data.role as TrainingRole | undefined;
 
     // Filter modules by role if specified
     let modules = TRAINING_MODULES;

@@ -1,50 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
-
-// Allow up to 30s for large file processing
-export const maxDuration = 30;
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_WIDTH = 1200;
+const photoUploadSchema = z.object({
+  file: z.instanceof(File, {
+    message: 'No file provided. Send a "file" field in multipart form data.',
+  }),
+});
 
 // ─── POST Handler ───────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
-  if (!allowed) return rateLimitResponse(resetIn);
-
   try {
-    let formData: FormData;
-    try {
-      formData = await request.formData();
-    } catch (parseErr) {
-      console.error('[API] /api/photo/upload formData parse error:', parseErr);
-      return NextResponse.json(
-        { error: 'File too large for server. Maximum ~4.5MB on this plan. Try a smaller image or compress the PDF.' },
-        { status: 413 },
-      );
-    }
-    const file = formData.get('file');
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('photo-upload', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-    if (!file || !(file instanceof File)) {
-      return NextResponse.json(
-        { error: 'No file provided. Send a "file" field in multipart form data.' },
-        { status: 400 },
-      );
+    const formData = await request.formData();
+    const rawFile = formData.get('file');
+    const parsed = photoUploadSchema.safeParse({ file: rawFile });
+
+    if (!parsed.success) {
+      const message = parsed.error.issues[0]?.message ?? 'Invalid upload payload';
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    console.error(`[API] /api/photo/upload — file: ${file.name}, type: ${file.type}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+    const { file } = parsed.data;
 
-    // Validate file type (also accept common PDF MIME variants)
-    const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
-    if (!isPdf && !ALLOWED_TYPES.includes(file.type)) {
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Accepted: JPEG, PNG, WebP, HEIC, PDF.' },
+        { error: 'Invalid file type. Only JPEG and PNG are accepted.' },
         { status: 400 },
       );
     }
@@ -61,21 +53,7 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    if (isPdf) {
-      // PDFs: store as base64 directly (sharp/libvips PDF support not available on Vercel)
-      const base64 = buffer.toString('base64');
-      const dataUrl = `data:application/pdf;base64,${base64}`;
-
-      return NextResponse.json({
-        imageBase64: dataUrl,
-        originalName: file.name,
-        originalSize: file.size,
-        processedSize: buffer.length,
-        isPdf: true,
-      });
-    }
-
-    // Images: process with sharp — resize if wider than MAX_WIDTH, output as JPEG
+    // Process with sharp: resize if wider than MAX_WIDTH, output as JPEG
     let image = sharp(buffer);
     const metadata = await image.metadata();
 
@@ -101,11 +79,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[API] /api/photo/upload error:', error);
 
-    const message =
-      error instanceof Error ? error.message : 'Photo upload processing failed';
-
     return NextResponse.json(
-      { error: message },
+      { error: 'Photo upload processing failed. Please try again.' },
       { status: 500 },
     );
   }

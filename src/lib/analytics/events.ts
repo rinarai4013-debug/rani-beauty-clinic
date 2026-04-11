@@ -9,6 +9,7 @@
  */
 
 import type { AnalyticsEventName, AnalyticsEventParams } from '@/types/analytics';
+import { env } from '@/lib/env';
 
 /* ── Meta Pixel Event Mapping ────────────────────────────────── */
 
@@ -26,7 +27,6 @@ const metaEventMap: Record<string, string> = {
   consultation_booked: 'Schedule',
   booking_completed: 'Schedule',
   // Intent
-  cta_click: 'Lead',
   booking_widget_opened: 'Schedule',
   quiz_completed: 'CompleteRegistration',
   service_page_view: 'ViewContent',
@@ -75,7 +75,7 @@ function getPageType(): string {
 
 let cachedUtm: Record<string, string> | null = null;
 
-export function getUtmParams(): Record<string, string> {
+function getUtmParams(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   if (cachedUtm) return cachedUtm;
 
@@ -148,7 +148,7 @@ export function trackAnalyticsEvent(
   }
 
   // Debug logging in development
-  if (process.env.NODE_ENV === 'development') {
+  if (env.NODE_ENV === 'development') {
     console.debug(`[Analytics] ${name}`, enriched);
   }
 }
@@ -201,39 +201,6 @@ export function trackOutboundClick(url: string, clickText: string) {
     });
   } catch {
     // Invalid URL - skip
-  }
-}
-
-export function trackBookingStarted(service: string, source: string) {
-  trackAnalyticsEvent("booking_started", { service, source });
-  if (typeof window !== "undefined") {
-    window.fbq?.("track", "InitiateCheckout", { content_name: service });
-    window.dataLayer?.push({ event: "booking_started", service, source });
-  }
-}
-
-export function trackBookingCompleted(service: string, value: number) {
-  trackAnalyticsEvent("booking_completed", { service, value });
-  if (typeof window !== "undefined") {
-    window.fbq?.("track", "Schedule", { content_name: service, value, currency: "USD" });
-    window.dataLayer?.push({ event: "purchase", ecommerce: { transaction_id: `bk_${Date.now()}`, value, currency: "USD", items: [{ item_name: service }] } });
-  }
-}
-
-export function trackFormInteraction(formName: string, action: "focus" | "blur" | "submit" | "abandon", field?: string) {
-  const eventName = `form_${action}`;
-  if (typeof window !== "undefined") {
-    window.gtag?.("event", eventName, { form_name: formName, field_name: field });
-    window.dataLayer?.push({ event: eventName, form_name: formName, field_name: field });
-    if (action === "submit") window.fbq?.("track", "Lead", { content_name: formName });
-  }
-}
-
-export function trackPhoneCall(source: string) {
-  trackAnalyticsEvent("phone_click", { source });
-  if (typeof window !== "undefined") {
-    window.fbq?.("track", "Contact", { content_name: "phone_call", content_category: source });
-    window.dataLayer?.push({ event: "phone_call_click", source });
   }
 }
 

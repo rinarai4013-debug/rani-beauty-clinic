@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
 import { UNIFIED_CATALOG, getServicesByConcern, type UnifiedService } from '@/data/services/unified-catalog';
 import { getPresetsForService } from './filter-presets';
+import { env } from '@/lib/env';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -317,14 +317,15 @@ function calculateProjectedScore(
 
 export async function analyzeSkinFromPhoto(photoBase64: string): Promise<SkinAnalysisResult> {
   // Check for API key
-  if (!hasAnthropicClient()) {
+  const apiKey = env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
     console.warn('[SkinAnalysis] ANTHROPIC_API_KEY not set - returning fallback analysis');
     const fallback = createFallbackResult();
     fallback.recommendations = buildRecommendations(fallback.concerns);
     return fallback;
   }
 
-  const client = getAnthropicClient();
+  const client = new Anthropic({ apiKey });
 
   // Strip data URL prefix if present
   let imageData = photoBase64;

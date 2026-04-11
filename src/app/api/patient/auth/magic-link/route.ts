@@ -4,14 +4,13 @@ import { Resend } from 'resend';
 import { createMagicLinkToken } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { env } from '@/lib/env';
 
-let _resend: Resend | null = null;
-function getResend(): Resend {
-  if (!_resend) {
-    _resend = new Resend(process.env.RESEND_API_KEY);
-  }
-  return _resend;
+function getResendClient() {
+  const apiKey = env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  return new Resend(apiKey);
 }
 
 const requestSchema = z.object({
@@ -19,17 +18,12 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
-  if (!allowed) return rateLimitResponse(resetIn);
-
   try {
-    const body = await request.json().catch(() => null);
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('patient-magic-link', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-    }
-
+    const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -49,11 +43,18 @@ export async function POST(request: NextRequest) {
     );
 
     if (client) {
+      const resend = getResendClient();
+      if (!resend) {
+        return NextResponse.json(
+          { error: 'Email service not configured' },
+          { status: 503 }
+        );
+      }
       const token = await createMagicLinkToken(email);
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+      const baseUrl = env.NEXT_PUBLIC_BASE_URL;
       const magicLinkUrl = `${baseUrl}/portal?token=${token}`;
 
-      await getResend().emails.send({
+      await resend.emails.send({
         from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
         to: email,
         subject: 'Your Rani Beauty Clinic Portal Login Link',

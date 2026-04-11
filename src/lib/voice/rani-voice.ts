@@ -145,11 +145,11 @@ Rules:
 - VIP/Loyal Client ("Inner Circle" energy): Exclusive, privileged access. "we wanted you to know first...", "as one of our most valued angels..."
 
 ## CLINIC INFORMATION
-- Location: 401 Olympia Ave NE, Suite 101, Renton, WA 98056
+- Location: 401 Olympia Ave NE #101, Renton, WA 98056
 - Phone: (425) 539-4440
 - Website: ranibeautyclinic.com
 - Hours: Mon-Fri 9AM-6PM, Sat 10AM-4PM, Sun Closed
-- Booking: https://www.ranibeautyclinic.com/#booking
+- Booking: https://ranibeautyclinic.com/#booking
 
 ## SERVICES & PRICING
 - Sofwave ($2,750-$4,500) - Non-invasive ultrasound skin tightening

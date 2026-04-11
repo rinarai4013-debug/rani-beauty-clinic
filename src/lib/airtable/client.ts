@@ -3,24 +3,25 @@ import { airtableCircuitBreaker, CircuitBreakerError } from './circuit-breaker';
 import { validateRecord } from './schemas';
 import { AirtableCache, airtableCache } from './cache';
 import { writeQueue } from './write-queue';
+import { env } from '../env';
 
 // Validate env vars at module load time
-if (!process.env.AIRTABLE_PAT) {
+if (!env.AIRTABLE_PAT) {
   console.error('[Airtable] AIRTABLE_PAT is missing. Airtable queries will fail.');
 }
-if (!process.env.AIRTABLE_BASE_ID) {
+if (!env.AIRTABLE_BASE_ID) {
   console.error('[Airtable] AIRTABLE_BASE_ID is missing. Airtable queries will fail.');
 }
 
 // Lazy-initialized to avoid throwing during Next.js build (env vars unavailable at build time)
 let _base: ReturnType<InstanceType<typeof Airtable>['base']> | null = null;
 
-export function getAirtableBase() {
+function getBase() {
   if (!_base) {
     const airtable = new Airtable({
-      apiKey: process.env.AIRTABLE_PAT,
+      apiKey: env.AIRTABLE_PAT,
     });
-    _base = airtable.base(process.env.AIRTABLE_BASE_ID!);
+    _base = airtable.base(env.AIRTABLE_BASE_ID);
   }
   return _base;
 }
@@ -99,7 +100,7 @@ export function rateLimitedQuery<T>(fn: () => Promise<T>): Promise<T> {
 
 /** Executor used by writeQueue.drain() to replay failed writes */
 async function drainExecutor(entry: { table: string; recordId?: string; fields: Record<string, unknown>; operation: string }) {
-  const table = getAirtableBase()(entry.table);
+  const table = getBase()(entry.table);
   if (entry.operation === 'create') {
     await table.create(entry.fields as Partial<Airtable.FieldSet>);
   } else if (entry.operation === 'update' && entry.recordId) {
@@ -108,20 +109,20 @@ async function drainExecutor(entry: { table: string; recordId?: string; fields: 
 }
 
 export const Tables = {
-  clients: () => getAirtableBase()('Clients'),
-  appointments: () => getAirtableBase()('Appointments'),
-  transactions: () => getAirtableBase()('Transactions'),
-  kpis: () => getAirtableBase()('KPI Snapshots'),
-  alerts: () => getAirtableBase()('Alerts'),
-  packages: () => getAirtableBase()('Packages'),
-  memberships: () => getAirtableBase()('Memberships'),
-  intakes: () => getAirtableBase()('Client Intakes'),
-  reviews: () => getAirtableBase()('Reviews'),
-  messagesLog: () => getAirtableBase()('Messages Log'),
-  competitorIntel: () => getAirtableBase()('Competitor Intelligence'),
-  intakeIntelligence: () => getAirtableBase()('Intake Intelligence'),
-  treatmentPlans: () => getAirtableBase()('Treatment Plans'),
-  chartNotes: () => getAirtableBase()('Chart Notes'),
+  clients: () => getBase()('Clients'),
+  appointments: () => getBase()('Appointments'),
+  transactions: () => getBase()('Transactions'),
+  kpis: () => getBase()('KPI Snapshots'),
+  alerts: () => getBase()('Alerts'),
+  packages: () => getBase()('Packages'),
+  memberships: () => getBase()('Memberships'),
+  intakes: () => getBase()('Intake'),
+  reviews: () => getBase()('Reviews'),
+  messagesLog: () => getBase()('Messages Log'),
+  competitorIntel: () => getBase()('Competitor Intelligence'),
+  intakeIntelligence: () => getBase()('Intake Intelligence'),
+  treatmentPlans: () => getBase()('Treatment Plans'),
+  chartNotes: () => getBase()('Chart Notes'),
 } as const;
 
 // Resolve a table accessor key to its Airtable table name
@@ -133,7 +134,7 @@ const TABLE_KEY_TO_NAME: Record<string, string> = {
   alerts: 'Alerts',
   packages: 'Packages',
   memberships: 'Memberships',
-  intakes: 'Client Intakes',
+  intakes: 'Intake',
   reviews: 'Reviews',
   messagesLog: 'Messages Log',
   competitorIntel: 'Competitor Intelligence',

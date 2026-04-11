@@ -159,7 +159,7 @@ export function ErrorState({
       {onRetry && <RetryButton onRetry={onRetry} />}
 
       {/* Dev-only error details */}
-      {process.env.NODE_ENV === 'development' && !!error && (
+      {process.env.NODE_ENV === 'development' && error && (
         <div className="mt-6 w-full max-w-lg">
           <button
             onClick={() => setShowDetails(!showDetails)}
@@ -176,7 +176,7 @@ export function ErrorState({
                 exit={{ height: 0, opacity: 0 }}
                 className="mt-3 p-4 bg-gray-50 rounded-xl text-xs text-left text-red-600 overflow-auto max-h-40 border border-gray-100"
               >
-                {(error instanceof Error ? `${error.message}\n\n${error.stack}` : JSON.stringify(error, null, 2)) as React.ReactNode}
+                {error instanceof Error ? `${error.message}\n\n${error.stack}` : JSON.stringify(error, null, 2)}
               </motion.pre>
             )}
           </AnimatePresence>

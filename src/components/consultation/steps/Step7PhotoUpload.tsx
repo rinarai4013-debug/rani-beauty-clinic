@@ -2,16 +2,12 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, X, Upload, User, Sun, Lightbulb, Lock, Sparkles, Loader2 } from 'lucide-react';
-import type { AuraScanResult } from '@/types/mastermind';
+import { Camera, X, Upload, User, Sun, Lightbulb, Lock } from 'lucide-react';
 
 interface StepProps {
   formData: Record<string, any>;
   onUpdate: (field: string, value: any) => void;
   errors: Record<string, string>;
-  auraScanResult?: AuraScanResult | null;
-  isScanning?: boolean;
-  onStartScan?: () => void;
 }
 
 const MAX_PHOTOS = 3;
@@ -74,9 +70,6 @@ export default function Step7PhotoUpload({
   formData,
   onUpdate,
   errors,
-  auraScanResult,
-  isScanning,
-  onStartScan,
 }: StepProps) {
   const photos: File[] = formData.photos || [];
   const [previews, setPreviews] = useState<string[]>([]);
@@ -332,87 +325,6 @@ export default function Step7PhotoUpload({
           </motion.div>
         ))}
       </motion.div>
-
-      {/* Aura Skin Scan Trigger */}
-      {photos.length > 0 && !auraScanResult && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="text-center"
-        >
-          <button
-            type="button"
-            onClick={onStartScan}
-            disabled={isScanning}
-            className={`
-              inline-flex items-center gap-2 px-6 py-3 rounded-xl font-body font-semibold text-sm transition-all duration-300
-              ${
-                isScanning
-                  ? 'bg-[#C9A96E]/50 text-white cursor-wait'
-                  : 'bg-gradient-to-r from-[#C9A96E] to-[#D4B87A] text-white hover:shadow-lg hover:shadow-[#C9A96E]/25 hover:scale-[1.02]'
-              }
-            `}
-          >
-            {isScanning ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Analyzing Your Skin...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                Begin Your Aura Skin Scan
-              </>
-            )}
-          </button>
-          {isScanning && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-body text-xs text-[#0F1D2C]/50 mt-2"
-            >
-              Our AI is analyzing your skin across 8 dimensions...
-            </motion.p>
-          )}
-        </motion.div>
-      )}
-
-      {/* Aura Score Mini Card */}
-      {auraScanResult && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className="p-5 rounded-2xl border-2 border-[#C9A96E] bg-gradient-to-br from-[#C9A96E]/5 to-[#C9A96E]/10"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-[#C9A96E]/20 flex items-center justify-center">
-                <span className="font-heading text-xl text-[#C9A96E] font-bold">
-                  {auraScanResult.auraScore.overall}
-                </span>
-              </div>
-              <div>
-                <p className="font-body text-sm font-semibold text-[#0F1D2C]">
-                  Aura Score: {auraScanResult.auraScore.grade}
-                </p>
-                <p className="font-body text-xs text-[#0F1D2C]/60">
-                  {auraScanResult.auraScore.label} &middot; Skin Age: {auraScanResult.auraScore.skinAge}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="font-body text-xs text-[#C9A96E] font-medium">
-                {auraScanResult.detectedConcerns.length} concerns detected
-              </p>
-              <p className="font-body text-xs text-[#0F1D2C]/40">
-                Full analysis on next step
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
 
       {/* Privacy Note */}
       <motion.div

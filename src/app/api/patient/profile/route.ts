@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPatientSession } from '@/lib/patient-auth/session';
 import { Tables, rateLimitedQuery, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const updateSchema = z.object({
@@ -39,19 +40,18 @@ export async function GET() {
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('patient-profile', ip, RATE_LIMITS.FORM);
+  if (!allowed) return rateLimitResponse(resetIn);
+
   try {
     const session = await getPatientSession();
     if (!session) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid input format' }, { status: 400 });
-    }
-
+    const body = await request.json();
     const parsed = updateSchema.safeParse(body);
 
     if (!parsed.success) {

@@ -1,1 +1,1 @@
-export default function ProgressRing(props: Record<string, unknown>) { return null; }
+export default function ProgressRing() { return null; }

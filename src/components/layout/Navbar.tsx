@@ -6,7 +6,6 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Menu, X, ChevronDown } from "lucide-react";
 import { clinicInfo } from "@/data/clinic-info";
-import { trackCTAClick, trackPhoneClick, trackBookingOpen } from "@/lib/analytics/events";
 
 // ── Mega Menu Data (4-column layout) ─────────────────────────────────────────
 
@@ -225,7 +224,6 @@ export default function Navbar() {
           <div className="hidden items-center gap-6 lg:flex shrink-0 ml-10">
             <a
               href={clinicInfo.phoneTel}
-              onClick={() => trackPhoneClick('navbar_desktop')}
               className="flex items-center gap-2 font-body text-sm font-medium text-white/80 transition-colors hover:text-rani-gold whitespace-nowrap"
             >
               <Phone size={15} aria-hidden="true" />
@@ -235,7 +233,6 @@ export default function Navbar() {
               href={clinicInfo.booking.url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => { trackCTAClick('Book Now', 'navbar_desktop', clinicInfo.booking.url); trackBookingOpen('navbar_desktop'); }}
               className="rounded-full bg-rani-gold px-8 py-2.5 font-body text-sm font-semibold text-rani-navy transition-all duration-200 hover:bg-rani-gold-light hover:shadow-lg whitespace-nowrap"
             >
               Book Now
@@ -243,19 +240,18 @@ export default function Navbar() {
           </div>
 
           {/* Mobile: Book pill + hamburger */}
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             <a
               href={clinicInfo.booking.url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => { trackCTAClick('Book', 'navbar_mobile', clinicInfo.booking.url); trackBookingOpen('navbar_mobile'); }}
-              className="rounded-full bg-rani-gold px-5 py-2 min-h-[44px] flex items-center font-body text-xs font-bold text-rani-navy transition-colors hover:bg-rani-gold-light"
+              className="rounded-full bg-rani-gold px-4 py-1.5 font-body text-xs font-bold text-rani-navy transition-colors hover:bg-rani-gold-light"
             >
               Book
             </a>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="text-white p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="text-white p-2"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -304,11 +300,10 @@ export default function Navbar() {
               </ul>
             </nav>
 
-            <div className="mt-8 flex flex-col items-center gap-4 w-full max-w-xs mx-auto px-6">
+            <div className="mt-8 flex flex-col items-center gap-4">
               <a
                 href={clinicInfo.phoneTel}
-                onClick={() => trackPhoneClick('mobile_menu')}
-                className="flex items-center justify-center gap-2 font-body text-base font-semibold text-rani-gold min-h-[48px] w-full rounded-full border border-rani-gold/30 transition-colors hover:bg-rani-gold/10"
+                className="flex items-center gap-2 font-body text-base font-semibold text-rani-gold"
               >
                 <Phone size={18} aria-hidden="true" />
                 {clinicInfo.phone}
@@ -317,8 +312,8 @@ export default function Navbar() {
                 href={clinicInfo.booking.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => { setMobileOpen(false); trackCTAClick('Book Your Consultation', 'mobile_menu', clinicInfo.booking.url); trackBookingOpen('mobile_menu'); }}
-                className="rounded-full bg-rani-gold min-h-[48px] w-full flex items-center justify-center font-body text-sm font-bold uppercase tracking-wider text-rani-navy transition-colors hover:bg-rani-gold-light"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-full bg-rani-gold px-8 py-3 font-body text-sm font-bold uppercase tracking-wider text-rani-navy transition-colors hover:bg-rani-gold-light"
               >
                 Book Your Consultation
               </a>

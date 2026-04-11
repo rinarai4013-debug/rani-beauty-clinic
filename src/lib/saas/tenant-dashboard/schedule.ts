@@ -489,7 +489,7 @@ export async function getNoShowPredictions(
     factors.push({ name: 'Time of Day', score: timeScore, weight: 10, detail: `${hour}:00 appointment` });
 
     const total = Math.round(factors.reduce((s, f) => s + f.score * (f.weight / 100), 0));
-    const riskLevel: NoShowPrediction['riskLevel'] = total >= 60 ? 'high' : total >= 30 ? 'moderate' : 'low';
+    const riskLevel = total >= 60 ? 'high' : total >= 30 ? 'moderate' : 'low';
 
     const recommendations: Record<string, string> = {
       high: 'Send confirmation reminder. Consider requiring deposit or calling to confirm.',

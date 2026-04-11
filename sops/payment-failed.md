@@ -23,4 +23,3 @@ Hi [FIRST_NAME], I haven't been able to reach you about the payment update. I kn
 
 ---
 **Note:** Always be empathetic. Never make the patient feel embarrassed about a declined card.
-**COMPLIANCE:** Do NOT ship medication until payment resolves. Rina does NOT diagnose or prescribe. All medical decisions = Medical Director via Qualiphy.

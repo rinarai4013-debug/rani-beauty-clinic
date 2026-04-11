@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "/Users/sukhithebanker/.nvm/versions/node/v20.20.2/bin/npm",
+      "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
     }

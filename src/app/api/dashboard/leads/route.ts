@@ -27,9 +27,7 @@ const STAGE_COLORS = ['#C9A96E', '#8B5CF6', '#3B82F6', '#22C55E', '#F59E0B', '#E
 
 export async function GET() {
   const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  }
+  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   if (!hasPermission(session.role, 'view_leads')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -47,19 +45,18 @@ export async function GET() {
     ]);
 
     const newLeads = intakes.filter((i) => (i.fields['Processing Status'] || '') === 'New').length;
-    const contacted = intakes.filter((i) =>
-      ['Processed', 'Responded'].includes(String(i.fields['Processing Status'] || '')),
-    ).length;
+    const contacted = intakes.filter((i) => ['Processed', 'Responded'].includes(String(i.fields['Processing Status'] || ''))).length;
+
     const consultsBooked = appointments.filter((a) => a.fields['Is Consult']).length;
     const consultsCompleted = appointments.filter(
-      (a) => a.fields['Is Consult'] && String(a.fields['Status'] || '').toLowerCase() === 'completed',
+      (a) => a.fields['Is Consult'] && String(a.fields['Status'] || '').toLowerCase() === 'completed'
     ).length;
-    const treatmentPlansSent = plans.filter((p) =>
-      ['Sent', 'Viewed'].includes(String(p.fields['Status'] || '')),
-    ).length;
+
+    const treatmentPlansSent = plans.filter((p) => ['Sent', 'Viewed'].includes(String(p.fields['Status'] || ''))).length;
     const converted = plans.filter((p) => String(p.fields['Status'] || '') === 'Booked').length;
+
     const depositsCollected = transactions.filter(
-      (t) => String(t.fields['Type'] || '') === 'Deposit' && String(t.fields['Status'] || '') !== 'Refund',
+      (t) => String(t.fields['Type'] || '') === 'Deposit' && String(t.fields['Status'] || '') !== 'Refund'
     ).length;
 
     const lost = Math.max(0, contacted - converted);
@@ -104,7 +101,7 @@ export async function GET() {
       topLeadSources: [],
     };
 
-    cache.set(cacheKey, data, TTL.MODERATE);
+    cache.set(cacheKey, data, TTL.HOURLY);
     return NextResponse.json(data);
   } catch (error) {
     console.error('Leads route error:', error);

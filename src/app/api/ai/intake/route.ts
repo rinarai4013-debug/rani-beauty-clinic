@@ -1,86 +1,10 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { z } from 'zod';
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth/session';
-import { hasPermission } from '@/lib/auth/roles';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { NextRequest, NextResponse } from "next/server";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
-const IntakeSchema = z.object({
-  intakeData: z.record(z.string(), z.unknown()),
-});
-
-const FALLBACK_INTELLIGENCE = {
-  summary: 'New client inquiry captured. Review goals and recommend the best starter treatment.',
-  riskFlags: [],
-  clientTier: 'mid-value',
-  recommendedPackage: {
-    name: 'Glow Package',
-    services: ['HydraFacial'],
-    estimatedValue: '$275',
-    timeline: '2-4 weeks',
-  },
-  consultScript: ['Welcome them warmly', 'Clarify their goals', 'Recommend an achievable first step'],
-  upsellOpportunities: ['Membership'],
-  urgency: 'medium',
-  suggestedNextStep: 'Schedule a consultation this week',
-};
-
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const ip = getClientIP(req);
-  const { allowed, resetIn } = rateLimit('ai-intake', ip, RATE_LIMITS.AI);
+  const { allowed, resetIn } = rateLimit("ai", ip, RATE_LIMITS.AI);
   if (!allowed) return rateLimitResponse(resetIn);
 
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_leads')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
-
-  const parsed = IntakeSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
-  }
-
-  try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-latest',
-      max_tokens: 700,
-      system: 'Return valid JSON with intake intelligence for a medspa consultation.',
-      messages: [
-        {
-          role: 'user',
-          content: JSON.stringify(parsed.data.intakeData),
-        },
-      ],
-    });
-
-    const raw = response.content
-      .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
-      .map((block) => block.text)
-      .join('\n')
-      .trim();
-
-    return NextResponse.json({
-      intelligence: JSON.parse(raw),
-      source: 'ai',
-    });
-  } catch (error) {
-    console.error('[ai/intake]', error);
-    return NextResponse.json({
-      intelligence: FALLBACK_INTELLIGENCE,
-      source: 'fallback',
-    });
-  }
+  return NextResponse.json({ status: "not_implemented" }, { status: 501 });
 }

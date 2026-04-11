@@ -41,7 +41,4 @@
 
 ## Titration Text Template (SMS)
 
-[FIRST_NAME]! Great news! Based on how well you're doing, our Medical Director has approved moving you up to [NEW_DOSE]. Your new medication will ship shortly. Same injection routine, just a slightly higher dose. You might feel a bit more appetite suppression, which means it's working even better! Let me know if you notice any new side effects. I'll check in after your first dose at the new level. (425) 539-4440
-
----
-**COMPLIANCE:** Rina does NOT diagnose or prescribe. All dose changes require Medical Director approval via Qualiphy. Never titrate without MD sign-off.
+[FIRST_NAME]! Great news! Based on how well you're doing, our Medical Director has approved moving you up to [NEW_DOSE]. Your new medication will ship shortly. Same injection routine, just a slightly higher dose. You might feel a bit more appetite suppression, which means it's working even better! I'll check in after your first dose at the new level. (425) 539-4440

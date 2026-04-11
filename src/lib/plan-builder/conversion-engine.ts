@@ -458,7 +458,7 @@ function findUpsells(recs: RecommendedService[], input: ConversionInput): string
   if (!categories.has('injectables') && input.skinConcerns.some((c) => ['aging', 'wrinkles', 'fine lines', 'aging-skin'].includes(c.toLowerCase()))) {
     upsells.push('Consider Botox or fillers for immediate volume and line correction');
   }
-  if (!categories.has('facial')) upsells.push('Add monthly HydraFacial ($249) for ongoing skin maintenance');
+  if (!categories.has('facial')) upsells.push('Add monthly HydraFacial ($275) for ongoing skin maintenance');
   if (input.engagementLevel === 'returning' && (input.totalSpend || 0) > 2000) {
     upsells.push('Offer membership pricing — this client is a strong membership candidate');
   }

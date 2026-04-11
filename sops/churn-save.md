@@ -40,4 +40,3 @@ I completely respect your decision, [FIRST_NAME]. It's been a pleasure taking ca
 ---
 **Revenue Impact:** Every saved patient = $3,588-7,188/year retained
 **Key:** Listen first. Never argue. Always offer alternatives before accepting cancellation.
-**COMPLIANCE:** Rina does NOT diagnose or prescribe. All dosing changes and medical consultations = Medical Director via Qualiphy.

@@ -53,7 +53,7 @@ function generateHydrafacialContent(city: string, drive: string): string {
 
 <p>The HydraFacial is suitable for all skin types, including sensitive skin, and can be performed year-round without sun sensitivity concerns. A standard HydraFacial treatment is priced at $249 at Rani Beauty Clinic, with our Deluxe HydraFacial at $375, which includes additional booster serums and LED light therapy. There is no downtime: you can apply makeup and return to your normal activities immediately after your appointment. Many ${city} professionals schedule their HydraFacials during lunch breaks.</p>
 
-<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking. We are open seven days a week from 10 AM to 7 PM. The HydraFacial pairs beautifully with other treatments in our menu, including Botox, chemical peels, and our AI-powered skin analysis for a comprehensive skincare strategy. Flexible payment options available. Call (425) 539-4440 or book your HydraFacial online today.</p>`;
+<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking. We are open seven days a week from 10 AM to 7 PM. The HydraFacial pairs beautifully with other treatments in our menu, including Botox, chemical peels, and our AI-powered skin analysis for a comprehensive skincare strategy. Financing through PatientFi and Cherry is available. Call (425) 539-4440 or book your HydraFacial online today.</p>`;
 }
 
 export const hydrafacialGeoPages: ServiceGeoPage[] = hydrafacialCities.map((c) => ({

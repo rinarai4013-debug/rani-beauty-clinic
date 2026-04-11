@@ -11,6 +11,7 @@
  */
 
 import { type TenantConfig, DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from './config';
+import { env } from '../env';
 
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
@@ -93,8 +94,8 @@ export interface TenantStore {
 import Airtable from 'airtable';
 
 function getMasterBase(): ReturnType<InstanceType<typeof Airtable>['base']> {
-  const pat = process.env.RANIOS_MASTER_PAT || process.env.AIRTABLE_PAT;
-  const baseId = process.env.RANIOS_MASTER_BASE_ID || process.env.AIRTABLE_BASE_ID;
+  const pat = env.RANIOS_MASTER_PAT || env.AIRTABLE_PAT;
+  const baseId = env.RANIOS_MASTER_BASE_ID || env.AIRTABLE_BASE_ID;
   if (!pat || !baseId) {
     throw new Error('Master Airtable credentials not configured (RANIOS_MASTER_PAT / RANIOS_MASTER_BASE_ID)');
   }
@@ -177,13 +178,13 @@ export class AirtableTenantStore implements TenantStore {
       updatedAt: now,
     };
 
-    await (this.table().create as any)({
+    await this.table().create({
       'Tenant ID': fullConfig.id,
       Slug: fullConfig.slug,
       'Custom Domain': fullConfig.customDomain || '',
       'Config JSON': JSON.stringify(fullConfig),
       Active: fullConfig.active,
-    });
+    } as Record<string, unknown>);
 
     return fullConfig;
   }
@@ -209,12 +210,12 @@ export class AirtableTenantStore implements TenantStore {
 
     if (records.length === 0) throw new Error(`Tenant record not found for ${id}`);
 
-    await (this.table().update as any)(records[0].id, {
+    await this.table().update(records[0].id, {
       Slug: updated.slug,
       'Custom Domain': updated.customDomain || '',
       'Config JSON': JSON.stringify(updated),
       Active: updated.active,
-    });
+    } as Record<string, unknown>);
 
     invalidateTenantCache(id);
     return updated;
@@ -318,7 +319,7 @@ let _store: TenantStore | null = null;
 
 export function getTenantStore(): TenantStore {
   if (!_store) {
-    if (process.env.NODE_ENV === 'test') {
+    if (env.NODE_ENV === 'test') {
       _store = new InMemoryTenantStore([DEFAULT_TENANT_CONFIG]);
     } else {
       _store = new AirtableTenantStore();

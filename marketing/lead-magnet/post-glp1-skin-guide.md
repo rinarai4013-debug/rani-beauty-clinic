@@ -116,7 +116,7 @@ Rani Beauty Clinic is a physician-supervised medical aesthetics clinic in Renton
 
 **The Reveal** is our signature protocol combining Sofwave ultrasound and Secret RF microneedling for comprehensive post-GLP-1 skin restoration. Available in three tiers (Essential, Signature, Complete) with complimentary assessments.
 
-**Location:** 401 Olympia Ave NE, Suite 101, Renton, WA 98056
+**Location:** 401 Olympia Ave NE #101, Renton, WA 98056
 **Phone:** (425) 539-4440
 **Hours:** 7 days a week, 10 AM - 7 PM
 **Book online:** ranibeautyclinic.com

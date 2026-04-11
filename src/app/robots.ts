@@ -61,15 +61,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api/",
           "/dashboard/",
-          "/portal/",
-          "/provider/",
-          "/admin/",
-          "/tenant/",
-          "/onboarding/",
-          "/docs/",
-          "/plan/",
-          "/tv/",
-          "/offline/",
           "/_next/",
           // WordPress artifact paths - save crawl budget
           "/wp-admin/",

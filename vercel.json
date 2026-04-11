@@ -1,14 +1,4 @@
 {
-  "functions": {
-    "src/app/api/photo/upload/route.ts": {
-      "maxDuration": 30,
-      "memory": 1024
-    },
-    "src/app/api/mastermind/scan/route.ts": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
   "redirects": [
     {
       "source": "/:path((?!api).*)",
@@ -20,18 +10,12 @@
       ],
       "destination": "https://www.ranibeautyclinic.com/:path",
       "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "offers.ranibeautyclinic.com"
-        }
-      ],
-      "destination": "https://www.ranibeautyclinic.com/pricing",
-      "permanent": true
     }
   ],
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/daily-briefing",
+      "schedule": "0 14 * * *"
+    }
+  ]
 }

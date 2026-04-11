@@ -155,7 +155,7 @@ ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, S
   {
     slug: "glp1",
     name: "GLP-1 Weight Management",
-    priceRange: "From $399",
+    priceRange: "From $399/month",
     category: "wellness",
     faqs: [
       { question: "What is The Rani Protocol?", answer: "The Rani Protocol is our physician-supervised GLP-1 weight management program using Semaglutide and Tirzepatide. It includes in-house blood work, custom dosing, regular follow-ups, and ongoing medical support from Dr. Landfield's team." },
@@ -254,7 +254,7 @@ function generateServiceGeoEntries(): ServiceGeoEntry[] {
         serviceName: service.name,
         slug: `${city.slug}/${service.slug}`,
         title: `Best ${service.name} Near ${city.name} - ${service.priceRange} | Rani Beauty Clinic`,
-        metaDescription: `${service.name} near ${city.name}. Physician-supervised, ${service.priceRange}. Just ${city.drivingTime} from Rani Beauty Clinic, Renton WA. Book today.`,
+        metaDescription: `${service.name} for ${city.name} residents at Rani Beauty Clinic in Renton. Physician-supervised by Dr. Landfield. ${service.priceRange}. ${city.drivingTime}. Book today!`,
         content: service.generateContent(city.name, city.county, city.drivingTime, city.distanceFromRenton),
       });
     }

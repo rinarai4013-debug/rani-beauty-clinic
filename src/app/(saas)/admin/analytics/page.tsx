@@ -209,7 +209,7 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="month" tick={{ fill: '#6B7280', fontSize: 11 }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fill: '#6B7280', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v / 1000}K`} />
                   <Tooltip
-                    formatter={((value: number) => [`$${value.toLocaleString()}`, 'MRR']) as any}
+                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'MRR']}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   />
                   <Area type="monotone" dataKey="mrr" stroke="#0F1D2C" strokeWidth={2.5} fill="url(#mrrGrad)" />
@@ -235,7 +235,7 @@ export default function AnalyticsPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={((value: number, name: string) => [`${value} tenants`, name]) as any}
+                    formatter={(value: number, name: string) => [`${value} tenants`, name]}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   />
                   <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
@@ -262,7 +262,7 @@ export default function AnalyticsPage() {
                   <XAxis type="number" domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} />
                   <YAxis dataKey="feature" type="category" tick={{ fill: '#6B7280', fontSize: 11 }} tickLine={false} axisLine={false} width={110} />
                   <Tooltip
-                    formatter={((value: number) => [`${value}%`, 'Adoption']) as any}
+                    formatter={(value: number) => [`${value}%`, 'Adoption']}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   />
                   <Bar dataKey="adoption" fill="#0F1D2C" radius={[0, 6, 6, 0]} barSize={16} />
@@ -537,7 +537,7 @@ export default function AnalyticsPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={((value: number, name: string) => [`${value} tenants`, name]) as any}
+                    formatter={(value: number, name: string) => [`${value} tenants`, name]}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   />
                   <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />

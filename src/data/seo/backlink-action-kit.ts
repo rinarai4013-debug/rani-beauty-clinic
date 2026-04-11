@@ -19,7 +19,7 @@ export const listingCorrections = {
     platform: "Healthgrades",
     url: "https://www.healthgrades.com/physician/dr-alexander-landfield-3stcc",
     issue: "Lists Dr. Landfield in Winchester, KY - not linked to Rani Beauty Clinic",
-    fix: "Claim profile → Update Practice Location to: 401 Olympia Ave NE, Suite 101, Renton, WA 98056 → Add practice name: Rani Beauty Clinic → Add specialties: Medical Aesthetics, Neurotoxin Injections, Laser Treatments",
+    fix: "Claim profile → Update Practice Location to: 401 Olympia Ave NE #101, Renton, WA 98056 → Add practice name: Rani Beauty Clinic → Add specialties: Medical Aesthetics, Neurotoxin Injections, Laser Treatments",
   },
 
   groupon: {
@@ -31,7 +31,7 @@ export const listingCorrections = {
 
 To Groupon Merchant Support,
 
-I am the owner of Rani Beauty Clinic located at 401 Olympia Ave NE, Suite 101, Renton, WA 98056.
+I am the owner of Rani Beauty Clinic located at 401 Olympia Ave NE #101, Renton, WA 98056.
 
 We have never created an account with Groupon nor authorized our business to be listed on your platform. Please remove our business listing immediately:
 https://www.groupon.com/biz/renton-wa/rani-beauty-clinic
@@ -66,7 +66,7 @@ export const newDirectorySubmissions = {
   // Copy-paste this info for every directory
   standardInfo: {
     businessName: "Rani Beauty Clinic",
-    address: "401 Olympia Ave NE, Suite 101, Renton, WA 98056",
+    address: "401 Olympia Ave NE #101, Renton, WA 98056",
     phone: "(425) 539-4440",
     website: "https://www.ranibeautyclinic.com",
     email: "info@ranibeautyclinic.com",
@@ -283,7 +283,7 @@ Rani Beauty Clinic is a woman-owned, physician-supervised medical spa offering B
 
 Contact:
 Rani Beauty Clinic
-401 Olympia Ave NE, Suite 101, Renton, WA 98056
+401 Olympia Ave NE #101, Renton, WA 98056
 (425) 539-4440
 info@ranibeautyclinic.com
 https://www.ranibeautyclinic.com`,

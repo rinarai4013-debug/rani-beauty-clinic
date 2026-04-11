@@ -31,15 +31,15 @@ function createMockDb(): TenantDatabaseClient {
 
   return {
     tenantId: 'test-tenant',
-    fetchAll: vi.fn(async (tableName: string) => {
+    fetchAll: jest.fn(async (tableName: string) => {
       if (tableName === 'Clients') return clients;
       if (tableName === 'Transactions') return transactions;
       return [];
     }),
-    fetchFirst: vi.fn(async () => []),
-    createRecord: vi.fn(async () => 'new-id'),
-    updateRecord: vi.fn(async () => {}),
-    deleteRecord: vi.fn(async () => {}),
+    fetchFirst: jest.fn(async () => []),
+    createRecord: jest.fn(async () => 'new-id'),
+    updateRecord: jest.fn(async () => {}),
+    deleteRecord: jest.fn(async () => {}),
   } as unknown as TenantDatabaseClient;
 }
 
@@ -270,7 +270,7 @@ describe('Tenant AI Engines Module', () => {
 
   describe('getConsultBriefing', () => {
     it('should return null for non-existent client', async () => {
-      const db = { ...createMockDb(), fetchAll: vi.fn(async () => []) } as unknown as TenantDatabaseClient;
+      const db = { ...createMockDb(), fetchAll: jest.fn(async () => []) } as unknown as TenantDatabaseClient;
       const result = await getConsultBriefing(db, makeTenant('professional'), 'nonexistent');
       expect(result).toBeNull();
     });

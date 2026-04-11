@@ -44,7 +44,7 @@ Treatment packages reduce per-session costs significantly. Our multi-session pac
 
 Membership programs provide predictable monthly costs with enhanced value. Rani Beauty Clinic memberships include monthly treatments, product discounts, and preferred pricing on additional services. The membership model smooths out the financial commitment into manageable monthly payments, making consistent care more accessible than paying for each visit individually.
 
-Third-party financing options allow patients to spread the cost of larger treatments into manageable payments. These financing options make treatments like Sofwave, comprehensive laser packages, and GLP-1 weight management programs accessible to patients who prefer installment payments. Ask our team about available financing during your consultation.
+Third-party financing through services like Cherry and similar platforms allows patients to spread the cost of larger treatments over monthly payments, often with promotional interest-free periods. These financing options make treatments like Sofwave, comprehensive laser packages, and GLP-1 weight management programs accessible to patients who prefer installment payments.
 
 Health savings accounts and flexible spending accounts can be used for certain medically indicated aesthetic treatments. Treatments with a documented medical purpose, such as laser hair removal for pseudofolliculitis barbae, Botox for chronic migraines, or weight management programs, may qualify for HSA or FSA spending. Consult your plan administrator for specific eligibility details.
 

@@ -97,7 +97,7 @@ function scoreLeadTime(days: number): { score: number; detail: string } {
 
 function scoreDeposit(paid: boolean, amount: number): { score: number; detail: string } {
   if (paid && amount >= 150) return { score: 5, detail: `$${amount} deposit paid - strong commitment` };
-  if (paid) return { score: 15, detail: amount > 0 ? `$${amount} deposit paid` : 'Deposit marked paid without amount recorded' };
+  if (paid && amount > 0) return { score: 15, detail: `$${amount} deposit paid` };
   return { score: 60, detail: 'No deposit - lower commitment signal' };
 }
 

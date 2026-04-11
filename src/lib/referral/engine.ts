@@ -105,7 +105,7 @@ export const REFEREE_REWARD: ReferralReward = {
 export const REFERRAL_EXPIRY_DAYS = 30; // Attribution window
 export const MAX_ACTIVE_REFERRALS = 10; // Anti-abuse limit
 export const REFERRAL_CODE_LENGTH = 4;
-export const BASE_URL = 'https://www.ranibeautyclinic.com';
+export const BASE_URL = 'https://ranibeautyclinic.com';
 
 // ── Code Generation ──────────────────────────────────────────────────────
 

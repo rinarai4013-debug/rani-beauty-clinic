@@ -177,7 +177,7 @@ export default function NearCityPage({ params }: PageProps) {
         name: "What is The Rani Protocol for weight management?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "The Rani Protocol is our physician-supervised GLP-1 weight management program using Semaglutide and Tirzepatide. It includes in-house blood work, custom dosing, ongoing medical support, and regular follow-ups with Dr. Landfield's team. Contact us for current pricing.",
+          text: "The Rani Protocol is our physician-supervised GLP-1 weight management program using Semaglutide and Tirzepatide. It includes in-house blood work, custom dosing, ongoing medical support, and regular follow-ups with Dr. Landfield's team. Programs start at $399 per month.",
         },
       },
     ],
@@ -196,46 +196,46 @@ export default function NearCityPage({ params }: PageProps) {
       />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#0F1D2C] via-[#1a2d40] to-[#0F1D2C] py-12 sm:py-16 lg:py-28">
+      <section className="relative bg-gradient-to-br from-[#0F1D2C] via-[#1a2d40] to-[#0F1D2C] py-20 lg:py-28">
         <div className="absolute inset-0 bg-[url('/images/pattern-dots.svg')] opacity-5" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <p className="mb-3 sm:mb-4 inline-flex items-center gap-2 rounded-full bg-[#C9A96E]/10 px-4 py-1.5 text-sm font-medium text-[#C9A96E]">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#C9A96E]/10 px-4 py-1.5 text-sm font-medium text-[#C9A96E]">
               <MapPin className="h-4 w-4" />
               {city.distanceFromRenton} from {city.name}
             </p>
-            <h1 className="font-playfair text-3xl font-bold text-white sm:text-5xl lg:text-6xl">
+            <h1 className="font-playfair text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
               Medspa Near{" "}
               <span className="text-[#C9A96E]">{city.name}</span>
             </h1>
-            <p className="mt-4 sm:mt-6 text-base leading-relaxed text-gray-300 sm:text-xl">
+            <p className="mt-6 text-lg leading-relaxed text-gray-300 sm:text-xl">
               Physician-supervised aesthetic and medical wellness treatments for{" "}
               {city.name} residents. {city.drivingTime} from our Renton clinic
               with free parking.
             </p>
-            <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <a
                 href={clinicInfo.booking.url}
-                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 min-h-[48px] text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 py-3.5 text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
               >
                 Book Your Appointment
               </a>
               <a
                 href={clinicInfo.phoneTel}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 min-h-[48px] text-base font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" />
                 {clinicInfo.phone}
               </a>
             </div>
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-400">
+            <div className="mt-8 flex items-center gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1.5">
                 <Star className="h-4 w-4 text-[#C9A96E]" />
-                {clinicInfo.reviews.aggregateRating} Stars
+                {clinicInfo.reviews.aggregateRating} Stars on Google
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-[#C9A96E]" />
-                Open 7 days
+                Open 7 days a week
               </span>
               <span className="flex items-center gap-1.5">
                 <Shield className="h-4 w-4 text-[#C9A96E]" />
@@ -247,7 +247,7 @@ export default function NearCityPage({ params }: PageProps) {
       </section>
 
       {/* About Section */}
-      <section className="bg-white py-10 sm:py-16 lg:py-24">
+      <section className="bg-white py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -337,7 +337,7 @@ export default function NearCityPage({ params }: PageProps) {
       </section>
 
       {/* Services Grid */}
-      <section className="bg-[#F8F6F1] py-10 sm:py-16 lg:py-24">
+      <section className="bg-[#F8F6F1] py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
@@ -378,71 +378,51 @@ export default function NearCityPage({ params }: PageProps) {
       </section>
 
       {/* Pricing Overview */}
-      <section className="bg-white py-10 sm:py-16 lg:py-24">
+      <section className="bg-white py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-4xl">
+          <h2 className="font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
             Pricing for {city.name} Clients
           </h2>
-          <p className="mt-3 sm:mt-4 max-w-2xl text-sm sm:text-base text-gray-600">
-            Transparent pricing with no hidden fees. Flexible payment options
-            available for qualified applicants.
+          <p className="mt-4 max-w-2xl text-base text-gray-600">
+            Transparent pricing with no hidden fees. Financing available through
+            PatientFi and Cherry for qualified applicants.
           </p>
-          {(() => {
-            const pricingRows = [
-              { name: "Botox / Dysport", price: "$12/unit", category: "Injectable" },
-              { name: "Dermal Fillers", price: "$650/syringe", category: "Injectable" },
-              { name: "Lip Filler", price: "$650", category: "Injectable" },
-              { name: "HydraFacial MD", price: "$249", category: "Facial" },
-              { name: "Chemical Peels (VI Peel)", price: "$395", category: "Facial" },
-              { name: "BioRePeel (PRX-T33)", price: "$495", category: "Facial" },
-              { name: "Laser Hair Removal", price: "$79/session", category: "Laser" },
-              { name: "RF Microneedling", price: "$495", category: "Skin Renewal" },
-              { name: "Sofwave", price: "$2,750", category: "Skin Tightening" },
-              { name: "GLP-1 Weight Management", price: "From $399", category: "Wellness" },
-              { name: "NAD+ Injections", price: "$150", category: "Wellness" },
-              { name: "Vitamin Injections", price: "$35", category: "Wellness" },
-              { name: "Peptide Therapy", price: "Consultation", category: "Wellness" },
-              { name: "Hormone Therapy", price: "Consultation", category: "Wellness" },
-              { name: "Blood Work Panel", price: "$99", category: "Wellness" },
-            ];
-            return (
-              <>
-                {/* Desktop Table */}
-                <div className="mt-8 sm:mt-10 hidden sm:block overflow-hidden rounded-2xl border border-gray-100">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-[#0F1D2C] text-white">
-                      <tr>
-                        <th className="px-6 py-4 font-semibold">Treatment</th>
-                        <th className="px-6 py-4 font-semibold">Starting Price</th>
-                        <th className="px-6 py-4 font-semibold">Category</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {pricingRows.map((row, i) => (
-                        <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
-                          <td className="px-6 py-3 font-medium text-[#0F1D2C]">{row.name}</td>
-                          <td className="px-6 py-3 text-[#C9A96E]">{row.price}</td>
-                          <td className="px-6 py-3 text-gray-500">{row.category}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Mobile Stacked Cards */}
-                <div className="mt-8 space-y-2 sm:hidden">
-                  {pricingRows.map((row, i) => (
-                    <div key={i} className="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-3">
-                      <div>
-                        <p className="font-medium text-[#0F1D2C] text-[15px]">{row.name}</p>
-                        <p className="text-xs text-gray-500">{row.category}</p>
-                      </div>
-                      <p className="text-sm font-bold text-[#C9A96E] whitespace-nowrap ml-3">{row.price}</p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            );
-          })()}
+          <div className="mt-10 overflow-hidden rounded-2xl border border-gray-100">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-[#0F1D2C] text-white">
+                <tr>
+                  <th className="px-6 py-4 font-semibold">Treatment</th>
+                  <th className="px-6 py-4 font-semibold">Starting Price</th>
+                  <th className="px-6 py-4 font-semibold">Category</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[
+                  { name: "Botox / Dysport", price: "$12/unit", category: "Injectable" },
+                  { name: "Dermal Fillers", price: "$650/syringe", category: "Injectable" },
+                  { name: "Lip Filler", price: "$650", category: "Injectable" },
+                  { name: "HydraFacial MD", price: "$249", category: "Facial" },
+                  { name: "Chemical Peels (VI Peel)", price: "$395", category: "Facial" },
+                  { name: "BioRePeel (PRX-T33)", price: "$495", category: "Facial" },
+                  { name: "Laser Hair Removal", price: "$79/session", category: "Laser" },
+                  { name: "RF Microneedling", price: "$495", category: "Skin Renewal" },
+                  { name: "Sofwave", price: "$2,750", category: "Skin Tightening" },
+                  { name: "GLP-1 Weight Management", price: "$399/month", category: "Wellness" },
+                  { name: "NAD+ Injections", price: "$150", category: "Wellness" },
+                  { name: "Vitamin Injections", price: "$35", category: "Wellness" },
+                  { name: "Peptide Therapy", price: "Consultation", category: "Wellness" },
+                  { name: "Hormone Therapy", price: "Consultation", category: "Wellness" },
+                  { name: "Blood Work Panel", price: "$99", category: "Wellness" },
+                ].map((row, i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
+                    <td className="px-6 py-3 font-medium text-[#0F1D2C]">{row.name}</td>
+                    <td className="px-6 py-3 text-[#C9A96E]">{row.price}</td>
+                    <td className="px-6 py-3 text-gray-500">{row.category}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
             <Link
               href="/pricing"
@@ -451,44 +431,32 @@ export default function NearCityPage({ params }: PageProps) {
               View Full Pricing Details <ChevronRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/cost/botox-cost"
+              href="/financing"
               className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
             >
-              Botox Cost Guide <ChevronRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/cost/laser-hair-removal-cost"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
-            >
-              Laser Hair Removal Cost <ChevronRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/vs/botox-vs-dysport"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
-            >
-              Compare: Botox vs Dysport <ChevronRight className="h-4 w-4" />
+              Financing Options <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-[#F8F6F1] py-10 sm:py-16 lg:py-24">
+      <section className="bg-[#F8F6F1] py-16 lg:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-4xl">
-            FAQ - {city.name}
+          <h2 className="text-center font-playfair text-3xl font-bold text-[#0F1D2C] sm:text-4xl">
+            Frequently Asked Questions - {city.name}
           </h2>
-          <div className="mt-8 sm:mt-10 space-y-3 sm:space-y-4">
+          <div className="mt-10 space-y-6">
             {(faqData.mainEntity as Array<{ "@type": string; name: string; acceptedAnswer: { "@type": string; text: string } }>).map((faq, i) => (
               <details
                 key={i}
                 className="group rounded-xl border border-gray-200 bg-white"
               >
-                <summary className="flex cursor-pointer items-center justify-between px-4 sm:px-6 py-4 text-[15px] sm:text-base font-semibold text-[#0F1D2C] min-h-[48px] gap-3">
-                  <span>{faq.name}</span>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-gray-400 transition group-open:rotate-90" />
+                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-base font-semibold text-[#0F1D2C]">
+                  {faq.name}
+                  <ChevronRight className="h-5 w-5 text-gray-400 transition group-open:rotate-90" />
                 </summary>
-                <p className="px-4 sm:px-6 pb-4 text-sm leading-relaxed text-gray-700">
+                <p className="px-6 pb-4 text-sm leading-relaxed text-gray-700">
                   {faq.acceptedAnswer.text}
                 </p>
               </details>
@@ -498,7 +466,7 @@ export default function NearCityPage({ params }: PageProps) {
       </section>
 
       {/* Nearby Cities */}
-      <section className="bg-white py-10 sm:py-16 lg:py-24">
+      <section className="bg-white py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-playfair text-3xl font-bold text-[#0F1D2C]">
             Also Serving Cities Near {city.name}
@@ -532,24 +500,26 @@ export default function NearCityPage({ params }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0F1D2C] py-12 sm:py-16 lg:py-20">
+      <section className="bg-[#0F1D2C] py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="font-playfair text-2xl font-bold text-white sm:text-4xl">
+          <h2 className="font-playfair text-3xl font-bold text-white sm:text-4xl">
             Ready to Experience the Rani Difference?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-gray-300">
-            {city.name} residents - book your consultation today. {city.drivingTime} with free parking.
+          <p className="mx-auto mt-4 max-w-2xl text-base text-gray-300">
+            {city.name} residents - book your consultation today and discover why
+            our clients trust us for physician-supervised aesthetic and wellness
+            treatments. {city.drivingTime} with free parking.
           </p>
-          <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
+          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
             <a
               href={clinicInfo.booking.url}
-              className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 min-h-[48px] text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
+              className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-8 py-3.5 text-base font-semibold text-[#0F1D2C] transition hover:bg-[#b8984f]"
             >
               Book Online
             </a>
             <a
               href={clinicInfo.phoneTel}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 min-h-[48px] text-base font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
             >
               <Phone className="h-4 w-4" />
               Call {clinicInfo.phone}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateAISimulation } from '@/lib/photo-simulation/ai-simulation';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 // ─── Request Schema ─────────────────────────────────────────────────────
 
@@ -16,18 +16,11 @@ const simulationRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit("ai", ip, RATE_LIMITS.AI);
+  const { allowed, resetIn } = rateLimit('simulation', ip, RATE_LIMITS.AI);
   if (!allowed) return rateLimitResponse(resetIn);
 
   try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid request body', details: { body: ['Invalid JSON'] } },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
 
     const parsed = simulationRequestSchema.safeParse(body);
     if (!parsed.success) {

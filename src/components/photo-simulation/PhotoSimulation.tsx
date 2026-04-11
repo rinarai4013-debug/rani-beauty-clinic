@@ -180,5 +180,5 @@ function PhotoThumb({ file }: { file: File }) {
   }, [file]);
 
   if (!src) return <div className="h-full w-full bg-[#F8F6F1]" />;
-  return <img src={src} alt="Uploaded photo thumbnail preview" className="h-full w-full object-cover" />;
+  return <img src={src} alt="" className="h-full w-full object-cover" />;
 }

@@ -7,6 +7,7 @@ export interface NavItem {
   permission?: Permission;
   badge?: string;
   group: 'overview' | 'revenue' | 'operations' | 'intelligence' | 'tools' | 'settings';
+  feature?: import('@/lib/dashboard/features').DashboardFeature;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -17,14 +18,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'LayoutDashboard',
     permission: 'view_executive',
     group: 'overview',
-  },
-  {
-    label: 'AI Council',
-    href: '/dashboard/command-center',
-    icon: 'Crown',
-    permission: 'view_executive',
-    badge: 'New',
-    group: 'overview',
+    feature: 'command-center',
   },
   {
     label: 'Leaderboard',
@@ -32,6 +26,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Trophy',
     permission: 'view_leaderboard',
     group: 'overview',
+    feature: 'command-center',
   },
 
   // Revenue
@@ -41,6 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'DollarSign',
     permission: 'view_revenue',
     group: 'revenue',
+    feature: 'revenue',
   },
   {
     label: 'Lead Funnel',
@@ -48,6 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Filter',
     permission: 'view_leads',
     group: 'revenue',
+    feature: 'leads',
   },
   {
     label: 'Ad Performance',
@@ -55,6 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Megaphone',
     permission: 'view_revenue',
     group: 'revenue',
+    feature: 'command-center',
   },
 
   // Operations
@@ -65,6 +63,7 @@ export const NAV_ITEMS: NavItem[] = [
     permission: 'view_revenue',
     badge: 'New',
     group: 'operations',
+    feature: 'command-center',
   },
   {
     label: 'Schedule',
@@ -72,6 +71,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Calendar',
     permission: 'view_schedule',
     group: 'operations',
+    feature: 'schedule',
   },
   {
     label: 'Finance',
@@ -79,6 +79,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Wallet',
     permission: 'view_finance',
     group: 'operations',
+    feature: 'command-center',
   },
   {
     label: 'Reactivation',
@@ -86,6 +87,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'UserMinus',
     permission: 'view_clients',
     group: 'operations',
+    feature: 'command-center',
   },
 
   // Intelligence
@@ -95,6 +97,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'TrendingUp',
     permission: 'view_revenue',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'P&L Intelligence',
@@ -102,6 +105,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'BarChart2',
     permission: 'view_finance',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Schedule Optimizer',
@@ -109,6 +113,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Zap',
     permission: 'view_schedule',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Inventory',
@@ -116,6 +121,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Package',
     permission: 'view_finance',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Social AI',
@@ -123,6 +129,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'PenSquare',
     permission: 'view_revenue',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Meta Ads AI',
@@ -130,6 +137,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Megaphone',
     permission: 'view_revenue',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Consult Co-pilot',
@@ -137,6 +145,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'MessageCircle',
     permission: 'view_schedule',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Knowledge Base',
@@ -144,6 +153,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'BookOpen',
     permission: 'view_executive',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Phone Agent',
@@ -151,6 +161,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Phone',
     permission: 'view_executive',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Competitor Intel',
@@ -158,6 +169,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Radar',
     permission: 'view_executive',
     group: 'intelligence',
+    feature: 'command-center',
   },
   {
     label: 'Reviews',
@@ -165,6 +177,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Star',
     permission: 'view_executive',
     group: 'intelligence',
+    feature: 'command-center',
   },
 
   // Operations - Alerts
@@ -174,29 +187,24 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Bell',
     permission: 'view_executive',
     group: 'operations',
+    feature: 'command-center',
   },
 
   // Tools
-  {
-    label: 'Mastermind',
-    href: '/dashboard/mastermind',
-    icon: 'Brain',
-    permission: 'view_schedule',
-    badge: 'New',
-    group: 'tools',
-  },
   {
     label: 'Plan Builder',
     href: '/dashboard/plan-builder',
     icon: 'FileText',
     permission: 'entry_plan_builder',
     group: 'tools',
+    feature: 'command-center',
   },
   {
     label: 'Quick Entry',
     href: '/dashboard/entry',
     icon: 'PenSquare',
     group: 'tools',
+    feature: 'command-center',
   },
 
   // System
@@ -206,6 +214,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Plug',
     permission: 'manage_settings',
     group: 'settings',
+    feature: 'command-center',
   },
   {
     label: 'Settings',
@@ -213,6 +222,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: 'Settings',
     permission: 'view_settings',
     group: 'settings',
+    feature: 'command-center',
   },
 ];
 

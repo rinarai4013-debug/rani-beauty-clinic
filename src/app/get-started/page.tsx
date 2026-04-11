@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Sparkles, Shield, Clock, CreditCard, Star, ChevronRight, Phone, CheckCircle } from 'lucide-react';
-import { clinicInfo } from '@/data/clinic-info';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -14,13 +13,13 @@ const SERVICES = [
   { name: 'Sofwave', price: 'From $2,750', desc: 'Non-invasive ultrasound skin tightening and lifting', icon: '\u{1F52C}', href: '/services/sofwave' },
   { name: 'RF Microneedling', price: 'From $495', desc: 'Collagen stimulation for acne scars, texture, and tightening', icon: '\u{1F3AF}', href: '/services/rf-microneedling' },
   { name: 'Laser Hair Removal', price: 'Packages from $800', desc: 'Permanent hair reduction for all skin tones', icon: '\u26A1', href: '/services/laser-hair-removal' },
-  { name: 'GLP-1 Weight Loss', price: 'From $399', desc: 'Physician-supervised medical weight loss program', icon: '\u{1F4AA}', href: '/wellness/glp1-weight-management' },
+  { name: 'GLP-1 Weight Loss', price: '$399-599/mo', desc: 'Physician-supervised medical weight loss program', icon: '\u{1F4AA}', href: '/wellness/glp1-weight-management' },
 ];
 
 const TRUST_POINTS = [
   { icon: Shield, label: 'Physician-Supervised', desc: 'Every treatment overseen by our medical director' },
   { icon: Clock, label: 'Free Consultations', desc: 'Complimentary assessment with personalized plan' },
-  { icon: CreditCard, label: 'Flexible Financing', desc: 'Payment plans with instant approval' },
+  { icon: CreditCard, label: '0% Financing', desc: 'Cherry financing with instant approval' },
   { icon: Star, label: 'HSA/FSA Accepted', desc: 'Use pre-tax dollars for eligible treatments' },
 ];
 
@@ -49,8 +48,7 @@ export default function GetStartedPage() {
               2-minute assessment · Results in 24 hours · Physician-supervised care
             </motion.p>
             <motion.div variants={fadeUp}>
-              <Link href={clinicInfo.consultation.url}
-                target="_blank" rel="noopener noreferrer"
+              <Link href="/contact"
                 className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                 Start Your Free Assessment <ChevronRight className="w-5 h-5" />
               </Link>
@@ -125,10 +123,10 @@ export default function GetStartedPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} className="text-2xl md:text-3xl font-heading text-white mb-4">
-              Flexible Payment Plans <span className="text-rani-gold">Available</span>
+              Treatments from <span className="text-rani-gold">$89/month</span>
             </motion.h2>
             <motion.p variants={fadeUp} className="text-base font-body text-white/60 mb-2">
-              Flexible financing options · Instant approval · No hard credit check
+              0% APR financing through PatientFi &amp; Cherry · Instant approval · No hard credit check
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 mt-6">
               {['Afterpay', 'Cherry', 'PatientFi', 'HSA/FSA'].map((method) => (
@@ -148,8 +146,7 @@ export default function GetStartedPage() {
             Start your free AI-powered skin assessment and receive a personalized treatment plan within 24 hours.
           </motion.p>
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href={clinicInfo.consultation.url}
-              target="_blank" rel="noopener noreferrer"
+            <Link href="/contact"
               className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
               Start Your Free Assessment <ChevronRight className="w-5 h-5" />
             </Link>
@@ -161,8 +158,7 @@ export default function GetStartedPage() {
       </section>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-rani-border p-3 sm:hidden z-50">
-        <Link href={clinicInfo.consultation.url}
-          target="_blank" rel="noopener noreferrer"
+        <Link href="/contact"
           className="block w-full bg-rani-gold text-rani-navy font-body font-bold text-center py-3.5 rounded-full">
           Start Your Free Assessment
         </Link>

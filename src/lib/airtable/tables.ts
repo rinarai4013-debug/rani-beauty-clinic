@@ -25,7 +25,6 @@ export const FIELDS = {
     phone: 'Phone',
     preferredContact: 'Preferred Contact',
     status: 'Status',         // Single select
-    mangomintClientId: 'MangoMint Client ID',
     leadSource: 'Lead Source',
     leadMedium: 'Lead Medium',
     leadCampaign: 'Lead Campaign',
@@ -35,9 +34,9 @@ export const FIELDS = {
     leadLandingPage: 'Lead Landing Page',
     leadKeyword: 'Lead Keyword',
     leadReferrer: 'Lead Referrer',
+    attributionId: 'Attribution ID',
     firstTouchAt: 'First Touch At',
     lastTouchAt: 'Last Touch At',
-    attributionId: 'Attribution ID',
     utmSource: 'UTM Source',
     utmMedium: 'UTM Medium',
     utmCampaign: 'UTM Campaign',
@@ -56,6 +55,7 @@ export const FIELDS = {
     transactions: 'Transactions',
     messagesLog: 'Messages Log',
     reviews: 'Reviews',
+    mangomintClientId: 'MangoMint Client ID',
   },
   appointments: {
     service: 'Service Name',
@@ -75,6 +75,7 @@ export const FIELDS = {
     bookingSource: 'Booking Source',
     reviewRequested: 'Review Requested',
     reviewReceived: 'Review Received',
+    mangomintAppointmentId: 'MangoMint Appointment ID',
   },
   transactions: {
     date: 'Date',
@@ -86,6 +87,7 @@ export const FIELDS = {
     status: 'Status',
     isFinancing: 'Is Financing',
     financingProvider: 'Financing Provider',
+    mangomintSaleId: 'MangoMint Sale ID',
   },
   kpiSnapshots: {
     date: 'Date',
@@ -138,6 +140,7 @@ export const FIELDS = {
     status: 'Status',
     startDate: 'Start Date',
     churnRiskScore: 'Churn Risk Score',
+    mangomintMembershipId: 'MangoMint Membership ID',
   },
   treatmentPlans: {
     client: 'Client',              // Linked record to Clients
@@ -149,13 +152,9 @@ export const FIELDS = {
     createdDate: 'Created Date',   // Date
     intakeRecordId: 'Intake Record ID', // Single-line text (for linking back)
     clientName: 'Client Name',     // Single-line text (denormalized for easy access)
-    lastViewedAt: 'Last Viewed At', // Date/time
-    viewCount: 'View Count',       // Number
-    financingClickedAt: 'Financing Clicked At', // Date/time
-    sentAt: 'Sent At',             // Date/time
-    clientEmail: 'Client Email',   // Email
-    clientPhone: 'Client Phone',   // Phone
-    followUpsSent: 'Follow Ups Sent', // Long text (JSON)
+    lastViewedAt: 'Last Viewed At',
+    viewCount: 'View Count',
+    financingClickedAt: 'Financing Clicked At',
   },
   packages: {
     name: 'Package Name',

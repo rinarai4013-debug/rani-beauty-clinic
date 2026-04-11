@@ -41,19 +41,17 @@ export default function manifest(): MetadataRoute.Manifest {
         src: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720"><rect width="1280" height="720" fill="#0F1D2C"/><text x="640" y="320" font-family="serif" font-size="64" font-weight="bold" fill="#C9A96E" text-anchor="middle">Rani Beauty Clinic</text><text x="640" y="400" font-family="sans-serif" font-size="28" fill="#F8F6F1" text-anchor="middle">Premier Medspa &amp; Wellness in Renton, WA</text></svg>`)}`,
         sizes: "1280x720",
         type: "image/svg+xml",
-        // form_factor is a valid PWA manifest property not yet typed by Next.js
-        ...({ form_factor: "wide" } as Record<string, string>),
+        form_factor: "wide",
         label: "Rani Beauty Clinic homepage",
       },
       {
         src: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844"><rect width="390" height="844" fill="#0F1D2C"/><text x="195" y="380" font-family="serif" font-size="40" font-weight="bold" fill="#C9A96E" text-anchor="middle">Rani Beauty</text><text x="195" y="430" font-family="sans-serif" font-size="18" fill="#F8F6F1" text-anchor="middle">Medspa &amp; Wellness</text></svg>`)}`,
         sizes: "390x844",
         type: "image/svg+xml",
-        // form_factor is a valid PWA manifest property not yet typed by Next.js
-        ...({ form_factor: "narrow" } as Record<string, string>),
+        form_factor: "narrow",
         label: "Rani Beauty Clinic mobile view",
       },
-    ] as any,
+    ],
     shortcuts: [
       {
         name: "Book Appointment",

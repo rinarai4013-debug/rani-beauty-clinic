@@ -13,10 +13,20 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTenantStore } from '@/lib/tenant/resolver';
-import { isValidSlug, TIER_FEATURES, type SubscriptionTier, type TenantConfig } from '@/lib/tenant/config';
+import { isValidSlug, TIER_FEATURES, type SubscriptionTier } from '@/lib/tenant/config';
 import { getSession } from '@/lib/auth/session';
 import { createNewTenant } from '@/lib/tenant/onboarding';
 import { z } from 'zod';
+
+const tenantGetQuerySchema = z.object({
+  id: z.string().min(1).optional(),
+  active: z.enum(['true', 'false']).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).default(100),
+});
+
+const tenantDeleteQuerySchema = z.object({
+  id: z.string().trim().min(1),
+});
 
 // ─── Auth Guard ─────────────────────────────────────────────────────────────
 
@@ -39,7 +49,14 @@ export async function GET(request: NextRequest) {
   if (error) return error;
 
   const store = getTenantStore();
-  const id = request.nextUrl.searchParams.get('id');
+  const parsedQuery = tenantGetQuerySchema.safeParse(
+    Object.fromEntries(request.nextUrl.searchParams.entries())
+  );
+  if (!parsedQuery.success) {
+    return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+  }
+
+  const id = parsedQuery.data.id;
 
   if (id) {
     const tenant = await store.getById(id);
@@ -52,10 +69,10 @@ export async function GET(request: NextRequest) {
   }
 
   // List all tenants
-  const active = request.nextUrl.searchParams.get('active');
-  const limit = parseInt(request.nextUrl.searchParams.get('limit') || '100');
+  const active = parsedQuery.data.active;
+  const limit = parsedQuery.data.limit;
   const tenants = await store.list({
-    active: active !== null ? active === 'true' : undefined,
+    active: active ? active === 'true' : undefined,
     limit,
   });
 
@@ -77,15 +94,7 @@ export async function POST(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: [{ path: ['body'], message: 'Invalid JSON' }] },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json();
     const parsed = createTenantSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -150,15 +159,7 @@ export async function PATCH(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: [{ path: ['body'], message: 'Invalid JSON' }] },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json();
     const parsed = updateTenantSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -227,10 +228,13 @@ export async function DELETE(request: NextRequest) {
   const { error } = await requireAdmin();
   if (error) return error;
 
-  const id = request.nextUrl.searchParams.get('id');
-  if (!id) {
+  const parsedQuery = tenantDeleteQuerySchema.safeParse(
+    Object.fromEntries(request.nextUrl.searchParams.entries())
+  );
+  if (!parsedQuery.success) {
     return NextResponse.json({ error: 'Tenant ID required' }, { status: 400 });
   }
+  const { id } = parsedQuery.data;
 
   const store = getTenantStore();
   const existing = await store.getById(id);
@@ -247,7 +251,7 @@ export async function DELETE(request: NextRequest) {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function sanitizeTenantForResponse(tenant: TenantConfig | Record<string, unknown>) {
+function sanitizeTenantForResponse(tenant: Record<string, unknown> | { id: string; name: string; slug: string; airtable: { baseId: string; pat: string }; [key: string]: unknown }) {
   // Remove sensitive fields from API responses
   const safe = { ...tenant } as Record<string, unknown>;
 

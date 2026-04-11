@@ -285,49 +285,49 @@ const SITELINKS: SitelinkExtension[] = [
     text: 'GLP-1 Weight Loss',
     description1: 'Physician-supervised medical weight loss',
     description2: 'GLP-1 program starting at $399/mo',
-    finalUrl: 'https://www.ranibeautyclinic.com/services/glp-1-weight-loss',
+    finalUrl: 'https://ranibeautyclinic.com/services/glp-1-weight-loss',
   },
   {
     text: 'Botox & Fillers',
     description1: 'Expert injectable treatments',
     description2: 'Natural results, zero downtime',
-    finalUrl: 'https://www.ranibeautyclinic.com/services/botox',
+    finalUrl: 'https://ranibeautyclinic.com/services/botox',
   },
   {
     text: 'HydraFacial',
     description1: 'Deep cleanse and hydrate',
     description2: 'Signature facial from $249',
-    finalUrl: 'https://www.ranibeautyclinic.com/services/hydrafacial',
+    finalUrl: 'https://ranibeautyclinic.com/services/hydrafacial',
   },
   {
     text: 'Sofwave Skin Tightening',
     description1: 'Non-surgical facelift alternative',
     description2: 'FDA-cleared, zero downtime',
-    finalUrl: 'https://www.ranibeautyclinic.com/services/sofwave',
+    finalUrl: 'https://ranibeautyclinic.com/services/sofwave',
   },
   {
     text: 'Laser Hair Removal',
     description1: 'Permanent hair reduction',
     description2: 'All skin types, packages from $800',
-    finalUrl: 'https://www.ranibeautyclinic.com/services/laser-hair-removal',
+    finalUrl: 'https://ranibeautyclinic.com/services/laser-hair-removal',
   },
   {
     text: 'Wellness Injections',
     description1: 'B12, Glutathione, NAD+, Tri-Immune',
     description2: 'Quick IM injections, walk-ins welcome',
-    finalUrl: 'https://www.ranibeautyclinic.com/services/wellness-injections',
+    finalUrl: 'https://ranibeautyclinic.com/services/wellness-injections',
   },
   {
     text: 'Book a Consultation',
     description1: 'Free consultation for new clients',
     description2: 'Personalized treatment plans',
-    finalUrl: 'https://www.ranibeautyclinic.com/book',
+    finalUrl: 'https://ranibeautyclinic.com/book',
   },
   {
     text: 'Financing Available',
     description1: 'Cherry financing for treatments',
     description2: 'Flexible monthly payments',
-    finalUrl: 'https://www.ranibeautyclinic.com/financing',
+    finalUrl: 'https://ranibeautyclinic.com/financing',
   },
 ];
 
@@ -371,7 +371,7 @@ const STRUCTURED_SNIPPETS: StructuredSnippetExtension[] = [
 
 const LOCATION_EXTENSION: LocationExtension = {
   businessName: 'Rani Beauty Clinic',
-  address: '401 Olympia Ave NE, Suite 101',
+  address: '401 Olympia Ave NE #101',
   city: 'Renton',
   state: 'WA',
   zip: '98056',
@@ -393,12 +393,12 @@ const PRICE_EXTENSIONS: PriceExtension[] = [
   {
     type: 'services',
     items: [
-      { header: 'Botox', description: 'Expert injectable treatment', price: '$12', priceUnit: 'per_unit', finalUrl: 'https://www.ranibeautyclinic.com/services/botox' },
-      { header: 'HydraFacial', description: 'Signature deep cleansing facial', price: '$249', priceUnit: 'per_session', finalUrl: 'https://www.ranibeautyclinic.com/services/hydrafacial' },
-      { header: 'GLP-1 Weight Loss', description: 'Medical weight loss program', price: '$399', priceUnit: 'per_month', finalUrl: 'https://www.ranibeautyclinic.com/services/glp-1-weight-loss' },
-      { header: 'Sofwave', description: 'Non-surgical skin tightening', price: '$2,750', priceUnit: 'from', finalUrl: 'https://www.ranibeautyclinic.com/services/sofwave' },
-      { header: 'RF Microneedling', description: 'Collagen renewal treatment', price: '$495', priceUnit: 'from', finalUrl: 'https://www.ranibeautyclinic.com/services/rf-microneedling' },
-      { header: 'Wellness Injections', description: 'B12, Glutathione, NAD+', price: '$35', priceUnit: 'from', finalUrl: 'https://www.ranibeautyclinic.com/services/wellness-injections' },
+      { header: 'Botox', description: 'Expert injectable treatment', price: '$12', priceUnit: 'per_unit', finalUrl: 'https://ranibeautyclinic.com/services/botox' },
+      { header: 'HydraFacial', description: 'Signature deep cleansing facial', price: '$249', priceUnit: 'per_session', finalUrl: 'https://ranibeautyclinic.com/services/hydrafacial' },
+      { header: 'GLP-1 Weight Loss', description: 'Medical weight loss program', price: '$399', priceUnit: 'per_month', finalUrl: 'https://ranibeautyclinic.com/services/glp-1-weight-loss' },
+      { header: 'Sofwave', description: 'Non-surgical skin tightening', price: '$2,750', priceUnit: 'from', finalUrl: 'https://ranibeautyclinic.com/services/sofwave' },
+      { header: 'RF Microneedling', description: 'Collagen renewal treatment', price: '$495', priceUnit: 'from', finalUrl: 'https://ranibeautyclinic.com/services/rf-microneedling' },
+      { header: 'Wellness Injections', description: 'B12, Glutathione, NAD+', price: '$35', priceUnit: 'from', finalUrl: 'https://ranibeautyclinic.com/services/wellness-injections' },
     ],
   },
 ];
@@ -572,7 +572,7 @@ function buildAdGroup(
     ads,
     defaultBid: Math.round(defaultBid * 100) / 100,
     qualityScoreEstimate: 7,
-    landingPage: `https://www.ranibeautyclinic.com${landingPage}`,
+    landingPage: `https://ranibeautyclinic.com${landingPage}`,
   };
 }
 
@@ -591,7 +591,7 @@ function buildResponsiveSearchAds(
     adGroupId,
     headlines,
     descriptions,
-    finalUrl: `https://www.ranibeautyclinic.com${landingPage}`,
+    finalUrl: `https://ranibeautyclinic.com${landingPage}`,
     displayUrl: 'ranibeautyclinic.com',
     path1: getPath1(serviceId),
     path2: getPath2(serviceId),

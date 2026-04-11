@@ -35,7 +35,6 @@ const TYPE_LABEL: Record<CampaignType, string> = {
   event: 'Event',
   seasonal: 'Seasonal',
   birthday: 'Birthday',
-  direct: 'Direct',
 };
 
 export default function CampaignList({

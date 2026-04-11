@@ -1,5 +1,14 @@
 // ── Legacy exports (preserved for backward compatibility) ─────────────
 export { default as DashboardSkeleton } from './DashboardSkeleton';
+export {
+  Shimmer as SkeletonBar,
+  StatCardSkeleton as KPICardSkeleton,
+  StatRowSkeleton as KPIRowSkeleton,
+  PanelSkeleton as LegacyPanelSkeleton,
+  TableSkeleton as LegacyTableSkeleton,
+  ChartSkeleton as LegacyChartSkeleton,
+  PageSkeleton as LegacyPageSkeleton,
+} from './LoadingSkeleton';
 
 export { default as DashboardEmptyState } from './DashboardEmptyState';
 
@@ -13,11 +22,8 @@ export {
 // Loading Skeletons (upgraded with shimmer animation)
 export {
   Shimmer,
-  Shimmer as SkeletonBar,
   StatCardSkeleton,
-  StatCardSkeleton as KPICardSkeleton,
   StatRowSkeleton,
-  StatRowSkeleton as KPIRowSkeleton,
   PanelSkeleton,
   TableSkeleton,
   ChartSkeleton,

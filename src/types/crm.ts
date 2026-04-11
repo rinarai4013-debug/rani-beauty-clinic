@@ -157,7 +157,6 @@ export interface PipelineMetrics {
   forecastedRevenue: number;    // weighted by stage probability
   revenueBySource: Record<LeadSource, number>;
   staleLeadCount: number;
-  staleLeads?: unknown[];
   lostLeadsByReason: Record<LostReason, number>;
   winRate: number;              // overall conversion %
   avgDealSize: number;

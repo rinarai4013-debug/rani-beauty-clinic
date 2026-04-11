@@ -24,6 +24,10 @@ export interface FinanceInput {
   previousPeriod?: { revenue: number; expenses: number; netIncome: number };
   bankBalance?: number;
   monthlyFixedCosts?: number;
+  projectionGrowthRates?: {
+    revenue?: number;
+    expenses?: number;
+  };
 }
 
 export interface RevenueEntry {
@@ -166,10 +170,10 @@ export interface FinancialKPIs {
 // ── EXPENSE CATEGORIZATION ──
 
 const EXPENSE_KEYWORDS: Record<ExpenseCategory, string[]> = {
-  payroll: ['payroll', 'salary', 'wages', 'compensation', 'bonus', 'commission', 'staff', 'w2', '1099'],
-  rent: ['rent', 'lease', 'mortgage', 'property', 'space'],
-  supplies: ['supplies', 'consumable', 'serum', 'needle', 'botox', 'filler', 'laser', 'hydrafacial', 'peel', 'gloves', 'medical'],
-  marketing: ['marketing', 'ads', 'meta', 'google', 'facebook', 'instagram', 'advertising', 'seo', 'campaign', 'promotion', 'sendgrid', 'twilio'],
+  payroll: ['payroll', 'salary', 'wages', 'compensation', 'bonus', 'commission', 'w2', '1099'],
+  rent: ['rent', 'lease', 'mortgage', 'property', 'office space'],
+  supplies: ['supplies', 'consumable', 'serum', 'needle', 'botox', 'filler', 'laser', 'hydrafacial', 'peel', 'gloves'],
+  marketing: ['marketing', 'ads', 'meta', 'google', 'facebook', 'instagram', 'advertising', 'seo', 'campaign', 'promotion', 'sendgrid'],
   insurance: ['insurance', 'malpractice', 'liability', 'coverage', 'premium'],
   equipment: ['equipment', 'machine', 'device', 'sofwave', 'candela', 'cutera', 'repair', 'maintenance'],
   software: ['software', 'subscription', 'saas', 'mangomint', 'n8n', 'vercel', 'airtable', 'twilio', 'stripe', 'plaid'],
@@ -183,6 +187,9 @@ export function categorizeExpense(expense: ExpenseEntry): ExpenseCategory {
   if (expense.category) return expense.category;
 
   const text = `${expense.vendor} ${expense.description}`.toLowerCase();
+  if (text.includes('staff meeting')) return 'misc';
+  if (text.includes('medical insurance')) return 'insurance';
+  if (text.includes('space heater')) return 'supplies';
 
   for (const [category, keywords] of Object.entries(EXPENSE_KEYWORDS)) {
     if (category === 'misc') continue;
@@ -273,7 +280,7 @@ function generatePnL(
     .map(([category, amount]) => ({
       category,
       amount,
-      percentage: Math.round((amount / totalRevenue) * 100),
+      percentage: totalRevenue > 0 ? Math.round((amount / totalRevenue) * 100) : 0,
     }))
     .sort((a, b) => b.amount - a.amount);
 
@@ -286,7 +293,7 @@ function generatePnL(
     .map(([provider, amount]) => ({
       provider,
       amount,
-      percentage: Math.round((amount / totalRevenue) * 100),
+      percentage: totalRevenue > 0 ? Math.round((amount / totalRevenue) * 100) : 0,
     }))
     .sort((a, b) => b.amount - a.amount);
 
@@ -326,9 +333,11 @@ function generatePnL(
   if (input.previousPeriod) {
     const prev = input.previousPeriod;
     periodComparison = {
-      revenueChange: prev.revenue > 0 ? Math.round(((totalRevenue - prev.revenue) / prev.revenue) * 100) : 0,
-      expenseChange: prev.expenses > 0 ? Math.round((((cos + totalOpex) - prev.expenses) / prev.expenses) * 100) : 0,
-      netIncomeChange: prev.netIncome !== 0 ? Math.round(((netIncome - prev.netIncome) / Math.abs(prev.netIncome)) * 100) : 0,
+      revenueChange: calculatePercentageChange(totalRevenue, prev.revenue),
+      expenseChange: calculatePercentageChange((cos + totalOpex), prev.expenses),
+      netIncomeChange: prev.netIncome !== 0
+        ? calculatePercentageChange(netIncome, prev.netIncome)
+        : (netIncome > 0 ? 100 : 0),
     };
   }
 
@@ -460,24 +469,34 @@ function projectCashFlow(
   const monthlyExpenses = pnl.costOfServices.total + pnl.operatingExpenses.total;
 
   // Growth assumptions
-  const revenueGrowthRate = 0.03; // 3% monthly growth
-  const expenseGrowthRate = 0.01; // 1% monthly expense growth
+  const revenueGrowthRate = input.projectionGrowthRates?.revenue ?? 0.03; // 3% monthly growth
+  const expenseGrowthRate = input.projectionGrowthRates?.expenses ?? 0.01; // 1% monthly expense growth
 
   let balance = startBalance;
+  const periodStart = parseDate(input.period.start);
+  const projectionStart = new Date(
+    Date.UTC(periodStart.getUTCFullYear(), periodStart.getUTCMonth(), 1)
+  );
 
   for (let i = 0; i < 6; i++) {
-    const month = new Date();
-    month.setMonth(month.getMonth() + i);
-    const monthStr = month.toLocaleString('default', { month: 'short', year: 'numeric' });
+    const month = new Date(
+      Date.UTC(projectionStart.getUTCFullYear(), projectionStart.getUTCMonth() + i, 1)
+    );
+    const monthStr = month.toLocaleString('default', {
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
 
     const projectedRev = Math.round(monthlyRevenue * Math.pow(1 + revenueGrowthRate, i));
     const projectedExp = Math.round(monthlyExpenses * Math.pow(1 + expenseGrowthRate, i));
     const projectedNet = projectedRev - projectedExp;
-    balance += projectedNet;
 
     // Runway: if losing money (burn > 0), how many months until zero
     const monthlyBurn = projectedExp - projectedRev;
-    const runway = monthlyBurn > 0 && balance > 0 ? Math.round(balance / monthlyBurn) : monthlyBurn > 0 ? 0 : 99;
+    const runway = monthlyBurn > 0 && balance > 0 ? Math.floor(balance / monthlyBurn) : monthlyBurn > 0 ? 0 : 99;
+
+    balance += projectedNet;
 
     projections.push({
       month: monthStr,
@@ -495,9 +514,12 @@ function projectCashFlow(
 // ── KPIs ──
 
 function calculateKPIs(input: FinanceInput, pnl: ProfitLossStatement): FinancialKPIs {
-  const days = Math.max(1, Math.ceil(
-    (new Date(input.period.end).getTime() - new Date(input.period.start).getTime()) / 86400000
-  ));
+  const days = Math.max(
+    1,
+    Math.round(
+      (parseDate(input.period.end).getTime() - parseDate(input.period.start).getTime()) / 86400000
+    ) + 1
+  );
 
   const financingTransactions = input.revenue.filter(r => r.paymentMethod === 'financing');
   const newClientRevenue = input.revenue
@@ -554,7 +576,7 @@ function calculateFinancialHealth(
   else if (pnl.netMargin > 15) profitability = 80;
   else if (pnl.netMargin > 10) profitability = 70;
   else if (pnl.netMargin > 5) profitability = 55;
-  else if (pnl.netMargin > 0) profitability = 40;
+  else if (pnl.netMargin >= 0) profitability = 40;
   else {
     profitability = 20;
     alerts.push('Business is operating at a loss this period');
@@ -600,7 +622,7 @@ function calculateFinancialHealth(
 
   // Cash position (0-100)
   let cashPosition = 50;
-  if (input.bankBalance) {
+  if (input.bankBalance !== undefined) {
     const monthsOfExpenses = input.bankBalance / (kpis.totalExpenses || 1);
     if (monthsOfExpenses > 6) cashPosition = 95;
     else if (monthsOfExpenses > 3) cashPosition = 80;
@@ -685,4 +707,20 @@ function generateFinancialInsights(
   }
 
   return insights;
+}
+
+function parseDate(date: string): Date {
+  const normalized = date.split('T')[0];
+  const [year, month, day] = normalized.split('-').map(Number);
+  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) {
+    return new Date(date);
+  }
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function calculatePercentageChange(current: number, previous: number): number {
+  if (previous === 0) {
+    return current > 0 ? 100 : 0;
+  }
+  return Math.round(((current - previous) / previous) * 100);
 }

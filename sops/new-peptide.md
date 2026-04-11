@@ -33,7 +33,4 @@
 - Provide administration instructions specific to peptide type
 - Move to ACTIVE-PATIENT
 - Monthly check-ins
-- Cross-sell NAD+ injection add-on
-
----
-**COMPLIANCE:** Rina does NOT diagnose or prescribe. All medical decisions = Medical Director via Qualiphy. Always say "compounded medication" — never reference brand names.
+- Cross-sell NAD+ IV drip add-on

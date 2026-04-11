@@ -3,7 +3,6 @@ import Link from "next/link";
 import { CheckCircle, Phone, MapPin, Calendar } from "lucide-react";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
 import Button from "@/components/ui/Button";
-import ReviewCTA from "@/components/conversion/ReviewCTA";
 import { clinicInfo } from "@/data/clinic-info";
 
 export const metadata: Metadata = {
@@ -88,11 +87,6 @@ export default function ThankYouPage() {
               <Calendar size={14} className="text-rani-gold" />
               {clinicInfo.hours.formatted}
             </div>
-          </div>
-
-          {/* Google Review CTA */}
-          <div className="mt-10">
-            <ReviewCTA location="thank_you_page" />
           </div>
 
           <p className="mt-8 font-body text-xs text-rani-muted">

@@ -762,7 +762,7 @@ That said, HydraFacial has its limitations. It is not a replacement for deeper t
       },
       {
         question: "Is HydraFacial better than a regular facial?",
-        answer: "HydraFacial uses patented medical-grade technology that delivers more consistent and effective results than most traditional facials. The vortex extraction system provides deeper cleansing, and the serum delivery system delivers active ingredients more effectively than manual application. Results are typically more noticeable and longer-lasting."
+        answer: "HydraFacial uses patented medical-grade technology that delivers more consistent and effective results than most traditional facials. The vortex extraction system provides deeper cleansing, and the serum infusion delivers active ingredients more effectively than manual application. Results are typically more noticeable and longer-lasting."
       },
       {
         question: "Can HydraFacial help with acne?",
@@ -1020,9 +1020,9 @@ Couples treatments also make exceptional gifts for anniversaries, Valentine's Da
 
 Afterpay allows you to split your treatment cost into four interest-free payments made every two weeks. There are no hidden fees when you pay on time, and approval is quick and straightforward. This option is popular with patients booking HydraFacials, Botox, and other treatments in the moderate price range. It is a simple way to enjoy your treatment now and pay over the following weeks without any interest charges.
 
-Cherry is a patient financing platform designed specifically for healthcare and aesthetic treatments. Cherry offers flexible payment plans and a quick application process that can be completed right at the clinic. This option is ideal for larger treatment plans, including laser hair removal packages, dermal filler treatments, and comprehensive programs like our Bride-to-Be Package or Total Body Transformation.
+Cherry is a patient financing platform designed specifically for healthcare and aesthetic treatments. Cherry offers flexible monthly payment plans with competitive rates and a quick application process that can be completed right at the clinic. This option is ideal for larger treatment plans, including laser hair removal packages, dermal filler treatments, and comprehensive programs like our Bride-to-Be Package or Total Body Transformation. Many patients appreciate that Cherry offers longer payment terms for bigger investments.
 
-PatientFi is another excellent option designed for medical and aesthetic treatments, with no hard credit check required to see your options. PatientFi offers flexible plans, making even premium treatments accessible. Our team at Rani Beauty Clinic is happy to help you explore all three options and find the best fit for your needs. We never want finances to stand between you and the care you want. Call (425) 539-4440 or ask about financing during your next visit.`,
+PatientFi is another excellent option that provides flexible monthly payments with no hard credit check required to see your options. PatientFi is designed for medical and aesthetic treatments and offers plans that can extend over several months, making even premium treatments accessible. Our team at Rani Beauty Clinic is happy to help you explore all three options and find the best fit for your needs. We never want finances to stand between you and the care you want. Call (425) 539-4440 or ask about financing during your next visit.`,
     faqs: [
       {
         question: "Is financing available for all treatments at Rani Beauty Clinic?",

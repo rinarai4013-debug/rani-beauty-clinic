@@ -16,8 +16,7 @@ describe('env validation', () => {
     vi.stubEnv('AIRTABLE_BASE_ID', 'app123');
     vi.stubEnv('DASHBOARD_JWT_SECRET', 'secret');
 
-    const mod = await import('./env');
-    expect(() => mod.env.AIRTABLE_PAT).toThrow('Environment validation failed');
+    await expect(import('./env')).rejects.toThrow('Environment validation failed');
   });
 
   it('throws when DASHBOARD_JWT_SECRET is missing', async () => {
@@ -25,8 +24,7 @@ describe('env validation', () => {
     vi.stubEnv('AIRTABLE_BASE_ID', 'app123');
     vi.stubEnv('DASHBOARD_JWT_SECRET', '');
 
-    const mod = await import('./env');
-    expect(() => mod.env.DASHBOARD_JWT_SECRET).toThrow('Environment validation failed');
+    await expect(import('./env')).rejects.toThrow('Environment validation failed');
   });
 
   it('succeeds with all required vars', async () => {

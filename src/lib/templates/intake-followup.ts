@@ -34,7 +34,7 @@ interface Template {
 
 const BOOKING_URL = 'https://www.ranibeautyclinic.com/contact';
 const CLINIC_PHONE = '(425) 207-8883';
-const CLINIC_ADDRESS = '401 Olympia Ave NE, Suite 101, Renton, WA 98056';
+const CLINIC_ADDRESS = '401 Olympia Ave NE #101, Renton, WA 98056';
 
 function fill(template: string, vars: IntakeFollowUpVars): string {
   return template

@@ -217,15 +217,26 @@ function isExcludedByContraindications(
 }
 
 function isRecentlyHad(service: UnifiedService, previousTreatments: string[]): boolean {
-  const prevLower = previousTreatments.map((t) => t.toLowerCase().trim());
+  const prevLower = previousTreatments
+    .map((t) => t.toLowerCase().trim())
+    .filter((t) => t.length > 0);
+  if (prevLower.length === 0) return false;
+
   const serviceLower = service.name.toLowerCase();
   const slugLower = service.parentSlug?.toLowerCase() ?? '';
+  const normalizeForMatch = (value: string) => value.replace(/[^a-z0-9]+/g, ' ').trim();
+  const serviceTokens = normalizeForMatch(service.name).split(' ');
+  const slugTokens = normalizeForMatch(slugLower).split(' ');
+
   return prevLower.some(
     (prev) =>
-      serviceLower.includes(prev) ||
-      prev.includes(slugLower) ||
-      slugLower.includes(prev) ||
-      prev.includes(service.id)
+      prev === service.id ||
+      prev === slugLower ||
+      prev === serviceLower ||
+      serviceTokens.some((token) => token.length > 2 && token === prev) ||
+      slugTokens.some((token) => token.length > 2 && token === prev) ||
+      new RegExp(`\\b${prev.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(serviceLower) ||
+      new RegExp(`\\b${prev.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(slugLower)
   );
 }
 
@@ -339,10 +350,23 @@ function scoreService(
 function assignPhase(service: UnifiedService): 1 | 2 | 3 {
   for (const [phase, categories] of Object.entries(PHASE_CATEGORIES)) {
     if (categories.has(service.category)) {
-      return Number(phase) as 1 | 2 | 3;
+      const numericPhase = Number(phase) as 1 | 2 | 3;
+      if (
+        numericPhase === 1 &&
+        (service.category === 'facial' || service.category === 'skincare') &&
+        (service.sessions >= 3 || service.price <= 300 || /maintenance|routine|monthly/i.test(service.name))
+      ) {
+        return 3;
+      }
+      return numericPhase;
     }
   }
-  return service.price > 400 ? 2 : 1;
+  if ((service.category === 'facial' || service.category === 'skincare') && service.price <= 300) {
+    return 3;
+  }
+  if (service.price > 600) return 2;
+  if (service.price > 400) return 2;
+  return 1;
 }
 
 function generateReason(service: UnifiedService, matchedConcerns: string[]): string {

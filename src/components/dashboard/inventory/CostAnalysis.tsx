@@ -74,7 +74,7 @@ export default function CostAnalysis({ loading = false }: CostAnalysisProps) {
             <YAxis tick={{ fontSize: 11, fill: '#8B8680' }} tickFormatter={(v) => `$${v}`} />
             <Tooltip
               contentStyle={{ backgroundColor: 'white', border: '1px solid #E2E0DC', borderRadius: '8px', fontSize: 11 }}
-              formatter={((value: number, name: string) => [`$${value}`, name.charAt(0).toUpperCase() + name.slice(1)]) as any}
+              formatter={(value: number, name: string) => [`$${value}`, name.charAt(0).toUpperCase() + name.slice(1)]}
             />
             <Line type="monotone" dataKey="botox" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3 }} name="Botox/100U" />
             <Line type="monotone" dataKey="dysport" stroke="#EC4899" strokeWidth={2} dot={{ r: 3 }} name="Dysport/300U" />
@@ -100,7 +100,7 @@ export default function CostAnalysis({ loading = false }: CostAnalysisProps) {
               <YAxis tick={{ fontSize: 10, fill: '#8B8680' }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} />
               <Tooltip
                 contentStyle={{ backgroundColor: 'white', border: '1px solid #E2E0DC', borderRadius: '8px', fontSize: 11 }}
-                formatter={((value: number, name: string) => [`$${value.toLocaleString()}`, name === 'cost' ? 'Product Cost' : 'Revenue']) as any}
+                formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name === 'cost' ? 'Product Cost' : 'Revenue']}
               />
               <Bar dataKey="revenue" fill="#C9A96E" radius={[2, 2, 0, 0]} name="Revenue" />
               <Bar dataKey="cost" fill="#0F1D2C" radius={[2, 2, 0, 0]} name="Product Cost" />

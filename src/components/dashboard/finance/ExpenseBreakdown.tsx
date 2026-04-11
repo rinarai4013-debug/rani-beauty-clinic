@@ -117,7 +117,7 @@ export default function ExpenseBreakdown() {
                   paddingAngle={2}
                   dataKey="value"
                   onClick={(entry) => setSelectedCategory(
-                    selectedCategory === (entry as any).category ? null : (entry as any).category,
+                    selectedCategory === entry.category ? null : entry.category,
                   )}
                   style={{ cursor: 'pointer' }}
                 >
@@ -132,7 +132,7 @@ export default function ExpenseBreakdown() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={((value: number) => formatCurrency(value)) as any}
+                  formatter={(value: number) => formatCurrency(value)}
                   contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 />
               </PieChart>

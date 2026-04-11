@@ -12,27 +12,10 @@ import {
   type LoyaltyMember,
   type PointsTransaction,
   type LoyaltyAnalytics,
+  type ServiceType,
+  type BonusType,
 } from '@/lib/loyalty/engine';
 import { getAvailableRewards } from '@/lib/loyalty/rewards';
-
-const LoyaltyTierSchema = z.enum(['Silver', 'Gold', 'Platinum']);
-const AwardBonusSchema = z.object({
-  action: z.literal('award_bonus'),
-  clientId: z.string().trim().min(1, 'clientId required'),
-  bonusType: z.enum(['birthday', 'review', 'referral', 'visit_streak', 'tier_up']),
-});
-const ProcessSpendSchema = z.object({
-  action: z.literal('process_spend'),
-  clientId: z.string().trim().min(1, 'clientId required'),
-  amount: z.number().positive('amount must be greater than 0'),
-  serviceType: z.string().trim().min(1, 'serviceType required'),
-});
-const LoyaltyPostSchema = z.discriminatedUnion('action', [AwardBonusSchema, ProcessSpendSchema]);
-
-const LoyaltyRewardsQuerySchema = z.object({
-  tier: LoyaltyTierSchema.optional().default('Silver'),
-  balance: z.coerce.number().int().min(0).optional().default(0),
-});
 
 /**
  * GET /api/dashboard/loyalty
@@ -43,6 +26,64 @@ const LoyaltyRewardsQuerySchema = z.object({
  *   ?action=member&clientId=xxx - Single member details
  *   ?action=rewards&tier=xxx&balance=xxx - Available rewards for tier/balance
  */
+
+const loyaltyTierSchema = z.enum(['Silver', 'Gold', 'Platinum']);
+const bonusTypeSchema = z.enum(['birthday', 'review', 'referral', 'visit_streak', 'tier_up']);
+const serviceTypeSchema = z.enum(['standard', 'membership', 'package']);
+const loyaltyGetActionSchema = z.enum(['analytics', 'member', 'rewards']);
+
+const loyaltyGetAnalyticsSchema = z.object({ action: z.literal('analytics') });
+const loyaltyGetMemberSchema = z.object({
+  action: z.literal('member'),
+  clientId: z.string().trim().min(1, 'clientId is required for member action'),
+});
+const loyaltyGetRewardsSchema = z.object({
+  action: z.literal('rewards'),
+  tier: loyaltyTierSchema.default('Silver'),
+  balance: z.coerce.number().int().nonnegative().default(0),
+});
+
+const loyaltyGetQuerySchema = z.object({
+  action: loyaltyGetActionSchema.default('analytics'),
+  clientId: z.string().trim().min(1).optional(),
+  tier: loyaltyTierSchema.optional(),
+  balance: z.coerce.number().int().nonnegative().optional(),
+});
+
+const loyaltyPostAwardBonusSchema = z.object({
+  action: z.literal('award_bonus'),
+  clientId: z.string().trim().min(1, 'clientId is required'),
+  bonusType: bonusTypeSchema,
+});
+
+const loyaltyPostProcessSpendSchema = z.object({
+  action: z.literal('process_spend'),
+  clientId: z.string().trim().min(1, 'clientId is required'),
+  amount: z.coerce.number().positive('amount must be greater than 0'),
+  serviceType: serviceTypeSchema.default('standard'),
+});
+
+function parseLoyaltyPostBody(rawBody: unknown) {
+  if (!rawBody || typeof rawBody !== 'object' || rawBody === null) {
+    throw new Error('Body must be an object');
+  }
+
+  const action = (rawBody as { action?: unknown }).action;
+  if (action === 'award_bonus') {
+    return loyaltyPostAwardBonusSchema.parse(rawBody);
+  }
+
+  if (action === 'process_spend') {
+    return loyaltyPostProcessSpendSchema.parse(rawBody);
+  }
+
+  return z.object({ action: z.string() }).parse(rawBody);
+}
+
+function formatZodError(error: z.ZodError) {
+  return { errors: error.issues.map(issue => ({ path: issue.path.join('.'), message: issue.message })) };
+}
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession();
@@ -51,7 +92,43 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const action = searchParams.get('action') || 'analytics';
+
+    let query;
+    try {
+      const parsedQuery = loyaltyGetQuerySchema.safeParse({
+        action: searchParams.get('action') ?? undefined,
+        clientId: searchParams.get('clientId') ?? undefined,
+        tier: searchParams.get('tier') ?? undefined,
+        balance: searchParams.get('balance') ?? undefined,
+      });
+
+      if (!parsedQuery.success) {
+        return NextResponse.json({ error: 'Invalid query parameters', details: formatZodError(parsedQuery.error) }, { status: 400 });
+      }
+
+      if (parsedQuery.data.action === 'member') {
+        const memberQuery = loyaltyGetMemberSchema.safeParse(parsedQuery.data);
+        if (!memberQuery.success) {
+          return NextResponse.json({ error: 'Invalid query parameters', details: formatZodError(memberQuery.error) }, { status: 400 });
+        }
+        query = memberQuery.data;
+      } else if (parsedQuery.data.action === 'rewards') {
+        const rewardsQuery = loyaltyGetRewardsSchema.safeParse(parsedQuery.data);
+        if (!rewardsQuery.success) {
+          return NextResponse.json({ error: 'Invalid query parameters', details: formatZodError(rewardsQuery.error) }, { status: 400 });
+        }
+        query = rewardsQuery.data;
+      } else {
+        query = loyaltyGetAnalyticsSchema.parse({ action: 'analytics' });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json({ error: 'Invalid query parameters', details: formatZodError(error) }, { status: 400 });
+      }
+      return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+    }
+
+    const { action } = query;
 
     if (action === 'analytics') {
       const cacheKey = 'loyalty:analytics';
@@ -69,10 +146,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (action === 'member') {
-      const clientId = searchParams.get('clientId');
-      if (!clientId) {
-        return NextResponse.json({ error: 'clientId required' }, { status: 400 });
-      }
+      const { clientId } = query;
 
       // In production: fetch from Airtable Clients + Loyalty Points tables
       const member = generateSampleMembers().find(m => m.clientId === clientId);
@@ -95,16 +169,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (action === 'rewards') {
-      const rewardsQuery = LoyaltyRewardsQuerySchema.safeParse({
-        tier: searchParams.get('tier'),
-        balance: searchParams.get('balance') ?? undefined,
-      });
-
-      if (!rewardsQuery.success) {
-        return NextResponse.json({ error: 'Invalid rewards query parameters' }, { status: 400 });
-      }
-
-      const { tier, balance } = rewardsQuery.data;
+      const { tier, balance } = query;
       const rewards = getAvailableRewards(tier, balance);
       return NextResponse.json({ rewards });
     }
@@ -135,21 +200,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const parsed = LoyaltyPostSchema.safeParse(await req.json().catch(() => null));
-    if (!parsed.success) {
+    let body: {
+      action: string;
+      clientId?: string;
+      bonusType?: BonusType;
+      amount?: number;
+      serviceType?: ServiceType;
+    };
+    try {
+      const rawBody = await req.json();
+      body = parseLoyaltyPostBody(rawBody) as typeof body;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json({ error: 'Invalid request body', details: formatZodError(error) }, { status: 400 });
+      }
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 
-    const { action, clientId } = parsed.data;
+    if (body.action === 'award_bonus') {
+      const { clientId, bonusType } = body;
 
-    if (action === 'award_bonus') {
       // In production: fetch member from Airtable, update, save
       const member = generateSampleMembers().find(m => m.clientId === clientId);
       if (!member) {
         return NextResponse.json({ error: 'Member not found' }, { status: 404 });
       }
 
-      const result = awardBonus(member, parsed.data.bonusType);
+      const result = awardBonus(member, bonusType as BonusType);
       cache.invalidate('loyalty:analytics');
 
       return NextResponse.json({
@@ -158,10 +235,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (action === 'process_spend') {
+    if (body.action === 'process_spend') {
       return NextResponse.json(
-        { error: 'process_spend is not implemented yet' },
-        { status: 501 }
+        {
+          error: 'process_spend action is not yet implemented',
+        },
+        { status: 501 },
       );
     }
 

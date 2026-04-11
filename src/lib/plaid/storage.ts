@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import type { PlaidAccount, PlaidTransaction, CategoryMappingRule } from '@/types/plaid';
 import { DEFAULT_CATEGORY_MAPPINGS } from './categories';
 import { Tables, fetchFirst, createRecord, updateRecord } from '@/lib/airtable/client';
+import { env } from '@/lib/env';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -42,7 +43,7 @@ const IV_LENGTH = 12; // 96-bit IV recommended for GCM
 const AUTH_TAG_LENGTH = 16;
 
 function deriveKey(): Buffer {
-  const secret = process.env.DASHBOARD_JWT_SECRET;
+  const secret = env.DASHBOARD_JWT_SECRET;
   if (!secret) {
     throw new Error(
       '[Plaid Storage] DASHBOARD_JWT_SECRET is not set. ' +

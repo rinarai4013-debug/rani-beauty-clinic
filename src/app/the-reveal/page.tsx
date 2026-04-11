@@ -47,7 +47,7 @@ const revealSchema = {
       telephone: "+14255394440",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "401 Olympia Ave NE, Suite 101",
+        streetAddress: "401 Olympia Ave NE #101",
         addressLocality: "Renton",
         addressRegion: "WA",
         postalCode: "98056",

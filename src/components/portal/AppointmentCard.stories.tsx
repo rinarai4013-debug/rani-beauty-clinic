@@ -21,7 +21,7 @@ const upcomingAppointment: PortalAppointment = {
   time: '2:00 PM',
   duration: 60,
   status: 'Confirmed',
-  location: '401 Olympia Ave NE, Suite 101, Renton, WA',
+  location: '401 Olympia Ave NE #101, Renton, WA',
 };
 
 const pastAppointment: PortalAppointment = {

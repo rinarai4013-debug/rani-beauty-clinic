@@ -27,7 +27,7 @@ export const costPages: CostPage[] = [
       { item: "Upper Lip or Chin", price: "$79", note: "Small facial areas" },
       { item: "Underarms", price: "$149" },
       { item: "Full Brazilian", price: "$225" },
-      { item: "Full Legs", price: "$400" },
+      { item: "Full Legs", price: "$375" },
       { item: "Full Back", price: "$375" },
       { item: "Full Body", price: "$1,199", note: "Best value - all areas included" },
     ],
@@ -38,7 +38,7 @@ export const costPages: CostPage[] = [
       "Technology used - we use the Candela GentleMax Pro Plus, which treats all skin tones safely and effectively.",
     ],
     financingNote:
-      "We offer flexible financing through Afterpay, Cherry, and PatientFi so you can start your laser hair removal journey today and pay over time. Apply online or in-clinic with no hard credit check.",
+      "We offer flexible financing through Afterpay, Cherry, and PatientFi so you can start your laser hair removal journey today and pay over time. Apply online or in-clinic with no impact to your credit score.",
     faqs: [
       {
         question: "How many laser hair removal sessions will I need?",
@@ -53,7 +53,7 @@ export const costPages: CostPage[] = [
       {
         question: "Do you offer payment plans for laser hair removal?",
         answer:
-          "Yes. We partner with Afterpay, Cherry, and PatientFi to offer flexible financing options. Apply with no hard credit check and find a plan that fits your budget.",
+          "Yes. We partner with Afterpay, Cherry, and PatientFi to offer interest-free and low-interest financing options. You can split your treatment cost into manageable monthly payments.",
       },
       {
         question: "Are laser hair removal packages a better deal?",
@@ -85,11 +85,11 @@ export const costPages: CostPage[] = [
     factors: [
       "Type of HydraFacial selected - Express, Signature, Back, or Keravive each address different concerns and treatment areas.",
       "Add-on treatments - dermaplaning, neck and decollete extension, and red light therapy each enhance your results at an additional cost.",
-      "Membership status - Angel Glow Up members receive discounted HydraFacial pricing.",
+      "Membership status - Angel Glow Up members receive discounted HydraFacial pricing starting at $199 per session.",
       "Package purchases - our Glow Up 3-Pack bundles three Signature HydraFacials with LED sessions for additional savings.",
     ],
     financingNote:
-      "Make your HydraFacial more affordable with financing through Afterpay, Cherry, or PatientFi. Flexible plans available with no hard credit check so you can keep your skin glowing without the upfront cost.",
+      "Make your HydraFacial more affordable with financing through Afterpay, Cherry, or PatientFi. Split your payment into interest-free installments and keep your skin glowing without the upfront cost.",
     faqs: [
       {
         question: "Is a HydraFacial worth the price?",
@@ -99,7 +99,7 @@ export const costPages: CostPage[] = [
       {
         question: "How often should I get a HydraFacial?",
         answer:
-          "We recommend monthly HydraFacials for optimal skin health. Our Angel Glow Up Membership includes a monthly facial starting at $199 with additional perks like priority booking and service discounts.",
+          "We recommend monthly HydraFacials for optimal skin health. Our Angel Glow Up Membership includes a monthly facial starting at $199/month with additional perks like priority booking and service discounts.",
       },
       {
         question: "What is included in the Signature HydraFacial?",
@@ -141,7 +141,7 @@ export const costPages: CostPage[] = [
       "Body area size - larger treatment zones like full legs ($1,500) cost more due to extended treatment time.",
     ],
     financingNote:
-      "Invest in your skin with flexible financing through Afterpay, Cherry, and PatientFi. Apply online with no hard credit check and find a plan that works for your budget.",
+      "Invest in your skin with flexible financing through Afterpay, Cherry, and PatientFi. Break your RF microneedling cost into comfortable monthly payments with fast online approval.",
     faqs: [
       {
         question: "How many RF microneedling sessions do I need?",
@@ -188,7 +188,7 @@ export const costPages: CostPage[] = [
       "Provider expertise - all injectable treatments at Rani Beauty Clinic are performed under physician supervision.",
     ],
     financingNote:
-      "Keep your look refreshed with flexible financing through Afterpay, Cherry, and PatientFi. Apply with no hard credit check and find a plan that fits your budget.",
+      "Keep your look refreshed with flexible financing through Afterpay, Cherry, and PatientFi. Pay for your Botox or Dysport treatment in installments that fit your budget.",
     faqs: [
       {
         question: "How many units of Botox do I need?",
@@ -240,7 +240,7 @@ export const costPages: CostPage[] = [
       "Longevity of the filler - some products last 6-12 months while others can last up to 18-24 months.",
     ],
     financingNote:
-      "Make your filler treatment more accessible with financing from Afterpay, Cherry, or PatientFi. Apply in minutes with no hard credit check and enjoy flexible options.",
+      "Make your filler treatment more accessible with financing from Afterpay, Cherry, or PatientFi. Apply in minutes with no impact to your credit score and enjoy flexible repayment terms.",
     faqs: [
       {
         question: "How much filler do I need for lips?",
@@ -286,7 +286,7 @@ export const costPages: CostPage[] = [
       "Series vs. single treatment - we offer 3-packs for VI Peel ($899) and BioRePeel ($949) for ongoing treatment plans.",
     ],
     financingNote:
-      "Invest in your skin with no financial stress. Afterpay, Cherry, and PatientFi offer flexible financing so you can start your chemical peel series today. Apply with no hard credit check.",
+      "Invest in your skin with no financial stress. Afterpay, Cherry, and PatientFi offer flexible financing so you can start your chemical peel series today and pay over time.",
     faqs: [
       {
         question: "Which chemical peel is best for my skin?",
@@ -332,7 +332,7 @@ export const costPages: CostPage[] = [
       "Skin condition severity - more pronounced pigmentation, acne, or texture concerns may benefit from additional sessions.",
     ],
     financingNote:
-      "Make BioRePeel affordable with Afterpay, Cherry, or PatientFi financing. Apply in minutes with no hard credit check and find a plan that works for you.",
+      "Make BioRePeel affordable with Afterpay, Cherry, or PatientFi financing. Apply in minutes and split your treatment cost into easy monthly payments with no credit score impact.",
     faqs: [
       {
         question: "What makes BioRePeel different from other peels?",
@@ -377,7 +377,7 @@ export const costPages: CostPage[] = [
       "Maintenance schedule - most clients benefit from annual touch-up sessions to maintain their lifted results.",
     ],
     financingNote:
-      "Sofwave is an investment in lasting skin tightening. Finance your treatment through Afterpay, Cherry, or PatientFi with flexible options that make this premium treatment accessible. No hard credit check to apply.",
+      "Sofwave is an investment in lasting skin tightening. Finance your treatment through Afterpay, Cherry, or PatientFi with flexible payment plans that make this premium treatment accessible.",
     faqs: [
       {
         question: "Is Sofwave worth the cost compared to a facelift?",
@@ -422,7 +422,7 @@ export const costPages: CostPage[] = [
       "Severity and depth of scarring - deeper or more widespread scarring may require more intensive and longer treatment series.",
     ],
     financingNote:
-      "Scar reduction is an investment in your confidence. Afterpay, Cherry, and PatientFi offer flexible financing so you can begin your treatment plan without waiting. No hard credit check to apply.",
+      "Scar reduction is an investment in your confidence. Afterpay, Cherry, and PatientFi offer financing options so you can begin your treatment plan without waiting.",
     faqs: [
       {
         question: "How many scar reduction sessions will I need?",
@@ -437,7 +437,7 @@ export const costPages: CostPage[] = [
       {
         question: "Does insurance cover scar reduction?",
         answer:
-          "Cosmetic scar reduction treatments are typically not covered by insurance. However, we accept HSA and FSA cards for eligible treatments, and we offer flexible financing through Afterpay, Cherry, and PatientFi with no hard credit check.",
+          "Cosmetic scar reduction treatments are typically not covered by insurance. However, we accept HSA and FSA cards for eligible treatments, and we offer financing through Afterpay, Cherry, and PatientFi to make treatment accessible.",
       },
     ],
   },
@@ -449,16 +449,16 @@ export const costPages: CostPage[] = [
     metaTitle:
       "GLP-1 Weight Management Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does GLP-1 weight management cost? Programs start at $249 at Rani Beauty Clinic in Renton, WA. Semaglutide, tirzepatide, and liraglutide options.",
+      "How much does GLP-1 weight management cost? Programs start at $249/month at Rani Beauty Clinic in Renton, WA. Semaglutide, tirzepatide, and liraglutide options.",
     heroTitle: "How Much Does GLP-1 Weight Management Cost?",
     intro:
-      "GLP-1 weight management at Rani Beauty Clinic includes three medication options - liraglutide, semaglutide, and tirzepatide - with costs ranging from $249 to $699 depending on the medication and dosage. All programs include physician oversight, body composition tracking, and in-house lab work for a comprehensive medical weight loss experience.",
+      "GLP-1 weight management at Rani Beauty Clinic includes three medication options - liraglutide, semaglutide, and tirzepatide - with monthly costs ranging from $249 to $699 depending on the medication and dosage. All programs include physician oversight, body composition tracking, and in-house lab work for a comprehensive medical weight loss experience.",
     priceRanges: [
-      { item: "Liraglutide (Month 1-2)", price: "$249", note: "Per month service fee" },
-      { item: "Semaglutide (Month 1)", price: "$349", note: "Starting dose 0.25mg/wk" },
-      { item: "Semaglutide (Month 3+)", price: "$449-$549" },
-      { item: "Tirzepatide (Month 1)", price: "$449", note: "Starting dose 2.5mg/wk" },
-      { item: "Tirzepatide (Month 4+)", price: "$599-$699" },
+      { item: "Liraglutide (Month 1-2)", price: "$249/month" },
+      { item: "Semaglutide (Month 1)", price: "$349/month", note: "Starting dose 0.25mg/wk" },
+      { item: "Semaglutide (Month 3+)", price: "$449-$549/month" },
+      { item: "Tirzepatide (Month 1)", price: "$449/month", note: "Starting dose 2.5mg/wk" },
+      { item: "Tirzepatide (Month 4+)", price: "$599-$699/month" },
       { item: "Slim Start Package (3 months)", price: "$799", note: "Liraglutide + B12 + labs" },
     ],
     factors: [
@@ -469,12 +469,12 @@ export const costPages: CostPage[] = [
       "Lab work - starter labs ($199) and quarterly monitoring ($99) are essential components factored into your total investment.",
     ],
     financingNote:
-      "Start your weight loss journey today with financing through Afterpay, Cherry, or PatientFi. Apply with no hard credit check and our team will help you find an option that fits your budget.",
+      "Start your weight loss journey today with financing through Afterpay, Cherry, or PatientFi. Our team can help you find a payment plan that fits your budget and timeline.",
     faqs: [
       {
         question: "What is the cheapest GLP-1 option?",
         answer:
-          "Liraglutide is our most affordable GLP-1 medication starting at $249. Our Slim Start Package at $799 includes 3 months of liraglutide plus B12 shots, body composition analysis, and starter labs - the best value for getting started.",
+          "Liraglutide is our most affordable GLP-1 medication starting at $249/month. Our Slim Start Package at $799 includes 3 months of liraglutide plus B12 shots, body composition analysis, and starter labs - the best value for getting started.",
       },
       {
         question: "Does insurance cover GLP-1 medications?",
@@ -489,7 +489,7 @@ export const costPages: CostPage[] = [
       {
         question: "How long will I need to be on a GLP-1 medication?",
         answer:
-          "Most clients are on GLP-1 therapy for 6-12 months to reach their weight loss goals. After that, a maintenance plan (from $449) helps sustain results. Your provider will work with you to create a timeline based on your goals and progress.",
+          "Most clients are on GLP-1 therapy for 6-12 months to reach their weight loss goals. After that, a maintenance plan ($449/month) helps sustain results. Your provider will work with you to create a timeline based on your goals and progress.",
       },
     ],
   },
@@ -501,10 +501,10 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Semaglutide Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does semaglutide cost? Treatments start at $349 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and packages.",
+      "How much does semaglutide cost? Monthly treatments start at $349 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and packages.",
     heroTitle: "How Much Does Semaglutide Cost?",
     intro:
-      "Semaglutide is our most popular GLP-1 medication for medical weight loss. At Rani Beauty Clinic, semaglutide starts at $349 for the initial dose and increases gradually as your dosage is escalated over the first several months. Our Transform Package ($1,199 for 3 months) bundles semaglutide with labs, lipo shots, and consultations for the best value.",
+      "Semaglutide is our most popular GLP-1 medication for medical weight loss. At Rani Beauty Clinic, semaglutide starts at $349/month for the initial dose and increases gradually as your dosage is escalated over the first several months. Our Transform Package ($1,199 for 3 months) bundles semaglutide with labs, lipo shots, and consultations for the best value.",
     priceRanges: [
       { item: "Month 1 (0.25mg/wk)", price: "$349" },
       { item: "Month 2 (0.5mg/wk)", price: "$399" },
@@ -517,10 +517,10 @@ export const costPages: CostPage[] = [
       "Dosage level - semaglutide uses a gradual escalation from 0.25mg to 2.4mg per week, with costs increasing at each tier.",
       "Treatment duration - most clients stay on semaglutide for 6-12 months, so total investment depends on how long you need to reach your goal weight.",
       "Package vs. month-to-month - the Transform Package provides 3 months of semaglutide plus extras at a lower per-month cost.",
-      "Supplemental treatments - B12 injections ($25 each) and lipo-B shots ($35 each) are often recommended alongside semaglutide for enhanced energy and metabolism.",
+      "Supplemental treatments - B12 injections ($25/shot) and lipo-B shots ($35/shot) are often recommended alongside semaglutide for enhanced energy and metabolism.",
     ],
     financingNote:
-      "Finance your semaglutide treatment with Afterpay, Cherry, or PatientFi. Flexible options available with no hard credit check, making it easy to invest in your health.",
+      "Finance your semaglutide treatment with Afterpay, Cherry, or PatientFi. Flexible monthly payment plans make it easy to invest in your health without financial strain.",
     faqs: [
       {
         question: "Why does semaglutide cost change each month?",
@@ -547,10 +547,10 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Tirzepatide Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does tirzepatide cost? Treatments start at $449 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and packages.",
+      "How much does tirzepatide cost? Monthly treatments start at $449 at Rani Beauty Clinic in Renton, WA. See dose-based pricing and packages.",
     heroTitle: "How Much Does Tirzepatide Cost?",
     intro:
-      "Tirzepatide is the most powerful GLP-1 medication we offer for medical weight loss, targeting both GIP and GLP-1 receptors for enhanced results. At Rani Beauty Clinic, tirzepatide starts at $449 and scales with dosage increases. Our Ultimate Package ($1,499 for 3 months) bundles tirzepatide with labs, lipo shots, B12, and body composition analysis.",
+      "Tirzepatide is the most powerful GLP-1 medication we offer for medical weight loss, targeting both GIP and GLP-1 receptors for enhanced results. At Rani Beauty Clinic, tirzepatide starts at $449/month and scales with dosage increases. Our Ultimate Package ($1,499 for 3 months) bundles tirzepatide with labs, lipo shots, B12, and body composition analysis.",
     priceRanges: [
       { item: "Month 1 (2.5mg/wk)", price: "$449" },
       { item: "Month 2 (5mg/wk)", price: "$499" },
@@ -566,7 +566,7 @@ export const costPages: CostPage[] = [
       "Supplemental treatments - lipo-B shots, B12 injections, and peptide add-ons can enhance your results and are available at additional cost.",
     ],
     financingNote:
-      "Invest in your health with financing through Afterpay, Cherry, or PatientFi. Flexible options available with no hard credit check. Start your transformation today.",
+      "Invest in your health with financing through Afterpay, Cherry, or PatientFi. Break your tirzepatide program into affordable monthly payments and start your transformation today.",
     faqs: [
       {
         question: "Why is tirzepatide more expensive than semaglutide?",
@@ -593,16 +593,16 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Peptide Therapy Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does peptide therapy cost? Programs start at $199 at Rani Beauty Clinic in Renton, WA. BPC-157, PT-141, and more.",
+      "How much does peptide therapy cost? Programs start at $199/month at Rani Beauty Clinic in Renton, WA. BPC-157, PT-141, and more.",
     heroTitle: "How Much Does Peptide Therapy Cost?",
     intro:
-      "Peptide therapy at Rani Beauty Clinic is customized to your wellness goals. Peptide programs range from $199 to $349 depending on the specific peptide and protocol. We offer targeted peptides for anti-aging, tissue repair, sexual wellness, and growth hormone optimization, all supervised by our medical team.",
+      "Peptide therapy at Rani Beauty Clinic is customized to your wellness goals. Monthly peptide programs range from $199 to $349 depending on the specific peptide and protocol. We offer targeted peptides for anti-aging, tissue repair, sexual wellness, and growth hormone optimization, all supervised by our medical team.",
     priceRanges: [
-      { item: "PT-141 (Bremelanotide)", price: "$199", note: "Sexual wellness" },
-      { item: "BPC-157", price: "$249", note: "Gut healing and tissue repair" },
-      { item: "Sermorelin", price: "$299", note: "Growth hormone and anti-aging" },
-      { item: "CJC-1295 / Ipamorelin", price: "$349", note: "Growth hormone secretagogue" },
-      { item: "Glutathione Injections", price: "$49 per session", note: "Master antioxidant" },
+      { item: "PT-141 (Bremelanotide)", price: "$199/month", note: "Sexual wellness" },
+      { item: "BPC-157", price: "$249/month", note: "Gut healing and tissue repair" },
+      { item: "Sermorelin", price: "$299/month", note: "Growth hormone and anti-aging" },
+      { item: "CJC-1295 / Ipamorelin", price: "$349/month", note: "Growth hormone secretagogue" },
+      { item: "Glutathione Injections", price: "$49/shot", note: "Master antioxidant" },
     ],
     factors: [
       "Specific peptide selected - each peptide targets different wellness goals (anti-aging, healing, sexual health, body composition) and is priced accordingly.",
@@ -612,7 +612,7 @@ export const costPages: CostPage[] = [
       "Lab monitoring - periodic blood work may be recommended to track biomarkers and optimize your peptide protocol.",
     ],
     financingNote:
-      "Explore peptide therapy with flexible financing from Afterpay, Cherry, or PatientFi. Apply with no hard credit check and find an option that works for you.",
+      "Explore peptide therapy with flexible financing from Afterpay, Cherry, or PatientFi. Monthly payment plans make it easy to start your peptide protocol without delay.",
     faqs: [
       {
         question: "Which peptide is right for me?",
@@ -644,10 +644,10 @@ export const costPages: CostPage[] = [
     intro:
       "NAD+ (nicotinamide adenine dinucleotide) injections support cellular energy, brain health, and anti-aging at the molecular level. At Rani Beauty Clinic, subcutaneous NAD+ injections are $149 per shot. Many clients incorporate NAD+ into a regular wellness protocol with weekly or biweekly sessions for sustained energy and cognitive benefits.",
     priceRanges: [
-      { item: "NAD+ Injection (SubQ)", price: "$149 per session", note: "Brain health, energy, anti-aging" },
-      { item: "NAD+ Weekly Protocol (4 sessions)", price: "$596", note: "Estimated for weekly sessions" },
-      { item: "Glutathione Add-On", price: "$49 per session", note: "Master antioxidant - pairs well with NAD+" },
-      { item: "Vitamin B12 Add-On", price: "$25 per session" },
+      { item: "NAD+ Injection (SubQ)", price: "$149/shot", note: "Brain health, energy, anti-aging" },
+      { item: "NAD+ Weekly Protocol (4 shots/month)", price: "$596/month", note: "Estimated for weekly sessions" },
+      { item: "Glutathione Add-On", price: "$49/shot", note: "Master antioxidant - pairs well with NAD+" },
+      { item: "Vitamin B12 Add-On", price: "$25/shot" },
     ],
     factors: [
       "Frequency of injections - weekly sessions provide the most consistent benefits, while biweekly or monthly sessions offer maintenance-level support.",
@@ -656,7 +656,7 @@ export const costPages: CostPage[] = [
       "Protocol duration - NAD+ benefits accumulate over time, so longer protocols typically deliver more noticeable results.",
     ],
     financingNote:
-      "Invest in your cellular health with flexible financing through Afterpay, Cherry, or PatientFi. Apply with no hard credit check and find an option that makes regular NAD+ sessions accessible.",
+      "Invest in your cellular health with flexible financing through Afterpay, Cherry, or PatientFi. Monthly payment plans make regular NAD+ sessions affordable and accessible.",
     faqs: [
       {
         question: "What are the benefits of NAD+ injections?",
@@ -683,16 +683,16 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Hormone Therapy Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does hormone therapy cost? HRT starts at $49 at Rani Beauty Clinic in Renton, WA. Male and female hormone optimization.",
+      "How much does hormone therapy cost? HRT starts at $49/month at Rani Beauty Clinic in Renton, WA. Male and female hormone optimization.",
     heroTitle: "How Much Does Hormone Therapy Cost?",
     intro:
       "Hormone replacement therapy (HRT) at Rani Beauty Clinic is tailored to your unique hormonal profile. Monthly programs range from $49 for supplemental hormones to $299 for comprehensive HRT protocols. All programs include physician oversight and are supported by in-house blood work to ensure safe and effective treatment.",
     priceRanges: [
-      { item: "Female HRT (Estradiol + Progesterone)", price: "$199-$299", note: "Olympia compounded" },
-      { item: "Male TRT (Testosterone Cypionate)", price: "$199-$299", note: "Olympia compounded" },
-      { item: "Thyroid Optimization", price: "$149-$249", note: "Armour / compounded T3+T4" },
-      { item: "DHEA Supplementation", price: "$49-$99" },
-      { item: "Pregnenolone", price: "$49-$99" },
+      { item: "Female HRT (Estradiol + Progesterone)", price: "$199-$299/month", note: "Olympia compounded" },
+      { item: "Male TRT (Testosterone Cypionate)", price: "$199-$299/month", note: "Olympia compounded" },
+      { item: "Thyroid Optimization", price: "$149-$249/month", note: "Armour / compounded T3+T4" },
+      { item: "DHEA Supplementation", price: "$49-$99/month" },
+      { item: "Pregnenolone", price: "$49-$99/month" },
       { item: "HRT Launch Package", price: "$449", note: "Consult + full panel labs + 1st month meds" },
     ],
     factors: [
@@ -703,7 +703,7 @@ export const costPages: CostPage[] = [
       "Compounding pharmacy - we use Olympia compounding pharmacy for high-quality, custom-dosed medications.",
     ],
     financingNote:
-      "Begin your hormone optimization journey with financing from Afterpay, Cherry, or PatientFi. Apply with no hard credit check and find an option that helps you get started.",
+      "Begin your hormone optimization journey with financing from Afterpay, Cherry, or PatientFi. Flexible payment plans help you cover initial labs and the first months of treatment.",
     faqs: [
       {
         question: "What is included in the HRT Launch Package?",
@@ -735,16 +735,16 @@ export const costPages: CostPage[] = [
     metaTitle:
       "Testosterone Therapy Cost in Renton, WA | Rani Beauty Clinic Pricing",
     metaDescription:
-      "How much does testosterone therapy cost? TRT starts at $199 at Rani Beauty Clinic in Renton, WA. Physician-supervised with in-house labs.",
+      "How much does testosterone therapy cost? TRT starts at $199/month at Rani Beauty Clinic in Renton, WA. Physician-supervised with in-house labs.",
     heroTitle: "How Much Does Testosterone Therapy Cost?",
     intro:
       "Testosterone replacement therapy (TRT) at Rani Beauty Clinic is designed for men experiencing symptoms of low testosterone. Monthly TRT costs range from $199 to $299 using high-quality compounded testosterone cypionate from Olympia pharmacy. Our program includes physician supervision, dose optimization, and regular lab monitoring.",
     priceRanges: [
-      { item: "Testosterone Cypionate (Monthly)", price: "$199-$299", note: "Olympia compounded" },
+      { item: "Testosterone Cypionate (Monthly)", price: "$199-$299/month", note: "Olympia compounded" },
       { item: "HRT Launch Package", price: "$449", note: "Consult + full male hormone panel + 1st month meds" },
       { item: "Male Hormone Panel (Starter)", price: "$249", note: "Comprehensive baseline labs" },
       { item: "Quarterly Monitoring Labs", price: "$119", note: "Key hormones + metabolic markers" },
-      { item: "DHEA Add-On", price: "$49-$99" },
+      { item: "DHEA Add-On", price: "$49-$99/month" },
     ],
     factors: [
       "Testosterone dosage - your specific dose is based on your lab results and symptoms, and may be adjusted to optimize your levels.",
@@ -753,7 +753,7 @@ export const costPages: CostPage[] = [
       "Treatment duration - TRT is typically a long-term commitment, and most men continue therapy indefinitely to maintain benefits.",
     ],
     financingNote:
-      "Start TRT with flexible financing through Afterpay, Cherry, or PatientFi. Apply with no hard credit check and find an option that works for your budget.",
+      "Start TRT with flexible financing through Afterpay, Cherry, or PatientFi. Spread your initial startup costs across manageable monthly payments.",
     faqs: [
       {
         question: "What are the signs of low testosterone?",
@@ -790,11 +790,11 @@ export const costPages: CostPage[] = [
     intro:
       "Vitamin injections at Rani Beauty Clinic are an affordable way to boost your energy, metabolism, and overall wellness. Individual shots start at just $25 for vitamin B12 and range up to $149 for NAD+. Many clients add vitamin injections to their regular wellness visits for a quick pick-me-up that delivers nutrients directly into the body for maximum absorption.",
     priceRanges: [
-      { item: "Vitamin B12 Injection", price: "$25 per session" },
-      { item: "Lipo-B (MIC + B12)", price: "$35 per session", note: "Fat metabolism support" },
-      { item: "Biotin Injection", price: "$35 per session", note: "Hair, skin, and nails" },
-      { item: "Glutathione Injection", price: "$49 per session", note: "Master antioxidant" },
-      { item: "NAD+ Injection (SubQ)", price: "$149 per session", note: "Cellular energy and anti-aging" },
+      { item: "Vitamin B12 Injection", price: "$25/shot" },
+      { item: "Lipo-B (MIC + B12)", price: "$35/shot", note: "Fat metabolism support" },
+      { item: "Biotin Injection", price: "$35/shot", note: "Hair, skin, and nails" },
+      { item: "Glutathione Injection", price: "$49/shot", note: "Master antioxidant" },
+      { item: "NAD+ Injection (SubQ)", price: "$149/shot", note: "Cellular energy and anti-aging" },
     ],
     factors: [
       "Type of injection - basic B12 is the most affordable, while specialty injections like glutathione and NAD+ are priced higher due to the cost of the compounds.",
@@ -803,7 +803,7 @@ export const costPages: CostPage[] = [
       "Wellness goals - clients seeking energy support may need B12 only, while those focused on anti-aging or detoxification may opt for glutathione or NAD+.",
     ],
     financingNote:
-      "Vitamin injections are affordable enough to pay per visit, but if you are combining them with other treatments, Afterpay, Cherry, and PatientFi offer flexible financing with no hard credit check.",
+      "Vitamin injections are affordable enough to pay per visit, but if you are combining them with other treatments, Afterpay, Cherry, and PatientFi financing can help manage the total cost.",
     faqs: [
       {
         question: "How often should I get vitamin injections?",
@@ -850,7 +850,7 @@ export const costPages: CostPage[] = [
       "In-house convenience - our blood draw fee is $25 per visit, and results are typically available within a few business days.",
     ],
     financingNote:
-      "Lab work is often bundled into our treatment packages at a discounted rate. For standalone labs, Afterpay, Cherry, and PatientFi offer flexible financing with no hard credit check.",
+      "Lab work is often bundled into our treatment packages at a discounted rate. For standalone labs, Afterpay, Cherry, and PatientFi financing options are available to help cover the cost.",
     faqs: [
       {
         question: "Do I need to fast before blood work?",

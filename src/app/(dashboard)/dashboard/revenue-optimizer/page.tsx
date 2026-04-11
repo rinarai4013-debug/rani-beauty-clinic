@@ -10,9 +10,8 @@ import {
 import KPICard from '@/components/dashboard/cards/KPICard';
 import { DashboardErrorBoundary, KPIRowSkeleton, PanelSkeleton, InlineError } from '@/components/dashboard/shared';
 import DashboardEmptyState from '@/components/dashboard/shared/DashboardEmptyState';
-import { useRevenueOptimizerSummary } from '@/hooks/useDashboardData';
+import { useRevenueOptimizerSummary, useDailyActions } from '@/hooks/useDashboardData';
 import { ActionItemCard } from '@/components/dashboard/revenue-optimizer';
-import type { RevenueActionItem } from '@/lib/revenue/gap-finder';
 
 interface SummaryData {
   totalAddressableGap: number;
@@ -30,41 +29,33 @@ interface SummaryData {
   topActions: Array<{ title: string; revenue: number; priority: number }>;
 }
 
+interface ActionsData {
+  date: string;
+  actionsCompleted: number;
+  totalActions: number;
+  totalPotentialRevenue: number;
+  actions: Array<{
+    id: string;
+    rank: number;
+    category: string;
+    title: string;
+    description: string;
+    estimatedRevenue: number;
+    effort: string;
+    timeToImpact: string;
+    priority: number;
+    status: string;
+    suggestedScript?: string;
+    targetClient?: string;
+  }>;
+}
+
 const NAV_LINKS = [
   { href: '/dashboard/revenue-optimizer/gaps', label: 'Gap Analysis', icon: BarChart3, description: 'Find every unfilled slot and missed opportunity' },
   { href: '/dashboard/revenue-optimizer/upsells', label: 'Upsell Tracker', icon: TrendingUp, description: 'Smart cross-sell and ticket-size optimization' },
   { href: '/dashboard/revenue-optimizer/forecast', label: 'Forecasting', icon: Calendar, description: 'Scenarios, targets, and Monte Carlo projections' },
   { href: '/dashboard/revenue-optimizer/actions', label: 'Daily Actions', icon: Zap, description: 'Today\'s prioritized revenue-capture actions' },
 ];
-
-function inferActionCategory(title: string): RevenueActionItem['category'] {
-  const normalized = title.toLowerCase();
-  if (normalized.includes('slot')) return 'fill-slot';
-  if (normalized.includes('rebook')) return 'rebook-overdue';
-  if (normalized.includes('member')) return 'activate-membership';
-  if (normalized.includes('vip') || normalized.includes('win back')) return 'reactivate-vip';
-  if (normalized.includes('boost')) return 'boost-service';
-  return 'optimize-day';
-}
-
-function summarizeAction(title: string): string {
-  return `${title}. Prioritize this move today to close the remaining revenue gap faster.`;
-}
-
-function toActionItems(summary: SummaryData | undefined): RevenueActionItem[] {
-  if (!summary) return [];
-
-  return summary.topActions.map((action, index) => ({
-    id: `summary-action-${index + 1}`,
-    category: inferActionCategory(action.title),
-    title: action.title,
-    description: summarizeAction(action.title),
-    estimatedRevenue: action.revenue,
-    effort: action.priority >= 85 ? 'low' : action.priority >= 70 ? 'medium' : 'high',
-    timeToImpact: action.priority >= 85 ? 'same-day' : 'this-week',
-    priority: action.priority,
-  }));
-}
 
 export default function RevenueOptimizerPage() {
   return (
@@ -78,7 +69,9 @@ function RevenueOptimizerContent() {
   const { data: summary, isLoading, error, mutate } = useRevenueOptimizerSummary() as {
     data: SummaryData | undefined; isLoading: boolean; error: unknown; mutate: () => void;
   };
-  const actions = toActionItems(summary);
+  const { data: actionsData } = useDailyActions() as {
+    data: ActionsData | undefined; isLoading: boolean; error: unknown; mutate: () => void;
+  };
 
   if (error) return <InlineError message="Failed to load revenue optimizer" onRetry={mutate} />;
 
@@ -208,19 +201,30 @@ function RevenueOptimizerContent() {
         <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-heading text-rani-navy">Today&apos;s Top Actions</h3>
-            {summary && (
+            {actionsData && (
               <span className="text-xs font-body text-rani-muted">
-                {actions.length} ready now
+                {actionsData.actionsCompleted}/{actionsData.totalActions} completed
               </span>
             )}
           </div>
 
-          {actions.length > 0 ? (
+          {actionsData?.actions ? (
             <div className="space-y-2">
-              {actions.slice(0, 5).map((action, i) => (
+              {actionsData.actions.slice(0, 5).map((action, i) => (
                 <ActionItemCard
                   key={action.id}
-                  action={action}
+                  action={{
+                    id: action.id,
+                    category: action.category as 'fill-slot' | 'rebook-overdue' | 'activate-membership' | 'reactivate-vip' | 'boost-service' | 'optimize-day',
+                    title: action.title,
+                    description: action.description,
+                    estimatedRevenue: action.estimatedRevenue,
+                    effort: action.effort as 'low' | 'medium' | 'high',
+                    timeToImpact: action.timeToImpact as 'same-day' | 'this-week' | 'this-month',
+                    priority: action.priority,
+                    suggestedScript: action.suggestedScript,
+                    targetClients: action.targetClient ? [action.targetClient] : undefined,
+                  }}
                   rank={i + 1}
                 />
               ))}

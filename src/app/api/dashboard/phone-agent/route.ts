@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { hasPermission } from '@/lib/auth/roles';
+import { configurePhoneAgent } from '@/lib/phone/vapi-agent';
 import { cache, TTL } from '@/lib/cache';
 
 export async function GET() {
@@ -7,19 +9,19 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  if (!hasPermission(session.role, 'view_settings')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const cacheKey = 'dashboard-phone-agent';
   const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+  if (cached) {
+    return NextResponse.json(cached);
+  }
 
   try {
-    const phoneAgent = await import('@/lib/phone/vapi-agent');
-    const payload = (
-      ('getPhoneAgentConfig' in phoneAgent && typeof phoneAgent.getPhoneAgentConfig === 'function'
-        ? phoneAgent.getPhoneAgentConfig
-        : phoneAgent.configurePhoneAgent)
-    )();
-    cache.set(cacheKey, payload, TTL.STANDARD);
+    const payload = configurePhoneAgent();
+    cache.set(cacheKey, payload, TTL.RELAXED);
     return NextResponse.json(payload);
   } catch (error) {
     console.error('[dashboard/phone-agent]', error);

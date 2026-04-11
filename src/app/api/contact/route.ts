@@ -1,66 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
-import { upsertClientAttribution } from "@/lib/attribution/upsert-client-attribution";
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { env } from "@/lib/env";
+
+// Simple in-memory dedup cache to prevent double-submit creating duplicate leads
+const DEDUP_TTL = 60_000; // 60 second window
+const dedup = new Map<string, number>();
+
+function isDuplicate(key: string): boolean {
+  const now = Date.now();
+  const expiresAt = dedup.get(key);
+  if (expiresAt && now < expiresAt) return true;
+  // Lazy cleanup: prune expired entries when map grows
+  if (dedup.size > 200) {
+    for (const [k, exp] of dedup) {
+      if (now >= exp) dedup.delete(k);
+    }
+  }
+  dedup.set(key, now + DEDUP_TTL);
+  return false;
+}
 
 const ContactSchema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email(),
   phone: z.string().max(20).optional().default(""),
   service: z.string().min(1).max(100),
-  message: z.string().max(2000).optional().default(""),
-  source: z.string().max(100).optional().default("contact_form"),
-  leadSource: z.string().max(100).optional(),
-  leadMedium: z.string().max(100).optional(),
-  leadCampaign: z.string().max(150).optional(),
-  leadAdSet: z.string().max(150).optional(),
-  leadAd: z.string().max(150).optional(),
-  leadOffer: z.string().max(150).optional(),
-  leadLandingPage: z.string().max(500).optional(),
-  leadKeyword: z.string().max(150).optional(),
-  leadReferrer: z.string().max(500).optional(),
-  attributionId: z.string().max(150).optional(),
-  firstTouchAt: z.string().datetime().optional(),
-  lastTouchAt: z.string().datetime().optional(),
-  utm_source: z.string().max(150).optional(),
-  utm_medium: z.string().max(150).optional(),
-  utm_campaign: z.string().max(150).optional(),
-  utm_content: z.string().max(150).optional(),
-  utm_term: z.string().max(150).optional(),
+  message: z.string().max(2000).optional().default("")
+    .transform((val) => val.replace(/<[^>]*>/g, "")),
   honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
 
-function appendAttributionLines(lines: Array<string | null>, attribution: Record<string, string | undefined>) {
-  const labelMap: Record<string, string> = {
-    source: 'Source',
-    leadSource: 'Lead Source',
-    leadMedium: 'Lead Medium',
-    leadCampaign: 'Lead Campaign',
-    leadAdSet: 'Lead Ad Set',
-    leadAd: 'Lead Ad',
-    leadOffer: 'Lead Offer',
-    leadLandingPage: 'Lead Landing Page',
-    leadKeyword: 'Lead Keyword',
-    leadReferrer: 'Lead Referrer',
-    attributionId: 'Attribution ID',
-    utm_source: 'UTM Source',
-    utm_medium: 'UTM Medium',
-    utm_campaign: 'UTM Campaign',
-    utm_content: 'UTM Content',
-    utm_term: 'UTM Term',
-  };
-
-  for (const [key, value] of Object.entries(attribution)) {
-    if (!value) continue;
-    const label = labelMap[key] || key;
-    lines.push(`${label}: ${value}`);
-  }
-}
-
 export async function POST(req: NextRequest) {
   const ip = getClientIP(req);
-  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
+  const { allowed, resetIn } = rateLimit("contact-form", ip, RATE_LIMITS.FORM);
   if (!allowed) return rateLimitResponse(resetIn);
 
   let body: unknown;
@@ -84,58 +58,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const {
-    name,
-    email,
-    phone,
-    service,
-    message,
-    source,
-    leadSource,
-    leadMedium,
-    leadCampaign,
-    leadAdSet,
-    leadAd,
-    leadOffer,
-    leadLandingPage,
-    leadKeyword,
-    leadReferrer,
-    attributionId,
-    firstTouchAt,
-    lastTouchAt,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_content,
-    utm_term,
-  } = parsed.data;
+  const { name, email, phone, service, message } = parsed.data;
+
+  // Dedup check — prevent double-click creating duplicate Airtable leads
+  const dedupeKey = `contact-form:${email}:${service}`;
+  if (isDuplicate(dedupeKey)) {
+    return NextResponse.json({ success: true }); // Silent success for dupes
+  }
 
   // Build intake summary for AI pipeline
-  const intakeLines = [
+  const intakeSummary = [
     `Service Interest: ${service}`,
     message ? `Message: ${message}` : null,
-  ];
-  appendAttributionLines(intakeLines, {
-    source,
-    leadSource,
-    leadMedium,
-    leadCampaign,
-    leadAdSet,
-    leadAd,
-    leadOffer,
-    leadLandingPage,
-    leadKeyword,
-    leadReferrer,
-    attributionId,
-    firstTouchAt,
-    lastTouchAt,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_content,
-    utm_term,
-  });
-  const intakeSummary = intakeLines.filter(Boolean).join("\n");
+    `Source: Contact Form`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   // 1. Write to Airtable Client Intakes
   // Field names verified against live Airtable schema 2026-03-28
@@ -164,43 +102,13 @@ export async function POST(req: NextRequest) {
         "do not exist in the Client Intakes table. Verify field names at https://airtable.com/app1SwhSfwe8GKUg4"
       );
     }
-    return NextResponse.json(
-      { error: "We couldn't save your request. Please try again or call us directly." },
-      { status: 502 }
-    );
-  }
-
-  try {
-    await upsertClientAttribution({
-      name,
-      email,
-      phone,
-      leadSource,
-      leadMedium,
-      leadCampaign,
-      leadAdSet,
-      leadAd,
-      leadOffer,
-      leadLandingPage,
-      leadKeyword,
-      leadReferrer,
-      attributionId,
-      firstTouchAt,
-      lastTouchAt,
-      utm_source,
-      utm_medium,
-      utm_campaign,
-      utm_content,
-      utm_term,
-    });
-  } catch (err) {
-    console.error("[contact] Client attribution upsert failed:", err instanceof Error ? err.message : err);
+    // Don't block the user — still attempt email + n8n
   }
 
   // 2. Send notification email via Resend
-  const resendKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.CONTACT_EMAIL ?? "info@ranibeautyclinic.com";
-  const fromEmail = process.env.FROM_EMAIL ?? "Rani Beauty Clinic <noreply@ranibeautyclinic.com>";
+  const resendKey = env.RESEND_API_KEY;
+  const toEmail = env.CONTACT_EMAIL;
+  const fromEmail = env.FROM_EMAIL;
 
   if (!resendKey) {
     console.warn("[contact] RESEND_API_KEY not set — skipping email notification");
@@ -233,33 +141,16 @@ export async function POST(req: NextRequest) {
   }
 
   // 3. Forward to n8n lead intake webhook
-  const n8nUrl = process.env.N8N_WEBHOOK_URL;
+  const n8nUrl = env.N8N_WEBHOOK_URL;
   if (!n8nUrl) {
     console.warn("[contact] N8N_WEBHOOK_URL not set — skipping webhook");
   } else {
     try {
-      await fetch(n8nUrl, {
+      await fetch(`${n8nUrl}/webhook/contact-form-intake`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           source: "contact_form",
-          leadSource,
-          leadMedium,
-          leadCampaign,
-          leadAdSet,
-          leadAd,
-          leadOffer,
-          leadLandingPage,
-          leadKeyword,
-          leadReferrer,
-          attributionId,
-          firstTouchAt,
-          lastTouchAt,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_content,
-          utm_term,
           name,
           email,
           phone,

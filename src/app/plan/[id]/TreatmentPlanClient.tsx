@@ -60,7 +60,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
     fetch(`/api/plan/${planId}/track`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ planId, action }),
+      body: JSON.stringify({ planId, action, code: accessCode }),
     }).catch(() => {}); // fire and forget
   };
 

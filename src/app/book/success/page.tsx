@@ -1,90 +1,65 @@
-import { Metadata } from "next";
-import { CheckCircle } from "lucide-react";
-import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
-import Button from "@/components/ui/Button";
-import ReviewCTA from "@/components/conversion/ReviewCTA";
-import { clinicInfo } from "@/data/clinic-info";
+import Link from 'next/link';
+import { CheckCircle2, PhoneCall } from 'lucide-react';
+import { Metadata } from 'next';
+import { CLINIC_PHONE } from '@/data/clinic-config';
 
 export const metadata: Metadata = {
-  title: "Booking Confirmed | Rani Beauty Clinic",
-  description:
-    "Your appointment at Rani Beauty Clinic has been confirmed. We look forward to seeing you.",
-  robots: {
-    index: false,
-    follow: false,
-  },
+  title: 'Booking Request Received | Rani Beauty Clinic',
+  description: 'Your booking request has been received. We will confirm your appointment and next steps shortly.',
 };
+
+function formatPhoneHref(phone: string): string {
+  return `tel:${phone.replace(/[^\d+]/g, '')}`;
+}
 
 export default function BookingSuccessPage() {
   return (
-    <section className="min-h-screen bg-rani-cream flex items-center">
-      <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-        <FadeInOnScroll>
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle size={40} className="text-green-600" />
+    <main className="min-h-screen bg-[#FAF8F5] px-4 py-16">
+      <div className="mx-auto max-w-3xl rounded-lg border border-[#E7E0D4] bg-white p-8 shadow-sm">
+        <div className="flex items-center gap-3 text-[#3E6B3A]">
+          <CheckCircle2 className="h-8 w-8" />
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em]">Booking received</p>
+            <h1 className="text-3xl font-semibold text-[#0F1D2C]">We’ve got your request</h1>
           </div>
+        </div>
 
-          <h1 className="mt-8 font-heading text-3xl font-bold text-rani-navy md:text-4xl">
-            Booking Confirmed
-          </h1>
+        <p className="mt-6 text-base leading-7 text-[#4B5563]">
+          Your appointment details are being finalized. If your booking came through the hosted Mangomint flow,
+          you should also receive confirmation and reminder messages directly from the clinic.
+        </p>
 
-          <p className="mt-4 font-body text-lg text-rani-text">
-            Your appointment at Rani Beauty Clinic has been confirmed. You&apos;ll
-            receive a confirmation text and email shortly with all the details.
-          </p>
-
-          <div className="mt-8 rounded-xl border border-rani-border bg-white p-6">
-            <h2 className="font-body text-lg font-bold text-rani-navy">
-              Before Your Visit
-            </h2>
-            <ul className="mt-4 space-y-3 text-left">
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rani-gold/20 font-body text-xs font-bold text-rani-navy">
-                  1
-                </span>
-                <span className="font-body text-sm text-rani-text">
-                  Arrive 10 minutes early to complete any intake forms
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rani-gold/20 font-body text-xs font-bold text-rani-navy">
-                  2
-                </span>
-                <span className="font-body text-sm text-rani-text">
-                  Come with a clean face — no makeup or heavy moisturizers for
-                  skin treatments
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rani-gold/20 font-body text-xs font-bold text-rani-navy">
-                  3
-                </span>
-                <span className="font-body text-sm text-rani-text">
-                  Bring a list of any medications or skincare products you
-                  currently use
-                </span>
-              </li>
-            </ul>
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-lg border border-[#EEE7DC] bg-[#FCFBF9] p-4">
+            <p className="text-sm font-medium text-[#0F1D2C]">Next step</p>
+            <p className="mt-2 text-sm text-[#6B7280]">Watch for your confirmation, reminder, and any deposit instructions.</p>
           </div>
-
-          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Button
-              href="/"
-              className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
-            >
-              Return Home
-            </Button>
-            <Button variant="secondary" href={clinicInfo.phoneTel}>
-              Questions? Call Us
-            </Button>
+          <div className="rounded-lg border border-[#EEE7DC] bg-[#FCFBF9] p-4">
+            <p className="text-sm font-medium text-[#0F1D2C]">Need help?</p>
+            <p className="mt-2 text-sm text-[#6B7280]">If you need to change anything, call the clinic and we’ll help you quickly.</p>
           </div>
-
-          {/* Google Review CTA */}
-          <div className="mt-10">
-            <ReviewCTA location="booking_success_page" />
+          <div className="rounded-lg border border-[#EEE7DC] bg-[#FCFBF9] p-4">
+            <p className="text-sm font-medium text-[#0F1D2C]">Want a full plan?</p>
+            <p className="mt-2 text-sm text-[#6B7280]">High-ticket and multi-service treatments can move into a consult + financing flow.</p>
           </div>
-        </FadeInOnScroll>
+        </div>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/book"
+            className="rounded-md bg-[#0F1D2C] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#17293b]"
+          >
+            Book another service
+          </Link>
+          <a
+            href={formatPhoneHref(CLINIC_PHONE)}
+            className="inline-flex items-center gap-2 rounded-md border border-[#E6DAC6] px-4 py-3 text-sm font-semibold text-[#0F1D2C] transition hover:bg-[#FCFBF9]"
+          >
+            <PhoneCall className="h-4 w-4" />
+            Call the clinic
+          </a>
+        </div>
       </div>
-    </section>
+    </main>
   );
 }

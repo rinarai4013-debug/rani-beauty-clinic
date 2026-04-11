@@ -8,9 +8,49 @@ import { env, hasFeature } from '@/lib/env';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { captureWebhookEvent, captureCheckoutEvent } from '@/lib/sentry-utils';
+import { z } from 'zod';
 
-function getWebhookSecret() {
-  return process.env.STRIPE_WEBHOOK_SECRET;
+const stripeEventSchema = z.object({
+  id: z.string(),
+  type: z.string().min(1),
+  data: z.object({
+    object: z.record(z.unknown()),
+  }),
+});
+
+const STRIPE_EVENT_DEDUPE_TTL_MS = 10 * 60 * 1000;
+
+async function forwardStripeEventToN8n(payload: Record<string, unknown>): Promise<void> {
+  if (!hasFeature.n8n()) return;
+
+  try {
+    const response = await fetch(`${env.N8N_WEBHOOK_URL}/webhook/stripe-payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      logWebhookEvent('stripe', 'n8n-forward', false, {
+        status: response.status,
+        responseBody: body.substring(0, 500),
+        forwardedEvent: String(payload.event || 'unknown'),
+      });
+      return;
+    }
+
+    logWebhookEvent('stripe', 'n8n-forward', true, {
+      status: response.status,
+      forwardedEvent: String(payload.event || 'unknown'),
+    });
+  } catch (err) {
+    logWebhookEvent('stripe', 'n8n-forward', false, {
+      error: String(err),
+      forwardedEvent: String(payload.event || 'unknown'),
+    });
+  }
 }
 
 // POST - receive Stripe webhook events
@@ -24,8 +64,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
-
-  const endpointSecret = getWebhookSecret();
+  const endpointSecret = env.STRIPE_WEBHOOK_SECRET;
 
   if (!signature || !endpointSecret) {
     logWebhookEvent('stripe', 'unknown', false, { error: 'Missing signature or webhook secret' });
@@ -40,6 +79,23 @@ export async function POST(request: NextRequest) {
     logWebhookEvent('stripe', 'unknown', false, { error: `Signature verification failed: ${String(err)}` });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
+
+  const parsedEvent = stripeEventSchema.safeParse(event);
+  if (!parsedEvent.success) {
+    logWebhookEvent('stripe', 'parse', false, {
+      error: `Invalid stripe event payload: ${JSON.stringify(parsedEvent.error.issues)}`,
+      eventId: event.id,
+    });
+    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+  }
+
+  const dedupeKey = `stripe:event:${event.id}`;
+  if (cache.get<boolean>(dedupeKey)) {
+    logWebhookEvent('stripe', event.type, true, { eventId: event.id, duplicate: true });
+    captureWebhookEvent('stripe', event.type, true, { duplicate: true });
+    return NextResponse.json({ received: true, event: event.type, duplicate: true });
+  }
+  cache.set(dedupeKey, true, STRIPE_EVENT_DEDUPE_TTL_MS);
 
   logWebhookEvent('stripe', event.type, true, { eventId: event.id });
 
@@ -128,13 +184,14 @@ export async function POST(request: NextRequest) {
         }
 
         // Forward to n8n (fire and forget)
-        if (hasFeature.n8n()) {
-          fetch(`${env.N8N_WEBHOOK_URL}/webhook/stripe-payment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event: 'checkout.session.completed', planId, tier, clientName, amount, sessionId: session.id }),
-          }).catch(() => {});
-        }
+        void forwardStripeEventToN8n({
+          event: 'checkout.session.completed',
+          planId,
+          tier,
+          clientName,
+          amount,
+          sessionId: session.id,
+        });
 
         // Invalidate caches
         cache.invalidatePrefix('revenue');
@@ -185,13 +242,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Forward to n8n for abandoned cart recovery (fire and forget)
-        if (hasFeature.n8n()) {
-          fetch(`${env.N8N_WEBHOOK_URL}/webhook/stripe-payment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event: 'checkout.session.expired', planId, tier, clientName }),
-          }).catch(() => {});
-        }
+        void forwardStripeEventToN8n({
+          event: 'checkout.session.expired',
+          planId,
+          tier,
+          clientName,
+        });
         break;
       }
 

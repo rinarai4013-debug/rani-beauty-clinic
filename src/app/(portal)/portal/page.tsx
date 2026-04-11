@@ -27,7 +27,7 @@ interface PortalHomeData {
   referralCount: number;
 }
 
-const MANGOMINT_BOOKING_URL = 'https://ranibeautyclinic.mangomint.com';
+const MANGOMINT_BOOKING_URL = 'https://booking.mangomint.com/ranibeautyclinic1';
 
 export default function PortalHomePage() {
   const [data, setData] = useState<PortalHomeData | null>(null);

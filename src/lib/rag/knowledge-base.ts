@@ -15,6 +15,8 @@
  * 6. Source attribution for compliance
  */
 
+import { env } from '@/lib/env';
+
 // ── TYPES ──
 
 export interface KnowledgeDocument {
@@ -735,7 +737,7 @@ export async function searchPinecone(
   }
 
   const { Pinecone } = await import('@pinecone-database/pinecone');
-  const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+  const pc = new Pinecone({ apiKey: env.PINECONE_API_KEY });
   const index = pc.index(INDEX_NAME);
 
   const filter: Record<string, string> = {};
@@ -821,8 +823,8 @@ function chunkDocument(content: string): string[] {
  * Returns null if no API key is available (caller should use keyword search instead).
  */
 async function generateEmbedding(text: string): Promise<number[] | null> {
-  const voyageApiKey = process.env.VOYAGE_API_KEY;
-  const openaiApiKey = process.env.OPENAI_API_KEY;
+  const voyageApiKey = env.VOYAGE_API_KEY;
+  const openaiApiKey = env.OPENAI_API_KEY;
 
   if (!voyageApiKey && !openaiApiKey) {
     console.warn('[RAG] No VOYAGE_API_KEY or OPENAI_API_KEY set - cannot generate embeddings. Falling back to keyword search.');

@@ -2,8 +2,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Sparkles, CheckCircle } from "lucide-react";
-import Link from "next/link";
-import { useAttribution } from "@/hooks/useAttribution";
 
 interface QuizOption {
   label: string;
@@ -63,12 +61,6 @@ export default function TreatmentQuiz() {
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState("");
   const [aiRecommendation, setAiRecommendation] = useState<Record<string, unknown> | null>(null);
-  const selectedGoal =
-    quizSteps[0].options.find((o) => o.value === answers[0])?.label || "Personalized Treatment Plan";
-  const attribution = useAttribution({
-    source: "treatment-quiz",
-    leadOffer: selectedGoal,
-  });
 
   const progress = ((currentStep + 1) / TOTAL_STEPS) * 100;
   const isContactStep = currentStep === quizSteps.length;
@@ -108,7 +100,6 @@ export default function TreatmentQuiz() {
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim() || undefined,
-      service: selectedGoal,
       quizAnswers: {
         primaryGoal:
           quizSteps[0].options.find((o) => o.value === answers[0])?.label || "",
@@ -119,7 +110,6 @@ export default function TreatmentQuiz() {
       },
       source: "treatment-quiz",
       smsConsent,
-      ...attribution,
     };
 
     try {
@@ -269,13 +259,15 @@ export default function TreatmentQuiz() {
             )}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Link
-                href="/contact"
+              <a
+                href="https://form.typeform.com/to/rani-consultation"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-rani-gold px-7 py-3 font-body text-sm font-semibold text-rani-navy transition-all duration-300 hover:bg-white"
               >
                 Book Your Consultation
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </a>
 
               <button
                 onClick={() => {

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { clinicInfo } from "@/data/clinic-info";
 
 export const metadata: Metadata = {
   title: "Page Not Found | Rani Beauty Clinic",
   description:
     "The page you're looking for doesn't exist. Explore our services or book a consultation.",
-  robots: { index: false, follow: true },
 };
 
 const quickLinks = [
@@ -14,18 +14,18 @@ const quickLinks = [
   { label: "Contact", href: "/contact" },
   {
     label: "Book Consultation",
-    href: "https://booking.mangomint.com/ranibeautyclinic1",
+    href: clinicInfo.booking.url,
     external: true,
   },
 ];
 
 const popularServices = [
-  { name: "Sofwave Skin Tightening", href: "/services/sofwave" },
-  { name: "HydraFacial", href: "/services/hydrafacial" },
-  { name: "RF Microneedling", href: "/services/rf-microneedling" },
-  { name: "Botox & Dysport", href: "/services/botox-dysport" },
-  { name: "Laser Hair Removal", href: "/services/laser-hair-removal" },
-  { name: "GLP-1 Weight Management", href: "/wellness/glp1-weight-management" },
+  { name: "Sofwave Skin Tightening", href: "/services" },
+  { name: "HydraFacial", href: "/services" },
+  { name: "RF Microneedling", href: "/services" },
+  { name: "Botox & Fillers", href: "/services" },
+  { name: "Laser Hair Removal", href: "/services" },
+  { name: "GLP-1 Weight Loss", href: "/services" },
 ];
 
 export default function NotFound() {
@@ -88,16 +88,6 @@ export default function NotFound() {
             ))}
           </div>
         </div>
-
-        <p className="mt-8 text-sm text-rani-muted">
-          Need help?{" "}
-          <a
-            href="tel:+14255394440"
-            className="text-rani-gold hover:underline font-medium"
-          >
-            Call (425) 539-4440
-          </a>
-        </p>
       </div>
     </div>
   );

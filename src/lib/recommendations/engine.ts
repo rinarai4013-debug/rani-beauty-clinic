@@ -145,6 +145,8 @@ const CROSS_SELL: Record<string, { suggest: string; reason: string; price: strin
   'Injectable': [
     { suggest: 'HydraFacial', reason: 'Maintain glowing skin between injectable visits', price: '$199-399' },
     { suggest: 'RF Microneedling', reason: 'Build collagen for longer-lasting results', price: '$495-1,500' },
+    { suggest: 'Laser Facial', reason: 'Smooth textural work complements volume-based treatments', price: '$199-350' },
+    { suggest: 'Sofwave', reason: 'Add skin tightening support after volume correction', price: '$1,150-3,999' },
   ],
   'Wellness': [
     { suggest: 'HydraFacial', reason: 'Invest in your skin while optimizing your health', price: '$199-399' },
@@ -198,12 +200,43 @@ const MAINTENANCE_DAYS: Record<string, number> = {
   'NAD+': 45,
 };
 
+const PATHWAY_KEYS = Object.keys(PATHWAYS).sort((a, b) => b.length - a.length);
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getPrimaryCategory(history: TreatmentRecord[]): string {
+  const counts = new Map<string, number>();
+  for (const item of history) {
+    counts.set(item.category, (counts.get(item.category) || 0) + 1);
+  }
+  let topCategory = 'Facial';
+  let topCount = 0;
+  for (const [category, count] of counts.entries()) {
+    if (count > topCount) {
+      topCategory = category;
+      topCount = count;
+    }
+  }
+  return topCategory;
+}
+
 // ── ENGINE ──
 
 function matchService(serviceName: string): string | null {
   const lower = serviceName.toLowerCase();
-  for (const key of Object.keys(PATHWAYS)) {
-    if (lower.includes(key.toLowerCase())) return key;
+  for (const key of PATHWAY_KEYS) {
+    const keyLower = key.toLowerCase();
+    const boundaryMatch = new RegExp(`\\b${escapeRegex(keyLower)}\\b`);
+    if (boundaryMatch.test(lower)) {
+      return key;
+    }
+  }
+  for (const key of PATHWAY_KEYS) {
+    if (lower.includes(key.toLowerCase())) {
+      return key;
+    }
   }
   return null;
 }
@@ -225,7 +258,8 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
     const lastService = matchService(sorted[0].service);
     if (lastService && PATHWAYS[lastService]) {
       const pathway = PATHWAYS[lastService];
-      const daysSinceLast = getDaysSince(sorted[0].date);
+      const computedDaysSince = getDaysSince(sorted[0].date);
+      const daysSinceLast = daysSinceLastVisit > 0 ? daysSinceLastVisit : computedDaysSince;
       const maintenanceDays = MAINTENANCE_DAYS[lastService] || 30;
 
       // Check if they're overdue for repeat
@@ -267,20 +301,28 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
   if (gaps.length > 0 && gaps.length < allCategories.length) {
     for (const gap of gaps.slice(0, 2)) {
       // Find a cross-sell from their most-used category
-      const primaryCategory = sorted[0]?.category || 'Facial';
+      const primaryCategory = getPrimaryCategory(sorted);
       const crossSells = CROSS_SELL[primaryCategory] || [];
       const relevant = crossSells.find(cs => {
-        // Exact match first, then fuzzy: check if any PATHWAYS key is contained in the suggest string
-        const exactCat = PATHWAYS[cs.suggest]?.category;
-        if (exactCat) return exactCat === gap;
-        const pathwayKey = Object.keys(PATHWAYS).find(key => cs.suggest.includes(key));
-        return pathwayKey ? PATHWAYS[pathwayKey].category === gap : false;
+        const canonicalGap = PATHWAYS[cs.suggest]?.category === gap;
+        if (canonicalGap) {
+          return true;
+        }
+        const pathwayKey = PATHWAY_KEYS.find(key => {
+          const keyLower = key.toLowerCase();
+          return cs.suggest.toLowerCase().split(/[^a-z0-9]+/).includes(keyLower)
+            || keyLower.includes(cs.suggest.toLowerCase())
+            || cs.suggest.toLowerCase().includes(keyLower);
+        });
+        return Boolean(pathwayKey && PATHWAYS[pathwayKey]?.category === gap);
       });
       if (relevant) {
-        // Resolve to the canonical PATHWAYS key for consistent naming
         const resolvedService = PATHWAYS[relevant.suggest]
           ? relevant.suggest
-          : Object.keys(PATHWAYS).find(key => relevant.suggest.includes(key)) || relevant.suggest;
+          : PATHWAY_KEYS.find(key => {
+            const keyLower = key.toLowerCase();
+            return relevant.suggest.toLowerCase().includes(keyLower);
+          }) || relevant.suggest;
         recommendations.push({
           service: resolvedService,
           category: gap,
@@ -326,6 +368,15 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
 
   // 4. MEMBERSHIP UPSELL: If they're high-spend without membership
   if (!input.membershipTier && avgSpend > 300 && sorted.length >= 3) {
+    const membershipRecommendation: Recommendation = {
+      service: 'Angel Glow Up Membership',
+      category: 'Wellness',
+      reason: `High-value client with strong recency (${daysSinceLastVisit} days since last visit) should be moved into membership.`,
+      urgency: 'soon',
+      estimatedPrice: '$179/mo',
+      confidence: 68,
+    };
+    recommendations.push(membershipRecommendation);
     insights.push('High-value client without membership - consider Angel Glow Up pitch');
   }
 

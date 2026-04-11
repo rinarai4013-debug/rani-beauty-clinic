@@ -4,6 +4,7 @@
  */
 
 import { applyFilterChain, type FilterStep } from './filters';
+import { env } from '@/lib/env';
 
 // ─── Types ─────────────────────────────────────────────────────────────
 
@@ -113,7 +114,7 @@ async function callReplicateAPI(
   timeframe: string,
   intensity: number,
 ): Promise<{ imageUrl: string; confidence: number }> {
-  const apiToken = process.env.REPLICATE_API_TOKEN;
+  const apiToken = env.REPLICATE_API_TOKEN;
   if (!apiToken) {
     throw new Error('REPLICATE_API_TOKEN not configured');
   }
@@ -424,7 +425,7 @@ export async function generateAISimulation(
 ): Promise<SimulationResult> {
   const { photoBase64, treatments, timeframe, intensity } = request;
 
-  const hasReplicateToken = !!process.env.REPLICATE_API_TOKEN;
+  const hasReplicateToken = Boolean(env.REPLICATE_API_TOKEN);
 
   try {
     if (hasReplicateToken) {

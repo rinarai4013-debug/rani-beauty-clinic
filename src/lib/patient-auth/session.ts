@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import crypto from 'crypto';
+import { env } from '../env';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 const PATIENT_COOKIE_NAME = 'rani-patient-session';
@@ -11,7 +12,7 @@ const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
 // ─── Secret ─────────────────────────────────────────────────────────────────
 function getSecret() {
-  const raw = process.env.PATIENT_JWT_SECRET || process.env.DASHBOARD_JWT_SECRET;
+  const raw = env.PATIENT_JWT_SECRET || env.DASHBOARD_JWT_SECRET;
   if (!raw) {
     throw new Error('PATIENT_JWT_SECRET or DASHBOARD_JWT_SECRET is required');
   }
@@ -106,7 +107,7 @@ export function getPatientSessionCookieConfig(token: string) {
     name: PATIENT_COOKIE_NAME,
     value: token,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'strict' as const,
     maxAge: SESSION_MAX_AGE,
     path: '/',
@@ -118,7 +119,7 @@ export function getPatientLogoutCookieConfig() {
     name: PATIENT_COOKIE_NAME,
     value: '',
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'strict' as const,
     maxAge: 0,
     path: '/',

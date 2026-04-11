@@ -1,90 +1,72 @@
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { env } from '@/lib/env';
+import { logWebhookEvent } from '@/lib/logging/structured-logger';
+import { verifyWebhookSignature } from '@/lib/webhooks/verify-signature';
 import { z } from 'zod';
 
-function getMetaPixelId() {
-  return process.env.NEXT_PUBLIC_META_PIXEL_ID || "769852657929598";
+interface MetaCapiPayload {
+  event_name?: string;
+  event_name_1?: string;
+  event?: string;
+  data?: Record<string, unknown>;
 }
 
-function getMetaAccessToken() {
-  return process.env.META_CAPI_ACCESS_TOKEN;
-}
-
-const MetaUserDataSchema = z.object({
-  email: z.string().trim().toLowerCase().min(1).optional(),
-  phone: z.string().trim().min(1).optional(),
-  client_ip: z.string().trim().min(1).optional(),
-  client_user_agent: z.string().trim().min(1).optional(),
+const metaCapiPayloadSchema = z.object({
+  event_name: z.string().optional(),
+  event_name_1: z.string().optional(),
+  event: z.string().optional(),
+  data: z.record(z.unknown()).optional(),
 });
 
-const MetaCapiPayloadSchema = z.object({
-  event_name: z.string().min(1),
-  event_time: z.number().int().positive().optional(),
-  event_source_url: z.string().trim().url().optional(),
-  user_data: MetaUserDataSchema.partial().optional(),
-  custom_data: z.record(z.unknown()).optional(),
-});
-
-function sha256(value: string): string {
-  return crypto.createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
-}
-
-export async function POST(req: NextRequest) {
-  const accessToken = getMetaAccessToken();
-  const pixelId = getMetaPixelId();
-
-  if (!accessToken) {
-    return NextResponse.json({ error: "META_CAPI_ACCESS_TOKEN not configured" }, { status: 500 });
+// POST - receive Meta CAPI webhook events
+export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+  const { allowed, resetIn } = rateLimit('meta-capi-webhook', ip, RATE_LIMITS.WEBHOOK);
+  if (!allowed) {
+    return rateLimitResponse(resetIn);
   }
 
+  const rawBody = await request.text();
+  if (!env.META_CAPI_WEBHOOK_SECRET) {
+    logWebhookEvent('meta-capi', 'config', false, { error: 'Missing META_CAPI_WEBHOOK_SECRET' });
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+  }
+
+  const signature = request.headers.get('x-hub-signature-256') ?? request.headers.get('x-meta-signature');
+  if (!verifyWebhookSignature({
+    rawBody,
+    signature,
+    secret: env.META_CAPI_WEBHOOK_SECRET,
+    signaturePrefix: 'sha256=',
+  })) {
+    logWebhookEvent('meta-capi', 'verify', false, { error: 'Invalid signature' });
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
+  let body: MetaCapiPayload;
   try {
-    const parsed = MetaCapiPayloadSchema.safeParse(await req.json().catch(() => null));
+    const parsed = metaCapiPayloadSchema.safeParse(JSON.parse(rawBody));
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid META CAPI payload' },
-        { status: 400 }
-      );
+      logWebhookEvent('meta-capi', 'parse', false, { error: 'Invalid payload schema' });
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
-
-    const { event_name, event_time, user_data, custom_data, event_source_url } = parsed.data;
-
-    const hashedUserData: Record<string, string> = {};
-    if (user_data?.email) hashedUserData.em = sha256(user_data.email);
-    if (user_data?.phone) hashedUserData.ph = sha256(user_data.phone.replace(/\D/g, ""));
-    hashedUserData.client_ip_address =
-      user_data?.client_ip || req.headers.get("x-forwarded-for") || "";
-    hashedUserData.client_user_agent =
-      user_data?.client_user_agent || req.headers.get("user-agent") || "";
-
-    const eventData = {
-      data: [{
-        event_name,
-        event_time: event_time || Math.floor(Date.now() / 1000),
-        action_source: "website",
-        event_source_url: event_source_url || "https://www.ranibeautyclinic.com",
-        user_data: hashedUserData,
-        custom_data: custom_data || {},
-      }],
-    };
-
-    const response = await fetch(
-      `https://graph.facebook.com/v18.0/${pixelId}/events?access_token=${accessToken}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
-      }
-    );
-
-    const result = await response.json();
-    if (!response.ok) {
-      console.error("[Meta CAPI] Error:", result);
-      return NextResponse.json({ error: "Meta CAPI request failed", details: result }, { status: 502 });
-    }
-
-    return NextResponse.json({ success: true, events_received: result.events_received });
-  } catch (error) {
-    console.error("[Meta CAPI] Error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    body = parsed.data;
+  } catch {
+    logWebhookEvent('meta-capi', 'parse', false, { error: 'Invalid JSON payload' });
+    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }
+
+  const event = body.event_name || body.event_name_1 || body.event || 'unknown';
+  logWebhookEvent('meta-capi', 'received', true, {
+    event,
+    hasData: Boolean(body.data),
+    payloadSample: JSON.stringify(body).slice(0, 300),
+  });
+
+  return NextResponse.json({ received: true, event });
+}
+
+export async function GET() {
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
 }

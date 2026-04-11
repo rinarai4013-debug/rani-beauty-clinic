@@ -4,6 +4,11 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import type { RevenueData, ProviderRevenue, ServiceRevenue, CategoryRevenue, PaymentTypeRevenue, RevenueEntry } from '@/types/dashboard';
+import { z } from 'zod';
+
+const revenueQuerySchema = z.object({
+  range: z.enum(['wtd', 'mtd', 'last30', 'ytd']).optional(),
+});
 
 interface TransactionFields {
   'Date': string;
@@ -71,7 +76,14 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const range = searchParams.get('range') || 'mtd';
+  const parsedQuery = revenueQuerySchema.safeParse(
+    Object.fromEntries(searchParams.entries())
+  );
+  if (!parsedQuery.success) {
+    return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+  }
+
+  const range = parsedQuery.data.range || 'mtd';
   const cacheKey = `revenue-${range}`;
   const cached = cache.get<RevenueData>(cacheKey);
   if (cached) return NextResponse.json(cached);

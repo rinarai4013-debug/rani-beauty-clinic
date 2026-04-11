@@ -43,7 +43,7 @@ vi.mock('@/lib/templates/post-treatment', () => ({
     { step: '7d-results', sms: 'Results', email: { subject: 'Results', html: '<p>Results</p>' } },
     { step: '30d-rebook', sms: 'Rebook', email: { subject: 'Rebook', html: '<p>Rebook</p>' } },
   ]),
-  getAftercareLinkForService: vi.fn().mockReturnValue('https://www.ranibeautyclinic.com/aftercare/hydrafacial'),
+  getAftercareLinkForService: vi.fn().mockReturnValue('https://ranibeautyclinic.com/aftercare/hydrafacial'),
   getNextRecommendedService: vi.fn().mockReturnValue('VI Peel'),
 }));
 

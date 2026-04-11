@@ -53,7 +53,7 @@ function generateBotoxContent(city: string, drive: string): string {
 
 <p>The Pacific Northwest lifestyle keeps ${city} residents active, social, and outdoors. Our Botox and Dysport treatments fit seamlessly into that lifestyle with zero downtime and subtle, professional results. Whether you are preparing for a presentation at work, getting ready for a special event, or simply investing in your confidence, our injectable treatments deliver consistent, beautiful results backed by genuine medical expertise.</p>
 
-<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking and hours seven days a week from 10 AM to 7 PM. We also offer a full menu of complementary treatments including dermal fillers, HydraFacial, RF microneedling, and chemical peels for a comprehensive aesthetic approach. Flexible payment options available. Call (425) 539-4440 or book your Botox consultation online today.</p>`;
+<p>Rani Beauty Clinic is located at 401 Olympia Ave NE, Suite 101 in Renton, with free on-site parking and hours seven days a week from 10 AM to 7 PM. We also offer a full menu of complementary treatments including dermal fillers, HydraFacial, RF microneedling, and chemical peels for a comprehensive aesthetic approach. Financing through PatientFi and Cherry is available. Call (425) 539-4440 or book your Botox consultation online today.</p>`;
 }
 
 export const botoxGeoPages: ServiceGeoPage[] = botoxCities.map((c) => ({

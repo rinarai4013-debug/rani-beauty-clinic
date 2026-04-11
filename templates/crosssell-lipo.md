@@ -12,4 +12,4 @@ Hey [FIRST_NAME]! You're doing amazing on [MEDICATION]! A lot of my patients at 
 
 ## If They Ask "What Is It?"
 
-Great question! Lipo-Mino is a lipotropic injection that helps your body break down fat more efficiently. It has methionine, inositol, choline, and B12. Most patients notice more energy and faster results with [MEDICATION]. Quick injection, about 2 minutes! Want to add it to your next visit? (425) 539-4440
+Great question! Lipo-Mino is a lipotropic injection that helps your body break down and process fat more efficiently. It has methionine, inositol, choline, and B12. Most patients notice more energy and faster results when they combine it with [MEDICATION]. It's a quick injection, takes about 2 minutes! Want to add it to your next visit?

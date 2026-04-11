@@ -15,6 +15,7 @@ import type {
 } from './config';
 import { TIER_PRICING, TIER_USAGE_LIMITS, TIER_FEATURES } from './config';
 import { getTenantStore, invalidateTenantCache } from './resolver';
+import { env } from '@/lib/env';
 
 // ─── Stripe Client ──────────────────────────────────────────────────────────
 
@@ -22,9 +23,9 @@ let _stripe: Stripe | null = null;
 
 function getStripe(): Stripe {
   if (!_stripe) {
-    const key = process.env.STRIPE_SECRET_KEY;
+    const key = env.STRIPE_SECRET_KEY;
     if (!key) throw new Error('STRIPE_SECRET_KEY is not configured');
-    _stripe = new Stripe(key, { apiVersion: '2026-02-25.clover' });
+    _stripe = new Stripe(key, { apiVersion: '2025-03-31.basil' });
   }
   return _stripe;
 }
@@ -42,9 +43,9 @@ export function setStripeClient(client: Stripe): void {
  */
 function getPriceId(tier: SubscriptionTier): string {
   const mapping: Record<SubscriptionTier, string> = {
-    starter: process.env.STRIPE_PRICE_STARTER || '',
-    professional: process.env.STRIPE_PRICE_PROFESSIONAL || '',
-    enterprise: process.env.STRIPE_PRICE_ENTERPRISE || '',
+    starter: env.STRIPE_PRICE_STARTER || '',
+    professional: env.STRIPE_PRICE_PROFESSIONAL || '',
+    enterprise: env.STRIPE_PRICE_ENTERPRISE || '',
   };
 
   const priceId = mapping[tier];
@@ -126,7 +127,7 @@ export async function createSubscription(params: CreateSubscriptionParams): Prom
   }
 
   if (params.couponId) {
-    (subscriptionParams as any).coupon = params.couponId;
+    subscriptionParams.coupon = params.couponId;
   }
 
   return stripe.subscriptions.create(subscriptionParams);
@@ -254,7 +255,7 @@ export function constructWebhookEvent(
   signature: string
 ): Stripe.Event {
   const stripe = getStripe();
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const secret = env.STRIPE_WEBHOOK_SECRET;
   if (!secret) throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
   return stripe.webhooks.constructEvent(payload, signature, secret);
 }
@@ -288,7 +289,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
           tier,
           stripeSubscriptionId: subscription.id,
           status: mapStripeStatus(subscription.status),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
           trialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : undefined,
@@ -315,7 +316,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
           ...config.subscription,
           tier,
           status: mapStripeStatus(subscription.status),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
           trialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : undefined,
@@ -368,8 +369,8 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
 
     case 'invoice.paid': {
       const invoice = event.data.object as Stripe.Invoice;
-      const tenantId = (invoice as any).subscription_details?.metadata?.tenantId
-        || (typeof (invoice as any).subscription === 'string' ? undefined : undefined);
+      const tenantId = invoice.subscription_details?.metadata?.tenantId
+        || (typeof invoice.subscription === 'string' ? undefined : undefined);
 
       if (!tenantId) {
         // Try to find tenant by customer ID

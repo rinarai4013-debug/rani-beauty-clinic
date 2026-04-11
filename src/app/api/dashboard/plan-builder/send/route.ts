@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { Tables, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { env } from '@/lib/env';
 import { Resend } from 'resend';
 import crypto from 'crypto';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ const SendPlanSchema = z.object({
 
 // ─── Access Code Generation ───────────────────────────────────────
 function generateAccessCode(recordId: string): string {
-  const secret = process.env.DASHBOARD_JWT_SECRET;
+  const secret = env.DASHBOARD_JWT_SECRET;
   if (!secret) throw new Error('DASHBOARD_JWT_SECRET is required');
   const hash = crypto.createHmac('sha256', secret).update(recordId).digest('hex');
   const numericHash = parseInt(hash.slice(0, 8), 16);
@@ -92,7 +93,7 @@ function buildEmailHtml(clientName: string, planUrl: string): string {
                 Rani Beauty Clinic
               </p>
               <p style="margin:0 0 4px;font-size:13px;color:#8899AA;">
-                401 Olympia Ave NE, Suite 101, Renton, WA 98056
+                401 Olympia Ave NE #101, Renton, WA 98056
               </p>
               <p style="margin:0 0 4px;font-size:13px;color:#8899AA;">
                 (425) 539-4440 &nbsp;|&nbsp; info@ranibeautyclinic.com
@@ -120,15 +121,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse & validate body
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid request body', details: { body: ['Invalid JSON'] } },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json();
     const parsed = SendPlanSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -141,11 +134,11 @@ export async function POST(request: NextRequest) {
 
     // Generate access code and plan URL
     const accessCode = generateAccessCode(planId);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com';
+    const baseUrl = env.NEXT_PUBLIC_BASE_URL;
     const planUrl = `${baseUrl}/plan/${planId}?code=${accessCode}`;
 
     // Send branded email via Resend
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(env.RESEND_API_KEY);
 
     await resend.emails.send({
       from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',

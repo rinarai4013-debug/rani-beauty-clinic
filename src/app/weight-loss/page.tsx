@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useAttribution } from '@/hooks/useAttribution';
 
 const TIERS = [
   {
@@ -133,10 +132,6 @@ export default function WeightLossLandingPage() {
     goalWeight: '',
   });
   const [submitted, setSubmitted] = useState(false);
-  const attribution = useAttribution({
-    source: 'weight-loss-landing',
-    leadOffer: 'Medical Weight Loss Consultation',
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,10 +143,8 @@ export default function WeightLossLandingPage() {
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
-          service: 'Medical Weight Loss',
           message: `GLP-1 Weight Loss Lead - Current: ${formData.currentWeight} lbs, Goal: ${formData.goalWeight} lbs`,
           source: 'weight-loss-landing',
-          ...attribution,
         }),
       });
     } catch {
@@ -536,7 +529,7 @@ export default function WeightLossLandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <p className="font-heading text-xl text-white mb-2">Rani Beauty Clinic</p>
           <p className="font-body text-sm text-gray-400">
-            401 Olympia Ave NE, Suite 101, Renton, WA 98056 &middot;{' '}
+            401 Olympia Ave NE #101, Renton, WA 98056 &middot;{' '}
             <a href="tel:+14255394440" className="hover:text-white transition-colors">(425) 539-4440</a>
           </p>
           <p className="font-body text-xs text-gray-500 mt-4 max-w-2xl mx-auto">

@@ -141,12 +141,12 @@ export function evaluateAudienceFilter(
   client: ClientRecord,
   filter: AudienceFilter
 ): boolean {
+  if (filter.groups.length === 0) return true;
+
   // Check unsubscribe exclusion
   if (filter.excludeUnsubscribed && !client.smsOptIn && !client.emailOptIn) {
     return false;
   }
-
-  if (filter.groups.length === 0) return true;
 
   const groupResults = filter.groups.map(g => evaluateGroup(client, g));
 
@@ -467,37 +467,32 @@ export function getCampaignTypeDefaults(type: CampaignType): {
   const defaults: Record<CampaignType, { suggestedSubject: string; suggestedBody: string; defaultChannel: MessageChannel | 'both' }> = {
     promotional: {
       suggestedSubject: 'Special Offer from Rani Beauty Clinic',
-      suggestedBody: 'Hi {{clientName}}, we have an exclusive offer just for you! Visit us at Rani Beauty Clinic for premium treatment results.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      suggestedBody: 'Hi {{clientName}}, we have an exclusive offer just for you! Visit us at Rani Beauty Clinic for premium treatment results.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'both',
     },
     educational: {
       suggestedSubject: 'Learn About {{serviceName}} at Rani Beauty Clinic',
-      suggestedBody: 'Hi {{clientName}}, discover what {{serviceName}} can do for your skin goals.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      suggestedBody: 'Hi {{clientName}}, discover what {{serviceName}} can do for your skin goals.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'email',
     },
     reactivation: {
       suggestedSubject: 'We Miss You at Rani Beauty Clinic',
-      suggestedBody: 'Hi {{clientName}}, it has been a while since your last visit. We would love to see you again and help you continue your transformation journey.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      suggestedBody: 'Hi {{clientName}}, it has been a while since your last visit. We would love to see you again and help you continue your transformation journey.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'both',
     },
     event: {
       suggestedSubject: 'You\'re Invited - {{eventName}} at Rani Beauty Clinic',
-      suggestedBody: 'Hi {{clientName}}, join us for an exclusive event at Rani Beauty Clinic.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      suggestedBody: 'Hi {{clientName}}, join us for an exclusive event at Rani Beauty Clinic.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'both',
     },
     seasonal: {
       suggestedSubject: '{{seasonName}} Specials at Rani Beauty Clinic',
-      suggestedBody: 'Hi {{clientName}}, this season calls for a refresh! Discover our curated seasonal treatments.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      suggestedBody: 'Hi {{clientName}}, this season calls for a refresh! Discover our curated seasonal treatments.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'email',
     },
     birthday: {
       suggestedSubject: 'Happy Birthday, {{clientName}}! A Gift From Rani Beauty Clinic',
-      suggestedBody: 'Happy Birthday, {{clientName}}! As our gift to you, enjoy a special birthday treat at Rani Beauty Clinic.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
-      defaultChannel: 'both',
-    },
-    direct: {
-      suggestedSubject: 'Message from Rani Beauty Clinic',
-      suggestedBody: 'Hi {{clientName}}, we wanted to reach out personally.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA 98056\nTo unsubscribe, reply STOP',
+      suggestedBody: 'Happy Birthday, {{clientName}}! As our gift to you, enjoy a special birthday treat at Rani Beauty Clinic.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA 98056\nTo unsubscribe, reply STOP',
       defaultChannel: 'both',
     },
   };

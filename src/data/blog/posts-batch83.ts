@@ -209,7 +209,7 @@ After completing the initial series, most patients experience 70 to 90 percent p
 
 Modern laser hair removal technology includes built-in cooling systems that protect the skin and reduce discomfort. Most patients describe the sensation as a quick snapping or warm prickling feeling. Sensitive areas like the bikini line or upper lip may be more uncomfortable than areas like the legs or arms. Topical numbing can be applied for sensitive areas if needed.
 
-Treatment time varies by area. An upper lip takes five to ten minutes. Underarms take about 15 minutes. Full legs take about 20 minutes.
+Treatment time varies by area. An upper lip takes five to ten minutes. Underarms take about 15 minutes. Full legs may take 45 to 60 minutes.
 
 <h2>Who Is the Ideal Candidate?</h2>
 

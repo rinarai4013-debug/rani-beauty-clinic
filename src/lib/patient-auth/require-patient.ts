@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getAirtableBase as getSharedAirtableBase } from '@/lib/airtable/client';
 import { getPatientSession, type PatientSessionPayload } from './session';
+import { env } from '../env';
 
 /**
  * Helper to require patient authentication in API routes.
@@ -27,6 +27,7 @@ export async function requirePatientAuth(): Promise<
 /**
  * Get an Airtable base instance.
  */
-export function getAirtableBase() {
-  return getSharedAirtableBase();
+export async function getAirtableBase() {
+  const Airtable = (await import('airtable')).default;
+  return new Airtable({ apiKey: env.AIRTABLE_PAT }).base(env.AIRTABLE_BASE_ID);
 }

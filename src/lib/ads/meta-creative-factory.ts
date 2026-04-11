@@ -561,7 +561,7 @@ function generateCarouselCards(serviceId: string, serviceName: string): Carousel
       description: 'Discover why hundreds of clients trust Rani Beauty Clinic for their treatments.',
       cta: 'Learn More',
       visualDescription: 'Clean, luxury branded image with clinic interior. Navy/gold palette.',
-      landingUrl: `https://www.ranibeautyclinic.com/services/${serviceId.replace('_', '-')}`,
+      landingUrl: `https://ranibeautyclinic.com/services/${serviceId.replace('_', '-')}`,
     },
     {
       position: 2,
@@ -569,7 +569,7 @@ function generateCarouselCards(serviceId: string, serviceName: string): Carousel
       description: 'A simple, straightforward process from consultation to visible results.',
       cta: 'See the Process',
       visualDescription: 'Step-by-step process infographic. 3 steps with icons.',
-      landingUrl: `https://www.ranibeautyclinic.com/services/${serviceId.replace('_', '-')}`,
+      landingUrl: `https://ranibeautyclinic.com/services/${serviceId.replace('_', '-')}`,
     },
     {
       position: 3,
@@ -577,7 +577,7 @@ function generateCarouselCards(serviceId: string, serviceName: string): Carousel
       description: '"The best experience I\'ve had at any medspa. Results speak for themselves."',
       cta: 'Read Reviews',
       visualDescription: 'Testimonial card with 5-star rating. Clean, minimal design.',
-      landingUrl: 'https://www.ranibeautyclinic.com/reviews',
+      landingUrl: 'https://ranibeautyclinic.com/reviews',
     },
     {
       position: 4,
@@ -585,7 +585,7 @@ function generateCarouselCards(serviceId: string, serviceName: string): Carousel
       description: 'Every treatment at Rani Beauty Clinic is supervised by our physician team.',
       cta: 'Meet Our Team',
       visualDescription: 'Provider headshots or clinic trust signals. Professional, warm.',
-      landingUrl: 'https://www.ranibeautyclinic.com/about',
+      landingUrl: 'https://ranibeautyclinic.com/about',
     },
     {
       position: 5,
@@ -593,7 +593,7 @@ function generateCarouselCards(serviceId: string, serviceName: string): Carousel
       description: 'Ready to start? Book a free consultation today. Walk-ins welcome for select services.',
       cta: 'Book Now',
       visualDescription: 'Strong CTA card with gold button. Clinic exterior or booking interface.',
-      landingUrl: 'https://www.ranibeautyclinic.com/book',
+      landingUrl: 'https://ranibeautyclinic.com/book',
     },
   ];
 
@@ -696,7 +696,7 @@ function generateCollectionItems(serviceId: string): CollectionItem[] {
   if (!service) return [];
 
   const items: CollectionItem[] = [
-    { title: service.name, description: service.topBenefit, price: `From ${service.priceRange}`, landingUrl: `https://www.ranibeautyclinic.com/services/${serviceId.replace('_', '-')}` },
+    { title: service.name, description: service.topBenefit, price: `From ${service.priceRange}`, landingUrl: `https://ranibeautyclinic.com/services/${serviceId.replace('_', '-')}` },
   ];
 
   // Add related services
@@ -706,7 +706,7 @@ function generateCollectionItems(serviceId: string): CollectionItem[] {
       title: rs.name,
       description: rs.topBenefit,
       price: `From ${rs.priceRange}`,
-      landingUrl: `https://www.ranibeautyclinic.com/services/${rs.id.replace('_', '-')}`,
+      landingUrl: `https://ranibeautyclinic.com/services/${rs.id.replace('_', '-')}`,
     });
   }
 

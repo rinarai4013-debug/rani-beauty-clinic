@@ -21,7 +21,6 @@ import type {
   ReminderScheduleItem,
   ReminderTiming,
 } from './types';
-export type { RebookingNudge };
 import { REBOOKING_INTERVALS } from './scheduler';
 
 // ── PRE-APPOINTMENT INSTRUCTIONS ──
@@ -238,7 +237,7 @@ export function generateReminderContent(
       return {
         subject: `Your ${appointment.serviceName} at Rani Beauty Clinic — ${dateFormatted}`,
         body: channel === 'email'
-          ? `We're looking forward to seeing you, ${appointment.clientName.split(' ')[0]}!\n\nYour ${appointment.serviceName} with ${appointment.providerName} is scheduled for ${dateFormatted} at ${timeFormatted}.\n\nWe'll send you a reminder with preparation instructions closer to your appointment.\n\nRani Beauty Clinic\n401 Olympia Ave NE, Suite 101, Renton, WA`
+          ? `We're looking forward to seeing you, ${appointment.clientName.split(' ')[0]}!\n\nYour ${appointment.serviceName} with ${appointment.providerName} is scheduled for ${dateFormatted} at ${timeFormatted}.\n\nWe'll send you a reminder with preparation instructions closer to your appointment.\n\nRani Beauty Clinic\n401 Olympia Ave NE #101, Renton, WA`
           : `Rani Beauty Clinic: Your ${appointment.serviceName} is in 1 week — ${dateFormatted} at ${timeFormatted}. We'll send prep instructions soon!`,
       };
 
@@ -261,8 +260,8 @@ export function generateReminderContent(
       return {
         subject: `Today's Appointment — ${timeFormatted}`,
         body: channel === 'sms'
-          ? `Rani Beauty: See you today at ${timeFormatted} for your ${appointment.serviceName}!${instructions.length > 0 ? ` Quick reminder: ${instructions[0]}` : ''} — 401 Olympia Ave NE, Suite 101, Renton`
-          : `Good morning, ${appointment.clientName.split(' ')[0]}!\n\nWe're excited to see you today:\n\n${appointment.serviceName}\nTime: ${timeFormatted}\nProvider: ${appointment.providerName}\nRoom: ${appointment.roomId.charAt(0).toUpperCase() + appointment.roomId.slice(1)}${instructionText}\n\nAddress: 401 Olympia Ave NE, Suite 101, Renton, WA 98056\n\nSee you soon!\nRani Beauty Clinic`,
+          ? `Rani Beauty: See you today at ${timeFormatted} for your ${appointment.serviceName}!${instructions.length > 0 ? ` Quick reminder: ${instructions[0]}` : ''} — 401 Olympia Ave NE #101, Renton`
+          : `Good morning, ${appointment.clientName.split(' ')[0]}!\n\nWe're excited to see you today:\n\n${appointment.serviceName}\nTime: ${timeFormatted}\nProvider: ${appointment.providerName}\nRoom: ${appointment.roomId.charAt(0).toUpperCase() + appointment.roomId.slice(1)}${instructionText}\n\nAddress: 401 Olympia Ave NE #101, Renton, WA 98056\n\nSee you soon!\nRani Beauty Clinic`,
       };
     }
 
@@ -539,7 +538,7 @@ export function processDueReminders(
   reminders: ReminderConfig[],
   appointments: Appointment[],
   currentTime: Date = new Date(),
-  baseUrl: string = 'https://www.ranibeautyclinic.com/book',
+  baseUrl: string = 'https://ranibeautyclinic.com/book',
 ): ProcessedReminder[] {
   const due: ProcessedReminder[] = [];
   const nowStr = currentTime.toISOString();

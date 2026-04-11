@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { clinicInfo } from "@/data/clinic-info";
 import {
   Check,
   Star,
@@ -426,7 +427,7 @@ export default function MembershipPageClient() {
                   </ul>
 
                   <a
-                    href="https://booking.mangomint.com/ranibeautyclinic1"
+                    href={clinicInfo.booking.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-lg py-3.5 font-body text-sm font-semibold uppercase tracking-wider transition-all duration-300 ${
@@ -505,7 +506,7 @@ export default function MembershipPageClient() {
               month.
             </p>
             <a
-              href="https://booking.mangomint.com/ranibeautyclinic1"
+              href={clinicInfo.booking.url}
               target="_blank"
               rel="noopener noreferrer"
               className="group mt-8 inline-flex items-center gap-2 rounded-lg bg-rani-gold px-10 py-4 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy shadow-lg shadow-rani-gold/20 transition-all duration-300 hover:bg-white hover:shadow-xl"

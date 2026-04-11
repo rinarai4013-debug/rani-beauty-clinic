@@ -16,6 +16,7 @@
 
 import type { MembershipTier, BillingCycle, MembershipStatus, DiscountType } from './plans';
 import { PLANS, getEffectiveMonthlyPrice, ANNUAL_DISCOUNT_MONTHS } from './plans';
+import { env } from '../env';
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -730,7 +731,7 @@ export function buildSquareSubscriptionRequest(
 
   return {
     idempotencyKey: `sub_${billing.memberId}_${Date.now()}`,
-    locationId: process.env.SQUARE_LOCATION_ID || '',
+    locationId: env.SQUARE_LOCATION_ID,
     customerId: billing.squareCustomerId || '',
     planVariationId: getSquarePlanVariationId(billing.tier, billing.billingCycle),
     startDate: billing.currentPeriodStart.split('T')[0],
@@ -747,12 +748,12 @@ export function buildSquareSubscriptionRequest(
  */
 export function getSquarePlanVariationId(tier: MembershipTier, cycle: BillingCycle): string {
   const planMap: Record<string, string> = {
-    'halo_monthly': process.env.SQUARE_PLAN_HALO_MONTHLY || 'plan_halo_monthly',
-    'halo_annual': process.env.SQUARE_PLAN_HALO_ANNUAL || 'plan_halo_annual',
-    'glow_monthly': process.env.SQUARE_PLAN_GLOW_MONTHLY || 'plan_glow_monthly',
-    'glow_annual': process.env.SQUARE_PLAN_GLOW_ANNUAL || 'plan_glow_annual',
-    'elite_monthly': process.env.SQUARE_PLAN_ELITE_MONTHLY || 'plan_elite_monthly',
-    'elite_annual': process.env.SQUARE_PLAN_ELITE_ANNUAL || 'plan_elite_annual',
+    'halo_monthly': env.SQUARE_PLAN_HALO_MONTHLY,
+    'halo_annual': env.SQUARE_PLAN_HALO_ANNUAL,
+    'glow_monthly': env.SQUARE_PLAN_GLOW_MONTHLY,
+    'glow_annual': env.SQUARE_PLAN_GLOW_ANNUAL,
+    'elite_monthly': env.SQUARE_PLAN_ELITE_MONTHLY,
+    'elite_annual': env.SQUARE_PLAN_ELITE_ANNUAL,
   };
 
   return planMap[`${tier}_${cycle}`] || `plan_${tier}_${cycle}`;

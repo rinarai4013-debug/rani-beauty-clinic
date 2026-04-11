@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
+import { env } from '@/lib/env';
 
 interface MetaCampaign {
   id: string;
@@ -42,8 +43,8 @@ export async function GET() {
   const cached = cache.get<MetaAdsData>(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  const accessToken = process.env.META_ACCESS_TOKEN;
-  const adAccountId = process.env.META_AD_ACCOUNT_ID;
+  const accessToken = env.META_ACCESS_TOKEN;
+  const adAccountId = env.META_AD_ACCOUNT_ID;
 
   if (!accessToken || !adAccountId) {
     return NextResponse.json({

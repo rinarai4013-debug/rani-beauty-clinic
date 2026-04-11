@@ -103,26 +103,26 @@ interface SegmentRule {
 const SEGMENT_RULES: SegmentRule[] = [
   // Champions: R=4-5, F=4-5, M=4-5
   { segment: 'champions', recencyRange: [4, 5], frequencyRange: [4, 5], monetaryRange: [4, 5] },
-  // Can't Lose Them: very valuable but at risk - check before generic at_risk
-  { segment: 'cant_lose', recencyRange: [1, 2], frequencyRange: [4, 5], monetaryRange: [4, 5] },
   // Loyal Customers: R=2-5, F=3-5, M=3-5
   { segment: 'loyal', recencyRange: [2, 5], frequencyRange: [3, 5], monetaryRange: [3, 5] },
-  // New Customers: first recent purchase should beat generic potential loyalist
-  { segment: 'new_customers', recencyRange: [4, 5], frequencyRange: [1, 1], monetaryRange: [1, 1] },
   // Potential Loyalists: R=3-5, F=1-3, M=1-3
   { segment: 'potential_loyalists', recencyRange: [3, 5], frequencyRange: [1, 3], monetaryRange: [1, 3] },
+  // New Customers: R=4-5, F=1-1, M=1-1
+  { segment: 'new_customers', recencyRange: [4, 5], frequencyRange: [1, 1], monetaryRange: [1, 1] },
   // Promising: R=3-4, F=1-1, M=1-1
   { segment: 'promising', recencyRange: [3, 4], frequencyRange: [1, 1], monetaryRange: [1, 1] },
   // Need Attention: R=2-3, F=2-3, M=2-3
   { segment: 'need_attention', recencyRange: [2, 3], frequencyRange: [2, 3], monetaryRange: [2, 3] },
-  // Lost: exact cold / low value pattern should beat hibernating fallback
-  { segment: 'lost', recencyRange: [1, 1], frequencyRange: [1, 1], monetaryRange: [1, 1] },
-  // Hibernating: more specific than about_to_sleep
-  { segment: 'hibernating', recencyRange: [1, 2], frequencyRange: [1, 2], monetaryRange: [1, 2] },
+  // About to Sleep: R=2-3, F=1-2, M=1-2
+  { segment: 'about_to_sleep', recencyRange: [2, 3], frequencyRange: [1, 2], monetaryRange: [1, 2] },
   // At Risk: R=1-2, F=2-5, M=2-5
   { segment: 'at_risk', recencyRange: [1, 2], frequencyRange: [2, 5], monetaryRange: [2, 5] },
-  // About to Sleep: softer version of hibernating
-  { segment: 'about_to_sleep', recencyRange: [2, 3], frequencyRange: [1, 2], monetaryRange: [1, 2] },
+  // Can't Lose Them: R=1-2, F=4-5, M=4-5
+  { segment: 'cant_lose', recencyRange: [1, 2], frequencyRange: [4, 5], monetaryRange: [4, 5] },
+  // Hibernating: R=1-2, F=1-2, M=1-2
+  { segment: 'hibernating', recencyRange: [1, 2], frequencyRange: [1, 2], monetaryRange: [1, 2] },
+  // Lost: R=1, F=1, M=1
+  { segment: 'lost', recencyRange: [1, 1], frequencyRange: [1, 1], monetaryRange: [1, 1] },
 ];
 
 /**
@@ -382,20 +382,6 @@ function getMovementSignificance(
   from: BehavioralSegment,
   to: BehavioralSegment,
 ): 'positive' | 'negative' | 'neutral' {
-  const segmentRank: Record<BehavioralSegment, number> = {
-    champions: 11,
-    loyal: 10,
-    potential_loyalists: 9,
-    new_customers: 8,
-    promising: 7,
-    need_attention: 6,
-    about_to_sleep: 5,
-    at_risk: 4,
-    cant_lose: 3,
-    hibernating: 2,
-    lost: 1,
-    new: 0,
-  };
   const positiveSegments: BehavioralSegment[] = ['champions', 'loyal', 'potential_loyalists'];
   const negativeSegments: BehavioralSegment[] = ['at_risk', 'cant_lose', 'hibernating', 'lost'];
 
@@ -408,8 +394,6 @@ function getMovementSignificance(
   if (wasPositive && isNegative) return 'negative';
   if (!wasPositive && isPositive) return 'positive';
   if (!wasNegative && isNegative) return 'negative';
-  if (segmentRank[to] > segmentRank[from]) return 'positive';
-  if (segmentRank[to] < segmentRank[from]) return 'negative';
   return 'neutral';
 }
 

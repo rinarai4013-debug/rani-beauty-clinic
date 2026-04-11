@@ -10,6 +10,7 @@ import ScrollProgress from "@/components/layout/ScrollProgress";
 import Analytics, { GTMNoScript } from "@/components/analytics/Analytics";
 import ConditionalPublicLayout from "@/components/layout/ConditionalPublicLayout";
 import PWAProvider from "@/components/pwa/PWAProvider";
+import SiteWideSchema from "@/components/seo/SiteWideSchema";
 
 // Dynamic imports - these are non-critical, below-fold or interaction-triggered components.
 // Loading them lazily reduces the initial JS bundle by ~60KB+ (framer-motion chunks, chat widget, etc.)
@@ -20,7 +21,6 @@ const AIChatWidget = dynamic(() => import("@/components/AIChatWidget"), { ssr: f
 const SocialProofToast = dynamic(() => import("@/components/sections/SocialProofToast"), { ssr: false });
 const BehavioralTracker = dynamic(() => import("@/components/analytics/BehavioralTracker"), { ssr: false });
 const AnalyticsTracker = dynamic(() => import("@/components/analytics/AnalyticsTracker"), { ssr: false });
-const CookieConsent = dynamic(() => import("@/components/analytics/CookieConsent"), { ssr: false });
 
 export const viewport: Viewport = {
   themeColor: "#0F1D2C",
@@ -38,10 +38,6 @@ export const metadata: Metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
-    "geo.region": "US-WA",
-    "geo.placename": "Renton",
-    "geo.position": "47.4856;-122.2031",
-    "ICBM": "47.4856, -122.2031",
   },
   title: {
     default: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
@@ -103,6 +99,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontVariables}>
       <head>
+        {/* Site-wide LocalBusiness + Organization structured data */}
+        <SiteWideSchema />
         {/* PWA - Apple touch icon */}
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         {/* AI Citation - llms.txt discovery for AI crawlers */}
@@ -114,6 +112,15 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://static.hotjar.com" />
+        {/* Hotjar - loaded after page is interactive to avoid render-blocking */}
+        <Script
+          id="hotjar"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};h._hjSettings={hjid:5241962,hjsv:6};a=o.getElementsByTagName('head')[0];r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;a.appendChild(r);})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
+          }}
+        />
         <Analytics />
         {/* Mangomint booking scripts are loaded via Analytics component */}
       </head>
@@ -134,9 +141,8 @@ export default function RootLayout({
           <AIChatWidget />
           <BehavioralTracker />
           <AnalyticsTracker />
-          <CookieConsent />
         </ConditionalPublicLayout>
-        <PWAProvider>{null}</PWAProvider>
+        <PWAProvider />
       </body>
     </html>
   );

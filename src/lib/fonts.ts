@@ -1,4 +1,4 @@
-import { Montserrat, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * Self-hosted font configuration using Next.js built-in font optimization.
@@ -15,18 +15,28 @@ import { Montserrat, Playfair_Display } from "next/font/google";
  * `tailwind.config.ts` (fontFamily.heading / fontFamily.body).
  */
 
-export const montserrat = Montserrat({
-  subsets: ["latin"],
+export const montserrat = localFont({
+  src: [
+    {
+      path: "../assets/fonts/Montserrat/Montserrat-Regular-Static.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
   variable: "--font-body",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
 });
 
-export const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
+export const montserratHeading = localFont({
+  src: [
+    {
+      path: "../assets/fonts/Montserrat/Montserrat-Regular-Static.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
   variable: "--font-heading",
   display: "swap",
-  weight: ["400", "700"],
 });
 
 /**
@@ -38,4 +48,4 @@ export const playfairDisplay = Playfair_Display({
  * <html lang="en" className={fontVariables}>
  * ```
  */
-export const fontVariables = `${montserrat.variable} ${playfairDisplay.variable}`;
+export const fontVariables = `${montserrat.variable} ${montserratHeading.variable}`;
