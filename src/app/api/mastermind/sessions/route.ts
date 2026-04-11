@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { createSession, saveSessionAsync, getAllSessionsAsync } from '@/lib/mastermind/session';
-import { unauthorized } from '@/lib/auth/middleware';
+import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession } from '@/types/mastermind';
 
@@ -16,9 +16,12 @@ export async function GET(request: NextRequest) {
   return withSentry('mastermind/sessions', async () => {
     try {
       // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
-      const session = await getSessionFromRequest(request).catch(() => null);
-      if (!session) {
+      const authSession = await getSessionFromRequest(request).catch(() => null);
+      if (!authSession) {
         return unauthorized();
+      }
+      if (authSession.role !== 'ceo' && authSession.role !== 'provider') {
+        return forbidden();
       }
 
       const sessions = await getAllSessionsAsync();
