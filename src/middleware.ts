@@ -15,9 +15,22 @@ import { jwtVerify } from 'jose';
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
-const PLATFORM_DOMAINS = ['ranios.com', 'ranios.dev', 'localhost'];
+const parseDomainCsv = (input: string | undefined, fallback: string[]): string[] =>
+  (input ?? fallback.join(','))
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+
+const PLATFORM_DOMAINS = parseDomainCsv(process.env.PLATFORM_DOMAINS, ['ranios.com', 'ranios.dev', 'localhost']);
 const SESSION_COOKIE = 'rani-session';
-const DEFAULT_TENANT_ID = 'rani-beauty-clinic';
+const DEFAULT_TENANT_ID = process.env.DEFAULT_TENANT_ID || 'rani-beauty-clinic';
+const DEFAULT_HOSTNAME = process.env.DEFAULT_HOSTNAME || 'localhost:3000';
+const CORS_ORIGINS = parseDomainCsv(process.env.CORS_ALLOWED_ORIGINS, [
+  'https://ranibeautyclinic.com',
+  'https://www.ranibeautyclinic.com',
+  'https://ranios.com',
+  'https://ranios.dev',
+]);
 
 // Paths that skip tenant resolution
 const PUBLIC_PATHS = [
@@ -86,7 +99,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const hostname = request.headers.get('host') || 'localhost:3000';
+  const hostname = request.headers.get('host') || DEFAULT_HOSTNAME;
   let tenantId: string | null = null;
   let tenantSlug: string | null = null;
   let tenantSource: string = 'default';
@@ -150,12 +163,7 @@ export async function middleware(request: NextRequest) {
   // CORS for API routes — restrict to known origins
   if (pathname.startsWith('/api/')) {
     const origin = request.headers.get('origin') || '';
-    const allowedOrigins = [
-      'https://ranibeautyclinic.com',
-      'https://www.ranibeautyclinic.com',
-      'https://ranios.com',
-      'https://ranios.dev',
-    ];
+    const allowedOrigins = [...CORS_ORIGINS];
     // Allow localhost in development
     if (process.env.NODE_ENV === 'development') {
       allowedOrigins.push('http://localhost:3000', 'http://localhost:3001');

@@ -333,7 +333,13 @@ export function setTenantStore(store: TenantStore): void {
 
 // ─── Resolution Functions ───────────────────────────────────────────────────
 
-const PLATFORM_DOMAINS = ['ranios.com', 'ranios.dev', 'localhost'];
+const parseDomainCsv = (input: string | undefined, fallback: string[]): string[] =>
+  (input ?? fallback.join(','))
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+
+const PLATFORM_DOMAINS = parseDomainCsv(process.env.PLATFORM_DOMAINS, ['ranios.com', 'ranios.dev', 'localhost']);
 
 /**
  * Extract subdomain from hostname.
