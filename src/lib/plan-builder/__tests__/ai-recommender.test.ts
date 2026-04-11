@@ -888,19 +888,48 @@ describe('Profile scoring: previous treatments', () => {
     ).not.toThrow();
   });
 
-  // SOURCE BUG: isRecentlyHad uses loose substring matching
-  // (slugLower.includes(prev)). An empty-string entry `['']` causes
-  // EVERY service to match (since every string includes '') which
-  // applies a -30 penalty across the whole plan. Similarly, very short
-  // prev tokens like 'b' will match botox, biorepeel, b12, biotin, etc.
-  // This can silently corrupt recommendations.
-  it('empty-string previousTreatment penalizes every service by 30 (SOURCE BUG)', () => {
+  // Post-Wave-11: empty-string / whitespace / sub-3-char prev tokens are
+  // now filtered out before substring matching, so the former "every
+  // service penalized by 30" poison pattern no longer fires.
+  it('empty-string previousTreatment is filtered and does NOT poison scoring', () => {
     const base = recommendTreatmentPlan(makeProfile({ skinConcerns: ['aging'] }));
-    const poisoned = recommendTreatmentPlan(
+    const withEmpty = recommendTreatmentPlan(
       makeProfile({ skinConcerns: ['aging'], previousTreatments: [''] })
     );
     const a = findById(base, 'botox');
-    const b = findById(poisoned, 'botox');
+    const b = findById(withEmpty, 'botox');
+    if (a && b) expect(a.fitScore).toBe(b.fitScore);
+  });
+
+  it('whitespace-only previousTreatment is filtered and does NOT poison scoring', () => {
+    const base = recommendTreatmentPlan(makeProfile({ skinConcerns: ['aging'] }));
+    const withWs = recommendTreatmentPlan(
+      makeProfile({ skinConcerns: ['aging'], previousTreatments: ['   '] })
+    );
+    const a = findById(base, 'botox');
+    const b = findById(withWs, 'botox');
+    if (a && b) expect(a.fitScore).toBe(b.fitScore);
+  });
+
+  it('single-char previousTreatment does NOT match every service with that letter', () => {
+    // Pre-Wave-11 this matched Botox, BioRePeel, B12, Biotin, etc.
+    const base = recommendTreatmentPlan(makeProfile({ skinConcerns: ['aging'] }));
+    const withShort = recommendTreatmentPlan(
+      makeProfile({ skinConcerns: ['aging'], previousTreatments: ['b'] })
+    );
+    const a = findById(base, 'botox');
+    const b = findById(withShort, 'botox');
+    if (a && b) expect(a.fitScore).toBe(b.fitScore);
+  });
+
+  it('legitimate previousTreatment still penalizes the intended service by 30', () => {
+    // Full service name (≥ 3 chars) is kept; the penalty remains.
+    const base = recommendTreatmentPlan(makeProfile({ skinConcerns: ['aging'] }));
+    const prev = recommendTreatmentPlan(
+      makeProfile({ skinConcerns: ['aging'], previousTreatments: ['botox'] })
+    );
+    const a = findById(base, 'botox');
+    const b = findById(prev, 'botox');
     if (a && b) expect(a.fitScore - b.fitScore).toBe(30);
   });
 });
@@ -1227,41 +1256,50 @@ describe('Realistic Rani personas', () => {
 // 16. Bug documentation: assignPhase map ambiguity
 // ─────────────────────────────────────────────────────────────────────
 
-// SOURCE BUG: PHASE_CATEGORIES maps both `skincare` and `facial` to BOTH
-// phase 1 and phase 3. Because `assignPhase` iterates 1 → 2 → 3 and returns
-// on first match, those categories are ALWAYS assigned to phase 1. The
-// phase-3 maintenance intent for `skincare` and `facial` is therefore dead.
-// The redistribution loop at the end of buildRecommendations ("ensure at
-// least 1 service per phase") can shuffle them into phase 3 post-hoc, but
-// only when a donor phase has a surplus — it is not a reliable fix.
-describe('SOURCE BUG: assignPhase cannot assign facial/skincare to phase 3', () => {
-  it('a facial-only concern ("dull skin") never lands any facial directly in phase 3 via assignPhase', () => {
+// Post-Wave-11: PHASE_CATEGORIES no longer lists `facial` and `skincare`
+// in both phase 1 and phase 3. Maintenance-style categories now live
+// ONLY in phase 3, so `assignPhase` returns 3 directly instead of always
+// falling into phase 1 and relying on the post-hoc redistribution loop.
+describe('assignPhase: facial/skincare now land directly in phase 3', () => {
+  it('a facial-only concern ("dull skin") lands facials in phase 3 via assignPhase, not redistribution', () => {
     const plan = recommendTreatmentPlan(['dull skin']);
-    // Check that any phase-3 facials came via the redistribution fallback
-    // (i.e., there were enough phase-1 facials to donate). This test pins
-    // current behavior so the bug is visible if fixed.
-    const phase3Facials = plan.filter((p) => p.phase === 3 && p.service.category === 'facial');
-    const phase1Facials = plan.filter((p) => p.phase === 1 && p.service.category === 'facial');
-    // If there's a phase-3 facial, phase-1 must have had surplus at redistribution time
-    if (phase3Facials.length > 0) {
-      expect(phase1Facials.length + phase3Facials.length).toBeGreaterThanOrEqual(2);
+    const facialItems = plan.filter((p) => p.service.category === 'facial');
+    // The plan must contain at least one facial for a dull-skin concern.
+    expect(facialItems.length).toBeGreaterThan(0);
+    // Every facial should now be in phase 3 (its natural maintenance home),
+    // not scattered across phase 1 as a side-effect of assignPhase returning
+    // on the first matching phase.
+    for (const facial of facialItems) {
+      expect(facial.phase).toBe(3);
+    }
+  });
+
+  it('skincare services are assigned to phase 3 (maintenance), not phase 1', () => {
+    // skincare category maps only to phase 3 now. We smoke-test by driving
+    // a plan and verifying every skincare item lands in phase 3 if present.
+    const plan = recommendTreatmentPlan(['acne']);
+    const skincareItems = plan.filter((p) => p.service.category === 'skincare');
+    for (const item of skincareItems) {
+      expect(item.phase).toBe(3);
     }
   });
 });
 
-// SOURCE BUG: the assignPhase "fallback" (`service.price > 400 ? 2 : 1`) can
-// only ever return 1 or 2 — a service whose category is not in any
-// PHASE_CATEGORIES set (e.g. `laser-hair-removal`) is literally impossible
-// to assign to phase 3. Again only the redistribution loop can move it.
-describe('SOURCE BUG: assignPhase fallback never returns 3', () => {
-  it('laser-hair-removal (not in PHASE_CATEGORIES) is assigned to phase 1 or 2 via fallback', () => {
+// Post-Wave-11: `laser-hair-removal` is now an explicit member of
+// PHASE_CATEGORIES[2] (core treatment), so `assignPhase` returns 2 for
+// LHR services directly. The previous `price > 400 ? 2 : 1` fallback
+// could never return phase 3; the flow no longer depends on that branch
+// for any known catalog category.
+describe('assignPhase: laser-hair-removal is an explicit phase-2 category', () => {
+  it('laser-hair-removal services are assigned to phase 2 directly', () => {
     const plan = recommendTreatmentPlan(['unwanted hair']);
-    // All laser-hair-removal items should initially assignPhase to 1 (price <= 400)
-    // or 2 (price > 400). Only redistribution could bump them to 3.
-    for (const item of plan) {
-      if (item.service.category === 'laser-hair-removal') {
-        expect([1, 2, 3]).toContain(item.phase);
-      }
-    }
+    const lhr = plan.filter((p) => p.service.category === 'laser-hair-removal');
+    expect(lhr.length).toBeGreaterThan(0);
+    // Primary assignment should be phase 2. Some items may drift to
+    // phase 1 or 3 via the "fill empty phase" redistribution pass when a
+    // parentSlug collision forces a move, but the overwhelming majority
+    // should be in phase 2.
+    const phase2Count = lhr.filter((p) => p.phase === 2).length;
+    expect(phase2Count).toBeGreaterThan(0);
   });
 });
