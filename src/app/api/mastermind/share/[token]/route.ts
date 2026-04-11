@@ -37,6 +37,9 @@ import type {
   PatientPredictiveMetrics,
 } from '@/types/patient-plan';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export type { PatientPlanData };
 
 // ── Sanitizers ──
@@ -225,6 +228,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
+  return withSentry('mastermind/share/[token]', async () => {
   try {
     const { token } = await params;
 
@@ -326,4 +330,6 @@ export async function GET(
       { status: 500 }
     );
   }
+
+  });
 }

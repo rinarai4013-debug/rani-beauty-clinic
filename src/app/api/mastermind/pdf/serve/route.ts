@@ -10,7 +10,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { retrievePdf } from '@/lib/mastermind/pdf-storage';
 import { getSession } from "@/lib/auth/session";
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET(request: NextRequest) {
+  return withSentry('mastermind/pdf/serve', async () => {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -50,4 +54,6 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

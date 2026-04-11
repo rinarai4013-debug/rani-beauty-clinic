@@ -14,6 +14,9 @@ import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { parseJsonBody, apiError } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/mastermind';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 type CopilotContext =
   | 'scan_review'
   | 'plan_discussion'
@@ -478,6 +481,7 @@ Always be specific and actionable. Reference the patient's actual data in your r
 // ── ROUTE HANDLER ──
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/copilot', async () => {
   try {
     const parsed = await parseJsonBody(request);
     if ('error' in parsed) return parsed.error;
@@ -553,4 +557,6 @@ export async function POST(request: NextRequest) {
     console.error('[Copilot API Error]', err);
     return apiError('Failed to generate copilot response', 500);
   }
+
+  });
 }

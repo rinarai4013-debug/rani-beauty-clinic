@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getReactivationTemplate, getAutoReactivationTemplate, type ReactivationTier } from '@/lib/templates/reactivation';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const Schema = z.object({
   firstName: z.string().min(1),
   lastService: z.string().optional().default('consultation'),
@@ -11,6 +14,7 @@ const Schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  return withSentry('templates/reactivation', async () => {
   const ip = getClientIP(request);
   const { allowed, resetIn } = rateLimit('templates-reactivation', ip, RATE_LIMITS.WEBHOOK);
   if (!allowed) return rateLimitResponse(resetIn);
@@ -43,4 +47,6 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(getAutoReactivationTemplate(vars));
+
+  });
 }

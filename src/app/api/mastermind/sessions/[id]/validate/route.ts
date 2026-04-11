@@ -11,10 +11,14 @@ import { validatePlan } from '@/lib/plan-builder/constraints';
 import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
 import type { ServiceCategory } from '@/data/services/unified-catalog';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return withSentry('mastermind/sessions/[id]/validate', async () => {
   try {
     const { id } = await params;
     const session = await getSessionByIdAsync(id);
@@ -105,4 +109,6 @@ export async function POST(
       { status: 500 }
     );
   }
+
+  });
 }

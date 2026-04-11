@@ -16,6 +16,9 @@ import { Tables } from '@/lib/airtable/client';
 import { rateLimitedQuery } from '@/lib/airtable/client';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ── Validation ──
 
 const InterestPayloadSchema = z.object({
@@ -33,6 +36,7 @@ const InterestPayloadSchema = z.object({
 // ── POST Handler ──
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/share/interest', async () => {
   try {
   const parsed = InterestPayloadSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
@@ -163,4 +167,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

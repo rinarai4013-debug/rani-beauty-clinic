@@ -4,7 +4,11 @@ import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET() {
+  return withSentry('patient/plan', async () => {
   try {
     const session = await getPatientSession();
     if (!session) {
@@ -59,4 +63,6 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  });
 }

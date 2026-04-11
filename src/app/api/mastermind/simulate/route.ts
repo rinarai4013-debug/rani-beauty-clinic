@@ -14,6 +14,9 @@ import { unauthorized } from '@/lib/auth/middleware';
 import { z } from 'zod';
 import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export const maxDuration = 30;
 const SimulateSessionSchema = z.object({
   sessionId: z.string().min(1).optional(),
@@ -138,6 +141,7 @@ function buildDataDrivenSimulation(
 }
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/simulate', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -214,4 +218,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

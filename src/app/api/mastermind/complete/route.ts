@@ -19,11 +19,15 @@ import {
 } from '@/lib/mastermind/post-consultation';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const CompletionBodySchema = z.object({
   sessionId: z.string().min(1, 'sessionId is required'),
 });
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/complete', async () => {
   try {
     const parsed = CompletionBodySchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
@@ -122,6 +126,8 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }
 
 // ── Webhook Helper ──

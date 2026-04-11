@@ -18,6 +18,9 @@ import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token'
 import crypto from 'crypto';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const CLINIC_PHONE = '(425) 539-4440';
 const FollowUpBodySchema = z.object({
@@ -27,6 +30,7 @@ const FollowUpBodySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/follow-up', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -213,11 +217,14 @@ export async function POST(request: NextRequest) {
     console.error('[Follow-Up] Error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
+
+  });
 }
 
 // ── Available templates endpoint (GET) ──
 
 export async function GET(request: NextRequest) {
+  return withSentry('mastermind/follow-up', async () => {
   // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
   const authSession = await getSessionFromRequest(request).catch(() => null);
   if (!authSession) {
@@ -233,4 +240,6 @@ export async function GET(request: NextRequest) {
   }));
 
   return NextResponse.json({ success: true, templates });
+
+  });
 }

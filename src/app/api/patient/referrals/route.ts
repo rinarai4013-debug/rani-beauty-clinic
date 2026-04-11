@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getPatientSession, generateReferralCode } from '@/lib/patient-auth/session';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET() {
+  return withSentry('patient/referrals', async () => {
   try {
     const session = await getPatientSession();
     if (!session) {
@@ -31,6 +35,8 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  });
 }
 
 /**

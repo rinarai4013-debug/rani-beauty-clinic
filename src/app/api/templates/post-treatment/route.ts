@@ -8,6 +8,9 @@ import {
   getNextRecommendedService,
 } from '@/lib/templates/post-treatment';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const Schema = z.object({
   step: z.string().optional().default('immediate'),
   firstName: z.string().min(1),
@@ -26,6 +29,7 @@ function authorizeWebhook(request: NextRequest): NextResponse | null {
 }
 
 export async function POST(request: NextRequest) {
+  return withSentry('templates/post-treatment', async () => {
   const ip = getClientIP(request);
   const { allowed, resetIn } = rateLimit('templates-post-treatment', ip, RATE_LIMITS.WEBHOOK);
   if (!allowed) return rateLimitResponse(resetIn);
@@ -65,4 +69,6 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(template);
+
+  });
 }

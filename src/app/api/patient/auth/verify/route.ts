@@ -9,6 +9,9 @@ import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const requestSchema = z.object({
   token: z.string().min(1),
 });
@@ -20,6 +23,7 @@ interface ClientRecord {
 }
 
 export async function POST(request: NextRequest) {
+  return withSentry('patient/auth/verify', async () => {
   const ip = getClientIP(request);
   const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
   if (!allowed) return rateLimitResponse(resetIn);
@@ -101,4 +105,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

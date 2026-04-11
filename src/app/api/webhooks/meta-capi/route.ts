@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 /**
  * POST /api/webhooks/meta-capi
  *
@@ -60,6 +63,7 @@ function sha256(value: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  return withSentry('webhooks/meta-capi', async () => {
   const accessToken = getMetaAccessToken();
   const pixelId = getMetaPixelId();
 
@@ -156,4 +160,6 @@ export async function POST(req: NextRequest) {
     console.error("[Meta CAPI] Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
+
+  });
 }

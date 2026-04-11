@@ -4,12 +4,16 @@ import { Tables, rateLimitedQuery, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const updateSchema = z.object({
   phone: z.string().min(1).max(20).optional(),
   preferredContact: z.enum(['Phone', 'Email', 'Text']).optional(),
 }).strict();
 
 export async function GET() {
+  return withSentry('patient/profile', async () => {
   try {
     const session = await getPatientSession();
     if (!session) {
@@ -37,9 +41,12 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  });
 }
 
 export async function PATCH(request: Request) {
+  return withSentry('patient/profile', async () => {
   try {
     const session = await getPatientSession();
     if (!session) {
@@ -83,4 +90,6 @@ export async function PATCH(request: Request) {
       { status: 500 }
     );
   }
+
+  });
 }

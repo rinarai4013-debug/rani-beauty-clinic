@@ -13,11 +13,15 @@ import { generateConsultationPdf } from '@/lib/mastermind/pdf-generator';
 import { storePdf } from '@/lib/mastermind/pdf-storage';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const PdfBodySchema = z.object({
   sessionId: z.string().min(1),
 });
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/pdf', async () => {
   try {
     const parsed = PdfBodySchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
@@ -82,4 +86,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

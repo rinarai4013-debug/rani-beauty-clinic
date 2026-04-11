@@ -13,10 +13,14 @@ import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSessionAction, PlanModification } from '@/types/mastermind';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return withSentry('mastermind/sessions/[id]', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(_request).catch(() => null);
@@ -36,12 +40,15 @@ export async function GET(
     console.error('[Mastermind Session] GET error:', error);
     return apiError('Failed to fetch session');
   }
+
+  });
 }
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return withSentry('mastermind/sessions/[id]', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -77,6 +84,8 @@ export async function PATCH(
     console.error('[Mastermind Session] PATCH error:', error);
     return apiError('Failed to update session');
   }
+
+  });
 }
 
 /**

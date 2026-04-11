@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { Tables } from '@/lib/airtable/client';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const LineItemSchema = z.object({
   service: z.string(),
   qty: z.number(),
@@ -616,6 +619,7 @@ function buildPlanHtml(data: z.infer<typeof PlanDataSchema>): string {
 }
 
 export async function POST(request: NextRequest) {
+  return withSentry('dashboard/plan-builder/export-pdf', async () => {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -678,4 +682,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

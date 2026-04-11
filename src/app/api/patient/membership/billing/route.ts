@@ -3,7 +3,11 @@ import { getPatientSession } from '@/lib/patient-auth/session';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET() {
+  return withSentry('patient/membership/billing', async () => {
   try {
     const session = await getPatientSession();
     if (!session) {
@@ -58,4 +62,6 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  });
 }
