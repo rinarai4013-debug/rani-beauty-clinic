@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
@@ -24,9 +25,16 @@ export async function GET(request: NextRequest) {
   if (cached) return NextResponse.json(cached);
 
   try {
+    // CRITICAL (codebase audit 2026-04-10): sanitize statusFilter before
+    // interpolating into the Airtable filterByFormula string. Without
+    // this, a caller could inject `' OR TRUE() OR '` into ?status= and
+    // bypass the status filter entirely, leaking every client record.
+    // sanitizeFormulaValue escapes quotes and strips formula control chars.
     const clients = await fetchAll<{ Client?: string; Email?: string; Phone?: string; Status?: string; 'Preferred Contact'?: string }>(
       Tables.clients(),
-      statusFilter ? { filterByFormula: `{Status} = '${statusFilter}'` } : undefined,
+      statusFilter
+        ? { filterByFormula: `{Status} = '${sanitizeFormulaValue(statusFilter)}'` }
+        : undefined,
       true
     );
 
