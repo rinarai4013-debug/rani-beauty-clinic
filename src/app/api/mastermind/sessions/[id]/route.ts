@@ -18,9 +18,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Auth check — allow unauthenticated in development
+    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(_request).catch(() => null);
-    if (!authSession && process.env.NODE_ENV !== 'development') {
+    if (!authSession) {
       return unauthorized();
     }
 
@@ -43,9 +43,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Auth check — allow unauthenticated in development
+    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession && process.env.NODE_ENV !== 'development') {
+    if (!authSession) {
       return unauthorized();
     }
 

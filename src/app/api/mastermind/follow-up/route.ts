@@ -28,8 +28,9 @@ const FollowUpBodySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession && process.env.NODE_ENV !== 'development') {
+    if (!authSession) {
       return unauthorized();
     }
 
@@ -217,8 +218,9 @@ export async function POST(request: NextRequest) {
 // ── Available templates endpoint (GET) ──
 
 export async function GET(request: NextRequest) {
+  // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
   const authSession = await getSessionFromRequest(request).catch(() => null);
-  if (!authSession && process.env.NODE_ENV !== 'development') {
+  if (!authSession) {
     return unauthorized();
   }
 

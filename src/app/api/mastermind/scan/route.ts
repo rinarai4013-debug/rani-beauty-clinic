@@ -23,9 +23,9 @@ import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
 
 export async function POST(request: NextRequest) {
   try {
-    // Auth check
+    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession && process.env.NODE_ENV !== 'development') {
+    if (!authSession) {
       return unauthorized();
     }
 
