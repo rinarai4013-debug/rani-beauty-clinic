@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 const urgencyMap: Record<string, 'critical' | 'medium' | 'low'> = {
   Churned: 'critical',
@@ -11,7 +12,7 @@ const urgencyMap: Record<string, 'critical' | 'medium' | 'low'> = {
   'Lapsed 30': 'low',
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!hasPermission(session.role, 'view_clients')) {
@@ -60,6 +61,19 @@ export async function GET() {
     };
 
     cache.set(cacheKey, payload, TTL.STANDARD);
+
+    // HIPAA §164.312(b): log the at-risk list view as an aggregate
+    // event. The at-risk list exposes names, emails, phones, and
+    // lapse status for every churned/lapsed client — sensitive enough
+    // to track even without individual per-record entries.
+    logPhiAccessFromRequest(request, session, {
+      patientId: '__LIST__',
+      patientName: `At-risk client list (${payload.total} records)`,
+      action: 'view',
+      dataCategory: 'demographics',
+      details: `Lapsed30=${payload.breakdown.lapsed30 ?? 0} Lapsed60=${payload.breakdown.lapsed60 ?? 0} Lapsed90=${payload.breakdown.lapsed90 ?? 0} Churned=${payload.breakdown.churned ?? 0}`,
+    });
+
     return NextResponse.json(payload);
   } catch (error) {
     console.error('[clients/at-risk]', error);

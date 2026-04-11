@@ -135,6 +135,37 @@ const scoped = authSession.role === 'ceo' || authSession.role === 'provider'
 
 Not a security issue — an empty file isn't a route and Next.js won't serve it. But it's dead code that confuses audits. Either delete the file or add a proper GET/POST handler (behind `withTenant`).
 
+### P1-4: `/api/webhooks/meta-capi` fails OPEN when signing secret is missing (added 2026-04-10 during env audit)
+
+**Finding:** `src/app/api/webhooks/meta-capi/route.ts` line 66-68 has this fallback:
+
+```typescript
+} else {
+  console.error("[Meta CAPI] WARNING: META_CAPI_WEBHOOK_SECRET not set — skipping signature verification");
+}
+```
+
+When `META_CAPI_WEBHOOK_SECRET` is unset, the route logs a warning and **accepts the POST unsigned**. The env audit (`tools/env-audit.sh`) confirms the secret is **not currently set in Vercel production**, which means anyone on the internet can POST arbitrary events to this endpoint right now.
+
+What the route does with an accepted POST:
+1. Validates the body shape (zod schema)
+2. Hashes user_data (email, phone)
+3. Forwards the event to `graph.facebook.com/v18.0/{pixelId}/events` with the Rani Meta access token
+
+The blast radius: an attacker could poison Rani's Meta Pixel conversion data with fabricated events, corrupting ad attribution and potentially triggering unexpected Meta ad spend on the account tied to the access token. Not catastrophic, but non-trivial.
+
+**Recommended fixes, in order:**
+
+1. **Immediate (deploy today):** add `META_CAPI_WEBHOOK_SECRET` to Vercel production via `vercel env add META_CAPI_WEBHOOK_SECRET production`. The code path that verifies the signature is correct; it just needs the secret.
+2. **Short-term (this week):** change the fallback to fail closed. The route should return 503 "Webhook secret not configured" instead of accepting the POST. Same pattern as `/api/webhooks/mangomint/route.ts` which correctly 503s when its secret is missing.
+3. **Investigate:** find the caller of this endpoint. Grep turned up no in-code callers, which means it's called from n8n, a browser bundle, or a production-only integration. If it's the browser, the correct protection is origin checking + CSRF, NOT a shared secret. If it's server-to-server, the shared secret is right.
+
+**Not fixing in this session** because:
+- The code fix (fail closed) would break whoever is currently calling it, and we can't confirm the caller's identity without production-only visibility.
+- The env var fix is a 30-second Vercel dashboard operation that Sukhi needs to do.
+
+Also related: `META_CAPI_ACCESS_TOKEN` is missing from production too, but the route already returns 500 when it's missing (fail closed) so it's less urgent — it'll just not fire any conversions until fixed.
+
 ## ℹ️ P2 Investigate
 
 ### P2-1: Stub routes returning 501 without auth

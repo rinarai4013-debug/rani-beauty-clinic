@@ -3,9 +3,10 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { recommendNextTreatment } from '@/lib/recommendations/engine';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
@@ -17,6 +18,17 @@ export async function GET(
   try {
     const { id } = await params;
     const client = await rateLimitedQuery(() => Tables.clients().find(id));
+
+    // HIPAA §164.312(b): log the PHI access. Treatment recommendations
+    // read the full appointment history for the patient.
+    logPhiAccessFromRequest(request, session, {
+      patientId: client.id,
+      patientName: (client.fields['Client'] as string) || 'Unknown',
+      action: 'view',
+      dataCategory: 'treatment_records',
+      details: 'Next-best-treatment recommendation — appointment history',
+    });
+
     const appointmentIds = (client.fields['Appointments'] as string[] | undefined) ?? [];
 
     const appointments = appointmentIds.length

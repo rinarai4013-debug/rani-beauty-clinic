@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { predictChurn, ChurnInput } from '@/lib/churn/engine';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 interface TransactionFields {
   'Date': string;
@@ -52,6 +53,17 @@ export async function GET(
     const record = await rateLimitedQuery(() => Tables.clients().find(id));
     const clientName = (record.fields['Client'] as string) || 'Unknown';
     const status = (record.fields['Status'] as string) || '';
+
+    // HIPAA §164.312(b): log the PHI access. Churn scoring reads the
+    // full client profile + appointment + transaction + membership +
+    // message history, which is a broad treatment-records scope.
+    logPhiAccessFromRequest(request, session, {
+      patientId: record.id,
+      patientName: clientName,
+      action: 'view',
+      dataCategory: 'treatment_records',
+      details: 'Churn prediction — visit history, transactions, memberships, messages',
+    });
 
     const appointmentIds = (record.fields['Appointments'] as string[]) || [];
     const transactionIds = (record.fields['Transactions'] as string[]) || [];

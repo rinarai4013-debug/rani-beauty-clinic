@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 function splitName(name: string) {
   const [firstName = '', ...rest] = name.trim().split(/\s+/);
@@ -48,6 +49,21 @@ export async function GET(request: NextRequest) {
     };
 
     cache.set(cacheKey, payload, TTL.STANDARD);
+
+    // HIPAA §164.312(b): log the list view as a single aggregate event.
+    // We deliberately don't create one log entry per returned record —
+    // that would generate dozens of entries per page load and pollute
+    // the audit stream. The aggregate entry captures scope (count,
+    // filter) which is enough for an OCR auditor to reconstruct what
+    // the user saw.
+    logPhiAccessFromRequest(request, session, {
+      patientId: '__LIST__',
+      patientName: `Client list (${payload.total} records)`,
+      action: 'view',
+      dataCategory: 'demographics',
+      details: `Clients list view${statusFilter ? `, filter=${statusFilter}` : ''}`,
+    });
+
     return NextResponse.json(payload);
   } catch (error) {
     console.error('[clients/list]', error);

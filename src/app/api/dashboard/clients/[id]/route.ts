@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 interface AppointmentFields {
   'Service Name': string;
@@ -77,6 +78,18 @@ export async function GET(
 
     const fullName = (record.fields['Client'] as string) || '';
     const nameParts = fullName.split(' ');
+
+    // HIPAA §164.312(b): log every PHI access event. The `full=true`
+    // query param expands the fetch to include treatment history,
+    // transactions, memberships, messages, and reviews — a broader
+    // access scope than the basic profile, so we tag it accordingly.
+    logPhiAccessFromRequest(request, session, {
+      patientId: record.id,
+      patientName: fullName,
+      action: 'view',
+      dataCategory: full ? 'treatment_records' : 'demographics',
+      details: full ? '360-profile view (all linked records)' : 'Basic profile view',
+    });
 
     // Linked record IDs from Airtable
     const appointmentIds = (record.fields['Appointments'] as string[]) || [];
