@@ -39,7 +39,6 @@ import type {
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 export type { PatientPlanData };
 
 // ── Sanitizers ──
@@ -151,7 +150,7 @@ function sanitizeTreatment(t: MastermindTreatment): PatientTreatment {
 
 function sanitizeSequencing(
   items: TreatmentSequenceItem[],
-  allTreatments: MastermindTreatment[]
+  allTreatments: MastermindTreatment[],
 ): PatientSequenceItem[] {
   const treatmentMap = new Map(allTreatments.map((t) => [t.id, t.treatmentName]));
   return items.map((item) => ({
@@ -226,110 +225,105 @@ function sanitizeSimulation(sim: SimulationComparison): PatientSimulation {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
+  { params }: { params: Promise<{ token: string }> },
 ) {
   return withSentry('mastermind/share/[token]', async () => {
-  try {
-    const { token } = await params;
+    try {
+      const { token } = await params;
 
-    if (!token || typeof token !== 'string') {
-      return NextResponse.json(
-        { success: false, error: 'Invalid token' },
-        { status: 400 }
-      );
-    }
+      if (!token || typeof token !== 'string') {
+        return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 400 });
+      }
 
-    // Resolve token (checks cache, falls back to Airtable)
-    const record = await resolveToken(token);
-    if (!record) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'This link has expired or is invalid. Please contact Rani Beauty Clinic for a new link.',
+      // Resolve token (checks cache, falls back to Airtable)
+      const record = await resolveToken(token);
+      if (!record) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              'This link has expired or is invalid. Please contact Rani Beauty Clinic for a new link.',
+          },
+          { status: 404 },
+        );
+      }
+
+      // Load session
+      const session = await getSessionByIdAsync(record.sessionId);
+      if (!session) {
+        return NextResponse.json(
+          { success: false, error: 'Session data is no longer available.' },
+          { status: 404 },
+        );
+      }
+
+      // Build sanitized patient-facing data
+      const scan = session.auraScanResult;
+      const plan = session.mastermindPlan;
+
+      if (!scan || !plan) {
+        return NextResponse.json(
+          { success: false, error: 'Treatment plan data is incomplete.' },
+          { status: 422 },
+        );
+      }
+
+      // Collect all treatments for name lookups
+      const recs = plan.recommendations || { primary: [], complementary: [], maintenance: [] };
+      const allTreatments = [
+        ...(recs.primary || []),
+        ...(recs.complementary || []),
+        ...(recs.maintenance || []),
+      ];
+
+      // Build aftercare with treatment names
+      const treatmentMap = new Map(allTreatments.map((t) => [t.id, t.treatmentName]));
+      const aftercare: PatientAftercare[] = (plan.aftercarePreview || []).map((a) => ({
+        treatmentName: treatmentMap.get(a.treatmentId) || 'Treatment',
+        immediateAftercare: a.immediateAftercare,
+        weekOneGuidance: a.weekOneGuidance,
+        productsRecommended: a.productsRecommended,
+      }));
+
+      const patientData: PatientPlanData = {
+        patientName:
+          session.patientName || (session.intakeData?.firstName as string) || 'Valued Client',
+        consultationDate: session.createdAt || new Date().toISOString(),
+        auraScore: sanitizeAuraScore(scan.auraScore),
+        deviceAnalysis: scan.auraDeviceAnalysis
+          ? sanitizeDeviceAnalysis(scan.auraDeviceAnalysis)
+          : null,
+        concerns: sanitizeConcerns(scan.detectedConcerns),
+        zones: sanitizeZones(scan.zoneAnalysis),
+        predictiveMetrics: scan.predictiveMetrics
+          ? sanitizePredictiveMetrics(scan.predictiveMetrics)
+          : null,
+        treatments: {
+          primary: plan.recommendations.primary.map(sanitizeTreatment),
+          complementary: plan.recommendations.complementary.map(sanitizeTreatment),
+          maintenance: plan.recommendations.maintenance.map(sanitizeTreatment),
         },
-        { status: 404 }
-      );
+        sequencing: sanitizeSequencing(plan.sequencing, allTreatments),
+        packages: sanitizePackages(plan.packages),
+        aftercare,
+        simulation: session.simulationComparison
+          ? sanitizeSimulation(session.simulationComparison)
+          : null,
+        summary: {
+          patientFacing: plan.aiSummary.patientFacing,
+          keyHighlights: plan.aiSummary.keyHighlights,
+          addressedConcerns: plan.aiSummary.addressedConcerns,
+        },
+      };
+
+      return NextResponse.json({
+        success: true,
+        data: patientData,
+        expiresAt: record.expiresAt,
+      });
+    } catch (err) {
+      console.error('[Share] Token resolution failed:', err);
+      return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
-
-    // Load session
-    const session = await getSessionByIdAsync(record.sessionId);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: 'Session data is no longer available.' },
-        { status: 404 }
-      );
-    }
-
-    // Build sanitized patient-facing data
-    const scan = session.auraScanResult;
-    const plan = session.mastermindPlan;
-
-    if (!scan || !plan) {
-      return NextResponse.json(
-        { success: false, error: 'Treatment plan data is incomplete.' },
-        { status: 422 }
-      );
-    }
-
-    // Collect all treatments for name lookups
-    const recs = plan.recommendations || { primary: [], complementary: [], maintenance: [] };
-    const allTreatments = [
-      ...(recs.primary || []),
-      ...(recs.complementary || []),
-      ...(recs.maintenance || []),
-    ];
-
-    // Build aftercare with treatment names
-    const treatmentMap = new Map(allTreatments.map((t) => [t.id, t.treatmentName]));
-    const aftercare: PatientAftercare[] = (plan.aftercarePreview || []).map((a) => ({
-      treatmentName: treatmentMap.get(a.treatmentId) || 'Treatment',
-      immediateAftercare: a.immediateAftercare,
-      weekOneGuidance: a.weekOneGuidance,
-      productsRecommended: a.productsRecommended,
-    }));
-
-    const patientData: PatientPlanData = {
-      patientName: session.patientName || (session.intakeData?.firstName as string) || 'Valued Client',
-      consultationDate: session.createdAt || new Date().toISOString(),
-      auraScore: sanitizeAuraScore(scan.auraScore),
-      deviceAnalysis: scan.auraDeviceAnalysis
-        ? sanitizeDeviceAnalysis(scan.auraDeviceAnalysis)
-        : null,
-      concerns: sanitizeConcerns(scan.detectedConcerns),
-      zones: sanitizeZones(scan.zoneAnalysis),
-      predictiveMetrics: scan.predictiveMetrics
-        ? sanitizePredictiveMetrics(scan.predictiveMetrics)
-        : null,
-      treatments: {
-        primary: plan.recommendations.primary.map(sanitizeTreatment),
-        complementary: plan.recommendations.complementary.map(sanitizeTreatment),
-        maintenance: plan.recommendations.maintenance.map(sanitizeTreatment),
-      },
-      sequencing: sanitizeSequencing(plan.sequencing, allTreatments),
-      packages: sanitizePackages(plan.packages),
-      aftercare,
-      simulation: session.simulationComparison
-        ? sanitizeSimulation(session.simulationComparison)
-        : null,
-      summary: {
-        patientFacing: plan.aiSummary.patientFacing,
-        keyHighlights: plan.aiSummary.keyHighlights,
-        addressedConcerns: plan.aiSummary.addressedConcerns,
-      },
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: patientData,
-      expiresAt: record.expiresAt,
-    });
-  } catch (err) {
-    console.error('[Share] Token resolution failed:', err);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-
   });
 }

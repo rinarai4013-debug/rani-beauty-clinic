@@ -16,7 +16,6 @@ import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 type CopilotContext =
   | 'scan_review'
   | 'plan_discussion'
@@ -96,10 +95,7 @@ MEMBERSHIPS & FINANCING
 
 // ── SYSTEM PROMPT BUILDER ──
 
-function buildSystemPrompt(
-  session: MastermindSession,
-  context: CopilotContext
-): string {
+function buildSystemPrompt(session: MastermindSession, context: CopilotContext): string {
   const scan = session.auraScanResult;
   const plan = session.mastermindPlan;
   const intake = session.intakeData;
@@ -231,8 +227,12 @@ function formatScanResults(scan: AuraScanResult): string {
 
   // Aura Score
   lines.push(`### Aura Score`);
-  lines.push(`- Overall: ${scan.auraScore.overall}/100 (Grade: ${scan.auraScore.grade}, "${scan.auraScore.label}")`);
-  lines.push(`- Skin Age: ${scan.auraScore.skinAge} | Chronological Age: ${scan.auraScore.chronologicalAge} | Delta: ${scan.auraScore.skinAgeDelta > 0 ? '+' : ''}${scan.auraScore.skinAgeDelta} years`);
+  lines.push(
+    `- Overall: ${scan.auraScore.overall}/100 (Grade: ${scan.auraScore.grade}, "${scan.auraScore.label}")`,
+  );
+  lines.push(
+    `- Skin Age: ${scan.auraScore.skinAge} | Chronological Age: ${scan.auraScore.chronologicalAge} | Delta: ${scan.auraScore.skinAgeDelta > 0 ? '+' : ''}${scan.auraScore.skinAgeDelta} years`,
+  );
   lines.push(`- Percentile: ${scan.auraScore.percentile}th (vs same age/skin type)`);
 
   // Score breakdown
@@ -250,7 +250,9 @@ function formatScanResults(scan: AuraScanResult): string {
   if (scan.auraDeviceAnalysis?.categories) {
     lines.push(`\n### Device Analysis Categories`);
     for (const cat of scan.auraDeviceAnalysis.categories) {
-      lines.push(`- ${cat.label}: absolute ${cat.absoluteScore}/5, peer ${cat.peerScore > 0 ? '+' : ''}${cat.peerScore}, severity: ${cat.severity} — ${cat.description}`);
+      lines.push(
+        `- ${cat.label}: absolute ${cat.absoluteScore}/5, peer ${cat.peerScore > 0 ? '+' : ''}${cat.peerScore}, severity: ${cat.severity} — ${cat.description}`,
+      );
     }
   }
 
@@ -258,7 +260,9 @@ function formatScanResults(scan: AuraScanResult): string {
   if (scan.detectedConcerns.length > 0) {
     lines.push(`\n### Detected Concerns (ranked by score)`);
     for (const c of scan.detectedConcerns) {
-      lines.push(`- ${String(c.concern).replace(/_/g, ' ')} — Score: ${c.score}/100, Severity: ${c.severity}, Urgency: ${c.urgency}, Trending: ${c.trending}`);
+      lines.push(
+        `- ${String(c.concern).replace(/_/g, ' ')} — Score: ${c.score}/100, Severity: ${c.severity}, Urgency: ${c.urgency}, Trending: ${c.trending}`,
+      );
       lines.push(`  Zones: ${c.zones.join(', ')}`);
       lines.push(`  Clinical: ${c.clinicalNote}`);
     }
@@ -273,7 +277,9 @@ function formatScanResults(scan: AuraScanResult): string {
     for (const z of worstZones) {
       lines.push(`- ${z.zoneName}: ${z.overallScore}/100 (skin age: ${z.skinAge})`);
       if (z.concerns.length > 0) {
-        lines.push(`  Top concerns: ${z.concerns.map(c => `${c.type} (${c.severity}/100)`).join(', ')}`);
+        lines.push(
+          `  Top concerns: ${z.concerns.map((c) => `${c.type} (${c.severity}/100)`).join(', ')}`,
+        );
       }
     }
   }
@@ -282,10 +288,16 @@ function formatScanResults(scan: AuraScanResult): string {
   const pred = scan.predictiveMetrics;
   if (pred) {
     lines.push(`\n### Predictive Metrics`);
-    lines.push(`WITHOUT treatment (6mo): Aura Score → ${pred.withoutIntervention.sixMonths.auraScore}, Skin Age → ${pred.withoutIntervention.sixMonths.skinAge}`);
-    lines.push(`WITH treatment (6mo): Aura Score → ${pred.withTreatment.sixMonths.auraScore}, Skin Age → ${pred.withTreatment.sixMonths.skinAge}`);
+    lines.push(
+      `WITHOUT treatment (6mo): Aura Score → ${pred.withoutIntervention.sixMonths.auraScore}, Skin Age → ${pred.withoutIntervention.sixMonths.skinAge}`,
+    );
+    lines.push(
+      `WITH treatment (6mo): Aura Score → ${pred.withTreatment.sixMonths.auraScore}, Skin Age → ${pred.withTreatment.sixMonths.skinAge}`,
+    );
     if (pred.riskFactors.length > 0) {
-      lines.push(`Risk Factors: ${pred.riskFactors.map(r => `${r.factor} (${r.impact})`).join(', ')}`);
+      lines.push(
+        `Risk Factors: ${pred.riskFactors.map((r) => `${r.factor} (${r.impact})`).join(', ')}`,
+      );
     }
   }
 
@@ -334,7 +346,9 @@ function formatPlanData(plan: MastermindPlan): string {
     lines.push(`\n### Primary Treatments`);
     for (const t of plan.recommendations.primary) {
       lines.push(`- ${t.treatmentName} (${t.category})`);
-      lines.push(`  ${t.sessionsRequired} sessions @ $${t.perSession}/ea = $${t.totalEstimate} total`);
+      lines.push(
+        `  ${t.sessionsRequired} sessions @ $${t.perSession}/ea = $${t.totalEstimate} total`,
+      );
       lines.push(`  Priority: ${t.priority} | Urgency: ${t.urgency} | Downtime: ${t.downtime}`);
       lines.push(`  Results in: ${t.timeToResults} | Lasts: ${t.longevity}`);
       lines.push(`  Clinical: ${t.clinicalRationale}`);
@@ -365,9 +379,13 @@ function formatPlanData(plan: MastermindPlan): string {
       const pkgTotal = pkg.totalPrice ?? pkg.price;
       lines.push(`- ${pkg.name}${highlighted}: $${pkgTotal} (${pkg.discount || 0}% savings)`);
       if ('services' in pkg && Array.isArray(pkg.services)) {
-        lines.push(`  Includes: ${pkg.services.map((s: { name?: string }) => s.name || 'treatment').join(', ')}`);
+        lines.push(
+          `  Includes: ${pkg.services.map((s: { name?: string }) => s.name || 'treatment').join(', ')}`,
+        );
       }
-      lines.push(`  Monthly financing: ~$${Math.round(pkgTotal / 24)}/mo (24mo) or ~$${Math.round(pkgTotal / 12)}/mo (12mo)`);
+      lines.push(
+        `  Monthly financing: ~$${Math.round(pkgTotal / 24)}/mo (24mo) or ~$${Math.round(pkgTotal / 12)}/mo (12mo)`,
+      );
     }
   }
 
@@ -375,7 +393,9 @@ function formatPlanData(plan: MastermindPlan): string {
   if (plan.sequencing.length > 0) {
     lines.push(`\n### Treatment Sequencing`);
     for (const phase of plan.sequencing) {
-      lines.push(`- Phase ${phase.phase} (${phase.phaseName}, ${phase.duration}): ${phase.expectedMilestone}`);
+      lines.push(
+        `- Phase ${phase.phase} (${phase.phaseName}, ${phase.duration}): ${phase.expectedMilestone}`,
+      );
     }
   }
 
@@ -482,81 +502,88 @@ Always be specific and actionable. Reference the patient's actual data in your r
 
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/copilot', async () => {
-  try {
-    const parsed = await parseJsonBody(request);
-    if ('error' in parsed) return parsed.error;
-    const { body } = parsed;
+    try {
+      const parsed = await parseJsonBody(request);
+      if ('error' in parsed) return parsed.error;
+      const { body } = parsed;
 
-    const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
-    const prompt = typeof body?.prompt === 'string' ? body.prompt : null;
-    const context = (typeof body?.context === 'string' ? body.context : 'general') as CopilotContext;
+      const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
+      const prompt = typeof body?.prompt === 'string' ? body.prompt : null;
+      const context = (
+        typeof body?.context === 'string' ? body.context : 'general'
+      ) as CopilotContext;
 
-    if (!sessionId) {
-      return apiError('Missing sessionId', 400);
-    }
-    if (!prompt) {
-      return apiError('Missing prompt', 400);
-    }
+      if (!sessionId) {
+        return apiError('Missing sessionId', 400);
+      }
+      if (!prompt) {
+        return apiError('Missing prompt', 400);
+      }
 
-    // Validate context
-    const validContexts: CopilotContext[] = ['scan_review', 'plan_discussion', 'objection_handling', 'closing', 'general'];
-    if (!validContexts.includes(context)) {
-      return apiError('Invalid context. Must be one of: scan_review, plan_discussion, objection_handling, closing, general', 400);
-    }
+      // Validate context
+      const validContexts: CopilotContext[] = [
+        'scan_review',
+        'plan_discussion',
+        'objection_handling',
+        'closing',
+        'general',
+      ];
+      if (!validContexts.includes(context)) {
+        return apiError(
+          'Invalid context. Must be one of: scan_review, plan_discussion, objection_handling, closing, general',
+          400,
+        );
+      }
 
-    // Load session
-    const session = await getSessionByIdAsync(sessionId);
-    if (!session) {
-      return apiError('Session not found', 404);
-    }
+      // Load session
+      const session = await getSessionByIdAsync(sessionId);
+      if (!session) {
+        return apiError('Session not found', 404);
+      }
 
-    // Build the system prompt with full session context
-    const systemPrompt = buildSystemPrompt(session, context);
+      // Build the system prompt with full session context
+      const systemPrompt = buildSystemPrompt(session, context);
 
-    // Create streaming response from Claude
-    const stream = await anthropic().messages.stream({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
+      // Create streaming response from Claude
+      const stream = await anthropic().messages.stream({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      });
 
-    // Convert the Anthropic stream to a ReadableStream
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        try {
-          for await (const event of stream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              controller.enqueue(encoder.encode(event.delta.text));
+      // Convert the Anthropic stream to a ReadableStream
+      const readableStream = new ReadableStream({
+        async start(controller) {
+          const encoder = new TextEncoder();
+          try {
+            for await (const event of stream) {
+              if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                controller.enqueue(encoder.encode(event.delta.text));
+              }
             }
+            controller.close();
+          } catch (err) {
+            controller.error(err);
           }
-          controller.close();
-        } catch (err) {
-          controller.error(err);
-        }
-      },
-    });
+        },
+      });
 
-    return new Response(readableStream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        'Transfer-Encoding': 'chunked',
-      },
-    });
-  } catch (err) {
-    console.error('[Copilot API Error]', err);
-    return apiError('Failed to generate copilot response', 500);
-  }
-
+      return new Response(readableStream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
+    } catch (err) {
+      console.error('[Copilot API Error]', err);
+      return apiError('Failed to generate copilot response', 500);
+    }
   });
 }

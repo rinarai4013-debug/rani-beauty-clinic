@@ -15,76 +15,67 @@ import type { MastermindSessionAction, PlanModification } from '@/types/mastermi
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withSentry('mastermind/sessions/[id]', async () => {
-  try {
-    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
-    const authSession = await getSessionFromRequest(_request).catch(() => null);
-    if (!authSession) {
-      return unauthorized();
+    try {
+      // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
+      const authSession = await getSessionFromRequest(_request).catch(() => null);
+      if (!authSession) {
+        return unauthorized();
+      }
+
+      const { id } = await params;
+      const session = await getSessionByIdAsync(id);
+
+      if (!session) {
+        return apiError('Session not found', 404);
+      }
+
+      return apiSuccess(session);
+    } catch (error) {
+      console.error('[Mastermind Session] GET error:', error);
+      return apiError('Failed to fetch session');
     }
-
-    const { id } = await params;
-    const session = await getSessionByIdAsync(id);
-
-    if (!session) {
-      return apiError('Session not found', 404);
-    }
-
-    return apiSuccess(session);
-  } catch (error) {
-    console.error('[Mastermind Session] GET error:', error);
-    return apiError('Failed to fetch session');
-  }
-
   });
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withSentry('mastermind/sessions/[id]', async () => {
-  try {
-    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
-    const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession) {
-      return unauthorized();
+    try {
+      // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
+      const authSession = await getSessionFromRequest(request).catch(() => null);
+      if (!authSession) {
+        return unauthorized();
+      }
+
+      const { id } = await params;
+      const session = await getSessionByIdAsync(id);
+
+      if (!session) {
+        return apiError('Session not found', 404);
+      }
+
+      const parsed = await parseJsonBody(request);
+      if ('error' in parsed) return parsed.error;
+      const { body } = parsed;
+
+      const action = body?.action as MastermindSessionAction | undefined;
+
+      if (!action || typeof action !== 'object' || !('type' in action) || !action.type) {
+        return apiError('Missing action with type', 400);
+      }
+
+      // Inject authenticated provider identity into review actions
+      const enrichedAction = await enrichWithProviderIdentity(request, action);
+
+      const updated = sessionReducer(session, enrichedAction);
+      await saveSessionAsync(updated);
+
+      return apiSuccess(updated);
+    } catch (error) {
+      console.error('[Mastermind Session] PATCH error:', error);
+      return apiError('Failed to update session');
     }
-
-    const { id } = await params;
-    const session = await getSessionByIdAsync(id);
-
-    if (!session) {
-      return apiError('Session not found', 404);
-    }
-
-    const parsed = await parseJsonBody(request);
-    if ('error' in parsed) return parsed.error;
-    const { body } = parsed;
-
-    const action = body?.action as MastermindSessionAction | undefined;
-
-    if (!action || typeof action !== 'object' || !('type' in action) || !action.type) {
-      return apiError('Missing action with type', 400);
-    }
-
-    // Inject authenticated provider identity into review actions
-    const enrichedAction = await enrichWithProviderIdentity(request, action);
-
-    const updated = sessionReducer(session, enrichedAction);
-    await saveSessionAsync(updated);
-
-    return apiSuccess(updated);
-  } catch (error) {
-    console.error('[Mastermind Session] PATCH error:', error);
-    return apiError('Failed to update session');
-  }
-
   });
 }
 
@@ -94,13 +85,17 @@ export async function PATCH(
  */
 async function enrichWithProviderIdentity(
   request: NextRequest,
-  action: MastermindSessionAction
+  action: MastermindSessionAction,
 ): Promise<MastermindSessionAction> {
   // Only enrich actions that carry provider identity
   // Enrich staff-trackable actions with actor identity
   const staffActions = [
-    'SET_PROVIDER_REVIEW', 'ADD_MODIFICATION', 'SET_APPROVAL_STATUS',
-    'SET_CLINIC_STATUS', 'SET_CLINIC_NOTES', 'SET_SHARE_TOKEN',
+    'SET_PROVIDER_REVIEW',
+    'ADD_MODIFICATION',
+    'SET_APPROVAL_STATUS',
+    'SET_CLINIC_STATUS',
+    'SET_CLINIC_NOTES',
+    'SET_SHARE_TOKEN',
   ];
   if (!staffActions.includes(action.type)) {
     return action;

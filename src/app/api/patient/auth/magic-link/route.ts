@@ -4,10 +4,9 @@ import { Resend } from 'resend';
 import { createMagicLinkToken } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
-import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 import { withSentry } from '@/lib/sentry-utils';
-
 
 let _resend: Resend | null = null;
 function getResend(): Resend {
@@ -23,45 +22,40 @@ const requestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   return withSentry('patient/auth/magic-link', async () => {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
-  if (!allowed) return rateLimitResponse(resetIn);
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('form', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  try {
-    const body = await request.json().catch(() => null);
+    try {
+      const body = await request.json().catch(() => null);
 
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-    }
+      if (!body) {
+        return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+      }
 
-    const parsed = requestSchema.safeParse(body);
+      const parsed = requestSchema.safeParse(body);
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid email address' },
-        { status: 400 }
-      );
-    }
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+      }
 
-    const { email } = parsed.data;
+      const { email } = parsed.data;
 
-    // Look up client by email — if not found, still return success to avoid leaking existence
-    const client = await fetchFirst<{ Email: string }>(
-      Tables.clients(),
-      1,
-      { filterByFormula: `{Email} = '${sanitizeFormulaValue(email)}'` }
-    );
+      // Look up client by email — if not found, still return success to avoid leaking existence
+      const client = await fetchFirst<{ Email: string }>(Tables.clients(), 1, {
+        filterByFormula: `{Email} = '${sanitizeFormulaValue(email)}'`,
+      });
 
-    if (client) {
-      const token = await createMagicLinkToken(email);
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
-      const magicLinkUrl = `${baseUrl}/portal?token=${token}`;
+      if (client) {
+        const token = await createMagicLinkToken(email);
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+        const magicLinkUrl = `${baseUrl}/portal?token=${token}`;
 
-      await getResend().emails.send({
-        from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
-        to: email,
-        subject: 'Your Rani Beauty Clinic Portal Login Link',
-        html: `
+        await getResend().emails.send({
+          from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
+          to: email,
+          subject: 'Your Rani Beauty Clinic Portal Login Link',
+          html: `
           <!DOCTYPE html>
           <html lang="en">
           <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
@@ -132,17 +126,13 @@ export async function POST(request: NextRequest) {
           </body>
           </html>
         `,
-      });
+        });
+      }
+
+      // Always return success regardless of whether client was found
+      return NextResponse.json({ success: true });
+    } catch {
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-
-    // Always return success regardless of whether client was found
-    return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-
   });
 }

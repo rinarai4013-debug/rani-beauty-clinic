@@ -5,7 +5,6 @@ import { getPreConsultTemplate, getAllPreConsultTemplates } from '@/lib/template
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 const Schema = z.object({
   step: z.string().optional().default('booking-confirmation'),
   firstName: z.string().min(1),
@@ -20,50 +19,52 @@ const Schema = z.object({
 
 export async function POST(request: NextRequest) {
   return withSentry('templates/pre-consult', async () => {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit('templates-pre-consult', ip, RATE_LIMITS.WEBHOOK);
-  if (!allowed) return rateLimitResponse(resetIn);
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('templates-pre-consult', ip, RATE_LIMITS.WEBHOOK);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  const parsed = Schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten().fieldErrors }, { status: 400 });
-  }
+    const parsed = Schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
 
-  if (parsed.data.step === 'all') {
-    return NextResponse.json({
-      templates: getAllPreConsultTemplates({
-        ...parsed.data,
-        serviceCategory: 'consult',
-        appointmentDate: parsed.data.appointmentDate ?? '',
-        appointmentTime: parsed.data.appointmentTime ?? '',
-        duration: parsed.data.duration ?? 60,
-        isNewClient: parsed.data.isNewClient ?? true,
-        depositPaid: false,
-      }),
+    if (parsed.data.step === 'all') {
+      return NextResponse.json({
+        templates: getAllPreConsultTemplates({
+          ...parsed.data,
+          serviceCategory: 'consult',
+          appointmentDate: parsed.data.appointmentDate ?? '',
+          appointmentTime: parsed.data.appointmentTime ?? '',
+          duration: parsed.data.duration ?? 60,
+          isNewClient: parsed.data.isNewClient ?? true,
+          depositPaid: false,
+        }),
+      });
+    }
+
+    const template = getPreConsultTemplate(parsed.data.step, {
+      ...parsed.data,
+      serviceCategory: 'consult',
+      appointmentDate: parsed.data.appointmentDate ?? '',
+      appointmentTime: parsed.data.appointmentTime ?? '',
+      duration: parsed.data.duration ?? 60,
+      isNewClient: parsed.data.isNewClient ?? true,
+      depositPaid: false,
     });
-  }
+    if (!template) {
+      return NextResponse.json({ error: 'Unknown step' }, { status: 400 });
+    }
 
-  const template = getPreConsultTemplate(parsed.data.step, {
-    ...parsed.data,
-    serviceCategory: 'consult',
-    appointmentDate: parsed.data.appointmentDate ?? '',
-    appointmentTime: parsed.data.appointmentTime ?? '',
-    duration: parsed.data.duration ?? 60,
-    isNewClient: parsed.data.isNewClient ?? true,
-    depositPaid: false,
-  });
-  if (!template) {
-    return NextResponse.json({ error: 'Unknown step' }, { status: 400 });
-  }
-
-  return NextResponse.json(template);
-
+    return NextResponse.json(template);
   });
 }

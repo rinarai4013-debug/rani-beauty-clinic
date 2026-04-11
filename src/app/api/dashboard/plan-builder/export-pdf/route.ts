@@ -5,7 +5,6 @@ import { Tables } from '@/lib/airtable/client';
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 const LineItemSchema = z.object({
   service: z.string(),
   qty: z.number(),
@@ -120,7 +119,7 @@ function buildConcernSummary(concerns: string[]): string {
       (c) => `
       <span style="display: inline-block; background: #F8F6F1; color: #0F1D2C; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 500; padding: 8px 20px; border-radius: 100px; margin: 4px 6px; border: 1px solid #E8E4DE;">
         ${escapeHtml(c.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()))}
-      </span>`
+      </span>`,
     )
     .join('');
 
@@ -210,16 +209,28 @@ function buildPhaseSection(phase: z.infer<typeof PhaseSchema>): string {
             ${formatCurrency(svc.price)}${svc.quantity * svc.sessions > 1 ? ` <span style="font-size: 11px; color: #999; font-weight: 400;">&times; ${svc.quantity * svc.sessions}</span>` : ''}
           </div>
         </div>
-        ${svc.purpose || svc.notes ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #666; line-height: 1.5; margin: 0 0 8px;">
+        ${
+          svc.purpose || svc.notes
+            ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #666; line-height: 1.5; margin: 0 0 8px;">
           <strong style="color: #0F1D2C;">Purpose:</strong> ${escapeHtml(svc.purpose || svc.notes || '')}
-        </p>` : ''}
-        ${svc.cadence ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #888; margin: 0 0 4px;">
+        </p>`
+            : ''
+        }
+        ${
+          svc.cadence
+            ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #888; margin: 0 0 4px;">
           <strong style="color: #555;">Cadence:</strong> ${escapeHtml(svc.cadence)}
-        </p>` : ''}
-        ${svc.visibleImprovement ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #888; margin: 0;">
+        </p>`
+            : ''
+        }
+        ${
+          svc.visibleImprovement
+            ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #888; margin: 0;">
           <strong style="color: #555;">Visible improvement starts:</strong> ${escapeHtml(svc.visibleImprovement)}
-        </p>` : ''}
-      </div>`
+        </p>`
+            : ''
+        }
+      </div>`,
     )
     .join('');
 
@@ -233,9 +244,13 @@ function buildPhaseSection(phase: z.infer<typeof PhaseSchema>): string {
           <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #0F1D2C; margin: 0;">
             ${escapeHtml(phase.label)}
           </h3>
-          ${phase.why ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #888; margin: 2px 0 0; font-style: italic;">
+          ${
+            phase.why
+              ? `<p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #888; margin: 2px 0 0; font-style: italic;">
             ${escapeHtml(phase.why)}
-          </p>` : ''}
+          </p>`
+              : ''
+          }
         </div>
       </div>
       ${treatmentCards}
@@ -270,7 +285,7 @@ function buildPackageCards(packages: z.infer<typeof PackageSchema>[]): string {
           <div style="display: flex; justify-content: space-between; padding: 4px 0; font-family: 'Montserrat', sans-serif; font-size: 11px; color: #666;">
             <span>${escapeHtml(li.service)} &times; ${li.qty}</span>
             <span>${formatCurrency(li.total)}</span>
-          </div>`
+          </div>`,
         )
         .join('');
 
@@ -279,7 +294,7 @@ function buildPackageCards(packages: z.infer<typeof PackageSchema>[]): string {
           ? pkg.extras
               .map(
                 (e) =>
-                  `<div style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #C9A96E; margin-bottom: 2px;">+ ${escapeHtml(e)}</div>`
+                  `<div style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #C9A96E; margin-bottom: 2px;">+ ${escapeHtml(e)}</div>`,
               )
               .join('')
           : '';
@@ -298,7 +313,7 @@ function buildPackageCards(packages: z.infer<typeof PackageSchema>[]): string {
             <div style="text-align: center; margin-bottom: 16px;">
               ${pkg.discount > 0 ? `<span style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #bbb; text-decoration: line-through;">${formatCurrency(pkg.originalPrice)}</span><br>` : ''}
               <span style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #0F1D2C;">${formatCurrency(pkg.price)}</span>
-              ${pkg.discount > 0 ? `<div style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #C9A96E; font-weight: 600; margin-top: 2px;">Save ${formatCurrency(pkg.savingsVsStandalone || Math.round(pkg.originalPrice * pkg.discount / 100))}</div>` : ''}
+              ${pkg.discount > 0 ? `<div style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #C9A96E; font-weight: 600; margin-top: 2px;">Save ${formatCurrency(pkg.savingsVsStandalone || Math.round((pkg.originalPrice * pkg.discount) / 100))}</div>` : ''}
             </div>
             ${pkg.resultIntensity ? `<div style="text-align: center; margin-bottom: 12px;"><span style="font-family: 'Montserrat', sans-serif; font-size: 10px; color: #0F1D2C; background: #F8F6F1; padding: 4px 12px; border-radius: 100px;">${escapeHtml(pkg.resultIntensity)}</span></div>` : ''}
             <div style="border-top: 1px solid #E8E4DE; padding-top: 12px; margin-bottom: 12px;">
@@ -315,9 +330,13 @@ function buildPackageCards(packages: z.infer<typeof PackageSchema>[]): string {
               </div>
             </div>
           </div>
-          ${isTransform && pkg.whyBest ? `<div style="background: #FBF8F3; padding: 12px 16px; border-top: 1px solid #E8E4DE;">
+          ${
+            isTransform && pkg.whyBest
+              ? `<div style="background: #FBF8F3; padding: 12px 16px; border-top: 1px solid #E8E4DE;">
             <p style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #0F1D2C; margin: 0; line-height: 1.5; text-align: center; font-style: italic;">${escapeHtml(pkg.whyBest)}</p>
-          </div>` : ''}
+          </div>`
+              : ''
+          }
         </div>`;
     })
     .join('');
@@ -355,7 +374,7 @@ function buildFinancingSection(packages: z.infer<typeof PackageSchema>[]): strin
         <td style="padding: 10px 14px; border-bottom: 1px solid #E8E4DE; font-family: 'Montserrat', sans-serif; font-size: 13px; color: #333; text-align: center;">
           ${formatCurrency(pkg.monthlyPayment24)}/mo
         </td>
-      </tr>`
+      </tr>`,
     )
     .join('');
 
@@ -392,9 +411,13 @@ function buildFinancingSection(packages: z.infer<typeof PackageSchema>[]): strin
 
 // ─── Aftercare ──────────────────────────────────────────────────────
 
-function buildAftercare(aftercareNotes: string[] | undefined, phases: z.infer<typeof PhaseSchema>[]): string {
+function buildAftercare(
+  aftercareNotes: string[] | undefined,
+  phases: z.infer<typeof PhaseSchema>[],
+): string {
   // Generate default aftercare based on service categories if none provided
-  const notes = aftercareNotes && aftercareNotes.length > 0 ? aftercareNotes : generateDefaultAftercare(phases);
+  const notes =
+    aftercareNotes && aftercareNotes.length > 0 ? aftercareNotes : generateDefaultAftercare(phases);
   if (notes.length === 0) return '';
 
   const items = notes
@@ -405,7 +428,7 @@ function buildAftercare(aftercareNotes: string[] | undefined, phases: z.infer<ty
         <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #555; line-height: 1.6; margin: 0;">
           ${escapeHtml(note)}
         </p>
-      </div>`
+      </div>`,
     )
     .join('');
 
@@ -434,21 +457,45 @@ function generateDefaultAftercare(phases: z.infer<typeof PhaseSchema>[]): string
 
   for (const name of serviceNames) {
     if (name.includes('hydrafacial'))
-      add('facial', 'After facial treatments: avoid direct sun exposure for 24 hours. Apply SPF 30+ daily.');
+      add(
+        'facial',
+        'After facial treatments: avoid direct sun exposure for 24 hours. Apply SPF 30+ daily.',
+      );
     if (name.includes('rf microneedling') || name.includes('microneedling'))
-      add('microneedling', 'After RF microneedling: expect mild redness for 24-48 hours. Avoid makeup and active ingredients for 48 hours.');
+      add(
+        'microneedling',
+        'After RF microneedling: expect mild redness for 24-48 hours. Avoid makeup and active ingredients for 48 hours.',
+      );
     if (name.includes('sofwave'))
-      add('sofwave', 'After Sofwave: minimal downtime. Mild swelling may occur for 1-2 days. Results develop over 3-6 months.');
+      add(
+        'sofwave',
+        'After Sofwave: minimal downtime. Mild swelling may occur for 1-2 days. Results develop over 3-6 months.',
+      );
     if (name.includes('vi peel') || name.includes('biorepeel') || name.includes('prx'))
-      add('peel', 'After chemical peels: do not pick or peel flaking skin. Keep skin moisturized and use gentle cleanser only.');
+      add(
+        'peel',
+        'After chemical peels: do not pick or peel flaking skin. Keep skin moisturized and use gentle cleanser only.',
+      );
     if (name.includes('botox'))
-      add('botox', 'After Botox: avoid lying down for 4 hours. Do not rub the treated area. Full results visible in 7-14 days.');
+      add(
+        'botox',
+        'After Botox: avoid lying down for 4 hours. Do not rub the treated area. Full results visible in 7-14 days.',
+      );
     if (name.includes('filler'))
-      add('filler', 'After dermal fillers: apply ice to reduce swelling. Avoid strenuous exercise for 24 hours. Minor bruising is normal.');
+      add(
+        'filler',
+        'After dermal fillers: apply ice to reduce swelling. Avoid strenuous exercise for 24 hours. Minor bruising is normal.',
+      );
     if (name.includes('laser'))
-      add('laser', 'After laser treatments: avoid sun exposure and tanning for 2 weeks. Apply SPF 50+ religiously.');
+      add(
+        'laser',
+        'After laser treatments: avoid sun exposure and tanning for 2 weeks. Apply SPF 50+ religiously.',
+      );
     if (name.includes('tretinoin'))
-      add('tretinoin', 'Tretinoin: start every other night, increase to nightly as tolerated. Always pair with moisturizer and daily SPF.');
+      add(
+        'tretinoin',
+        'Tretinoin: start every other night, increase to nightly as tolerated. Always pair with moisturizer and daily SPF.',
+      );
   }
 
   if (notes.length === 0) {
@@ -620,68 +667,64 @@ function buildPlanHtml(data: z.infer<typeof PlanDataSchema>): string {
 
 export async function POST(request: NextRequest) {
   return withSentry('dashboard/plan-builder/export-pdf', async () => {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  }
-
-  try {
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: { body: ['Invalid JSON'] } },
-        { status: 400 }
-      );
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const parsed = RequestSchema.safeParse(body);
+    try {
+      const body = await request.json().catch(() => null);
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: parsed.error.flatten() },
-        { status: 400 }
-      );
+      if (!body) {
+        return NextResponse.json(
+          { error: 'Invalid request data', details: { body: ['Invalid JSON'] } },
+          { status: 400 },
+        );
+      }
+
+      const parsed = RequestSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: 'Invalid request data', details: parsed.error.flatten() },
+          { status: 400 },
+        );
+      }
+
+      let planData: z.infer<typeof PlanDataSchema>;
+
+      if (parsed.data.planData) {
+        planData = parsed.data.planData;
+      } else if (parsed.data.planId) {
+        // Fetch from Airtable
+        const record = await Tables.treatmentPlans().find(parsed.data.planId);
+        const fields = record.fields as Record<string, unknown>;
+        const servicesJson = fields['Services Included'] as string;
+        const servicesData = JSON.parse(servicesJson);
+
+        planData = {
+          clientName: (fields['Client Name'] as string) || 'Client',
+          planName: (fields['Plan Name'] as string) || 'Custom Treatment Plan',
+          phases: servicesData.phases || [],
+          packages: servicesData.packages || [],
+          providerName: servicesData.providerName,
+          concerns: servicesData.concerns,
+          planObjective: servicesData.planObjective,
+          aftercareNotes: servicesData.aftercareNotes,
+        };
+      } else {
+        return NextResponse.json(
+          { error: 'Either planId or planData is required' },
+          { status: 400 },
+        );
+      }
+
+      const html = buildPlanHtml(planData);
+
+      return NextResponse.json({ html });
+    } catch (error) {
+      console.error('[Export PDF API] Error:', error);
+      return NextResponse.json({ error: 'Failed to generate plan document' }, { status: 500 });
     }
-
-    let planData: z.infer<typeof PlanDataSchema>;
-
-    if (parsed.data.planData) {
-      planData = parsed.data.planData;
-    } else if (parsed.data.planId) {
-      // Fetch from Airtable
-      const record = await Tables.treatmentPlans().find(parsed.data.planId);
-      const fields = record.fields as Record<string, unknown>;
-      const servicesJson = fields['Services Included'] as string;
-      const servicesData = JSON.parse(servicesJson);
-
-      planData = {
-        clientName: (fields['Client Name'] as string) || 'Client',
-        planName: (fields['Plan Name'] as string) || 'Custom Treatment Plan',
-        phases: servicesData.phases || [],
-        packages: servicesData.packages || [],
-        providerName: servicesData.providerName,
-        concerns: servicesData.concerns,
-        planObjective: servicesData.planObjective,
-        aftercareNotes: servicesData.aftercareNotes,
-      };
-    } else {
-      return NextResponse.json(
-        { error: 'Either planId or planData is required' },
-        { status: 400 }
-      );
-    }
-
-    const html = buildPlanHtml(planData);
-
-    return NextResponse.json({ html });
-  } catch (error) {
-    console.error('[Export PDF API] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate plan document' },
-      { status: 500 }
-    );
-  }
-
   });
 }
