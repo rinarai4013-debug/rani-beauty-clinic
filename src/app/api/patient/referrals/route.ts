@@ -3,39 +3,34 @@ import { getPatientSession, generateReferralCode } from '@/lib/patient-auth/sess
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 export async function GET() {
   return withSentry('patient/referrals', async () => {
-  try {
-    const session = await getPatientSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    try {
+      const session = await getPatientSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+      }
+
+      // Generate a deterministic-style referral code for this patient
+      // Note: generateReferralCode is random-based, so for a stable code
+      // we derive one from the patient ID
+      const code = deriveReferralCode(session.patientId);
+
+      return NextResponse.json({
+        referral: {
+          code,
+          // Placeholder stats until a referral tracking table is built
+          totalReferrals: 0,
+          successfulReferrals: 0,
+          pendingReferrals: 0,
+          rewardsEarned: 0,
+          link: `https://www.ranibeautyclinic.com?ref=${code}`,
+        },
+      });
+    } catch (error) {
+      console.error('[Patient API] Referrals error:', error);
+      return NextResponse.json({ error: 'Failed to fetch referral info' }, { status: 500 });
     }
-
-    // Generate a deterministic-style referral code for this patient
-    // Note: generateReferralCode is random-based, so for a stable code
-    // we derive one from the patient ID
-    const code = deriveReferralCode(session.patientId);
-
-    return NextResponse.json({
-      referral: {
-        code,
-        // Placeholder stats until a referral tracking table is built
-        totalReferrals: 0,
-        successfulReferrals: 0,
-        pendingReferrals: 0,
-        rewardsEarned: 0,
-        link: `https://www.ranibeautyclinic.com?ref=${code}`,
-      },
-    });
-  } catch (error) {
-    console.error('[Patient API] Referrals error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch referral info' },
-      { status: 500 }
-    );
-  }
-
   });
 }
 

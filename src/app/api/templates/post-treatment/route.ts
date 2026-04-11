@@ -10,7 +10,6 @@ import {
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 const Schema = z.object({
   step: z.string().optional().default('immediate'),
   firstName: z.string().min(1),
@@ -30,45 +29,47 @@ function authorizeWebhook(request: NextRequest): NextResponse | null {
 
 export async function POST(request: NextRequest) {
   return withSentry('templates/post-treatment', async () => {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit('templates-post-treatment', ip, RATE_LIMITS.WEBHOOK);
-  if (!allowed) return rateLimitResponse(resetIn);
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('templates-post-treatment', ip, RATE_LIMITS.WEBHOOK);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  const unauthorized = authorizeWebhook(request);
-  if (unauthorized) return unauthorized;
+    const unauthorized = authorizeWebhook(request);
+    if (unauthorized) return unauthorized;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  const parsed = Schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten().fieldErrors }, { status: 400 });
-  }
+    const parsed = Schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
 
-  const { step, firstName, serviceName, providerName, appointmentDate } = parsed.data;
-  const vars = {
-    firstName,
-    serviceName,
-    providerName,
-    appointmentDate: appointmentDate ?? '',
-    aftercareLink: getAftercareLinkForService(serviceName),
-    nextRecommendedService: getNextRecommendedService(serviceName),
-  };
+    const { step, firstName, serviceName, providerName, appointmentDate } = parsed.data;
+    const vars = {
+      firstName,
+      serviceName,
+      providerName,
+      appointmentDate: appointmentDate ?? '',
+      aftercareLink: getAftercareLinkForService(serviceName),
+      nextRecommendedService: getNextRecommendedService(serviceName),
+    };
 
-  if (step === 'all') {
-    return NextResponse.json({ templates: getAllPostTreatmentTemplates(vars) });
-  }
+    if (step === 'all') {
+      return NextResponse.json({ templates: getAllPostTreatmentTemplates(vars) });
+    }
 
-  const template = getPostTreatmentTemplate(step, vars);
-  if (!template) {
-    return NextResponse.json({ error: 'Unknown step' }, { status: 400 });
-  }
+    const template = getPostTreatmentTemplate(step, vars);
+    if (!template) {
+      return NextResponse.json({ error: 'Unknown step' }, { status: 400 });
+    }
 
-  return NextResponse.json(template);
-
+    return NextResponse.json(template);
   });
 }

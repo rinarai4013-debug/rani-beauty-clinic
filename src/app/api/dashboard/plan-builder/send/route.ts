@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 // ─── Input Validation ─────────────────────────────────────────────
 const SendPlanSchema = z.object({
   planId: z.string().regex(/^rec[a-zA-Z0-9]{10,}$/, 'Invalid plan ID'),
@@ -116,66 +115,62 @@ function buildEmailHtml(clientName: string, planUrl: string): string {
 // ─── POST Handler ─────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   return withSentry('dashboard/plan-builder/send', async () => {
-  try {
-    // Auth check
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    try {
+      // Auth check
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      // Parse & validate body
+      const body = await request.json().catch(() => null);
+
+      if (!body) {
+        return NextResponse.json(
+          { error: 'Invalid request body', details: { body: ['Invalid JSON'] } },
+          { status: 400 },
+        );
+      }
+
+      const parsed = SendPlanSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+          { status: 400 },
+        );
+      }
+
+      const { planId, clientEmail, clientName, clientPhone } = parsed.data;
+
+      // Generate access code and plan URL
+      const accessCode = generateAccessCode(planId);
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com';
+      const planUrl = `${baseUrl}/plan/${planId}?code=${accessCode}`;
+
+      // Send branded email via Resend
+      const resend = new Resend(process.env.RESEND_API_KEY);
+
+      await resend.emails.send({
+        from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
+        to: clientEmail,
+        subject: `${clientName}, Your Personalized Treatment Plan is Ready`,
+        html: buildEmailHtml(clientName, planUrl),
+      });
+
+      // Update treatment plan status to Sent with the plan URL and follow-up metadata
+      await updateRecord(Tables.treatmentPlans(), planId, {
+        [FIELDS.treatmentPlans.status]: 'Sent',
+        [FIELDS.treatmentPlans.planUrl]: planUrl,
+        [FIELDS.treatmentPlans.sentAt]: new Date().toISOString(),
+        [FIELDS.treatmentPlans.clientEmail]: clientEmail,
+        [FIELDS.treatmentPlans.clientName]: clientName,
+        ...(clientPhone ? { [FIELDS.treatmentPlans.clientPhone]: clientPhone } : {}),
+      });
+
+      return NextResponse.json({ success: true, planUrl });
+    } catch (error) {
+      console.error('[Plan Send] Error sending plan:', error);
+      return NextResponse.json({ error: 'Failed to send treatment plan' }, { status: 500 });
     }
-
-    // Parse & validate body
-    const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: 'Invalid request body', details: { body: ['Invalid JSON'] } },
-        { status: 400 }
-      );
-    }
-
-    const parsed = SendPlanSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
-
-    const { planId, clientEmail, clientName, clientPhone } = parsed.data;
-
-    // Generate access code and plan URL
-    const accessCode = generateAccessCode(planId);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com';
-    const planUrl = `${baseUrl}/plan/${planId}?code=${accessCode}`;
-
-    // Send branded email via Resend
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    await resend.emails.send({
-      from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
-      to: clientEmail,
-      subject: `${clientName}, Your Personalized Treatment Plan is Ready`,
-      html: buildEmailHtml(clientName, planUrl),
-    });
-
-    // Update treatment plan status to Sent with the plan URL and follow-up metadata
-    await updateRecord(Tables.treatmentPlans(), planId, {
-      [FIELDS.treatmentPlans.status]: 'Sent',
-      [FIELDS.treatmentPlans.planUrl]: planUrl,
-      [FIELDS.treatmentPlans.sentAt]: new Date().toISOString(),
-      [FIELDS.treatmentPlans.clientEmail]: clientEmail,
-      [FIELDS.treatmentPlans.clientName]: clientName,
-      ...(clientPhone ? { [FIELDS.treatmentPlans.clientPhone]: clientPhone } : {}),
-    });
-
-    return NextResponse.json({ success: true, planUrl });
-  } catch (error) {
-    console.error('[Plan Send] Error sending plan:', error);
-    return NextResponse.json(
-      { error: 'Failed to send treatment plan' },
-      { status: 500 }
-    );
-  }
-
   });
 }

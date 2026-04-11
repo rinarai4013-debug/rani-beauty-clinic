@@ -16,7 +16,6 @@ import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 export const maxDuration = 30;
 const SimulateSessionSchema = z.object({
   sessionId: z.string().min(1).optional(),
@@ -27,14 +26,14 @@ function buildDataDrivenSimulation(
   skinAge: number,
   chronologicalAge: number,
   concerns: string[],
-  planCost?: number
+  planCost?: number,
 ): SimulationComparison {
   const frame = (
     timepoint: string,
     monthNumber: number,
     score: number,
     age: number,
-    desc: string
+    desc: string,
   ): SimulationFrame => ({
     imageDataUrl: '',
     timepoint,
@@ -53,25 +52,33 @@ function buildDataDrivenSimulation(
   const topConcerns = concerns.slice(0, 3).join(', ') || 'skin concerns';
 
   const withTreatmentFrames = [
-    frame('1M', 1,
+    frame(
+      '1M',
+      1,
       auraScore + improvementPotential * 0.25,
       skinAge - skinAgeReduction * 0.15,
-      `Initial results visible — early improvement in ${topConcerns}`
+      `Initial results visible — early improvement in ${topConcerns}`,
     ),
-    frame('3M', 3,
+    frame(
+      '3M',
+      3,
       auraScore + improvementPotential * 0.5,
       skinAge - skinAgeReduction * 0.4,
-      `Collagen remodeling underway — noticeable texture and tone improvement`
+      `Collagen remodeling underway — noticeable texture and tone improvement`,
     ),
-    frame('6M', 6,
+    frame(
+      '6M',
+      6,
       auraScore + improvementPotential * 0.8,
       skinAge - skinAgeReduction * 0.75,
-      `Full treatment effects realized — significant visible transformation`
+      `Full treatment effects realized — significant visible transformation`,
     ),
-    frame('1Y', 12,
+    frame(
+      '1Y',
+      12,
       auraScore + improvementPotential,
       skinAge - skinAgeReduction,
-      `Peak results with maintenance — optimal skin health achieved`
+      `Peak results with maintenance — optimal skin health achieved`,
     ),
   ];
 
@@ -80,25 +87,33 @@ function buildDataDrivenSimulation(
   const agingRate = Math.max(1, Math.round((skinAge - chronologicalAge + 3) * 0.3));
 
   const withoutTreatmentFrames = [
-    frame('6M', 6,
+    frame(
+      '6M',
+      6,
       auraScore - declineRate,
       skinAge + agingRate * 0.5,
-      'Continued gradual decline without intervention'
+      'Continued gradual decline without intervention',
     ),
-    frame('1Y', 12,
+    frame(
+      '1Y',
+      12,
       auraScore - declineRate * 2,
       skinAge + agingRate,
-      `${topConcerns} become more pronounced`
+      `${topConcerns} become more pronounced`,
     ),
-    frame('3Y', 36,
+    frame(
+      '3Y',
+      36,
       auraScore - declineRate * 4,
       skinAge + agingRate * 3,
-      'Significant aging acceleration — deeper concerns develop'
+      'Significant aging acceleration — deeper concerns develop',
     ),
-    frame('5Y', 60,
+    frame(
+      '5Y',
+      60,
       Math.max(20, auraScore - declineRate * 6),
       skinAge + agingRate * 5,
-      'Advanced aging — more aggressive treatment required to achieve results'
+      'Advanced aging — more aggressive treatment required to achieve results',
     ),
   ];
 
@@ -142,82 +157,81 @@ function buildDataDrivenSimulation(
 
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/simulate', async () => {
-  try {
-    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
-    const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession) {
-      return unauthorized();
-    }
+    try {
+      // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
+      const authSession = await getSessionFromRequest(request).catch(() => null);
+      if (!authSession) {
+        return unauthorized();
+      }
 
-    const parsed = SimulateSessionSchema.safeParse(await request.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid request body' },
-        { status: 400 }
-      );
-    }
-
-    const { sessionId } = parsed.data;
-
-    let result: SimulationComparison;
-    let renderMode = 'mock';
-
-    if (sessionId) {
-      const session = await getSessionByIdAsync(sessionId);
-      if (!session) {
+      const parsed = SimulateSessionSchema.safeParse(await request.json().catch(() => null));
+      if (!parsed.success) {
         return NextResponse.json(
-          { success: false, error: 'Session not found' },
-          { status: 404 }
+          { success: false, error: 'Invalid request body' },
+          { status: 400 },
         );
       }
 
-      // Use actual scan data if available
-      if (session.auraScanResult?.auraScore) {
-        const scan = session.auraScanResult;
-        const concerns = scan.detectedConcerns?.map((c: { concern: string }) => c.concern) || [];
-        const dobStr = session.intakeData?.dob;
-        const dobAge = dobStr ? Math.floor((Date.now() - new Date(dobStr).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : NaN;
-        const chronoAge = !isNaN(dobAge)
-          ? dobAge
-          : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
+      const { sessionId } = parsed.data;
 
-        // Get plan cost if available
-        const planCost = session.mastermindPlan?.recommendations
-          ? [...(session.mastermindPlan.recommendations.primary || []),
-             ...(session.mastermindPlan.recommendations.complementary || [])]
-            .reduce((sum: number, t: { totalEstimate?: number }) => sum + (t.totalEstimate || 0), 0)
-          : undefined;
+      let result: SimulationComparison;
+      let renderMode = 'mock';
 
-        result = buildDataDrivenSimulation(
-          scan.auraScore.overall,
-          scan.auraScore.skinAge,
-          chronoAge,
-          concerns,
-          planCost
-        );
-        renderMode = 'data-driven';
+      if (sessionId) {
+        const session = await getSessionByIdAsync(sessionId);
+        if (!session) {
+          return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
+        }
+
+        // Use actual scan data if available
+        if (session.auraScanResult?.auraScore) {
+          const scan = session.auraScanResult;
+          const concerns = scan.detectedConcerns?.map((c: { concern: string }) => c.concern) || [];
+          const dobStr = session.intakeData?.dob;
+          const dobAge = dobStr
+            ? Math.floor((Date.now() - new Date(dobStr).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+            : NaN;
+          const chronoAge = !isNaN(dobAge)
+            ? dobAge
+            : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
+
+          // Get plan cost if available
+          const planCost = session.mastermindPlan?.recommendations
+            ? [
+                ...(session.mastermindPlan.recommendations.primary || []),
+                ...(session.mastermindPlan.recommendations.complementary || []),
+              ].reduce(
+                (sum: number, t: { totalEstimate?: number }) => sum + (t.totalEstimate || 0),
+                0,
+              )
+            : undefined;
+
+          result = buildDataDrivenSimulation(
+            scan.auraScore.overall,
+            scan.auraScore.skinAge,
+            chronoAge,
+            concerns,
+            planCost,
+          );
+          renderMode = 'data-driven';
+        } else {
+          result = mockSimulationComparison();
+        }
+
+        const updated = sessionReducer(session, { type: 'SET_SIMULATION', comparison: result });
+        await saveSessionAsync(updated);
       } else {
         result = mockSimulationComparison();
       }
 
-      const updated = sessionReducer(session, { type: 'SET_SIMULATION', comparison: result });
-      await saveSessionAsync(updated);
-    } else {
-      result = mockSimulationComparison();
+      return NextResponse.json({
+        success: true,
+        data: result,
+        meta: { renderMode },
+      });
+    } catch (error) {
+      console.error('[Mastermind Simulate] Error:', error);
+      return NextResponse.json({ success: false, error: 'Simulation failed' }, { status: 500 });
     }
-
-    return NextResponse.json({
-      success: true,
-      data: result,
-      meta: { renderMode },
-    });
-  } catch (error) {
-    console.error('[Mastermind Simulate] Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Simulation failed' },
-      { status: 500 }
-    );
-  }
-
   });
 }

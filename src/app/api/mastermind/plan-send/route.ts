@@ -18,7 +18,6 @@ import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const PlanSendSchema = z.object({
   sessionId: z.string().min(1, 'sessionId is required'),
@@ -26,54 +25,97 @@ const PlanSendSchema = z.object({
 
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/plan-send', async () => {
-  try {
-    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
-    const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession) {
-      return unauthorized();
-    }
+    try {
+      // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
+      const authSession = await getSessionFromRequest(request).catch(() => null);
+      if (!authSession) {
+        return unauthorized();
+      }
 
-    const staffName = authSession?.name || 'Staff';
+      const staffName = authSession?.name || 'Staff';
 
-    const parsed = PlanSendSchema.safeParse(await request.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
-        { status: 400 }
-      );
-    }
+      const parsed = PlanSendSchema.safeParse(await request.json().catch(() => null));
+      if (!parsed.success) {
+        return NextResponse.json(
+          { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
+          { status: 400 },
+        );
+      }
 
-    const { sessionId } = parsed.data;
+      const { sessionId } = parsed.data;
 
-    if (!sessionId) {
-      return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });
-    }
+      if (!sessionId) {
+        return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });
+      }
 
-    const session = await getSessionByIdAsync(sessionId);
-    if (!session) {
-      return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
-    }
+      const session = await getSessionByIdAsync(sessionId);
+      if (!session) {
+        return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
+      }
 
-    const email = session.patientEmail || (session.intakeData?.email as string) || '';
-    if (!email) {
-      return NextResponse.json({ success: false, error: 'No patient email on file' }, { status: 422 });
-    }
+      const email = session.patientEmail || (session.intakeData?.email as string) || '';
+      if (!email) {
+        return NextResponse.json(
+          { success: false, error: 'No patient email on file' },
+          { status: 422 },
+        );
+      }
 
-    // Ensure share token exists (reuse if valid, generate if not)
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ranibeautyclinic.com';
-    let shareUrl: string;
+      // Ensure share token exists (reuse if valid, generate if not)
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ranibeautyclinic.com';
+      let shareUrl: string;
 
-    if (session.shareToken) {
-      const existing = await resolveToken(session.shareToken);
-      if (existing) {
-        shareUrl = `${siteUrl}/my-plan/${session.shareToken}`;
+      if (session.shareToken) {
+        const existing = await resolveToken(session.shareToken);
+        if (existing) {
+          shareUrl = `${siteUrl}/my-plan/${session.shareToken}`;
+        } else {
+          // Token expired — generate new one
+          const newToken = crypto.randomBytes(32).toString('hex');
+          const now = new Date();
+          const expiresAt = new Date(now.getTime() + SEVEN_DAYS_MS);
+
+          // Persist token via Airtable (same as share/route.ts)
+          await saveTokenToAirtable({
+            token: newToken,
+            sessionId,
+            createdAt: now.toISOString(),
+            expiresAt: expiresAt.toISOString(),
+          });
+
+          const updated = sessionReducer(session, {
+            type: 'SET_SHARE_TOKEN',
+            token: newToken,
+            actor: staffName,
+          });
+          await saveSessionAsync(updated);
+          shareUrl = `${siteUrl}/my-plan/${newToken}`;
+        }
       } else {
-        // Token expired — generate new one
+        // No token yet — session must be plan_ready or later
+        const shareablePhases = [
+          'plan_ready',
+          'provider_review',
+          'approved',
+          'simulating',
+          'simulation_ready',
+          'presenting',
+          'completed',
+        ];
+        if (!shareablePhases.includes(session.phase)) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: `Session is in "${session.phase}" phase. A plan must be generated before sending.`,
+            },
+            { status: 422 },
+          );
+        }
+
         const newToken = crypto.randomBytes(32).toString('hex');
         const now = new Date();
         const expiresAt = new Date(now.getTime() + SEVEN_DAYS_MS);
 
-        // Persist token via Airtable (same as share/route.ts)
         await saveTokenToAirtable({
           token: newToken,
           sessionId,
@@ -81,71 +123,57 @@ export async function POST(request: NextRequest) {
           expiresAt: expiresAt.toISOString(),
         });
 
-        const updated = sessionReducer(session, { type: 'SET_SHARE_TOKEN', token: newToken, actor: staffName });
+        const updated = sessionReducer(session, {
+          type: 'SET_SHARE_TOKEN',
+          token: newToken,
+          actor: staffName,
+        });
         await saveSessionAsync(updated);
         shareUrl = `${siteUrl}/my-plan/${newToken}`;
       }
-    } else {
-      // No token yet — session must be plan_ready or later
-      const shareablePhases = ['plan_ready', 'provider_review', 'approved', 'simulating', 'simulation_ready', 'presenting', 'completed'];
-      if (!shareablePhases.includes(session.phase)) {
-        return NextResponse.json({
-          success: false,
-          error: `Session is in "${session.phase}" phase. A plan must be generated before sending.`,
-        }, { status: 422 });
+
+      // Send email via Resend
+      const firstName = (session.patientName || 'there').split(' ')[0];
+
+      try {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        await resend.emails.send({
+          from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
+          to: email,
+          subject: `${firstName}, Your Personalized Treatment Plan is Ready`,
+          html: buildPlanEmailHtml(firstName, shareUrl),
+        });
+      } catch (emailErr) {
+        console.error('[Share Send] Email send failed:', emailErr);
+        return NextResponse.json(
+          { success: false, error: 'Email delivery failed' },
+          { status: 502 },
+        );
       }
 
-      const newToken = crypto.randomBytes(32).toString('hex');
-      const now = new Date();
-      const expiresAt = new Date(now.getTime() + SEVEN_DAYS_MS);
+      // Log the send action on the session
+      const latestSession = await getSessionByIdAsync(sessionId);
+      if (latestSession) {
+        const withLog = sessionReducer(latestSession, {
+          type: 'SET_CLINIC_NOTES',
+          notes: [
+            latestSession.clinicNotes,
+            `Plan sent to ${email} by ${staffName} on ${new Date().toLocaleDateString()}`,
+          ]
+            .filter(Boolean)
+            .join('\n'),
+          actor: staffName,
+        });
+        await saveSessionAsync(withLog);
+      }
 
-      await saveTokenToAirtable({
-        token: newToken,
-        sessionId,
-        createdAt: now.toISOString(),
-        expiresAt: expiresAt.toISOString(),
-      });
-
-      const updated = sessionReducer(session, { type: 'SET_SHARE_TOKEN', token: newToken, actor: staffName });
-      await saveSessionAsync(updated);
-      shareUrl = `${siteUrl}/my-plan/${newToken}`;
+      return NextResponse.json({ success: true, shareUrl, sentTo: email });
+    } catch (err) {
+      console.error('[Share Send] Error:', err);
+      return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
-
-    // Send email via Resend
-    const firstName = (session.patientName || 'there').split(' ')[0];
-
-    try {
-      const { Resend } = await import('resend');
-      const resend = new Resend(process.env.RESEND_API_KEY);
-
-      await resend.emails.send({
-        from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
-        to: email,
-        subject: `${firstName}, Your Personalized Treatment Plan is Ready`,
-        html: buildPlanEmailHtml(firstName, shareUrl),
-      });
-    } catch (emailErr) {
-      console.error('[Share Send] Email send failed:', emailErr);
-      return NextResponse.json({ success: false, error: 'Email delivery failed' }, { status: 502 });
-    }
-
-    // Log the send action on the session
-    const latestSession = await getSessionByIdAsync(sessionId);
-    if (latestSession) {
-      const withLog = sessionReducer(latestSession, {
-        type: 'SET_CLINIC_NOTES',
-        notes: [latestSession.clinicNotes, `Plan sent to ${email} by ${staffName} on ${new Date().toLocaleDateString()}`].filter(Boolean).join('\n'),
-        actor: staffName,
-      });
-      await saveSessionAsync(withLog);
-    }
-
-    return NextResponse.json({ success: true, shareUrl, sentTo: email });
-  } catch (err) {
-    console.error('[Share Send] Error:', err);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
-  }
-
   });
 }
 

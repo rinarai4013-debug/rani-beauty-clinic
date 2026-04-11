@@ -1,10 +1,13 @@
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
-import { getReactivationTemplate, getAutoReactivationTemplate, type ReactivationTier } from '@/lib/templates/reactivation';
+import {
+  getReactivationTemplate,
+  getAutoReactivationTemplate,
+  type ReactivationTier,
+} from '@/lib/templates/reactivation';
 
 import { withSentry } from '@/lib/sentry-utils';
-
 
 const Schema = z.object({
   firstName: z.string().min(1),
@@ -15,38 +18,40 @@ const Schema = z.object({
 
 export async function POST(request: NextRequest) {
   return withSentry('templates/reactivation', async () => {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit('templates-reactivation', ip, RATE_LIMITS.WEBHOOK);
-  if (!allowed) return rateLimitResponse(resetIn);
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('templates-reactivation', ip, RATE_LIMITS.WEBHOOK);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  const parsed = Schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten().fieldErrors }, { status: 400 });
-  }
+    const parsed = Schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
 
-  const vars = {
-    firstName: parsed.data.firstName,
-    lastService: parsed.data.lastService,
-    daysSinceLastVisit: parsed.data.daysSinceLastVisit,
-    ltv: 0,
-  };
+    const vars = {
+      firstName: parsed.data.firstName,
+      lastService: parsed.data.lastService,
+      daysSinceLastVisit: parsed.data.daysSinceLastVisit,
+      ltv: 0,
+    };
 
-  if (parsed.data.tier) {
-    const tier = parsed.data.tier as ReactivationTier;
-    return NextResponse.json({
-      tier,
-      ...getReactivationTemplate(tier, vars),
-    });
-  }
+    if (parsed.data.tier) {
+      const tier = parsed.data.tier as ReactivationTier;
+      return NextResponse.json({
+        tier,
+        ...getReactivationTemplate(tier, vars),
+      });
+    }
 
-  return NextResponse.json(getAutoReactivationTemplate(vars));
-
+    return NextResponse.json(getAutoReactivationTemplate(vars));
   });
 }

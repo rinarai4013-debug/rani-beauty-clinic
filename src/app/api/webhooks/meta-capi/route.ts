@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
-
 
 /**
  * POST /api/webhooks/meta-capi
@@ -32,7 +31,7 @@ import { withSentry } from '@/lib/sentry-utils';
  */
 
 function getMetaPixelId() {
-  return process.env.NEXT_PUBLIC_META_PIXEL_ID || "769852657929598";
+  return process.env.NEXT_PUBLIC_META_PIXEL_ID || '769852657929598';
 }
 
 function getMetaAccessToken() {
@@ -59,107 +58,103 @@ const MetaCapiPayloadSchema = z.object({
 });
 
 function sha256(value: string): string {
-  return crypto.createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
+  return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
 
 export async function POST(req: NextRequest) {
   return withSentry('webhooks/meta-capi', async () => {
-  const accessToken = getMetaAccessToken();
-  const pixelId = getMetaPixelId();
+    const accessToken = getMetaAccessToken();
+    const pixelId = getMetaPixelId();
 
-  if (!accessToken) {
-    return NextResponse.json({ error: "META_CAPI_ACCESS_TOKEN not configured" }, { status: 500 });
-  }
+    if (!accessToken) {
+      return NextResponse.json({ error: 'META_CAPI_ACCESS_TOKEN not configured' }, { status: 500 });
+    }
 
-  // MANDATORY webhook secret. Without it, the endpoint cannot verify
-  // signatures, so we fail closed rather than accept unsigned traffic.
-  // (Wave 11 Horizon 1 P1-4 fix, 2026-04-10 — previously fail-open.)
-  const webhookSecret = getMetaWebhookSecret();
-  if (!webhookSecret) {
-    console.error("[Meta CAPI] META_CAPI_WEBHOOK_SECRET is not configured — rejecting request");
-    return NextResponse.json(
-      { error: "Webhook secret not configured" },
-      { status: 503 },
-    );
-  }
+    // MANDATORY webhook secret. Without it, the endpoint cannot verify
+    // signatures, so we fail closed rather than accept unsigned traffic.
+    // (Wave 11 Horizon 1 P1-4 fix, 2026-04-10 — previously fail-open.)
+    const webhookSecret = getMetaWebhookSecret();
+    if (!webhookSecret) {
+      console.error('[Meta CAPI] META_CAPI_WEBHOOK_SECRET is not configured — rejecting request');
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    }
 
-  // Read raw body for HMAC verification
-  const body = await req.text();
+    // Read raw body for HMAC verification
+    const body = await req.text();
 
-  // HMAC-SHA256 signature verification (Meta's x-hub-signature-256 header)
-  const signature = req.headers.get("x-hub-signature-256");
-  if (!signature) {
-    console.error("[Meta CAPI] Missing x-hub-signature-256 header");
-    return NextResponse.json({ error: "Missing signature" }, { status: 401 });
-  }
+    // HMAC-SHA256 signature verification (Meta's x-hub-signature-256 header)
+    const signature = req.headers.get('x-hub-signature-256');
+    if (!signature) {
+      console.error('[Meta CAPI] Missing x-hub-signature-256 header');
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
 
-  const expectedSig = "sha256=" + crypto
-    .createHmac("sha256", webhookSecret)
-    .update(body)
-    .digest("hex");
-  const sigBuf = Buffer.from(signature, "utf8");
-  const expBuf = Buffer.from(expectedSig, "utf8");
-  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
-    console.error("[Meta CAPI] Invalid webhook signature");
-    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-  }
+    const expectedSig =
+      'sha256=' + crypto.createHmac('sha256', webhookSecret).update(body).digest('hex');
+    const sigBuf = Buffer.from(signature, 'utf8');
+    const expBuf = Buffer.from(expectedSig, 'utf8');
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+      console.error('[Meta CAPI] Invalid webhook signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
 
-  try {
-    let jsonBody: unknown = null;
     try {
-      jsonBody = JSON.parse(body);
-    } catch {
-      // invalid JSON
-    }
-    const parsed = MetaCapiPayloadSchema.safeParse(jsonBody);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid META CAPI payload' },
-        { status: 400 }
-      );
-    }
-
-    const { event_name, event_time, user_data, custom_data, event_source_url } = parsed.data;
-
-    const hashedUserData: Record<string, string> = {};
-    if (user_data?.email) hashedUserData.em = sha256(user_data.email);
-    if (user_data?.phone) hashedUserData.ph = sha256(user_data.phone.replace(/\D/g, ""));
-    hashedUserData.client_ip_address =
-      user_data?.client_ip || req.headers.get("x-forwarded-for") || "";
-    hashedUserData.client_user_agent =
-      user_data?.client_user_agent || req.headers.get("user-agent") || "";
-
-    const eventData = {
-      data: [{
-        event_name,
-        event_time: event_time || Math.floor(Date.now() / 1000),
-        action_source: "website",
-        event_source_url: event_source_url || "https://www.ranibeautyclinic.com",
-        user_data: hashedUserData,
-        custom_data: custom_data || {},
-      }],
-    };
-
-    const response = await fetch(
-      `https://graph.facebook.com/v18.0/${pixelId}/events?access_token=${accessToken}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
+      let jsonBody: unknown = null;
+      try {
+        jsonBody = JSON.parse(body);
+      } catch {
+        // invalid JSON
       }
-    );
+      const parsed = MetaCapiPayloadSchema.safeParse(jsonBody);
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Invalid META CAPI payload' }, { status: 400 });
+      }
 
-    const result = await response.json();
-    if (!response.ok) {
-      console.error("[Meta CAPI] Error:", result);
-      return NextResponse.json({ error: "Meta CAPI request failed", details: result }, { status: 502 });
+      const { event_name, event_time, user_data, custom_data, event_source_url } = parsed.data;
+
+      const hashedUserData: Record<string, string> = {};
+      if (user_data?.email) hashedUserData.em = sha256(user_data.email);
+      if (user_data?.phone) hashedUserData.ph = sha256(user_data.phone.replace(/\D/g, ''));
+      hashedUserData.client_ip_address =
+        user_data?.client_ip || req.headers.get('x-forwarded-for') || '';
+      hashedUserData.client_user_agent =
+        user_data?.client_user_agent || req.headers.get('user-agent') || '';
+
+      const eventData = {
+        data: [
+          {
+            event_name,
+            event_time: event_time || Math.floor(Date.now() / 1000),
+            action_source: 'website',
+            event_source_url: event_source_url || 'https://www.ranibeautyclinic.com',
+            user_data: hashedUserData,
+            custom_data: custom_data || {},
+          },
+        ],
+      };
+
+      const response = await fetch(
+        `https://graph.facebook.com/v18.0/${pixelId}/events?access_token=${accessToken}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData),
+        },
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        console.error('[Meta CAPI] Error:', result);
+        return NextResponse.json(
+          { error: 'Meta CAPI request failed', details: result },
+          { status: 502 },
+        );
+      }
+
+      return NextResponse.json({ success: true, events_received: result.events_received });
+    } catch (error) {
+      console.error('[Meta CAPI] Error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-
-    return NextResponse.json({ success: true, events_received: result.events_received });
-  } catch (error) {
-    console.error("[Meta CAPI] Error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-
   });
 }

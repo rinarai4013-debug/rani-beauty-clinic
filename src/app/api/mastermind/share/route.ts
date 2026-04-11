@@ -23,7 +23,6 @@ import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
 
-
 // Re-export the type so existing `import type { ShareTokenRecord }` from sibling
 // routes that may have used `../route` still work at the type level.
 export type { ShareTokenRecord };
@@ -41,85 +40,78 @@ const ShareTokenCreateSchema = z.object({
 
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/share', async () => {
-  try {
-    const parsed = ShareTokenCreateSchema.safeParse(await request.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
-        { status: 400 }
-      );
+    try {
+      const parsed = ShareTokenCreateSchema.safeParse(await request.json().catch(() => null));
+      if (!parsed.success) {
+        return NextResponse.json(
+          { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
+          { status: 400 },
+        );
+      }
+
+      const { sessionId, expiresIn } = parsed.data;
+
+      // Validate expiresIn
+      const ttl =
+        typeof expiresIn === 'number' && expiresIn > 0
+          ? Math.min(expiresIn, MAX_EXPIRY_MS)
+          : SEVEN_DAYS_MS;
+
+      // Verify session exists
+      const session = await getSessionByIdAsync(sessionId);
+      if (!session) {
+        return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
+      }
+
+      // Session must be at least plan_ready to share
+      const shareablePhases = [
+        'plan_ready',
+        'provider_review',
+        'approved',
+        'simulating',
+        'simulation_ready',
+        'presenting',
+        'completed',
+      ];
+      if (!shareablePhases.includes(session.phase)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Session is in "${session.phase}" phase. A plan must be generated before sharing.`,
+          },
+          { status: 422 },
+        );
+      }
+
+      // Generate cryptographically secure token
+      const token = crypto.randomBytes(32).toString('hex');
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + ttl);
+
+      const record: ShareTokenRecord = {
+        token,
+        sessionId,
+        createdAt: now.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+      };
+
+      // Store the token (in-memory + Airtable for persistence across cold starts)
+      cacheToken(record);
+      await saveTokenToAirtable(record);
+
+      // Build the patient-facing URL
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ranibeautyclinic.com';
+      const shareUrl = `${siteUrl}/my-plan/${token}`;
+
+      return NextResponse.json({
+        success: true,
+        shareUrl,
+        token,
+        expiresAt: expiresAt.toISOString(),
+      });
+    } catch (err) {
+      console.error('[Share] Token generation failed:', err);
+      return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
-
-    const { sessionId, expiresIn } = parsed.data;
-
-    // Validate expiresIn
-    const ttl =
-      typeof expiresIn === 'number' && expiresIn > 0
-        ? Math.min(expiresIn, MAX_EXPIRY_MS)
-        : SEVEN_DAYS_MS;
-
-    // Verify session exists
-    const session = await getSessionByIdAsync(sessionId);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: 'Session not found' },
-        { status: 404 }
-      );
-    }
-
-    // Session must be at least plan_ready to share
-    const shareablePhases = [
-      'plan_ready',
-      'provider_review',
-      'approved',
-      'simulating',
-      'simulation_ready',
-      'presenting',
-      'completed',
-    ];
-    if (!shareablePhases.includes(session.phase)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Session is in "${session.phase}" phase. A plan must be generated before sharing.`,
-        },
-        { status: 422 }
-      );
-    }
-
-    // Generate cryptographically secure token
-    const token = crypto.randomBytes(32).toString('hex');
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + ttl);
-
-    const record: ShareTokenRecord = {
-      token,
-      sessionId,
-      createdAt: now.toISOString(),
-      expiresAt: expiresAt.toISOString(),
-    };
-
-    // Store the token (in-memory + Airtable for persistence across cold starts)
-    cacheToken(record);
-    await saveTokenToAirtable(record);
-
-    // Build the patient-facing URL
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ranibeautyclinic.com';
-    const shareUrl = `${siteUrl}/my-plan/${token}`;
-
-    return NextResponse.json({
-      success: true,
-      shareUrl,
-      token,
-      expiresAt: expiresAt.toISOString(),
-    });
-  } catch (err) {
-    console.error('[Share] Token generation failed:', err);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-
   });
 }
