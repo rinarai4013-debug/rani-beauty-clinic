@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { generateAISimulation } from '@/lib/photo-simulation/ai-simulation';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ─── Request Schema ─────────────────────────────────────────────────────
 
 const simulationRequestSchema = z.object({
@@ -15,6 +18,7 @@ const simulationRequestSchema = z.object({
 // ─── POST Handler ───────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  return withSentry('simulation/generate', async () => {
   const ip = getClientIP(request);
   const { allowed, resetIn } = rateLimit("ai", ip, RATE_LIMITS.AI);
   if (!allowed) return rateLimitResponse(resetIn);
@@ -66,4 +70,6 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+
+  });
 }

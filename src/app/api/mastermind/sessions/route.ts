@@ -10,7 +10,11 @@ import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession } from '@/types/mastermind';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET(request: NextRequest) {
+  return withSentry('mastermind/sessions', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const session = await getSessionFromRequest(request).catch(() => null);
@@ -24,9 +28,12 @@ export async function GET(request: NextRequest) {
     console.error('[Mastermind Sessions] GET error:', error);
     return apiError('Failed to fetch sessions');
   }
+
+  });
 }
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/sessions', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -54,4 +61,6 @@ export async function POST(request: NextRequest) {
     console.error('[Mastermind Sessions] POST error:', error);
     return apiError('Failed to create session');
   }
+
+  });
 }

@@ -5,6 +5,9 @@ import { Tables, fetchAll, createRecord, updateRecord } from '@/lib/airtable/cli
 import { FIELDS } from '@/lib/airtable/tables';
 import { cache, TTL } from '@/lib/cache';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const SavePlanSchema = z.object({
   client: z.array(z.string()).optional(),
   clientName: z.string().min(1),
@@ -25,6 +28,7 @@ const UpdatePlanSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  return withSentry('dashboard/plan-builder', async () => {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -61,9 +65,12 @@ export async function GET(request: NextRequest) {
     console.error('[Plan Builder API] GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch plans' }, { status: 500 });
   }
+
+  });
 }
 
 export async function POST(request: NextRequest) {
+  return withSentry('dashboard/plan-builder', async () => {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -110,9 +117,12 @@ export async function POST(request: NextRequest) {
     console.error('[Plan Builder API] POST error:', error);
     return NextResponse.json({ error: 'Failed to save plan' }, { status: 500 });
   }
+
+  });
 }
 
 export async function PATCH(request: NextRequest) {
+  return withSentry('dashboard/plan-builder', async () => {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -151,9 +161,12 @@ export async function PATCH(request: NextRequest) {
     console.error('[Plan Builder API] PATCH error:', error);
     return NextResponse.json({ error: 'Failed to update plan' }, { status: 500 });
   }
+
+  });
 }
 
 export async function DELETE(request: NextRequest) {
+  return withSentry('dashboard/plan-builder', async () => {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -177,4 +190,6 @@ export async function DELETE(request: NextRequest) {
     console.error('[Plan Builder API] DELETE error:', error);
     return NextResponse.json({ error: 'Failed to archive plan' }, { status: 500 });
   }
+
+  });
 }

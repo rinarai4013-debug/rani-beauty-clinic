@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getPatientSession } from '@/lib/patient-auth/session';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function GET() {
+  return withSentry('patient/auth/me', async () => {
   try {
     const session = await getPatientSession();
 
@@ -23,4 +27,6 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  });
 }

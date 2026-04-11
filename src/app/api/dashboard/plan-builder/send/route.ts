@@ -6,6 +6,9 @@ import { Resend } from 'resend';
 import crypto from 'crypto';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ─── Input Validation ─────────────────────────────────────────────
 const SendPlanSchema = z.object({
   planId: z.string().regex(/^rec[a-zA-Z0-9]{10,}$/, 'Invalid plan ID'),
@@ -112,6 +115,7 @@ function buildEmailHtml(clientName: string, planUrl: string): string {
 
 // ─── POST Handler ─────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
+  return withSentry('dashboard/plan-builder/send', async () => {
   try {
     // Auth check
     const session = await getSession();
@@ -172,4 +176,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

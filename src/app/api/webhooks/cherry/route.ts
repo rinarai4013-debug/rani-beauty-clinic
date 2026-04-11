@@ -3,6 +3,9 @@ import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ─── Env ──────────────────────────────────────────────────────────
 function getCherryWebhookSecret(): string {
   return process.env.CHERRY_WEBHOOK_SECRET || '';
@@ -31,6 +34,7 @@ interface TreatmentPlanFields {
 // Receives Cherry payment webhook events
 
 export async function POST(request: NextRequest) {
+  return withSentry('webhooks/cherry', async () => {
   try {
     // Read raw body for HMAC verification
     const rawBody = await request.text();
@@ -150,4 +154,6 @@ export async function POST(request: NextRequest) {
     // Return 200 even on error to prevent Cherry from retrying
     return NextResponse.json({ received: true, error: 'Processing error' }, { status: 200 });
   }
+
+  });
 }

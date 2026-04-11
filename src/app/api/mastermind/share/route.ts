@@ -21,6 +21,9 @@ import {
 } from '@/lib/mastermind/share-token';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // Re-export the type so existing `import type { ShareTokenRecord }` from sibling
 // routes that may have used `../route` still work at the type level.
 export type { ShareTokenRecord };
@@ -37,6 +40,7 @@ const ShareTokenCreateSchema = z.object({
 // ── POST Handler ──
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/share', async () => {
   try {
     const parsed = ShareTokenCreateSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
@@ -116,4 +120,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  });
 }

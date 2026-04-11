@@ -17,7 +17,11 @@ import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helper
 import type { AuraScanResult } from '@/types/mastermind';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/plan', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -94,4 +98,6 @@ export async function POST(request: NextRequest) {
       return apiError('Plan generation failed');
     }
   }
+
+  });
 }

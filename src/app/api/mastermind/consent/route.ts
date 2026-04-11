@@ -13,9 +13,13 @@ import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { ConsentRecord } from '@/types/consent';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ── POST: Store a consent record ──
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/consent', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -112,11 +116,14 @@ export async function POST(request: NextRequest) {
     console.error('[Mastermind Consent] POST error:', error);
     return apiError('Failed to store consent record');
   }
+
+  });
 }
 
 // ── GET: Retrieve consent records for a session ──
 
 export async function GET(request: NextRequest) {
+  return withSentry('mastermind/consent', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -178,4 +185,6 @@ export async function GET(request: NextRequest) {
     console.error('[Mastermind Consent] GET error:', error);
     return apiError('Failed to retrieve consent records');
   }
+
+  });
 }

@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getPreConsultTemplate, getAllPreConsultTemplates } from '@/lib/templates/pre-consult';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const Schema = z.object({
   step: z.string().optional().default('booking-confirmation'),
   firstName: z.string().min(1),
@@ -16,6 +19,7 @@ const Schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  return withSentry('templates/pre-consult', async () => {
   const ip = getClientIP(request);
   const { allowed, resetIn } = rateLimit('templates-pre-consult', ip, RATE_LIMITS.WEBHOOK);
   if (!allowed) return rateLimitResponse(resetIn);
@@ -60,4 +64,6 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(template);
+
+  });
 }

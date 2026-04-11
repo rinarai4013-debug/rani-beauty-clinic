@@ -16,12 +16,16 @@ import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token'
 import crypto from 'crypto';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const PlanSendSchema = z.object({
   sessionId: z.string().min(1, 'sessionId is required'),
 });
 
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/plan-send', async () => {
   try {
     // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
     const authSession = await getSessionFromRequest(request).catch(() => null);
@@ -141,6 +145,8 @@ export async function POST(request: NextRequest) {
     console.error('[Share Send] Error:', err);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
+
+  });
 }
 
 // ── Branded email HTML ──

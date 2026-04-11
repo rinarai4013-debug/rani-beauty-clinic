@@ -4,6 +4,9 @@ import { FIELDS } from '@/lib/airtable/tables';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import crypto from 'crypto';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ─── Rate Limiting ──────────────────────────────────────────────────
 const viewAttempts = new Map<string, { count: number; resetAt: number }>();
 const RATE_WINDOW = 60_000; // 1 minute
@@ -97,6 +100,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  return withSentry('plan/[id]', async () => {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
       || request.headers.get('x-real-ip')
@@ -292,4 +296,6 @@ export async function GET(
       { status: 500 }
     );
   }
+
+  });
 }

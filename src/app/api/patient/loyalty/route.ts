@@ -3,6 +3,9 @@ import { getPatientSession } from '@/lib/patient-auth/session';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 function getLoyaltyTier(totalSpend: number): string {
   if (totalSpend >= 5000) return 'Platinum';
   if (totalSpend >= 2000) return 'Gold';
@@ -21,6 +24,7 @@ function getNextTierThreshold(tier: string): { nextTier: string; amountNeeded: n
 }
 
 export async function GET() {
+  return withSentry('patient/loyalty', async () => {
   try {
     const session = await getPatientSession();
     if (!session) {
@@ -79,4 +83,6 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  });
 }

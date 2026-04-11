@@ -20,11 +20,15 @@ import {
 } from '@/lib/mastermind/session-store';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 /**
  * GET — List available scans from the Aura device.
  * Returns array of { name, date, imageCount }.
  */
 export async function GET() {
+  return withSentry('mastermind/aura-import', async () => {
   try {
     const scans = listAvailableScans();
     return apiSuccess(scans, { source: 'aura-device', count: scans.length });
@@ -32,6 +36,8 @@ export async function GET() {
     console.error('[Aura Import API] GET error:', error);
     return apiError('Failed to list Aura scans');
   }
+
+  });
 }
 
 /**
@@ -47,6 +53,7 @@ export async function GET() {
  * - Returns the imported scan data
  */
 export async function POST(request: NextRequest) {
+  return withSentry('mastermind/aura-import', async () => {
   try {
     const parsed = await parseJsonBody(request);
     if ('error' in parsed) return parsed.error;
@@ -157,4 +164,6 @@ export async function POST(request: NextRequest) {
       `Aura import failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
+
+  });
 }

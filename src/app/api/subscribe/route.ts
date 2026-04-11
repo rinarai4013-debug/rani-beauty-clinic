@@ -3,6 +3,9 @@ import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
 import { upsertClientAttribution } from "@/lib/attribution/upsert-client-attribution";
 
+import { withSentry } from '@/lib/sentry-utils';
+
+
 // ── Zod schema ───────────────────────────────────────────────────
 const SubscribeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -66,6 +69,7 @@ if (typeof setInterval !== "undefined") {
 
 // ── POST handler ─────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  return withSentry('subscribe', async () => {
   // 1. Rate limiting by IP
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -234,4 +238,6 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ success: true });
+
+  });
 }
