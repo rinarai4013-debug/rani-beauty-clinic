@@ -135,36 +135,23 @@ const scoped = authSession.role === 'ceo' || authSession.role === 'provider'
 
 Not a security issue — an empty file isn't a route and Next.js won't serve it. But it's dead code that confuses audits. Either delete the file or add a proper GET/POST handler (behind `withTenant`).
 
-### P1-4: `/api/webhooks/meta-capi` fails OPEN when signing secret is missing (added 2026-04-10 during env audit)
+### P1-4: `/api/webhooks/meta-capi` fail-open → fail-closed (✅ FIXED 2026-04-10 evening)
 
-**Finding:** `src/app/api/webhooks/meta-capi/route.ts` line 66-68 has this fallback:
+**Original finding** (from env-audit discovery earlier in the day): the route had a fail-open fallback at line 66-68 that skipped signature verification entirely when `META_CAPI_WEBHOOK_SECRET` was unset. Combined with the env var being missing in Vercel production, that meant anyone on the internet could POST fabricated conversion events into Rani's Meta Pixel.
 
-```typescript
-} else {
-  console.error("[Meta CAPI] WARNING: META_CAPI_WEBHOOK_SECRET not set — skipping signature verification");
-}
-```
+**Resolution:**
 
-When `META_CAPI_WEBHOOK_SECRET` is unset, the route logs a warning and **accepts the POST unsigned**. The env audit (`tools/env-audit.sh`) confirms the secret is **not currently set in Vercel production**, which means anyone on the internet can POST arbitrary events to this endpoint right now.
+1. **Code fix** (landed in Horizon 1 batch #3): the route now fails closed with a 503 "Webhook secret not configured" when the env var is missing, matching the Mangomint webhook pattern. Signed requests are still accepted under the same HMAC-SHA256 + timing-safe-compare check; unsigned or mis-signed requests get 401.
+2. **Test coverage**: 18-case integration suite added at `src/app/api/__tests__/meta-capi.test.ts` covering every fail-closed path (missing secret → 503, missing access token → 500, missing signature → 401, wrong secret → 401, wrong length → 401, wrong algorithm prefix → 401) plus happy-path forwarding to `graph.facebook.com`, PII hashing contract, payload validation, and downstream Meta failures.
+3. **Still pending (Sukhi action)**: add the env vars to Vercel production:
+   ```
+   vercel env add META_CAPI_WEBHOOK_SECRET production
+   vercel env add META_CAPI_ACCESS_TOKEN production
+   ```
+   Without these, the route will 503 for every request — that's the correct fail-closed behavior. Conversion events will not flow to Meta until both are set.
+4. **Caller identification**: still unresolved. No in-code callers. Likely an n8n workflow or a production-only background process. When the env vars are added, whoever the caller is will start getting signed requests through; if they were unsigned before, they'll start failing visibly. That's the desired outcome — it surfaces the caller, and whoever it is can then update their signing logic.
 
-What the route does with an accepted POST:
-1. Validates the body shape (zod schema)
-2. Hashes user_data (email, phone)
-3. Forwards the event to `graph.facebook.com/v18.0/{pixelId}/events` with the Rani Meta access token
-
-The blast radius: an attacker could poison Rani's Meta Pixel conversion data with fabricated events, corrupting ad attribution and potentially triggering unexpected Meta ad spend on the account tied to the access token. Not catastrophic, but non-trivial.
-
-**Recommended fixes, in order:**
-
-1. **Immediate (deploy today):** add `META_CAPI_WEBHOOK_SECRET` to Vercel production via `vercel env add META_CAPI_WEBHOOK_SECRET production`. The code path that verifies the signature is correct; it just needs the secret.
-2. **Short-term (this week):** change the fallback to fail closed. The route should return 503 "Webhook secret not configured" instead of accepting the POST. Same pattern as `/api/webhooks/mangomint/route.ts` which correctly 503s when its secret is missing.
-3. **Investigate:** find the caller of this endpoint. Grep turned up no in-code callers, which means it's called from n8n, a browser bundle, or a production-only integration. If it's the browser, the correct protection is origin checking + CSRF, NOT a shared secret. If it's server-to-server, the shared secret is right.
-
-**Not fixing in this session** because:
-- The code fix (fail closed) would break whoever is currently calling it, and we can't confirm the caller's identity without production-only visibility.
-- The env var fix is a 30-second Vercel dashboard operation that Sukhi needs to do.
-
-Also related: `META_CAPI_ACCESS_TOKEN` is missing from production too, but the route already returns 500 when it's missing (fail closed) so it's less urgent — it'll just not fire any conversions until fixed.
+**Net state after Horizon 1 batch #3:** the route is now **secure by default**. A missing secret or an unsigned request both fail closed. The env vars are the only remaining gap and Sukhi can add them in 30 seconds via Vercel CLI.
 
 ## ℹ️ P2 Investigate
 

@@ -2,6 +2,13 @@
  * HIPAA Audit Engine
  * Track access logs, PHI disclosures, breach notifications,
  * training completions, and Business Associate Agreements.
+ *
+ * Storage: in-memory module state as the primary store (fast reads
+ * for the current request + hot dyno). Optional dual-write to
+ * Airtable via `./persistence.ts` when
+ * `COMPLIANCE_PERSISTENCE_ENABLED=1`. See that file for the
+ * required Airtable table schemas and the wire-first/provision-later
+ * rationale.
  */
 
 import type {
@@ -12,6 +19,12 @@ import type {
   BusinessAssociateAgreement,
 } from '@/types/compliance';
 import { createAuditEntry } from './audit-trail';
+import {
+  persistPhiAccessLog,
+  persistBreach,
+  persistBaa,
+  persistTraining,
+} from './persistence';
 
 // ── In-memory stores ─────────────────────────────────────────────────
 
@@ -41,6 +54,10 @@ export function logPHIAccess(params: Omit<PHIAccessLog, 'id' | 'timestamp'>): PH
     details: `${params.action} ${params.dataCategory} for patient ${params.patientName}${params.details ? `: ${params.details}` : ''}`,
     ipAddress: params.ipAddress,
   });
+
+  // Fire-and-forget dual-write to Airtable when persistence is enabled.
+  // Never blocks the sync return — see ./persistence.ts for contract.
+  persistPhiAccessLog(entry);
 
   return entry;
 }
@@ -103,6 +120,9 @@ export function reportBreach(params: Omit<BreachNotification, 'id'>): BreachNoti
     ipAddress: '0.0.0.0',
   });
 
+  // Fire-and-forget dual-write to Airtable `HIPAA Breaches` table.
+  persistBreach(breach);
+
   return breach;
 }
 
@@ -134,17 +154,25 @@ export function assessBreachNotificationRequirements(breach: BreachNotification)
   deadlineIndividuals: string;
   deadlineMedia: string;
 } {
-  const discoveryDate = new Date(breach.discoveryDate);
-  const sixtyDaysOut = new Date(discoveryDate);
-  sixtyDaysOut.setDate(sixtyDaysOut.getDate() + 60);
+  // Anchor the date math to UTC so the +60-day deadline calculation
+  // doesn't drift by a day in negative-offset timezones (Pacific,
+  // Mountain, Central, Eastern). This is the same TZ-parsing bug
+  // class fixed in Wave 11 Bug 4 (schedule/optimizer.ts). Previously:
+  //   new Date('2026-02-10').setDate(+60)
+  // would give Apr 10 in Pacific instead of Apr 11 UTC.
+  const discoveryUtc = new Date(`${breach.discoveryDate}T00:00:00Z`);
+  const sixtyDaysOut = new Date(discoveryUtc);
+  sixtyDaysOut.setUTCDate(sixtyDaysOut.getUTCDate() + 60);
+
+  const deadlineStr = sixtyDaysOut.toISOString().split('T')[0];
 
   return {
     requiresHHS: breach.individualsAffected >= 500,
     requiresIndividualNotice: true, // All breaches require individual notice
     requiresMediaNotice: breach.individualsAffected >= 500,
-    deadlineHHS: sixtyDaysOut.toISOString().split('T')[0],
-    deadlineIndividuals: sixtyDaysOut.toISOString().split('T')[0],
-    deadlineMedia: sixtyDaysOut.toISOString().split('T')[0],
+    deadlineHHS: deadlineStr,
+    deadlineIndividuals: deadlineStr,
+    deadlineMedia: deadlineStr,
   };
 }
 
@@ -167,6 +195,9 @@ export function recordTraining(params: Omit<TrainingCompletion, 'id'>): Training
     details: `Completed ${params.trainingType} training. Score: ${params.score ?? 'N/A'}. Passed: ${params.passed}`,
     ipAddress: '0.0.0.0',
   });
+
+  // Fire-and-forget dual-write to Airtable `HIPAA Training` table.
+  persistTraining(record);
 
   return record;
 }
@@ -229,6 +260,10 @@ export function addBAA(params: Omit<BusinessAssociateAgreement, 'id'>): Business
     ...params,
   };
   baas = [...baas, baa];
+
+  // Fire-and-forget dual-write to Airtable `BAAs` table.
+  persistBaa(baa);
+
   return baa;
 }
 

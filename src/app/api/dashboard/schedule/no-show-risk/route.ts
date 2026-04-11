@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { predictNoShow, type NoShowInput, type NoShowScore } from '@/lib/predictions/no-show';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 // ── Field interfaces ──
 
@@ -284,6 +285,24 @@ export async function GET(req: NextRequest) {
     results.sort((a, b) => b.noShowScore.score - a.noShowScore.score);
 
     cache.set(cacheKey, results, TTL.STANDARD); // 60s
+
+    // HIPAA §164.312(b): no-show risk scoring reads the full client +
+    // appointment history + deposit status for each upcoming
+    // appointment. Each returned record carries client name + service
+    // + visit history inferences. Aggregate log entry with score
+    // distribution for audit reconstruction.
+    const highRisk = results.filter((r) => r.noShowScore.score >= 70).length;
+    const medRisk = results.filter(
+      (r) => r.noShowScore.score >= 40 && r.noShowScore.score < 70,
+    ).length;
+    logPhiAccessFromRequest(req, session, {
+      patientId: '__LIST__',
+      patientName: `No-show risk list (${results.length} appointments)`,
+      action: 'view',
+      dataCategory: 'treatment_records',
+      details: `No-show risk view — ${highRisk} high, ${medRisk} medium, ${results.length - highRisk - medRisk} low`,
+    });
+
     return NextResponse.json(results);
   } catch (err) {
     console.error('[dashboard/schedule/no-show-risk]', err);

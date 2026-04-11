@@ -2,6 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { z } from 'zod';
 
+/**
+ * POST /api/webhooks/meta-capi
+ *
+ * Proxies conversion events from trusted server-to-server callers (n8n,
+ * backend jobs) to the Meta Conversions API. Hashes PII (email/phone)
+ * with SHA-256 before forwarding per Meta's privacy rules, then POSTs
+ * to graph.facebook.com/v18.0/{pixelId}/events using the Rani access
+ * token.
+ *
+ * AUTHENTICATION (Wave 11 Horizon 1 P1-4 fix, 2026-04-10):
+ *   This endpoint REQUIRES an HMAC-SHA256 signature in the
+ *   `x-hub-signature-256` header, signed with `META_CAPI_WEBHOOK_SECRET`.
+ *   If the secret is not configured, the endpoint fails closed (503).
+ *   Previously, a missing secret was treated as a warning and the
+ *   request was accepted unsigned — that made this route a free
+ *   conversion-event injection point.
+ *
+ *   Callers must compute `sha256=<hex>` over the raw request body
+ *   and put it in the `x-hub-signature-256` header. Example (Node):
+ *
+ *     const signature = 'sha256=' + crypto
+ *       .createHmac('sha256', process.env.META_CAPI_WEBHOOK_SECRET)
+ *       .update(rawBody)
+ *       .digest('hex');
+ */
+
 function getMetaPixelId() {
   return process.env.NEXT_PUBLIC_META_PIXEL_ID || "769852657929598";
 }
@@ -41,30 +67,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "META_CAPI_ACCESS_TOKEN not configured" }, { status: 500 });
   }
 
+  // MANDATORY webhook secret. Without it, the endpoint cannot verify
+  // signatures, so we fail closed rather than accept unsigned traffic.
+  // (Wave 11 Horizon 1 P1-4 fix, 2026-04-10 — previously fail-open.)
+  const webhookSecret = getMetaWebhookSecret();
+  if (!webhookSecret) {
+    console.error("[Meta CAPI] META_CAPI_WEBHOOK_SECRET is not configured — rejecting request");
+    return NextResponse.json(
+      { error: "Webhook secret not configured" },
+      { status: 503 },
+    );
+  }
+
   // Read raw body for HMAC verification
   const body = await req.text();
 
   // HMAC-SHA256 signature verification (Meta's x-hub-signature-256 header)
-  const webhookSecret = getMetaWebhookSecret();
-  if (webhookSecret) {
-    const signature = req.headers.get("x-hub-signature-256");
-    if (!signature) {
-      console.error("[Meta CAPI] Missing x-hub-signature-256 header");
-      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
-    }
+  const signature = req.headers.get("x-hub-signature-256");
+  if (!signature) {
+    console.error("[Meta CAPI] Missing x-hub-signature-256 header");
+    return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+  }
 
-    const expectedSig = "sha256=" + crypto
-      .createHmac("sha256", webhookSecret)
-      .update(body)
-      .digest("hex");
-    const sigBuf = Buffer.from(signature, "utf8");
-    const expBuf = Buffer.from(expectedSig, "utf8");
-    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
-      console.error("[Meta CAPI] Invalid webhook signature");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    }
-  } else {
-    console.error("[Meta CAPI] WARNING: META_CAPI_WEBHOOK_SECRET not set — skipping signature verification");
+  const expectedSig = "sha256=" + crypto
+    .createHmac("sha256", webhookSecret)
+    .update(body)
+    .digest("hex");
+  const sigBuf = Buffer.from(signature, "utf8");
+  const expBuf = Buffer.from(expectedSig, "utf8");
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+    console.error("[Meta CAPI] Invalid webhook signature");
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   try {

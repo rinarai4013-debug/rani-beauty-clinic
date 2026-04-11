@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 interface ClientPreferenceFields {
   'Client': string;
@@ -55,6 +56,29 @@ export async function GET(req: NextRequest) {
     };
 
     cache.set(cacheKey, result, TTL.RELAXED);
+
+    // HIPAA §164.312(b): communications preferences expose contact
+    // info (email/phone) for a single client (when ?clientId= is
+    // passed) or the entire list. Log as a targeted access when
+    // individual, aggregate when listing.
+    if (clientId && preferences[0]) {
+      logPhiAccessFromRequest(req, session, {
+        patientId: clientId,
+        patientName: preferences[0].name || 'Unknown',
+        action: 'view',
+        dataCategory: 'demographics',
+        details: 'Communications preferences — contact info lookup',
+      });
+    } else {
+      logPhiAccessFromRequest(req, session, {
+        patientId: '__LIST__',
+        patientName: `Communications preferences list (${preferences.length} clients)`,
+        action: 'view',
+        dataCategory: 'demographics',
+        details: 'Communications preferences list view',
+      });
+    }
+
     return NextResponse.json(result);
   } catch (err) {
     console.error('[dashboard/communications/preferences]', err);

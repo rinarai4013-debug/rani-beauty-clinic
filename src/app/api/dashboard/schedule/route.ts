@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import type { AppointmentItem } from '@/types/dashboard';
 
 interface AppointmentFields {
@@ -114,6 +115,20 @@ export async function GET(request: NextRequest) {
     };
 
     cache.set(cacheKey, data, TTL.REALTIME);
+
+    // HIPAA §164.312(b): today's schedule exposes appointment metadata
+    // for every client seen today. Aggregate log entry — the Client
+    // names aren't included in the response payload yet (they default
+    // to 'Walk-in' due to a pending linked-record lookup), but this
+    // gets the audit trail in place for when the lookup is wired.
+    logPhiAccessFromRequest(request, session, {
+      patientId: '__LIST__',
+      patientName: `Today's schedule (${today.length} appointments)`,
+      action: 'view',
+      dataCategory: 'treatment_records',
+      details: `Schedule view — ${filledSlots} filled, ${noShows} no-shows, ${cancellations} cancelled`,
+    });
+
     return NextResponse.json(data);
   } catch (error) {
     console.error('Schedule route error:', error);

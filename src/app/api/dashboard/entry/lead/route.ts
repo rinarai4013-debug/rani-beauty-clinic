@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, createRecord } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
 const LeadSchema = z.object({
   firstName: z.string().min(1),
@@ -26,14 +27,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
   }
 
+  const clientName = `${parsed.data.firstName} ${parsed.data.lastName}`.trim();
+
   try {
     const recordId = await createRecord(Tables.clients(), {
-      Client: `${parsed.data.firstName} ${parsed.data.lastName}`.trim(),
+      Client: clientName,
       Email: parsed.data.email ?? '',
       Phone: parsed.data.phone ?? '',
       Status: 'New Lead',
     });
     cache.invalidate('leads');
+
+    // HIPAA §164.312(b): a new client record is a PHI create action.
+    // Log name + the patient ID returned by Airtable for audit reconstruction.
+    logPhiAccessFromRequest(request, session, {
+      patientId: recordId,
+      patientName: clientName,
+      action: 'create',
+      dataCategory: 'demographics',
+      details: `Manual lead entry — email=${parsed.data.email ? 'yes' : 'no'} phone=${parsed.data.phone ? 'yes' : 'no'}`,
+    });
+
     return NextResponse.json({ success: true, recordId });
   } catch (error) {
     console.error('[entry/lead]', error);

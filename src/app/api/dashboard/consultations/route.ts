@@ -18,6 +18,7 @@ import { getAllSessionsAsync } from '@/lib/mastermind/session';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { unauthorized } from '@/lib/auth/middleware';
 import { apiSuccess, apiError } from '@/lib/mastermind/api-helpers';
+import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import type { MastermindSession, ClinicStatus, ActivityLogEntry, ProviderReviewState, MastermindPhase } from '@/types/mastermind';
 import type { UnifiedConsultation } from '@/types/consultations';
 
@@ -348,6 +349,20 @@ export async function GET(request: NextRequest) {
     const all = [...msConsultations, ...intakeConsultations].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+
+    // HIPAA §164.312(b): consultations list exposes every patient
+    // who has ever filled out an intake or started a mastermind
+    // session, including name + email + phone + chief concern +
+    // AI-generated treatment plan. Aggregate log entry for the list
+    // view — individual consultation detail views would need their
+    // own per-session log when those endpoints are wired.
+    logPhiAccessFromRequest(request, authSession, {
+      patientId: '__LIST__',
+      patientName: `Consultations list (${all.length} entries: ${msConsultations.length} mastermind + ${intakeConsultations.length} intakes)`,
+      action: 'view',
+      dataCategory: 'treatment_records',
+      details: 'Unified consultation pipeline view',
+    });
 
     return apiSuccess(all);
   } catch (error) {
