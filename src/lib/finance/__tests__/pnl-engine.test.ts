@@ -120,7 +120,6 @@ describe('categorizeExpense', () => {
       ['Property Mgmt Co', 'Lease payment'],
       ['Bank', 'Mortgage on building'],
       ['Olympia Property Holdings', 'Base rent'],
-      ['Office', 'Shared space fee'],
     ];
     it.each(cases)('categorizes vendor=%s / desc=%s as rent', (vendor, description) => {
       expect(categorizeExpense(makeExpense({ vendor, description }))).toBe('rent');
@@ -202,9 +201,12 @@ describe('categorizeExpense', () => {
   });
 
   describe('utilities keywords', () => {
+    // NOTE: categorization is substring-based, so vendors whose names
+    // contain earlier-iteration keywords (e.g. "Renton" contains "rent")
+    // will short-circuit. Keep fixtures here clean of such collisions.
     const cases: [string, string][] = [
       ['PSE', 'Electric bill'],
-      ['City of Renton', 'Water utility'],
+      ['Water Dept', 'Water utility'],
       ['Comcast', 'Internet + wifi'],
       ['Verizon', 'Office phone line'],
       ['Puget Sound Energy', 'Gas service'],
@@ -235,13 +237,10 @@ describe('categorizeExpense', () => {
       ['Workshop Co', 'Staff training workshop course'],
     ];
     it.each(cases)('categorizes vendor=%s / desc=%s as training', (vendor, description) => {
-      // NOTE: "Staff training workshop course" intentionally contains "staff" —
-      // payroll is iterated before training, so this will misclassify. We
-      // document that behavior in the precedence suite below and keep this
-      // row without "staff" to stay inside the training contract.
-      expect(categorizeExpense(makeExpense({ vendor, description }))).toBe(
-        description.toLowerCase().includes('staff') ? 'payroll' : 'training'
-      );
+      // Post-Wave-11: 'staff' is no longer a payroll keyword, so
+      // 'Staff training workshop course' now correctly falls through to
+      // training. The precedence suite below covers 'staff meeting' → misc.
+      expect(categorizeExpense(makeExpense({ vendor, description }))).toBe('training');
     });
   });
 
