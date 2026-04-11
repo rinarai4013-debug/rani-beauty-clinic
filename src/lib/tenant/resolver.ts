@@ -11,6 +11,7 @@
  */
 
 import { type TenantConfig, DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from './config';
+import { getPlatformDomains } from './env';
 
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
@@ -333,7 +334,9 @@ export function setTenantStore(store: TenantStore): void {
 
 // ─── Resolution Functions ───────────────────────────────────────────────────
 
-const PLATFORM_DOMAINS = ['ranios.com', 'ranios.dev', 'localhost'];
+// Platform domains are read from env at call time (see ./env.ts) so tests,
+// dev, and prod can override without touching this module. The default
+// fallback matches the prior hardcoded list.
 
 /**
  * Extract subdomain from hostname.
@@ -344,8 +347,9 @@ const PLATFORM_DOMAINS = ['ranios.com', 'ranios.dev', 'localhost'];
 export function extractSubdomain(hostname: string): string | null {
   // Strip port
   const host = hostname.split(':')[0];
+  const platformDomains = getPlatformDomains();
 
-  for (const domain of PLATFORM_DOMAINS) {
+  for (const domain of platformDomains) {
     if (host === domain) return null; // bare platform domain
     if (host.endsWith(`.${domain}`)) {
       const sub = host.slice(0, -(domain.length + 1));
@@ -363,7 +367,8 @@ export function extractSubdomain(hostname: string): string | null {
  */
 export function isCustomDomain(hostname: string): boolean {
   const host = hostname.split(':')[0];
-  for (const domain of PLATFORM_DOMAINS) {
+  const platformDomains = getPlatformDomains();
+  for (const domain of platformDomains) {
     if (host === domain || host.endsWith(`.${domain}`)) return false;
   }
   // Must contain a dot (actual domain, not 'localhost')
