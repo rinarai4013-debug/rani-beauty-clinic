@@ -36,6 +36,7 @@ vi.mock('@/lib/logging/structured-logger', () => ({
 vi.mock('@/lib/sentry-utils', () => ({
   captureWebhookEvent: vi.fn(),
   captureCheckoutEvent: vi.fn(),
+  withSentry: vi.fn((_name: string, handler: () => Promise<unknown>) => handler()),
 }));
 
 vi.mock('@/lib/airtable/client', () => {
@@ -55,15 +56,29 @@ vi.mock('@/lib/airtable/client', () => {
       memberships: mockTable,
       alerts: mockTable,
       intakes: mockTable,
+      treatmentPlans: mockTable,
     },
     rateLimitedQuery: (...args: unknown[]) => mockRateLimitedQuery(...args),
     fetchAll: (...args: unknown[]) => mockFetchAll(...args),
+    fetchFirst: vi.fn().mockResolvedValue([]),
+    updateRecord: vi.fn().mockResolvedValue(undefined),
   };
 });
 
 vi.mock('@/lib/airtable/sanitize', () => ({
   sanitizeFormulaValue: vi.fn((v: string) => v),
 }));
+
+vi.mock('@/lib/airtable/tables', () => {
+  // Return a Proxy so any FIELDS.x.y access returns a stable string
+  const fieldProxy = new Proxy({} as Record<string, string>, {
+    get: (_target, prop: string) => prop,
+  });
+  const fieldsProxy = new Proxy({} as Record<string, Record<string, string>>, {
+    get: () => fieldProxy,
+  });
+  return { FIELDS: fieldsProxy };
+});
 
 vi.mock('@/lib/cache', () => ({
   cache: {
@@ -408,35 +423,48 @@ describe('POST /api/webhooks/stripe', () => {
 // ---------------------------------------------------------------------------
 
 describe('POST /api/webhooks/cherry', () => {
+  const CHERRY_SECRET = 'cherry_test_secret_123';
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.CHERRY_WEBHOOK_SECRET = CHERRY_SECRET;
   });
 
   async function sendCherryWebhook(event: string, data: Record<string, unknown>) {
+    const payload = JSON.stringify({ event, data });
+    const signature = await hmacSha256(CHERRY_SECRET, payload);
+
     const req = new Request('http://localhost:3000/api/webhooks/cherry', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
         'x-forwarded-for': '10.0.0.1',
+        'x-webhook-signature': signature,
       },
-      body: JSON.stringify({ event, data }),
+      body: payload,
     });
 
     const { POST } = await import('@/app/api/webhooks/cherry/route');
     return POST(req as any);
   }
 
-  it('should acknowledge malformed payloads with a 200 warning response', async () => {
+  it('should reject malformed payloads with 422', async () => {
+    const payload = 'not valid json!!!';
+    const signature = await hmacSha256(CHERRY_SECRET, payload);
+
     const req = new Request('http://localhost:3000/api/webhooks/cherry', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.0.0.2' },
-      body: JSON.stringify({ event: 'test', data: {} }),
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': '10.0.0.2',
+        'x-webhook-signature': signature,
+      },
+      body: payload,
     });
 
     const { POST } = await import('@/app/api/webhooks/cherry/route');
     const response = await POST(req as any);
-    const data = await expectJsonStatus(response, 200);
-    expect(data.received).toBe(true);
+    await expectJsonStatus(response, 422);
   });
 
   it('should handle application_submitted event', async () => {
