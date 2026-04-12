@@ -167,7 +167,10 @@ describe('Revenue Gap Finder', () => {
       }
     });
 
-    // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
+    // SKIP: TZ-dependent — production code uses bare-date parsing (new Date("YYYY-MM-DD")
+    // = UTC midnight) then getDay() in local TZ, causing day-of-week mismatch between
+    // the test guard (which uses T00:00:00 local) and the production logic. Cannot fix
+    // without modifying production date parsing to use UTC consistently.
     it.skip('should detect gaps between appointments', () => {
       const tomorrow = makeDate(1);
       const dow = new Date(tomorrow + 'T00:00:00').getDay();

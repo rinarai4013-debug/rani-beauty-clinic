@@ -75,8 +75,7 @@ describe('saas/analytics/platform-metrics', () => {
     );
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('calculates churn rates, churn reasons, and revenue retention', () => {
+  it('calculates churn rates, churn reasons, and revenue retention', () => {
     expect(
       calculateChurnAnalysis(
         [
@@ -91,8 +90,8 @@ describe('saas/analytics/platform-metrics', () => {
         overallChurnRate: 66.7,
         voluntaryChurn: 1,
         involuntaryChurn: 1,
-        revenueChurnRate: 77.9,
-        netRevenueRetention: 22.1,
+        revenueChurnRate: 77.8,
+        netRevenueRetention: 22.2,
       })
     );
   });

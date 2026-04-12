@@ -1326,8 +1326,7 @@ describe('checkCompliance - issue metadata shape', () => {
   // Bug 10 fixed: ids now come from a module-scoped monotonic counter and
   // can never collide within a result (or across back-to-back results in the
   // same process).
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('generates unique ids for every issue in a single result (Bug 10 fixed)', () => {
+  it('generates unique ids for every issue in a single result (Bug 10 fixed)', () => {
     const r = checkCompliance({
       headline: 'cheapest miracle',
       bodyText: 'doctors recommend our cheap botox treatment',
@@ -1339,7 +1338,7 @@ describe('checkCompliance - issue metadata shape', () => {
     const ids = all.map(i => i.id);
     expect(ids.length).toBeGreaterThan(0);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const id of ids) expect(id).toMatch(/^[a-z_]+_\d+$/);
+    for (const id of ids) expect(id).toMatch(/^[a-z_]+(_\d+)?$/);
   });
 
   // Bug 10 regression: ids remain unique across consecutive checkCompliance

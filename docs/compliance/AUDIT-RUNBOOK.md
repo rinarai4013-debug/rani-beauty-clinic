@@ -25,6 +25,7 @@
 11. [Known gaps and open risks](#known-gaps-and-open-risks)
 12. [Quarterly self-audit schedule](#quarterly-self-audit-schedule)
 13. [Incident response](#incident-response)
+14. [Daily ops — compliance persistence check](#daily-ops--compliance-persistence-check)
 
 ---
 
@@ -742,3 +743,57 @@ Keep this updated with every interaction with an inspector, regulator, or attorn
 **Next review due:** 2026-07-10 (quarterly)
 **Questions?** Sukhi / Rina / healthcare attorney
 **Maintained by:** engineering team, updated as compliance engine + business practices evolve
+
+---
+
+## Daily ops — compliance persistence check
+
+The compliance persistence adapter (`src/lib/compliance/persistence.ts`) writes PHI access logs, breach records, BAA status, and training records to Airtable. It ships **disabled by default** — the adapter no-ops until the required tables are provisioned and `COMPLIANCE_PERSISTENCE_ENABLED=1` is set in production.
+
+### Automated readiness check
+
+Run the check script daily (or as a cron) to verify the persistence infrastructure is operational:
+
+```bash
+node scripts/compliance/check-persistence-ready.mjs
+```
+
+**Exit code 0:** all 4 tables exist and the adapter can write to them.
+**Exit code 1:** one or more tables missing or inaccessible — audit data is NOT being retained.
+
+The script checks:
+1. `COMPLIANCE_PERSISTENCE_ENABLED` env var is set to `1`
+2. `AIRTABLE_PAT` and `AIRTABLE_BASE_ID` (or `COMPLIANCE_BASE_ID`) are set
+3. Each of the 4 required tables exists and is accessible
+4. Critical fields are present in each table (spot-check via first record)
+
+### Required tables
+
+| Table | Retention | Key fields |
+|---|---|---|
+| `PHI Access Log` | 6 years (§164.530(j)) | Log ID, Timestamp, User ID, Action, Patient ID |
+| `HIPAA Breaches` | Indefinite (life of entity) | Breach ID, Discovery Date, Description, Severity, Status |
+| `BAAs` | 6 years after termination (§164.504(e)) | BAA ID, Vendor Name, Effective Date, Status |
+| `HIPAA Training` | 6 years from completion (§164.530(j)) | Training ID, Staff Name, Training Type, Completed Date, Passed |
+
+### Provisioning steps
+
+1. Open the Airtable base (`AIRTABLE_BASE_ID`)
+2. Create each table with the exact field names listed above (field types are documented in `src/lib/compliance/persistence.ts`)
+3. Run the readiness check to verify: `node scripts/compliance/check-persistence-ready.mjs`
+4. Once all 4 tables pass: `vercel env add COMPLIANCE_PERSISTENCE_ENABLED production` → set to `1`
+5. The adapter starts writing on the next deployment — no code change needed
+
+### Morning check (add to daily routine)
+
+```bash
+# Run from repo root — takes ~5 seconds
+node scripts/compliance/check-persistence-ready.mjs
+# If exit code is 0: data is being retained ✅
+# If exit code is 1: investigate immediately — PHI audit trail has a gap ❌
+```
+
+If the check fails, the most common causes are:
+- A table was accidentally deleted or renamed in Airtable
+- The `AIRTABLE_PAT` token expired or was rotated without updating Vercel
+- `COMPLIANCE_PERSISTENCE_ENABLED` was removed during a Vercel env cleanup

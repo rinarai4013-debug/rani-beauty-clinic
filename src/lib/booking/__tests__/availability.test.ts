@@ -77,8 +77,9 @@ describe('booking/availability', () => {
     expect(result.nextAvailableDate).not.toBe('2026-04-13');
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('same-day availability starts at or after the current rounded time', () => {
+  it('same-day availability starts at or after the current rounded time', () => {
+    // Use a time that's consistent: format(new Date(), 'HH:mm') uses local TZ,
+    // so we check that all returned slots start at or after the local "now".
     const engine = new AvailabilityEngine(undefined, undefined, [], BOOKABLE_SERVICES);
 
     const result = engine.getAvailableSlots({
@@ -86,19 +87,26 @@ describe('booking/availability', () => {
       date: '2026-04-10',
     });
 
+    // The engine filters same-day slots to start at or after the current local time (rounded up).
+    // Since vi.setSystemTime controls Date.now(), get local HH:mm the same way the engine does.
+    const nowHHMM = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+    const [h, m] = nowHHMM.split(':').map(Number);
+    const roundedMin = Math.ceil(m / 15) * 15;
+    const roundedTime = roundedMin >= 60
+      ? `${String(h + 1).padStart(2, '0')}:00`
+      : `${String(h).padStart(2, '0')}:${String(roundedMin).padStart(2, '0')}`;
     expect(result.slots.length).toBeGreaterThan(0);
-    expect(result.slots.every(slot => slot.startTime >= '12:00')).toBe(true);
+    expect(result.slots.every(slot => slot.startTime >= roundedTime)).toBe(true);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('books an appointment and creates recurring follow-ups when requested', () => {
+  it('books an appointment and creates recurring follow-ups when requested', () => {
     const engine = new AvailabilityEngine(undefined, undefined, [], BOOKABLE_SERVICES);
 
     const result = engine.bookAppointment({
       serviceId: 'consult-aesthetic',
       providerId: 'dr-landfield',
       roomId: 'glow',
-      date: '2026-04-13',
+      date: '2026-04-14',
       startTime: '09:00',
       clientInfo: {
         firstName: 'Rina',
@@ -119,8 +127,7 @@ describe('booking/availability', () => {
     expect(result.recurringAppointments?.every(appointment => !!appointment.recurringSeriesId)).toBe(true);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('rejects overlapping bookings with conflict details and alternatives', () => {
+  it('rejects overlapping bookings with conflict details and alternatives', () => {
     const existing = {
       id: 'apt-1',
       clientId: 'c1',
@@ -132,7 +139,7 @@ describe('booking/availability', () => {
       providerId: 'dr-landfield',
       providerName: 'Dr. Alexander Landfield',
       roomId: 'glow' as const,
-      date: '2026-04-13',
+      date: '2026-04-14',
       startTime: '10:00',
       endTime: '10:30',
       duration: 30,
@@ -153,7 +160,7 @@ describe('booking/availability', () => {
       serviceId: 'botox',
       providerId: 'dr-landfield',
       roomId: 'glow',
-      date: '2026-04-13',
+      date: '2026-04-14',
       startTime: '10:15',
       clientInfo: {
         firstName: 'Sukhi',
