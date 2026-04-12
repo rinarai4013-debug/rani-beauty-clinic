@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildRAGContext } from '@/lib/rag/knowledge-base';
 import { RANI_SYSTEM_PROMPT } from '@/lib/voice/rani-voice';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']).default('user'),
@@ -14,6 +15,7 @@ const ChatSchema = z.object({
   messages: z.array(MessageSchema).min(1),
   visitorInfo: z.record(z.string(), z.unknown()).optional(),
 });
+const MAX_CHAT_BODY_BYTES = 256 * 1024; // 256 KB
 
 function extractLeadInfo(text: string): { email?: string; phone?: string } | undefined {
   const email = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0];
@@ -42,6 +44,12 @@ export async function POST(req: NextRequest) {
   const ip = getClientIP(req);
   const { allowed, resetIn } = rateLimit('ai', ip, RATE_LIMITS.AI);
   if (!allowed) return rateLimitResponse(resetIn);
+
+  const originViolation = enforceAllowedPublicOrigin(req);
+  if (originViolation) return originViolation;
+
+  const sizeViolation = enforceContentLength(req, MAX_CHAT_BODY_BYTES);
+  if (sizeViolation) return sizeViolation;
 
   let body: unknown;
   try {

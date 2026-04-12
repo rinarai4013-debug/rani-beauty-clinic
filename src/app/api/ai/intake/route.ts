@@ -4,10 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 
 const IntakeSchema = z.object({
   intakeData: z.record(z.string(), z.unknown()),
 });
+const MAX_INTAKE_BODY_BYTES = 256 * 1024; // 256 KB
 
 const FALLBACK_INTELLIGENCE = {
   summary: 'New client inquiry captured. Review goals and recommend the best starter treatment.',
@@ -29,6 +31,12 @@ export async function POST(req: NextRequest) {
   const ip = getClientIP(req);
   const { allowed, resetIn } = rateLimit('ai-intake', ip, RATE_LIMITS.AI);
   if (!allowed) return rateLimitResponse(resetIn);
+
+  const originViolation = enforceAllowedPublicOrigin(req);
+  if (originViolation) return originViolation;
+
+  const sizeViolation = enforceContentLength(req, MAX_INTAKE_BODY_BYTES);
+  if (sizeViolation) return sizeViolation;
 
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

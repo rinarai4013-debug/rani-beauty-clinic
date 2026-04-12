@@ -4,6 +4,12 @@ const rateLimitMock = vi.fn();
 const rateLimitResponseMock = vi.fn((resetIn: number) =>
   new Response(JSON.stringify({ error: 'Too many requests', resetIn }), { status: 429 }),
 );
+const sharpMock = vi.fn().mockImplementation(() => ({
+  metadata: vi.fn().mockResolvedValue({ width: 100, height: 100 }),
+  resize: vi.fn().mockReturnThis(),
+  jpeg: vi.fn().mockReturnThis(),
+  toBuffer: vi.fn().mockResolvedValue(Buffer.from('image')),
+}));
 
 vi.mock('@/lib/rate-limit', () => ({
   rateLimit: (...args: unknown[]) => rateLimitMock(...args),
@@ -12,6 +18,10 @@ vi.mock('@/lib/rate-limit', () => ({
   RATE_LIMITS: {
     FORM: { limit: 5, windowMs: 60_000 },
   },
+}));
+
+vi.mock('sharp', () => ({
+  default: (...args: unknown[]) => sharpMock(...args),
 }));
 
 describe('POST /api/photo/upload', () => {

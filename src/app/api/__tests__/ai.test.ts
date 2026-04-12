@@ -127,6 +127,32 @@ describe('POST /api/ai/chat', () => {
     await expectBadRequest(response);
   });
 
+  it('should return 403 for disallowed browser origins', async () => {
+    const { POST } = await import('@/app/api/ai/chat/route');
+    const req = buildPostRequest('/api/ai/chat', {
+      messages: [{ role: 'user', content: 'Tell me about HydraFacial' }],
+    }, {
+      origin: 'https://evil.example.com',
+      'x-forwarded-for': '10.0.0.90',
+    });
+
+    const response = await POST(req as any);
+    expect(response.status).toBe(403);
+  });
+
+  it('should return 413 when request body exceeds max size', async () => {
+    const { POST } = await import('@/app/api/ai/chat/route');
+    const req = buildPostRequest('/api/ai/chat', {
+      messages: [{ role: 'user', content: 'Tell me about HydraFacial' }],
+    }, {
+      'content-length': String(300 * 1024),
+      'x-forwarded-for': '10.0.0.91',
+    });
+
+    const response = await POST(req as any);
+    expect(response.status).toBe(413);
+  });
+
   it('should return fallback when API key is missing', async () => {
     delete process.env.ANTHROPIC_API_KEY;
 
@@ -249,6 +275,32 @@ describe('POST /api/ai/recommend', () => {
     await expectBadRequest(response);
   });
 
+  it('should return 403 for disallowed browser origins', async () => {
+    const { POST } = await import('@/app/api/ai/recommend/route');
+    const req = buildPostRequest('/api/ai/recommend', {
+      primaryGoal: 'glowing-skin',
+    }, {
+      origin: 'https://evil.example.com',
+      'x-forwarded-for': '10.0.0.92',
+    });
+
+    const response = await POST(req as any);
+    expect(response.status).toBe(403);
+  });
+
+  it('should return 413 when request body exceeds max size', async () => {
+    const { POST } = await import('@/app/api/ai/recommend/route');
+    const req = buildPostRequest('/api/ai/recommend', {
+      primaryGoal: 'glowing-skin',
+    }, {
+      'content-length': String(80 * 1024),
+      'x-forwarded-for': '10.0.0.93',
+    });
+
+    const response = await POST(req as any);
+    expect(response.status).toBe(413);
+  });
+
   it('should return static recommendation when API key is missing', async () => {
     delete process.env.ANTHROPIC_API_KEY;
     vi.resetModules();
@@ -344,6 +396,34 @@ describe('POST /api/ai/intake', () => {
     const req = buildPostRequest('/api/ai/intake', {});
     const response = await POST(req as any);
     await expectBadRequest(response);
+  });
+
+  it('should return 403 for disallowed browser origins', async () => {
+    mockGetSession.mockResolvedValue(CEO_SESSION);
+    mockHasPermission.mockReturnValue(true);
+
+    const { POST } = await import('@/app/api/ai/intake/route');
+    const req = buildPostRequest('/api/ai/intake', { intakeData: { firstName: 'Jane' } }, {
+      origin: 'https://evil.example.com',
+      'x-forwarded-for': '10.0.0.94',
+    });
+    const response = await POST(req as any);
+
+    expect(response.status).toBe(403);
+  });
+
+  it('should return 413 when request body exceeds max size', async () => {
+    mockGetSession.mockResolvedValue(CEO_SESSION);
+    mockHasPermission.mockReturnValue(true);
+
+    const { POST } = await import('@/app/api/ai/intake/route');
+    const req = buildPostRequest('/api/ai/intake', { intakeData: { firstName: 'Jane' } }, {
+      'content-length': String(300 * 1024),
+      'x-forwarded-for': '10.0.0.95',
+    });
+    const response = await POST(req as any);
+
+    expect(response.status).toBe(413);
   });
 
   it('should return 503 when API key is missing', async () => {
