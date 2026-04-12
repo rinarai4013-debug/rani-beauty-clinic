@@ -4,11 +4,13 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { recommendNextTreatment } from '@/lib/recommendations/engine';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return withSentry('dashboard/clients/[id]/recommend', async () => {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!hasPermission(session.role, 'view_clients')) {
@@ -63,4 +65,5 @@ export async function GET(
     console.error('[clients/recommend]', error);
     return NextResponse.json({ error: 'Failed to generate recommendations' }, { status: 500 });
   }
+  });
 }

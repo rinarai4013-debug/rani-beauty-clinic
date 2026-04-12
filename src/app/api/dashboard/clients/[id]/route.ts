@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface AppointmentFields {
   'Service Name': string;
@@ -55,6 +56,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return withSentry('dashboard/clients/[id]', async () => {
   try {
     const session = await getSession();
     if (!session) {
@@ -231,4 +233,5 @@ export async function GET(
     console.error('Error fetching client:', error);
     return NextResponse.json({ error: 'Failed to fetch client' }, { status: 500 });
   }
+  });
 }

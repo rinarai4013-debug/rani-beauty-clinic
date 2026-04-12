@@ -53,8 +53,10 @@ vi.mock('@/lib/airtable/client', () => ({
   rateLimitedQuery: (...args: unknown[]) => mockRateLimitedQuery(...args),
 }));
 
+const mockSanitizeFormulaValue = vi.fn((v: string) => v);
+
 vi.mock('@/lib/airtable/sanitize', () => ({
-  sanitizeFormulaValue: vi.fn((v: string) => v),
+  sanitizeFormulaValue: (...args: unknown[]) => mockSanitizeFormulaValue(...args),
 }));
 
 vi.mock('@/lib/cache', () => ({
@@ -63,6 +65,10 @@ vi.mock('@/lib/cache', () => ({
     set: (...args: unknown[]) => mockCacheSet(...args),
   },
   TTL: { REALTIME: 15, STANDARD: 30, MODERATE: 60, RELAXED: 120 },
+}));
+
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
 }));
 
 vi.mock('@/lib/churn/engine', () => ({
@@ -77,13 +83,15 @@ vi.mock('@/lib/churn/engine', () => ({
   }),
 }));
 
+const mockRecommendNextTreatment = vi.fn().mockReturnValue({
+  recommendations: [
+    { service: 'RF Microneedling', reason: 'Next in pathway', confidence: 85, estimatedPrice: 495 },
+  ],
+  strategies: ['pathway'],
+});
+
 vi.mock('@/lib/recommendations/engine', () => ({
-  recommendNextTreatment: vi.fn().mockReturnValue({
-    recommendations: [
-      { service: 'RF Microneedling', reason: 'Next in pathway', confidence: 85, estimatedPrice: 495 },
-    ],
-    strategies: ['pathway'],
-  }),
+  recommendNextTreatment: (...args: unknown[]) => mockRecommendNextTreatment(...args),
 }));
 
 // ---------------------------------------------------------------------------
@@ -165,6 +173,18 @@ describe('GET /api/dashboard/clients', () => {
 
     expect(data.clients).toHaveLength(1);
     expect(mockFetchAll).toHaveBeenCalled();
+  });
+
+  it('should sanitize status filter before building Airtable formula', async () => {
+    setupAuthCEO();
+    mockFetchAll.mockResolvedValue([]);
+
+    const { GET } = await import('@/app/api/dashboard/clients/route');
+    const req = buildGetRequest('/api/dashboard/clients', { status: "' OR TRUE() OR '" });
+    const response = await GET(req as any);
+
+    expect(response.status).toBe(200);
+    expect(mockSanitizeFormulaValue).toHaveBeenCalledWith("' OR TRUE() OR '");
   });
 
   it('should return cached data when available', async () => {
@@ -368,6 +388,14 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     await expectUnauthorized(response);
   });
 
+  it('should return 403 when lacking permission', async () => {
+    setupNoPermission();
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    await expectForbidden(response);
+  });
+
   it('should return churn prediction data', async () => {
     setupAuthCEO();
     mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
@@ -405,6 +433,48 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
 
     expect(data).toEqual(cached);
   });
+
+  it('should still return churn prediction when linked record fetches fail', async () => {
+    setupAuthCEO();
+    mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
+    mockFetchAll.mockRejectedValue(new Error('Linked fetch failed'));
+
+    const { Tables } = await import('@/lib/airtable/client');
+    (Tables.clients as any).mockReturnValue({
+      find: vi.fn().mockResolvedValue({
+        id: 'rec001',
+        fields: {
+          Client: 'Recovery Client',
+          Status: 'Active',
+          Appointments: ['apt_001'],
+          Transactions: ['tx_001'],
+          Memberships: ['mem_001'],
+          'Messages Log': ['msg_001'],
+        },
+      }),
+    });
+
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('score');
+    expect(data.clientName).toBe('Recovery Client');
+  });
+
+  it('should return 500 when client lookup fails', async () => {
+    setupAuthCEO();
+    mockRateLimitedQuery.mockImplementation(() => {
+      throw new Error('Find failed');
+    });
+
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    await expectServerError(response);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -423,6 +493,14 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
     const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
     await expectUnauthorized(response);
+  });
+
+  it('should return 403 when lacking permission', async () => {
+    setupNoPermission();
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    await expectForbidden(response);
   });
 
   it('should return treatment recommendations', async () => {
@@ -446,6 +524,36 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('recommendations');
     expect(data).toHaveProperty('strategies');
+  });
+
+  it('should normalize legacy engine output shape', async () => {
+    setupAuthCEO();
+    mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
+    mockFetchAll.mockResolvedValue([]);
+
+    const { Tables } = await import('@/lib/airtable/client');
+    (Tables.clients as any).mockReturnValue({
+      find: vi.fn().mockResolvedValue({
+        id: 'rec001',
+        fields: { Appointments: [] },
+      }),
+    });
+
+    mockRecommendNextTreatment.mockReturnValueOnce({
+      primary: { service: 'HydraFacial', reason: 'Primary', confidence: 88, estimatedPrice: 299 },
+      alternatives: [{ service: 'Peel', reason: 'Alt', confidence: 70, estimatedPrice: 199 }],
+      insights: ['membership-match'],
+    });
+
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.recommendations).toHaveLength(2);
+    expect(data.recommendations[0].service).toBe('HydraFacial');
+    expect(data.strategies).toEqual(['membership-match']);
   });
 
   it('should return 500 on engine error', async () => {
@@ -483,6 +591,20 @@ describe('GET /api/dashboard/clients/at-risk', () => {
     const { GET } = await import('@/app/api/dashboard/clients/at-risk/route');
     const response = await GET();
     await expectForbidden(response);
+  });
+
+  it('should return cached at-risk payload when available', async () => {
+    setupAuthCEO();
+    const cached = { clients: [{ id: 'cached_1', urgency: 'critical' }], total: 1, breakdown: { churned: 1 } };
+    mockCacheGet.mockReturnValue(cached);
+
+    const { GET } = await import('@/app/api/dashboard/clients/at-risk/route');
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toEqual(cached);
+    expect(mockFetchAll).not.toHaveBeenCalled();
   });
 
   it('should return at-risk clients sorted by urgency', async () => {
@@ -543,5 +665,14 @@ describe('GET /api/dashboard/clients/at-risk', () => {
     await GET();
 
     expect(mockCacheSet).toHaveBeenCalledWith('clients-at-risk', expect.any(Object), expect.any(Number));
+  });
+
+  it('should return 500 when Airtable lookup fails', async () => {
+    setupAuthCEO();
+    mockFetchAll.mockRejectedValue(new Error('Airtable unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/clients/at-risk/route');
+    const response = await GET();
+    await expectServerError(response);
   });
 });

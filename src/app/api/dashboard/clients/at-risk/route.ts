@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 
 const urgencyMap: Record<string, 'critical' | 'medium' | 'low'> = {
   Churned: 'critical',
@@ -13,6 +14,7 @@ const urgencyMap: Record<string, 'critical' | 'medium' | 'low'> = {
 };
 
 export async function GET(request: NextRequest) {
+  return withSentry('dashboard/clients/at-risk', async () => {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!hasPermission(session.role, 'view_clients')) {
@@ -79,4 +81,5 @@ export async function GET(request: NextRequest) {
     console.error('[clients/at-risk]', error);
     return NextResponse.json({ error: 'Failed to load at-risk clients' }, { status: 500 });
   }
+  });
 }

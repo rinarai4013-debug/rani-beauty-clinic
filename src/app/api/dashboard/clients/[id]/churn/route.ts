@@ -5,6 +5,7 @@ import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { predictChurn, ChurnInput } from '@/lib/churn/engine';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface TransactionFields {
   'Date': string;
@@ -31,6 +32,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return withSentry('dashboard/clients/[id]/churn', async () => {
   try {
     const session = await getSession();
     if (!session) {
@@ -159,4 +161,5 @@ export async function GET(
     console.error('Error computing churn prediction:', error);
     return NextResponse.json({ error: 'Failed to compute churn prediction' }, { status: 500 });
   }
+  });
 }
