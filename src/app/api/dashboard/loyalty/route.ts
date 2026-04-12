@@ -14,6 +14,7 @@ import {
   type LoyaltyAnalytics,
 } from '@/lib/loyalty/engine';
 import { getAvailableRewards } from '@/lib/loyalty/rewards';
+import { withSentry } from '@/lib/sentry-utils';
 
 const LoyaltyTierSchema = z.enum(['Silver', 'Gold', 'Platinum']);
 const AwardBonusSchema = z.object({
@@ -44,76 +45,79 @@ const LoyaltyRewardsQuerySchema = z.object({
  *   ?action=rewards&tier=xxx&balance=xxx - Available rewards for tier/balance
  */
 export async function GET(req: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const action = searchParams.get('action') || 'analytics';
-
-    if (action === 'analytics') {
-      const cacheKey = 'loyalty:analytics';
-      const cached = cache.get<LoyaltyAnalytics>(cacheKey);
-      if (cached) return NextResponse.json(cached);
-
-      // In production, these would come from Airtable
-      // For now, return structured mock data that matches the analytics interface
-      const members = generateSampleMembers();
-      const transactions = generateSampleTransactions();
-      const analytics = buildAnalytics(members, transactions);
-
-      cache.set(cacheKey, analytics, TTL.MODERATE);
-      return NextResponse.json(analytics);
-    }
-
-    if (action === 'member') {
-      const clientId = searchParams.get('clientId');
-      if (!clientId) {
-        return NextResponse.json({ error: 'clientId required' }, { status: 400 });
+  return withSentry('dashboard/loyalty', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      // In production: fetch from Airtable Clients + Loyalty Points tables
-      const member = generateSampleMembers().find(m => m.clientId === clientId);
-      if (!member) {
-        return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+      const { searchParams } = new URL(req.url);
+      const action = searchParams.get('action') || 'analytics';
+
+      if (action === 'analytics') {
+        const cacheKey = 'loyalty:analytics';
+        const cached = cache.get<LoyaltyAnalytics>(cacheKey);
+        if (cached) return NextResponse.json(cached);
+
+        // In production, these would come from Airtable
+        // For now, return structured mock data that matches the analytics interface
+        const members = generateSampleMembers();
+        const transactions = generateSampleTransactions();
+        const analytics = buildAnalytics(members, transactions);
+
+        cache.set(cacheKey, analytics, TTL.MODERATE);
+        return NextResponse.json(analytics);
       }
 
-      const tier = determineTier(member.totalPointsEarned);
-      const progress = calculateTierProgress(member.totalPointsEarned);
-      const benefits = getTierBenefits(tier);
-      const rewards = getAvailableRewards(tier, member.currentBalance);
+      if (action === 'member') {
+        const clientId = searchParams.get('clientId');
+        if (!clientId) {
+          return NextResponse.json({ error: 'clientId required' }, { status: 400 });
+        }
 
-      return NextResponse.json({
-        member,
-        tier,
-        progress,
-        benefits,
-        availableRewards: rewards,
-      });
-    }
+        // In production: fetch from Airtable Clients + Loyalty Points tables
+        const member = generateSampleMembers().find(m => m.clientId === clientId);
+        if (!member) {
+          return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+        }
 
-    if (action === 'rewards') {
-      const rewardsQuery = LoyaltyRewardsQuerySchema.safeParse({
-        tier: searchParams.get('tier'),
-        balance: searchParams.get('balance') ?? undefined,
-      });
+        const tier = determineTier(member.totalPointsEarned);
+        const progress = calculateTierProgress(member.totalPointsEarned);
+        const benefits = getTierBenefits(tier);
+        const rewards = getAvailableRewards(tier, member.currentBalance);
 
-      if (!rewardsQuery.success) {
-        return NextResponse.json({ error: 'Invalid rewards query parameters' }, { status: 400 });
+        return NextResponse.json({
+          member,
+          tier,
+          progress,
+          benefits,
+          availableRewards: rewards,
+        });
       }
 
-      const { tier, balance } = rewardsQuery.data;
-      const rewards = getAvailableRewards(tier, balance);
-      return NextResponse.json({ rewards });
+      if (action === 'rewards') {
+        const rewardsQuery = LoyaltyRewardsQuerySchema.safeParse({
+          tier: searchParams.get('tier'),
+          balance: searchParams.get('balance') ?? undefined,
+        });
+
+        if (!rewardsQuery.success) {
+          return NextResponse.json({ error: 'Invalid rewards query parameters' }, { status: 400 });
+        }
+
+        const { tier, balance } = rewardsQuery.data;
+        const rewards = getAvailableRewards(tier, balance);
+        return NextResponse.json({ rewards });
+      }
+
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    } catch (error) {
+      console.error('[Loyalty API] Error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) {
-    console.error('[Loyalty API] Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+  });
 }
 
 /**
@@ -125,51 +129,54 @@ export async function GET(req: NextRequest) {
  *   { action: 'process_spend', clientId: string, amount: number, serviceType: string }
  */
 export async function POST(req: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    if (!hasPermission(session.role, 'entry_sale')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const parsed = LoyaltyPostSchema.safeParse(await req.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-    }
-
-    const { action, clientId } = parsed.data;
-
-    if (action === 'award_bonus') {
-      // In production: fetch member from Airtable, update, save
-      const member = generateSampleMembers().find(m => m.clientId === clientId);
-      if (!member) {
-        return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+  return withSentry('dashboard/loyalty', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const result = awardBonus(member, parsed.data.bonusType);
-      cache.invalidate('loyalty:analytics');
+      if (!hasPermission(session.role, 'entry_sale')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
-      return NextResponse.json({
-        success: true,
-        ...result,
-      });
+      const parsed = LoyaltyPostSchema.safeParse(await req.json().catch(() => null));
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+      }
+
+      const { action, clientId } = parsed.data;
+
+      if (action === 'award_bonus') {
+        // In production: fetch member from Airtable, update, save
+        const member = generateSampleMembers().find(m => m.clientId === clientId);
+        if (!member) {
+          return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+        }
+
+        const result = awardBonus(member, parsed.data.bonusType);
+        cache.invalidate('loyalty:analytics');
+
+        return NextResponse.json({
+          success: true,
+          ...result,
+        });
+      }
+
+      if (action === 'process_spend') {
+        return NextResponse.json(
+          { error: 'process_spend is not implemented yet' },
+          { status: 501 }
+        );
+      }
+
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    } catch (error) {
+      console.error('[Loyalty API] POST Error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
-    if (action === 'process_spend') {
-      return NextResponse.json(
-        { error: 'process_spend is not implemented yet' },
-        { status: 501 }
-      );
-    }
-
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) {
-    console.error('[Loyalty API] POST Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+  });
 }
 
 // ── Sample Data (replace with Airtable queries in production) ────────────

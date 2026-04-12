@@ -5,6 +5,7 @@ import { cache, TTL } from '@/lib/cache';
 import type { AgentId, AgentReport } from '@/types/agent';
 import { AGENT_REGISTRY } from '@/lib/agents/registry';
 import { buildOfflineReport, buildComplianceReport, buildFinanceReport, buildScoredReport } from '@/lib/agents/report-builder';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/agents/[agentId]
@@ -19,47 +20,50 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ agentId: string }> }
 ) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_executive')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/agents/[agentId]', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_executive')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
-    const { agentId } = await params;
+      const { agentId } = await params;
 
-    if (!AGENT_REGISTRY[agentId as AgentId]) {
-      return NextResponse.json({ error: `Unknown agent: ${agentId}` }, { status: 404 });
-    }
+      if (!AGENT_REGISTRY[agentId as AgentId]) {
+        return NextResponse.json({ error: `Unknown agent: ${agentId}` }, { status: 404 });
+      }
 
-    const cacheKey = `agent-report-${agentId}`;
-    const cached = cache.get<AgentReport>(cacheKey);
-    if (cached) {
-      return NextResponse.json({ success: true, data: cached });
-    }
+      const cacheKey = `agent-report-${agentId}`;
+      const cached = cache.get<AgentReport>(cacheKey);
+      if (cached) {
+        return NextResponse.json({ success: true, data: cached });
+      }
 
-    const config = AGENT_REGISTRY[agentId as AgentId];
+      const config = AGENT_REGISTRY[agentId as AgentId];
 
-    // Offline or recommendation-only agents return a default report
-    if (config.status === 'offline' || config.status === 'recommendation-only') {
-      const report = buildOfflineReport(agentId as AgentId);
+      // Offline or recommendation-only agents return a default report
+      if (config.status === 'offline' || config.status === 'recommendation-only') {
+        const report = buildOfflineReport(agentId as AgentId);
+        return NextResponse.json({ success: true, data: report });
+      }
+
+      // Build report by fetching from the agent's internal API routes
+      const report = await buildAgentReport(agentId as AgentId, request);
+
+      cache.set(cacheKey, report, TTL.STANDARD);
       return NextResponse.json({ success: true, data: report });
+    } catch (error) {
+      console.error(`Agent report error:`, error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to build agent report' },
+        { status: 500 }
+      );
     }
 
-    // Build report by fetching from the agent's internal API routes
-    const report = await buildAgentReport(agentId as AgentId, request);
-
-    cache.set(cacheKey, report, TTL.STANDARD);
-    return NextResponse.json({ success: true, data: report });
-  } catch (error) {
-    console.error(`Agent report error:`, error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to build agent report' },
-      { status: 500 }
-    );
-  }
+  });
 }
 
 /**

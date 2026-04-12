@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { withSentry } from '@/lib/sentry-utils';
 
 const RecommendSchema = z.object({
   primaryGoal: z.string().min(1),
@@ -33,65 +34,68 @@ const STATIC_RECOMMENDATION = {
 };
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit('ai-recommend', ip, RATE_LIMITS.AI);
-  if (!allowed) {
-    return rateLimitResponse(resetIn);
-  }
+  return withSentry('ai/recommend', async () => {
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('ai-recommend', ip, RATE_LIMITS.AI);
+    if (!allowed) {
+      return rateLimitResponse(resetIn);
+    }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  const parsed = RecommendSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid request', details: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
-  }
+    const parsed = RecommendSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({
-      recommendation: STATIC_RECOMMENDATION,
-      source: 'static',
-    });
-  }
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json({
+        recommendation: STATIC_RECOMMENDATION,
+        source: 'static',
+      });
+    }
 
-  try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-latest',
-      max_tokens: 700,
-      system: 'Return valid JSON with good, better, best, and personalNote fields for a medspa treatment recommendation.',
-      messages: [
-        {
-          role: 'user',
-          content: JSON.stringify(parsed.data),
-        },
-      ],
-    });
+    try {
+      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const response = await client.messages.create({
+        model: 'claude-3-5-sonnet-latest',
+        max_tokens: 700,
+        system: 'Return valid JSON with good, better, best, and personalNote fields for a medspa treatment recommendation.',
+        messages: [
+          {
+            role: 'user',
+            content: JSON.stringify(parsed.data),
+          },
+        ],
+      });
 
-    const raw = response.content
-      .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
-      .map((block) => block.text)
-      .join('\n')
-      .trim();
+      const raw = response.content
+        .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
+        .map((block) => block.text)
+        .join('\n')
+        .trim();
 
-    const recommendation = JSON.parse(raw);
+      const recommendation = JSON.parse(raw);
 
-    return NextResponse.json({
-      recommendation,
-      source: 'ai',
-    });
-  } catch (error) {
-    console.error('[ai/recommend]', error);
-    return NextResponse.json({
-      recommendation: STATIC_RECOMMENDATION,
-      source: 'static',
-    });
-  }
+      return NextResponse.json({
+        recommendation,
+        source: 'ai',
+      });
+    } catch (error) {
+      console.error('[ai/recommend]', error);
+      return NextResponse.json({
+        recommendation: STATIC_RECOMMENDATION,
+        source: 'static',
+      });
+    }
+
+  });
 }

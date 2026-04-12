@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface AppointmentFields {
   'Service Name': string;
@@ -55,75 +56,76 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_clients')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/clients/[id]', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_clients')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
-    const { id } = await params;
-    const { searchParams } = new URL(request.url);
-    const full = searchParams.get('full') === 'true';
+      const { id } = await params;
+      const { searchParams } = new URL(request.url);
+      const full = searchParams.get('full') === 'true';
 
-    const cacheKey = full ? `client-full-${id}` : `client-${id}`;
-    const cached = cache.get<unknown>(cacheKey);
-    if (cached) {
-      return NextResponse.json(cached);
-    }
+      const cacheKey = full ? `client-full-${id}` : `client-${id}`;
+      const cached = cache.get<unknown>(cacheKey);
+      if (cached) {
+        return NextResponse.json(cached);
+      }
 
-    const record = await rateLimitedQuery(() => Tables.clients().find(id));
+      const record = await rateLimitedQuery(() => Tables.clients().find(id));
 
-    const fullName = (record.fields['Client'] as string) || '';
-    const nameParts = fullName.split(' ');
+      const fullName = (record.fields['Client'] as string) || '';
+      const nameParts = fullName.split(' ');
 
-    // HIPAA §164.312(b): log every PHI access event. The `full=true`
-    // query param expands the fetch to include treatment history,
-    // transactions, memberships, messages, and reviews — a broader
-    // access scope than the basic profile, so we tag it accordingly.
-    logPhiAccessFromRequest(request, session, {
-      patientId: record.id,
-      patientName: fullName,
-      action: 'view',
-      dataCategory: full ? 'treatment_records' : 'demographics',
-      details: full ? '360-profile view (all linked records)' : 'Basic profile view',
-    });
+      // HIPAA §164.312(b): log every PHI access event. The `full=true`
+      // query param expands the fetch to include treatment history,
+      // transactions, memberships, messages, and reviews — a broader
+      // access scope than the basic profile, so we tag it accordingly.
+      logPhiAccessFromRequest(request, session, {
+        patientId: record.id,
+        patientName: fullName,
+        action: 'view',
+        dataCategory: full ? 'treatment_records' : 'demographics',
+        details: full ? '360-profile view (all linked records)' : 'Basic profile view',
+      });
 
-    // Linked record IDs from Airtable
-    const appointmentIds = (record.fields['Appointments'] as string[]) || [];
-    const transactionIds = (record.fields['Transactions'] as string[]) || [];
-    const membershipIds = (record.fields['Memberships'] as string[]) || [];
-    const messageIds = (record.fields['Messages Log'] as string[]) || [];
-    const reviewIds = (record.fields['Reviews'] as string[]) || [];
+      // Linked record IDs from Airtable
+      const appointmentIds = (record.fields['Appointments'] as string[]) || [];
+      const transactionIds = (record.fields['Transactions'] as string[]) || [];
+      const membershipIds = (record.fields['Memberships'] as string[]) || [];
+      const messageIds = (record.fields['Messages Log'] as string[]) || [];
+      const reviewIds = (record.fields['Reviews'] as string[]) || [];
 
-    const client: Record<string, unknown> = {
-      id: record.id,
-      firstName: nameParts[0] || '',
-      lastName: nameParts.slice(1).join(' ') || '',
-      name: fullName,
-      email: (record.fields['Email'] as string) || '',
-      phone: (record.fields['Phone'] as string) || '',
-      status: (record.fields['Status'] as string) || '',
-      preferredContact: (record.fields['Preferred Contact'] as string) || '',
-      source: '',
-      tags: '',
-      valueSegment: '',
-      treatmentTier: '',
-      ltv: 0,
-      visitCount: appointmentIds.length,
-      lastVisitDate: '',
-      daysSinceLastVisit: 0,
-      membershipTier: '',
-      membershipStatus: '',
-      riskFlags: '',
-      providerMatch: '',
-      createdDate: '',
-    };
+      const client: Record<string, unknown> = {
+        id: record.id,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        name: fullName,
+        email: (record.fields['Email'] as string) || '',
+        phone: (record.fields['Phone'] as string) || '',
+        status: (record.fields['Status'] as string) || '',
+        preferredContact: (record.fields['Preferred Contact'] as string) || '',
+        source: '',
+        tags: '',
+        valueSegment: '',
+        treatmentTier: '',
+        ltv: 0,
+        visitCount: appointmentIds.length,
+        lastVisitDate: '',
+        daysSinceLastVisit: 0,
+        membershipTier: '',
+        membershipStatus: '',
+        riskFlags: '',
+        providerMatch: '',
+        createdDate: '',
+      };
 
-    // If full profile requested, fetch linked records
-    if (full) {
+      // If full profile requested, fetch linked records
+      if (full) {
       const [appointments, transactions, memberships, messages, reviews] = await Promise.all([
         appointmentIds.length > 0
           ? fetchAll<AppointmentFields>(Tables.appointments(), {
@@ -223,12 +225,13 @@ export async function GET(
         platform: r.fields['Platform'] || '',
         sentiment: r.fields['Sentiment'] || '',
       }));
-    }
+      }
 
-    cache.set(cacheKey, client, TTL.RELAXED);
-    return NextResponse.json(client);
-  } catch (error) {
-    console.error('Error fetching client:', error);
-    return NextResponse.json({ error: 'Failed to fetch client' }, { status: 500 });
-  }
+      cache.set(cacheKey, client, TTL.RELAXED);
+      return NextResponse.json(client);
+    } catch (error) {
+      console.error('Error fetching client:', error);
+      return NextResponse.json({ error: 'Failed to fetch client' }, { status: 500 });
+    }
+  });
 }

@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/marketing
  * Marketing overview — aggregated KPIs, channel breakdown, recent leads, upcoming content.
  */
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_revenue')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/marketing', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_revenue')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  try {
+    try {
     // In production, these would aggregate from real Airtable data
     const data = {
       kpis: {
@@ -50,9 +52,10 @@ export async function GET() {
       ],
     };
 
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('[Marketing Overview]', error);
-    return NextResponse.json({ error: 'Failed to load marketing data' }, { status: 500 });
-  }
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('[Marketing Overview]', error);
+      return NextResponse.json({ error: 'Failed to load marketing data' }, { status: 500 });
+    }
+  });
 }
