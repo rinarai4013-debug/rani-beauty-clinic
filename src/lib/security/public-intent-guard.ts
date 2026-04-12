@@ -1,5 +1,3 @@
-import { env } from '@/lib/env';
-
 const LOCAL_DEV_ORIGINS = new Set([
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -17,13 +15,13 @@ function normalizeOrigin(value: string | null): string | null {
 function buildAllowedOrigins(): Set<string> {
   const allowed = new Set<string>();
 
-  const baseOrigin = normalizeOrigin(env.NEXT_PUBLIC_BASE_URL);
+  const baseOrigin = normalizeOrigin(process.env.NEXT_PUBLIC_BASE_URL || 'https://www.ranibeautyclinic.com');
   if (baseOrigin) allowed.add(baseOrigin);
 
-  const siteOrigin = normalizeOrigin(env.NEXT_PUBLIC_SITE_URL);
+  const siteOrigin = normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL || 'https://ranibeautyclinic.com');
   if (siteOrigin) allowed.add(siteOrigin);
 
-  for (const raw of env.CORS_ALLOWED_ORIGINS.split(',')) {
+  for (const raw of (process.env.CORS_ALLOWED_ORIGINS || '').split(',')) {
     const origin = normalizeOrigin(raw.trim());
     if (origin) allowed.add(origin);
   }

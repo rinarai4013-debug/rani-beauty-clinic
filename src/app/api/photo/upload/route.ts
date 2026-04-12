@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 
 // Allow up to 30s for large file processing
 export const maxDuration = 30;
@@ -9,6 +10,7 @@ export const maxDuration = 30;
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_MULTIPART_BODY_BYTES = MAX_FILE_SIZE + (1024 * 1024); // 26 MB including multipart overhead
 const MAX_WIDTH = 1200;
 
 // ─── POST Handler ───────────────────────────────────────────────────────
@@ -17,6 +19,12 @@ export async function POST(request: NextRequest) {
   const ip = getClientIP(request);
   const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
   if (!allowed) return rateLimitResponse(resetIn);
+
+  const originViolation = enforceAllowedPublicOrigin(request);
+  if (originViolation) return originViolation;
+
+  const sizeViolation = enforceContentLength(request, MAX_MULTIPART_BODY_BYTES);
+  if (sizeViolation) return sizeViolation;
 
   try {
     let formData: FormData;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateAISimulation } from '@/lib/photo-simulation/ai-simulation';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -13,6 +14,7 @@ const simulationRequestSchema = z.object({
   intensity: z.number().min(0).max(1),
   timeframe: z.enum(['1-month', '3-months', '6-months']),
 });
+const MAX_SIMULATION_BODY_BYTES = 6 * 1024 * 1024; // 6 MB
 
 // ─── POST Handler ───────────────────────────────────────────────────────
 
@@ -21,6 +23,12 @@ export async function POST(request: NextRequest) {
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('ai', ip, RATE_LIMITS.AI);
     if (!allowed) return rateLimitResponse(resetIn);
+
+    const originViolation = enforceAllowedPublicOrigin(request);
+    if (originViolation) return originViolation;
+
+    const sizeViolation = enforceContentLength(request, MAX_SIMULATION_BODY_BYTES);
+    if (sizeViolation) return sizeViolation;
 
     try {
       const body = await request.json().catch(() => null);

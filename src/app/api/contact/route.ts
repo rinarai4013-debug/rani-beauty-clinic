@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
 import { upsertClientAttribution } from "@/lib/attribution/upsert-client-attribution";
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { enforceAllowedPublicOrigin, enforceContentLength } from "@/lib/security/public-intent-guard";
 
 const ContactSchema = z.object({
   name: z.string().min(1).max(100),
@@ -30,6 +31,7 @@ const ContactSchema = z.object({
   utm_term: z.string().max(150).optional(),
   honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
+const MAX_CONTACT_BODY_BYTES = 64 * 1024; // 64 KB
 
 function appendAttributionLines(lines: Array<string | null>, attribution: Record<string, string | undefined>) {
   const labelMap: Record<string, string> = {
@@ -62,6 +64,12 @@ export async function POST(req: NextRequest) {
   const ip = getClientIP(req);
   const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
   if (!allowed) return rateLimitResponse(resetIn);
+
+  const originViolation = enforceAllowedPublicOrigin(req);
+  if (originViolation) return originViolation;
+
+  const sizeViolation = enforceContentLength(req, MAX_CONTACT_BODY_BYTES);
+  if (sizeViolation) return sizeViolation;
 
   let body: unknown;
   try {

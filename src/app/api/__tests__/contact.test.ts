@@ -117,9 +117,9 @@ const validPayload = {
   message: 'Looking to start with a consult.',
 };
 
-async function postContact(body: unknown) {
+async function postContact(body: unknown, headers?: Record<string, string>) {
   const { POST } = await import('@/app/api/contact/route');
-  const req = buildPostRequest('/api/contact', body);
+  const req = buildPostRequest('/api/contact', body, headers);
   return POST(req);
 }
 
@@ -382,6 +382,37 @@ describe('POST /api/contact — rate limiting', () => {
       '127.0.0.1',
       expect.objectContaining({ maxRequests: expect.any(Number) }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Public intent guard
+// ---------------------------------------------------------------------------
+
+describe('POST /api/contact — public intent guard', () => {
+  it('blocks browser requests from disallowed origins with 403', async () => {
+    const response = await postContact(validPayload, {
+      origin: 'https://evil.example.com',
+    });
+    expect(response.status).toBe(403);
+    expect(mockCreateRecord).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('allows browser requests from first-party origins', async () => {
+    const response = await postContact(validPayload, {
+      origin: 'https://www.ranibeautyclinic.com',
+    });
+    expect(response.status).toBe(200);
+    expect(mockCreateRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects oversized requests by content-length with 413', async () => {
+    const response = await postContact(validPayload, {
+      'content-length': String(70 * 1024),
+    });
+    expect(response.status).toBe(413);
+    expect(mockCreateRecord).not.toHaveBeenCalled();
   });
 });
 
