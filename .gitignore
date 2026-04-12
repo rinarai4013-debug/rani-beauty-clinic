@@ -47,4 +47,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 # Deploy trigger
-.github/workflows/
+# .github/workflows/ — removed: CI workflow now tracked in git
