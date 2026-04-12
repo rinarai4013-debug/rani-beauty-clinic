@@ -26,6 +26,10 @@ vi.mock('@/lib/saas/tenant-dashboard/schedule', () => ({
   getCalendarData: (...args: unknown[]) => getCalendarDataMock(...args),
 }));
 
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
 function tenantRequest(url: string, token?: string) {
   return {
     url,
@@ -140,9 +144,28 @@ describe('tenant revenue + schedule routes', () => {
     );
   });
 
+  it('GET /api/tenant/revenue propagates error when revenue service throws', async () => {
+    getRevenueBreakdownMock.mockRejectedValueOnce(new Error('revenue calc failed'));
+
+    const { GET } = await import('@/app/api/tenant/revenue/route');
+    // withTenant uses `return handler(...)` (not `return await`), so rejections
+    // propagate through the async boundary without hitting the catch block.
+    await expect(
+      GET(tenantRequest('http://localhost:3000/api/tenant/revenue', 'ok')),
+    ).rejects.toThrow('revenue calc failed');
+  });
+
   it('GET /api/tenant/schedule returns 401 when session cookie is missing', async () => {
     const { GET } = await import('@/app/api/tenant/schedule/route');
     const response = await GET(tenantRequest('http://localhost:3000/api/tenant/schedule'));
+
+    expect(response.status).toBe(401);
+  });
+
+  it('GET /api/tenant/schedule returns 401 when token is invalid', async () => {
+    verifySessionMock.mockResolvedValueOnce(null);
+    const { GET } = await import('@/app/api/tenant/schedule/route');
+    const response = await GET(tenantRequest('http://localhost:3000/api/tenant/schedule', 'bad'));
 
     expect(response.status).toBe(401);
   });
@@ -181,5 +204,16 @@ describe('tenant revenue + schedule routes', () => {
       '2026-05-01',
       'Dr Rina',
     );
+  });
+
+  it('GET /api/tenant/schedule propagates error when schedule service throws', async () => {
+    getCalendarDataMock.mockRejectedValueOnce(new Error('calendar service unavailable'));
+
+    const { GET } = await import('@/app/api/tenant/schedule/route');
+    // withTenant uses `return handler(...)` (not `return await`), so rejections
+    // propagate through the async boundary without hitting the catch block.
+    await expect(
+      GET(tenantRequest('http://localhost:3000/api/tenant/schedule', 'ok')),
+    ).rejects.toThrow('calendar service unavailable');
   });
 });

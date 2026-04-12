@@ -287,6 +287,44 @@ describe('POST /api/webhooks/mangomint', () => {
     expect(data.received).toBe(true);
   });
 
+  it('should return 400 for malformed JSON with valid signature', async () => {
+    const payload = '{"event":';
+    const signature = await hmacSha256(MANGOMINT_SECRET, payload);
+
+    const req = new Request('http://localhost:3000/api/webhooks/mangomint', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-mangomint-signature': signature,
+      },
+      body: payload,
+    });
+
+    const { POST } = await import('@/app/api/webhooks/mangomint/route');
+    const response = await POST(req);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should return 422 for structurally invalid webhook envelope', async () => {
+    const payload = JSON.stringify({ event: '', data: {} });
+    const signature = await hmacSha256(MANGOMINT_SECRET, payload);
+
+    const req = new Request('http://localhost:3000/api/webhooks/mangomint', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-mangomint-signature': signature,
+      },
+      body: payload,
+    });
+
+    const { POST } = await import('@/app/api/webhooks/mangomint/route');
+    const response = await POST(req);
+
+    expect(response.status).toBe(422);
+  });
+
   it('GET should return 405', async () => {
     const { GET } = await import('@/app/api/webhooks/mangomint/route');
     const response = await GET();
@@ -327,6 +365,24 @@ describe('POST /api/webhooks/stripe', () => {
     const req = new Request('http://localhost:3000/api/webhooks/stripe', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ type: 'checkout.session.completed' }),
+    });
+
+    const { POST } = await import('@/app/api/webhooks/stripe/route');
+    const response = await POST(req as any);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should return 400 when webhook secret is missing even if signature is present', async () => {
+    process.env.STRIPE_WEBHOOK_SECRET = '';
+
+    const req = new Request('http://localhost:3000/api/webhooks/stripe', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'stripe-signature': 'sig',
+      },
       body: JSON.stringify({ type: 'checkout.session.completed' }),
     });
 
@@ -408,6 +464,49 @@ describe('POST /api/webhooks/stripe', () => {
     expect(mockCacheInvalidatePrefix).toHaveBeenCalledWith('revenue');
     expect(mockCacheInvalidatePrefix).toHaveBeenCalledWith('kpi');
     expect(mockCacheInvalidatePrefix).toHaveBeenCalledWith('transactions');
+    expect(mockRateLimitedQuery).toHaveBeenCalled();
+  });
+
+  it('should handle checkout.session.expired successfully', async () => {
+    vi.resetModules();
+    vi.doMock('stripe', () => ({
+      default: vi.fn().mockImplementation(() => ({
+        webhooks: {
+          constructEvent: vi.fn().mockReturnValue({
+            id: 'evt_test_expired',
+            type: 'checkout.session.expired',
+            data: {
+              object: {
+                id: 'cs_expired_123',
+                metadata: {
+                  planId: 'plan_123',
+                  tier: 'Transform',
+                  clientName: 'Jane Doe',
+                },
+                customer_details: { name: 'Jane Doe' },
+              },
+            },
+          }),
+        },
+      })),
+    }));
+
+    const req = new Request('http://localhost:3000/api/webhooks/stripe', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'stripe-signature': 'valid_sig',
+      },
+      body: JSON.stringify({ id: 'evt_test_expired', type: 'checkout.session.expired' }),
+    });
+
+    const { POST } = await import('@/app/api/webhooks/stripe/route');
+    const response = await POST(req as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.received).toBe(true);
+    expect(data.event).toBe('checkout.session.expired');
     expect(mockRateLimitedQuery).toHaveBeenCalled();
   });
 

@@ -121,6 +121,62 @@ describe('patient auth + profile critical routes', () => {
     expect(response.status).toBe(401);
   });
 
+  it('POST /api/patient/auth/verify rejects malformed JSON payloads', async () => {
+    const { POST } = await import('@/app/api/patient/auth/verify/route');
+    const request = new Request('http://localhost:3000/api/patient/auth/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{"token":',
+    });
+
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('POST /api/patient/auth/verify requires token in request body', async () => {
+    const { POST } = await import('@/app/api/patient/auth/verify/route');
+    const request = new Request('http://localhost:3000/api/patient/auth/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('POST /api/patient/auth/verify returns 401 when account is not found', async () => {
+    fetchFirstMock.mockResolvedValueOnce([]);
+
+    const { POST } = await import('@/app/api/patient/auth/verify/route');
+    const request = new Request('http://localhost:3000/api/patient/auth/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ token: 'valid-token' }),
+    });
+
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('POST /api/patient/auth/verify returns 500 on unexpected downstream errors', async () => {
+    fetchFirstMock.mockRejectedValueOnce(new Error('airtable unavailable'));
+
+    const { POST } = await import('@/app/api/patient/auth/verify/route');
+    const request = new Request('http://localhost:3000/api/patient/auth/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ token: 'valid-token' }),
+    });
+
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(500);
+  });
+
   it('POST /api/patient/auth/verify enforces rate limits', async () => {
     rateLimitMock.mockReturnValueOnce({ allowed: false, resetIn: 60 });
 

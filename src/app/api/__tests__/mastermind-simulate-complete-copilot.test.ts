@@ -291,6 +291,28 @@ describe('mastermind simulate + complete + copilot routes', () => {
     expect(saveSessionAsyncMock).toHaveBeenCalledTimes(1);
   });
 
+  it('POST /api/mastermind/complete succeeds with skipped webhook when N8N URL is unset', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce({
+      id: 'ms_1',
+      auraScanResult: { auraScore: { overall: 80 } },
+      mastermindPlan: { recommendations: {} },
+      providerReview: { approved: true },
+      selectedPackageTier: 'Transform',
+    });
+
+    const { POST } = await import('@/app/api/mastermind/complete/route');
+    const response = await POST(
+      makeRequest('http://localhost:3000/api/mastermind/complete', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.data.webhookStatus).toBe('skipped');
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(saveSessionAsyncMock).toHaveBeenCalledTimes(1);
+  });
+
   it('POST /api/mastermind/complete returns success when webhook fails', async () => {
     process.env.N8N_WEBHOOK_URL = 'https://hooks.example.com/';
     fetchMock.mockResolvedValueOnce(new Response('{}', { status: 500 }));
@@ -312,6 +334,43 @@ describe('mastermind simulate + complete + copilot routes', () => {
     expect(body.success).toBe(true);
     expect(body.data.webhookStatus).toBe('failed');
     expect(saveSessionAsyncMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/complete returns 500 when completion payload build fails', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce({
+      id: 'ms_1',
+      auraScanResult: { auraScore: { overall: 80 } },
+      mastermindPlan: { recommendations: {} },
+      providerReview: { approved: true },
+      selectedPackageTier: 'Transform',
+    });
+    buildCompletionResultMock.mockImplementationOnce(() => {
+      throw new Error('bad completion state');
+    });
+
+    const { POST } = await import('@/app/api/mastermind/complete/route');
+    const response = await POST(
+      makeRequest('http://localhost:3000/api/mastermind/complete', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.success).toBe(false);
+    expect(body.error).toBe('bad completion state');
+  });
+
+  it('POST /api/mastermind/complete returns 500 when session lookup throws', async () => {
+    getSessionByIdAsyncMock.mockRejectedValueOnce(new Error('session store down'));
+
+    const { POST } = await import('@/app/api/mastermind/complete/route');
+    const response = await POST(
+      makeRequest('http://localhost:3000/api/mastermind/complete', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.success).toBe(false);
+    expect(body.error).toBe('session store down');
   });
 
   it('POST /api/mastermind/copilot rejects invalid JSON body', async () => {

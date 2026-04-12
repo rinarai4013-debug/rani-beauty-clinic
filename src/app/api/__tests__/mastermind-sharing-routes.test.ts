@@ -165,6 +165,34 @@ describe('mastermind share + send + interest routes', () => {
     expect(response.status).toBe(401);
   });
 
+  it('POST /api/mastermind/plan-send rejects invalid payloads', async () => {
+    const { POST } = await import('@/app/api/mastermind/plan-send/route');
+    const request = new Request('http://localhost:3000/api/mastermind/plan-send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.success).toBe(false);
+  });
+
+  it('POST /api/mastermind/plan-send returns 404 when session does not exist', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce(null);
+
+    const { POST } = await import('@/app/api/mastermind/plan-send/route');
+    const request = new Request('http://localhost:3000/api/mastermind/plan-send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sessionId: 'missing_session' }),
+    });
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(404);
+  });
+
   it('POST /api/mastermind/plan-send returns 422 when no patient email exists', async () => {
     getSessionByIdAsyncMock.mockResolvedValueOnce({
       id: 'ms_1',
@@ -173,6 +201,27 @@ describe('mastermind share + send + interest routes', () => {
       patientEmail: '',
       patientName: 'Jane Doe',
       intakeData: {},
+    });
+
+    const { POST } = await import('@/app/api/mastermind/plan-send/route');
+    const request = new Request('http://localhost:3000/api/mastermind/plan-send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sessionId: 'ms_1' }),
+    });
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(422);
+  });
+
+  it('POST /api/mastermind/plan-send returns 422 when session phase is not shareable', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce({
+      id: 'ms_1',
+      phase: 'intake',
+      shareToken: '',
+      patientEmail: 'jane@example.com',
+      patientName: 'Jane Doe',
+      intakeData: { email: 'jane@example.com' },
     });
 
     const { POST } = await import('@/app/api/mastermind/plan-send/route');
@@ -200,6 +249,44 @@ describe('mastermind share + send + interest routes', () => {
     expect(body.success).toBe(true);
     expect(body.sentTo).toBe('jane@example.com');
     expect(resendSendMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/plan-send rotates expired share tokens before sending', async () => {
+    resolveTokenMock.mockResolvedValueOnce(null);
+
+    const { POST } = await import('@/app/api/mastermind/plan-send/route');
+    const request = new Request('http://localhost:3000/api/mastermind/plan-send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sessionId: 'ms_1' }),
+    });
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.shareUrl).toContain('/my-plan/');
+    expect(saveTokenToAirtableMock).toHaveBeenCalled();
+    expect(sessionReducerMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ type: 'SET_SHARE_TOKEN' }),
+    );
+  });
+
+  it('POST /api/mastermind/plan-send returns 502 when email delivery fails', async () => {
+    resendSendMock.mockRejectedValueOnce(new Error('resend outage'));
+
+    const { POST } = await import('@/app/api/mastermind/plan-send/route');
+    const request = new Request('http://localhost:3000/api/mastermind/plan-send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sessionId: 'ms_1' }),
+    });
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(502);
+    expect(body.success).toBe(false);
   });
 
   it('POST /api/mastermind/share/interest rejects invalid input payloads', async () => {
