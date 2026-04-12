@@ -78,6 +78,11 @@ const envSchema = z.object({
   CRON_SECRET: z.string().optional().default(''),
   N8N_API_KEY: z.string().optional().default(''),
 
+  // Public runtime URLs / request policy
+  NEXT_PUBLIC_BASE_URL: z.string().optional().default('https://www.ranibeautyclinic.com'),
+  NEXT_PUBLIC_SITE_URL: z.string().optional().default('https://ranibeautyclinic.com'),
+  CORS_ALLOWED_ORIGINS: z.string().optional().default(''),
+
   // External services
   REPLICATE_API_TOKEN: z.string().optional().default(''),
   HTML2PDF_API_KEY: z.string().optional().default(''),

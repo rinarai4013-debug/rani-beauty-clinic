@@ -20,13 +20,35 @@ import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { submitIntakeSchema } from '@/lib/consultation/schema';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import {
+  enforceAllowedPublicOrigin,
+  enforceContentLength,
+  normalizeEmailForLimit,
+} from '@/lib/security/public-intent-guard';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_JSON_REQUEST_BYTES = 512 * 1024;
+const MAX_MULTIPART_REQUEST_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
 export async function POST(request: NextRequest) {
   try {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+
+    const contentType = request.headers.get('content-type') || '';
+    const requestLimit = contentType.includes('multipart/form-data')
+      ? MAX_MULTIPART_REQUEST_BYTES
+      : MAX_JSON_REQUEST_BYTES;
+    const sizeError = enforceContentLength(request, requestLimit);
+    if (sizeError) return sizeError;
+
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('consultation-submit', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
+
     const formData = await request.formData();
 
     // 1. Parse JSON data
@@ -97,6 +119,20 @@ export async function POST(request: NextRequest) {
     // 3. Create MastermindSession
     const patientName = `${intakeData.firstName || ''} ${intakeData.lastName || ''}`.trim();
     const patientEmail = (intakeData.email as string) || '';
+
+    if (!patientEmail) {
+      return NextResponse.json(
+        { success: false, error: 'Email is required' },
+        { status: 400 },
+      );
+    }
+
+    const scopedLimit = rateLimit(
+      'consultation-submit-email',
+      `${ip}:${normalizeEmailForLimit(patientEmail)}`,
+      { limit: 3, windowMs: 10 * 60_000 },
+    );
+    if (!scopedLimit.allowed) return rateLimitResponse(scopedLimit.resetIn);
 
     const session = createSession({
       intakeData,
