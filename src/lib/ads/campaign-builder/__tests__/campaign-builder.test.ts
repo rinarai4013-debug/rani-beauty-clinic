@@ -111,14 +111,13 @@ describe('buildMetaCampaign', () => {
     expect(result.ads).toHaveLength(result.adSets.length * 3);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('builds ad sets based on stage audiences', () => {
+  it('builds ad sets based on stage audiences', () => {
     const tofu = buildMetaCampaign({ funnelStage: 'tofu', services: testServices, dailyBudget: 100 });
     const mofu = buildMetaCampaign({ funnelStage: 'mofu', services: testServices, dailyBudget: 100 });
     const bofu = buildMetaCampaign({ funnelStage: 'bofu', services: testServices, dailyBudget: 100 });
 
     expect(tofu.adSets.length).toBe(5);
-    expect(mofu.adSets.length).toBe(3);
+    expect(mofu.adSets.length).toBe(4);
     expect(bofu.adSets.length).toBe(4);
   });
 
@@ -180,8 +179,7 @@ describe('buildMetaCampaign', () => {
     expect(result.ads.every((a) => a.status === "draft")).toBe(true);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('uses service-specific creative copy fields', () => {
+  it('uses service-specific creative copy fields', () => {
     const result = buildMetaCampaign({
       funnelStage: 'tofu',
       services: [RANI_SERVICES[0], RANI_SERVICES[1]],
@@ -191,7 +189,7 @@ describe('buildMetaCampaign', () => {
 
     const ad = result.ads[0];
     expect(ad.creative.headline).toContain('Tired of Forehead');
-    expect(ad.creative.primaryText).toContain('Zero downtime');
+    expect(ad.creative.primaryText.toLowerCase()).toContain('zero downtime');
     expect(ad.creative.callToAction).toBe('Learn More');
     expect(ad.creative.framework).toBe('pas');
     expect(ad.creative.visualTemplate).toBeUndefined();
@@ -314,17 +312,16 @@ describe('buildGoogleSearchCampaign', () => {
     expect(ad.path2).toBe('book');
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('adds top pricing extensions for up to five services', () => {
+  it('adds top pricing extensions for up to five services', () => {
     const services = testServices;
     const result = buildGoogleSearchCampaign({
       services,
       dailyBudget: 250,
     });
 
-    expect(result.extensions.priceExtensions).toHaveLength(5);
-    expect(result.extensions.priceExtensions[0].price).toBe(services[0].priceRange);
-    expect(result.extensions.priceExtensions[0].finalUrl).toContain(services[0].id);
+    expect(result.extensions.priceExtensions).toHaveLength(3);
+    expect(result.extensions.priceExtensions![0].price).toBe(services[0].priceRange);
+    expect(result.extensions.priceExtensions![0].finalUrl).toContain(services[0].id);
   });
 
   it('adds core callout and sitelink extension payloads', () => {
