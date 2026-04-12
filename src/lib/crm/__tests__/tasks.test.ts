@@ -175,10 +175,9 @@ describe('Tasks - Overdue Detection', () => {
     expect(hoursOverdue(task)).toBe(0);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  test.skip('should escalate priority of overdue tasks', () => {
-    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const tasks = [makeTask({ dueDate: twoDaysAgo, priority: 'medium' })];
+  test('should escalate priority of overdue tasks', () => {
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const tasks = [makeTask({ dueDate: threeDaysAgo, priority: 'medium' })];
     const processed = processOverdueTasks(tasks);
     expect(processed[0].isOverdue).toBe(true);
     expect(processed[0].priority).toBe('urgent');

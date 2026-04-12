@@ -82,15 +82,16 @@ describe('booking/scheduler', () => {
     expect(suggestions[0].score).toBeGreaterThanOrEqual(suggestions.at(-1)!.score);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('computes provider loads and can suggest the least-loaded qualified provider', () => {
+  it('computes provider loads and can suggest the least-loaded qualified provider', () => {
     const engine = new AvailabilityEngine(undefined, undefined, appointments, BOOKABLE_SERVICES);
     const scheduler = new SmartScheduler(engine, BOOKABLE_SERVICES, DEFAULT_SCHEDULING_CONFIG);
 
     const loads = scheduler.getProviderLoads('2026-04-13');
 
     expect(loads.find(load => load.providerId === 'dr-landfield')?.appointmentCount).toBe(1);
-    expect(scheduler.suggestProvider('consult-aesthetic', '2026-04-13')).toBe('raj');
+    // dr-landfield has 30min booked (5.5% util), raj has 60min (11.1% util).
+    // Least-loaded qualified provider is dr-landfield.
+    expect(scheduler.suggestProvider('consult-aesthetic', '2026-04-13')).toBe('dr-landfield');
   });
 
   it('plans compatible combination bookings in optimal order and rejects incompatible ones', () => {
@@ -163,13 +164,13 @@ describe('booking/scheduler', () => {
     expect(suggestions[0].serviceId).toBe('botox');
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('checks same-day availability against the feature flag and cutoff time', () => {
+  it('checks same-day availability against the feature flag and cutoff time', () => {
     const engine = new AvailabilityEngine(undefined, undefined, [], BOOKABLE_SERVICES);
     const scheduler = new SmartScheduler(engine, BOOKABLE_SERVICES, DEFAULT_SCHEDULING_CONFIG);
 
     const allowed = scheduler.checkSameDayAvailability('botox');
-    vi.setSystemTime(new Date('2026-04-10T16:00:00Z'));
+    // Set time after 15:00 local (cutoff). In Pacific (UTC-7), 22:00 UTC = 15:00 local.
+    vi.setSystemTime(new Date('2026-04-10T23:00:00Z'));
     const blocked = scheduler.checkSameDayAvailability('botox');
 
     expect(allowed.allowed).toBe(true);

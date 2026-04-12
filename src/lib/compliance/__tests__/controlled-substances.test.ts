@@ -989,17 +989,17 @@ describe('recordCustodyEvent', () => {
     });
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('creates a custody event with a coc_-prefixed unique id', () => {
-    const ev = recordCustodyEvent(makeCustody());
+  it('creates a custody event with a coc_-prefixed unique id', () => {
+    const { id: _id, ...custody } = makeCustody({ substanceId: 'sub_ket' });
+    const ev = recordCustodyEvent(custody);
     expect(ev.id).toMatch(/^coc_\d+_[a-z0-9]+$/);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip.each(['dispensed', 'administered'] as const)(
+  it.each(['dispensed', 'administered'] as const)(
     'decrements currentQuantity on action=%s',
     (action) => {
-      recordCustodyEvent(makeCustody({ action, quantity: 3 }));
+      const { id: _id, ...custody } = makeCustody({ substanceId: 'sub_ket', action, quantity: 3 });
+      recordCustodyEvent(custody);
       const sub = getSubstances().find((s) => s.id === 'sub_ket')!;
       expect(sub.currentQuantity).toBe(17);
     }
@@ -1014,18 +1014,16 @@ describe('recordCustodyEvent', () => {
     }
   );
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('floors currentQuantity at 0 when a dispense would go negative', () => {
-    recordCustodyEvent(makeCustody({ action: 'dispensed', quantity: 999 }));
+  it('floors currentQuantity at 0 when a dispense would go negative', () => {
+    const { id: _id, ...custody } = makeCustody({ substanceId: 'sub_ket', action: 'dispensed', quantity: 999 });
+    recordCustodyEvent(custody);
     const sub = getSubstances().find((s) => s.id === 'sub_ket')!;
     expect(sub.currentQuantity).toBe(0);
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('forwards a substance_dispense audit entry on dispense/administer with patient context', () => {
-    recordCustodyEvent(
-      makeCustody({ action: 'administered', quantity: 1, patientId: 'pat_777' })
-    );
+  it('forwards a substance_dispense audit entry on dispense/administer with patient context', () => {
+    const { id: _id, ...custody } = makeCustody({ substanceId: 'sub_ket', action: 'administered', quantity: 1, patientId: 'pat_777' });
+    recordCustodyEvent(custody);
     expect(createAuditEntryMock).toHaveBeenCalledTimes(1);
     const call = createAuditEntryMock.mock.calls[0][0];
     expect(call).toMatchObject({
@@ -1044,9 +1042,9 @@ describe('recordCustodyEvent', () => {
     expect(createAuditEntryMock).not.toHaveBeenCalled();
   });
 
-  // SKIP: stale fixture — needs update after Wave 11 / Tier 1 changes
-  it.skip('persists the event so it is retrievable via getCustodyChain', () => {
-    const ev = recordCustodyEvent(makeCustody());
+  it('persists the event so it is retrievable via getCustodyChain', () => {
+    const { id: _id, ...custody } = makeCustody({ substanceId: 'sub_ket' });
+    const ev = recordCustodyEvent(custody);
     const chain = getCustodyChain('sub_ket');
     expect(chain).toHaveLength(1);
     expect(chain[0].id).toBe(ev.id);
