@@ -6,25 +6,27 @@ import { cache, TTL } from '@/lib/cache';
 import { ACHIEVEMENTS, checkAchievements } from '@/data/dashboard/achievement-definitions';
 import { getCurrentLevel } from '@/lib/gamification/levels';
 import type { DailyMetrics } from '@/types/gamification';
+import { withSentry } from '@/lib/sentry-utils';
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_executive')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/gamification/achievements', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_executive')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'gamification-achievements';
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'gamification-achievements';
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    await Promise.all([
-      fetchAll(Tables.appointments(), undefined, true),
-      fetchAll(Tables.transactions(), undefined, true),
-      fetchAll(Tables.kpis(), undefined, true),
-      fetchAll(Tables.reviews(), undefined, true),
-    ]);
+    try {
+      await Promise.all([
+        fetchAll(Tables.appointments(), undefined, true),
+        fetchAll(Tables.transactions(), undefined, true),
+        fetchAll(Tables.kpis(), undefined, true),
+        fetchAll(Tables.reviews(), undefined, true),
+      ]);
 
     const metrics: DailyMetrics = {
       revenue: 850,
@@ -57,10 +59,11 @@ export async function GET() {
       level: getCurrentLevel(3200),
     };
 
-    cache.set(cacheKey, payload, TTL.STANDARD);
-    return NextResponse.json(payload);
-  } catch (error) {
-    console.error('[gamification/achievements]', error);
-    return NextResponse.json({ error: 'Failed to load achievements' }, { status: 500 });
-  }
+      cache.set(cacheKey, payload, TTL.STANDARD);
+      return NextResponse.json(payload);
+    } catch (error) {
+      console.error('[gamification/achievements]', error);
+      return NextResponse.json({ error: 'Failed to load achievements' }, { status: 500 });
+    }
+  });
 }

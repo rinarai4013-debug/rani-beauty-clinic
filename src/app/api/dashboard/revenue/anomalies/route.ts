@@ -5,6 +5,7 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { detectRevenueAnomalies, type AnomalyInput } from '@/lib/predictions/revenue-anomaly';
 import { TARGETS } from '@/data/dashboard/score-weights';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/revenue/anomalies
@@ -26,14 +27,15 @@ interface TransactionFields {
 }
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_revenue')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/revenue/anomalies', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_revenue')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'revenue-anomalies';
     const cached = cache.get<unknown>(cacheKey);
@@ -124,13 +126,14 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.STANDARD);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Revenue anomaly detection error:', error);
-    return NextResponse.json(
-      { error: 'Failed to detect revenue anomalies' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, result, TTL.STANDARD);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Revenue anomaly detection error:', error);
+      return NextResponse.json(
+        { error: 'Failed to detect revenue anomalies' },
+        { status: 500 }
+      );
+    }
+  });
 }

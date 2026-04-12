@@ -266,6 +266,13 @@ describe('dashboard growth + ops routes', () => {
     expect(buildExecutiveBriefingMock).toHaveBeenCalledTimes(1);
   });
 
+  it('GET /api/dashboard/briefing propagates error when upstream aggregators fail', async () => {
+    fetchRevenueMock.mockRejectedValueOnce(new Error('revenue unavailable'));
+    const { GET } = await import('@/app/api/dashboard/briefing/route');
+    // Route lacks try/catch — rejection propagates through withSentry
+    await expect(GET()).rejects.toThrow('revenue unavailable');
+  });
+
   it('GET /api/dashboard/marketing returns 401 when unauthenticated', async () => {
     getSessionMock.mockResolvedValueOnce(null);
     const { GET } = await import('@/app/api/dashboard/marketing/route');
@@ -375,6 +382,44 @@ describe('dashboard growth + ops routes', () => {
     expect(cacheSetMock).toHaveBeenCalledTimes(1);
   });
 
+  it('GET /api/dashboard/meta-ads returns 502 when Meta API responds non-OK', async () => {
+    process.env.META_ACCESS_TOKEN = 'meta_token';
+    process.env.META_AD_ACCOUNT_ID = 'act_123';
+
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          error: { message: 'Invalid OAuth access token' },
+        }),
+        { status: 400 },
+      ),
+    );
+
+    const { GET } = await import('@/app/api/dashboard/meta-ads/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(502);
+    expect(body.error).toBe('Meta API error');
+    expect(body.details).toContain('Invalid OAuth access token');
+  });
+
+  it('GET /api/dashboard/meta-ads returns 500 when fetch throws unexpectedly', async () => {
+    process.env.META_ACCESS_TOKEN = 'meta_token';
+    process.env.META_AD_ACCOUNT_ID = 'act_123';
+
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('network unavailable'),
+    );
+
+    const { GET } = await import('@/app/api/dashboard/meta-ads/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to fetch Meta Ads data');
+  });
+
   it('GET /api/dashboard/providers returns 401 when unauthenticated', async () => {
     getSessionMock.mockResolvedValueOnce(null);
     const { GET } = await import('@/app/api/dashboard/providers/route');
@@ -412,6 +457,17 @@ describe('dashboard growth + ops routes', () => {
     expect(cacheSetMock).toHaveBeenCalledTimes(1);
   });
 
+  it('GET /api/dashboard/providers returns 500 when upstream fetch fails', async () => {
+    fetchAllMock.mockRejectedValueOnce(new Error('appointments fetch failed'));
+
+    const { GET } = await import('@/app/api/dashboard/providers/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to fetch providers');
+  });
+
   it('GET /api/dashboard/providers/[name] returns 401 when unauthenticated', async () => {
     getSessionMock.mockResolvedValueOnce(null);
     const { GET } = await import('@/app/api/dashboard/providers/[name]/route');
@@ -421,6 +477,17 @@ describe('dashboard growth + ops routes', () => {
     );
 
     expect(response.status).toBe(401);
+  });
+
+  it('GET /api/dashboard/providers/[name] returns 403 without provider permission', async () => {
+    hasPermissionMock.mockReturnValueOnce(false);
+    const { GET } = await import('@/app/api/dashboard/providers/[name]/route');
+    const response = await GET(
+      new Request('http://localhost:3000/api/dashboard/providers/rina') as never,
+      { params: Promise.resolve({ name: 'rina' }) },
+    );
+
+    expect(response.status).toBe(403);
   });
 
   it('GET /api/dashboard/providers/[name] returns 404 for unknown provider slug', async () => {
@@ -489,5 +556,12 @@ describe('dashboard growth + ops routes', () => {
     expect(response.status).toBe(200);
     expect(body.status).toBe('ok');
     expect(body.reactivation.dormantClients).toBe(31);
+  });
+
+  it('GET /api/dashboard/reactivation propagates error when upstream intelligence fetch fails', async () => {
+    fetchReactivationIntelligenceMock.mockRejectedValueOnce(new Error('reactivation service down'));
+    const { GET } = await import('@/app/api/dashboard/reactivation/route');
+    // Route lacks try/catch — rejection propagates through withSentry
+    await expect(GET()).rejects.toThrow('reactivation service down');
   });
 });

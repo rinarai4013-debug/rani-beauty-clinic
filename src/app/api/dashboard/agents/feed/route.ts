@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
 import type { AgentFeed, AgentStatusSummary, AgentAlert, AgentRecommendation } from '@/types/agent';
 import { AGENT_IDS, AGENT_REGISTRY } from '@/lib/agents/registry';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/agents/feed
@@ -15,14 +16,15 @@ import { AGENT_IDS, AGENT_REGISTRY } from '@/lib/agents/registry';
  * Calls /api/dashboard/agents/[agentId] for each agent in parallel.
  */
 export async function GET(request: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_executive')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/agents/feed', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_executive')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'agent-feed';
     const cached = cache.get<AgentFeed>(cacheKey);
@@ -96,13 +98,14 @@ export async function GET(request: NextRequest) {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, feed, TTL.REALTIME);
-    return NextResponse.json({ success: true, data: feed });
-  } catch (error) {
-    console.error('Agent feed error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to build agent feed' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, feed, TTL.REALTIME);
+      return NextResponse.json({ success: true, data: feed });
+    } catch (error) {
+      console.error('Agent feed error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to build agent feed' },
+        { status: 500 }
+      );
+    }
+  });
 }

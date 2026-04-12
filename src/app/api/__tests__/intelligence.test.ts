@@ -77,6 +77,10 @@ vi.mock('@/lib/cache', () => ({
   TTL: { REALTIME: 15, STANDARD: 30, MODERATE: 60, RELAXED: 120 },
 }));
 
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
 vi.mock('@/lib/pricing/dynamic-engine', () => ({
   analyzePricing: vi.fn().mockReturnValue({
     recommendations: [],

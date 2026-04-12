@@ -3,23 +3,25 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_executive')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/gamification/briefing', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_executive')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'gamification-briefing';
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'gamification-briefing';
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const [transactions, appointments] = await Promise.all([
-      fetchAll<{ Amount?: number }>(Tables.transactions(), { filterByFormula: 'Service' }, true),
-      fetchAll<{ 'Is Consult'?: boolean }>(Tables.appointments(), undefined, true),
-    ]);
+    try {
+      const [transactions, appointments] = await Promise.all([
+        fetchAll<{ Amount?: number }>(Tables.transactions(), { filterByFormula: 'Service' }, true),
+        fetchAll<{ 'Is Consult'?: boolean }>(Tables.appointments(), undefined, true),
+      ]);
 
     const yesterdayRevenue = transactions.reduce((sum, record) => sum + (record.fields.Amount ?? 0), 0);
     const appointmentsToday = appointments.length;
@@ -36,10 +38,11 @@ export async function GET() {
       topWin: yesterdayRevenue >= 3000 ? 'Huge revenue day yesterday - keep the momentum' : 'Steady progress',
     };
 
-    cache.set(cacheKey, payload, TTL.STANDARD);
-    return NextResponse.json(payload);
-  } catch (error) {
-    console.error('[gamification/briefing]', error);
-    return NextResponse.json({ error: 'Failed to load briefing' }, { status: 500 });
-  }
+      cache.set(cacheKey, payload, TTL.STANDARD);
+      return NextResponse.json(payload);
+    } catch (error) {
+      console.error('[gamification/briefing]', error);
+      return NextResponse.json({ error: 'Failed to load briefing' }, { status: 500 });
+    }
+  });
 }

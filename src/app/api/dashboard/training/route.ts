@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { TRAINING_MODULES, ROLE_LABELS, ROLE_COLORS } from '@/data/training/modules';
 import type { TrainingRole } from '@/data/training/modules';
+import { withSentry } from '@/lib/sentry-utils';
 
 export async function GET(req: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  return withSentry('dashboard/training', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
 
     const { searchParams } = new URL(req.url);
     const roleFilter = searchParams.get('role') as TrainingRole | null;
@@ -59,15 +61,16 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    return NextResponse.json({
-      modules: moduleSummaries,
-      byRole,
-      stats,
-      roleLabels: ROLE_LABELS,
-      roleColors: ROLE_COLORS,
-    });
-  } catch (error) {
-    console.error('Training API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+      return NextResponse.json({
+        modules: moduleSummaries,
+        byRole,
+        stats,
+        roleLabels: ROLE_LABELS,
+        roleColors: ROLE_COLORS,
+      });
+    } catch (error) {
+      console.error('Training API error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+  });
 }

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface AppointmentFields {
   'Provider': string;
@@ -36,14 +37,15 @@ const PROVIDERS = [
 ];
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_providers')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/providers', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_providers')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cached = cache.get<unknown>('providers');
     if (cached) {
@@ -99,11 +101,12 @@ export async function GET() {
     });
 
     const data = { providers };
-    cache.set('providers', data, TTL.RELAXED);
+      cache.set('providers', data, TTL.RELAXED);
 
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error fetching providers:', error);
-    return NextResponse.json({ error: 'Failed to fetch providers' }, { status: 500 });
-  }
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Error fetching providers:', error);
+      return NextResponse.json({ error: 'Failed to fetch providers' }, { status: 500 });
+    }
+  });
 }

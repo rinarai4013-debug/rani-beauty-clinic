@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildRAGContext } from '@/lib/rag/knowledge-base';
 import { RANI_SYSTEM_PROMPT } from '@/lib/voice/rani-voice';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { withSentry } from '@/lib/sentry-utils';
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']).default('user'),
@@ -39,74 +40,76 @@ function buildFallbackReply(message: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const ip = getClientIP(req);
-  const { allowed, resetIn } = rateLimit('ai', ip, RATE_LIMITS.AI);
-  if (!allowed) return rateLimitResponse(resetIn);
+  return withSentry('ai/chat', async () => {
+    const ip = getClientIP(req);
+    const { allowed, resetIn } = rateLimit('ai', ip, RATE_LIMITS.AI);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  const parsed = ChatSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
-  }
+    const parsed = ChatSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+    }
 
-  const { messages } = parsed.data;
-  const latestUserMessage = [...messages].reverse().find((message) => message.role === 'user')?.content ?? '';
-  const leadInfo = extractLeadInfo(messages.map((message) => message.content).join(' '));
+    const { messages } = parsed.data;
+    const latestUserMessage = [...messages].reverse().find((message) => message.role === 'user')?.content ?? '';
+    const leadInfo = extractLeadInfo(messages.map((message) => message.content).join(' '));
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({
-      reply: buildFallbackReply(latestUserMessage),
-      source: 'fallback',
-      actions: [],
-      ...(leadInfo ? { leadInfo } : {}),
-    });
-  }
-
-  try {
-    const rag = buildRAGContext(latestUserMessage);
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-latest',
-      max_tokens: 400,
-      system: `${RANI_SYSTEM_PROMPT}\n\nKnowledge:\n${rag.contextText}`,
-      messages: messages.map((message) => ({
-        role: message.role === 'assistant' ? 'assistant' : 'user',
-        content: message.content,
-      })),
-    });
-
-    const replyText = response.content
-      .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
-      .map((block) => block.text)
-      .join('\n')
-      .trim();
-
-    const actions = replyText.includes('[BOOK_NOW]')
-      ? [{ type: 'book_now', label: 'Book now' }]
-      : [];
-
-    return NextResponse.json({
-      reply: replyText.replace(/\[BOOK_NOW\]/g, '').trim(),
-      source: 'ai',
-      actions,
-      ...(leadInfo ? { leadInfo } : {}),
-    });
-  } catch (error) {
-    console.error('[ai/chat]', error);
-    return NextResponse.json(
-      {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json({
         reply: buildFallbackReply(latestUserMessage),
         source: 'fallback',
         actions: [],
         ...(leadInfo ? { leadInfo } : {}),
-      },
-      { status: 200 }
-    );
-  }
+      });
+    }
+
+    try {
+      const rag = buildRAGContext(latestUserMessage);
+      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const response = await client.messages.create({
+        model: 'claude-3-5-sonnet-latest',
+        max_tokens: 400,
+        system: `${RANI_SYSTEM_PROMPT}\n\nKnowledge:\n${rag.contextText}`,
+        messages: messages.map((message) => ({
+          role: message.role === 'assistant' ? 'assistant' : 'user',
+          content: message.content,
+        })),
+      });
+
+      const replyText = response.content
+        .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
+        .map((block) => block.text)
+        .join('\n')
+        .trim();
+
+      const actions = replyText.includes('[BOOK_NOW]')
+        ? [{ type: 'book_now', label: 'Book now' }]
+        : [];
+
+      return NextResponse.json({
+        reply: replyText.replace(/\[BOOK_NOW\]/g, '').trim(),
+        source: 'ai',
+        actions,
+        ...(leadInfo ? { leadInfo } : {}),
+      });
+    } catch (error) {
+      console.error('[ai/chat]', error);
+      return NextResponse.json(
+        {
+          reply: buildFallbackReply(latestUserMessage),
+          source: 'fallback',
+          actions: [],
+          ...(leadInfo ? { leadInfo } : {}),
+        },
+        { status: 200 }
+      );
+    }
+  });
 }

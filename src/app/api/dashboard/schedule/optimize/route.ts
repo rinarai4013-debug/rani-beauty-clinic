@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { optimizeSchedule, type ScheduleInput, type AppointmentData } from '@/lib/schedule/optimizer';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/schedule/optimize
@@ -27,14 +28,15 @@ interface AppointmentFields {
 }
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_schedule')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/schedule/optimize', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_schedule')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'schedule-optimization';
     const cached = cache.get<unknown>(cacheKey);
@@ -108,13 +110,14 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.STANDARD);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Schedule optimization error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to optimize schedule' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, result, TTL.STANDARD);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Schedule optimization error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to optimize schedule' },
+        { status: 500 }
+      );
+    }
+  });
 }

@@ -5,6 +5,7 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { predictNoShow, type NoShowInput, type NoShowScore } from '@/lib/predictions/no-show';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 
 // ── Field interfaces ──
 
@@ -88,24 +89,25 @@ function parseHour(timeStr: string): number {
 // ── Route handler ──
 
 export async function GET(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_schedule')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/schedule/no-show-risk', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_schedule')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const dateParam = req.nextUrl.searchParams.get('date');
-  const today = todayISO();
+    const dateParam = req.nextUrl.searchParams.get('date');
+    const today = todayISO();
 
-  // If a specific date is requested, use just that day; otherwise next 7 days
-  const startDate = dateParam || today;
-  const endDate = dateParam || addDays(today, 6);
+    // If a specific date is requested, use just that day; otherwise next 7 days
+    const startDate = dateParam || today;
+    const endDate = dateParam || addDays(today, 6);
 
-  const cacheKey = `no-show-risk:${startDate}:${endDate}`;
-  const cached = cache.get<NoShowRiskItem[]>(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = `no-show-risk:${startDate}:${endDate}`;
+    const cached = cache.get<NoShowRiskItem[]>(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
+    try {
     // ── Step 1: Fetch upcoming appointments ──
     const dateFilter = startDate === endDate
       ? `IS_SAME({Date}, '${startDate}', 'day')`
@@ -284,7 +286,7 @@ export async function GET(req: NextRequest) {
     // Sort by risk score descending (highest risk first)
     results.sort((a, b) => b.noShowScore.score - a.noShowScore.score);
 
-    cache.set(cacheKey, results, TTL.STANDARD); // 60s
+      cache.set(cacheKey, results, TTL.STANDARD); // 60s
 
     // HIPAA §164.312(b): no-show risk scoring reads the full client +
     // appointment history + deposit status for each upcoming
@@ -295,17 +297,18 @@ export async function GET(req: NextRequest) {
     const medRisk = results.filter(
       (r) => r.noShowScore.score >= 40 && r.noShowScore.score < 70,
     ).length;
-    logPhiAccessFromRequest(req, session, {
-      patientId: '__LIST__',
-      patientName: `No-show risk list (${results.length} appointments)`,
-      action: 'view',
-      dataCategory: 'treatment_records',
-      details: `No-show risk view — ${highRisk} high, ${medRisk} medium, ${results.length - highRisk - medRisk} low`,
-    });
+      logPhiAccessFromRequest(req, session, {
+        patientId: '__LIST__',
+        patientName: `No-show risk list (${results.length} appointments)`,
+        action: 'view',
+        dataCategory: 'treatment_records',
+        details: `No-show risk view — ${highRisk} high, ${medRisk} medium, ${results.length - highRisk - medRisk} low`,
+      });
 
-    return NextResponse.json(results);
-  } catch (err) {
-    console.error('[dashboard/schedule/no-show-risk]', err);
-    return NextResponse.json({ error: 'Failed to compute no-show risk' }, { status: 500 });
-  }
+      return NextResponse.json(results);
+    } catch (err) {
+      console.error('[dashboard/schedule/no-show-risk]', err);
+      return NextResponse.json({ error: 'Failed to compute no-show risk' }, { status: 500 });
+    }
+  });
 }

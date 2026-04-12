@@ -7,6 +7,7 @@ import { calculateClinicScore, getCurrentBossLevel } from '@/lib/gamification/en
 import { getCurrentLevel, getNextLevel, getLevelProgress } from '@/lib/gamification/levels';
 import { TARGETS } from '@/data/dashboard/score-weights';
 import type { DailyMetrics } from '@/types/gamification';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface TransactionFields {
   'Date': string;
@@ -27,21 +28,22 @@ function todayISO(): string {
 }
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_executive')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/gamification/snapshot', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_executive')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'gamification:snapshot';
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'gamification:snapshot';
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const today = todayISO();
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const todayFilter = `IS_SAME({Date}, '${today}', 'day')`;
+    try {
+      const today = todayISO();
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+      const todayFilter = `IS_SAME({Date}, '${today}', 'day')`;
 
     const [todayTxns, todayAppts, monthTxns] = await Promise.all([
       fetchAll<TransactionFields>(Tables.transactions(), {
@@ -142,10 +144,11 @@ export async function GET() {
       asOf: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.REALTIME);
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error('[dashboard/gamification/snapshot]', err);
-    return NextResponse.json({ error: 'Failed to generate snapshot' }, { status: 500 });
-  }
+      cache.set(cacheKey, result, TTL.REALTIME);
+      return NextResponse.json(result);
+    } catch (err) {
+      console.error('[dashboard/gamification/snapshot]', err);
+      return NextResponse.json({ error: 'Failed to generate snapshot' }, { status: 500 });
+    }
+  });
 }
