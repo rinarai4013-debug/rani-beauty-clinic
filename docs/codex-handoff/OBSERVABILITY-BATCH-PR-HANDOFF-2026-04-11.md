@@ -376,3 +376,49 @@ Command for growth-ops resilience wave:
 CI=1 ./node_modules/.bin/vitest run \
   src/app/api/__tests__/dashboard-growth-ops-routes.test.ts
 ```
+
+Command for public-mutation depth wave:
+
+```bash
+CI=1 ./node_modules/.bin/vitest run \
+  src/app/api/__tests__/booking-route.test.ts \
+  src/app/api/__tests__/subscribe-plan-track.test.ts \
+  src/app/api/__tests__/consultation-submit-route.test.ts
+```
+
+Command for auth/profile resilience wave:
+
+```bash
+CI=1 ./node_modules/.bin/vitest run \
+  src/app/api/__tests__/auth.test.ts \
+  src/app/api/__tests__/patient-public-critical-routes.test.ts
+```
+
+Command for webhook + share-interest resilience wave:
+
+```bash
+CI=1 ./node_modules/.bin/vitest run \
+  src/app/api/__tests__/webhooks.test.ts \
+  src/app/api/__tests__/mastermind-sharing-routes.test.ts
+```
+
+Command for share-token patient payload edge wave:
+
+```bash
+CI=1 ./node_modules/.bin/vitest run \
+  src/app/api/__tests__/mastermind-session-detail-validate-share.test.ts
+```
+
+Command for ops/plaid resilience wave:
+
+```bash
+CI=1 ./node_modules/.bin/vitest run \
+  src/app/api/__tests__/mastermind-pdf-aura-import-and-ops-routes.test.ts
+```
+
+Command for webhook security hardening wave (includes Cherry fail-closed):
+
+```bash
+CI=1 ./node_modules/.bin/vitest run \
+  src/app/api/__tests__/webhooks.test.ts
+```

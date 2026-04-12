@@ -220,12 +220,71 @@ describe('patient auth + profile critical routes', () => {
     expect(body.profile.id).toBe('rec_client_1');
   });
 
+  it('GET /api/patient/profile returns 401 when no patient session exists', async () => {
+    getPatientSessionMock.mockResolvedValueOnce(null);
+
+    const { GET } = await import('@/app/api/patient/profile/route');
+    const response = await GET();
+
+    expect(response.status).toBe(401);
+  });
+
+  it('GET /api/patient/profile returns 500 on downstream profile fetch failures', async () => {
+    clientFindMock.mockRejectedValueOnce(new Error('client lookup failed'));
+
+    const { GET } = await import('@/app/api/patient/profile/route');
+    const response = await GET();
+
+    expect(response.status).toBe(500);
+  });
+
   it('PATCH /api/patient/profile rejects empty updates', async () => {
     const { PATCH } = await import('@/app/api/patient/profile/route');
     const request = new Request('http://localhost:3000/api/patient/profile', {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({}),
+    });
+
+    const response = await PATCH(request);
+    expect(response.status).toBe(400);
+  });
+
+  it('PATCH /api/patient/profile returns 401 when no patient session exists', async () => {
+    getPatientSessionMock.mockResolvedValueOnce(null);
+
+    const { PATCH } = await import('@/app/api/patient/profile/route');
+    const request = new Request('http://localhost:3000/api/patient/profile', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ phone: '425-555-0100' }),
+    });
+
+    const response = await PATCH(request);
+    expect(response.status).toBe(401);
+  });
+
+  it('PATCH /api/patient/profile rejects malformed JSON bodies', async () => {
+    const { PATCH } = await import('@/app/api/patient/profile/route');
+    const request = new Request('http://localhost:3000/api/patient/profile', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: '{"phone":',
+    });
+
+    const response = await PATCH(request);
+    expect(response.status).toBe(400);
+  });
+
+  it('PATCH /api/patient/profile rejects invalid enum values and unknown fields', async () => {
+    const { PATCH } = await import('@/app/api/patient/profile/route');
+    const request = new Request('http://localhost:3000/api/patient/profile', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        preferredContact: 'CarrierPigeon',
+        unexpectedField: 'not-allowed',
+      }),
     });
 
     const response = await PATCH(request);
@@ -246,5 +305,19 @@ describe('patient auth + profile critical routes', () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(updateRecordMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('PATCH /api/patient/profile returns 500 when persistence update fails', async () => {
+    updateRecordMock.mockRejectedValueOnce(new Error('update failed'));
+
+    const { PATCH } = await import('@/app/api/patient/profile/route');
+    const request = new Request('http://localhost:3000/api/patient/profile', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ phone: '425-555-0199' }),
+    });
+
+    const response = await PATCH(request);
+    expect(response.status).toBe(500);
   });
 });

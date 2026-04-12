@@ -301,6 +301,18 @@ describe('mastermind share + send + interest routes', () => {
     expect(response.status).toBe(400);
   });
 
+  it('POST /api/mastermind/share/interest rejects malformed JSON bodies', async () => {
+    const { POST } = await import('@/app/api/mastermind/share/interest/route');
+    const request = new Request('http://localhost:3000/api/mastermind/share/interest', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{"token":',
+    });
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(400);
+  });
+
   it('POST /api/mastermind/share/interest returns 404 for expired/invalid token', async () => {
     resolveTokenMock.mockResolvedValueOnce(null);
 
@@ -340,5 +352,70 @@ describe('mastermind share + send + interest routes', () => {
     expect(body.success).toBe(true);
     expect(body.details.airtableRecorded).toBe(true);
     expect(rateLimitedQueryMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/share/interest keeps success response when Airtable write fails', async () => {
+    rateLimitedQueryMock.mockRejectedValueOnce(new Error('airtable write failed'));
+
+    const { POST } = await import('@/app/api/mastermind/share/interest/route');
+    const request = new Request('http://localhost:3000/api/mastermind/share/interest', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        token: 'token123',
+        name: 'Jane Doe',
+        phone: '425-555-0100',
+        packageTier: 'Transform',
+      }),
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.details.airtableRecorded).toBe(false);
+  });
+
+  it('POST /api/mastermind/share/interest marks webhook fired when N8N URL is configured', async () => {
+    process.env.N8N_WEBHOOK_URL = 'https://hooks.n8n.local';
+
+    const { POST } = await import('@/app/api/mastermind/share/interest/route');
+    const request = new Request('http://localhost:3000/api/mastermind/share/interest', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        token: 'token123',
+        name: 'Jane Doe',
+        phone: '425-555-0100',
+        packageTier: 'Transform',
+      }),
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.details.webhookFired).toBe(true);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/share/interest returns 500 on unexpected downstream errors', async () => {
+    getSessionByIdAsyncMock.mockRejectedValueOnce(new Error('session store unavailable'));
+
+    const { POST } = await import('@/app/api/mastermind/share/interest/route');
+    const request = new Request('http://localhost:3000/api/mastermind/share/interest', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        token: 'token123',
+        name: 'Jane Doe',
+        phone: '425-555-0100',
+        packageTier: 'Transform',
+      }),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(500);
   });
 });

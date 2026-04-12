@@ -70,6 +70,10 @@ vi.mock('@/lib/airtable/client', () => ({
   rateLimitedQuery: (...args: unknown[]) => rateLimitedQueryMock(...args),
 }));
 
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
 describe('POST /api/consultation/submit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -110,6 +114,35 @@ describe('POST /api/consultation/submit', () => {
     expect(response.status).toBe(403);
   });
 
+  it('returns 413 when content-length guard blocks oversized payloads', async () => {
+    enforceContentLengthMock.mockReturnValueOnce(
+      new Response(JSON.stringify({ error: 'Request body too large' }), { status: 413 }),
+    );
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: new FormData(),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(413);
+  });
+
+  it('returns 429 when global form rate limit is exceeded', async () => {
+    rateLimitMock.mockReturnValueOnce({ allowed: false, resetIn: 22 });
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: new FormData(),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(429);
+    expect(rateLimitResponseMock).toHaveBeenCalledWith(22);
+  });
+
   it('returns 400 when required data field is missing', async () => {
     const { POST } = await import('@/app/api/consultation/submit/route');
     const request = new Request('http://localhost:3000/api/consultation/submit', {
@@ -119,6 +152,39 @@ describe('POST /api/consultation/submit', () => {
 
     const response = await POST(request as never);
     expect(response.status).toBe(400);
+  });
+
+  it('returns 400 when intake data JSON is malformed', async () => {
+    const formData = new FormData();
+    formData.set('data', '{"firstName":');
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(400);
+  });
+
+  it('returns 422 when zod validation fails', async () => {
+    safeParseMock.mockReturnValueOnce({
+      success: false,
+      error: { issues: [{ path: ['email'], message: 'Invalid email' }] },
+    });
+
+    const formData = new FormData();
+    formData.set('data', JSON.stringify({ firstName: 'Jane', email: 'bad-email' }));
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(422);
   });
 
   it('returns 400 when parsed intake has no email', async () => {
@@ -133,6 +199,32 @@ describe('POST /api/consultation/submit', () => {
 
     const response = await POST(request as never);
     expect(response.status).toBe(400);
+  });
+
+  it('returns 429 when scoped per-email limiter is exceeded', async () => {
+    rateLimitMock
+      .mockReturnValueOnce({ allowed: true, resetIn: 0 }) // consultation-submit
+      .mockReturnValueOnce({ allowed: false, resetIn: 45 }); // consultation-submit-email
+
+    const formData = new FormData();
+    formData.set(
+      'data',
+      JSON.stringify({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+      }),
+    );
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(429);
+    expect(rateLimitResponseMock).toHaveBeenCalledWith(45);
   });
 
   it('returns session metadata for a valid intake submission', async () => {
@@ -160,5 +252,57 @@ describe('POST /api/consultation/submit', () => {
     expect(body.success).toBe(true);
     expect(body.data.sessionId).toBe('ms_test_1');
     expect(intakeCreateMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps success response when Airtable intake write fails', async () => {
+    intakeCreateMock.mockRejectedValueOnce(new Error('airtable unavailable'));
+
+    const formData = new FormData();
+    formData.set(
+      'data',
+      JSON.stringify({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+      }),
+    );
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+  });
+
+  it('uses mock scan path when USE_MOCK_AI=true', async () => {
+    process.env.USE_MOCK_AI = 'true';
+
+    const formData = new FormData();
+    formData.set(
+      'data',
+      JSON.stringify({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+      }),
+    );
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+
+    expect(response.status).toBe(200);
+    expect(mockAuraScanResultMock).toHaveBeenCalledTimes(1);
+    expect(runAuraScanMock).not.toHaveBeenCalled();
   });
 });

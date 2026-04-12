@@ -164,6 +164,17 @@ describe('mastermind aura/pdf + ops routes', () => {
     expect(body.meta.count).toBe(2);
   });
 
+  it('GET /api/mastermind/aura-import returns 500 when scan listing throws', async () => {
+    listAvailableScansMock.mockImplementationOnce(() => {
+      throw new Error('scanner service unavailable');
+    });
+
+    const { GET } = await import('@/app/api/mastermind/aura-import/route');
+    const response = await GET();
+
+    expect(response.status).toBe(500);
+  });
+
   it('POST /api/mastermind/aura-import requires sessionId', async () => {
     const { POST } = await import('@/app/api/mastermind/aura-import/route');
     const response = await POST(
@@ -171,6 +182,19 @@ describe('mastermind aura/pdf + ops routes', () => {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ patientName: 'Jane Doe' }),
+      }) as never,
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  it('POST /api/mastermind/aura-import returns 400 for malformed JSON payloads', async () => {
+    const { POST } = await import('@/app/api/mastermind/aura-import/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/aura-import', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{"sessionId":',
       }) as never,
     );
 
@@ -234,6 +258,42 @@ describe('mastermind aura/pdf + ops routes', () => {
     expect(body.meta.source).toBe('aura-device-ai');
     expect(saveSessionToAirtableMock).toHaveBeenCalledTimes(2);
     expect(runAIAuraScanWithDeviceMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/aura-import returns 500 when AI analysis fails', async () => {
+    runAIAuraScanWithDeviceMock.mockRejectedValueOnce(new Error('ai scan failed'));
+
+    const { POST } = await import('@/app/api/mastermind/aura-import/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/aura-import', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sessionId: 'ms_1', patientName: 'Jane Doe' }),
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.success).toBe(false);
+    expect(body.error).toContain('Aura import failed');
+  });
+
+  it('POST /api/mastermind/aura-import returns 500 when session persistence fails', async () => {
+    saveSessionToAirtableMock.mockRejectedValueOnce(new Error('session write failed'));
+
+    const { POST } = await import('@/app/api/mastermind/aura-import/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/aura-import', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sessionId: 'ms_1', patientName: 'Jane Doe' }),
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.success).toBe(false);
+    expect(body.error).toContain('Aura import failed');
   });
 
   it('POST /api/mastermind/pdf rejects invalid body', async () => {
@@ -373,6 +433,17 @@ describe('mastermind aura/pdf + ops routes', () => {
     expect(body.providers).toHaveLength(1);
   });
 
+  it('GET /api/dashboard/providers/performance returns 500 when upstream provider intelligence fails', async () => {
+    fetchProviderIntelligenceMock.mockRejectedValueOnce(new Error('provider service unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/providers/performance/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to fetch provider performance');
+  });
+
   it('GET /api/dashboard/plaid/transactions returns 401 for unauthenticated users', async () => {
     getSessionMock.mockResolvedValueOnce(null);
     const { GET } = await import('@/app/api/dashboard/plaid/transactions/route');
@@ -407,5 +478,30 @@ describe('mastermind aura/pdf + ops routes', () => {
     expect(body.page).toBe(1);
     expect(body.hasMore).toBe(false);
     expect(body.transactions[0].merchantName).toBe('Cherry');
+  });
+
+  it('GET /api/dashboard/plaid/transactions applies category and date range filters', async () => {
+    const { GET } = await import('@/app/api/dashboard/plaid/transactions/route');
+    const response = await GET(
+      new Request(
+        'http://localhost:3000/api/dashboard/plaid/transactions?category=revenue&startDate=2026-04-01&endDate=2026-04-10',
+      ) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.total).toBe(1);
+    expect(body.transactions[0].id).toBe('tx_2');
+  });
+
+  it('GET /api/dashboard/plaid/transactions returns 500 when storage read fails', async () => {
+    readStorageMock.mockRejectedValueOnce(new Error('disk unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/plaid/transactions/route');
+    const response = await GET(
+      new Request('http://localhost:3000/api/dashboard/plaid/transactions') as never,
+    );
+
+    expect(response.status).toBe(500);
   });
 });

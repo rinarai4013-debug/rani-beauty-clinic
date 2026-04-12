@@ -54,6 +54,7 @@ vi.mock('@/lib/logging/structured-logger', () => ({
 vi.mock('@/lib/sentry-utils', () => ({
   captureAuthEvent: vi.fn(),
   captureWebhookEvent: vi.fn(),
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
 }));
 
 // ---------------------------------------------------------------------------
@@ -88,6 +89,13 @@ describe('POST /api/dashboard/auth/login', () => {
     expect(data.user.username).toBe('rina');
     expect(data.user.role).toBe('ceo');
     expect(data.user.displayName).toBe('Rina');
+  });
+
+  it('should return 405 for GET /api/dashboard/auth/login', async () => {
+    const { GET } = await import('@/app/api/dashboard/auth/login/route');
+    const response = await GET();
+
+    expect(response.status).toBe(405);
   });
 
   it('should set a session cookie on successful login', async () => {
@@ -127,6 +135,18 @@ describe('POST /api/dashboard/auth/login', () => {
     const response = await POST(req);
     const data = await expectJsonStatus(response, 401);
     expect(data.error).toBe('Invalid credentials');
+  });
+
+  it('should match usernames case-insensitively', async () => {
+    const { POST } = await import('@/app/api/dashboard/auth/login/route');
+    const req = buildPostRequest('/api/dashboard/auth/login', {
+      username: 'RINA',
+      password: 'testpass123',
+    });
+
+    const response = await POST(req);
+    const data = await expectJsonStatus(response, 200);
+    expect(data.user.username).toBe('rina');
   });
 
   it('should return 400 for missing username', async () => {
@@ -309,6 +329,34 @@ describe('POST /api/dashboard/auth/login', () => {
       expect(resp.status).toBe(401); // Not 429
     }
   });
+
+  it('should use fallback cookie config when cookie helper returns invalid config', async () => {
+    mockGetSessionCookieConfig.mockReturnValueOnce(null as unknown as ReturnType<typeof mockGetSessionCookieConfig>);
+
+    const { POST } = await import('@/app/api/dashboard/auth/login/route');
+    const req = buildPostRequest('/api/dashboard/auth/login', {
+      username: 'rina',
+      password: 'testpass123',
+    }, { 'x-forwarded-for': '10.0.0.90' });
+
+    const response = await POST(req);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('set-cookie')).toContain('rani-session=');
+  });
+
+  it('should return 500 when session creation fails unexpectedly', async () => {
+    mockCreateSession.mockRejectedValueOnce(new Error('session signing failed'));
+
+    const { POST } = await import('@/app/api/dashboard/auth/login/route');
+    const req = buildPostRequest('/api/dashboard/auth/login', {
+      username: 'rina',
+      password: 'testpass123',
+    }, { 'x-forwarded-for': '10.0.0.91' });
+
+    const response = await POST(req);
+    const data = await expectJsonStatus(response, 500);
+    expect(data.error).toBe('Login failed');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -370,6 +418,16 @@ describe('GET /api/dashboard/auth/me', () => {
     expect(data.user.role).toBe('provider');
     expect(data.user.displayName).toBe('Mom');
   });
+
+  it('should return 500 when session lookup throws unexpectedly', async () => {
+    mockGetSession.mockRejectedValueOnce(new Error('session store unavailable'));
+    const { GET } = await import('@/app/api/dashboard/auth/me/route');
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Internal server error');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -406,5 +464,14 @@ describe('POST /api/dashboard/auth/logout', () => {
 
     const setCookieHeader = response.headers.get('set-cookie');
     expect(setCookieHeader).toContain('rani-session');
+  });
+
+  it('should return 405 for GET /api/dashboard/auth/logout', async () => {
+    const { GET } = await import('@/app/api/dashboard/auth/logout/route');
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(405);
+    expect(data.error).toBe('Method not allowed');
   });
 });

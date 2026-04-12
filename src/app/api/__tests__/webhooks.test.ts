@@ -3,9 +3,10 @@
  *   POST /api/webhooks/mangomint
  *   POST /api/webhooks/stripe
  *   POST /api/webhooks/cherry
+ *   POST /api/webhooks/meta-capi
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   expectJsonStatus,
   hmacSha256,
@@ -17,6 +18,8 @@ import {
 
 const mockRateLimitedQuery = vi.fn().mockImplementation(<T>(fn: () => Promise<T>) => fn());
 const mockFetchAll = vi.fn().mockResolvedValue([]);
+const fetchFirstMock = vi.fn().mockResolvedValue([]);
+const updateRecordMock = vi.fn().mockResolvedValue(undefined);
 const mockCacheInvalidatePrefix = vi.fn();
 const mockRateLimit = vi.fn().mockReturnValue({ allowed: true, resetIn: 0 });
 const mockRateLimitResponse = vi.fn().mockImplementation(
@@ -60,8 +63,8 @@ vi.mock('@/lib/airtable/client', () => {
     },
     rateLimitedQuery: (...args: unknown[]) => mockRateLimitedQuery(...args),
     fetchAll: (...args: unknown[]) => mockFetchAll(...args),
-    fetchFirst: vi.fn().mockResolvedValue([]),
-    updateRecord: vi.fn().mockResolvedValue(undefined),
+    fetchFirst: (...args: unknown[]) => fetchFirstMock(...args),
+    updateRecord: (...args: unknown[]) => updateRecordMock(...args),
   };
 });
 
@@ -621,5 +624,278 @@ describe('POST /api/webhooks/cherry', () => {
     const data = await expectJsonStatus(response, 200);
     expect(data.received).toBe(true);
     expect(data.event).toBe('unknown.event');
+  });
+
+  it('should return 401 when Cherry signature header is missing', async () => {
+    const payload = JSON.stringify({
+      event: 'checkout.completed',
+      data: { customerId: 'customer_1' },
+    });
+
+    const req = new Request('http://localhost:3000/api/webhooks/cherry', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: payload,
+    });
+
+    const { POST } = await import('@/app/api/webhooks/cherry/route');
+    const response = await POST(req as any);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('should return 503 when Cherry webhook secret is not configured', async () => {
+    delete process.env.CHERRY_WEBHOOK_SECRET;
+
+    const req = new Request('http://localhost:3000/api/webhooks/cherry', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        event: 'checkout.completed',
+        data: { customerId: 'customer_1' },
+      }),
+    });
+
+    const { POST } = await import('@/app/api/webhooks/cherry/route');
+    const response = await POST(req as any);
+
+    expect(response.status).toBe(503);
+  });
+
+  it('should return 401 when Cherry signature is invalid', async () => {
+    const req = new Request('http://localhost:3000/api/webhooks/cherry', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-webhook-signature': 'totally-invalid',
+      },
+      body: JSON.stringify({
+        event: 'checkout.completed',
+        data: { customerId: 'customer_2' },
+      }),
+    });
+
+    const { POST } = await import('@/app/api/webhooks/cherry/route');
+    const response = await POST(req as any);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('should return warning when checkout.completed lacks identifiers', async () => {
+    const response = await sendCherryWebhook('checkout.completed', {
+      status: 'approved',
+      amount: 1200,
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.warning).toContain('No customer identifier');
+  });
+
+  it('should update matching plan status to Booked on checkout.completed', async () => {
+    fetchFirstMock.mockResolvedValueOnce([
+      {
+        id: 'rec_plan_7',
+        fields: { Status: 'Viewed', 'Client Name': 'customer-abc' },
+      },
+    ]);
+
+    const response = await sendCherryWebhook('checkout.completed', {
+      customerId: 'customer-abc',
+      amount: 3300,
+      status: 'approved',
+    });
+
+    const body = await response.json();
+    expect(response.status).toBe(200);
+    expect(body.received).toBe(true);
+    expect(updateRecordMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/webhooks/meta-capi
+// ---------------------------------------------------------------------------
+
+describe('POST /api/webhooks/meta-capi', () => {
+  const META_SECRET = 'meta_capi_secret_abc';
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.META_CAPI_ACCESS_TOKEN = 'meta_access_token';
+    process.env.META_CAPI_WEBHOOK_SECRET = META_SECRET;
+    process.env.NEXT_PUBLIC_META_PIXEL_ID = '123456789';
+
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ events_received: 1 }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    ) as unknown as typeof global.fetch;
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  async function sendMetaWebhook(payload: Record<string, unknown>) {
+    const raw = JSON.stringify(payload);
+    const signature = `sha256=${await hmacSha256(META_SECRET, raw)}`;
+
+    const request = new Request('http://localhost:3000/api/webhooks/meta-capi', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-hub-signature-256': signature,
+        'user-agent': 'vitest-agent',
+      },
+      body: raw,
+    });
+
+    const { POST } = await import('@/app/api/webhooks/meta-capi/route');
+    return POST(request as any);
+  }
+
+  it('should return 500 when access token is missing', async () => {
+    delete process.env.META_CAPI_ACCESS_TOKEN;
+
+    const { POST } = await import('@/app/api/webhooks/meta-capi/route');
+    const request = new Request('http://localhost:3000/api/webhooks/meta-capi', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ event_name: 'Lead' }),
+    });
+
+    const response = await POST(request as any);
+    expect(response.status).toBe(500);
+  });
+
+  it('should return 503 when webhook secret is missing', async () => {
+    delete process.env.META_CAPI_WEBHOOK_SECRET;
+
+    const { POST } = await import('@/app/api/webhooks/meta-capi/route');
+    const request = new Request('http://localhost:3000/api/webhooks/meta-capi', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ event_name: 'Lead' }),
+    });
+
+    const response = await POST(request as any);
+    expect(response.status).toBe(503);
+  });
+
+  it('should return 401 when signature is missing', async () => {
+    const { POST } = await import('@/app/api/webhooks/meta-capi/route');
+    const request = new Request('http://localhost:3000/api/webhooks/meta-capi', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ event_name: 'Lead' }),
+    });
+
+    const response = await POST(request as any);
+    expect(response.status).toBe(401);
+  });
+
+  it('should return 401 when signature is invalid', async () => {
+    const request = new Request('http://localhost:3000/api/webhooks/meta-capi', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-hub-signature-256': 'sha256=invalid',
+      },
+      body: JSON.stringify({ event_name: 'Lead' }),
+    });
+
+    const { POST } = await import('@/app/api/webhooks/meta-capi/route');
+    const response = await POST(request as any);
+    expect(response.status).toBe(401);
+  });
+
+  it('should return 400 for malformed JSON after passing signature verification', async () => {
+    const payload = '{"event_name":';
+    const signature = `sha256=${await hmacSha256(META_SECRET, payload)}`;
+
+    const request = new Request('http://localhost:3000/api/webhooks/meta-capi', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-hub-signature-256': signature,
+      },
+      body: payload,
+    });
+
+    const { POST } = await import('@/app/api/webhooks/meta-capi/route');
+    const response = await POST(request as any);
+    expect(response.status).toBe(400);
+  });
+
+  it('should return 400 for invalid event payload schema', async () => {
+    const response = await sendMetaWebhook({
+      event_name: '',
+      user_data: {},
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should return 502 when Meta Graph API responds non-OK', async () => {
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      new Response(JSON.stringify({ error: { message: 'bad token' } }), { status: 400 }),
+    );
+
+    const response = await sendMetaWebhook({
+      event_name: 'Lead',
+      user_data: { email: 'jane@example.com' },
+      custom_data: { value: 100 },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(502);
+    expect(body.error).toBe('Meta CAPI request failed');
+  });
+
+  it('should forward hashed user data and return success on valid payload', async () => {
+    const response = await sendMetaWebhook({
+      event_name: 'Lead',
+      event_time: 1731000000,
+      event_source_url: 'https://www.ranibeautyclinic.com/consultation',
+      user_data: {
+        email: 'Jane@Example.com',
+        phone: '+1 (425) 555-0188',
+        client_ip: '10.1.1.1',
+        client_user_agent: 'Mozilla/Test',
+      },
+      custom_data: {
+        source: 'quiz',
+        value: 3500,
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.events_received).toBe(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('graph.facebook.com/v18.0/123456789/events?access_token=meta_access_token'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+
+    const fetchCall = (global.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
+    const requestInit = fetchCall[1] as RequestInit;
+    const forwardedBody = JSON.parse(String(requestInit.body)) as {
+      data: Array<{ user_data: Record<string, string> }>;
+    };
+    const userData = forwardedBody.data[0].user_data;
+
+    expect(userData.em).toMatch(/^[a-f0-9]{64}$/);
+    expect(userData.ph).toMatch(/^[a-f0-9]{64}$/);
+    expect(userData.em).not.toContain('jane@example.com');
+    expect(userData.ph).not.toContain('425');
+    expect(userData.client_ip_address).toBe('10.1.1.1');
   });
 });

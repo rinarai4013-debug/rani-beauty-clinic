@@ -464,6 +464,17 @@ describe('mastermind session detail + validate + share token routes', () => {
     expect(response.status).toBe(422);
   });
 
+  it('GET /api/mastermind/share/[token] returns 404 when session cannot be loaded', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce(null);
+    const { GET } = await import('@/app/api/mastermind/share/[token]/route');
+    const response = await GET(
+      new Request('http://localhost:3000/api/mastermind/share/share_123') as never,
+      { params: Promise.resolve({ token: 'share_123' }) },
+    );
+
+    expect(response.status).toBe(404);
+  });
+
   it('GET /api/mastermind/share/[token] returns sanitized patient-facing payload', async () => {
     const { GET } = await import('@/app/api/mastermind/share/[token]/route');
     const response = await GET(
@@ -480,6 +491,53 @@ describe('mastermind session detail + validate + share token routes', () => {
     expect(body.data.concerns[0].id).toBeUndefined();
     expect(body.data.concerns[0].score).toBeUndefined();
     expect(body.data.simulation.costOfDelay).toBeUndefined();
+  });
+
+  it('GET /api/mastermind/share/[token] falls back to intake firstName when patientName is missing', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce({
+      id: 'ms_1',
+      createdAt: '2026-04-10T00:00:00.000Z',
+      patientName: '',
+      intakeData: { firstName: 'FallbackName' },
+      auraScanResult: {
+        auraScore: {
+          overall: 80,
+          grade: 'B+',
+          label: 'Strong',
+          skinAge: 37,
+          chronologicalAge: 34,
+          skinAgeDelta: 3,
+          percentile: 84,
+        },
+        detectedConcerns: [],
+        zoneAnalysis: [],
+      },
+      mastermindPlan: {
+        recommendations: { primary: [], complementary: [], maintenance: [] },
+        sequencing: [],
+        packages: [],
+        aftercarePreview: [],
+        aiSummary: {
+          patientFacing: 'summary',
+          providerFacing: 'internal',
+          keyHighlights: [],
+          addressedConcerns: [],
+        },
+        contraindications: [],
+      },
+      simulationComparison: null,
+    });
+
+    const { GET } = await import('@/app/api/mastermind/share/[token]/route');
+    const response = await GET(
+      new Request('http://localhost:3000/api/mastermind/share/share_123') as never,
+      { params: Promise.resolve({ token: 'share_123' }) },
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.patientName).toBe('FallbackName');
+    expect(body.expiresAt).toBe('2026-04-17T00:00:00.000Z');
   });
 
   it('GET /api/mastermind/share/[token] returns 500 on unexpected token-resolution failures', async () => {
