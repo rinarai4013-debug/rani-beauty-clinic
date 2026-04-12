@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { calculateClinicScore } from '@/lib/gamification/engine';
+import { withSentry } from '@/lib/sentry-utils';
 
 // ── Field interfaces ──
 
@@ -122,20 +123,21 @@ function pctChange(current: number, previous: number): number | null {
 // ── Route handler ──
 
 export async function GET(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_executive')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/kpis', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_executive')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const searchParams = new URL(req.url).searchParams;
-  const range = searchParams.get('range') || 'today';
-  const cacheKey = 'kpis';
+    const searchParams = new URL(req.url).searchParams;
+    const range = searchParams.get('range') || 'today';
+    const cacheKey = 'kpis';
 
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
+    try {
     const current = getRangeDates(range);
     const previous = getPreviousPeriodDates(range);
     const weekStart = getWeekStart();
@@ -289,10 +291,11 @@ export async function GET(req: NextRequest) {
       asOf: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.REALTIME); // 30s — matches SWR refresh
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error('[dashboard/kpis]', err);
-    return NextResponse.json({ error: 'Failed to fetch KPIs' }, { status: 500 });
-  }
+      cache.set(cacheKey, result, TTL.REALTIME); // 30s — matches SWR refresh
+      return NextResponse.json(result);
+    } catch (err) {
+      console.error('[dashboard/kpis]', err);
+      return NextResponse.json({ error: 'Failed to fetch KPIs' }, { status: 500 });
+    }
+  });
 }

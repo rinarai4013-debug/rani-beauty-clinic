@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface ClientFields {
   'Status': string;
@@ -16,31 +17,32 @@ interface AppointmentFields {
 }
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_leads')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/leads/stats', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_leads')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'leads:stats';
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'leads:stats';
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const [clients, consults] = await Promise.all([
-      fetchAll<ClientFields>(
-        Tables.clients(),
-        { fields: ['Status'] },
-        true
-      ),
-      fetchAll<AppointmentFields>(
-        Tables.appointments(),
-        {
-          filterByFormula: `{Is Consult} = TRUE()`,
-          fields: ['Is Consult', 'Consult Outcome', 'Date', 'Status'],
-        }
-      ),
-    ]);
+    try {
+      const [clients, consults] = await Promise.all([
+        fetchAll<ClientFields>(
+          Tables.clients(),
+          { fields: ['Status'] },
+          true
+        ),
+        fetchAll<AppointmentFields>(
+          Tables.appointments(),
+          {
+            filterByFormula: `{Is Consult} = TRUE()`,
+            fields: ['Is Consult', 'Consult Outcome', 'Date', 'Status'],
+          }
+        ),
+      ]);
 
     const newLeads = clients.filter(c => c.fields['Status'] === 'New Lead').length;
     const active = clients.filter(c => c.fields['Status'] === 'Active').length;
@@ -74,10 +76,11 @@ export async function GET() {
       asOf: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.MODERATE);
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error('[dashboard/leads/stats]', err);
-    return NextResponse.json({ error: 'Failed to fetch lead stats' }, { status: 500 });
-  }
+      cache.set(cacheKey, result, TTL.MODERATE);
+      return NextResponse.json(result);
+    } catch (err) {
+      console.error('[dashboard/leads/stats]', err);
+      return NextResponse.json({ error: 'Failed to fetch lead stats' }, { status: 500 });
+    }
+  });
 }

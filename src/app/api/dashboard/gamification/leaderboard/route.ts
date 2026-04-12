@@ -2,14 +2,16 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (!hasPermission(session.role, 'view_leaderboard')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/gamification/leaderboard', async () => {
+    try {
+      const session = await getSession();
+      if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      if (!hasPermission(session.role, 'view_leaderboard')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'gamification-leaderboard';
     const cached = cache.get(cacheKey);
@@ -23,10 +25,11 @@ export async function GET() {
       ],
     };
 
-    cache.set(cacheKey, payload, TTL.STANDARD);
-    return NextResponse.json(payload);
-  } catch (err) {
-    console.error('[dashboard/gamification/leaderboard]', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+      cache.set(cacheKey, payload, TTL.STANDARD);
+      return NextResponse.json(payload);
+    } catch (err) {
+      console.error('[dashboard/gamification/leaderboard]', err);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+  });
 }

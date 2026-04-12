@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { withSentry } from '@/lib/sentry-utils';
 
 const IntakeSchema = z.object({
   intakeData: z.record(z.string(), z.unknown()),
@@ -26,61 +27,63 @@ const FALLBACK_INTELLIGENCE = {
 };
 
 export async function POST(req: NextRequest) {
-  const ip = getClientIP(req);
-  const { allowed, resetIn } = rateLimit('ai-intake', ip, RATE_LIMITS.AI);
-  if (!allowed) return rateLimitResponse(resetIn);
+  return withSentry('ai/intake', async () => {
+    const ip = getClientIP(req);
+    const { allowed, resetIn } = rateLimit('ai-intake', ip, RATE_LIMITS.AI);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_leads')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_leads')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  const parsed = IntakeSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
-  }
+    const parsed = IntakeSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+    }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
-  }
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
+    }
 
-  try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-latest',
-      max_tokens: 700,
-      system: 'Return valid JSON with intake intelligence for a medspa consultation.',
-      messages: [
-        {
-          role: 'user',
-          content: JSON.stringify(parsed.data.intakeData),
-        },
-      ],
-    });
+    try {
+      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const response = await client.messages.create({
+        model: 'claude-3-5-sonnet-latest',
+        max_tokens: 700,
+        system: 'Return valid JSON with intake intelligence for a medspa consultation.',
+        messages: [
+          {
+            role: 'user',
+            content: JSON.stringify(parsed.data.intakeData),
+          },
+        ],
+      });
 
-    const raw = response.content
-      .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
-      .map((block) => block.text)
-      .join('\n')
-      .trim();
+      const raw = response.content
+        .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
+        .map((block) => block.text)
+        .join('\n')
+        .trim();
 
-    return NextResponse.json({
-      intelligence: JSON.parse(raw),
-      source: 'ai',
-    });
-  } catch (error) {
-    console.error('[ai/intake]', error);
-    return NextResponse.json({
-      intelligence: FALLBACK_INTELLIGENCE,
-      source: 'fallback',
-    });
-  }
+      return NextResponse.json({
+        intelligence: JSON.parse(raw),
+        source: 'ai',
+      });
+    } catch (error) {
+      console.error('[ai/intake]', error);
+      return NextResponse.json({
+        intelligence: FALLBACK_INTELLIGENCE,
+        source: 'fallback',
+      });
+    }
+  });
 }

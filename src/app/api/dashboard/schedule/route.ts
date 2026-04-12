@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 import type { AppointmentItem } from '@/types/dashboard';
 
 interface AppointmentFields {
@@ -26,24 +27,25 @@ interface AppointmentFields {
 const HOURS_PER_PROVIDER = 8;
 
 export async function GET(request: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_schedule')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/schedule', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_schedule')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'schedule-today';
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'schedule-today';
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const todayAppointments = await fetchAll<AppointmentFields>(
-      Tables.appointments(),
-      {
-        filterByFormula: `{Date} = TODAY()`,
-        sort: [{ field: 'Time', direction: 'asc' }],
-      }
-    );
+    try {
+      const todayAppointments = await fetchAll<AppointmentFields>(
+        Tables.appointments(),
+        {
+          filterByFormula: `{Date} = TODAY()`,
+          sort: [{ field: 'Time', direction: 'asc' }],
+        }
+      );
 
     // Map to AppointmentItem shape
     const today: AppointmentItem[] = todayAppointments.map((a) => {
@@ -114,24 +116,25 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    cache.set(cacheKey, data, TTL.REALTIME);
+      cache.set(cacheKey, data, TTL.REALTIME);
 
     // HIPAA §164.312(b): today's schedule exposes appointment metadata
     // for every client seen today. Aggregate log entry — the Client
     // names aren't included in the response payload yet (they default
     // to 'Walk-in' due to a pending linked-record lookup), but this
     // gets the audit trail in place for when the lookup is wired.
-    logPhiAccessFromRequest(request, session, {
-      patientId: '__LIST__',
-      patientName: `Today's schedule (${today.length} appointments)`,
-      action: 'view',
-      dataCategory: 'treatment_records',
-      details: `Schedule view — ${filledSlots} filled, ${noShows} no-shows, ${cancellations} cancelled`,
-    });
+      logPhiAccessFromRequest(request, session, {
+        patientId: '__LIST__',
+        patientName: `Today's schedule (${today.length} appointments)`,
+        action: 'view',
+        dataCategory: 'treatment_records',
+        details: `Schedule view — ${filledSlots} filled, ${noShows} no-shows, ${cancellations} cancelled`,
+      });
 
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Schedule route error:', error);
-    return NextResponse.json({ error: 'Failed to fetch schedule data' }, { status: 500 });
-  }
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Schedule route error:', error);
+      return NextResponse.json({ error: 'Failed to fetch schedule data' }, { status: 500 });
+    }
+  });
 }

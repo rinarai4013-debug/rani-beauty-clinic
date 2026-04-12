@@ -5,6 +5,7 @@ import { cache, TTL } from '@/lib/cache';
 import type { AgentId, AgentReport } from '@/types/agent';
 import { AGENT_REGISTRY } from '@/lib/agents/registry';
 import { buildOfflineReport, buildComplianceReport, buildFinanceReport, buildScoredReport } from '@/lib/agents/report-builder';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/agents/[agentId]
@@ -19,14 +20,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ agentId: string }> }
 ) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_executive')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/agents/[agentId]', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_executive')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const { agentId } = await params;
 
@@ -51,15 +53,16 @@ export async function GET(
     // Build report by fetching from the agent's internal API routes
     const report = await buildAgentReport(agentId as AgentId, request);
 
-    cache.set(cacheKey, report, TTL.STANDARD);
-    return NextResponse.json({ success: true, data: report });
-  } catch (error) {
-    console.error(`Agent report error:`, error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to build agent report' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, report, TTL.STANDARD);
+      return NextResponse.json({ success: true, data: report });
+    } catch (error) {
+      console.error(`Agent report error:`, error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to build agent report' },
+        { status: 500 }
+      );
+    }
+  });
 }
 
 /**

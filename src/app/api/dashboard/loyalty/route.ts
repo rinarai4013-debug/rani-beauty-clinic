@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
 import { z } from 'zod';
+import { withSentry } from '@/lib/sentry-utils';
 import {
   buildAnalytics,
   determineTier,
@@ -44,11 +45,12 @@ const LoyaltyRewardsQuerySchema = z.object({
  *   ?action=rewards&tier=xxx&balance=xxx - Available rewards for tier/balance
  */
 export async function GET(req: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  return withSentry('dashboard/loyalty/get', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
 
     const { searchParams } = new URL(req.url);
     const action = searchParams.get('action') || 'analytics';
@@ -109,11 +111,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ rewards });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) {
-    console.error('[Loyalty API] Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    } catch (error) {
+      console.error('[Loyalty API] Error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+  });
 }
 
 /**
@@ -125,11 +128,12 @@ export async function GET(req: NextRequest) {
  *   { action: 'process_spend', clientId: string, amount: number, serviceType: string }
  */
 export async function POST(req: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  return withSentry('dashboard/loyalty/post', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
 
     if (!hasPermission(session.role, 'entry_sale')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -165,11 +169,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) {
-    console.error('[Loyalty API] POST Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    } catch (error) {
+      console.error('[Loyalty API] POST Error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+  });
 }
 
 // ── Sample Data (replace with Airtable queries in production) ────────────

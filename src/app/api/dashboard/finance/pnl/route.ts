@@ -9,6 +9,7 @@ import {
   type RevenueEntry,
   type ExpenseEntry,
 } from '@/lib/finance/pnl-engine';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/finance/pnl
@@ -36,14 +37,15 @@ interface ExpenseAlertFields {
 }
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_finance')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/finance/pnl', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_finance')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'finance-pnl';
     const cached = cache.get<unknown>(cacheKey);
@@ -158,13 +160,14 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.SLOW);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('P&L intelligence error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to generate P&L intelligence' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, result, TTL.SLOW);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('P&L intelligence error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to generate P&L intelligence' },
+        { status: 500 }
+      );
+    }
+  });
 }

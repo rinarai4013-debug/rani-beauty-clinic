@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface AppointmentFields {
   'Provider': string;
@@ -55,25 +56,26 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ name: string }> }
 ) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_providers')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/providers/[name]', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_providers')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const { name } = await params;
-  const normalizedName = name.toLowerCase();
-  const providerInfo = PROVIDER_INFO[normalizedName];
+    const { name } = await params;
+    const normalizedName = name.toLowerCase();
+    const providerInfo = PROVIDER_INFO[normalizedName];
 
-  if (!providerInfo) {
-    return NextResponse.json({ error: 'Provider not found' }, { status: 404 });
-  }
+    if (!providerInfo) {
+      return NextResponse.json({ error: 'Provider not found' }, { status: 404 });
+    }
 
-  const cacheKey = `providers:detail:${normalizedName}`;
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = `providers:detail:${normalizedName}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
+    try {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
@@ -184,10 +186,11 @@ export async function GET(
       asOf: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.RELAXED);
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error(`[dashboard/providers/${name}]`, err);
-    return NextResponse.json({ error: 'Failed to fetch provider details' }, { status: 500 });
-  }
+      cache.set(cacheKey, result, TTL.RELAXED);
+      return NextResponse.json(result);
+    } catch (err) {
+      console.error(`[dashboard/providers/${name}]`, err);
+      return NextResponse.json({ error: 'Failed to fetch provider details' }, { status: 500 });
+    }
+  });
 }

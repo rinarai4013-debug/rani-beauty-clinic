@@ -4,6 +4,7 @@ import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { analyzeInventory, type InventoryInput, type InventoryItem, type InventoryCategory } from '@/lib/inventory/auto-manager';
+import { withSentry } from '@/lib/sentry-utils';
 
 // Fields stored in the Alerts table by the entry/inventory form
 interface InventoryAlertFields {
@@ -121,28 +122,29 @@ function buildInventoryItems(
 }
 
 export async function GET() {
-  // Auth check
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_executive')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/inventory', async () => {
+    // Auth check
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_executive')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  // Check cache
-  const cacheKey = 'inventory-intelligence';
-  const cached = cache.get<{ success: true; data: ReturnType<typeof analyzeInventory>; generatedAt: string }>(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    // Check cache
+    const cacheKey = 'inventory-intelligence';
+    const cached = cache.get<{ success: true; data: ReturnType<typeof analyzeInventory>; generatedAt: string }>(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    // Query Alerts table for inventory entries
-    // The entry/inventory form writes records with Message starting with "[Inventory"
-    const inventoryRecords = await fetchAll<InventoryAlertFields>(
-      Tables.alerts(),
-      {
-        filterByFormula: `SEARCH("[Inventory", {Message})`,
-        sort: [{ field: 'Created Date', direction: 'desc' }],
-      }
-    );
+    try {
+      // Query Alerts table for inventory entries
+      // The entry/inventory form writes records with Message starting with "[Inventory"
+      const inventoryRecords = await fetchAll<InventoryAlertFields>(
+        Tables.alerts(),
+        {
+          filterByFormula: `SEARCH("[Inventory", {Message})`,
+          sort: [{ field: 'Created Date', direction: 'desc' }],
+        }
+      );
 
     // No inventory data yet - return clear empty state
     if (inventoryRecords.length === 0) {
@@ -186,13 +188,14 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, response, TTL.SLOW);
-    return NextResponse.json(response);
-  } catch (error) {
-    console.error('Inventory analysis error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to analyze inventory' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, response, TTL.SLOW);
+      return NextResponse.json(response);
+    } catch (error) {
+      console.error('Inventory analysis error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to analyze inventory' },
+        { status: 500 }
+      );
+    }
+  });
 }

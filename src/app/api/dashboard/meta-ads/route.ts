@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 interface MetaCampaign {
   id: string;
@@ -32,29 +33,30 @@ interface MetaAdsData {
 }
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_revenue')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/meta-ads', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_revenue')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'meta-ads';
-  const cached = cache.get<MetaAdsData>(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'meta-ads';
+    const cached = cache.get<MetaAdsData>(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  const accessToken = process.env.META_ACCESS_TOKEN;
-  const adAccountId = process.env.META_AD_ACCOUNT_ID;
+    const accessToken = process.env.META_ACCESS_TOKEN;
+    const adAccountId = process.env.META_AD_ACCOUNT_ID;
 
-  if (!accessToken || !adAccountId) {
-    return NextResponse.json({
-      error: 'Meta Ads not configured',
-      message: 'Set META_ACCESS_TOKEN and META_AD_ACCOUNT_ID environment variables',
-      summary: null,
-      campaigns: [],
-    });
-  }
+    if (!accessToken || !adAccountId) {
+      return NextResponse.json({
+        error: 'Meta Ads not configured',
+        message: 'Set META_ACCESS_TOKEN and META_AD_ACCOUNT_ID environment variables',
+        summary: null,
+        campaigns: [],
+      });
+    }
 
-  try {
+    try {
     // Fetch campaign insights from Meta Marketing API
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const until = new Date().toISOString().split('T')[0];
@@ -134,10 +136,11 @@ export async function GET() {
       dateRange: `${since} to ${until}`,
     };
 
-    cache.set(cacheKey, data, TTL.RELAXED);
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Meta Ads fetch error:', error);
-    return NextResponse.json({ error: 'Failed to fetch Meta Ads data' }, { status: 500 });
-  }
+      cache.set(cacheKey, data, TTL.RELAXED);
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Meta Ads fetch error:', error);
+      return NextResponse.json({ error: 'Failed to fetch Meta Ads data' }, { status: 500 });
+    }
+  });
 }

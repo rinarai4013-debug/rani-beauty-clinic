@@ -19,6 +19,7 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { unauthorized } from '@/lib/auth/middleware';
 import { apiSuccess, apiError } from '@/lib/mastermind/api-helpers';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
+import { withSentry } from '@/lib/sentry-utils';
 import type { MastermindSession, ClinicStatus, ActivityLogEntry, ProviderReviewState, MastermindPhase } from '@/types/mastermind';
 import type { UnifiedConsultation } from '@/types/consultations';
 
@@ -303,38 +304,39 @@ function fromAirtableIntake(
 // ── Handler ──
 
 export async function GET(request: NextRequest) {
-  try {
-    // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
-    const authSession = await getSessionFromRequest(request).catch(() => null);
-    if (!authSession) {
-      return unauthorized();
-    }
+  return withSentry('dashboard/consultations', async () => {
+    try {
+      // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
+      const authSession = await getSessionFromRequest(request).catch(() => null);
+      if (!authSession) {
+        return unauthorized();
+      }
 
-    // Fetch both sources in parallel
-    const [mastermindSessions, intakeRecords] = await Promise.all([
-      getAllSessionsAsync().catch(err => {
-        console.error('[Consultations API] Mastermind fetch failed:', err);
-        return [] as MastermindSession[];
-      }),
-      fetchAll<IntakeFields>(
-        Tables.intakes(),
-        {
-          sort: [{ field: 'Created Date', direction: 'desc' }],
-          maxRecords: 100,
-          fields: [
-            'Full Name', 'Email', 'Phone Number',
-            'Intake Summary (AI)', 'Program Plan (AI)',
-            'Cost Breakdown (AI)', 'Timeline (AI)',
-            'Suggested Next Step (AI)', 'Treatment Value (AI)',
-            'Processing Status',
-          ],
-        },
-        true // skipTestFilter — intakes have no "Is Test" field
-      ).catch(err => {
-        console.error('[Consultations API] Airtable intakes fetch failed:', err);
-        return [] as { id: string; fields: IntakeFields; createdTime?: string }[];
-      }),
-    ]);
+      // Fetch both sources in parallel
+      const [mastermindSessions, intakeRecords] = await Promise.all([
+        getAllSessionsAsync().catch(err => {
+          console.error('[Consultations API] Mastermind fetch failed:', err);
+          return [] as MastermindSession[];
+        }),
+        fetchAll<IntakeFields>(
+          Tables.intakes(),
+          {
+            sort: [{ field: 'Created Date', direction: 'desc' }],
+            maxRecords: 100,
+            fields: [
+              'Full Name', 'Email', 'Phone Number',
+              'Intake Summary (AI)', 'Program Plan (AI)',
+              'Cost Breakdown (AI)', 'Timeline (AI)',
+              'Suggested Next Step (AI)', 'Treatment Value (AI)',
+              'Processing Status',
+            ],
+          },
+          true // skipTestFilter — intakes have no "Is Test" field
+        ).catch(err => {
+          console.error('[Consultations API] Airtable intakes fetch failed:', err);
+          return [] as { id: string; fields: IntakeFields; createdTime?: string }[];
+        }),
+      ]);
 
     // Normalize mastermind sessions
     const msConsultations = mastermindSessions.map(fromMastermindSession);
@@ -350,23 +352,24 @@ export async function GET(request: NextRequest) {
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    // HIPAA §164.312(b): consultations list exposes every patient
-    // who has ever filled out an intake or started a mastermind
-    // session, including name + email + phone + chief concern +
-    // AI-generated treatment plan. Aggregate log entry for the list
-    // view — individual consultation detail views would need their
-    // own per-session log when those endpoints are wired.
-    logPhiAccessFromRequest(request, authSession, {
-      patientId: '__LIST__',
-      patientName: `Consultations list (${all.length} entries: ${msConsultations.length} mastermind + ${intakeConsultations.length} intakes)`,
-      action: 'view',
-      dataCategory: 'treatment_records',
-      details: 'Unified consultation pipeline view',
-    });
+      // HIPAA §164.312(b): consultations list exposes every patient
+      // who has ever filled out an intake or started a mastermind
+      // session, including name + email + phone + chief concern +
+      // AI-generated treatment plan. Aggregate log entry for the list
+      // view — individual consultation detail views would need their
+      // own per-session log when those endpoints are wired.
+      logPhiAccessFromRequest(request, authSession, {
+        patientId: '__LIST__',
+        patientName: `Consultations list (${all.length} entries: ${msConsultations.length} mastermind + ${intakeConsultations.length} intakes)`,
+        action: 'view',
+        dataCategory: 'treatment_records',
+        details: 'Unified consultation pipeline view',
+      });
 
-    return apiSuccess(all);
-  } catch (error) {
-    console.error('[Consultations API] Error:', error);
-    return apiError('Failed to fetch consultations');
-  }
+      return apiSuccess(all);
+    } catch (error) {
+      console.error('[Consultations API] Error:', error);
+      return apiError('Failed to fetch consultations');
+    }
+  });
 }

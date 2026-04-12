@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from "@/lib/auth/session";
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/revenue-optimizer
@@ -9,11 +10,12 @@ import { getSession } from "@/lib/auth/session";
  */
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  return withSentry('dashboard/revenue-optimizer', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
 
     // In production, these would pull from Airtable and compute in real-time.
     // For now, return structured mock data that matches engine output types.
@@ -49,12 +51,13 @@ export async function GET() {
       opportunityCount: 42,
     };
 
-    return NextResponse.json(summary);
-  } catch (error) {
-    console.error('Revenue optimizer error:', error);
-    return NextResponse.json(
-      { error: 'Failed to compute revenue optimization' },
-      { status: 500 },
-    );
-  }
+      return NextResponse.json(summary);
+    } catch (error) {
+      console.error('Revenue optimizer error:', error);
+      return NextResponse.json(
+        { error: 'Failed to compute revenue optimization' },
+        { status: 500 },
+      );
+    }
+  });
 }

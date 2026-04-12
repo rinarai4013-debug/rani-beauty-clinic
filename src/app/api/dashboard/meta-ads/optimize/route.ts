@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
 import { analyzeMetaAds, type MetaAdsInput } from '@/lib/ads/meta-ads-manager';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/meta-ads/optimize
@@ -18,14 +19,15 @@ import { analyzeMetaAds, type MetaAdsInput } from '@/lib/ads/meta-ads-manager';
  * Requires: META_ACCESS_TOKEN, META_AD_ACCOUNT_ID env vars
  */
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_revenue')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/meta-ads/optimize', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_revenue')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'meta-ads-optimize';
     const cached = cache.get<unknown>(cacheKey);
@@ -152,15 +154,16 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.SLOW);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Meta Ads optimization error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to generate Meta Ads optimization' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, result, TTL.SLOW);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Meta Ads optimization error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to generate Meta Ads optimization' },
+        { status: 500 }
+      );
+    }
+  });
 }
 
 function mapMetaStatus(s: string): 'active' | 'paused' | 'completed' {

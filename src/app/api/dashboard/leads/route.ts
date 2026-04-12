@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 import type { LeadFunnelData } from '@/types/dashboard';
 
 interface IntakeFields {
@@ -26,25 +27,26 @@ interface TransactionFields {
 const STAGE_COLORS = ['#C9A96E', '#8B5CF6', '#3B82F6', '#22C55E', '#F59E0B', '#EF4444', '#94A3B8'];
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  }
-  if (!hasPermission(session.role, 'view_leads')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/leads', async () => {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+    if (!hasPermission(session.role, 'view_leads')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const cacheKey = 'leads-funnel';
-  const cached = cache.get<LeadFunnelData>(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'leads-funnel';
+    const cached = cache.get<LeadFunnelData>(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const [intakes, appointments, plans, transactions] = await Promise.all([
-      fetchAll<IntakeFields>(Tables.intakes(), {}, true),
-      fetchAll<AppointmentFields>(Tables.appointments(), {}, true),
-      fetchAll<TreatmentPlanFields>(Tables.treatmentPlans(), {}, true),
-      fetchAll<TransactionFields>(Tables.transactions(), {}, true),
-    ]);
+    try {
+      const [intakes, appointments, plans, transactions] = await Promise.all([
+        fetchAll<IntakeFields>(Tables.intakes(), {}, true),
+        fetchAll<AppointmentFields>(Tables.appointments(), {}, true),
+        fetchAll<TreatmentPlanFields>(Tables.treatmentPlans(), {}, true),
+        fetchAll<TransactionFields>(Tables.transactions(), {}, true),
+      ]);
 
     const newLeads = intakes.filter((i) => (i.fields['Processing Status'] || '') === 'New').length;
     const contacted = intakes.filter((i) =>
@@ -104,10 +106,11 @@ export async function GET() {
       topLeadSources: [],
     };
 
-    cache.set(cacheKey, data, TTL.MODERATE);
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Leads route error:', error);
-    return NextResponse.json({ error: 'Failed to fetch lead funnel data' }, { status: 500 });
-  }
+      cache.set(cacheKey, data, TTL.MODERATE);
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Leads route error:', error);
+      return NextResponse.json({ error: 'Failed to fetch lead funnel data' }, { status: 500 });
+    }
+  });
 }
