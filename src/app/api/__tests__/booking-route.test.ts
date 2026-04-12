@@ -22,6 +22,27 @@ vi.mock('@/lib/rate-limit', () => ({
   },
 }));
 
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn((req: Request) => {
+    const origin = req.headers.get('origin');
+    if (origin && origin !== 'http://localhost:3000') {
+      return new Response(JSON.stringify({ error: 'Origin not allowed' }), { status: 403 });
+    }
+    return null;
+  }),
+  enforceContentLength: vi.fn((req: Request, maxBytes: number) => {
+    const rawLength = req.headers.get('content-length');
+    if (rawLength && Number(rawLength) > maxBytes) {
+      return new Response(JSON.stringify({ error: 'Request body too large' }), { status: 413 });
+    }
+    return null;
+  }),
+}));
+
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn((_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
 describe('/api/booking/book', () => {
   beforeEach(() => {
     vi.clearAllMocks();
