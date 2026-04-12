@@ -35,14 +35,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci --ignore-scripts
-      # continue-on-error: true while 22 pre-existing test failures
-      # are fixed in a follow-up PR. These are stale fixtures from
-      # Wave 11 changes + Cherry webhook hardening (tests expect old
-      # 200 responses, route now returns 422). Typecheck job is the
-      # hard gate; test job reports but doesn't block merges yet.
-      # TODO: remove continue-on-error once the 22 tests are fixed.
       - run: npx vitest run --reporter=verbose
-        continue-on-error: true
         env:
           NODE_ENV: test
           AIRTABLE_PAT: test_pat_fake
