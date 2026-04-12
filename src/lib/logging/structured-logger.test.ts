@@ -54,4 +54,23 @@ describe('structured-logger', () => {
     expect(output.recordsSkipped).toBe(2);
     spy.mockRestore();
   });
+
+  it('redacts sensitive metadata fields', () => {
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logEvent('api', 'info', 'Sensitive event', {
+      email: 'patient@example.com',
+      accessToken: 'token-123',
+      nested: {
+        phone: '+1-425-555-1212',
+        note: 'safe text',
+      },
+    });
+
+    const output = JSON.parse(spy.mock.calls[0][0]);
+    expect(output.email).toBe('[REDACTED]');
+    expect(output.accessToken).toBe('[REDACTED]');
+    expect(output.nested.phone).toBe('[REDACTED]');
+    expect(output.nested.note).toBe('safe text');
+    spy.mockRestore();
+  });
 });

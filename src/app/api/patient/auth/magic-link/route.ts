@@ -5,13 +5,21 @@ import { createMagicLinkToken } from '@/lib/patient-auth/session';
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import {
+  enforceAllowedPublicOrigin,
+  enforceContentLength,
+  normalizeEmailForLimit,
+} from '@/lib/security/public-intent-guard';
+import { env } from '@/lib/env';
 
 import { withSentry } from '@/lib/sentry-utils';
 
 let _resend: Resend | null = null;
-function getResend(): Resend {
+function getResend(): Resend | null {
+  const apiKey = env.RESEND_API_KEY;
+  if (!apiKey) return null;
   if (!_resend) {
-    _resend = new Resend(process.env.RESEND_API_KEY);
+    _resend = new Resend(apiKey);
   }
   return _resend;
 }
@@ -20,10 +28,18 @@ const requestSchema = z.object({
   email: z.string().email(),
 });
 
+const MAX_MAGIC_LINK_BYTES = 16 * 1024;
+
 export async function POST(request: NextRequest) {
   return withSentry('patient/auth/magic-link', async () => {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(request, MAX_MAGIC_LINK_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(request);
-    const { allowed, resetIn } = rateLimit('form', ip, RATE_LIMITS.FORM);
+    const { allowed, resetIn } = rateLimit('patient-magic-link', ip, RATE_LIMITS.FORM);
     if (!allowed) return rateLimitResponse(resetIn);
 
     try {
@@ -39,7 +55,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
       }
 
-      const { email } = parsed.data;
+      const email = normalizeEmailForLimit(parsed.data.email);
+      const scopedLimit = rateLimit('patient-magic-link-email', `${ip}:${email}`, {
+        limit: 3,
+        windowMs: 10 * 60_000,
+      });
+      if (!scopedLimit.allowed) return rateLimitResponse(scopedLimit.resetIn);
 
       // Look up client by email — if not found, still return success to avoid leaking existence
       const client = await fetchFirst<{ Email: string }>(Tables.clients(), 1, {
@@ -47,11 +68,15 @@ export async function POST(request: NextRequest) {
       });
 
       if (client) {
+        const resend = getResend();
+        if (!resend) {
+          return NextResponse.json({ success: true });
+        }
         const token = await createMagicLinkToken(email);
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
+        const baseUrl = env.NEXT_PUBLIC_BASE_URL || 'https://ranibeautyclinic.com';
         const magicLinkUrl = `${baseUrl}/portal?token=${token}`;
 
-        await getResend().emails.send({
+        await resend.emails.send({
           from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
           to: email,
           subject: 'Your Rani Beauty Clinic Portal Login Link',
@@ -132,7 +157,7 @@ export async function POST(request: NextRequest) {
       // Always return success regardless of whether client was found
       return NextResponse.json({ success: true });
     } catch {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      return NextResponse.json({ success: true });
     }
   });
 }

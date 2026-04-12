@@ -72,6 +72,32 @@ describe('/api/booking/book', () => {
     const data = await expectJsonStatus(response, 501);
 
     expect(data.status).toBe('not_implemented');
-    expect(mockRateLimit).toHaveBeenCalledWith('booking', '127.0.0.1', expect.any(Object));
+    expect(mockRateLimit).toHaveBeenCalledWith('booking-mutation', '127.0.0.1', expect.any(Object));
+  });
+
+  it('POST should reject unknown origins', async () => {
+    const { POST } = await import('@/app/api/booking/book/route');
+    const response = await POST(
+      buildPostRequest(
+        '/api/booking/book',
+        { service: 'hydrafacial-signature' },
+        { origin: 'https://evil.example.com' },
+      ) as any,
+    );
+
+    expect(response.status).toBe(403);
+  });
+
+  it('POST should reject oversized payloads', async () => {
+    const { POST } = await import('@/app/api/booking/book/route');
+    const response = await POST(
+      buildPostRequest(
+        '/api/booking/book',
+        { service: 'hydrafacial-signature' },
+        { 'content-length': String(200 * 1024) },
+      ) as any,
+    );
+
+    expect(response.status).toBe(413);
   });
 });
