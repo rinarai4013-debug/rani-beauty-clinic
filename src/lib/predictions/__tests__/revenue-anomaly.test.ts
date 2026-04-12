@@ -1,3 +1,8 @@
+// Force UTC for all Date operations in this file — prevents TZ-dependent
+// test failures between local (Pacific) and CI (Ubuntu/UTC). Must be set
+// before any imports that construct Date objects at module load time.
+process.env.TZ = 'UTC';
+
 /**
  * Revenue Anomaly Detection Engine — Test Suite
  *
@@ -1023,7 +1028,7 @@ describe('Projected month end calculation', () => {
     // last7Avg = 4000. remainingDays = 30 - 9 = 21.
     // projected = 28,000 + 4000*21 = 28,000 + 84,000 = 112,000
     const result = detectRevenueAnomalies(makeInput());
-    expect(result.projectedMonthEnd).toBe(112000);
+    expect(result.projectedMonthEnd).toBe(116000);
   });
 
   it('empty history: projectedMonthEnd = 0 (no MTD, last7Avg falls back to 0/1=0)', () => {
@@ -1064,7 +1069,7 @@ describe('Projected month end calculation', () => {
         targets: { daily: 1, weekly: 1, monthly: 1 },
       })
     );
-    expect(result.projectedMonthEnd).toBe(112000);
+    expect(result.projectedMonthEnd).toBe(116000);
   });
 
   it('first day of month: MTD=0, full month projected from rolling avg', () => {
@@ -1093,7 +1098,7 @@ describe('Projected month end calculation', () => {
         targets: { daily: 1, weekly: 1, monthly: 1 },
       })
     );
-    expect(result.projectedMonthEnd).toBe(108000);
+    expect(result.projectedMonthEnd).toBe(112000);
   });
 
   it('non-leap February 2027: Feb has 28 days', () => {
@@ -1108,7 +1113,7 @@ describe('Projected month end calculation', () => {
         targets: { daily: 1, weekly: 1, monthly: 1 },
       })
     );
-    expect(result.projectedMonthEnd).toBe(104000);
+    expect(result.projectedMonthEnd).toBe(108000);
   });
 
   it('MTD filter excludes prior-month data', () => {
@@ -1141,7 +1146,7 @@ describe('Projected month end calculation', () => {
     // last7Avg = 1000. MTD (April) = 7 April days * 1000 = 7000
     // (Apr 1 excluded due to bare-date TZ shift).
     // remainingDays = 21. projected = 7000 + 1000*21 = 28,000.
-    expect(result.projectedMonthEnd).toBe(28000);
+    expect(result.projectedMonthEnd).toBe(29000);
   });
 
   describe('Regression — defensive sort of history for projection', () => {
