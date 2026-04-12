@@ -142,13 +142,25 @@ export default function MastermindSessionPage() {
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      if (!file.type.startsWith('image/')) return;
+
+      const lowerName = file.name?.toLowerCase?.() || '';
+      const isPdf = file.type === 'application/pdf' || lowerName.endsWith('.pdf');
+      const isImage = file.type.startsWith('image/');
+      if (!isImage && !isPdf) {
+        console.warn('Unsupported upload type. Expected image or PDF:', file.type, file.name);
+        return;
+      }
+
       setPhotoUploading(true);
       try {
         const formData = new FormData();
         formData.append('file', file);
         const res = await fetch('/api/photo/upload', { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('Upload failed');
+        if (!res.ok) {
+          const payload = await res.json().catch(() => ({}));
+          const message = typeof payload?.error === 'string' ? payload.error : 'Upload failed';
+          throw new Error(message);
+        }
         const json = await res.json();
         const dataUrl = json.imageBase64 || json.dataUrl || json.url;
         if (dataUrl) {
@@ -795,13 +807,22 @@ export default function MastermindSessionPage() {
                       onClick={() => photoInputRef.current?.click()}
                       className="w-16 h-16 rounded-2xl overflow-hidden relative group cursor-pointer"
                       style={{ border: '2px solid rgba(201,169,110,0.4)', boxShadow: '0 0 15px rgba(201,169,110,0.15)' }}
-                      title="Click to change photo"
+                      title="Click to change photo or PDF"
                     >
-                      <img
-                        src={session.sourcePhotoUrl}
-                        alt={session.patientName}
-                        className="w-full h-full object-cover"
-                      />
+                      {session.sourcePhotoUrl.startsWith('data:application/pdf') ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F1D2C]/95">
+                          <FileText className="w-6 h-6 text-[#C9A96E]" />
+                          <span className="text-[9px] mt-0.5 font-semibold tracking-wide text-[#C9A96E]/90">
+                            PDF
+                          </span>
+                        </div>
+                      ) : (
+                        <img
+                          src={session.sourcePhotoUrl}
+                          alt={session.patientName}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Camera className="w-5 h-5 text-white" />
                       </div>
@@ -812,14 +833,14 @@ export default function MastermindSessionPage() {
                       disabled={photoUploading}
                       className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105"
                       style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.05))', border: '2px dashed rgba(201,169,110,0.4)', boxShadow: '0 0 15px rgba(201,169,110,0.1)' }}
-                      title="Upload patient photo"
+                      title="Upload patient photo or Aura PDF"
                     >
                       {photoUploading ? (
                         <Loader2 className="w-5 h-5 text-[#C9A96E]/70 animate-spin" />
                       ) : (
                         <>
                           <Camera className="w-5 h-5 text-[#C9A96E]/50" />
-                          <span className="text-[8px] text-[#C9A96E]/40 mt-0.5 font-medium">PHOTO</span>
+                          <span className="text-[8px] text-[#C9A96E]/40 mt-0.5 font-medium">PHOTO / PDF</span>
                         </>
                       )}
                     </button>
