@@ -107,6 +107,7 @@ describe('/api/booking/book', () => {
     );
 
     expect(response.status).toBe(403);
+    expect(mockRateLimit).not.toHaveBeenCalled();
   });
 
   it('POST should reject oversized payloads', async () => {
@@ -120,5 +121,20 @@ describe('/api/booking/book', () => {
     );
 
     expect(response.status).toBe(413);
+    expect(mockRateLimit).not.toHaveBeenCalled();
+  });
+
+  it('POST should allow requests without origin header and return 501 placeholder', async () => {
+    const { POST } = await import('@/app/api/booking/book/route');
+    const response = await POST(
+      buildPostRequest('/api/booking/book', {
+        service: 'hydrafacial-signature',
+        provider: 'mom',
+      }) as any,
+    );
+    const data = await expectJsonStatus(response, 501);
+
+    expect(data.status).toBe('not_implemented');
+    expect(mockRateLimit).toHaveBeenCalledWith('booking-mutation', '127.0.0.1', expect.any(Object));
   });
 });

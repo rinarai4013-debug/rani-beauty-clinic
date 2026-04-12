@@ -129,6 +129,78 @@ describe('subscribe + plan track critical routes', () => {
     expect(createRecordMock).not.toHaveBeenCalled();
   });
 
+  it('POST /api/subscribe returns 400 for malformed JSON bodies', async () => {
+    const { POST } = await import('@/app/api/subscribe/route');
+    const request = new Request('http://localhost:3000/api/subscribe', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.0.0.40' },
+      body: '{"email":',
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(400);
+  });
+
+  it('POST /api/subscribe returns 429 after exceeding in-memory IP quota', async () => {
+    const { POST } = await import('@/app/api/subscribe/route');
+    const ip = '10.0.0.77';
+
+    for (let i = 0; i < 5; i += 1) {
+      const ok = await POST(
+        new Request('http://localhost:3000/api/subscribe', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+          body: JSON.stringify({ email: `jane+${i}@example.com`, source: 'homepage' }),
+        }) as never,
+      );
+      expect(ok.status).toBe(200);
+    }
+
+    const limited = await POST(
+      new Request('http://localhost:3000/api/subscribe', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+        body: JSON.stringify({ email: 'jane+final@example.com', source: 'homepage' }),
+      }) as never,
+    );
+    expect(limited.status).toBe(429);
+  });
+
+  it('POST /api/subscribe keeps success response when Airtable write fails', async () => {
+    createRecordMock.mockRejectedValueOnce(new Error('airtable down'));
+
+    const { POST } = await import('@/app/api/subscribe/route');
+    const request = new Request('http://localhost:3000/api/subscribe', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.0.0.41' },
+      body: JSON.stringify({ email: 'jane@example.com', source: 'homepage' }),
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(upsertAttributionMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/subscribe keeps success response when attribution upsert fails', async () => {
+    upsertAttributionMock.mockRejectedValueOnce(new Error('attribution timeout'));
+
+    const { POST } = await import('@/app/api/subscribe/route');
+    const request = new Request('http://localhost:3000/api/subscribe', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.0.0.42' },
+      body: JSON.stringify({ email: 'jane@example.com', source: 'homepage' }),
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+  });
+
   it('POST /api/plan/[id]/track rejects malformed plan IDs', async () => {
     const { POST } = await import('@/app/api/plan/[id]/track/route');
     const request = new Request('http://localhost:3000/api/plan/bad-id/track', {
@@ -155,6 +227,22 @@ describe('subscribe + plan track critical routes', () => {
     expect(response.status).toBe(404);
   });
 
+  it('POST /api/plan/[id]/track returns 429 when view rate limit is exceeded', async () => {
+    rateLimitMock.mockReturnValueOnce({ allowed: false, resetIn: 14 });
+
+    const { POST } = await import('@/app/api/plan/[id]/track/route');
+    const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'view' }),
+    });
+
+    const response = await POST(request as never, { params: { id: 'recABCDEFGHIJ' } });
+
+    expect(response.status).toBe(429);
+    expect(rateLimitResponseMock).toHaveBeenCalledWith(14);
+  });
+
   it('POST /api/plan/[id]/track updates status and view count for valid transitions', async () => {
     const { POST } = await import('@/app/api/plan/[id]/track/route');
     const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
@@ -170,6 +258,67 @@ describe('subscribe + plan track critical routes', () => {
     expect(body.success).toBe(true);
     expect(body.newStatus).toBe('Viewed');
     expect(updateRecordMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/plan/[id]/track updates financing timestamp for financing clicks', async () => {
+    getNextStatusMock.mockReturnValueOnce('Financing Clicked');
+
+    const { POST } = await import('@/app/api/plan/[id]/track/route');
+    const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'financing_clicked' }),
+    });
+
+    const response = await POST(request as never, { params: { id: 'recABCDEFGHIJ' } });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.newStatus).toBe('Financing Clicked');
+    expect(updateRecordMock).toHaveBeenCalledWith(
+      expect.anything(),
+      'rec_plan_1',
+      expect.objectContaining({ 'Financing Clicked At': expect.any(String) }),
+    );
+  });
+
+  it('POST /api/plan/[id]/track still increments views when no status transition is available', async () => {
+    getNextStatusMock.mockReturnValueOnce(null);
+
+    const { POST } = await import('@/app/api/plan/[id]/track/route');
+    const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'view' }),
+    });
+
+    const response = await POST(request as never, { params: { id: 'recABCDEFGHIJ' } });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.newStatus).toBe('Sent');
+    expect(updateRecordMock).toHaveBeenCalledWith(
+      expect.anything(),
+      'rec_plan_1',
+      expect.objectContaining({
+        'Last Viewed At': expect.any(String),
+        'View Count': 3,
+      }),
+    );
+  });
+
+  it('POST /api/plan/[id]/track returns 500 when persistence throws', async () => {
+    updateRecordMock.mockRejectedValueOnce(new Error('write failed'));
+
+    const { POST } = await import('@/app/api/plan/[id]/track/route');
+    const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'view' }),
+    });
+
+    const response = await POST(request as never, { params: { id: 'recABCDEFGHIJ' } });
+    expect(response.status).toBe(500);
   });
 
   it('POST /api/plan/[id]/track rejects invalid actions with 400', async () => {
