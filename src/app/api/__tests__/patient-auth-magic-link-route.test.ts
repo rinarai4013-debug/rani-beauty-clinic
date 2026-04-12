@@ -233,6 +233,33 @@ describe('POST /api/patient/auth/magic-link', () => {
     );
   });
 
+  it('normalizes email before token generation and outbound send', async () => {
+    envState.RESEND_API_KEY = 're_test_key';
+    envState.NEXT_PUBLIC_BASE_URL = undefined;
+    fetchFirstMock.mockResolvedValueOnce({ id: 'rec_1', fields: { Email: 'jane@example.com' } });
+    normalizeEmailForLimitMock.mockReturnValueOnce('jane@example.com');
+
+    const { POST } = await import('@/app/api/patient/auth/magic-link/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/patient/auth/magic-link', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: 'Jane@Example.com' }),
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(createMagicLinkTokenMock).toHaveBeenCalledWith('jane@example.com');
+    expect(resendSendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'jane@example.com',
+        html: expect.stringContaining('https://ranibeautyclinic.com/portal?token=magic_token_123'),
+      }),
+    );
+  });
+
   it('fails closed to success when downstream dependencies throw unexpectedly', async () => {
     fetchFirstMock.mockRejectedValueOnce(new Error('airtable outage'));
     const { POST } = await import('@/app/api/patient/auth/magic-link/route');

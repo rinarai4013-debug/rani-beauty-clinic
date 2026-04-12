@@ -125,6 +125,15 @@ describe('dashboard leads, alerts, and public plan routes', () => {
     expect(response.status).toBe(401);
   });
 
+  it('GET /api/dashboard/leads enforces lead-view permission', async () => {
+    hasPermissionMock.mockReturnValueOnce(false);
+
+    const { GET } = await import('@/app/api/dashboard/leads/route');
+    const response = await GET();
+
+    expect(response.status).toBe(403);
+  });
+
   it('GET /api/dashboard/leads returns funnel metrics for authorized users', async () => {
     fetchAllMock
       .mockResolvedValueOnce([
@@ -153,6 +162,36 @@ describe('dashboard leads, alerts, and public plan routes', () => {
     expect(Array.isArray(body.stages)).toBe(true);
   });
 
+  it('GET /api/dashboard/leads returns cached payload when available', async () => {
+    cacheGetMock.mockReturnValueOnce({
+      stages: [{ name: 'New Leads', count: 3, percentage: 100, color: '#C9A96E' }],
+      metrics: { newLeads: 3, contacted: 2, converted: 1 },
+      conversionRates: { leadToConsult: 67, consultShowRate: 50, consultCloseRate: 50, depositCaptureRate: 0 },
+      avgResponseTime: 0,
+      avgTreatmentPlanValue: 0,
+      topLeadSources: [],
+    });
+
+    const { GET } = await import('@/app/api/dashboard/leads/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.metrics.newLeads).toBe(3);
+    expect(fetchAllMock).not.toHaveBeenCalled();
+  });
+
+  it('GET /api/dashboard/leads returns 500 when Airtable fetch fails', async () => {
+    fetchAllMock.mockRejectedValueOnce(new Error('intakes unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/leads/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to fetch lead funnel data');
+  });
+
   it('GET /api/dashboard/leads/stats returns 403 without lead-view permission', async () => {
     hasPermissionMock.mockReturnValueOnce(false);
 
@@ -160,6 +199,15 @@ describe('dashboard leads, alerts, and public plan routes', () => {
     const response = await GET();
 
     expect(response.status).toBe(403);
+  });
+
+  it('GET /api/dashboard/leads/stats returns 401 when unauthenticated', async () => {
+    getSessionMock.mockResolvedValueOnce(null);
+
+    const { GET } = await import('@/app/api/dashboard/leads/stats/route');
+    const response = await GET();
+
+    expect(response.status).toBe(401);
   });
 
   it('GET /api/dashboard/leads/stats computes funnel and consult conversion', async () => {
@@ -184,6 +232,33 @@ describe('dashboard leads, alerts, and public plan routes', () => {
     expect(body.consults.conversionRate).toBe(67);
   });
 
+  it('GET /api/dashboard/leads/stats returns cached payload when available', async () => {
+    cacheGetMock.mockReturnValueOnce({
+      funnel: { newLeads: 4, active: 10, lapsed: 2, churned: 1, total: 17 },
+      consults: { total: 6, booked: 3, conversionRate: 50 },
+      asOf: '2026-04-12T00:00:00.000Z',
+    });
+
+    const { GET } = await import('@/app/api/dashboard/leads/stats/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.funnel.total).toBe(17);
+    expect(fetchAllMock).not.toHaveBeenCalled();
+  });
+
+  it('GET /api/dashboard/leads/stats returns 500 on downstream failures', async () => {
+    fetchAllMock.mockRejectedValueOnce(new Error('clients table unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/leads/stats/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to fetch lead stats');
+  });
+
   it('GET /api/dashboard/alerts returns normalized active alerts', async () => {
     fetchAllMock.mockResolvedValueOnce([
       {
@@ -206,6 +281,104 @@ describe('dashboard leads, alerts, and public plan routes', () => {
     expect(body.success).toBe(true);
     expect(body.data.total).toBe(1);
     expect(body.data.bySeverity.critical).toBe(1);
+  });
+
+  it('GET /api/dashboard/alerts returns 401 when unauthenticated', async () => {
+    getSessionMock.mockResolvedValueOnce(null);
+
+    const { GET } = await import('@/app/api/dashboard/alerts/route');
+    const response = await GET();
+
+    expect(response.status).toBe(401);
+  });
+
+  it('GET /api/dashboard/alerts enforces executive permission', async () => {
+    hasPermissionMock.mockReturnValueOnce(false);
+
+    const { GET } = await import('@/app/api/dashboard/alerts/route');
+    const response = await GET();
+
+    expect(response.status).toBe(403);
+  });
+
+  it('GET /api/dashboard/alerts serves cached payload without hitting Airtable', async () => {
+    cacheGetMock.mockReturnValueOnce({
+      success: true,
+      data: {
+        total: 1,
+        bySeverity: { critical: 0, high: 1, medium: 0, low: 0 },
+        alerts: [
+          {
+            id: 'alt_cached_1',
+            severity: 'high',
+            message: 'Cached alert',
+          },
+        ],
+      },
+      generatedAt: '2026-04-12T00:00:00.000Z',
+    });
+
+    const { GET } = await import('@/app/api/dashboard/alerts/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.total).toBe(1);
+    expect(body.data.alerts[0].message).toBe('Cached alert');
+    expect(fetchAllMock).not.toHaveBeenCalled();
+  });
+
+  it('GET /api/dashboard/alerts normalizes mixed severities and returns 500 on fetch failures', async () => {
+    fetchAllMock
+      .mockResolvedValueOnce([
+        {
+          id: 'alt_urgent',
+          fields: {
+            Type: 'ops',
+            Severity: 'urgent',
+            Message: 'Urgent issue',
+            Status: 'Active',
+            'Created Date': '2026-04-10T00:00:00.000Z',
+          },
+        },
+        {
+          id: 'alt_warning',
+          fields: {
+            Type: 'ops',
+            Severity: 'warning',
+            Message: 'Warning issue',
+            Status: 'Active',
+            'Created Date': '2026-04-11T00:00:00.000Z',
+          },
+        },
+        {
+          id: 'alt_other',
+          fields: {
+            Type: 'ops',
+            Severity: 'unknown',
+            Message: 'Unknown severity',
+            Status: 'Active',
+            'Created Date': '2026-04-12T00:00:00.000Z',
+          },
+        },
+      ])
+      .mockRejectedValueOnce(new Error('alerts table unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/alerts/route');
+    const okResponse = await GET();
+    const okBody = await okResponse.json();
+
+    expect(okResponse.status).toBe(200);
+    expect(okBody.data.bySeverity.critical).toBe(1);
+    expect(okBody.data.bySeverity.high).toBe(1);
+    expect(okBody.data.bySeverity.low).toBe(1);
+
+    cacheGetMock.mockReturnValueOnce(null);
+    const failResponse = await GET();
+    const failBody = await failResponse.json();
+
+    expect(failResponse.status).toBe(500);
+    expect(failBody.success).toBe(false);
   });
 
   it('GET /api/plan/[id] enforces access code', async () => {

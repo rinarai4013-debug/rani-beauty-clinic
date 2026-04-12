@@ -91,6 +91,10 @@ vi.mock('@/lib/loyalty/rewards', () => ({
   getAvailableRewards: (...args: unknown[]) => getAvailableRewardsMock(...args),
 }));
 
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
 describe('dashboard critical auth/permission routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -148,6 +152,69 @@ describe('dashboard critical auth/permission routes', () => {
     expect(logPhiAccessMock).toHaveBeenCalledTimes(1);
   });
 
+  it('GET /api/dashboard/consultations merges mastermind + intake sources', async () => {
+    getAllSessionsAsyncMock.mockResolvedValueOnce([
+      {
+        id: 'ms_1',
+        patientName: 'Jane Doe',
+        patientEmail: 'jane@example.com',
+        phase: 'plan_ready',
+        createdAt: '2026-04-10T12:00:00.000Z',
+        updatedAt: '2026-04-10T12:00:00.000Z',
+        intakeData: {
+          phone: '425-555-0100',
+          skinConcerns: ['pigmentation'],
+          goals: 'Smoother tone',
+          timeline: '6 months',
+          budget: '$2,000',
+        },
+        auraScanResult: { auraScore: { overall: 81, grade: 'B' } },
+        mastermindPlan: {
+          recommendations: { primary: [{ totalEstimate: 1800 }] },
+        },
+        activityLog: [],
+      },
+    ]);
+    fetchAllMock.mockResolvedValueOnce([
+      {
+        id: 'rec_intake_1',
+        createdTime: '2026-04-10T08:00:00.000Z',
+        fields: {
+          'Full Name': 'Mary Roe',
+          Email: 'mary@example.com',
+          'Phone Number': '206-555-0111',
+          'Intake Summary (AI)': 'Skin Concerns: dryness\nGoals: brighter skin',
+          'Treatment Value (AI)': '$950',
+          'Processing Status': 'Processed',
+        },
+      },
+    ]);
+
+    const { GET } = await import('@/app/api/dashboard/consultations/route');
+    const request = new Request('http://localhost:3000/api/dashboard/consultations');
+    const response = await GET(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.some((item: { source: string }) => item.source === 'mastermind')).toBe(true);
+    expect(body.some((item: { source: string }) => item.source === 'intake_form')).toBe(true);
+  });
+
+  it('GET /api/dashboard/consultations degrades gracefully when both source fetches fail', async () => {
+    getAllSessionsAsyncMock.mockRejectedValueOnce(new Error('mastermind unavailable'));
+    fetchAllMock.mockRejectedValueOnce(new Error('airtable unavailable'));
+
+    const { GET } = await import('@/app/api/dashboard/consultations/route');
+    const request = new Request('http://localhost:3000/api/dashboard/consultations');
+    const response = await GET(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(body)).toBe(true);
+    expect(body).toHaveLength(0);
+  });
+
   it('GET /api/dashboard/communications/campaigns rejects unauthenticated requests', async () => {
     getSessionMock.mockResolvedValueOnce(null);
 
@@ -155,6 +222,28 @@ describe('dashboard critical auth/permission routes', () => {
     const response = await GET();
 
     expect(response.status).toBe(401);
+  });
+
+  it('GET /api/dashboard/communications/campaigns enforces permission checks', async () => {
+    hasPermissionMock.mockReturnValueOnce(false);
+
+    const { GET } = await import('@/app/api/dashboard/communications/campaigns/route');
+    const response = await GET();
+
+    expect(response.status).toBe(403);
+  });
+
+  it('GET /api/dashboard/communications/campaigns returns 500 when campaign fetch fails', async () => {
+    getAllCampaignsMock.mockImplementationOnce(() => {
+      throw new Error('campaign store unavailable');
+    });
+
+    const { GET } = await import('@/app/api/dashboard/communications/campaigns/route');
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to fetch campaigns');
   });
 
   it('POST /api/dashboard/communications/campaigns enforces permission checks', async () => {
@@ -191,6 +280,43 @@ describe('dashboard critical auth/permission routes', () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(createCampaignMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/dashboard/communications/campaigns validates request body', async () => {
+    const { POST } = await import('@/app/api/dashboard/communications/campaigns/route');
+    const request = new Request('http://localhost:3000/api/dashboard/communications/campaigns', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: '',
+        type: 'promotional',
+      }),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(400);
+  });
+
+  it('POST /api/dashboard/communications/campaigns returns 500 when campaign creation fails', async () => {
+    createCampaignMock.mockImplementationOnce(() => {
+      throw new Error('campaign write failed');
+    });
+
+    const { POST } = await import('@/app/api/dashboard/communications/campaigns/route');
+    const request = new Request('http://localhost:3000/api/dashboard/communications/campaigns', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Campaign A',
+        type: 'promotional',
+      }),
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Failed to create campaign');
   });
 
   it('GET /api/dashboard/loyalty rejects unauthenticated requests', async () => {

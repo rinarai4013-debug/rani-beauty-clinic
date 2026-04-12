@@ -8,6 +8,9 @@ const unauthorizedMock = vi.fn(
   () => new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401 }),
 );
 const runAuraScanMock = vi.fn();
+const runAIAuraScanMock = vi.fn();
+const findLatestScanMock = vi.fn();
+const runAIAuraScanWithDeviceMock = vi.fn();
 const mockAuraScanResultMock = vi.fn();
 const generateMastermindPlanMock = vi.fn();
 const generateAIPlanMock = vi.fn();
@@ -35,6 +38,18 @@ vi.mock('@/lib/auth/middleware', () => ({
 
 vi.mock('@/lib/mastermind/aura-scan', () => ({
   runAuraScan: (...args: unknown[]) => runAuraScanMock(...args),
+}));
+
+vi.mock('@/lib/mastermind/ai-aura-scan', () => ({
+  runAIAuraScan: (...args: unknown[]) => runAIAuraScanMock(...args),
+}));
+
+vi.mock('@/lib/mastermind/aura-device-integration', () => ({
+  findLatestScan: (...args: unknown[]) => findLatestScanMock(...args),
+}));
+
+vi.mock('@/lib/mastermind/ai-aura-scan-with-device', () => ({
+  runAIAuraScanWithDevice: (...args: unknown[]) => runAIAuraScanWithDeviceMock(...args),
 }));
 
 vi.mock('@/lib/mastermind/mock-data', () => ({
@@ -121,6 +136,9 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     saveSessionAsyncMock.mockResolvedValue(undefined);
 
     runAuraScanMock.mockResolvedValue({ auraScore: { overall: 81 } });
+    runAIAuraScanMock.mockResolvedValue({ auraScore: { overall: 88 } });
+    findLatestScanMock.mockResolvedValue({ id: 'aura_scan_1' });
+    runAIAuraScanWithDeviceMock.mockResolvedValue({ auraScore: { overall: 92 } });
     mockAuraScanResultMock.mockReturnValue({ auraScore: { overall: 54 } });
     generateMastermindPlanMock.mockReturnValue({
       packages: [{ name: 'Transform', price: 2900 }],
@@ -212,6 +230,70 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     expect(runAuraScanMock).not.toHaveBeenCalled();
   });
 
+  it('POST /api/mastermind/scan uses AI mode when ANTHROPIC_API_KEY is present', async () => {
+    process.env.ANTHROPIC_API_KEY = 'anthropic_test_key';
+
+    const { POST } = await import('@/app/api/mastermind/scan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/scan', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.meta.source).toBe('ai');
+    expect(runAIAuraScanMock).toHaveBeenCalledTimes(1);
+    expect(runAIAuraScanMock).toHaveBeenCalledWith(
+      expect.objectContaining({ firstName: 'Jane', lastName: 'Doe' }),
+      'https://example.com/photo.jpg',
+    );
+  });
+
+  it('POST /api/mastermind/scan falls back to engine when AI scan throws', async () => {
+    process.env.ANTHROPIC_API_KEY = 'anthropic_test_key';
+    runAIAuraScanMock.mockRejectedValueOnce(new Error('vision timeout'));
+
+    const { POST } = await import('@/app/api/mastermind/scan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/scan', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.meta.source).toBe('engine-fallback');
+    expect(runAuraScanMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/scan uses aura-device AI mode when device scan is available', async () => {
+    const { POST } = await import('@/app/api/mastermind/scan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/scan', {
+        sessionId: 'ms_1',
+        useAuraDevice: true,
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.meta.source).toBe('aura-device-ai');
+    expect(findLatestScanMock).toHaveBeenCalledTimes(1);
+    expect(runAIAuraScanWithDeviceMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/scan returns fallback payload when scan execution crashes', async () => {
+    runAuraScanMock.mockRejectedValueOnce(new Error('scan pipeline down'));
+
+    const { POST } = await import('@/app/api/mastermind/scan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/scan', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.meta.source).toBe('fallback');
+    expect(body.meta.fallback).toBe(true);
+  });
+
   it('POST /api/mastermind/plan returns 401 without a staff session', async () => {
     getSessionFromRequestMock.mockResolvedValueOnce(null);
     const { POST } = await import('@/app/api/mastermind/plan/route');
@@ -266,6 +348,62 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     expect(response.status).toBe(200);
     expect(body.meta.source).toBe('mock');
     expect(mockMastermindPlanMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/plan uses AI mode when ANTHROPIC_API_KEY is present', async () => {
+    process.env.ANTHROPIC_API_KEY = 'anthropic_test_key';
+
+    const { POST } = await import('@/app/api/mastermind/plan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/plan', {
+        scanResult: { auraScore: { overall: 83 } },
+        intakeData: { firstName: 'Jane', lastName: 'Doe' },
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.meta.source).toBe('ai');
+    expect(generateAIPlanMock).toHaveBeenCalledTimes(1);
+    expect(generateMastermindPlanMock).not.toHaveBeenCalled();
+  });
+
+  it('POST /api/mastermind/plan falls back to engine when AI plan generation fails', async () => {
+    process.env.ANTHROPIC_API_KEY = 'anthropic_test_key';
+    generateAIPlanMock.mockRejectedValueOnce(new Error('ai model timeout'));
+
+    const { POST } = await import('@/app/api/mastermind/plan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/plan', {
+        scanResult: { auraScore: { overall: 74 } },
+        intakeData: { firstName: 'Jane' },
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.meta.source).toBe('engine-fallback');
+    expect(generateMastermindPlanMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/plan returns fallback mock when plan pipeline crashes', async () => {
+    generateMastermindPlanMock.mockImplementationOnce(() => {
+      throw new Error('rule engine panic');
+    });
+
+    const { POST } = await import('@/app/api/mastermind/plan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/plan', {
+        scanResult: { auraScore: { overall: 74 } },
+        intakeData: { firstName: 'Jane' },
+      }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.meta.source).toBe('fallback');
+    expect(body.meta.fallback).toBe(true);
   });
 
   it('POST /api/mastermind/consent validates consentType', async () => {
