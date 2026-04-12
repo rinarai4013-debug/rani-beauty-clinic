@@ -6,16 +6,26 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { validatePlan } from '@/lib/plan-builder/constraints';
 import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
 import type { ServiceCategory } from '@/data/services/unified-catalog';
+import { forbidden, unauthorized } from '@/lib/auth/middleware';
 
 import { withSentry } from '@/lib/sentry-utils';
 
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withSentry('mastermind/sessions/[id]/validate', async () => {
     try {
+      const authSession = await getSessionFromRequest(_request).catch(() => null);
+      if (!authSession) {
+        return unauthorized();
+      }
+      if (authSession.role !== 'ceo' && authSession.role !== 'provider') {
+        return forbidden();
+      }
+
       const { id } = await params;
       const session = await getSessionByIdAsync(id);
 

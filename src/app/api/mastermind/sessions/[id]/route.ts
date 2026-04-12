@@ -9,7 +9,7 @@
 import { NextRequest } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
-import { unauthorized } from '@/lib/auth/middleware';
+import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSessionAction, PlanModification } from '@/types/mastermind';
 
@@ -22,6 +22,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       const authSession = await getSessionFromRequest(_request).catch(() => null);
       if (!authSession) {
         return unauthorized();
+      }
+      if (authSession.role !== 'ceo' && authSession.role !== 'provider') {
+        return forbidden();
       }
 
       const { id } = await params;
@@ -46,6 +49,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const authSession = await getSessionFromRequest(request).catch(() => null);
       if (!authSession) {
         return unauthorized();
+      }
+      if (authSession.role !== 'ceo' && authSession.role !== 'provider') {
+        return forbidden();
       }
 
       const { id } = await params;
