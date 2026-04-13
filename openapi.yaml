@@ -755,6 +755,296 @@ paths:
         "401":
           description: Invalid signature
 
+  # ── OpenAPI Wave 4: providers, revenue, meta-ads ─────────────────
+
+  /api/dashboard/providers:
+    get:
+      operationId: listProviders
+      summary: Provider performance summary
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Provider list with performance metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        appointmentCount:
+                          type: integer
+                        revenue:
+                          type: number
+                        avgTicket:
+                          type: number
+                        utilizationRate:
+                          type: number
+                  total:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/providers/{name}:
+    get:
+      operationId: getProviderByName
+      summary: Single provider detailed stats
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Provider slug (e.g. 'rina', 'mom')
+      responses:
+        "200":
+          description: Provider detail with monthly metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  revenue:
+                    type: number
+                  appointmentCount:
+                    type: integer
+                  avgTicket:
+                    type: number
+                  topServices:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Provider not found
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/providers/performance:
+    get:
+      operationId: getProviderPerformance
+      summary: Provider performance comparison
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Performance comparison across providers
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue:
+    get:
+      operationId: getRevenueBreakdown
+      summary: Revenue breakdown by provider, service, and category
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: range
+          in: query
+          schema:
+            type: string
+            enum: ["7d", "30d", "90d", "ytd"]
+      responses:
+        "200":
+          description: Revenue breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  byProvider:
+                    type: array
+                    items:
+                      type: object
+                  byService:
+                    type: array
+                    items:
+                      type: object
+                  byCategory:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue/trends:
+    get:
+      operationId: getRevenueTrends
+      summary: 30-day revenue trend
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Daily revenue trend data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trend:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        revenue:
+                          type: number
+                  avgDaily:
+                    type: number
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue/anomalies:
+    get:
+      operationId: getRevenueAnomalies
+      summary: Revenue anomaly detection (5 methods + health score)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Anomalies, health score, month-end projection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anomalies:
+                    type: array
+                    items:
+                      type: object
+                  healthScore:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                  projectedMonthEnd:
+                    type: number
+                  summary:
+                    type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue-optimizer:
+    get:
+      operationId: getRevenueOptimizer
+      summary: Revenue optimization opportunities
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Optimization recommendations
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/meta-ads:
+    get:
+      operationId: getMetaAdsPerformance
+      summary: Meta Ads 30-day performance summary
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Ad performance, campaigns, ROAS
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  performanceSummary:
+                    type: object
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                  adScore:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "502":
+          description: Meta API error
+
+  /api/dashboard/meta-ads/optimize:
+    get:
+      operationId: getMetaAdsOptimizations
+      summary: Meta Ads AI optimization + ad copy variants
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Optimizations, ad copy variants, budget recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  optimizations:
+                    type: array
+                    items:
+                      type: object
+                  adCopyVariants:
+                    type: array
+                    items:
+                      type: object
+                  budgetRecommendations:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
 components:
   securitySchemes:
     SessionCookie:
