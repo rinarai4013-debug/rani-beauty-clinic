@@ -54,6 +54,7 @@ vi.mock('@/lib/logging/structured-logger', () => ({
 vi.mock('@/lib/sentry-utils', () => ({
   captureAuthEvent: vi.fn(),
   captureWebhookEvent: vi.fn(),
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
 }));
 
 // ---------------------------------------------------------------------------

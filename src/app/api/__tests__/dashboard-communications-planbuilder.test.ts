@@ -7,6 +7,7 @@ const updateRecordMock = vi.fn();
 const cacheGetMock = vi.fn();
 const cacheSetMock = vi.fn();
 const logPhiAccessMock = vi.fn();
+const sanitizeFormulaValueMock = vi.fn((value: string) => `sanitized(${value})`);
 const getCommunicationAnalyticsMock = vi.fn();
 const getConversationStatsMock = vi.fn();
 const getAllCampaignsMock = vi.fn();
@@ -59,6 +60,10 @@ vi.mock('@/lib/compliance/phi-logger', () => ({
   logPhiAccessFromRequest: (...args: unknown[]) => logPhiAccessMock(...args),
 }));
 
+vi.mock('@/lib/airtable/sanitize', () => ({
+  sanitizeFormulaValue: (...args: unknown[]) => sanitizeFormulaValueMock(...args),
+}));
+
 vi.mock('@/lib/communications', () => ({
   getCommunicationAnalytics: (...args: unknown[]) => getCommunicationAnalyticsMock(...args),
   getConversationStats: (...args: unknown[]) => getConversationStatsMock(...args),
@@ -92,6 +97,7 @@ describe('dashboard communications and plan-builder routes', () => {
     });
     hasPermissionMock.mockReturnValue(true);
     cacheGetMock.mockReturnValue(null);
+    sanitizeFormulaValueMock.mockClear();
 
     getCommunicationAnalyticsMock.mockReturnValue({
       totalSent: 100,
@@ -201,6 +207,28 @@ describe('dashboard communications and plan-builder routes', () => {
     expect(body.preferences).toBeDefined();
     expect(body.preferences.name).toBe('Jane Doe');
     expect(logPhiAccessMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('GET /api/dashboard/communications/preferences sanitizes clientId before filterByFormula', async () => {
+    const { GET } = await import('@/app/api/dashboard/communications/preferences/route');
+    const injected = `' OR TRUE() OR '`;
+    const encoded = encodeURIComponent(injected);
+    const url = `http://localhost:3000/api/dashboard/communications/preferences?clientId=${encoded}`;
+    const response = await GET({
+      nextUrl: new URL(url),
+      headers: new Headers(),
+      url,
+    } as never);
+
+    expect(response.status).toBe(200);
+    expect(sanitizeFormulaValueMock).toHaveBeenCalledWith(injected);
+    expect(fetchAllMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        filterByFormula: expect.stringContaining(`sanitized(${injected})`),
+      }),
+      true,
+    );
   });
 
   it('GET /api/dashboard/communications/preferences returns null for unknown client id', async () => {

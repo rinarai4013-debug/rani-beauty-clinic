@@ -64,14 +64,16 @@ function todayISO(): string {
 }
 
 function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr);
-  d.setDate(d.getDate() + days);
+  const d = new Date(`${dateStr}T00:00:00.000Z`);
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
 
 function daysBetween(a: string, b: string): number {
   const msPerDay = 86400000;
-  return Math.round((new Date(b).getTime() - new Date(a).getTime()) / msPerDay);
+  const start = new Date(`${a}T00:00:00.000Z`);
+  const end = new Date(`${b}T00:00:00.000Z`);
+  return Math.round((end.getTime() - start.getTime()) / msPerDay);
 }
 
 function parseHour(timeStr: string): number {
@@ -119,15 +121,19 @@ export async function GET(req: NextRequest) {
     const startDate = dateParam || today;
     const endDate = dateParam || addDays(today, 6);
 
-    const cacheKey = `no-show-risk:${startDate}:${endDate}`;
+    const safeStartDate = sanitizeFormulaValue(startDate);
+    const safeEndDate = sanitizeFormulaValue(endDate);
+    const safeToday = sanitizeFormulaValue(today);
+
+    const cacheKey = `no-show-risk:${safeStartDate}:${safeEndDate}`;
     const cached = cache.get<NoShowRiskItem[]>(cacheKey);
     if (cached) return NextResponse.json(cached);
 
     try {
     // ── Step 1: Fetch upcoming appointments ──
-    const dateFilter = startDate === endDate
-      ? `IS_SAME({Date}, '${startDate}', 'day')`
-      : `AND({Date} >= '${startDate}', {Date} <= '${endDate}')`;
+    const dateFilter = safeStartDate === safeEndDate
+      ? `IS_SAME({Date}, '${safeStartDate}', 'day')`
+      : `AND({Date} >= '${safeStartDate}', {Date} <= '${safeEndDate}')`;
 
     const apptFilter = `AND(${dateFilter}, OR({Status} = "scheduled", {Status} = "confirmed"))`;
 
@@ -170,7 +176,7 @@ export async function GET(req: NextRequest) {
       : '';
 
     // Fetch historical appointments (completed or no-show, before today)
-    const historyFilter = `AND({Date} < '${today}', OR({Status} = "completed", {Status} = "no_show"))`;
+    const historyFilter = `AND({Date} < '${safeToday}', OR({Status} = "completed", {Status} = "no_show"))`;
 
     const [clients, historyAppts] = await Promise.all([
       clientFilter
@@ -250,7 +256,7 @@ export async function GET(req: NextRequest) {
 
       const apptDate = f['Date'] || today;
       const bookingLeadDays = daysBetween(today, apptDate);
-      const apptDayOfWeek = new Date(apptDate).getDay();
+      const apptDayOfWeek = new Date(`${apptDate}T00:00:00.000Z`).getUTCDay();
       const apptHour = parseHour(f['Time'] || '');
 
       // Build no-show input

@@ -6,7 +6,7 @@ import { cache } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { FIELDS } from '@/lib/airtable/tables';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
-import { captureWebhookEvent } from '@/lib/sentry-utils';
+import { captureWebhookEvent, withSentry } from '@/lib/sentry-utils';
 import { parseTextWithSchema } from '@/lib/validation/parse-body';
 
 // Envelope-level validation for Mangomint webhooks. Mangomint rolls
@@ -598,112 +598,116 @@ async function handleMembershipCancelled(data: Record<string, unknown>, payload:
 // ─── Main POST Handler ───
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.text();
+  return withSentry('webhooks/mangomint', async () => {
+    try {
+      const body = await request.text();
 
-    // MANDATORY: verify webhook signature
-    if (!process.env.MANGOMINT_WEBHOOK_SECRET) {
-      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+      // MANDATORY: verify webhook signature
+      if (!process.env.MANGOMINT_WEBHOOK_SECRET) {
+        return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+      }
+
+      const signature = request.headers.get('x-mangomint-signature');
+      if (!signature) {
+        logWebhookEvent('mangomint', 'unknown', false, { error: 'Missing signature' });
+        return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+      }
+
+      const crypto = await import('crypto');
+      const expected = crypto
+        .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
+        .update(body)
+        .digest('hex');
+      const sigBuf = Buffer.from(signature, 'utf8');
+      const expBuf = Buffer.from(expected, 'utf8');
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid signature' });
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+
+      // Tier 1 zod (2026-04-11): validate envelope before routing.
+      // Rejects null / non-object bodies / bad event-type fields with
+      // a 422 + details that the HMAC-verified caller can use to
+      // self-correct.
+      const parsed = parseTextWithSchema(body, MangomintWebhookEnvelopeSchema);
+      if (!parsed.ok) {
+        logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid envelope' });
+        return parsed.response;
+      }
+
+      const payload = parsed.data as Record<string, unknown>;
+      const event = (payload.event as string) || (payload.type as string) || 'unknown';
+      const data = (payload.data as Record<string, unknown>) || payload;
+
+      logWebhookEvent('mangomint', event, true, { dataPreview: JSON.stringify(data).substring(0, 200) });
+
+      // Route to handler by event type
+      switch (event) {
+        case 'appointment.created':
+          await handleAppointmentCreated(data, payload);
+          break;
+
+        case 'appointment.updated':
+          await handleAppointmentUpdated(data);
+          break;
+
+        case 'appointment.completed':
+          await handleAppointmentCompleted(data, payload);
+          break;
+
+        case 'appointment.cancelled':
+        case 'appointment.canceled':
+          await handleAppointmentCancelled(data);
+          break;
+
+        case 'appointment.noshow':
+        case 'appointment.no_show':
+          await handleAppointmentNoshow(data);
+          break;
+
+        case 'sale.completed':
+          await handleSaleCompleted(data, payload);
+          break;
+
+        case 'client.created':
+          await handleClientCreated(data);
+          break;
+
+        case 'client.updated':
+          await handleClientUpdated(data);
+          break;
+
+        case 'membership.created':
+        case 'membership.started':
+          await handleMembershipCreated(data, payload);
+          break;
+
+        case 'membership.cancelled':
+        case 'membership.canceled':
+          await handleMembershipCancelled(data, payload);
+          break;
+
+        default:
+          logWebhookEvent('mangomint', event, true, { note: 'Unhandled event type' });
+      }
+
+      captureWebhookEvent('mangomint', event, true);
+      return NextResponse.json({ received: true, event });
+    } catch (error) {
+      Sentry.captureException(error, { tags: { route: 'webhook-mangomint' } });
+      captureWebhookEvent('mangomint', 'processing', false, { error: String(error) });
+      logWebhookEvent('mangomint', 'processing', false, { error: String(error) });
+      return NextResponse.json(
+        { error: 'Webhook processing failed' },
+        { status: 500 }
+      );
     }
-
-    const signature = request.headers.get('x-mangomint-signature');
-    if (!signature) {
-      logWebhookEvent('mangomint', 'unknown', false, { error: 'Missing signature' });
-      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
-    }
-
-    const crypto = await import('crypto');
-    const expected = crypto
-      .createHmac('sha256', process.env.MANGOMINT_WEBHOOK_SECRET)
-      .update(body)
-      .digest('hex');
-    const sigBuf = Buffer.from(signature, 'utf8');
-    const expBuf = Buffer.from(expected, 'utf8');
-    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
-      logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid signature' });
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
-
-    // Tier 1 zod (2026-04-11): validate envelope before routing.
-    // Rejects null / non-object bodies / bad event-type fields with
-    // a 422 + details that the HMAC-verified caller can use to
-    // self-correct.
-    const parsed = parseTextWithSchema(body, MangomintWebhookEnvelopeSchema);
-    if (!parsed.ok) {
-      logWebhookEvent('mangomint', 'unknown', false, { error: 'Invalid envelope' });
-      return parsed.response;
-    }
-
-    const payload = parsed.data as Record<string, unknown>;
-    const event = (payload.event as string) || (payload.type as string) || 'unknown';
-    const data = (payload.data as Record<string, unknown>) || payload;
-
-    logWebhookEvent('mangomint', event, true, { dataPreview: JSON.stringify(data).substring(0, 200) });
-
-    // Route to handler by event type
-    switch (event) {
-      case 'appointment.created':
-        await handleAppointmentCreated(data, payload);
-        break;
-
-      case 'appointment.updated':
-        await handleAppointmentUpdated(data);
-        break;
-
-      case 'appointment.completed':
-        await handleAppointmentCompleted(data, payload);
-        break;
-
-      case 'appointment.cancelled':
-      case 'appointment.canceled':
-        await handleAppointmentCancelled(data);
-        break;
-
-      case 'appointment.noshow':
-      case 'appointment.no_show':
-        await handleAppointmentNoshow(data);
-        break;
-
-      case 'sale.completed':
-        await handleSaleCompleted(data, payload);
-        break;
-
-      case 'client.created':
-        await handleClientCreated(data);
-        break;
-
-      case 'client.updated':
-        await handleClientUpdated(data);
-        break;
-
-      case 'membership.created':
-      case 'membership.started':
-        await handleMembershipCreated(data, payload);
-        break;
-
-      case 'membership.cancelled':
-      case 'membership.canceled':
-        await handleMembershipCancelled(data, payload);
-        break;
-
-      default:
-        logWebhookEvent('mangomint', event, true, { note: 'Unhandled event type' });
-    }
-
-    captureWebhookEvent('mangomint', event, true);
-    return NextResponse.json({ received: true, event });
-  } catch (error) {
-    Sentry.captureException(error, { tags: { route: 'webhook-mangomint' } });
-    captureWebhookEvent('mangomint', 'processing', false, { error: String(error) });
-    logWebhookEvent('mangomint', 'processing', false, { error: String(error) });
-    return NextResponse.json(
-      { error: 'Webhook processing failed' },
-      { status: 500 }
-    );
-  }
+  });
 }
 
 // GET - reject non-POST requests (no health check info exposed)
 export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return withSentry('webhooks/mangomint:get', async () =>
+    NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
+  );
 }

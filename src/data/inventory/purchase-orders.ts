@@ -449,9 +449,12 @@ export const sampleWasteEntries: WasteEntry[] = [
 
 // ── Utility Functions ─────────────────────────────────────────────────
 
+let poNumberSequence = Math.floor(Math.random() * 9000) + 1000;
+
 export function generatePONumber(): string {
   const year = new Date().getFullYear();
-  const num = Math.floor(Math.random() * 9000) + 1000;
+  const num = poNumberSequence;
+  poNumberSequence = poNumberSequence >= 9999 ? 1000 : poNumberSequence + 1;
   return `PO-${year}-${num}`;
 }
 

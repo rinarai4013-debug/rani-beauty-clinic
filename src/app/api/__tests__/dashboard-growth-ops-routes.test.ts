@@ -32,6 +32,7 @@ const tablesAppointmentsMock = vi.fn();
 const tablesTransactionsMock = vi.fn();
 const tablesReviewsMock = vi.fn();
 const fetchAllMock = vi.fn();
+const sanitizeFormulaValueMock = vi.fn((value: string) => value);
 
 vi.mock('@/lib/auth/session', () => ({
   getSession: (...args: unknown[]) => getSessionMock(...args),
@@ -105,9 +106,14 @@ vi.mock('@/lib/airtable/client', () => ({
   fetchAll: (...args: unknown[]) => fetchAllMock(...args),
 }));
 
+vi.mock('@/lib/airtable/sanitize', () => ({
+  sanitizeFormulaValue: (...args: unknown[]) => sanitizeFormulaValueMock(...args),
+}));
+
 describe('dashboard growth + ops routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sanitizeFormulaValueMock.mockClear();
 
     delete process.env.META_ACCESS_TOKEN;
     delete process.env.META_AD_ACCOUNT_ID;
@@ -525,6 +531,7 @@ describe('dashboard growth + ops routes', () => {
     expect(body.name).toBe('Rina');
     expect(body.monthlyStats.revenue).toBeGreaterThanOrEqual(0);
     expect(body.reviews.count).toBeGreaterThanOrEqual(0);
+    expect(sanitizeFormulaValueMock).toHaveBeenCalledWith('Rina');
     expect(cacheSetMock).toHaveBeenCalledTimes(1);
   });
 

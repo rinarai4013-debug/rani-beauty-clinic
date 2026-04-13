@@ -1,7 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, afterEach, afterAll, describe, it, expect, vi } from 'vitest';
 import { rateLimit, getClientIP, RATE_LIMITS } from './rate-limit';
 
 describe('rateLimit', () => {
+  const dateNowSpy = vi.spyOn(Date, 'now');
+  const fixedNow = new Date('2026-04-13T12:00:00.000Z').getTime();
+
+  beforeEach(() => {
+    dateNowSpy.mockReturnValue(fixedNow);
+  });
+
+  afterEach(() => {
+    dateNowSpy.mockReset();
+  });
+
+  afterAll(() => {
+    dateNowSpy.mockRestore();
+  });
+
   it('allows requests within the limit', () => {
     const result = rateLimit('test-allow', '1.2.3.4', { limit: 5, windowMs: 60000 });
     expect(result.allowed).toBe(true);
@@ -30,6 +45,36 @@ describe('rateLimit', () => {
     rateLimit('route-a', '20.0.0.1', config);
     const result = rateLimit('route-b', '20.0.0.1', config);
     expect(result.allowed).toBe(true);
+  });
+
+  it('resets limiter after window expires', () => {
+    const config = { limit: 1, windowMs: 1000 };
+    const routeKey = 'test-reset-window';
+    const ip = '30.0.0.1';
+
+    const first = rateLimit(routeKey, ip, config);
+    const blocked = rateLimit(routeKey, ip, config);
+    expect(first.allowed).toBe(true);
+    expect(blocked.allowed).toBe(false);
+
+    dateNowSpy.mockReturnValue(fixedNow + 1001);
+    const afterReset = rateLimit(routeKey, ip, config);
+    expect(afterReset.allowed).toBe(true);
+    expect(afterReset.remaining).toBe(0);
+  });
+
+  it('returns resetIn countdown while within active window', () => {
+    const config = { limit: 2, windowMs: 5000 };
+    const routeKey = 'test-reset-countdown';
+    const ip = '30.0.0.2';
+
+    const first = rateLimit(routeKey, ip, config);
+    expect(first.resetIn).toBe(5000);
+
+    dateNowSpy.mockReturnValue(fixedNow + 1200);
+    const second = rateLimit(routeKey, ip, config);
+    expect(second.allowed).toBe(true);
+    expect(second.resetIn).toBe(3800);
   });
 
   it('RATE_LIMITS presets are defined', () => {

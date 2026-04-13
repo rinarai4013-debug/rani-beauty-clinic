@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPatientSession } from '@/lib/patient-auth/session';
 import { Tables, rateLimitedQuery, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { logPHIAccess } from '@/lib/compliance/hipaa-audit';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -13,7 +14,13 @@ const updateSchema = z
   })
   .strict();
 
-export async function GET() {
+function getClientIp(request: NextRequest): string {
+  const xff = request.headers.get('x-forwarded-for');
+  if (xff) return xff.split(',')[0]?.trim() || 'unknown';
+  return request.headers.get('x-real-ip') || 'unknown';
+}
+
+export async function GET(request: NextRequest) {
   return withSentry('patient/profile', async () => {
     try {
       const session = await getPatientSession();
@@ -22,6 +29,19 @@ export async function GET() {
       }
 
       const client = await rateLimitedQuery(() => Tables.clients().find(session.patientId));
+      const clientName = (client.fields[FIELDS.clients.name] as string) || session.name || 'Patient';
+
+      logPHIAccess({
+        userId: session.patientId,
+        userName: clientName,
+        userRole: 'patient',
+        patientId: session.patientId,
+        patientName: clientName,
+        action: 'view',
+        dataCategory: 'demographics',
+        ipAddress: getClientIp(request),
+        details: 'Patient profile self-service view',
+      });
 
       return NextResponse.json({
         profile: {
@@ -40,7 +60,7 @@ export async function GET() {
   });
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   return withSentry('patient/profile', async () => {
     try {
       const session = await getPatientSession();
@@ -76,6 +96,17 @@ export async function PATCH(request: Request) {
       }
 
       await updateRecord(Tables.clients(), session.patientId, updates);
+      logPHIAccess({
+        userId: session.patientId,
+        userName: session.name || session.email || 'Patient',
+        userRole: 'patient',
+        patientId: session.patientId,
+        patientName: session.name || session.email || 'Patient',
+        action: 'update',
+        dataCategory: 'demographics',
+        ipAddress: getClientIp(request),
+        details: `Patient profile self-service update: ${Object.keys(updates).join(', ')}`,
+      });
 
       return NextResponse.json({ success: true });
     } catch (error) {

@@ -8,12 +8,15 @@ import {
 import { Tables, fetchFirst } from '@/lib/airtable/client';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 
 import { withSentry } from '@/lib/sentry-utils';
 
 const requestSchema = z.object({
   token: z.string().min(1),
 });
+
+const MAX_VERIFY_REQUEST_BYTES = 16 * 1024;
 
 interface ClientRecord {
   Client: string;
@@ -23,6 +26,12 @@ interface ClientRecord {
 
 export async function POST(request: NextRequest) {
   return withSentry('patient/auth/verify', async () => {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(request, MAX_VERIFY_REQUEST_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('form', ip, RATE_LIMITS.FORM);
     if (!allowed) return rateLimitResponse(resetIn);
@@ -49,11 +58,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid or expired link' }, { status: 401 });
       }
 
+      const normalizedEmail = payload.email.trim().toLowerCase();
+
       // Look up client by email
       const clientRecords = await fetchFirst<ClientRecord>(
         Tables.clients(),
         1,
-        { filterByFormula: `{Email} = '${sanitizeFormulaValue(payload.email)}'` },
+        { filterByFormula: `{Email} = '${sanitizeFormulaValue(normalizedEmail)}'` },
         true, // skip cache to get fresh data
       );
 
@@ -63,7 +74,7 @@ export async function POST(request: NextRequest) {
 
       const client = clientRecords[0];
       const clientId = client.id;
-      const email = client.fields.Email;
+      const email = client.fields.Email || normalizedEmail;
       const name = client.fields.Client;
 
       // Create patient session
