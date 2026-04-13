@@ -84,21 +84,39 @@ function buildClientProfile(
   scanResult: AuraScanResult,
   intakeData: Partial<ConsultationFormData>
 ): ClientProfile {
+  const planningContext = intakeData as Partial<ConsultationFormData> & {
+    downtimeTolerance?: string;
+    painTolerance?: string;
+    availableServiceIds?: string[];
+    unavailableServiceIds?: string[];
+    availableDeviceTags?: string[];
+    unavailableDeviceTags?: string[];
+    providerRole?: string;
+    providerSkills?: string[];
+    labsCompleted?: boolean;
+    requiresLabWork?: boolean;
+  };
   const concerns = (intakeData.skinConcerns as string[]) || [];
   const interests = (intakeData.treatmentInterests as string[]) || [];
   const budget = mapBudgetBand(intakeData.budget as string);
   const timeline = mapUrgency(intakeData.timeline as string);
-  const downtime = mapDowntimeTolerance((intakeData as { downtimeTolerance?: string }).downtimeTolerance);
-  const painTolerance = mapPainTolerance((intakeData as { painTolerance?: string }).painTolerance);
+  const downtime = mapDowntimeTolerance(planningContext.downtimeTolerance);
+  const painTolerance = mapPainTolerance(planningContext.painTolerance);
+  const prerequisiteLabsComplete = planningContext.labsCompleted === true
+    ? true
+    : planningContext.requiresLabWork
+      ? false
+      : undefined;
 
   // Map medical data to contraindications
   const contraindications: string[] = [];
   if (intakeData.pregnant) contraindications.push('pregnancy');
   if (intakeData.breastfeeding) contraindications.push('breastfeeding');
-  if (intakeData.bloodThinners) contraindications.push('blood_thinners');
-  if (intakeData.isotretinoinHistory) contraindications.push('isotretinoin');
-  if (intakeData.keloidHistory) contraindications.push('keloid');
-  if (intakeData.activeSkinInfection) contraindications.push('active_infection');
+  if (intakeData.bloodThinners) contraindications.push('blood-thinners');
+  if (intakeData.isotretinoinHistory) contraindications.push('retinoid-use');
+  if (intakeData.keloidHistory) contraindications.push('keloid-prone');
+  if (intakeData.activeSkinInfection) contraindications.push('active-infection');
+  if (intakeData.hasAutoimmune) contraindications.push('autoimmune');
 
   return {
     skinConcerns: concerns,
@@ -109,6 +127,13 @@ function buildClientProfile(
     contraindications,
     downtimeTolerance: downtime,
     painTolerance,
+    availableServiceIds: planningContext.availableServiceIds,
+    unavailableServiceIds: planningContext.unavailableServiceIds,
+    availableDeviceTags: planningContext.availableDeviceTags,
+    unavailableDeviceTags: planningContext.unavailableDeviceTags,
+    providerRole: planningContext.providerRole,
+    providerSkills: planningContext.providerSkills,
+    prerequisiteLabsComplete,
   };
 }
 
