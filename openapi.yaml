@@ -1,0 +1,1450 @@
+openapi: 3.0.3
+info:
+  title: Rani Beauty Clinic API
+  version: 1.0.0
+  description: |
+    Baseline API contract for production route surfaces.
+    This spec is CI-validated and intended to evolve with the codebase.
+  license:
+    name: Proprietary
+    url: https://rani-beauty-clinic.vercel.app
+servers:
+  - url: https://rani-beauty-clinic.vercel.app
+    description: Production
+tags:
+  - name: Dashboard
+    description: Internal dashboard routes for operations, revenue, and intelligence views.
+  - name: Tenant
+    description: Tenant-scoped SaaS routes guarded by tenant middleware.
+  - name: Patient
+    description: Patient-facing authentication and portal access routes.
+security:
+  - SessionCookie: []
+paths:
+  /api/dashboard/clients:
+    get:
+      tags: [Dashboard]
+      operationId: getDashboardClients
+      summary: List clients for dashboard views
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+          description: Optional client status filter.
+      responses:
+        "200":
+          description: Client list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientsListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/clients/{id}:
+    get:
+      tags: [Dashboard]
+      operationId: getDashboardClientById
+      summary: Get client profile by record id
+      parameters:
+        - $ref: "#/components/parameters/ClientIdPath"
+        - name: full
+          in: query
+          schema:
+            type: boolean
+          description: Include linked records for 360 profile.
+      responses:
+        "200":
+          description: Client profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/clients/{id}/churn:
+    get:
+      tags: [Dashboard]
+      operationId: getClientChurnPrediction
+      summary: Compute churn risk prediction for a client
+      parameters:
+        - $ref: "#/components/parameters/ClientIdPath"
+      responses:
+        "200":
+          description: Churn prediction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChurnPredictionResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/clients/{id}/recommend:
+    get:
+      tags: [Dashboard]
+      operationId: getClientRecommendations
+      summary: Get treatment recommendations for a client
+      parameters:
+        - $ref: "#/components/parameters/ClientIdPath"
+      responses:
+        "200":
+          description: Recommendation payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/schedule:
+    get:
+      tags: [Dashboard]
+      operationId: getDashboardSchedule
+      summary: Get today's schedule summary
+      responses:
+        "200":
+          description: Schedule summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/schedule/no-show-risk:
+    get:
+      tags: [Dashboard]
+      operationId: getNoShowRisk
+      summary: Get no-show risk scoring for upcoming appointments
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Optional single-day date filter.
+      responses:
+        "200":
+          description: Ranked no-show risk list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoShowRiskItem"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/schedule/optimize:
+    get:
+      tags: [Dashboard]
+      operationId: getScheduleOptimization
+      summary: Get optimization recommendations for schedule
+      responses:
+        "200":
+          description: Optimization payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/plaid/transactions:
+    get:
+      tags: [Dashboard]
+      operationId: getPlaidTransactions
+      summary: List and filter plaid transactions
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 120
+      responses:
+        "200":
+          description: Paginated transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaidTransactionsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/training:
+    get:
+      tags: [Dashboard]
+      operationId: getTrainingModules
+      summary: List training modules and summary stats
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [front-desk, provider, all-staff, management]
+      responses:
+        "200":
+          description: Training content summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/knowledge-base:
+    get:
+      tags: [Dashboard]
+      operationId: getKnowledgeBase
+      summary: Get knowledge base stats or search results
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+            maxLength: 200
+          description: Optional search query.
+      responses:
+        "200":
+          description: Knowledge base payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/dashboard/loyalty:
+    get:
+      tags: [Dashboard]
+      operationId: getLoyaltyData
+      summary: Get loyalty analytics, member details, or rewards
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum: [analytics, member, rewards]
+            default: analytics
+        - name: clientId
+          in: query
+          schema:
+            type: string
+        - name: tier
+          in: query
+          schema:
+            type: string
+            enum: [Silver, Gold, Platinum]
+        - name: balance
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Loyalty payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      tags: [Dashboard]
+      operationId: postLoyaltyAction
+      summary: Run loyalty mutation action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/LoyaltyAwardBonusRequest"
+                - $ref: "#/components/schemas/LoyaltyProcessSpendRequest"
+      responses:
+        "200":
+          description: Loyalty mutation result
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "501":
+          description: Action not implemented
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/tenant/revenue:
+    get:
+      tags: [Tenant]
+      operationId: getTenantRevenue
+      summary: Get tenant-scoped revenue breakdown
+      parameters:
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Revenue breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/tenant/schedule:
+    get:
+      tags: [Tenant]
+      operationId: getTenantSchedule
+      summary: Get tenant-scoped calendar data
+      parameters:
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: provider
+          in: query
+          schema:
+            type: string
+            maxLength: 120
+      responses:
+        "200":
+          description: Calendar data payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/patient/auth/magic-link:
+    post:
+      tags: [Patient]
+      operationId: postPatientMagicLink
+      summary: Request patient magic-link sign-in email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientMagicLinkRequest"
+      responses:
+        "200":
+          description: Privacy-safe success response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/patient/auth/verify:
+    post:
+      tags: [Patient]
+      operationId: postPatientVerifyMagicLink
+      summary: Verify patient magic-link token and establish session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientVerifyRequest"
+      responses:
+        "200":
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Public mutation routes ───────────────────────────────────────
+
+  /api/consultation/submit:
+    post:
+      operationId: submitConsultation
+      summary: Submit consultation intake with optional photo
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  description: JSON-encoded intake form data
+                photos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+              required: [data]
+      responses:
+        "200":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsultationSubmitResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Request body too large
+        "422":
+          description: Validation error (zod schema)
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/booking/book:
+    get:
+      operationId: checkBookingAvailability
+      summary: Check booking availability (stub — returns 501)
+      tags: [Public]
+      responses:
+        "200":
+          description: Availability check (currently returns 501)
+        "501":
+          description: Not implemented
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      operationId: createBooking
+      summary: Create a booking (stub — returns 501)
+      tags: [Public]
+      responses:
+        "200":
+          description: Booking created (currently returns 501)
+        "501":
+          description: Not implemented
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Request body too large
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/subscribe:
+    post:
+      operationId: subscribe
+      summary: Newsletter / email subscribe
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscribeRequest"
+      responses:
+        "200":
+          description: Subscribed (or honeypot accepted silently)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          description: Invalid email
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/plan/{id}/track:
+    post:
+      operationId: trackPlanInteraction
+      summary: Track plan view or interaction (public endpoint)
+      tags: [Public]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^rec[a-zA-Z0-9]{10,}$"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlanTrackRequest"
+      responses:
+        "200":
+          description: Interaction tracked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlanTrackResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: Treatment plan not found
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Dashboard communications ─────────────────────────────────────
+
+  /api/dashboard/communications/campaigns:
+    get:
+      operationId: listCampaigns
+      summary: List all campaigns
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Campaign list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: createCampaign
+      summary: Create a campaign
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignCreateRequest"
+      responses:
+        "200":
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Webhook routes ───────────────────────────────────────────────
+
+  /api/webhooks/cherry:
+    post:
+      operationId: handleCherryWebhook
+      summary: Cherry financing webhook (HMAC-signed)
+      tags: [Webhooks]
+      parameters:
+        - name: x-webhook-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CherryWebhookPayload"
+      responses:
+        "200":
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookAckResponse"
+        "401":
+          description: Invalid or missing signature
+        "503":
+          description: Webhook secret not configured
+
+  /api/webhooks/mangomint:
+    post:
+      operationId: handleMangomintWebhook
+      summary: Mangomint POS webhook (HMAC-signed)
+      tags: [Webhooks]
+      parameters:
+        - name: x-mangomint-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MangomintWebhookPayload"
+      responses:
+        "200":
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookAckResponse"
+        "401":
+          description: Invalid or missing signature
+        "422":
+          description: Invalid envelope structure
+        "503":
+          description: Webhook secret not configured
+
+  /api/webhooks/stripe:
+    post:
+      operationId: handleStripeWebhook
+      summary: Stripe checkout webhook (Stripe-signed)
+      tags: [Webhooks]
+      parameters:
+        - name: stripe-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeWebhookResponse"
+        "400":
+          description: Invalid payload
+        "401":
+          description: Invalid signature
+
+  # ── OpenAPI Wave 4: providers, revenue, meta-ads ─────────────────
+
+  /api/dashboard/providers:
+    get:
+      operationId: listProviders
+      summary: Provider performance summary
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Provider list with performance metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        appointmentCount:
+                          type: integer
+                        revenue:
+                          type: number
+                        avgTicket:
+                          type: number
+                        utilizationRate:
+                          type: number
+                  total:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/providers/{name}:
+    get:
+      operationId: getProviderByName
+      summary: Single provider detailed stats
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Provider slug (e.g. 'rina', 'mom')
+      responses:
+        "200":
+          description: Provider detail with monthly metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  revenue:
+                    type: number
+                  appointmentCount:
+                    type: integer
+                  avgTicket:
+                    type: number
+                  topServices:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Provider not found
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/providers/performance:
+    get:
+      operationId: getProviderPerformance
+      summary: Provider performance comparison
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Performance comparison across providers
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue:
+    get:
+      operationId: getRevenueBreakdown
+      summary: Revenue breakdown by provider, service, and category
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: range
+          in: query
+          schema:
+            type: string
+            enum: ["7d", "30d", "90d", "ytd"]
+      responses:
+        "200":
+          description: Revenue breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  byProvider:
+                    type: array
+                    items:
+                      type: object
+                  byService:
+                    type: array
+                    items:
+                      type: object
+                  byCategory:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue/trends:
+    get:
+      operationId: getRevenueTrends
+      summary: 30-day revenue trend
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Daily revenue trend data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trend:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        revenue:
+                          type: number
+                  avgDaily:
+                    type: number
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue/anomalies:
+    get:
+      operationId: getRevenueAnomalies
+      summary: Revenue anomaly detection (5 methods + health score)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Anomalies, health score, month-end projection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anomalies:
+                    type: array
+                    items:
+                      type: object
+                  healthScore:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                  projectedMonthEnd:
+                    type: number
+                  summary:
+                    type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue-optimizer:
+    get:
+      operationId: getRevenueOptimizer
+      summary: Revenue optimization opportunities
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Optimization recommendations
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/meta-ads:
+    get:
+      operationId: getMetaAdsPerformance
+      summary: Meta Ads 30-day performance summary
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Ad performance, campaigns, ROAS
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  performanceSummary:
+                    type: object
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                  adScore:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "502":
+          description: Meta API error
+
+  /api/dashboard/meta-ads/optimize:
+    get:
+      operationId: getMetaAdsOptimizations
+      summary: Meta Ads AI optimization + ad copy variants
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Optimizations, ad copy variants, budget recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  optimizations:
+                    type: array
+                    items:
+                      type: object
+                  adCopyVariants:
+                    type: array
+                    items:
+                      type: object
+                  budgetRecommendations:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: rani-session
+  parameters:
+    ClientIdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    ClientsListResponse:
+      type: object
+      properties:
+        clients:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClientSummary"
+        total:
+          type: integer
+      required: [clients, total]
+    ClientSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+      required: [id, name]
+    ClientProfileResponse:
+      allOf:
+        - $ref: "#/components/schemas/ClientSummary"
+        - type: object
+          properties:
+            phone:
+              type: string
+            ltv:
+              type: number
+            visitCount:
+              type: integer
+            appointments:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            transactions:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            memberships:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+    ChurnPredictionResponse:
+      type: object
+      properties:
+        clientId:
+          type: string
+        clientName:
+          type: string
+        score:
+          type: number
+        risk:
+          type: string
+        recommendation:
+          type: string
+      required: [clientId, score, risk]
+    RecommendationResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        strategies:
+          type: array
+          items:
+            type: string
+      required: [recommendations]
+    ScheduleResponse:
+      type: object
+      properties:
+        today:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        utilization:
+          type: object
+          additionalProperties: true
+        stats:
+          type: object
+          additionalProperties: true
+      required: [today, utilization, stats]
+    NoShowRiskItem:
+      type: object
+      properties:
+        appointmentId:
+          type: string
+        clientName:
+          type: string
+        service:
+          type: string
+        provider:
+          type: string
+        date:
+          type: string
+        time:
+          type: string
+        noShowScore:
+          type: object
+          properties:
+            score:
+              type: number
+            risk:
+              type: string
+          required: [score]
+      required: [appointmentId, clientName, noShowScore]
+    PlaidTransactionsResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        total:
+          type: integer
+        page:
+          type: integer
+        hasMore:
+          type: boolean
+      required: [transactions, total, page, hasMore]
+    TrainingResponse:
+      type: object
+      properties:
+        modules:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byRole:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+        stats:
+          type: object
+          additionalProperties: true
+        roleLabels:
+          type: object
+          additionalProperties:
+            type: string
+        roleColors:
+          type: object
+          additionalProperties:
+            type: string
+      required: [modules, byRole, stats]
+    LoyaltyAwardBonusRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [award_bonus]
+        clientId:
+          type: string
+        bonusType:
+          type: string
+          enum: [birthday, review, referral, visit_streak, tier_up]
+      required: [action, clientId, bonusType]
+    LoyaltyProcessSpendRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [process_spend]
+        clientId:
+          type: string
+        amount:
+          type: number
+        serviceType:
+          type: string
+      required: [action, clientId, amount, serviceType]
+    PatientMagicLinkRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required: [email]
+    PatientVerifyRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        email:
+          type: string
+          format: email
+      required: [token, email]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
+
+    # ── Public mutation schemas ──────────────────────────────────────
+
+    ConsultationSubmitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            sessionId:
+              type: string
+            patientName:
+              type: string
+            hasPhoto:
+              type: boolean
+            phase:
+              type: string
+      required: [success]
+
+    SubscribeRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        source:
+          type: string
+          maxLength: 100
+        honeypot:
+          type: string
+          maxLength: 0
+      required: [email]
+
+    PlanTrackRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [view, financing_clicked, booking_clicked]
+
+    PlanTrackResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        previousStatus:
+          type: string
+        newStatus:
+          type: string
+        followUp:
+          type: object
+          nullable: true
+          properties:
+            template:
+              type: string
+            delayHours:
+              type: number
+            action:
+              type: string
+
+    CampaignCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [promotional, educational, reactivation, event, seasonal, birthday, direct]
+        channel:
+          type: string
+          enum: [sms, email, both]
+        subject:
+          type: string
+        body:
+          type: string
+      required: [name, type]
+
+    CampaignResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        campaign:
+          type: object
+
+    CampaignListResponse:
+      type: object
+      properties:
+        campaigns:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+        asOf:
+          type: string
+          format: date-time
+
+    # ── Webhook schemas ──────────────────────────────────────────────
+
+    CherryWebhookPayload:
+      type: object
+      properties:
+        event:
+          type: string
+        data:
+          type: object
+      required: [event]
+
+    MangomintWebhookPayload:
+      type: object
+      properties:
+        event:
+          type: string
+        type:
+          type: string
+        data:
+          type: object
+
+    StripeWebhookResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+        event:
+          type: string
+
+    WebhookAckResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+        event:
+          type: string

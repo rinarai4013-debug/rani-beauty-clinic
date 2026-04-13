@@ -366,4 +366,85 @@ describe('dashboard critical auth/permission routes', () => {
     expect(body.success).toBe(true);
     expect(awardBonusMock).toHaveBeenCalledTimes(1);
   });
+
+  it('GET /api/dashboard/loyalty returns 400 for invalid action', async () => {
+    const { GET } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty?action=unknown');
+    const response = await GET(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid action');
+  });
+
+  it('GET /api/dashboard/loyalty member action requires clientId', async () => {
+    const { GET } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty?action=member');
+    const response = await GET(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('clientId required');
+  });
+
+  it('GET /api/dashboard/loyalty rewards action validates query params', async () => {
+    const { GET } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty?action=rewards&tier=Diamond');
+    const response = await GET(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid rewards query parameters');
+  });
+
+  it('POST /api/dashboard/loyalty validates request body', async () => {
+    const { POST } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'award_bonus', clientId: '', bonusType: 'birthday' }),
+    });
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid request body');
+  });
+
+  it('POST /api/dashboard/loyalty returns 404 when member does not exist', async () => {
+    const { POST } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        action: 'award_bonus',
+        clientId: 'missing-client',
+        bonusType: 'birthday',
+      }),
+    });
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(body.error).toBe('Member not found');
+  });
+
+  it('POST /api/dashboard/loyalty process_spend returns 501', async () => {
+    const { POST } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        action: 'process_spend',
+        clientId: 'client-001',
+        amount: 250,
+        serviceType: 'HydraFacial',
+      }),
+    });
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(501);
+    expect(body.error).toBe('process_spend is not implemented yet');
+  });
 });

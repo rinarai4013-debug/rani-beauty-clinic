@@ -405,6 +405,29 @@ describe('GET /api/dashboard/knowledge-base', () => {
 
     expect(response.status).toBe(200);
   });
+
+  it('should trim search query before calling searchKnowledgeBase', async () => {
+    setupAuthCEO();
+    const knowledgeBase = await import('@/lib/rag/knowledge-base');
+
+    const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
+    const req = buildGetRequest('/api/dashboard/knowledge-base', { q: '  botox aftercare  ' });
+    const response = await GET(req as any);
+
+    expect(response.status).toBe(200);
+    expect(knowledgeBase.searchKnowledgeBase).toHaveBeenCalledWith('botox aftercare');
+  });
+
+  it('should return 400 when q is too long', async () => {
+    setupAuthCEO();
+    const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
+    const req = buildGetRequest('/api/dashboard/knowledge-base', { q: 'x'.repeat(201) });
+    const response = await GET(req as any);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Query too long');
+  });
 });
 
 // ---------------------------------------------------------------------------
