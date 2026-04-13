@@ -49,6 +49,12 @@ vi.mock('@/lib/sentry-utils', () => ({
   withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
 }));
 
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
+  enforceContentLength: vi.fn().mockReturnValue(null),
+  normalizeEmailForLimit: vi.fn((v: string) => v.toLowerCase().trim()),
+}));
+
 describe('patient auth + profile critical routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
