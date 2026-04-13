@@ -755,6 +755,371 @@ paths:
         "401":
           description: Invalid signature
 
+  # ── OpenAPI Wave 3: clients, consult, consultations, plan-builder, leads ──
+
+  /api/dashboard/communications/preferences:
+    get:
+      operationId: getCommunicationPreferences
+      summary: Client communication preferences (PHI — logged)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: string
+          description: Optional — single client lookup (sanitized before formula)
+      responses:
+        "200":
+          description: Preferences list or single client
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences:
+                    oneOf:
+                      - type: array
+                        items:
+                          $ref: "#/components/schemas/ClientPreference"
+                      - $ref: "#/components/schemas/ClientPreference"
+                  total:
+                    type: integer
+                  asOf:
+                    type: string
+                    format: date-time
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/consult:
+    get:
+      operationId: getConsultSample
+      summary: Sample consult copilot output
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Copilot result
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: generateConsult
+      summary: Generate consult copilot for custom client
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client:
+                  type: object
+                concerns:
+                  type: array
+                  items:
+                    type: string
+                consultType:
+                  type: string
+                  enum: [new_client, existing_client, follow_up, upsell]
+                timeAvailable:
+                  type: integer
+              required: [client, concerns, consultType, timeAvailable]
+      responses:
+        "200":
+          description: Copilot result
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/consultations:
+    get:
+      operationId: listConsultations
+      summary: Unified consultation pipeline (mastermind + intakes)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Merged consultation list sorted by date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        source:
+                          type: string
+                          enum: [mastermind, intake_form]
+                        patientName:
+                          type: string
+                        clinicStatus:
+                          type: string
+                        estimatedValue:
+                          type: number
+                        weightedValue:
+                          type: number
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/leads:
+    get:
+      operationId: getLeadFunnel
+      summary: Lead funnel with conversion rates
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Funnel stages + metrics + conversion rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        count:
+                          type: integer
+                        percentage:
+                          type: number
+                  metrics:
+                    type: object
+                  conversionRates:
+                    type: object
+                    properties:
+                      leadToConsult:
+                        type: number
+                      consultShowRate:
+                        type: number
+                      consultCloseRate:
+                        type: number
+                      depositCaptureRate:
+                        type: number
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/leads/stats:
+    get:
+      operationId: getLeadStats
+      summary: Lead conversion statistics
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Lead stats
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/plan-builder:
+    get:
+      operationId: listTreatmentPlans
+      summary: List or get single treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+          description: Optional plan ID for single lookup
+      responses:
+        "200":
+          description: Plan list or single plan
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      operationId: createTreatmentPlan
+      summary: Create a draft treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientName:
+                  type: string
+                planName:
+                  type: string
+                planTier:
+                  type: string
+                planValue:
+                  type: number
+                servicesIncluded:
+                  type: string
+              required: [clientName]
+      responses:
+        "201":
+          description: Plan created
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    patch:
+      operationId: updateTreatmentPlan
+      summary: Update treatment plan fields
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                status:
+                  type: string
+                planValue:
+                  type: number
+              required: [id]
+      responses:
+        "200":
+          description: Plan updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      operationId: archiveTreatmentPlan
+      summary: Archive a treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Plan archived
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/plan-builder/send:
+    post:
+      operationId: sendTreatmentPlan
+      summary: Send treatment plan via email (Resend)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  pattern: "^rec[a-zA-Z0-9]{10,}$"
+                clientEmail:
+                  type: string
+                  format: email
+                clientName:
+                  type: string
+                clientPhone:
+                  type: string
+              required: [planId, clientEmail, clientName]
+      responses:
+        "200":
+          description: Plan sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  planUrl:
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/plan-builder/export-pdf:
+    post:
+      operationId: exportTreatmentPlanPdf
+      summary: Generate PDF HTML for treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planData:
+                  type: object
+              required: [planData]
+      responses:
+        "200":
+          description: PDF HTML generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  html:
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
   securitySchemes:
     SessionCookie:
@@ -1014,6 +1379,22 @@ components:
           type: string
           format: email
       required: [token, email]
+
+    ClientPreference:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        preferredContact:
+          type: string
+        status:
+          type: string
 
     SuccessResponse:
       type: object
