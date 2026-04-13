@@ -11,10 +11,34 @@ vi.mock('@/lib/env', () => ({
 import { enforceAllowedPublicOrigin, enforceContentLength } from './public-intent-guard';
 
 describe('public-intent-guard', () => {
-  it('allows configured origins', () => {
+  it('allows NEXT_PUBLIC_BASE_URL origin', () => {
     const request = new Request('http://localhost:3000/api/test', {
       method: 'POST',
       headers: { origin: 'https://ranibeautyclinic.com' },
+    });
+    expect(enforceAllowedPublicOrigin(request)).toBeNull();
+  });
+
+  it('allows NEXT_PUBLIC_SITE_URL origin', () => {
+    const request = new Request('http://localhost:3000/api/test', {
+      method: 'POST',
+      headers: { origin: 'https://www.ranibeautyclinic.com' },
+    });
+    expect(enforceAllowedPublicOrigin(request)).toBeNull();
+  });
+
+  it('allows CORS_ALLOWED_ORIGINS entries', () => {
+    const request = new Request('http://localhost:3000/api/test', {
+      method: 'POST',
+      headers: { origin: 'https://book.ranibeautyclinic.com' },
+    });
+    expect(enforceAllowedPublicOrigin(request)).toBeNull();
+  });
+
+  it('allows localhost dev origins in non-production', () => {
+    const request = new Request('http://localhost:3000/api/test', {
+      method: 'POST',
+      headers: { origin: 'http://localhost:3000' },
     });
     expect(enforceAllowedPublicOrigin(request)).toBeNull();
   });
@@ -34,6 +58,24 @@ describe('public-intent-guard', () => {
     expect(enforceAllowedPublicOrigin(request)).toBeNull();
   });
 
+  it('uses referer origin when origin header is missing', () => {
+    const request = new Request('http://localhost:3000/api/test', {
+      method: 'POST',
+      headers: { referer: 'https://ranibeautyclinic.com/some/page' },
+    });
+    expect(enforceAllowedPublicOrigin(request)).toBeNull();
+  });
+
+  it('rejects malformed origin values', async () => {
+    const request = new Request('http://localhost:3000/api/test', {
+      method: 'POST',
+      headers: { origin: '%%%not-a-url%%%' },
+    });
+    const response = enforceAllowedPublicOrigin(request);
+    expect(response?.status).toBe(400);
+    await expect(response?.json()).resolves.toEqual({ error: 'Invalid request origin' });
+  });
+
   it('rejects oversized payloads', async () => {
     const request = new Request('http://localhost:3000/api/test', {
       method: 'POST',
@@ -42,5 +84,15 @@ describe('public-intent-guard', () => {
     const response = enforceContentLength(request, 1024);
     expect(response?.status).toBe(413);
     await expect(response?.json()).resolves.toEqual({ error: 'Request body too large' });
+  });
+
+  it('rejects malformed content-length header', async () => {
+    const request = new Request('http://localhost:3000/api/test', {
+      method: 'POST',
+      headers: { 'content-length': 'not-a-number' },
+    });
+    const response = enforceContentLength(request, 1024);
+    expect(response?.status).toBe(400);
+    await expect(response?.json()).resolves.toEqual({ error: 'Invalid content length' });
   });
 });
