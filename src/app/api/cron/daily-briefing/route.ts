@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import Airtable from 'airtable';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       'New Leads': newLeads,
       'Snapshot Type': 'Daily Briefing',
       'Created At': new Date().toISOString(),
-    } as any);
+    } as Partial<Airtable.FieldSet>);
 
     // Optional morning SMS to owner
     const ownerPhone = process.env.OWNER_PHONE;

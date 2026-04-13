@@ -12,6 +12,7 @@
  */
 
 import { z } from 'zod';
+import Stripe from 'stripe';
 import type {
   TenantConfig,
   TenantBranding,
@@ -366,8 +367,9 @@ export async function processSubscription(
     });
 
     // Extract client secret for payment confirmation
-    const invoice = subscription.latest_invoice as any;
-    const paymentIntent = invoice?.payment_intent as any;
+    // Expanded via expand: ['latest_invoice.payment_intent'] in createSubscription
+    const invoice = subscription.latest_invoice as Stripe.Invoice | null;
+    const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent | null;
 
     return {
       valid: true,

@@ -17,6 +17,7 @@ import type {
   BreachNotification,
   TrainingCompletion,
   BusinessAssociateAgreement,
+  AuditAction,
 } from '@/types/compliance';
 import { createAuditEntry } from './audit-trail';
 import {
@@ -48,7 +49,7 @@ export function logPHIAccess(params: Omit<PHIAccessLog, 'id' | 'timestamp'>): PH
     userId: params.userId,
     userName: params.userName,
     userRole: params.userRole,
-    action: `phi_${params.action}` as any,
+    action: `phi_${params.action}` as AuditAction,
     resourceType: 'patient_record',
     resourceId: params.patientId,
     details: `${params.action} ${params.dataCategory} for patient ${params.patientName}${params.details ? `: ${params.details}` : ''}`,

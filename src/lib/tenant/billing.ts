@@ -126,7 +126,8 @@ export async function createSubscription(params: CreateSubscriptionParams): Prom
   }
 
   if (params.couponId) {
-    (subscriptionParams as any).coupon = params.couponId;
+    // Stripe REST API accepts top-level `coupon` but TS types use `discounts[]`
+    (subscriptionParams as unknown as Record<string, unknown>).coupon = params.couponId;
   }
 
   return stripe.subscriptions.create(subscriptionParams);
@@ -288,7 +289,8 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
           tier,
           stripeSubscriptionId: subscription.id,
           status: mapStripeStatus(subscription.status),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+          // current_period_end is present in the Stripe REST response but absent from this SDK version's types
+          currentPeriodEnd: new Date(((subscription as unknown as Record<string, number>).current_period_end) * 1000).toISOString(),
           trialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : undefined,
@@ -315,7 +317,8 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
           ...config.subscription,
           tier,
           status: mapStripeStatus(subscription.status),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+          // current_period_end is present in the Stripe REST response but absent from this SDK version's types
+          currentPeriodEnd: new Date(((subscription as unknown as Record<string, number>).current_period_end) * 1000).toISOString(),
           trialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : undefined,
@@ -368,8 +371,10 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
 
     case 'invoice.paid': {
       const invoice = event.data.object as Stripe.Invoice;
-      const tenantId = (invoice as any).subscription_details?.metadata?.tenantId
-        || (typeof (invoice as any).subscription === 'string' ? undefined : undefined);
+      // These fields may be present in Stripe REST responses but are not in the SDK types for this API version
+      const invoiceRaw = invoice as unknown as Record<string, Record<string, Record<string, string>>>;
+      const tenantId = invoiceRaw.subscription_details?.metadata?.tenantId
+        || (typeof invoice.parent?.subscription_details?.subscription === 'string' ? undefined : undefined);
 
       if (!tenantId) {
         // Try to find tenant by customer ID
