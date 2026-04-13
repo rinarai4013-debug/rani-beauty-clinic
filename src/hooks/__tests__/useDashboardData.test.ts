@@ -47,7 +47,7 @@ function mockSWRReturn(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockedSWR.mockReturnValue(mockSWRReturn() as any);
+  mockedSWR.mockReturnValue(mockSWRReturn() as never);
 });
 
 // ── FetchError ──
@@ -80,7 +80,7 @@ describe('FetchError', () => {
 
 describe('useDashboardData', () => {
   it('passes correct URL to SWR with /api/dashboard prefix', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useDashboardData('/kpis'));
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/kpis',
@@ -90,7 +90,7 @@ describe('useDashboardData', () => {
   });
 
   it('passes null to SWR when endpoint is null (conditional fetching)', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useDashboardData(null));
     expect(mockedSWR).toHaveBeenCalledWith(
       null,
@@ -100,28 +100,28 @@ describe('useDashboardData', () => {
   });
 
   it('returns isLoading true when SWR is loading', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn({ isLoading: true }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ isLoading: true }) as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isLoading).toBe(true);
   });
 
   it('returns data when SWR has data', () => {
     const testData = { revenue: 5000 };
-    mockedSWR.mockReturnValue(mockSWRReturn({ data: testData }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ data: testData }) as never);
     const { result } = renderHook(() => useDashboardData<{ revenue: number }>('/test'));
     expect(result.current.data).toEqual(testData);
   });
 
   it('returns error when SWR has error', () => {
     const testError = new FetchError('Server error', 500);
-    mockedSWR.mockReturnValue(mockSWRReturn({ error: testError }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ error: testError }) as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.error).toBe(testError);
   });
 
   it('isRefreshing is true when validating with existing data', () => {
     mockedSWR.mockReturnValue(
-      mockSWRReturn({ data: { x: 1 }, isValidating: true, isLoading: false }) as any
+      mockSWRReturn({ data: { x: 1 }, isValidating: true, isLoading: false }) as never
     );
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isRefreshing).toBe(true);
@@ -129,45 +129,45 @@ describe('useDashboardData', () => {
 
   it('isRefreshing is false when loading initially (no data yet)', () => {
     mockedSWR.mockReturnValue(
-      mockSWRReturn({ data: undefined, isValidating: true, isLoading: true }) as any
+      mockSWRReturn({ data: undefined, isValidating: true, isLoading: true }) as never
     );
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isRefreshing).toBe(false);
   });
 
   it('isEmpty is true when data is empty array', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn({ data: [] }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ data: [] }) as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isEmpty).toBe(true);
   });
 
   it('isEmpty is true when data is empty object', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn({ data: {} }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ data: {} }) as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isEmpty).toBe(true);
   });
 
   it('isEmpty is true when data is null', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn({ data: null }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ data: null }) as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isEmpty).toBe(true);
   });
 
   it('isEmpty is false when data has content', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn({ data: [1, 2, 3] }) as any);
+    mockedSWR.mockReturnValue(mockSWRReturn({ data: [1, 2, 3] }) as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     expect(result.current.isEmpty).toBe(false);
   });
 
   it('provides a retry function that calls mutate', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     result.current.retry();
     expect(mockMutate).toHaveBeenCalled();
   });
 
   it('provides a mutate function that calls SWR mutate', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     const { result } = renderHook(() => useDashboardData('/test'));
     result.current.mutate();
     expect(mockMutate).toHaveBeenCalled();
@@ -178,7 +178,7 @@ describe('useDashboardData', () => {
 
 describe('pre-configured hooks', () => {
   it('useKPIs fetches /kpis with default range "today"', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useKPIs());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/kpis?range=today',
@@ -188,7 +188,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useKPIs accepts custom range parameter', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useKPIs('mtd'));
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/kpis?range=mtd',
@@ -198,7 +198,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useRevenueData fetches /revenue with 60s refresh', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useRevenueData());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/revenue?range=mtd',
@@ -208,7 +208,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useLeadData fetches /leads', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useLeadData());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/leads',
@@ -218,7 +218,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useScheduleData fetches /schedule with 30s refresh', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useScheduleData());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/schedule',
@@ -228,7 +228,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useAlerts fetches /alerts with 30s refresh', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useAlerts());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/alerts',
@@ -238,7 +238,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useClinicScore fetches /gamification/score', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useClinicScore());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/gamification/score',
@@ -248,7 +248,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useGamification fetches /gamification/achievements', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useGamification());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/gamification/achievements',
@@ -258,7 +258,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useLeaderboard fetches with 120s refresh', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useLeaderboard());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/gamification/leaderboard',
@@ -268,7 +268,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useIntegrationStatus fetches with 5min refresh', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useIntegrationStatus());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/integrations/sync-all',
@@ -278,7 +278,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useClientProfile passes null when id is null (conditional)', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useClientProfile(null));
     expect(mockedSWR).toHaveBeenCalledWith(
       null,
@@ -288,7 +288,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useClientProfile fetches with full=true for valid id', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useClientProfile('rec123'));
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/clients/rec123?full=true',
@@ -298,7 +298,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useClientChurn passes null when id is null', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useClientChurn(null));
     expect(mockedSWR).toHaveBeenCalledWith(
       null,
@@ -308,7 +308,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useAtRiskClients fetches /clients/at-risk', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useAtRiskClients());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/clients/at-risk',
@@ -318,7 +318,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useNoShowRisk includes date parameter', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useNoShowRisk('2026-03-25'));
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/schedule/no-show-risk?date=2026-03-25',
@@ -328,7 +328,7 @@ describe('pre-configured hooks', () => {
   });
 
   it('useRevenueAnomalies fetches /revenue/anomalies with 2min refresh', () => {
-    mockedSWR.mockReturnValue(mockSWRReturn() as any);
+    mockedSWR.mockReturnValue(mockSWRReturn() as never);
     renderHook(() => useRevenueAnomalies());
     expect(mockedSWR).toHaveBeenCalledWith(
       '/api/dashboard/revenue/anomalies',

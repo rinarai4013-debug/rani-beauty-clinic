@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildRAGContext } from '@/lib/rag/knowledge-base';
 import { RANI_SYSTEM_PROMPT } from '@/lib/voice/rani-voice';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { logEvent } from '@/lib/logging/structured-logger';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
 
 const MessageSchema = z.object({
@@ -15,6 +17,8 @@ const ChatSchema = z.object({
   messages: z.array(MessageSchema).min(1),
   visitorInfo: z.record(z.string(), z.unknown()).optional(),
 });
+
+const MAX_AI_REQUEST_BYTES = 256 * 1024;
 
 function extractLeadInfo(text: string): { email?: string; phone?: string } | undefined {
   const email = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0];
@@ -41,6 +45,12 @@ function buildFallbackReply(message: string): string {
 
 export async function POST(req: NextRequest) {
   return withSentry('ai/chat', async () => {
+    const originError = enforceAllowedPublicOrigin(req);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(req, MAX_AI_REQUEST_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(req);
     const { allowed, resetIn } = rateLimit('ai', ip, RATE_LIMITS.AI);
     if (!allowed) return rateLimitResponse(resetIn);
@@ -100,7 +110,9 @@ export async function POST(req: NextRequest) {
         ...(leadInfo ? { leadInfo } : {}),
       });
     } catch (error) {
-      console.error('[ai/chat]', error);
+      logEvent('ai', 'error', '[ai/chat] request failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json(
         {
           reply: buildFallbackReply(latestUserMessage),

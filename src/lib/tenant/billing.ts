@@ -15,6 +15,7 @@ import type {
 } from './config';
 import { TIER_PRICING, TIER_USAGE_LIMITS, TIER_FEATURES } from './config';
 import { getTenantStore, invalidateTenantCache } from './resolver';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 // ─── Stripe Client ──────────────────────────────────────────────────────────
 
@@ -384,7 +385,10 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
         if (!customerId) return { handled: false, error: 'No customer ID on invoice' };
 
         // We log this but don't block - invoice.paid is informational
-        console.log(`[Billing] Invoice paid for customer ${customerId} (no tenantId in metadata)`);
+        logEvent('integration', 'warn', 'Invoice paid without tenant metadata', {
+          scope: 'tenant-billing',
+          customerId,
+        });
         return { handled: true, action: 'invoice_paid_no_tenant' };
       }
 

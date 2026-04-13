@@ -136,7 +136,7 @@ describe('GET /api/dashboard/kpis', () => {
     setupUnauthenticated();
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectUnauthorized(response);
   });
 
@@ -144,7 +144,7 @@ describe('GET /api/dashboard/kpis', () => {
     setupForbidden();
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectForbidden(response);
   });
 
@@ -155,7 +155,7 @@ describe('GET /api/dashboard/kpis', () => {
 
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data).toEqual(cachedData);
@@ -180,7 +180,7 @@ describe('GET /api/dashboard/kpis', () => {
 
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -211,7 +211,7 @@ describe('GET /api/dashboard/kpis', () => {
 
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -225,7 +225,7 @@ describe('GET /api/dashboard/kpis', () => {
 
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    await GET(req as any);
+    await GET(req as never);
 
     expect(mockCacheSet).toHaveBeenCalledWith('kpis', expect.any(Object), expect.any(Number));
   });
@@ -237,7 +237,7 @@ describe('GET /api/dashboard/kpis', () => {
 
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectServerError(response);
   });
 
@@ -248,7 +248,7 @@ describe('GET /api/dashboard/kpis', () => {
 
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data.clinicScore).toBeDefined();
@@ -259,7 +259,7 @@ describe('GET /api/dashboard/kpis', () => {
     setupAuthenticatedCEO();
     const { GET } = await import('@/app/api/dashboard/kpis/route');
     const req = buildGetRequest('/api/dashboard/kpis', { range: 'all-time' });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
 
     expect(response.status).toBe(400);
   });
@@ -279,7 +279,7 @@ describe('GET /api/dashboard/revenue', () => {
     setupUnauthenticated();
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectUnauthorized(response);
   });
 
@@ -287,7 +287,7 @@ describe('GET /api/dashboard/revenue', () => {
     setupForbidden();
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectForbidden(response);
   });
 
@@ -297,7 +297,7 @@ describe('GET /api/dashboard/revenue', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -315,7 +315,7 @@ describe('GET /api/dashboard/revenue', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue', { range: 'last30' });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     expect(response.status).toBe(200);
   });
 
@@ -325,7 +325,7 @@ describe('GET /api/dashboard/revenue', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue');
-    await GET(req as any);
+    await GET(req as never);
 
     expect(mockCacheSet).toHaveBeenCalledWith('revenue-mtd', expect.any(Object), expect.any(Number));
   });
@@ -334,7 +334,7 @@ describe('GET /api/dashboard/revenue', () => {
     setupAuthenticatedCEO();
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue', { range: 'all-time' });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
 
     expect(response.status).toBe(400);
   });
@@ -346,7 +346,7 @@ describe('GET /api/dashboard/revenue', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/route');
     const req = buildGetRequest('/api/dashboard/revenue');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data).toEqual(cached);
@@ -368,7 +368,7 @@ describe('GET /api/dashboard/revenue/trends', () => {
     setupUnauthenticated();
     const { GET } = await import('@/app/api/dashboard/revenue/trends/route');
     const req = buildGetRequest('/api/dashboard/revenue/trends');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectUnauthorized(response);
   });
 
@@ -381,7 +381,7 @@ describe('GET /api/dashboard/revenue/trends', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/trends/route');
     const req = buildGetRequest('/api/dashboard/revenue/trends');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -401,7 +401,7 @@ describe('GET /api/dashboard/revenue/trends', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/trends/route');
     const req = buildGetRequest('/api/dashboard/revenue/trends');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(['up', 'flat', 'down']).toContain(data.trend);
@@ -413,7 +413,7 @@ describe('GET /api/dashboard/revenue/trends', () => {
 
     const { GET } = await import('@/app/api/dashboard/revenue/trends/route');
     const req = buildGetRequest('/api/dashboard/revenue/trends');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);

@@ -95,11 +95,14 @@ function buildClientProfile(
     providerSkills?: string[];
     labsCompleted?: boolean;
     requiresLabWork?: boolean;
+    seasonality?: string;
+    recentSunExposure?: boolean;
   };
   const concerns = (intakeData.skinConcerns as string[]) || [];
   const interests = (intakeData.treatmentInterests as string[]) || [];
   const budget = mapBudgetBand(intakeData.budget as string);
   const timeline = mapUrgency(intakeData.timeline as string);
+  const seasonality = mapSeasonality(planningContext.seasonality, planningContext.recentSunExposure);
   const downtime = mapDowntimeTolerance(planningContext.downtimeTolerance);
   const painTolerance = mapPainTolerance(planningContext.painTolerance);
   const prerequisiteLabsComplete = planningContext.labsCompleted === true
@@ -125,6 +128,7 @@ function buildClientProfile(
     budgetBand: budget,
     urgency: timeline,
     contraindications,
+    seasonality,
     downtimeTolerance: downtime,
     painTolerance,
     availableServiceIds: planningContext.availableServiceIds,
@@ -154,6 +158,21 @@ function mapUrgency(timeline?: string): 'relaxed' | 'moderate' | 'event-driven' 
     case 'gradual': return 'relaxed';
     case 'ongoing': return 'moderate';
     default: return 'moderate';
+  }
+}
+
+function mapSeasonality(
+  seasonality?: string,
+  recentSunExposure?: boolean
+): 'summer' | 'fall' | 'winter' | 'spring' | undefined {
+  switch (seasonality) {
+    case 'summer':
+    case 'fall':
+    case 'winter':
+    case 'spring':
+      return seasonality;
+    default:
+      return recentSunExposure ? 'summer' : undefined;
   }
 }
 

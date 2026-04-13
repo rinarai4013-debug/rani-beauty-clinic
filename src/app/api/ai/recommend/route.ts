@@ -2,6 +2,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { logEvent } from '@/lib/logging/structured-logger';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
 
 const RecommendSchema = z.object({
@@ -10,6 +12,8 @@ const RecommendSchema = z.object({
   timeline: z.string().optional(),
   budget: z.string().optional(),
 });
+
+const MAX_AI_REQUEST_BYTES = 128 * 1024;
 
 const STATIC_RECOMMENDATION = {
   good: {
@@ -35,6 +39,12 @@ const STATIC_RECOMMENDATION = {
 
 export async function POST(request: NextRequest) {
   return withSentry('ai/recommend', async () => {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(request, MAX_AI_REQUEST_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('ai-recommend', ip, RATE_LIMITS.AI);
     if (!allowed) {
@@ -90,7 +100,9 @@ export async function POST(request: NextRequest) {
         source: 'ai',
       });
     } catch (error) {
-      console.error('[ai/recommend]', error);
+      logEvent('ai', 'error', '[ai/recommend] request failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json({
         recommendation: STATIC_RECOMMENDATION,
         source: 'static',

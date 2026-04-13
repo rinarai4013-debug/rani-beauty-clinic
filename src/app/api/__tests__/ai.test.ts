@@ -55,6 +55,12 @@ vi.mock('@/lib/sentry-utils', () => ({
   withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
 }));
 
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
+  enforceContentLength: vi.fn().mockReturnValue(null),
+  normalizeEmailForLimit: vi.fn((e: string) => e.toLowerCase()),
+}));
+
 vi.mock('@/lib/voice/rani-voice', () => ({
   RANI_SYSTEM_PROMPT: 'You are the AI concierge for Rani Beauty Clinic.',
 }));
@@ -101,7 +107,7 @@ describe('POST /api/ai/chat', () => {
       messages: [{ role: 'user', content: 'Tell me about HydraFacial' }],
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -115,7 +121,7 @@ describe('POST /api/ai/chat', () => {
       messages: [{ role: 'user', content: 'I want to book a treatment' }],
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(data.actions).toBeDefined();
@@ -126,7 +132,7 @@ describe('POST /api/ai/chat', () => {
     const { POST } = await import('@/app/api/ai/chat/route');
     const req = buildPostRequest('/api/ai/chat', {});
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -134,7 +140,7 @@ describe('POST /api/ai/chat', () => {
     const { POST } = await import('@/app/api/ai/chat/route');
     const req = buildPostRequest('/api/ai/chat', { messages: [] });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -142,7 +148,7 @@ describe('POST /api/ai/chat', () => {
     const { POST } = await import('@/app/api/ai/chat/route');
     const req = buildPostRequest('/api/ai/chat', { messages: 'hello' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -154,7 +160,7 @@ describe('POST /api/ai/chat', () => {
       body: '{"messages":',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(400);
   });
 
@@ -168,7 +174,7 @@ describe('POST /api/ai/chat', () => {
       messages: [{ role: 'user', content: 'Hello' }],
     });
 
-    const response = await mod.POST(req as any);
+    const response = await mod.POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -180,7 +186,7 @@ describe('POST /api/ai/chat', () => {
     mockRateLimit.mockReturnValueOnce({ allowed: false, resetIn: 42 });
     const response = await POST(buildPostRequest('/api/ai/chat', {
       messages: [{ role: 'user', content: 'One more' }],
-    }, { 'x-forwarded-for': '192.168.1.50' }) as any);
+    }, { 'x-forwarded-for': '192.168.1.50' }) as never);
 
     expect(response.status).toBe(429);
   });
@@ -192,7 +198,7 @@ describe('POST /api/ai/chat', () => {
       messages: [{ role: 'user', content: 'What should I book?' }],
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -206,7 +212,7 @@ describe('POST /api/ai/chat', () => {
       messages: [{ role: 'user', content: 'My email is jane@test.com and I want to learn more' }],
     }, { 'x-forwarded-for': '10.0.0.20' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(data.leadInfo).toBeDefined();
@@ -219,7 +225,7 @@ describe('POST /api/ai/chat', () => {
       messages: [{ role: 'user', content: 'Call me at 425-555-0100' }],
     }, { 'x-forwarded-for': '10.0.0.21' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(data.leadInfo).toBeDefined();
@@ -233,7 +239,7 @@ describe('POST /api/ai/chat', () => {
       visitorInfo: { name: 'Jane', email: 'jane@test.com', page: '/services' },
     }, { 'x-forwarded-for': '10.0.0.22' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 });
@@ -274,7 +280,7 @@ describe('POST /api/ai/recommend', () => {
       budget: 'moderate',
     }, { 'x-forwarded-for': '10.0.0.30' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -288,7 +294,7 @@ describe('POST /api/ai/recommend', () => {
       experience: 'beginner',
     }, { 'x-forwarded-for': '10.0.0.31' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -300,7 +306,7 @@ describe('POST /api/ai/recommend', () => {
       body: '{"primaryGoal":',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(400);
   });
 
@@ -311,7 +317,7 @@ describe('POST /api/ai/recommend', () => {
       primaryGoal: 'glowing-skin',
     }, { 'x-forwarded-for': '10.0.0.90' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(429);
   });
 
@@ -324,7 +330,7 @@ describe('POST /api/ai/recommend', () => {
       primaryGoal: 'anti-aging',
     }, { 'x-forwarded-for': '10.0.0.32' });
 
-    const response = await mod.POST(req as any);
+    const response = await mod.POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -344,7 +350,7 @@ describe('POST /api/ai/recommend', () => {
       primaryGoal: 'anti-aging',
     }, { 'x-forwarded-for': '10.0.0.91' });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -388,7 +394,7 @@ describe('POST /api/ai/intake', () => {
     mockGetSession.mockResolvedValue(null);
     const { POST } = await import('@/app/api/ai/intake/route');
     const req = buildPostRequest('/api/ai/intake', { intakeData: {} });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 
@@ -397,7 +403,7 @@ describe('POST /api/ai/intake', () => {
     mockHasPermission.mockReturnValue(false);
     const { POST } = await import('@/app/api/ai/intake/route');
     const req = buildPostRequest('/api/ai/intake', { intakeData: {} });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     expect(response.status).toBe(403);
   });
@@ -417,7 +423,7 @@ describe('POST /api/ai/intake', () => {
       },
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -431,7 +437,7 @@ describe('POST /api/ai/intake', () => {
 
     const { POST } = await import('@/app/api/ai/intake/route');
     const req = buildPostRequest('/api/ai/intake', {});
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -445,7 +451,7 @@ describe('POST /api/ai/intake', () => {
       headers: { 'content-type': 'application/json' },
       body: '{"intakeData":',
     });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     expect(response.status).toBe(400);
   });
@@ -457,7 +463,7 @@ describe('POST /api/ai/intake', () => {
     const req = buildPostRequest('/api/ai/intake', { intakeData: { firstName: 'Jane' } }, {
       'x-forwarded-for': '10.0.0.92',
     });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     expect(response.status).toBe(429);
   });
@@ -470,7 +476,7 @@ describe('POST /api/ai/intake', () => {
     vi.resetModules();
     const mod = await import('@/app/api/ai/intake/route');
     const req = buildPostRequest('/api/ai/intake', { intakeData: { firstName: 'Jane' } });
-    const response = await mod.POST(req as any);
+    const response = await mod.POST(req as never);
 
     expect(response.status).toBe(503);
   });
@@ -482,7 +488,7 @@ describe('POST /api/ai/intake', () => {
 
     const { POST } = await import('@/app/api/ai/intake/route');
     const req = buildPostRequest('/api/ai/intake', { intakeData: { firstName: 'Jane' } });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);

@@ -35,6 +35,17 @@ const planConfig: Record<Tenant['plan'], { label: string; color: string }> = {
   enterprise: { label: 'Enterprise', color: 'text-purple-600' },
 };
 
+const STATUS_FILTER_OPTIONS = ['all', 'active', 'trial', 'suspended', 'churned'] as const;
+const PLAN_FILTER_OPTIONS = ['all', 'starter', 'growth', 'enterprise'] as const;
+
+function isStatusFilter(value: string): value is (typeof STATUS_FILTER_OPTIONS)[number] {
+  return STATUS_FILTER_OPTIONS.includes(value as (typeof STATUS_FILTER_OPTIONS)[number]);
+}
+
+function isPlanFilter(value: string): value is (typeof PLAN_FILTER_OPTIONS)[number] {
+  return PLAN_FILTER_OPTIONS.includes(value as (typeof PLAN_FILTER_OPTIONS)[number]);
+}
+
 const defaultTenants: Tenant[] = [
   { id: 't_001', name: 'Glow Medical Spa', slug: 'glow-medical', email: 'admin@glowmedspa.com', plan: 'growth', status: 'active', mrr: 499, aiCalls: 3240, lastActive: '2026-03-24T10:30:00Z', createdAt: '2025-10-15', location: 'Seattle, WA' },
   { id: 't_002', name: 'Radiance Aesthetics', slug: 'radiance', email: 'hello@radianceaesthetics.com', plan: 'enterprise', status: 'active', mrr: 999, aiCalls: 8760, lastActive: '2026-03-24T09:15:00Z', createdAt: '2025-09-01', location: 'Portland, OR' },
@@ -118,7 +129,9 @@ export default function TenantTable({ tenants = defaultTenants, onStatusChange }
         </div>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
+          onChange={(e) => {
+            if (isStatusFilter(e.target.value)) setStatusFilter(e.target.value);
+          }}
           className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F1D2C]/20"
         >
           <option value="all">All Statuses</option>
@@ -129,7 +142,9 @@ export default function TenantTable({ tenants = defaultTenants, onStatusChange }
         </select>
         <select
           value={planFilter}
-          onChange={(e) => setPlanFilter(e.target.value as any)}
+          onChange={(e) => {
+            if (isPlanFilter(e.target.value)) setPlanFilter(e.target.value);
+          }}
           className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F1D2C]/20"
         >
           <option value="all">All Plans</option>

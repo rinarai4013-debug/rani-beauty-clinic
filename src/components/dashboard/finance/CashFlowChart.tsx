@@ -113,7 +113,7 @@ export default function CashFlowChart() {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={v => formatCurrency(v)} tick={{ fontSize: 10 }} />
-              <Tooltip formatter={((value: number) => formatCurrency(value)) as any} />
+              <Tooltip formatter={((value: number) => formatCurrency(value)) as never} />
               <ReferenceLine y={0} stroke="#9CA3AF" />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                 {waterfallData.map((entry, idx) => (

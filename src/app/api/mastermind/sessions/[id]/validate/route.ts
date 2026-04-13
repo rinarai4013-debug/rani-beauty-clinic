@@ -12,6 +12,7 @@ import { validatePlan } from '@/lib/plan-builder/constraints';
 import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
 import type { ServiceCategory } from '@/data/services/unified-catalog';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -107,7 +108,9 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
         },
       });
     } catch (error) {
-      console.error('[Mastermind Validate] Error:', error);
+      logEvent('api', 'error', '[Mastermind Validate] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json({ success: false, error: 'Validation failed' }, { status: 500 });
     }
   });

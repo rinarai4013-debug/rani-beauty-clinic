@@ -12,7 +12,7 @@ describe('pdf-storage', () => {
   });
 
   afterEach(async () => {
-    try { await rmdir(TEST_DIR, { recursive: true } as any); } catch { /* ok */ }
+    try { await rmdir(TEST_DIR, { recursive: true } as never); } catch { /* ok */ }
   });
 
   it('stores and retrieves PDF HTML', async () => {

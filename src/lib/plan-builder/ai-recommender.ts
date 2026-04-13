@@ -19,6 +19,13 @@ export interface ClientProfile {
   previousTreatments?: string[];
   seasonality?: 'summer' | 'fall' | 'winter' | 'spring';
   contraindications?: string[];
+  availableServiceIds?: string[];
+  unavailableServiceIds?: string[];
+  availableDeviceTags?: string[];
+  unavailableDeviceTags?: string[];
+  providerRole?: string;
+  providerSkills?: string[];
+  prerequisiteLabsComplete?: boolean;
 }
 
 export interface RecommendedService {
@@ -135,6 +142,16 @@ const CONTRAINDICATION_EXCLUSIONS: Record<string, Set<string>> = {
   'keloid-prone': new Set(['rf-micro-face', 'rf-micro-face-neck', 'scar-rf-micro', 'scar-combination']),
   'autoimmune': new Set(['botox', 'dermal-fillers']),
 };
+
+const LAB_DEPENDENT_CONTINUATION_IDS = new Set([
+  'glp1-semaglutide-m2',
+  'glp1-semaglutide-m3',
+  'glp1-semaglutide-m4',
+  'glp1-tirzepatide-m2',
+  'glp1-tirzepatide-m3',
+  'lab-glp1-quarterly',
+  'lab-hrt-quarterly',
+]);
 
 // ─── Phase explanations ───────────────────────────────────────────────
 
@@ -415,6 +432,66 @@ function getWhyThisPhase(service: UnifiedService, phase: 1 | 2 | 3): string {
   return fallbacks[phase];
 }
 
+function normalizeTags(values?: string[]): string[] {
+  return (values ?? []).map((v) => v.toLowerCase().trim()).filter(Boolean);
+}
+
+function inferRequiredDevice(service: UnifiedService): string | undefined {
+  if (service.requiredDevice) return service.requiredDevice;
+  if (service.category === 'skin-tightening' && service.parentSlug === 'sofwave') return 'sofwave';
+  if (service.category === 'rf-microneedling' || service.id.startsWith('rf-micro-') || service.id === 'scar-rf-micro') return 'cutera-secret-rf';
+  if (service.category === 'laser' || service.category === 'laser-hair-removal' || service.id.startsWith('lhr-')) return 'ndyag-laser';
+  return undefined;
+}
+
+function inferQualifiedProviders(service: UnifiedService): string[] {
+  if (service.qualifiedProviders && service.qualifiedProviders.length > 0) return service.qualifiedProviders;
+  if (service.category === 'injectables' || service.category === 'weight-management' || service.category === 'hormones') {
+    return ['provider', 'ceo'];
+  }
+  return ['provider', 'ceo', 'frontdesk', 'operations'];
+}
+
+function needsLabPrerequisite(service: UnifiedService): boolean {
+  if (service.requiresLabs) return true;
+  if (service.category === 'weight-management' || service.category === 'hormones') {
+    return LAB_DEPENDENT_CONTINUATION_IDS.has(service.id);
+  }
+  return false;
+}
+
+function isOperationallyEligible(service: UnifiedService, profile?: ClientProfile): boolean {
+  if (service.active === false) return false;
+  if (!profile) return true;
+
+  const availableServices = new Set(profile.availableServiceIds ?? []);
+  const unavailableServices = new Set(profile.unavailableServiceIds ?? []);
+  if (availableServices.size > 0 && !availableServices.has(service.id)) return false;
+  if (unavailableServices.has(service.id)) return false;
+
+  const requiredDevice = inferRequiredDevice(service);
+  const availableDevices = new Set(normalizeTags(profile.availableDeviceTags));
+  const unavailableDevices = new Set(normalizeTags(profile.unavailableDeviceTags));
+  if (requiredDevice) {
+    const required = requiredDevice.toLowerCase().trim();
+    if (unavailableDevices.has(required)) return false;
+    if (availableDevices.size > 0 && !availableDevices.has(required)) return false;
+  }
+
+  const providerRole = profile.providerRole?.toLowerCase().trim();
+  const providerSkills = new Set(normalizeTags(profile.providerSkills));
+  const qualified = inferQualifiedProviders(service).map((q) => q.toLowerCase().trim());
+  if (providerRole && !qualified.includes(providerRole) && !providerSkills.has('override-all-services')) {
+    return false;
+  }
+
+  if (needsLabPrerequisite(service) && profile.prerequisiteLabsComplete === false) {
+    return false;
+  }
+
+  return true;
+}
+
 // ─── Core recommendation logic ────────────────────────────────────────
 
 function buildRecommendations(
@@ -441,6 +518,9 @@ function buildRecommendations(
         if (contraindications.length > 0 && isExcludedByContraindications(svc, contraindications)) {
           continue;
         }
+        if (!isOperationallyEligible(svc, profile)) {
+          continue;
+        }
         candidateSet.add(svc.id);
         candidates.push({
           service: svc,
@@ -465,6 +545,9 @@ function buildRecommendations(
             svc.description.toLowerCase().includes(lower))
         ) {
           if (contraindications.length > 0 && isExcludedByContraindications(svc, contraindications)) {
+            continue;
+          }
+          if (!isOperationallyEligible(svc, profile)) {
             continue;
           }
           candidateSet.add(svc.id);

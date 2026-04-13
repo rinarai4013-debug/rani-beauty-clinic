@@ -12,6 +12,8 @@ import {
   expectBadRequest,
 } from './helpers';
 
+const getSessionFromRequestMock = vi.fn();
+
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
@@ -25,6 +27,15 @@ vi.mock('@/lib/rate-limit', () => ({
   RATE_LIMITS: {
     WEBHOOK: { maxRequests: 100, windowMs: 60000 },
   },
+}));
+
+vi.mock('@/lib/auth/session', () => ({
+  getSessionFromRequest: (...args: unknown[]) => getSessionFromRequestMock(...args),
+}));
+
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
+  enforceContentLength: vi.fn().mockReturnValue(null),
 }));
 
 vi.mock('@/lib/templates/post-treatment', () => ({
@@ -75,6 +86,23 @@ vi.mock('@/lib/templates/pre-consult', () => ({
   ]),
 }));
 
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
+  enforceContentLength: vi.fn().mockReturnValue(null),
+}));
+
+vi.mock('@/lib/auth/session', () => ({
+  getSessionFromRequest: vi.fn().mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' }),
+}));
+
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
+vi.mock('@/lib/logging/structured-logger', () => ({
+  logEvent: vi.fn(),
+}));
+
 // ---------------------------------------------------------------------------
 // POST /api/templates/post-treatment
 // ---------------------------------------------------------------------------
@@ -82,7 +110,9 @@ vi.mock('@/lib/templates/pre-consult', () => ({
 describe('POST /api/templates/post-treatment', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getSessionFromRequestMock.mockResolvedValue({ userId: 'staff-1', role: 'ceo' });
     delete process.env.N8N_API_KEY;
+    delete process.env.TEMPLATE_API_SECRET;
   });
 
   it('should return template for specific step', async () => {
@@ -95,7 +125,7 @@ describe('POST /api/templates/post-treatment', () => {
       appointmentDate: '2026-03-25',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -113,7 +143,7 @@ describe('POST /api/templates/post-treatment', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -128,7 +158,7 @@ describe('POST /api/templates/post-treatment', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -140,7 +170,7 @@ describe('POST /api/templates/post-treatment', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -152,7 +182,7 @@ describe('POST /api/templates/post-treatment', () => {
       serviceName: 'HydraFacial',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -165,11 +195,11 @@ describe('POST /api/templates/post-treatment', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
-  it('should return 401 when n8n API key is required but wrong', async () => {
+  it('should allow staff session even when n8n API key header is wrong', async () => {
     process.env.N8N_API_KEY = 'correct-key';
     const { POST } = await import('@/app/api/templates/post-treatment/route');
     const req = buildPostRequest('/api/templates/post-treatment', {
@@ -179,8 +209,8 @@ describe('POST /api/templates/post-treatment', () => {
       providerName: 'Mom',
     }, { 'x-webhook-secret': 'wrong-key' });
 
-    const response = await POST(req as any);
-    await expectJsonStatus(response, 401);
+    const response = await POST(req as never);
+    await expectJsonStatus(response, 200);
   });
 
   it('should default to immediate step when not specified', async () => {
@@ -191,12 +221,13 @@ describe('POST /api/templates/post-treatment', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
     expect(data.step).toBe('immediate');
   });
+
 });
 
 // ---------------------------------------------------------------------------
@@ -206,7 +237,9 @@ describe('POST /api/templates/post-treatment', () => {
 describe('POST /api/templates/reactivation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getSessionFromRequestMock.mockResolvedValue({ userId: 'staff-1', role: 'ceo' });
     delete process.env.N8N_API_KEY;
+    delete process.env.TEMPLATE_API_SECRET;
   });
 
   it('should return auto-detected tier template', async () => {
@@ -217,7 +250,7 @@ describe('POST /api/templates/reactivation', () => {
       daysSinceLastVisit: 45,
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -235,7 +268,7 @@ describe('POST /api/templates/reactivation', () => {
       tier: 'lapsed-90',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -249,7 +282,7 @@ describe('POST /api/templates/reactivation', () => {
       daysSinceLastVisit: 45,
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -259,7 +292,7 @@ describe('POST /api/templates/reactivation', () => {
       firstName: 'Jane',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 });
@@ -271,7 +304,9 @@ describe('POST /api/templates/reactivation', () => {
 describe('POST /api/templates/pre-consult', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getSessionFromRequestMock.mockResolvedValue({ userId: 'staff-1', role: 'ceo' });
     delete process.env.N8N_API_KEY;
+    delete process.env.TEMPLATE_API_SECRET;
   });
 
   it('should return booking confirmation template', async () => {
@@ -286,7 +321,7 @@ describe('POST /api/templates/pre-consult', () => {
       duration: 60,
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -302,7 +337,7 @@ describe('POST /api/templates/pre-consult', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -315,7 +350,7 @@ describe('POST /api/templates/pre-consult', () => {
       step: 'booking-confirmation',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -328,7 +363,7 @@ describe('POST /api/templates/pre-consult', () => {
       providerName: 'Mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -342,7 +377,7 @@ describe('POST /api/templates/pre-consult', () => {
       isNewClient: true,
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 
@@ -357,7 +392,7 @@ describe('POST /api/templates/pre-consult', () => {
       depositAmount: 500,
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 });

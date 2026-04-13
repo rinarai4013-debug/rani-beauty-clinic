@@ -19,6 +19,7 @@ import {
   saveTokenToAirtable,
   type ShareTokenRecord,
 } from '@/lib/mastermind/share-token';
+import { logEvent } from '@/lib/logging/structured-logger';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -110,7 +111,9 @@ export async function POST(request: NextRequest) {
         expiresAt: expiresAt.toISOString(),
       });
     } catch (err) {
-      console.error('[Share] Token generation failed:', err);
+      logEvent('api', 'error', '[Share] Token generation failed', {
+        error: err instanceof Error ? err.message : String(err),
+      });
       return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
   });

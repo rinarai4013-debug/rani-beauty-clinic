@@ -50,6 +50,15 @@ export default function ExpenseBreakdown() {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
+  const handlePieClick = (entry: unknown) => {
+    if (!entry || typeof entry !== 'object' || !('category' in entry)) return;
+    const category = (entry as { category?: ClinicExpenseCategory }).category;
+    if (!category) return;
+    setSelectedCategory((prev) => (prev === category ? null : category));
+  };
+
+  const tooltipFormatter = (value: number) => formatCurrency(value);
+
   const chartData = data
     ? Object.entries(data.byCategory)
         .filter(([, v]) => v.amount > 0)
@@ -116,9 +125,7 @@ export default function ExpenseBreakdown() {
                   outerRadius={90}
                   paddingAngle={2}
                   dataKey="value"
-                  onClick={(entry) => setSelectedCategory(
-                    selectedCategory === (entry as any).category ? null : (entry as any).category,
-                  )}
+                  onClick={handlePieClick}
                   style={{ cursor: 'pointer' }}
                 >
                   {chartData.map((entry) => (
@@ -132,7 +139,7 @@ export default function ExpenseBreakdown() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={((value: number) => formatCurrency(value)) as any}
+                  formatter={tooltipFormatter}
                   contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 />
               </PieChart>

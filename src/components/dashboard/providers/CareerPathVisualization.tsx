@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import type { CareerLevel, CareerPath } from '@/types/providers';
@@ -50,7 +51,11 @@ export default function CareerPathVisualization({ careerPath }: CareerPathVisual
                   className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     isPast ? 'bg-green-100' : isCurrent ? 'ring-2 ring-offset-2' : 'bg-gray-100'
                   }`}
-                  style={isCurrent ? { backgroundColor: `${color}20`, ringColor: color } as any : isPast ? {} : {}}
+                  style={
+                    isCurrent
+                      ? ({ backgroundColor: `${color}20`, boxShadow: `0 0 0 2px ${color}` } as CSSProperties)
+                      : isPast ? {} : {}
+                  }
                 >
                   {isPast ? (
                     <CheckCircle2 className="w-5 h-5 text-green-600" />

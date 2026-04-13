@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { getPreConsultTemplate, getAllPreConsultTemplates } from '@/lib/templates/pre-consult';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -17,11 +19,39 @@ const Schema = z.object({
   depositAmount: z.number().optional(),
 });
 
+const MAX_TEMPLATE_BYTES = 128 * 1024;
+
+async function authorizeTemplateRequest(request: NextRequest): Promise<NextResponse | null> {
+  const staffSession = await getSessionFromRequest(request).catch(() => null);
+  if (staffSession) return null;
+
+  const expectedSecret = process.env.TEMPLATE_API_SECRET || process.env.N8N_API_KEY;
+  if (!expectedSecret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const providedSecret = request.headers.get('x-webhook-secret') || request.headers.get('x-cron-secret');
+  if (providedSecret !== expectedSecret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   return withSentry('templates/pre-consult', async () => {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(request, MAX_TEMPLATE_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('templates-pre-consult', ip, RATE_LIMITS.WEBHOOK);
     if (!allowed) return rateLimitResponse(resetIn);
+
+    const unauthorized = await authorizeTemplateRequest(request);
+    if (unauthorized) return unauthorized;
 
     let body: unknown;
     try {

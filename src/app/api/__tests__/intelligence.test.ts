@@ -354,7 +354,7 @@ describe('GET|POST /api/dashboard/consult', () => {
     setupUnauth();
     const mod = await import('@/app/api/dashboard/consult/route');
     const req = buildPostRequest('/api/dashboard/consult', { clientId: 'rec001' });
-    const response = await mod.POST(req as any);
+    const response = await mod.POST(req as never);
     await expectUnauthorized(response);
   });
 
@@ -382,7 +382,7 @@ describe('GET /api/dashboard/knowledge-base', () => {
     setupUnauth();
     const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
     const req = buildGetRequest('/api/dashboard/knowledge-base');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectUnauthorized(response);
   });
 
@@ -391,7 +391,7 @@ describe('GET /api/dashboard/knowledge-base', () => {
 
     const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
     const req = buildGetRequest('/api/dashboard/knowledge-base');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
 
     expect(response.status).toBe(200);
   });
@@ -401,7 +401,7 @@ describe('GET /api/dashboard/knowledge-base', () => {
 
     const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
     const req = buildGetRequest('/api/dashboard/knowledge-base', { q: 'botox aftercare' });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
 
     expect(response.status).toBe(200);
   });
@@ -412,7 +412,7 @@ describe('GET /api/dashboard/knowledge-base', () => {
 
     const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
     const req = buildGetRequest('/api/dashboard/knowledge-base', { q: '  botox aftercare  ' });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
 
     expect(response.status).toBe(200);
     expect(knowledgeBase.searchKnowledgeBase).toHaveBeenCalledWith('botox aftercare');
@@ -422,7 +422,7 @@ describe('GET /api/dashboard/knowledge-base', () => {
     setupAuthCEO();
     const { GET } = await import('@/app/api/dashboard/knowledge-base/route');
     const req = buildGetRequest('/api/dashboard/knowledge-base', { q: 'x'.repeat(201) });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const body = await response.json();
 
     expect(response.status).toBe(400);

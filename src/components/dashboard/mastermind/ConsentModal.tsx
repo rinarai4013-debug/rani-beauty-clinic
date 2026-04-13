@@ -11,6 +11,7 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import SignaturePad from './SignaturePad';
 import { renderConsentTemplate } from '@/lib/mastermind/consent-templates';
+import { sanitizeTrustedHtml } from '@/lib/security/sanitize-html';
 import type { ConsentRecord, ConsentTemplate } from '@/types/consent';
 
 interface ConsentModalProps {
@@ -66,6 +67,8 @@ export default function ConsentModal({
       }),
     [template, patientName, treatmentNames, totalCost, providerName]
   );
+  const sanitizedTitle = useMemo(() => sanitizeTrustedHtml(template.title), [template.title]);
+  const sanitizedRenderedBody = useMemo(() => sanitizeTrustedHtml(renderedBody), [renderedBody]);
 
   // Check if all acknowledgments are checked
   const allChecked = useMemo(() => {
@@ -97,7 +100,7 @@ export default function ConsentModal({
       patientName,
       patientEmail,
       consentType: template.type,
-      consentText: renderedBody,
+      consentText: sanitizedRenderedBody,
       treatmentNames: treatmentNames.length > 0 ? treatmentNames : undefined,
       signatureDataUrl,
       signedAt: new Date().toISOString(),
@@ -114,6 +117,7 @@ export default function ConsentModal({
     patientEmail,
     template.type,
     renderedBody,
+    sanitizedRenderedBody,
     treatmentNames,
     providerName,
     onConsent,
@@ -152,7 +156,7 @@ export default function ConsentModal({
             <h2
               className="text-lg font-semibold text-white"
               style={{ fontFamily: 'Playfair Display, serif' }}
-              dangerouslySetInnerHTML={{ __html: template.title }}
+              dangerouslySetInnerHTML={{ __html: sanitizedTitle }}
             />
             <p
               className="text-xs mt-0.5"
@@ -189,7 +193,7 @@ export default function ConsentModal({
               color: '#0F1D2C',
               fontFamily: 'Montserrat, sans-serif',
             }}
-            dangerouslySetInnerHTML={{ __html: renderedBody }}
+            dangerouslySetInnerHTML={{ __html: sanitizedRenderedBody }}
           />
 
           {/* Acknowledgment checkboxes */}

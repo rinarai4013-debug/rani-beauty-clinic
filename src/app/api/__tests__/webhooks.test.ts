@@ -356,7 +356,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     expect(response.status).toBe(429);
     expect(mockRateLimitResponse).toHaveBeenCalledWith(42);
@@ -370,7 +370,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     expect(response.status).toBe(400);
   });
@@ -388,7 +388,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     expect(response.status).toBe(400);
   });
@@ -415,7 +415,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
 
     // Should be 401 for invalid signature
     expect([400, 401]).toContain(response.status);
@@ -456,7 +456,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -502,7 +502,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -546,7 +546,7 @@ describe('POST /api/webhooks/cherry', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/cherry/route');
-    return POST(req as any);
+    return POST(req as never);
   }
 
   it('should reject malformed payloads with 422', async () => {
@@ -564,7 +564,7 @@ describe('POST /api/webhooks/cherry', () => {
     });
 
     const { POST } = await import('@/app/api/webhooks/cherry/route');
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectJsonStatus(response, 422);
   });
 

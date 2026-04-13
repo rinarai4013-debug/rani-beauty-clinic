@@ -15,6 +15,7 @@ import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mas
 import { unauthorized } from '@/lib/auth/middleware';
 import { FOLLOW_UP_TEMPLATES, renderTemplate } from '@/lib/plan-builder/follow-up-templates';
 import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token';
+import { logEvent } from '@/lib/logging/structured-logger';
 import crypto from 'crypto';
 import { z } from 'zod';
 
@@ -140,20 +141,22 @@ export async function POST(request: NextRequest) {
           const resend = new Resend(process.env.RESEND_API_KEY);
 
           const recipient = sendChannel === 'internal' ? 'info@ranibeautyclinic.com' : email;
-          await resend.emails.send({
-            from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
-            to: recipient,
-            subject: rendered.subject || `Update from Rani Beauty Clinic`,
-            html: rendered.body,
-          });
-          sentTo = recipient;
-        } catch (emailErr) {
-          console.error('[Follow-Up] Email send failed:', emailErr);
-          return NextResponse.json(
-            { success: false, error: 'Email delivery failed' },
-            { status: 502 },
-          );
-        }
+        await resend.emails.send({
+          from: 'Rani Beauty Clinic <noreply@ranibeautyclinic.com>',
+          to: recipient,
+          subject: rendered.subject || `Update from Rani Beauty Clinic`,
+          html: rendered.body,
+        });
+        sentTo = recipient;
+      } catch (emailErr) {
+        logEvent('integration', 'error', '[Follow-Up] Email send failed', {
+          error: emailErr instanceof Error ? emailErr.message : String(emailErr),
+        });
+        return NextResponse.json(
+          { success: false, error: 'Email delivery failed' },
+          { status: 502 },
+        );
+      }
       } else if (sendChannel === 'sms') {
         // Route SMS through n8n webhook
         const smsWebhookUrl = process.env.N8N_WEBHOOK_URL;
@@ -173,7 +176,9 @@ export async function POST(request: NextRequest) {
             });
             sentTo = phone;
           } catch (smsErr) {
-            console.error('[Follow-Up] SMS send failed:', smsErr);
+            logEvent('webhook', 'error', '[Follow-Up] SMS send failed', {
+              error: smsErr instanceof Error ? smsErr.message : String(smsErr),
+            });
             return NextResponse.json(
               { success: false, error: 'SMS delivery failed' },
               { status: 502 },
@@ -243,7 +248,9 @@ export async function POST(request: NextRequest) {
         channel: sendChannel,
       });
     } catch (err) {
-      console.error('[Follow-Up] Error:', err);
+      logEvent('api', 'error', '[Follow-Up] Error', {
+        error: err instanceof Error ? err.message : String(err),
+      });
       return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
   });

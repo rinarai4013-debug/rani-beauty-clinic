@@ -20,6 +20,7 @@ import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -128,7 +129,9 @@ export async function POST(request: NextRequest) {
 
       return apiSuccess(result, { source });
     } catch (error) {
-      console.error('[Aura Scan API] Error:', error);
+      logEvent('api', 'error', '[Aura Scan API] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return apiError(
         `Scan failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         500,

@@ -19,6 +19,11 @@ vi.mock('@/lib/sentry-utils', () => ({
   withSentry: (...args: unknown[]) => mockWithSentry(...args),
 }));
 
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
+  enforceContentLength: vi.fn().mockReturnValue(null),
+}));
+
 const ROUTES = [
   {
     name: 'advisor',

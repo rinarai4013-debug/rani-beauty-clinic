@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Zap,
 } from 'lucide-react';
+import { sanitizeTrustedHtml } from '@/lib/security/sanitize-html';
 import type { MastermindSession, MastermindPhase } from '@/types/mastermind';
 
 // ── TYPES ──
@@ -832,5 +833,5 @@ function formatMessageContent(content: string): string {
     html = `<p>${html}</p>`;
   }
 
-  return html;
+  return sanitizeTrustedHtml(html);
 }

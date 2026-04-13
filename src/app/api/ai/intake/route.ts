@@ -4,11 +4,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { logEvent } from '@/lib/logging/structured-logger';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
 
 const IntakeSchema = z.object({
   intakeData: z.record(z.string(), z.unknown()),
 });
+
+const MAX_AI_REQUEST_BYTES = 256 * 1024;
 
 const FALLBACK_INTELLIGENCE = {
   summary: 'New client inquiry captured. Review goals and recommend the best starter treatment.',
@@ -28,6 +32,12 @@ const FALLBACK_INTELLIGENCE = {
 
 export async function POST(req: NextRequest) {
   return withSentry('ai/intake', async () => {
+    const originError = enforceAllowedPublicOrigin(req);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(req, MAX_AI_REQUEST_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(req);
     const { allowed, resetIn } = rateLimit('ai-intake', ip, RATE_LIMITS.AI);
     if (!allowed) return rateLimitResponse(resetIn);
@@ -79,7 +89,9 @@ export async function POST(req: NextRequest) {
         source: 'ai',
       });
     } catch (error) {
-      console.error('[ai/intake]', error);
+      logEvent('ai', 'error', '[ai/intake] request failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json({
         intelligence: FALLBACK_INTELLIGENCE,
         source: 'fallback',

@@ -36,6 +36,7 @@ import type {
   PatientDeviceAnalysis,
   PatientPredictiveMetrics,
 } from '@/types/patient-plan';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -322,7 +323,9 @@ export async function GET(
         expiresAt: record.expiresAt,
       });
     } catch (err) {
-      console.error('[Share] Token resolution failed:', err);
+      logEvent('api', 'error', '[Share] Token resolution failed', {
+        error: err instanceof Error ? err.message : String(err),
+      });
       return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
   });

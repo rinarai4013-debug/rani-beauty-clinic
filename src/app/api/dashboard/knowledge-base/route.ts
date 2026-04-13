@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
+import { logEvent } from '@/lib/logging/structured-logger';
 import { withSentry } from '@/lib/sentry-utils';
 
 export async function GET(request: NextRequest) {
@@ -16,8 +17,11 @@ export async function GET(request: NextRequest) {
     if (query && query.length > 200) {
       return NextResponse.json({ error: 'Query too long' }, { status: 400 });
     }
+    if (query && /[\u0000-\u001F\u007F]/.test(query)) {
+      return NextResponse.json({ error: 'Query contains invalid control characters' }, { status: 400 });
+    }
 
-    const cacheKey = query ? `knowledge-base-search:${query}` : 'knowledge-base-stats';
+    const cacheKey = query ? `knowledge-base-search:${query.toLowerCase()}` : 'knowledge-base-stats';
     const cached = cache.get(cacheKey);
     if (cached) return NextResponse.json(cached);
 
@@ -34,7 +38,9 @@ export async function GET(request: NextRequest) {
       cache.set(cacheKey, payload, TTL.STANDARD);
       return NextResponse.json(payload);
     } catch (error) {
-      console.error('[dashboard/knowledge-base]', error);
+      logEvent('api', 'error', '[dashboard/knowledge-base] request failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json({ error: 'Failed to load knowledge base data' }, { status: 500 });
     }
   });

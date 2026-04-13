@@ -48,16 +48,16 @@ describe('analytics/behavioral-tracking', () => {
       value: 2000,
     });
 
-    (window as any).clarity = vi.fn();
-    (window as any).gtag = vi.fn();
-    (window as any).dataLayer = { push: vi.fn() };
+    (window as never).clarity = vi.fn();
+    (window as never).gtag = vi.fn();
+    (window as never).dataLayer = { push: vi.fn() };
 
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
       cb(0);
       return 1;
     });
-    vi.stubGlobal('IntersectionObserver', IntersectionObserverMock as any);
-    vi.stubGlobal('MutationObserver', MutationObserverMock as any);
+    vi.stubGlobal('IntersectionObserver', IntersectionObserverMock as never);
+    vi.stubGlobal('MutationObserver', MutationObserverMock as never);
 
     window.localStorage.clear();
     window.sessionStorage.clear();
@@ -77,10 +77,10 @@ describe('analytics/behavioral-tracking', () => {
   it('tags device, visitor, and page context during initialization', () => {
     const cleanup = initBehavioralTracking();
 
-    expect((window as any).clarity).toHaveBeenCalledWith('set', 'device_type', 'desktop');
-    expect((window as any).clarity).toHaveBeenCalledWith('set', 'visitor_type', 'new');
-    expect((window as any).clarity).toHaveBeenCalledWith('set', 'page_path', '/services/sofwave');
-    expect((window as any).dataLayer.push).toHaveBeenCalledWith(
+    expect((window as never).clarity).toHaveBeenCalledWith('set', 'device_type', 'desktop');
+    expect((window as never).clarity).toHaveBeenCalledWith('set', 'visitor_type', 'new');
+    expect((window as never).clarity).toHaveBeenCalledWith('set', 'page_path', '/services/sofwave');
+    expect((window as never).dataLayer.push).toHaveBeenCalledWith(
       expect.objectContaining({
         event: 'session_start_enriched',
         device_type: 'desktop',
@@ -156,7 +156,7 @@ describe('analytics/behavioral-tracking', () => {
       {} as MutationObserver
     );
 
-    expect((window as any).gtag).toHaveBeenCalledWith(
+    expect((window as never).gtag).toHaveBeenCalledWith(
       'event',
       'booking_widget_opened',
       expect.objectContaining({
@@ -164,7 +164,7 @@ describe('analytics/behavioral-tracking', () => {
         page_url: '/services/sofwave',
       })
     );
-    expect((window as any).clarity).toHaveBeenCalledWith(
+    expect((window as never).clarity).toHaveBeenCalledWith(
       'set',
       'booking_attempt',
       'mangomint_opened'

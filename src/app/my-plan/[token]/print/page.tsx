@@ -99,7 +99,7 @@ export default function PrintPlanPage() {
   return (
     <>
       {/* ── Global + Print Styles ── */}
-      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
+      <style>{printStyles}</style>
 
       {/* ── Floating Action Bar (hidden on print) ── */}
       <div className="no-print" style={{

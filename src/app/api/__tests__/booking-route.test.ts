@@ -52,7 +52,7 @@ describe('/api/booking/book', () => {
     mockRateLimit.mockReturnValueOnce({ allowed: false, resetIn: 27 });
 
     const { GET } = await import('@/app/api/booking/book/route');
-    const response = await GET(buildGetRequest('/api/booking/book') as any);
+    const response = await GET(buildGetRequest('/api/booking/book') as never);
 
     expect(response.status).toBe(429);
     expect(mockRateLimitResponse).toHaveBeenCalledWith(27);
@@ -60,7 +60,7 @@ describe('/api/booking/book', () => {
 
   it('GET should return 501 when allowed through the rate limiter', async () => {
     const { GET } = await import('@/app/api/booking/book/route');
-    const response = await GET(buildGetRequest('/api/booking/book') as any);
+    const response = await GET(buildGetRequest('/api/booking/book') as never);
     const data = await expectJsonStatus(response, 501);
 
     expect(data.status).toBe('not_implemented');
@@ -75,7 +75,7 @@ describe('/api/booking/book', () => {
       buildPostRequest('/api/booking/book', {
         service: 'hydrafacial-signature',
         provider: 'mom',
-      }) as any,
+      }) as never,
     );
 
     expect(response.status).toBe(429);
@@ -88,7 +88,7 @@ describe('/api/booking/book', () => {
       buildPostRequest('/api/booking/book', {
         service: 'hydrafacial-signature',
         provider: 'mom',
-      }) as any,
+      }) as never,
     );
     const data = await expectJsonStatus(response, 501);
 
@@ -103,7 +103,7 @@ describe('/api/booking/book', () => {
         '/api/booking/book',
         { service: 'hydrafacial-signature' },
         { origin: 'https://evil.example.com' },
-      ) as any,
+      ) as never,
     );
 
     expect(response.status).toBe(403);
@@ -116,7 +116,7 @@ describe('/api/booking/book', () => {
         '/api/booking/book',
         { service: 'hydrafacial-signature' },
         { 'content-length': String(200 * 1024) },
-      ) as any,
+      ) as never,
     );
 
     expect(response.status).toBe(413);

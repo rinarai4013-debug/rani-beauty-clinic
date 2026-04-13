@@ -12,6 +12,7 @@ import { NextRequest } from 'next/server';
 import { getAnthropicClient } from '@/lib/ai/client';
 import { getSessionByIdAsync } from '@/lib/mastermind/session';
 import { parseJsonBody, apiError } from '@/lib/mastermind/api-helpers';
+import { logEvent } from '@/lib/logging/structured-logger';
 import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -582,7 +583,9 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (err) {
-      console.error('[Copilot API Error]', err);
+      logEvent('api', 'error', '[Copilot API Error]', {
+        error: err instanceof Error ? err.message : String(err),
+      });
       return apiError('Failed to generate copilot response', 500);
     }
   });

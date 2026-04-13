@@ -125,7 +125,7 @@ describe('GET /api/dashboard/clients', () => {
     setupUnauth();
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectUnauthorized(response);
   });
 
@@ -133,7 +133,7 @@ describe('GET /api/dashboard/clients', () => {
     setupNoPermission();
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectForbidden(response);
   });
 
@@ -146,7 +146,7 @@ describe('GET /api/dashboard/clients', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -164,7 +164,7 @@ describe('GET /api/dashboard/clients', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients', { status: 'Active' });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data.clients).toHaveLength(1);
@@ -178,7 +178,7 @@ describe('GET /api/dashboard/clients', () => {
     const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients', { status: "' OR TRUE() OR '" });
-    const response = await GET(req as any);
+    const response = await GET(req as never);
 
     expect(response.status).toBe(200);
     expect(sanitizeFormulaValue).toHaveBeenCalledWith("' OR TRUE() OR '");
@@ -191,7 +191,7 @@ describe('GET /api/dashboard/clients', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data).toEqual(cached);
@@ -204,7 +204,7 @@ describe('GET /api/dashboard/clients', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data.clients).toHaveLength(0);
@@ -217,7 +217,7 @@ describe('GET /api/dashboard/clients', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     await expectServerError(response);
   });
 
@@ -229,7 +229,7 @@ describe('GET /api/dashboard/clients', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/route');
     const req = buildGetRequest('/api/dashboard/clients');
-    const response = await GET(req as any);
+    const response = await GET(req as never);
     const data = await response.json();
 
     expect(data.clients[0].firstName).toBe('Madonna');
@@ -251,7 +251,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
     setupUnauth();
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectUnauthorized(response);
   });
 
@@ -259,7 +259,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
     setupNoPermission();
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectForbidden(response);
   });
 
@@ -284,11 +284,11 @@ describe('GET /api/dashboard/clients/[id]', () => {
     });
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({ find: mockFind });
+    (Tables.clients as never).mockReturnValue({ find: mockFind });
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -318,7 +318,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
     });
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({ find: mockFind });
+    (Tables.clients as never).mockReturnValue({ find: mockFind });
 
     // Mock linked record fetches
     mockFetchAll.mockImplementation((_table: unknown, opts?: { filterByFormula?: string }) => {
@@ -329,7 +329,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001', { full: 'true' });
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -343,7 +343,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
     mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
 
     const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
-    (sanitizeFormulaValue as any).mockImplementation((v: string) => v.replace(/['"]/g, ''));
+    (sanitizeFormulaValue as never).mockImplementation((v: string) => v.replace(/['"]/g, ''));
 
     const mockFind = vi.fn().mockResolvedValue({
       id: 'rec001',
@@ -362,12 +362,12 @@ describe('GET /api/dashboard/clients/[id]', () => {
     });
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({ find: mockFind });
+    (Tables.clients as never).mockReturnValue({ find: mockFind });
     mockFetchAll.mockResolvedValue([]);
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001', { full: 'true' });
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
 
     expect(response.status).toBe(200);
     expect(sanitizeFormulaValue).toHaveBeenCalledWith("apt_001' OR TRUE() OR 'bad");
@@ -390,7 +390,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(data).toEqual(cached);
@@ -401,13 +401,13 @@ describe('GET /api/dashboard/clients/[id]', () => {
     mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockRejectedValue(new Error('NOT_FOUND')),
     });
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
     const req = buildGetRequest('/api/dashboard/clients/nonexistent');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'nonexistent' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'nonexistent' }) });
     await expectServerError(response);
   });
 });
@@ -426,7 +426,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     setupUnauth();
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectUnauthorized(response);
   });
 
@@ -434,7 +434,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     setupNoPermission();
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectForbidden(response);
   });
 
@@ -444,7 +444,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     mockFetchAll.mockResolvedValue([]);
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockResolvedValue({
         id: 'rec001',
         fields: { Status: 'Active', Appointments: [], Transactions: [], Memberships: [], 'Messages Log': [] },
@@ -453,7 +453,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -470,7 +470,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(data).toEqual(cached);
@@ -482,7 +482,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     mockFetchAll.mockRejectedValue(new Error('Linked fetch failed'));
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockResolvedValue({
         id: 'rec001',
         fields: {
@@ -498,7 +498,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -512,10 +512,10 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     mockFetchAll.mockResolvedValue([]);
 
     const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
-    (sanitizeFormulaValue as any).mockImplementation((v: string) => v.replace(/['"]/g, ''));
+    (sanitizeFormulaValue as never).mockImplementation((v: string) => v.replace(/['"]/g, ''));
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockResolvedValue({
         id: 'rec001',
         fields: {
@@ -531,7 +531,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
 
     expect(response.status).toBe(200);
     expect(sanitizeFormulaValue).toHaveBeenCalledWith("apt_001' OR TRUE() OR 'bad");
@@ -548,7 +548,7 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectServerError(response);
   });
 });
@@ -567,7 +567,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     setupUnauth();
     const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectUnauthorized(response);
   });
 
@@ -575,7 +575,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     setupNoPermission();
     const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectForbidden(response);
   });
 
@@ -585,7 +585,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     mockFetchAll.mockResolvedValue([]);
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockResolvedValue({
         id: 'rec001',
         fields: { Appointments: [], Transactions: [], Memberships: [] },
@@ -594,7 +594,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -608,7 +608,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     mockFetchAll.mockResolvedValue([]);
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockResolvedValue({
         id: 'rec001',
         fields: { Appointments: [] },
@@ -616,7 +616,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     });
 
     const { recommendNextTreatment } = await import('@/lib/recommendations/engine');
-    (recommendNextTreatment as any).mockReturnValue({
+    (recommendNextTreatment as never).mockReturnValue({
       primary: { service: 'HydraFacial', reason: 'Primary', confidence: 88, estimatedPrice: 299 },
       alternatives: [{ service: 'Peel', reason: 'Alt', confidence: 70, estimatedPrice: 199 }],
       insights: ['membership-match'],
@@ -624,7 +624,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -639,10 +639,10 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     mockFetchAll.mockResolvedValue([]);
 
     const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
-    (sanitizeFormulaValue as any).mockImplementation((v: string) => v.replace(/['"]/g, ''));
+    (sanitizeFormulaValue as never).mockImplementation((v: string) => v.replace(/['"]/g, ''));
 
     const { Tables } = await import('@/lib/airtable/client');
-    (Tables.clients as any).mockReturnValue({
+    (Tables.clients as never).mockReturnValue({
       find: vi.fn().mockResolvedValue({
         id: 'rec001',
         fields: { Appointments: ["apt_001' OR TRUE() OR 'bad"] },
@@ -651,7 +651,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
 
     expect(response.status).toBe(200);
     expect(sanitizeFormulaValue).toHaveBeenCalledWith("apt_001' OR TRUE() OR 'bad");
@@ -668,7 +668,7 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
 
     const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
     const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
-    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+    const response = await GET(req as never, { params: Promise.resolve({ id: 'rec001' }) });
     await expectServerError(response);
   });
 });

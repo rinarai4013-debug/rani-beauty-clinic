@@ -26,6 +26,7 @@ import {
   enforceContentLength,
   normalizeEmailForLimit,
 } from '@/lib/security/public-intent-guard';
+import { logEvent } from '@/lib/logging/structured-logger';
 import { withSentry } from '@/lib/sentry-utils';
 
 const MAX_PHOTO_WIDTH = 1200;
@@ -218,9 +219,14 @@ export async function POST(request: NextRequest) {
           result: scanResult,
         });
         await saveSessionAsync(scanned);
-        console.error(`[Consultation Submit] Auto-scan completed for session ${session.id}`);
+        logEvent('api', 'info', '[Consultation Submit] Auto-scan completed', {
+          sessionId: session.id,
+        });
       } catch (err) {
-        console.error('[Consultation Submit] Auto-scan failed:', err);
+        logEvent('api', 'error', '[Consultation Submit] Auto-scan failed', {
+          sessionId: session.id,
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     })();
 
@@ -242,7 +248,9 @@ export async function POST(request: NextRequest) {
       },
     });
     } catch (error) {
-      console.error('[Consultation Submit] Error:', error);
+      logEvent('api', 'error', '[Consultation Submit] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json(
         {
           success: false,

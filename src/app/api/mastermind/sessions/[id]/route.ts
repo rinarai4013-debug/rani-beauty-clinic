@@ -11,6 +11,7 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
+import { logEvent } from '@/lib/logging/structured-logger';
 import type { MastermindSessionAction, PlanModification } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -38,7 +39,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
       return apiSuccess(session);
     } catch (error) {
-      console.error('[Mastermind Session] GET error:', error);
+      logEvent('api', 'error', '[Mastermind Session] GET error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return apiError('Failed to fetch session');
     }
   });
@@ -90,7 +93,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       return apiSuccess(updated);
     } catch (error) {
-      console.error('[Mastermind Session] PATCH error:', error);
+      logEvent('api', 'error', '[Mastermind Session] PATCH error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return apiError('Failed to update session');
     }
   });

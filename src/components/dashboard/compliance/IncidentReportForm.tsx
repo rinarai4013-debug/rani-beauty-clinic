@@ -95,7 +95,10 @@ export default function IncidentReportForm({ incidents, onSubmit }: IncidentRepo
               <label className="text-xs font-body font-medium text-rani-muted block mb-1">Incident Type</label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                onChange={(e) => {
+                  const selected = INCIDENT_TYPES.find((t) => t.value === e.target.value)?.value;
+                  setFormData({ ...formData, type: selected ?? formData.type });
+                }}
                 className="w-full h-9 px-3 rounded-lg border border-rani-border text-sm font-body focus:outline-none focus:ring-2 focus:ring-rani-gold/30"
               >
                 {INCIDENT_TYPES.map((t) => (

@@ -409,7 +409,7 @@ export async function createChart(chart: Omit<ChartNote, 'id'>): Promise<string>
   return rateLimitedQuery(async () => {
     return new Promise<string>((resolve, reject) => {
       table.create(
-        [{ fields }] as any,
+        [{ fields }] as never,
         { typecast: true },
         (err: Error | null, records?: readonly any[]) => {
           if (err) reject(err);
@@ -449,7 +449,7 @@ export async function updateChart(
   await rateLimitedQuery(async () => {
     return new Promise<void>((resolve, reject) => {
       table.update(
-        [{ id: recordId, fields }] as any,
+        [{ id: recordId, fields }] as never,
         { typecast: true },
         (err: Error | null) => {
           if (err) reject(err);

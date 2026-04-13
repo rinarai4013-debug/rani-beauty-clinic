@@ -25,6 +25,7 @@ import {
   getSessionCookieConfig,
   COOKIE_NAME,
 } from '../session';
+import type { NextRequest } from 'next/server';
 
 const TEST_SECRET = 'test-secret-key-for-vitest-at-least-32-chars';
 const secret = new TextEncoder().encode(TEST_SECRET);
@@ -231,7 +232,7 @@ describe('getSessionFromRequest', () => {
           name === COOKIE_NAME && token ? { value: token } : undefined
         ),
       },
-    } as any;
+    } as unknown as NextRequest;
   }
 
   it('returns null when the request has no auth cookie', async () => {

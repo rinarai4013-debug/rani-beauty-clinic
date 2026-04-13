@@ -47,9 +47,9 @@ export default function ForecastChart({ projections, confidenceIntervals, height
             formatter={((value: number, name: string) => [
               `$${value.toLocaleString()}`,
               name === 'expected' ? 'Expected' : name === 'optimistic' ? 'Optimistic' : name === 'conservative' ? 'Conservative' : name,
-            ]) as any}
+            ]) as never}
             contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }}
-            labelFormatter={((label: any) => formatMonth(label as string)) as any}
+            labelFormatter={((label: any) => formatMonth(label as string)) as never}
           />
           <Legend />
           {confidenceIntervals && (

@@ -125,7 +125,7 @@ describe('POST /api/simulation/generate', () => {
   it('should return 429 when rate limited', async () => {
     setupRateLimitDeny();
     const req = buildSimulationRequest(validSimulationBody);
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
 
     expect(response.status).toBe(429);
   });
@@ -136,7 +136,7 @@ describe('POST /api/simulation/generate', () => {
       headers: { 'content-type': 'application/json', 'x-forwarded-for': '127.0.0.1' },
       body: 'not-valid-json{{{',
     });
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -145,7 +145,7 @@ describe('POST /api/simulation/generate', () => {
 
   it('should return 400 for missing required fields', async () => {
     const req = buildSimulationRequest({ imageBase64: '' });
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -157,7 +157,7 @@ describe('POST /api/simulation/generate', () => {
       ...validSimulationBody,
       treatmentPresets: [],
     });
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -169,7 +169,7 @@ describe('POST /api/simulation/generate', () => {
       ...validSimulationBody,
       intensity: 2.0,
     });
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -178,7 +178,7 @@ describe('POST /api/simulation/generate', () => {
 
   it('should return 200 with simulation result on valid request', async () => {
     const req = buildSimulationRequest(validSimulationBody);
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -190,7 +190,7 @@ describe('POST /api/simulation/generate', () => {
 
   it('should call generateAISimulation with correct params', async () => {
     const req = buildSimulationRequest(validSimulationBody);
-    await simulationPOST(req as any);
+    await simulationPOST(req as never);
 
     expect(mockGenerateAISimulation).toHaveBeenCalledWith({
       photoBase64: validSimulationBody.imageBase64,
@@ -203,7 +203,7 @@ describe('POST /api/simulation/generate', () => {
   it('should return 500 when simulation engine fails', async () => {
     mockGenerateAISimulation.mockRejectedValue(new Error('AI engine timeout'));
     const req = buildSimulationRequest(validSimulationBody);
-    const response = await simulationPOST(req as any);
+    const response = await simulationPOST(req as never);
     await expectServerError(response);
   });
 });
@@ -231,14 +231,14 @@ describe('POST /api/photo/upload', () => {
     setupRateLimitDeny();
     const file = new File([new Uint8Array(100)], 'photo.jpg', { type: 'image/jpeg' });
     const req = buildPhotoUploadRequest(file);
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
 
     expect(response.status).toBe(429);
   });
 
   it('should return 400 when no file is provided', async () => {
     const req = buildPhotoUploadRequest(); // no file
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -248,7 +248,7 @@ describe('POST /api/photo/upload', () => {
   it('should return 400 for invalid file type', async () => {
     const file = new File(['text content'], 'doc.txt', { type: 'text/plain' });
     const req = buildPhotoUploadRequest(file);
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -259,7 +259,7 @@ describe('POST /api/photo/upload', () => {
     const imageData = new Uint8Array(1000);
     const file = new File([imageData], 'photo.jpg', { type: 'image/jpeg' });
     const req = buildPhotoUploadRequest(file);
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -273,7 +273,7 @@ describe('POST /api/photo/upload', () => {
     const imageData = new Uint8Array(500);
     const file = new File([imageData], 'photo.png', { type: 'image/png' });
     const req = buildPhotoUploadRequest(file);
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -284,7 +284,7 @@ describe('POST /api/photo/upload', () => {
     const pdfData = new Uint8Array(500);
     const file = new File([pdfData], 'document.pdf', { type: 'application/pdf' });
     const req = buildPhotoUploadRequest(file);
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -307,7 +307,7 @@ describe('POST /api/photo/upload', () => {
     const imageData = new Uint8Array(500);
     const file = new File([imageData], 'photo.jpg', { type: 'image/jpeg' });
     const req = buildPhotoUploadRequest(file);
-    const response = await photoUploadPOST(req as any);
+    const response = await photoUploadPOST(req as never);
     await expectServerError(response);
   });
 });

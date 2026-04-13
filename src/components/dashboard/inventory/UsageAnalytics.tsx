@@ -123,7 +123,7 @@ export default function UsageAnalytics({ loading = false }: UsageAnalyticsProps)
                 }}
                 formatter={((value: number, name: string) =>
                   [`$${value.toFixed(2)}`, name === 'productCost' ? 'Product Cost' : 'Revenue']
-                ) as any}
+                ) as never}
               />
               <Bar dataKey="productCost" fill="#EF4444" radius={[0, 2, 2, 0]} name="Product Cost" />
               <Bar dataKey="totalRevenue" fill="#10B981" radius={[0, 2, 2, 0]} name="Revenue" />
@@ -181,7 +181,7 @@ export default function UsageAnalytics({ loading = false }: UsageAnalyticsProps)
                 borderRadius: '8px',
                 fontSize: 12,
               }}
-              formatter={((value: number) => [`$${value.toLocaleString()}`, 'Spend']) as any}
+              formatter={((value: number) => [`$${value.toLocaleString()}`, 'Spend']) as never}
             />
             <Line
               type="monotone"

@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { retrievePdf } from '@/lib/mastermind/pdf-storage';
 import { getSession } from '@/lib/auth/session';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -44,7 +45,9 @@ export async function GET(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('[PDF Serve] Error:', error);
+      logEvent('api', 'error', '[PDF Serve] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json({ success: false, error: 'Failed to serve PDF' }, { status: 500 });
     }
   });

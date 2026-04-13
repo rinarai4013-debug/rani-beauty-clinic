@@ -415,7 +415,6 @@ export async function getAllSessionsAsync(): Promise<MastermindSession[]> {
     try {
       const { getAllSessionsFromAirtable } = await import('./session-store');
       const atSessions = await getAllSessionsFromAirtable();
-      console.log(`[Session] getAllSessionsAsync: ${atSessions.length} from Airtable, ${sessions.size} in memory`);
       // Rehydrate in-memory cache from Airtable results
       for (const s of atSessions) {
         if (!sessions.has(s.id)) sessions.set(s.id, s);

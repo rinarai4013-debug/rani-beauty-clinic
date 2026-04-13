@@ -14,6 +14,7 @@ import { mockMastermindPlan } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
+import { logEvent } from '@/lib/logging/structured-logger';
 import type { AuraScanResult } from '@/types/mastermind';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 
@@ -95,7 +96,9 @@ export async function POST(request: NextRequest) {
 
       return apiSuccess(plan, { source });
     } catch (error) {
-      console.error('[Mastermind Plan API] Error:', error);
+      logEvent('api', 'error', '[Mastermind Plan API] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
 
       // Fallback to mock — flagged so client knows
       try {

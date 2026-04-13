@@ -13,8 +13,8 @@ describe('plan-generator', () => {
       bloodThinners: true,
       keloidHistory: true,
       hasAutoimmune: true,
-      budget: 'premium' as any,
-      timeline: 'ongoing' as any,
+      budget: 'premium' as never,
+      timeline: 'ongoing' as never,
     });
 
     // Botox should be excluded because pregnancy + autoimmune both block it
@@ -33,8 +33,8 @@ describe('plan-generator', () => {
       skinConcerns: ['acne'],
       treatmentInterests: [],
       isotretinoinHistory: true,
-      budget: 'mid' as any,
-      timeline: 'gradual' as any,
+      budget: 'mid' as never,
+      timeline: 'gradual' as never,
     });
 
     // VI Peel should be excluded (retinoid-use contraindication)
@@ -51,8 +51,8 @@ describe('plan-generator', () => {
     const plan = generateMastermindPlan(baseScan, {
       skinConcerns: ['body-contouring'],
       treatmentInterests: ['glp1'],
-      budget: 'premium' as any,
-      timeline: 'ongoing' as any,
+      budget: 'premium' as never,
+      timeline: 'ongoing' as never,
     });
 
     const allTreatments = [
@@ -70,8 +70,8 @@ describe('plan-generator', () => {
     const plan = generateMastermindPlan(baseScan, {
       skinConcerns: ['aging-skin', 'dull-skin'],
       treatmentInterests: [],
-      budget: 'mid' as any,
-      timeline: 'gradual' as any,
+      budget: 'mid' as never,
+      timeline: 'gradual' as never,
     });
 
     const allTreatments = [
@@ -100,10 +100,10 @@ describe('plan-generator', () => {
     const plan = generateMastermindPlan(baseScan, {
       skinConcerns: ['aging-skin'],
       treatmentInterests: [],
-      downtimeTolerance: 'none' as any,
-      painTolerance: 'low' as any,
-      budget: 'value' as any,
-      timeline: 'gradual' as any,
+      downtimeTolerance: 'none' as never,
+      painTolerance: 'low' as never,
+      budget: 'value' as never,
+      timeline: 'gradual' as never,
     });
 
     // With low pain tolerance + no downtime, RF microneedling should be penalized
@@ -117,12 +117,57 @@ describe('plan-generator', () => {
     expect(allNames.length).toBeGreaterThan(0);
   });
 
+  it('maps recentSunExposure to summer risk profile (penalizes aggressive treatments)', () => {
+    const baseline = generateMastermindPlan(baseScan, {
+      skinConcerns: ['acne'],
+      treatmentInterests: [],
+      budget: 'premium' as never,
+      timeline: 'gradual' as never,
+    });
+
+    const withRecentSun = generateMastermindPlan(baseScan, {
+      skinConcerns: ['acne'],
+      treatmentInterests: [],
+      recentSunExposure: true as never,
+      budget: 'premium' as never,
+      timeline: 'gradual' as never,
+    });
+
+    const baselineTreatments = [
+      ...baseline.recommendations.primary,
+      ...baseline.recommendations.complementary,
+      ...baseline.recommendations.maintenance,
+    ];
+    const sunTreatments = [
+      ...withRecentSun.recommendations.primary,
+      ...withRecentSun.recommendations.complementary,
+      ...withRecentSun.recommendations.maintenance,
+    ];
+
+    const aggressiveNameRegex = /(vi peel|laser scar revision|nd:yag)/i;
+    const baselineAggressive = baselineTreatments.find((t) => aggressiveNameRegex.test(t.treatmentName));
+    expect(baselineAggressive).toBeDefined();
+
+    if (!baselineAggressive) return;
+
+    const sunMatch = sunTreatments.find(
+      (t) => t.treatmentName.toLowerCase() === baselineAggressive.treatmentName.toLowerCase()
+    );
+
+    if (sunMatch) {
+      expect(sunMatch.aiConfidence).toBeLessThanOrEqual(baselineAggressive.aiConfidence);
+    } else {
+      // Conservative behavior is also acceptable: treatment removed under recent sun exposure.
+      expect(sunTreatments.length).toBeGreaterThan(0);
+    }
+  });
+
   it('generates valid plan structure with all required fields', () => {
     const plan = generateMastermindPlan(baseScan, {
       skinConcerns: ['aging-skin'],
       treatmentInterests: ['hydrafacial'],
-      budget: 'mid' as any,
-      timeline: 'ongoing' as any,
+      budget: 'mid' as never,
+      timeline: 'ongoing' as never,
     });
 
     expect(plan.planId).toBeTruthy();

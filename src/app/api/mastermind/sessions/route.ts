@@ -8,6 +8,7 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { createSession, saveSessionAsync, getAllSessionsAsync } from '@/lib/mastermind/session';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
+import { logEvent } from '@/lib/logging/structured-logger';
 import type { MastermindSession } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -27,7 +28,9 @@ export async function GET(request: NextRequest) {
       const sessions = await getAllSessionsAsync();
       return apiSuccess(sessions);
     } catch (error) {
-      console.error('[Mastermind Sessions] GET error:', error);
+      logEvent('api', 'error', '[Mastermind Sessions] GET error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return apiError('Failed to fetch sessions');
     }
   });
@@ -59,7 +62,9 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ success: true, data: session }, { status: 201 });
     } catch (error) {
-      console.error('[Mastermind Sessions] POST error:', error);
+      logEvent('api', 'error', '[Mastermind Sessions] POST error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return apiError('Failed to create session');
     }
   });

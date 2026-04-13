@@ -42,8 +42,8 @@ export default function MRRChart({ data, height = 300 }: MRRChartProps) {
             formatter={((value: number, name: string) => [
               name === 'mrr' ? formatCurrency(value) : value,
               name === 'mrr' ? 'MRR' : 'Members',
-            ]) as any}
-            labelFormatter={formatMonth as any}
+            ]) as never}
+            labelFormatter={formatMonth as never}
             contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }}
           />
           <Area type="monotone" dataKey="mrr" stroke="#C9A96E" fill="url(#mrrGradient)" strokeWidth={2} />

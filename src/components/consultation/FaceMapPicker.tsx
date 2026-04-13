@@ -13,7 +13,7 @@ interface FaceZone {
   label: string;
   // SVG element definition
   element: 'ellipse' | 'path' | 'rect';
-  props: Record<string, any>;
+  props: Record<string, unknown>;
   // Label position
   labelX: number;
   labelY: number;
@@ -217,15 +217,15 @@ export default function FaceMapPicker({
             },
           };
 
-          // Render under-eyes as two separate paths but within one group
-          const Element = zone.element;
+          const ellipseProps = zoneProps as React.SVGProps<SVGEllipseElement>;
+          const pathProps = zoneProps as React.SVGProps<SVGPathElement>;
 
           return (
             <g key={zone.id}>
               {zone.element === 'ellipse' && (
-                <ellipse {...(zoneProps as any)} />
+                <ellipse {...ellipseProps} />
               )}
-              {zone.element === 'path' && <path {...(zoneProps as any)} />}
+              {zone.element === 'path' && <path {...pathProps} />}
 
               {/* Zone label - show on hover or when selected */}
               {(hovered || selected) && (

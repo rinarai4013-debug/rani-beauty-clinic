@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { generateConsultationPdf } from '@/lib/mastermind/pdf-generator';
 import { storePdf } from '@/lib/mastermind/pdf-storage';
+import { logEvent } from '@/lib/logging/structured-logger';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -70,7 +71,9 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('[Mastermind PDF API] Error:', error);
+      logEvent('api', 'error', '[Mastermind PDF API] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json(
         {
           success: false,

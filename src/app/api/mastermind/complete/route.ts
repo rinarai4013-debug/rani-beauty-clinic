@@ -17,6 +17,7 @@ import {
   buildN8nWebhookPayload,
   type ConsultationCompletionResult,
 } from '@/lib/mastermind/post-consultation';
+import { logEvent } from '@/lib/logging/structured-logger';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -69,7 +70,9 @@ export async function POST(request: NextRequest) {
       try {
         completionResult = buildCompletionResult(session);
       } catch (err) {
-        console.error('[Mastermind Complete] Build error:', err);
+        logEvent('api', 'error', '[Mastermind Complete] Build error', {
+          error: err instanceof Error ? err.message : String(err),
+        });
         return NextResponse.json(
           {
             success: false,
@@ -92,7 +95,9 @@ export async function POST(request: NextRequest) {
         } catch (err) {
           webhookStatus = 'failed';
           // Non-blocking: log but don't fail the completion
-          console.error('[Mastermind Complete] n8n webhook failed:', err);
+          logEvent('webhook', 'error', '[Mastermind Complete] n8n webhook failed', {
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }
 
@@ -116,7 +121,9 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('[Mastermind Complete API] Error:', error);
+      logEvent('api', 'error', '[Mastermind Complete API] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json(
         {
           success: false,

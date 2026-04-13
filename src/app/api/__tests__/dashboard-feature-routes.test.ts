@@ -225,14 +225,14 @@ describe('GET /api/dashboard/agents/feed', () => {
   it('should return 401 when not authenticated', async () => {
     setupUnauthenticated();
     const req = buildNextRequest('/api/dashboard/agents/feed');
-    const response = await agentsFeedGET(req as any);
+    const response = await agentsFeedGET(req as never);
     await expectUnauthorized(response);
   });
 
   it('should return 403 when user lacks view_executive permission', async () => {
     setupForbidden();
     const req = buildNextRequest('/api/dashboard/agents/feed');
-    const response = await agentsFeedGET(req as any);
+    const response = await agentsFeedGET(req as never);
     const data = await response.json();
     expect(response.status).toBe(403);
     expect(data.error).toBeDefined();
@@ -244,7 +244,7 @@ describe('GET /api/dashboard/agents/feed', () => {
     mockCacheGet.mockReturnValue(cachedFeed);
 
     const req = buildNextRequest('/api/dashboard/agents/feed');
-    const response = await agentsFeedGET(req as any);
+    const response = await agentsFeedGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -256,7 +256,7 @@ describe('GET /api/dashboard/agents/feed', () => {
     setupAuthenticatedCEO();
 
     const req = buildNextRequest('/api/dashboard/agents/feed');
-    const response = await agentsFeedGET(req as any);
+    const response = await agentsFeedGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -270,7 +270,7 @@ describe('GET /api/dashboard/agents/feed', () => {
   it('should return 500 when getSession throws', async () => {
     mockGetSession.mockRejectedValue(new Error('Session service down'));
     const req = buildNextRequest('/api/dashboard/agents/feed');
-    const response = await agentsFeedGET(req as any);
+    const response = await agentsFeedGET(req as never);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.error).toBeDefined();
@@ -311,7 +311,7 @@ describe('GET /api/dashboard/agents/[agentId]', () => {
   it('should return 401 when not authenticated', async () => {
     setupUnauthenticated();
     const req = buildNextRequest('/api/dashboard/agents/compliance-guardian');
-    const response = await agentByIdGET(req as any, {
+    const response = await agentByIdGET(req as never, {
       params: Promise.resolve({ agentId: 'compliance-guardian' }),
     });
     await expectUnauthorized(response);
@@ -320,7 +320,7 @@ describe('GET /api/dashboard/agents/[agentId]', () => {
   it('should return 403 when user lacks view_executive permission', async () => {
     setupForbidden();
     const req = buildNextRequest('/api/dashboard/agents/compliance-guardian');
-    const response = await agentByIdGET(req as any, {
+    const response = await agentByIdGET(req as never, {
       params: Promise.resolve({ agentId: 'compliance-guardian' }),
     });
     const data = await response.json();
@@ -331,7 +331,7 @@ describe('GET /api/dashboard/agents/[agentId]', () => {
   it('should return 404 for unknown agent ID', async () => {
     setupAuthenticatedCEO();
     const req = buildNextRequest('/api/dashboard/agents/nonexistent-agent');
-    const response = await agentByIdGET(req as any, {
+    const response = await agentByIdGET(req as never, {
       params: Promise.resolve({ agentId: 'nonexistent-agent' }),
     });
     const data = await response.json();
@@ -345,7 +345,7 @@ describe('GET /api/dashboard/agents/[agentId]', () => {
     mockCacheGet.mockReturnValue(cachedReport);
 
     const req = buildNextRequest('/api/dashboard/agents/compliance-guardian');
-    const response = await agentByIdGET(req as any, {
+    const response = await agentByIdGET(req as never, {
       params: Promise.resolve({ agentId: 'compliance-guardian' }),
     });
     const data = await response.json();
@@ -359,7 +359,7 @@ describe('GET /api/dashboard/agents/[agentId]', () => {
     setupAuthenticatedCEO();
 
     const req = buildNextRequest('/api/dashboard/agents/compliance-guardian');
-    const response = await agentByIdGET(req as any, {
+    const response = await agentByIdGET(req as never, {
       params: Promise.resolve({ agentId: 'compliance-guardian' }),
     });
     const data = await response.json();
@@ -372,7 +372,7 @@ describe('GET /api/dashboard/agents/[agentId]', () => {
   it('should return 500 on internal error', async () => {
     mockGetSession.mockRejectedValue(new Error('Internal failure'));
     const req = buildNextRequest('/api/dashboard/agents/compliance-guardian');
-    const response = await agentByIdGET(req as any, {
+    const response = await agentByIdGET(req as never, {
       params: Promise.resolve({ agentId: 'compliance-guardian' }),
     });
     const data = await response.json();
@@ -528,14 +528,14 @@ describe('GET /api/dashboard/training', () => {
   it('should return 401 when not authenticated', async () => {
     setupUnauthenticated();
     const req = buildGetRequest('/api/dashboard/training');
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     await expectUnauthorized(response);
   });
 
   it('should return 200 with training modules structure', async () => {
     setupAuthenticatedCEO();
     const req = buildGetRequest('/api/dashboard/training');
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -550,7 +550,7 @@ describe('GET /api/dashboard/training', () => {
   it('should include stats with totals', async () => {
     setupAuthenticatedCEO();
     const req = buildGetRequest('/api/dashboard/training');
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     const data = await response.json();
 
     expect(data.stats).toHaveProperty('totalModules');
@@ -563,7 +563,7 @@ describe('GET /api/dashboard/training', () => {
   it('should filter modules by role query param', async () => {
     setupAuthenticatedCEO();
     const req = buildGetRequest('/api/dashboard/training', { role: 'front-desk' });
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -576,7 +576,7 @@ describe('GET /api/dashboard/training', () => {
   it('should return empty modules array for non-matching role', async () => {
     setupAuthenticatedCEO();
     const req = buildGetRequest('/api/dashboard/training', { role: 'management' });
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -587,7 +587,7 @@ describe('GET /api/dashboard/training', () => {
   it('should return 400 for invalid role filter', async () => {
     setupAuthenticatedCEO();
     const req = buildGetRequest('/api/dashboard/training', { role: 'owner' });
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -597,7 +597,7 @@ describe('GET /api/dashboard/training', () => {
   it('should return 500 on error', async () => {
     mockGetSession.mockRejectedValue(new Error('Session error'));
     const req = buildGetRequest('/api/dashboard/training');
-    const response = await trainingGET(req as any);
+    const response = await trainingGET(req as never);
     await expectServerError(response);
   });
 });

@@ -206,7 +206,7 @@ describe('mastermind/ai-plan-generator', () => {
       }],
     });
 
-    const plan = await generateAIPlan(scan, { firstName: 'Rina' }, catalog as any);
+    const plan = await generateAIPlan(scan, { firstName: 'Rina' }, catalog as never);
 
     expect(plan.planId).toContain('plan_ai_');
     expect(plan.packages).toHaveLength(3);
@@ -226,7 +226,7 @@ describe('mastermind/ai-plan-generator', () => {
     mockMessagesCreate.mockRejectedValue(new Error('anthropic down'));
     mockGenerateMastermindPlan.mockReturnValue(fallbackPlan);
 
-    const plan = await generateAIPlan(scan, { firstName: 'Rina' }, catalog as any);
+    const plan = await generateAIPlan(scan, { firstName: 'Rina' }, catalog as never);
 
     expect(plan.planId).toContain('plan_ai_');
     expect(plan.recommendations.primary).toEqual(fallbackPlan.recommendations.primary);

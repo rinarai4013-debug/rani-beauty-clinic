@@ -11,6 +11,7 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { mockSimulationComparison } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
+import { logEvent } from '@/lib/logging/structured-logger';
 import { z } from 'zod';
 import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
@@ -230,7 +231,9 @@ export async function POST(request: NextRequest) {
         meta: { renderMode },
       });
     } catch (error) {
-      console.error('[Mastermind Simulate] Error:', error);
+      logEvent('api', 'error', '[Mastermind Simulate] Error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json({ success: false, error: 'Simulation failed' }, { status: 500 });
     }
   });

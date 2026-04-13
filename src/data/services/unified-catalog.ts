@@ -34,6 +34,12 @@ export interface UnifiedService {
   note?: string;
   results?: string;
   downtime?: string;
+  active?: boolean; // defaults to true when omitted
+  requiredDevice?: string; // optional explicit device tag override
+  qualifiedProviders?: string[]; // optional role/skill tags allowed to perform
+  roomRequirement?: string; // optional room/equipment station tag
+  leadTimeDays?: number; // optional minimum lead time before first session
+  requiresLabs?: boolean; // optional hard prerequisite gate
 }
 
 // ─── Full Service Catalog ───────────────────────────────────────────

@@ -14,7 +14,7 @@ const hydrafacial = {
   sessions: 1,
   duration: 60,
   category: 'facial',
-} as any;
+} as never;
 
 const sofwave = {
   id: 'sofwave-full-face',
@@ -23,7 +23,7 @@ const sofwave = {
   sessions: 1,
   duration: 45,
   category: 'skin-tightening',
-} as any;
+} as never;
 
 const tretinoin = {
   id: 'tretinoin',
@@ -32,7 +32,7 @@ const tretinoin = {
   sessions: 1,
   duration: 0,
   category: 'skincare',
-} as any;
+} as never;
 
 const state: BuilderState = {
   client: {

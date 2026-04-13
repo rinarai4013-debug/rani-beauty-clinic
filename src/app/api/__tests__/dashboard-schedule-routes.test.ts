@@ -147,14 +147,14 @@ describe('GET /api/dashboard/schedule', () => {
   it('should return 401 when not authenticated', async () => {
     setupUnauthenticated();
     const req = buildGetRequest('/api/dashboard/schedule');
-    const response = await scheduleGET(req as any);
+    const response = await scheduleGET(req as never);
     await expectUnauthorized(response);
   });
 
   it('should return 403 when user lacks view_schedule permission', async () => {
     setupForbidden();
     const req = buildGetRequest('/api/dashboard/schedule');
-    const response = await scheduleGET(req as any);
+    const response = await scheduleGET(req as never);
     const data = await response.json();
     expect(response.status).toBe(403);
     expect(data.error).toBeDefined();
@@ -166,7 +166,7 @@ describe('GET /api/dashboard/schedule', () => {
     mockCacheGet.mockReturnValue(cachedData);
 
     const req = buildGetRequest('/api/dashboard/schedule');
-    const response = await scheduleGET(req as any);
+    const response = await scheduleGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -182,7 +182,7 @@ describe('GET /api/dashboard/schedule', () => {
     ]);
 
     const req = buildGetRequest('/api/dashboard/schedule');
-    const response = await scheduleGET(req as any);
+    const response = await scheduleGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -202,7 +202,7 @@ describe('GET /api/dashboard/schedule', () => {
     mockFetchAll.mockResolvedValue([sampleAppointment('apt_001')]);
 
     const req = buildGetRequest('/api/dashboard/schedule');
-    await scheduleGET(req as any);
+    await scheduleGET(req as never);
 
     expect(mockLogPhiAccess).toHaveBeenCalledWith(
       expect.anything(),
@@ -219,7 +219,7 @@ describe('GET /api/dashboard/schedule', () => {
     mockFetchAll.mockRejectedValue(new Error('Airtable connection failed'));
 
     const req = buildGetRequest('/api/dashboard/schedule');
-    const response = await scheduleGET(req as any);
+    const response = await scheduleGET(req as never);
     await expectServerError(response);
   });
 });
@@ -242,14 +242,14 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
   it('should return 401 when not authenticated', async () => {
     setupUnauthenticated();
     const req = buildGetRequest('/api/dashboard/schedule/no-show-risk');
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     await expectUnauthorized(response);
   });
 
   it('should return 403 when user lacks view_schedule permission', async () => {
     setupForbidden();
     const req = buildGetRequest('/api/dashboard/schedule/no-show-risk');
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     const data = await response.json();
     expect(response.status).toBe(403);
     expect(data.error).toBeDefined();
@@ -261,7 +261,7 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk', {
       date: "2026-04-12' OR TRUE() OR '",
     });
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -275,7 +275,7 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     mockCacheGet.mockReturnValue(cachedData);
 
     const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk');
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -300,7 +300,7 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     });
 
     const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk');
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -316,7 +316,7 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     mockFetchAll.mockResolvedValue([]);
 
     const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk');
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -333,7 +333,7 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     });
 
     const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk');
-    await noShowRiskGET(req as any);
+    await noShowRiskGET(req as never);
 
     expect(mockLogPhiAccess).toHaveBeenCalledWith(
       expect.anything(),
@@ -350,7 +350,7 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     mockFetchAll.mockRejectedValue(new Error('Airtable connection failed'));
 
     const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk');
-    const response = await noShowRiskGET(req as any);
+    const response = await noShowRiskGET(req as never);
     await expectServerError(response);
   });
 });

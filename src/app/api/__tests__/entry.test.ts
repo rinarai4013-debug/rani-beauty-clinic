@@ -91,7 +91,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/lead/route');
     const req = buildPostRequest('/api/dashboard/entry/lead', { firstName: 'A', lastName: 'B', email: 'a@b.com' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 
@@ -99,7 +99,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     setupAuth(PROVIDER_SESSION, false);
     const { POST } = await import('@/app/api/dashboard/entry/lead/route');
     const req = buildPostRequest('/api/dashboard/entry/lead', { firstName: 'A', lastName: 'B', email: 'a@b.com' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectForbidden(response);
   });
 
@@ -113,7 +113,7 @@ describe('POST /api/dashboard/entry/lead', () => {
       phone: '(425) 555-0100',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -126,7 +126,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/lead/route');
     const req = buildPostRequest('/api/dashboard/entry/lead', { lastName: 'Doe', email: 'a@b.com' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -134,7 +134,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/lead/route');
     const req = buildPostRequest('/api/dashboard/entry/lead', { firstName: 'Jane', email: 'a@b.com' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -142,7 +142,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/lead/route');
     const req = buildPostRequest('/api/dashboard/entry/lead', { firstName: 'Jane', lastName: 'Doe' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -152,7 +152,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     const req = buildPostRequest('/api/dashboard/entry/lead', {
       firstName: 'Jane', lastName: 'Doe', phone: '(425) 555-0100',
     });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 
@@ -162,7 +162,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     const req = buildPostRequest('/api/dashboard/entry/lead', {
       firstName: 'Jane', lastName: 'Doe', email: 'jane@test.com',
     });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 
@@ -173,7 +173,7 @@ describe('POST /api/dashboard/entry/lead', () => {
     const req = buildPostRequest('/api/dashboard/entry/lead', {
       firstName: 'Jane', lastName: 'Doe', email: 'jane@test.com',
     });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectServerError(response);
   });
 });
@@ -191,7 +191,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: 100, serviceName: 'HydraFacial', paymentMethod: 'credit-card', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 
@@ -199,7 +199,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth(MARKETING_SESSION, false);
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: 100, serviceName: 'HydraFacial', paymentMethod: 'credit-card', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectForbidden(response);
   });
 
@@ -213,7 +213,7 @@ describe('POST /api/dashboard/entry/sale', () => {
       provider: 'mom',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -227,7 +227,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { serviceName: 'HydraFacial', paymentMethod: 'credit-card', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -235,7 +235,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: 0, serviceName: 'HydraFacial', paymentMethod: 'credit-card', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -243,7 +243,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: -50, serviceName: 'HydraFacial', paymentMethod: 'credit-card', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -251,7 +251,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: 275, paymentMethod: 'credit-card', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -259,7 +259,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: 275, serviceName: 'HydraFacial', provider: 'mom' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -267,7 +267,7 @@ describe('POST /api/dashboard/entry/sale', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/sale/route');
     const req = buildPostRequest('/api/dashboard/entry/sale', { amount: 275, serviceName: 'HydraFacial', paymentMethod: 'credit-card' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -278,7 +278,7 @@ describe('POST /api/dashboard/entry/sale', () => {
       amount: 2750, serviceName: 'Sofwave', paymentMethod: 'cherry',
       provider: 'mom', isFinancing: true, financingProvider: 'Cherry',
     });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     expect(response.status).toBe(200);
   });
 });
@@ -296,7 +296,7 @@ describe('POST /api/dashboard/entry/expense', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/expense/route');
     const req = buildPostRequest('/api/dashboard/entry/expense', { amount: 100, vendor: 'Supply Co', category: 'Supplies' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 
@@ -304,7 +304,7 @@ describe('POST /api/dashboard/entry/expense', () => {
     setupAuth(PROVIDER_SESSION, false);
     const { POST } = await import('@/app/api/dashboard/entry/expense/route');
     const req = buildPostRequest('/api/dashboard/entry/expense', { amount: 100, vendor: 'Supply Co', category: 'Supplies' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectForbidden(response);
   });
 
@@ -318,7 +318,7 @@ describe('POST /api/dashboard/entry/expense', () => {
       paymentMethod: 'business-card',
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -331,7 +331,7 @@ describe('POST /api/dashboard/entry/expense', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/expense/route');
     const req = buildPostRequest('/api/dashboard/entry/expense', { vendor: 'Supply Co', category: 'Supplies' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -339,7 +339,7 @@ describe('POST /api/dashboard/entry/expense', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/expense/route');
     const req = buildPostRequest('/api/dashboard/entry/expense', { amount: 100, category: 'Supplies' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -347,7 +347,7 @@ describe('POST /api/dashboard/entry/expense', () => {
     setupAuth();
     const { POST } = await import('@/app/api/dashboard/entry/expense/route');
     const req = buildPostRequest('/api/dashboard/entry/expense', { amount: 100, vendor: 'Supply Co' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectBadRequest(response);
   });
 
@@ -357,7 +357,7 @@ describe('POST /api/dashboard/entry/expense', () => {
     const req = buildPostRequest('/api/dashboard/entry/expense', {
       amount: 100, vendor: 'Supply Co', category: 'Supplies',
     });
-    await POST(req as any);
+    await POST(req as never);
     expect(mockCacheInvalidate).toHaveBeenCalledWith('finance-expenses');
   });
 });
@@ -375,7 +375,7 @@ describe('POST /api/dashboard/entry/ceo-note', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/ceo-note/route');
     const req = buildPostRequest('/api/dashboard/entry/ceo-note', { note: 'test' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 
@@ -383,7 +383,7 @@ describe('POST /api/dashboard/entry/ceo-note', () => {
     setupAuth(FRONTDESK_SESSION, false);
     const { POST } = await import('@/app/api/dashboard/entry/ceo-note/route');
     const req = buildPostRequest('/api/dashboard/entry/ceo-note', { note: 'test' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectForbidden(response);
   });
 });
@@ -397,7 +397,7 @@ describe('POST /api/dashboard/entry/eod-recap', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/eod-recap/route');
     const req = buildPostRequest('/api/dashboard/entry/eod-recap', { recap: 'Great day' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 });
@@ -411,7 +411,7 @@ describe('POST /api/dashboard/entry/room-issue', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/room-issue/route');
     const req = buildPostRequest('/api/dashboard/entry/room-issue', { room: 'Room 1', issue: 'Broken light' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 });
@@ -425,7 +425,7 @@ describe('POST /api/dashboard/entry/review', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/review/route');
     const req = buildPostRequest('/api/dashboard/entry/review', { rating: 5, text: 'Great!' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 });
@@ -439,7 +439,7 @@ describe('POST /api/dashboard/entry/inventory', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/inventory/route');
     const req = buildPostRequest('/api/dashboard/entry/inventory', { product: 'Serum', quantity: 10 });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 });
@@ -453,7 +453,7 @@ describe('POST /api/dashboard/entry/staff-note', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/staff-note/route');
     const req = buildPostRequest('/api/dashboard/entry/staff-note', { note: 'Staff meeting notes' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 });
@@ -467,7 +467,7 @@ describe('POST /api/dashboard/entry/consult-notes', () => {
     setupUnauth();
     const { POST } = await import('@/app/api/dashboard/entry/consult-notes/route');
     const req = buildPostRequest('/api/dashboard/entry/consult-notes', { clientId: 'rec001', notes: 'Consult details' });
-    const response = await POST(req as any);
+    const response = await POST(req as never);
     await expectUnauthorized(response);
   });
 });

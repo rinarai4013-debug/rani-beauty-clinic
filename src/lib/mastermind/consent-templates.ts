@@ -13,6 +13,7 @@
  */
 
 import type { ConsentTemplate } from '@/types/consent';
+import { escapeHtml } from '@/lib/security/sanitize-html';
 
 export const CONSENT_TEMPLATES: ConsentTemplate[] = [
   // ── 1. GENERAL TREATMENT CONSENT ──
@@ -334,11 +335,11 @@ export function renderConsentTemplate(
     });
 
   let rendered = template.body;
-  rendered = rendered.replace(/\{\{patientName\}\}/g, variables.patientName || '');
-  rendered = rendered.replace(/\{\{treatmentList\}\}/g, variables.treatmentList || 'As discussed');
-  rendered = rendered.replace(/\{\{totalCost\}\}/g, variables.totalCost || 'As quoted');
-  rendered = rendered.replace(/\{\{providerName\}\}/g, variables.providerName || 'Rani Beauty Clinic Provider');
-  rendered = rendered.replace(/\{\{date\}\}/g, dateStr);
+  rendered = rendered.replace(/\{\{patientName\}\}/g, escapeHtml(variables.patientName || ''));
+  rendered = rendered.replace(/\{\{treatmentList\}\}/g, escapeHtml(variables.treatmentList || 'As discussed'));
+  rendered = rendered.replace(/\{\{totalCost\}\}/g, escapeHtml(variables.totalCost || 'As quoted'));
+  rendered = rendered.replace(/\{\{providerName\}\}/g, escapeHtml(variables.providerName || 'Rani Beauty Clinic Provider'));
+  rendered = rendered.replace(/\{\{date\}\}/g, escapeHtml(dateStr));
 
   return rendered;
 }

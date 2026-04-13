@@ -50,6 +50,33 @@ interface ImportResult {
   };
 }
 
+interface PdfViewport {
+  width: number;
+  height: number;
+}
+
+interface PdfPage {
+  getViewport: (options: { scale: number }) => PdfViewport;
+  render: (options: { canvasContext: CanvasRenderingContext2D; viewport: PdfViewport }) => { promise: Promise<void> };
+}
+
+interface PdfDocument {
+  getPage: (pageNumber: number) => Promise<PdfPage>;
+}
+
+interface PdfJsLib {
+  getDocument: (source: { data: Uint8Array }) => { promise: Promise<PdfDocument> };
+  GlobalWorkerOptions: {
+    workerSrc: string;
+  };
+}
+
+declare global {
+  interface Window {
+    pdfjsLib?: PdfJsLib;
+  }
+}
+
 // ── PROPS ──
 
 interface AuraImportPanelProps {
@@ -60,7 +87,7 @@ interface AuraImportPanelProps {
 // ── COMPONENT ──
 
 export default function AuraImportPanel({ session, onImportComplete }: AuraImportPanelProps) {
-  const MAX_CLIENT_DATA_URL_BYTES = 900_000;
+  const MAX_CLIENT_DATA_URL_BYTES = 1_500_000;
 
   // State
   const [availableScans, setAvailableScans] = useState<AvailableScan[]>([]);
@@ -82,27 +109,39 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const maxWidth = 1000;
-        let width = img.width;
-        let height = img.height;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        canvas.width = width;
-        canvas.height = height;
-
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           reject(new Error('Canvas context unavailable for compression'));
           return;
         }
 
-        ctx.drawImage(img, 0, 0, width, height);
-        let output = canvas.toDataURL('image/jpeg', 0.72);
-        if (output.length > MAX_CLIENT_DATA_URL_BYTES) {
-          output = canvas.toDataURL('image/jpeg', 0.58);
+        const strategies = [
+          { maxWidth: 1400, quality: 0.72 },
+          { maxWidth: 1200, quality: 0.64 },
+          { maxWidth: 1000, quality: 0.58 },
+          { maxWidth: 850, quality: 0.52 },
+          { maxWidth: 700, quality: 0.46 },
+        ];
+
+        let output = input;
+        for (const strategy of strategies) {
+          let width = img.width;
+          let height = img.height;
+          if (width > strategy.maxWidth) {
+            height = Math.round((height * strategy.maxWidth) / width);
+            width = strategy.maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          output = canvas.toDataURL('image/jpeg', strategy.quality);
+          if (output.length <= MAX_CLIENT_DATA_URL_BYTES) {
+            resolve(output);
+            return;
+          }
         }
+
         resolve(output);
       };
       img.onerror = () => reject(new Error('Failed to compress uploaded image'));
@@ -111,8 +150,8 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   }, []);
 
   // Load pdf.js library from CDN with retry
-  const loadPdfJs = useCallback(async (): Promise<any> => {
-    const win = window as any;
+  const loadPdfJs = useCallback(async (): Promise<PdfJsLib> => {
+    const win = window;
     if (win.pdfjsLib) return win.pdfjsLib;
 
     // Try loading the script
@@ -159,11 +198,9 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
     const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
 
     if (isPdf) {
-      console.log('[AuraImport] Processing PDF client-side...', file.name, `${(file.size / 1024 / 1024).toFixed(1)}MB`);
       const pdfjsLib = await loadPdfJs();
 
       const arrayBuffer = await file.arrayBuffer();
-      console.log('[AuraImport] PDF loaded into buffer, rendering first page...');
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const page = await pdf.getPage(1);
       const baseViewport = page.getViewport({ scale: 1.0 });
@@ -176,10 +213,8 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas context unavailable');
       await page.render({ canvasContext: ctx, viewport }).promise;
-      console.log('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
 
       const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
-      console.log('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
       return dataUrl;
     }
 
@@ -243,7 +278,6 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         }
 
         // Step 3: Run AI scan from session-stored photo (avoid sending base64 twice)
-        console.log('[AuraImport] Running AI scan...');
         const scanRes = await fetch('/api/mastermind/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -257,10 +291,8 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           throw new Error(`AI scan failed (${scanRes.status}): ${errText.slice(0, 200)}`);
         }
         const scanJson = await scanRes.json();
-        console.log('[AuraImport] AI scan complete:', scanJson.success);
 
         // Step 4: Auto-trigger simulation so projections populate
-        console.log('[AuraImport] Triggering simulation...');
         const simRes = await fetch('/api/mastermind/simulate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -284,7 +316,6 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           setImportError(scanJson.error || 'AI scan failed after photo upload');
         }
       } catch (err) {
-        console.error('File upload scan failed:', err);
         setImportError(err instanceof Error ? err.message : 'Failed to upload and analyze. Please try again.');
       } finally {
         setFileUploading(false);
