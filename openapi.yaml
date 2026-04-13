@@ -770,25 +770,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  providers:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        appointmentCount:
-                          type: integer
-                        revenue:
-                          type: number
-                        avgTicket:
-                          type: number
-                        utilizationRate:
-                          type: number
-                  total:
-                    type: integer
+                $ref: "#/components/schemas/ProvidersSummaryResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -816,20 +798,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  revenue:
-                    type: number
-                  appointmentCount:
-                    type: integer
-                  avgTicket:
-                    type: number
-                  topServices:
-                    type: array
-                    items:
-                      type: object
+                $ref: "#/components/schemas/ProviderDetailResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -875,22 +844,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  total:
-                    type: number
-                  byProvider:
-                    type: array
-                    items:
-                      type: object
-                  byService:
-                    type: array
-                    items:
-                      type: object
-                  byCategory:
-                    type: array
-                    items:
-                      type: object
+                $ref: "#/components/schemas/RevenueResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "500":
@@ -909,20 +863,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  trend:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        date:
-                          type: string
-                          format: date
-                        revenue:
-                          type: number
-                  avgDaily:
-                    type: number
+                $ref: "#/components/schemas/RevenueTrendsResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "500":
@@ -941,20 +882,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  anomalies:
-                    type: array
-                    items:
-                      type: object
-                  healthScore:
-                    type: number
-                    minimum: 0
-                    maximum: 100
-                  projectedMonthEnd:
-                    type: number
-                  summary:
-                    type: string
+                $ref: "#/components/schemas/RevenueAnomaliesResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "500":
@@ -970,6 +898,10 @@ paths:
       responses:
         "200":
           description: Optimization recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueOptimizerResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -990,18 +922,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  performanceSummary:
-                    type: object
-                  campaigns:
-                    type: array
-                    items:
-                      type: object
-                  adScore:
-                    type: number
-                    minimum: 0
-                    maximum: 100
+                $ref: "#/components/schemas/MetaAdsResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -1024,26 +945,282 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  optimizations:
-                    type: array
-                    items:
-                      type: object
-                  adCopyVariants:
-                    type: array
-                    items:
-                      type: object
-                  budgetRecommendations:
-                    type: array
-                    items:
-                      type: object
+                $ref: "#/components/schemas/MetaAdsOptimizeResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
         "500":
           $ref: "#/components/responses/InternalError"
+
+  # ── Wave 3: consult, consultations, leads, plan-builder, preferences ──
+
+  /api/dashboard/communications/preferences:
+    get:
+      operationId: getCommunicationPreferences
+      summary: Client communication preferences (PHI — logged)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences:
+                    oneOf:
+                      - type: array
+                        items:
+                          $ref: "#/components/schemas/ClientPreference"
+                      - $ref: "#/components/schemas/ClientPreference"
+                  total:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/consult:
+    get:
+      operationId: getConsultSample
+      summary: Sample consult copilot output
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Copilot result
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: generateConsult
+      summary: Generate consult copilot for custom client
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client:
+                  type: object
+                concerns:
+                  type: array
+                  items:
+                    type: string
+              required: [client, concerns]
+      responses:
+        "200":
+          description: Copilot result
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/consultations:
+    get:
+      operationId: listConsultations
+      summary: Unified consultation pipeline (mastermind + intakes)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Merged consultation list
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/leads:
+    get:
+      operationId: getLeadFunnel
+      summary: Lead funnel with conversion rates
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Funnel data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeadFunnelResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/leads/stats:
+    get:
+      operationId: getLeadStats
+      summary: Lead conversion statistics
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Lead stats
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/plan-builder:
+    get:
+      operationId: listTreatmentPlans
+      summary: List or get single treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Plan list or single plan
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: createTreatmentPlan
+      summary: Create a draft treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientName:
+                  type: string
+              required: [clientName]
+      responses:
+        "201":
+          description: Plan created
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      operationId: updateTreatmentPlan
+      summary: Update treatment plan fields
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              required: [id]
+      responses:
+        "200":
+          description: Plan updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      operationId: archiveTreatmentPlan
+      summary: Archive a treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Plan archived
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/plan-builder/send:
+    post:
+      operationId: sendTreatmentPlan
+      summary: Send treatment plan via email (Resend)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  pattern: "^rec[a-zA-Z0-9]{10,}$"
+                clientEmail:
+                  type: string
+                  format: email
+                clientName:
+                  type: string
+              required: [planId, clientEmail, clientName]
+      responses:
+        "200":
+          description: Plan sent
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/plan-builder/export-pdf:
+    post:
+      operationId: exportTreatmentPlanPdf
+      summary: Generate PDF HTML for treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planData:
+                  type: object
+              required: [planData]
+      responses:
+        "200":
+          description: PDF HTML
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
 components:
   securitySchemes:
@@ -1304,6 +1481,185 @@ components:
           type: string
           format: email
       required: [token, email]
+
+    # ── Wave 4 named schemas ──────────────────────────────────────────
+
+    ProvidersSummaryResponse:
+      type: object
+      properties:
+        providers:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              appointmentCount:
+                type: integer
+              revenue:
+                type: number
+              avgTicket:
+                type: number
+              utilizationRate:
+                type: number
+        total:
+          type: integer
+
+    ProviderDetailResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        revenue:
+          type: number
+        appointmentCount:
+          type: integer
+        avgTicket:
+          type: number
+        topServices:
+          type: array
+          items:
+            type: object
+        monthlyMetrics:
+          type: array
+          items:
+            type: object
+
+    RevenueResponse:
+      type: object
+      properties:
+        total:
+          type: number
+        byProvider:
+          type: array
+          items:
+            type: object
+        byService:
+          type: array
+          items:
+            type: object
+        byCategory:
+          type: array
+          items:
+            type: object
+
+    RevenueTrendsResponse:
+      type: object
+      properties:
+        trend:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              revenue:
+                type: number
+        avgDaily:
+          type: number
+
+    RevenueAnomaliesResponse:
+      type: object
+      properties:
+        anomalies:
+          type: array
+          items:
+            type: object
+        healthScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        projectedMonthEnd:
+          type: number
+        summary:
+          type: string
+
+    RevenueOptimizerResponse:
+      type: object
+      properties:
+        opportunities:
+          type: array
+          items:
+            type: object
+        totalEstimatedValue:
+          type: number
+
+    MetaAdsResponse:
+      type: object
+      properties:
+        performanceSummary:
+          type: object
+        campaigns:
+          type: array
+          items:
+            type: object
+        adScore:
+          type: number
+          minimum: 0
+          maximum: 100
+
+    MetaAdsOptimizeResponse:
+      type: object
+      properties:
+        optimizations:
+          type: array
+          items:
+            type: object
+        adCopyVariants:
+          type: array
+          items:
+            type: object
+        budgetRecommendations:
+          type: array
+          items:
+            type: object
+
+    # ── Wave 3 schemas ─────────────────────────────────────────────
+
+    ClientPreference:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        preferredContact:
+          type: string
+        status:
+          type: string
+
+    LeadFunnelResponse:
+      type: object
+      properties:
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+              percentage:
+                type: number
+        metrics:
+          type: object
+        conversionRates:
+          type: object
+          properties:
+            leadToConsult:
+              type: number
+            consultShowRate:
+              type: number
+            consultCloseRate:
+              type: number
+            depositCaptureRate:
+              type: number
 
     SuccessResponse:
       type: object
