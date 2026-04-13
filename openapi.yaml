@@ -1642,6 +1642,225 @@ paths:
         "500":
           $ref: "#/components/responses/InternalError"
 
+  # ── Batch 2: entry forms, gamification, dashboard misc ───────────
+
+  /api/dashboard/entry/ceo-note:
+    post:
+      operationId: entryCeoNote
+      summary: CEO daily note entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Note saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/consult-notes:
+    post:
+      operationId: entryConsultNotes
+      summary: Consultation notes entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Notes saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/eod-recap:
+    post:
+      operationId: entryEodRecap
+      summary: End-of-day recap entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Recap saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/expense:
+    post:
+      operationId: entryExpense
+      summary: Expense entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Expense saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/inventory:
+    post:
+      operationId: entryInventory
+      summary: Inventory adjustment entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Adjustment saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/lead:
+    post:
+      operationId: entryLead
+      summary: Manual lead entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Lead saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/review:
+    post:
+      operationId: entryReview
+      summary: Review entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Review saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/room-issue:
+    post:
+      operationId: entryRoomIssue
+      summary: Room issue report
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Issue reported }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/sale:
+    post:
+      operationId: entrySale
+      summary: Manual sale entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Sale saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/staff-note:
+    post:
+      operationId: entryStaffNote
+      summary: Staff note entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Note saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/finance/pnl:
+    get:
+      operationId: getFinancePnl
+      summary: P&L intelligence + financial health scoring
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: P&L data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/dashboard/gamification/achievements:
+    get:
+      operationId: getAchievements
+      summary: Achievement list
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Achievements }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/briefing:
+    get:
+      operationId: getGamificationBriefing
+      summary: Gamification daily briefing
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Briefing }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/leaderboard:
+    get:
+      operationId: getLeaderboard
+      summary: Provider rankings
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Leaderboard }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/score:
+    get:
+      operationId: getClinicScore
+      summary: Clinic score from real metrics
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Score data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/snapshot:
+    get:
+      operationId: getGamificationSnapshot
+      summary: Gamification snapshot
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Snapshot }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/inventory:
+    get:
+      operationId: getInventoryIntelligence
+      summary: Inventory intelligence (reorder, waste, par levels)
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Inventory data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/dashboard/kpis:
+    get:
+      operationId: getKpis
+      summary: KPI cards (revenue, bookings, consults, leads)
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: KPI data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/dashboard/marketing:
+    get:
+      operationId: getMarketingOverview
+      summary: Marketing overview
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Marketing data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/dashboard/phone-agent:
+    get:
+      operationId: getPhoneAgent
+      summary: AI phone agent configuration + analytics
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Phone agent data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
 components:
   securitySchemes:
     SessionCookie:
