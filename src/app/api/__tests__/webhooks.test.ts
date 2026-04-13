@@ -17,6 +17,7 @@ import {
 
 const mockRateLimitedQuery = vi.fn().mockImplementation(<T>(fn: () => Promise<T>) => fn());
 const mockFetchAll = vi.fn().mockResolvedValue([]);
+const mockFetchFirst = vi.fn().mockResolvedValue([]);
 const mockCacheInvalidatePrefix = vi.fn();
 const mockRateLimit = vi.fn().mockReturnValue({ allowed: true, resetIn: 0 });
 const mockRateLimitResponse = vi.fn().mockImplementation(
@@ -60,13 +61,13 @@ vi.mock('@/lib/airtable/client', () => {
     },
     rateLimitedQuery: (...args: unknown[]) => mockRateLimitedQuery(...args),
     fetchAll: (...args: unknown[]) => mockFetchAll(...args),
-    fetchFirst: vi.fn().mockResolvedValue([]),
+    fetchFirst: (...args: unknown[]) => mockFetchFirst(...args),
     updateRecord: vi.fn().mockResolvedValue(undefined),
   };
 });
 
 vi.mock('@/lib/airtable/sanitize', () => ({
-  sanitizeFormulaValue: vi.fn((v: string) => v),
+  sanitizeFormulaValue: vi.fn((v: string) => v.replace(/['"\\\n\r]/g, '')),
 }));
 
 vi.mock('@/lib/airtable/tables', () => {
@@ -527,6 +528,7 @@ describe('POST /api/webhooks/cherry', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.CHERRY_WEBHOOK_SECRET = CHERRY_SECRET;
+    mockFetchFirst.mockReset().mockResolvedValue([]);
   });
 
   async function sendCherryWebhook(event: string, data: Record<string, unknown>) {
@@ -621,5 +623,26 @@ describe('POST /api/webhooks/cherry', () => {
     const data = await expectJsonStatus(response, 200);
     expect(data.received).toBe(true);
     expect(data.event).toBe('unknown.event');
+  });
+
+  it('should sanitize customerId before treatment plan lookup formula on checkout.completed', async () => {
+    const customerId = "cust_123' OR TRUE() OR '";
+    const safeCustomerId = customerId.replace(/['"\\\n\r]/g, '');
+
+    const response = await sendCherryWebhook('checkout.completed', {
+      customerId,
+      amount: 1200,
+      status: 'approved',
+    });
+
+    expect(response.status).toBe(200);
+    expect(mockFetchFirst).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      expect.objectContaining({
+        filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${safeCustomerId}')`,
+      }),
+      true,
+    );
   });
 });
