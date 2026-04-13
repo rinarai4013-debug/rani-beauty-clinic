@@ -18,7 +18,7 @@
 import { writeFile, mkdir, readFile, access } from 'fs/promises';
 import { join } from 'path';
 
-// Storage directory — /tmp is writable on Vercel and local
+// Storage directory — prefer /tmp (portable/write-safe), then .next cache.
 const STORAGE_DIR = join(process.cwd(), '.next', 'cache', 'rani-pdfs');
 const FALLBACK_DIR = '/tmp/rani-pdfs';
 
@@ -27,8 +27,8 @@ let resolvedDir: string | null = null;
 async function getStorageDir(): Promise<string> {
   if (resolvedDir) return resolvedDir;
 
-  // Try primary dir first, fallback to /tmp
-  for (const dir of [STORAGE_DIR, FALLBACK_DIR]) {
+  // Prefer /tmp first, then .next cache.
+  for (const dir of [FALLBACK_DIR, STORAGE_DIR]) {
     try {
       await mkdir(dir, { recursive: true });
       resolvedDir = dir;
