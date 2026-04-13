@@ -317,7 +317,7 @@ export function generateContentCalendar(
   startDate?: string,
 ): ContentCalendar {
   const start = startDate ? new Date(startDate) : new Date();
-  start.setHours(0, 0, 0, 0);
+  start.setUTCHours(0, 0, 0, 0);
 
   const daysMap = { '30_day': 30, '60_day': 60, '90_day': 90 };
   const totalDays = daysMap[period];
