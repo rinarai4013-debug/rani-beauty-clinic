@@ -106,7 +106,11 @@ describe('buildReminderSchedule', () => {
   });
 
   it('includes both SMS and email channels', () => {
-    const config = buildReminderSchedule(mockAppointment, ['sms', 'email']);
+    const futureDate = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+    const config = buildReminderSchedule(
+      { ...mockAppointment, date: futureDate },
+      ['sms', 'email'],
+    );
     const channels = new Set(config.schedule.map(s => s.channel));
     expect(channels.has('sms')).toBe(true);
     expect(channels.has('email')).toBe(true);
