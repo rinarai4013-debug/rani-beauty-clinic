@@ -488,6 +488,273 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalError"
+
+  # ── Public mutation routes ───────────────────────────────────────
+
+  /api/consultation/submit:
+    post:
+      operationId: submitConsultation
+      summary: Submit consultation intake with optional photo
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  description: JSON-encoded intake form data
+                photos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+              required: [data]
+      responses:
+        "200":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsultationSubmitResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Request body too large
+        "422":
+          description: Validation error (zod schema)
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/booking/book:
+    get:
+      operationId: checkBookingAvailability
+      summary: Check booking availability (stub — returns 501)
+      tags: [Public]
+      responses:
+        "200":
+          description: Availability check (currently returns 501)
+        "501":
+          description: Not implemented
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      operationId: createBooking
+      summary: Create a booking (stub — returns 501)
+      tags: [Public]
+      responses:
+        "200":
+          description: Booking created (currently returns 501)
+        "501":
+          description: Not implemented
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Request body too large
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/subscribe:
+    post:
+      operationId: subscribe
+      summary: Newsletter / email subscribe
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscribeRequest"
+      responses:
+        "200":
+          description: Subscribed (or honeypot accepted silently)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          description: Invalid email
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/plan/{id}/track:
+    post:
+      operationId: trackPlanInteraction
+      summary: Track plan view or interaction (public endpoint)
+      tags: [Public]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^rec[a-zA-Z0-9]{10,}$"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlanTrackRequest"
+      responses:
+        "200":
+          description: Interaction tracked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlanTrackResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: Treatment plan not found
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Dashboard communications ─────────────────────────────────────
+
+  /api/dashboard/communications/campaigns:
+    get:
+      operationId: listCampaigns
+      summary: List all campaigns
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Campaign list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: createCampaign
+      summary: Create a campaign
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignCreateRequest"
+      responses:
+        "200":
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Webhook routes ───────────────────────────────────────────────
+
+  /api/webhooks/cherry:
+    post:
+      operationId: handleCherryWebhook
+      summary: Cherry financing webhook (HMAC-signed)
+      tags: [Webhooks]
+      parameters:
+        - name: x-webhook-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CherryWebhookPayload"
+      responses:
+        "200":
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookAckResponse"
+        "401":
+          description: Invalid or missing signature
+        "503":
+          description: Webhook secret not configured
+
+  /api/webhooks/mangomint:
+    post:
+      operationId: handleMangomintWebhook
+      summary: Mangomint POS webhook (HMAC-signed)
+      tags: [Webhooks]
+      parameters:
+        - name: x-mangomint-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MangomintWebhookPayload"
+      responses:
+        "200":
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookAckResponse"
+        "401":
+          description: Invalid or missing signature
+        "422":
+          description: Invalid envelope structure
+        "503":
+          description: Webhook secret not configured
+
+  /api/webhooks/stripe:
+    post:
+      operationId: handleStripeWebhook
+      summary: Stripe checkout webhook (Stripe-signed)
+      tags: [Webhooks]
+      parameters:
+        - name: stripe-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeWebhookResponse"
+        "400":
+          description: Invalid payload
+        "401":
+          description: Invalid signature
+
 components:
   securitySchemes:
     SessionCookie:
@@ -528,6 +795,12 @@ components:
             $ref: "#/components/schemas/ErrorResponse"
     InternalError:
       description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Too many requests
       content:
         application/json:
           schema:
@@ -741,3 +1014,147 @@ components:
           type: string
           format: email
       required: [token, email]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
+
+    # ── Public mutation schemas ──────────────────────────────────────
+
+    ConsultationSubmitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            sessionId:
+              type: string
+            patientName:
+              type: string
+            hasPhoto:
+              type: boolean
+            phase:
+              type: string
+      required: [success]
+
+    SubscribeRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        source:
+          type: string
+          maxLength: 100
+        honeypot:
+          type: string
+          maxLength: 0
+      required: [email]
+
+    PlanTrackRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [view, financing_clicked, booking_clicked]
+
+    PlanTrackResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        previousStatus:
+          type: string
+        newStatus:
+          type: string
+        followUp:
+          type: object
+          nullable: true
+          properties:
+            template:
+              type: string
+            delayHours:
+              type: number
+            action:
+              type: string
+
+    CampaignCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [promotional, educational, reactivation, event, seasonal, birthday, direct]
+        channel:
+          type: string
+          enum: [sms, email, both]
+        subject:
+          type: string
+        body:
+          type: string
+      required: [name, type]
+
+    CampaignResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        campaign:
+          type: object
+
+    CampaignListResponse:
+      type: object
+      properties:
+        campaigns:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+        asOf:
+          type: string
+          format: date-time
+
+    # ── Webhook schemas ──────────────────────────────────────────────
+
+    CherryWebhookPayload:
+      type: object
+      properties:
+        event:
+          type: string
+        data:
+          type: object
+      required: [event]
+
+    MangomintWebhookPayload:
+      type: object
+      properties:
+        event:
+          type: string
+        type:
+          type: string
+        data:
+          type: object
+
+    StripeWebhookResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+        event:
+          type: string
+
+    WebhookAckResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+        event:
+          type: string
