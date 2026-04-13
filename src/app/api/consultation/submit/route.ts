@@ -26,6 +26,7 @@ import {
   enforceContentLength,
   normalizeEmailForLimit,
 } from '@/lib/security/public-intent-guard';
+import { withSentry } from '@/lib/sentry-utils';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
@@ -34,7 +35,8 @@ const MAX_MULTIPART_REQUEST_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
 export async function POST(request: NextRequest) {
-  try {
+  return withSentry('consultation/submit', async () => {
+    try {
     const originError = enforceAllowedPublicOrigin(request);
     if (originError) return originError;
 
@@ -229,14 +231,15 @@ export async function POST(request: NextRequest) {
         phase: session.phase,
       },
     });
-  } catch (error) {
-    console.error('[Consultation Submit] Error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Submission failed',
-      },
-      { status: 500 }
-    );
-  }
+    } catch (error) {
+      console.error('[Consultation Submit] Error:', error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: error instanceof Error ? error.message : 'Submission failed',
+        },
+        { status: 500 }
+      );
+    }
+  });
 }

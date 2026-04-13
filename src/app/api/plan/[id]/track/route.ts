@@ -5,6 +5,7 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { getNextStatus, getAutoFollowUp } from '@/lib/plan-builder/plan-status';
 import type { PlanStatus } from '@/lib/plan-builder/plan-status';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -29,6 +30,7 @@ const VALID_ACTIONS = Object.keys(ACTION_TRIGGER_MAP);
 const TrackBodySchema = z.object({
   action: z.enum(VALID_ACTIONS as [string, ...string[]]).optional(),
 });
+const MAX_PLAN_TRACK_REQUEST_BYTES = 16 * 1024;
 
 // ─── POST Handler ─────────────────────────────────────────────────
 // Called from client viewer to track plan views and interactions
@@ -36,6 +38,12 @@ const TrackBodySchema = z.object({
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   return withSentry('plan/[id]/track', async () => {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+
+    const sizeError = enforceContentLength(request, MAX_PLAN_TRACK_REQUEST_BYTES);
+    if (sizeError) return sizeError;
+
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('view', ip, RATE_LIMITS.VIEW);
     if (!allowed) return rateLimitResponse(resetIn);

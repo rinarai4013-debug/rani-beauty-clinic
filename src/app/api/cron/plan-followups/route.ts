@@ -4,6 +4,7 @@ import { FIELDS } from '@/lib/airtable/tables';
 import { renderTemplate } from '@/lib/plan-builder/follow-up-templates';
 import type { PlanStatus } from '@/lib/plan-builder/plan-status';
 import { Resend } from 'resend';
+import { withSentry } from '@/lib/sentry-utils';
 
 // ─── Constants ───────────────────────────────────────────────────────
 const CLINIC_PHONE = '(425) 539-4440';
@@ -356,17 +357,18 @@ async function executeFollowUp(
 // Authorization: CRON_SECRET bearer token
 
 export async function GET(req: NextRequest) {
-  // Verify Vercel cron secret
-  const auth = req.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && auth !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  return withSentry('cron/plan-followups', async () => {
+    // Verify Vercel cron secret
+    const auth = req.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret && auth !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  const startTime = Date.now();
+    const startTime = Date.now();
 
-  try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Fetch all treatment plans with actionable statuses
     // OR({Status} = "Sent", {Status} = "Viewed", {Status} = "Financing Clicked",
@@ -435,24 +437,25 @@ export async function GET(req: NextRequest) {
     const failed = results.filter((r) => !r.success).length;
     const elapsed = Date.now() - startTime;
 
-    return NextResponse.json({
-      success: true,
-      summary: {
-        plansEvaluated: plans.length,
-        followUpsSent: sent,
-        followUpsFailed: failed,
-        elapsedMs: elapsed,
-      },
-      results,
-    });
-  } catch (error) {
-    console.error('[Plan Follow-Ups] Cron error:', error);
-    return NextResponse.json(
-      {
-        error: 'Follow-up cron failed',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
-    );
-  }
+      return NextResponse.json({
+        success: true,
+        summary: {
+          plansEvaluated: plans.length,
+          followUpsSent: sent,
+          followUpsFailed: failed,
+          elapsedMs: elapsed,
+        },
+        results,
+      });
+    } catch (error) {
+      console.error('[Plan Follow-Ups] Cron error:', error);
+      return NextResponse.json(
+        {
+          error: 'Follow-up cron failed',
+          detail: error instanceof Error ? error.message : String(error),
+        },
+        { status: 500 }
+      );
+    }
+  });
 }

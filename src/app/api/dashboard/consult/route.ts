@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 // Tier 1 zod (2026-04-11): the copilot engine declares a ConsultInput
 // interface. Lock the POST body to that shape so random payloads
@@ -41,65 +42,69 @@ async function getConsultGenerator() {
 }
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  return withSentry('dashboard/consult:get', async () => {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  const cacheKey = 'dashboard-consult';
-  const cached = cache.get(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const cacheKey = 'dashboard-consult';
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const generator = await getConsultGenerator();
-    const consult = generator({
-      client: {
-        name: 'Sample Client',
-        previousServices: [],
-        totalSpend: 0,
-        visitCount: 0,
-        membershipStatus: 'none',
-      },
-      concerns: ['glow'],
-      consultType: 'new_client',
-      timeAvailable: 30,
-    });
-    const payload = { status: 'ok', consult };
-    cache.set(cacheKey, payload, TTL.STANDARD);
-    return NextResponse.json(payload);
-  } catch (error) {
-    console.error('[dashboard/consult][GET]', error);
-    return NextResponse.json({ error: 'Failed to load consult intelligence' }, { status: 500 });
-  }
+    try {
+      const generator = await getConsultGenerator();
+      const consult = generator({
+        client: {
+          name: 'Sample Client',
+          previousServices: [],
+          totalSpend: 0,
+          visitCount: 0,
+          membershipStatus: 'none',
+        },
+        concerns: ['glow'],
+        consultType: 'new_client',
+        timeAvailable: 30,
+      });
+      const payload = { status: 'ok', consult };
+      cache.set(cacheKey, payload, TTL.STANDARD);
+      return NextResponse.json(payload);
+    } catch (error) {
+      console.error('[dashboard/consult][GET]', error);
+      return NextResponse.json({ error: 'Failed to load consult intelligence' }, { status: 500 });
+    }
+  });
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  return withSentry('dashboard/consult:post', async () => {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Malformed JSON body' }, { status: 400 });
-  }
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Malformed JSON body' }, { status: 400 });
+    }
 
-  const parsed = ConsultInputSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid consult request body', details: parsed.error.issues },
-      { status: 422 },
-    );
-  }
+    const parsed = ConsultInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid consult request body', details: parsed.error.issues },
+        { status: 422 },
+      );
+    }
 
-  try {
-    const generator = await getConsultGenerator();
-    const briefing = generator(parsed.data);
-    return NextResponse.json({ status: 'ok', briefing });
-  } catch (error) {
-    console.error('[dashboard/consult][POST]', error);
-    return NextResponse.json({ error: 'Failed to generate consult briefing' }, { status: 500 });
-  }
+    try {
+      const generator = await getConsultGenerator();
+      const briefing = generator(parsed.data);
+      return NextResponse.json({ status: 'ok', briefing });
+    } catch (error) {
+      console.error('[dashboard/consult][POST]', error);
+      return NextResponse.json({ error: 'Failed to generate consult briefing' }, { status: 500 });
+    }
+  });
 }

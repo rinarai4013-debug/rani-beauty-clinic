@@ -65,7 +65,7 @@ describe('dashboard plan-builder route CRUD', () => {
     });
     cacheGetMock.mockReturnValue(null);
     treatmentPlansFindMock.mockResolvedValue({
-      id: 'rec_plan_1',
+      id: 'recPlanTest0001',
       fields: {
         'Client Name': 'Jane Doe',
         'Plan Tier': 'Transform',
@@ -73,7 +73,7 @@ describe('dashboard plan-builder route CRUD', () => {
     });
     fetchAllMock.mockResolvedValue([
       {
-        id: 'rec_plan_1',
+        id: 'recPlanTest0001',
         fields: {
           'Client Name': 'Jane Doe',
           Status: 'Draft',
@@ -105,12 +105,22 @@ describe('dashboard plan-builder route CRUD', () => {
 
   it('GET with id loads single treatment plan', async () => {
     const { GET } = await import('@/app/api/dashboard/plan-builder/route');
-    const response = await GET(new Request('http://localhost:3000/api/dashboard/plan-builder?id=rec_plan_1') as never);
+    const response = await GET(new Request('http://localhost:3000/api/dashboard/plan-builder?id=recPlanTest0001') as never);
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.id).toBe('rec_plan_1');
+    expect(body.id).toBe('recPlanTest0001');
     expect(treatmentPlansFindMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('GET with invalid id returns 400', async () => {
+    const { GET } = await import('@/app/api/dashboard/plan-builder/route');
+    const response = await GET(new Request('http://localhost:3000/api/dashboard/plan-builder?id=bad-id') as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid plan ID');
+    expect(treatmentPlansFindMock).not.toHaveBeenCalled();
   });
 
   it('POST rejects malformed json with 400', async () => {
@@ -154,7 +164,7 @@ describe('dashboard plan-builder route CRUD', () => {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        id: 'rec_plan_1',
+        id: 'recPlanTest0001',
         status: 'Sent',
         planValue: 2700,
       }),
@@ -167,6 +177,22 @@ describe('dashboard plan-builder route CRUD', () => {
     expect(updateRecordMock).toHaveBeenCalledTimes(1);
   });
 
+  it('PATCH rejects invalid plan id format', async () => {
+    const { PATCH } = await import('@/app/api/dashboard/plan-builder/route');
+    const request = new Request('http://localhost:3000/api/dashboard/plan-builder', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        id: 'bad-id',
+        status: 'Sent',
+      }),
+    });
+    const response = await PATCH(request as never);
+
+    expect(response.status).toBe(400);
+    expect(updateRecordMock).not.toHaveBeenCalled();
+  });
+
   it('DELETE requires plan id', async () => {
     const { DELETE } = await import('@/app/api/dashboard/plan-builder/route');
     const response = await DELETE(new Request('http://localhost:3000/api/dashboard/plan-builder') as never);
@@ -176,13 +202,23 @@ describe('dashboard plan-builder route CRUD', () => {
 
   it('DELETE archives plan by setting status to Archived', async () => {
     const { DELETE } = await import('@/app/api/dashboard/plan-builder/route');
-    const response = await DELETE(new Request('http://localhost:3000/api/dashboard/plan-builder?id=rec_plan_1') as never);
+    const response = await DELETE(new Request('http://localhost:3000/api/dashboard/plan-builder?id=recPlanTest0001') as never);
     const body = await response.json();
 
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
-    expect(updateRecordMock).toHaveBeenCalledWith(expect.anything(), 'rec_plan_1', {
+    expect(updateRecordMock).toHaveBeenCalledWith(expect.anything(), 'recPlanTest0001', {
       Status: 'Archived',
     });
+  });
+
+  it('DELETE rejects invalid plan id format', async () => {
+    const { DELETE } = await import('@/app/api/dashboard/plan-builder/route');
+    const response = await DELETE(new Request('http://localhost:3000/api/dashboard/plan-builder?id=bad-id') as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid plan ID');
+    expect(updateRecordMock).not.toHaveBeenCalled();
   });
 });

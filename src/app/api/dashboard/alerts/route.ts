@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 
 /**
  * GET /api/dashboard/alerts
@@ -28,14 +29,15 @@ interface AlertFields {
 }
 
 export async function GET() {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!hasPermission(session.role, 'view_executive')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  return withSentry('dashboard/alerts', async () => {
+    try {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!hasPermission(session.role, 'view_executive')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
     const cacheKey = 'active-alerts';
     const cached = cache.get<unknown>(cacheKey);
@@ -80,15 +82,16 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
     };
 
-    cache.set(cacheKey, result, TTL.REALTIME);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Alerts fetch error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch alerts' },
-      { status: 500 }
-    );
-  }
+      cache.set(cacheKey, result, TTL.REALTIME);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Alerts fetch error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch alerts' },
+        { status: 500 }
+      );
+    }
+  });
 }
 
 function normalizeSeverity(raw: string | undefined): 'critical' | 'high' | 'medium' | 'low' {

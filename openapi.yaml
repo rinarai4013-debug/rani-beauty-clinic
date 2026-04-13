@@ -755,6 +755,1228 @@ paths:
         "401":
           description: Invalid signature
 
+  # ── OpenAPI Wave 4: providers, revenue, meta-ads ─────────────────
+
+  /api/dashboard/providers:
+    get:
+      operationId: listProviders
+      summary: Provider performance summary
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Provider list with performance metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProvidersSummaryResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/providers/{name}:
+    get:
+      operationId: getProviderByName
+      summary: Single provider detailed stats
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Provider slug (e.g. 'rina', 'mom')
+      responses:
+        "200":
+          description: Provider detail with monthly metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProviderDetailResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Provider not found
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/providers/performance:
+    get:
+      operationId: getProviderPerformance
+      summary: Provider performance comparison
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Performance comparison across providers
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue:
+    get:
+      operationId: getRevenueBreakdown
+      summary: Revenue breakdown by provider, service, and category
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: range
+          in: query
+          schema:
+            type: string
+            enum: ["7d", "30d", "90d", "ytd"]
+      responses:
+        "200":
+          description: Revenue breakdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue/trends:
+    get:
+      operationId: getRevenueTrends
+      summary: 30-day revenue trend
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Daily revenue trend data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueTrendsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue/anomalies:
+    get:
+      operationId: getRevenueAnomalies
+      summary: Revenue anomaly detection (5 methods + health score)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Anomalies, health score, month-end projection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueAnomaliesResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/revenue-optimizer:
+    get:
+      operationId: getRevenueOptimizer
+      summary: Revenue optimization opportunities
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Optimization recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueOptimizerResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/meta-ads:
+    get:
+      operationId: getMetaAdsPerformance
+      summary: Meta Ads 30-day performance summary
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Ad performance, campaigns, ROAS
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaAdsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "502":
+          description: Meta API error
+
+  /api/dashboard/meta-ads/optimize:
+    get:
+      operationId: getMetaAdsOptimizations
+      summary: Meta Ads AI optimization + ad copy variants
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Optimizations, ad copy variants, budget recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaAdsOptimizeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Wave 3: consult, consultations, leads, plan-builder, preferences ──
+
+  /api/dashboard/communications/preferences:
+    get:
+      operationId: getCommunicationPreferences
+      summary: Client communication preferences (PHI — logged)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences:
+                    oneOf:
+                      - type: array
+                        items:
+                          $ref: "#/components/schemas/ClientPreference"
+                      - $ref: "#/components/schemas/ClientPreference"
+                  total:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/consult:
+    get:
+      operationId: getConsultSample
+      summary: Sample consult copilot output
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Copilot result
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: generateConsult
+      summary: Generate consult copilot for custom client
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client:
+                  type: object
+                concerns:
+                  type: array
+                  items:
+                    type: string
+              required: [client, concerns]
+      responses:
+        "200":
+          description: Copilot result
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/consultations:
+    get:
+      operationId: listConsultations
+      summary: Unified consultation pipeline (mastermind + intakes)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Merged consultation list
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/leads:
+    get:
+      operationId: getLeadFunnel
+      summary: Lead funnel with conversion rates
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Funnel data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeadFunnelResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/leads/stats:
+    get:
+      operationId: getLeadStats
+      summary: Lead conversion statistics
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Lead stats
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/plan-builder:
+    get:
+      operationId: listTreatmentPlans
+      summary: List or get single treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Plan list or single plan
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: createTreatmentPlan
+      summary: Create a draft treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientName:
+                  type: string
+              required: [clientName]
+      responses:
+        "201":
+          description: Plan created
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      operationId: updateTreatmentPlan
+      summary: Update treatment plan fields
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              required: [id]
+      responses:
+        "200":
+          description: Plan updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      operationId: archiveTreatmentPlan
+      summary: Archive a treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Plan archived
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/plan-builder/send:
+    post:
+      operationId: sendTreatmentPlan
+      summary: Send treatment plan via email (Resend)
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  pattern: "^rec[a-zA-Z0-9]{10,}$"
+                clientEmail:
+                  type: string
+                  format: email
+                clientName:
+                  type: string
+              required: [planId, clientEmail, clientName]
+      responses:
+        "200":
+          description: Plan sent
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/plan-builder/export-pdf:
+    post:
+      operationId: exportTreatmentPlanPdf
+      summary: Generate PDF HTML for treatment plan
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planData:
+                  type: object
+              required: [planData]
+      responses:
+        "200":
+          description: PDF HTML
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ── Batch 1: auth, AI, cron, agents, alerts, briefing, backlinks ──
+
+  /api/dashboard/auth/login:
+    post:
+      operationId: dashboardLogin
+      summary: Staff JWT login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [username, password]
+      responses:
+        "200":
+          description: Login successful (sets rani-session cookie)
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/auth/logout:
+    post:
+      operationId: dashboardLogout
+      summary: Clear session cookie
+      tags: [Auth]
+      responses:
+        "200":
+          description: Logged out
+
+  /api/dashboard/auth/me:
+    get:
+      operationId: dashboardMe
+      summary: Current session user info
+      tags: [Auth]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: User session data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/alerts:
+    get:
+      operationId: getAlerts
+      summary: Active operational alerts
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Alerts with severity breakdown
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/briefing:
+    get:
+      operationId: getExecutiveBriefing
+      summary: Daily executive briefing
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Briefing payload
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/backlinks:
+    get:
+      operationId: getBacklinks
+      summary: SEO backlink analysis
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Backlink data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/communications:
+    get:
+      operationId: getCommunicationsOverview
+      summary: Communications analytics overview
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Overview payload
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/compliance:
+    get:
+      operationId: getComplianceStatus
+      summary: HIPAA compliance score and status
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Compliance status
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/clients/at-risk:
+    get:
+      operationId: getAtRiskClients
+      summary: At-risk clients sorted by urgency
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: At-risk client list with breakdown
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/agents/feed:
+    get:
+      operationId: getAgentsFeed
+      summary: AI agent status feed
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Agent statuses and recommendations
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/agents/{agentId}:
+    get:
+      operationId: getAgentById
+      summary: Single AI agent detail
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent detail
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Agent not found
+
+  /api/contact:
+    post:
+      operationId: submitContactForm
+      summary: Contact form submission
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                service:
+                  type: string
+                message:
+                  type: string
+                honeypot:
+                  type: string
+                  maxLength: 0
+              required: [name, email, service]
+      responses:
+        "200":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          description: Validation error
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Airtable write failed
+
+  /api/ai/chat:
+    post:
+      operationId: aiChat
+      summary: AI concierge chatbot
+      tags: [AI]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+              required: [messages]
+      responses:
+        "200":
+          description: AI response
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/ai/recommend:
+    post:
+      operationId: aiRecommend
+      summary: AI treatment recommender (3-tier)
+      tags: [AI]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Treatment recommendation
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/ai/intake:
+    post:
+      operationId: aiIntake
+      summary: AI intake intelligence
+      tags: [AI]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Intake intelligence
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/ai/advisor:
+    get:
+      operationId: aiAdvisorGet
+      summary: AI advisor (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Advisor response
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiAdvisorPost
+      summary: AI advisor (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Advisor response
+        "501":
+          description: Not implemented
+
+  /api/ai/outcome:
+    get:
+      operationId: aiOutcomeGet
+      summary: AI outcome prediction (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Outcome prediction
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiOutcomePost
+      summary: AI outcome prediction (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Outcome prediction
+        "501":
+          description: Not implemented
+
+  /api/ai/protocols:
+    get:
+      operationId: aiProtocolsGet
+      summary: AI treatment protocols (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Protocols
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiProtocolsPost
+      summary: AI treatment protocols (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Protocols
+        "501":
+          description: Not implemented
+
+  /api/ai/quiz:
+    get:
+      operationId: aiQuizGet
+      summary: AI skin quiz (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Quiz
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiQuizPost
+      summary: AI skin quiz (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Quiz
+        "501":
+          description: Not implemented
+
+  /api/ai/skin-analysis:
+    get:
+      operationId: aiSkinAnalysisGet
+      summary: AI skin analysis (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Analysis
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiSkinAnalysisPost
+      summary: AI skin analysis (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Analysis
+        "501":
+          description: Not implemented
+
+  /api/cron/daily-briefing:
+    get:
+      operationId: cronDailyBriefing
+      summary: Daily briefing cron job
+      tags: [Cron]
+      responses:
+        "200":
+          description: Briefing generated
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/cron/daily-kpi:
+    get:
+      operationId: cronDailyKpi
+      summary: Daily KPI snapshot cron job (stub)
+      tags: [Cron]
+      responses:
+        "200":
+          description: KPI snapshot
+        "501":
+          description: Not implemented
+
+  /api/cron/plan-followups:
+    get:
+      operationId: cronPlanFollowups
+      summary: Treatment plan follow-up cron job
+      tags: [Cron]
+      responses:
+        "200":
+          description: Follow-ups processed
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ── Batch 2: entry forms, gamification, dashboard misc ───────────
+
+  /api/dashboard/entry/ceo-note:
+    post:
+      operationId: entryCeoNote
+      summary: CEO daily note entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Note saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/consult-notes:
+    post:
+      operationId: entryConsultNotes
+      summary: Consultation notes entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Notes saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/eod-recap:
+    post:
+      operationId: entryEodRecap
+      summary: End-of-day recap entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Recap saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/expense:
+    post:
+      operationId: entryExpense
+      summary: Expense entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Expense saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/inventory:
+    post:
+      operationId: entryInventory
+      summary: Inventory adjustment entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Adjustment saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/lead:
+    post:
+      operationId: entryLead
+      summary: Manual lead entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Lead saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/review:
+    post:
+      operationId: entryReview
+      summary: Review entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Review saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/room-issue:
+    post:
+      operationId: entryRoomIssue
+      summary: Room issue report
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Issue reported }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/sale:
+    post:
+      operationId: entrySale
+      summary: Manual sale entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Sale saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/entry/staff-note:
+    post:
+      operationId: entryStaffNote
+      summary: Staff note entry
+      tags: [Entry]
+      security: [{ SessionCookie: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Note saved }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/finance/pnl:
+    get:
+      operationId: getFinancePnl
+      summary: P&L intelligence + financial health scoring
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: P&L data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/dashboard/gamification/achievements:
+    get:
+      operationId: getAchievements
+      summary: Achievement list
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Achievements }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/briefing:
+    get:
+      operationId: getGamificationBriefing
+      summary: Gamification daily briefing
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Briefing }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/leaderboard:
+    get:
+      operationId: getLeaderboard
+      summary: Provider rankings
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Leaderboard }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/score:
+    get:
+      operationId: getClinicScore
+      summary: Clinic score from real metrics
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Score data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/gamification/snapshot:
+    get:
+      operationId: getGamificationSnapshot
+      summary: Gamification snapshot
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Snapshot }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/dashboard/inventory:
+    get:
+      operationId: getInventoryIntelligence
+      summary: Inventory intelligence (reorder, waste, par levels)
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Inventory data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/dashboard/kpis:
+    get:
+      operationId: getKpis
+      summary: KPI cards (revenue, bookings, consults, leads)
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: KPI data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/dashboard/marketing:
+    get:
+      operationId: getMarketingOverview
+      summary: Marketing overview
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Marketing data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/dashboard/phone-agent:
+    get:
+      operationId: getPhoneAgent
+      summary: AI phone agent configuration + analytics
+      tags: [Dashboard]
+      security: [{ SessionCookie: [] }]
+      responses:
+        "200": { description: Phone agent data }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  # ── Batch 3: dashboard misc + mastermind + patient + misc ────────
+
+  /api/dashboard/pricing:
+    get: { operationId: getPricingIntel, summary: Dynamic pricing intelligence, tags: [Dashboard], security: [{ SessionCookie: [] }], responses: { "200": { description: Pricing recommendations }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" } } }
+
+  /api/dashboard/reactivation:
+    get: { operationId: getReactivation, summary: Reactivation intelligence, tags: [Dashboard], security: [{ SessionCookie: [] }], responses: { "200": { description: Reactivation targets }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/dashboard/social:
+    get: { operationId: getSocialPlan, summary: Social media content plan, tags: [Dashboard], security: [{ SessionCookie: [] }], responses: { "200": { description: Weekly content calendar }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" } } }
+
+  /api/mastermind/aura-import:
+    get: { operationId: getAuraImportStatus, summary: Aura scan import status, tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Import status }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post: { operationId: importAuraScan, summary: Import Aura 3D scan, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Import result }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/mastermind/complete:
+    post: { operationId: completeMastermind, summary: Complete mastermind session, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string } }, required: [sessionId] } } } }, responses: { "200": { description: Session completed }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/mastermind/consent:
+    get: { operationId: getConsent, summary: Get consent status, tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Consent status }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post: { operationId: recordConsent, summary: Record patient consent, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Consent recorded }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/mastermind/copilot:
+    post: { operationId: runCopilot, summary: Run consult copilot for session, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Copilot result }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/mastermind/follow-up:
+    get: { operationId: getFollowUps, summary: Get follow-up queue (stub), tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Follow-up queue }, "501": { description: Not implemented } } }
+    post: { operationId: sendFollowUp, summary: Send follow-up (stub), tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Follow-up sent }, "501": { description: Not implemented } } }
+
+  /api/mastermind/pdf:
+    post: { operationId: generatePdf, summary: Generate treatment plan PDF, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: PDF generated }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/mastermind/pdf/serve:
+    get: { operationId: servePdf, summary: Serve generated PDF, tags: [Mastermind], responses: { "200": { description: PDF file }, "404": { description: PDF not found } } }
+
+  /api/mastermind/plan:
+    post: { operationId: generatePlan, summary: Generate mastermind treatment plan, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string } }, required: [sessionId] } } } }, responses: { "200": { description: Plan generated }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/mastermind/plan-send:
+    post: { operationId: sendPlan, summary: Send plan via email, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string } }, required: [sessionId] } } } }, responses: { "200": { description: Plan sent }, "401": { $ref: "#/components/responses/Unauthorized" }, "422": { description: No patient email }, "502": { description: Email delivery failed } } }
+
+  /api/mastermind/scan:
+    post: { operationId: runScan, summary: Run Aura scan analysis, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Scan result }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/mastermind/sessions:
+    get: { operationId: listSessions, summary: List mastermind sessions, tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Session list }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    post: { operationId: createSession, summary: Create mastermind session, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "201": { description: Session created }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/mastermind/sessions/{id}:
+    get: { operationId: getSessionById, summary: Get session detail, tags: [Mastermind], security: [{ SessionCookie: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Session detail }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { description: Session not found } } }
+    patch: { operationId: updateSession, summary: Update session fields, tags: [Mastermind], security: [{ SessionCookie: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Session updated }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/mastermind/sessions/{id}/validate:
+    post: { operationId: validateSession, summary: Validate session data, tags: [Mastermind], security: [{ SessionCookie: [] }], parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Validation result }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/mastermind/share:
+    post: { operationId: createShareLink, summary: Generate share link for plan, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string } }, required: [sessionId] } } } }, responses: { "200": { description: Share URL }, "401": { $ref: "#/components/responses/Unauthorized" }, "404": { description: Session not found } } }
+
+  /api/mastermind/share/interest:
+    post: { operationId: submitInterest, summary: Patient interest from shared plan, tags: [Public], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { token: { type: string }, name: { type: string }, phone: { type: string }, packageTier: { type: string, enum: [Start, Transform, Elite] } }, required: [token, name, phone, packageTier] } } } }, responses: { "200": { description: Interest recorded }, "400": { $ref: "#/components/responses/BadRequest" }, "404": { description: Token expired } } }
+
+  /api/mastermind/share/{token}:
+    get: { operationId: getSharedPlan, summary: View shared treatment plan, tags: [Public], parameters: [{ name: token, in: path, required: true, schema: { type: string } }], responses: { "200": { description: Plan data }, "404": { description: Token not found or expired } } }
+
+  /api/mastermind/simulate:
+    post: { operationId: runSimulation, summary: Run treatment simulation, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Simulation result }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/patient/appointments:
+    get: { operationId: getPatientAppointments, summary: Patient appointment history, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Appointments }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/auth/me:
+    get: { operationId: getPatientMe, summary: Current patient session, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Patient identity }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/loyalty:
+    get: { operationId: getPatientLoyalty, summary: Patient loyalty points and tier, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Loyalty data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/membership:
+    get: { operationId: getPatientMembership, summary: Patient membership details, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Membership data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/membership/billing:
+    get: { operationId: getPatientBilling, summary: Patient billing history, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Billing data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/plan:
+    get: { operationId: getPatientPlan, summary: Patient treatment plan, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Plan data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/profile:
+    get: { operationId: getPatientProfile, summary: Patient profile, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Profile data }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+    patch: { operationId: updatePatientProfile, summary: Update patient profile, tags: [Patient], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Profile updated }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/referrals:
+    get: { operationId: getPatientReferrals, summary: Patient referral history, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Referrals }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/patient/treatments:
+    get: { operationId: getPatientTreatments, summary: Patient treatment history, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Treatments }, "401": { $ref: "#/components/responses/Unauthorized" } } }
+
+  /api/photo/upload:
+    post: { operationId: uploadPhoto, summary: Upload treatment photo, tags: [Public], requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, properties: { file: { type: string, format: binary } } } } } }, responses: { "200": { description: Upload result }, "400": { $ref: "#/components/responses/BadRequest" }, "413": { description: File too large } } }
+
+  /api/plan/{id}:
+    get: { operationId: getPlanById, summary: View treatment plan (access-code protected), tags: [Public], parameters: [{ name: id, in: path, required: true, schema: { type: string, pattern: "^rec[a-zA-Z0-9]{10,}$" } }, { name: code, in: query, required: true, schema: { type: string } }], responses: { "200": { description: Plan data (PII redacted) }, "400": { $ref: "#/components/responses/BadRequest" }, "403": { description: ACCESS_CODE_REQUIRED }, "404": { description: Plan not found }, "410": { description: Plan expired }, "429": { $ref: "#/components/responses/RateLimited" } } }
+
+  /api/simulation/generate:
+    post: { operationId: generateSimulation, summary: Generate treatment simulation image, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Simulation generated }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/templates/post-treatment:
+    post: { operationId: getPostTreatmentTemplate, summary: Render post-treatment follow-up templates, tags: [Templates], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Rendered templates } } }
+
+  /api/templates/pre-consult:
+    post: { operationId: getPreConsultTemplate, summary: Render pre-consult communication templates, tags: [Templates], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Rendered templates } } }
+
+  /api/templates/reactivation:
+    post: { operationId: getReactivationTemplate, summary: Render reactivation campaign templates, tags: [Templates], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Rendered templates } } }
+
+  /api/webhooks/meta-capi:
+    post: { operationId: handleMetaCapiWebhook, summary: Meta Conversions API proxy (HMAC-signed), tags: [Webhooks], parameters: [{ name: x-hub-signature-256, in: header, required: true, schema: { type: string } }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Event forwarded }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { description: Invalid signature }, "500": { $ref: "#/components/responses/InternalError" }, "502": { description: Meta API error }, "503": { description: Webhook secret not configured } } }
+
 components:
   securitySchemes:
     SessionCookie:
@@ -1014,6 +2236,185 @@ components:
           type: string
           format: email
       required: [token, email]
+
+    # ── Wave 4 named schemas ──────────────────────────────────────────
+
+    ProvidersSummaryResponse:
+      type: object
+      properties:
+        providers:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              appointmentCount:
+                type: integer
+              revenue:
+                type: number
+              avgTicket:
+                type: number
+              utilizationRate:
+                type: number
+        total:
+          type: integer
+
+    ProviderDetailResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        revenue:
+          type: number
+        appointmentCount:
+          type: integer
+        avgTicket:
+          type: number
+        topServices:
+          type: array
+          items:
+            type: object
+        monthlyMetrics:
+          type: array
+          items:
+            type: object
+
+    RevenueResponse:
+      type: object
+      properties:
+        total:
+          type: number
+        byProvider:
+          type: array
+          items:
+            type: object
+        byService:
+          type: array
+          items:
+            type: object
+        byCategory:
+          type: array
+          items:
+            type: object
+
+    RevenueTrendsResponse:
+      type: object
+      properties:
+        trend:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              revenue:
+                type: number
+        avgDaily:
+          type: number
+
+    RevenueAnomaliesResponse:
+      type: object
+      properties:
+        anomalies:
+          type: array
+          items:
+            type: object
+        healthScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        projectedMonthEnd:
+          type: number
+        summary:
+          type: string
+
+    RevenueOptimizerResponse:
+      type: object
+      properties:
+        opportunities:
+          type: array
+          items:
+            type: object
+        totalEstimatedValue:
+          type: number
+
+    MetaAdsResponse:
+      type: object
+      properties:
+        performanceSummary:
+          type: object
+        campaigns:
+          type: array
+          items:
+            type: object
+        adScore:
+          type: number
+          minimum: 0
+          maximum: 100
+
+    MetaAdsOptimizeResponse:
+      type: object
+      properties:
+        optimizations:
+          type: array
+          items:
+            type: object
+        adCopyVariants:
+          type: array
+          items:
+            type: object
+        budgetRecommendations:
+          type: array
+          items:
+            type: object
+
+    # ── Wave 3 schemas ─────────────────────────────────────────────
+
+    ClientPreference:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        preferredContact:
+          type: string
+        status:
+          type: string
+
+    LeadFunnelResponse:
+      type: object
+      properties:
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+              percentage:
+                type: number
+        metrics:
+          type: object
+        conversionRates:
+          type: object
+          properties:
+            leadToConsult:
+              type: number
+            consultShowRate:
+              type: number
+            consultCloseRate:
+              type: number
+            depositCaptureRate:
+              type: number
 
     SuccessResponse:
       type: object

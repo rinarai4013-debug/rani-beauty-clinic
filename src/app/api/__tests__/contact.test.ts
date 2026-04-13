@@ -58,6 +58,27 @@ vi.mock('@/lib/rate-limit', () => ({
   },
 }));
 
+vi.mock('@/lib/sentry-utils', () => ({
+  withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn((req: Request) => {
+    const origin = req.headers.get('origin');
+    if (origin && !['http://localhost:3000', 'https://www.ranibeautyclinic.com', 'https://ranibeautyclinic.com'].includes(origin)) {
+      return new Response(JSON.stringify({ error: 'Origin not allowed' }), { status: 403 });
+    }
+    return null;
+  }),
+  enforceContentLength: vi.fn((req: Request, maxBytes: number) => {
+    const len = req.headers.get('content-length');
+    if (len && Number(len) > maxBytes) {
+      return new Response(JSON.stringify({ error: 'Request body too large' }), { status: 413 });
+    }
+    return null;
+  }),
+}));
+
 // ---------------------------------------------------------------------------
 // Global fetch mock for Resend + n8n
 // ---------------------------------------------------------------------------
@@ -122,6 +143,30 @@ async function postContact(body: unknown) {
   const req = buildPostRequest('/api/contact', body);
   return POST(req);
 }
+
+describe('POST /api/contact — public intent guards', () => {
+  it('blocks disallowed browser origins with 403', async () => {
+    const { POST } = await import('@/app/api/contact/route');
+    const req = buildPostRequest('/api/contact', validPayload, {
+      origin: 'https://evil.example.com',
+    });
+
+    const response = await POST(req);
+    expect(response.status).toBe(403);
+    expect(mockCreateRecord).not.toHaveBeenCalled();
+  });
+
+  it('blocks oversized payloads via content-length with 413', async () => {
+    const { POST } = await import('@/app/api/contact/route');
+    const req = buildPostRequest('/api/contact', validPayload, {
+      'content-length': String(70 * 1024),
+    });
+
+    const response = await POST(req);
+    expect(response.status).toBe(413);
+    expect(mockCreateRecord).not.toHaveBeenCalled();
+  });
+});
 
 // ---------------------------------------------------------------------------
 // Happy path
