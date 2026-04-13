@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
@@ -50,6 +51,10 @@ interface ReviewFields {
   'Review Date': string;
   'Platform': string;
   'Sentiment': string;
+}
+
+function buildRecordIdOrFilter(ids: string[]): string {
+  return `OR(${ids.map((id) => `RECORD_ID() = '${sanitizeFormulaValue(id)}'`).join(',')})`;
 }
 
 export async function GET(
@@ -129,27 +134,27 @@ export async function GET(
       const [appointments, transactions, memberships, messages, reviews] = await Promise.all([
         appointmentIds.length > 0
           ? fetchAll<AppointmentFields>(Tables.appointments(), {
-              filterByFormula: `OR(${appointmentIds.map(aid => `RECORD_ID() = '${aid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(appointmentIds),
             }).catch(() => [])
           : Promise.resolve([]),
         transactionIds.length > 0
           ? fetchAll<TransactionFields>(Tables.transactions(), {
-              filterByFormula: `OR(${transactionIds.map(tid => `RECORD_ID() = '${tid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(transactionIds),
             }).catch(() => [])
           : Promise.resolve([]),
         membershipIds.length > 0
           ? fetchAll<MembershipFields>(Tables.memberships(), {
-              filterByFormula: `OR(${membershipIds.map(mid => `RECORD_ID() = '${mid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(membershipIds),
             }).catch(() => [])
           : Promise.resolve([]),
         messageIds.length > 0 && messageIds.length <= 20
           ? fetchAll<MessageFields>(Tables.messagesLog(), {
-              filterByFormula: `OR(${messageIds.map(mid => `RECORD_ID() = '${mid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(messageIds),
             }).catch(() => [])
           : Promise.resolve([]),
         reviewIds.length > 0
           ? fetchAll<ReviewFields>(Tables.reviews(), {
-              filterByFormula: `OR(${reviewIds.map(rid => `RECORD_ID() = '${rid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(reviewIds),
             }).catch(() => [])
           : Promise.resolve([]),
       ]);

@@ -12,6 +12,7 @@
 
 import { type TenantConfig, DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from './config';
 import { getPlatformDomains } from './env';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
@@ -124,9 +125,10 @@ export class AirtableTenantStore implements TenantStore {
 
   async getById(id: string): Promise<TenantConfig | null> {
     try {
+      const safeId = sanitizeFormulaValue(id);
       const records = await this.table()
         .select({
-          filterByFormula: `{Tenant ID} = "${id}"`,
+          filterByFormula: `{Tenant ID} = "${safeId}"`,
           maxRecords: 1,
         })
         .firstPage();
@@ -140,9 +142,10 @@ export class AirtableTenantStore implements TenantStore {
 
   async getBySlug(slug: string): Promise<TenantConfig | null> {
     try {
+      const safeSlug = sanitizeFormulaValue(slug);
       const records = await this.table()
         .select({
-          filterByFormula: `{Slug} = "${slug}"`,
+          filterByFormula: `{Slug} = "${safeSlug}"`,
           maxRecords: 1,
         })
         .firstPage();
@@ -156,9 +159,10 @@ export class AirtableTenantStore implements TenantStore {
 
   async getByCustomDomain(domain: string): Promise<TenantConfig | null> {
     try {
+      const safeDomain = sanitizeFormulaValue(domain);
       const records = await this.table()
         .select({
-          filterByFormula: `{Custom Domain} = "${domain}"`,
+          filterByFormula: `{Custom Domain} = "${safeDomain}"`,
           maxRecords: 1,
         })
         .firstPage();
@@ -201,9 +205,10 @@ export class AirtableTenantStore implements TenantStore {
     };
 
     // Find the Airtable record ID
+    const safeId = sanitizeFormulaValue(id);
     const records = await this.table()
       .select({
-        filterByFormula: `{Tenant ID} = "${id}"`,
+        filterByFormula: `{Tenant ID} = "${safeId}"`,
         maxRecords: 1,
       })
       .firstPage();
@@ -222,9 +227,10 @@ export class AirtableTenantStore implements TenantStore {
   }
 
   async delete(id: string): Promise<void> {
+    const safeId = sanitizeFormulaValue(id);
     const records = await this.table()
       .select({
-        filterByFormula: `{Tenant ID} = "${id}"`,
+        filterByFormula: `{Tenant ID} = "${safeId}"`,
         maxRecords: 1,
       })
       .firstPage();

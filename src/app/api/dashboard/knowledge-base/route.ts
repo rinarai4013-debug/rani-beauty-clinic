@@ -11,7 +11,12 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = new URL(request.url).searchParams;
-    const query = searchParams.get('q');
+    const rawQuery = searchParams.get('q');
+    const query = rawQuery?.trim() || null;
+    if (query && query.length > 200) {
+      return NextResponse.json({ error: 'Query too long' }, { status: 400 });
+    }
+
     const cacheKey = query ? `knowledge-base-search:${query}` : 'knowledge-base-stats';
     const cached = cache.get(cacheKey);
     if (cached) return NextResponse.json(cached);

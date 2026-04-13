@@ -584,6 +584,16 @@ describe('GET /api/dashboard/training', () => {
     expect(data.modules).toEqual([]);
   });
 
+  it('should return 400 for invalid role filter', async () => {
+    setupAuthenticatedCEO();
+    const req = buildGetRequest('/api/dashboard/training', { role: 'owner' });
+    const response = await trainingGET(req as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe('Invalid role parameter');
+  });
+
   it('should return 500 on error', async () => {
     mockGetSession.mockRejectedValue(new Error('Session error'));
     const req = buildGetRequest('/api/dashboard/training');

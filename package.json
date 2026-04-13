@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
+    "openapi:lint": "redocly lint openapi.yaml",
     "remotion:studio": "npx remotion studio remotion/index.ts",
     "remotion:render": "npx remotion render remotion/index.ts",
     "remotion:render:all": "npx remotion render remotion/index.ts --all"
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@redocly/cli": "^2.26.0",
     "@remotion/bundler": "^4.0.448",
     "@remotion/cli": "^4.0.448",
     "@remotion/renderer": "^4.0.448",
@@ -63,6 +65,7 @@
     "remotion": "^4.0.448",
     "tailwindcss": "^3.4.19",
     "typescript": "^5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "yaml": "^2.8.3"
   }
 }

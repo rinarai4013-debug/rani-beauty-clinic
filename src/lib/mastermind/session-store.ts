@@ -16,6 +16,7 @@
  */
 
 import type { MastermindSession, MastermindPhase, SimulationFrame } from '@/types/mastermind';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
 const TABLE_NAME = 'Automation%20Log';
@@ -251,7 +252,8 @@ async function findSessionRecord(sessionId: string): Promise<{ session: Mastermi
   if (!pat) return null;
 
   try {
-    const filter = encodeURIComponent(`AND({Workflow}='${WORKFLOW_KEY}',{Action}='${sessionId}')`);
+    const safeSessionId = sanitizeFormulaValue(sessionId);
+    const filter = encodeURIComponent(`AND({Workflow}='${WORKFLOW_KEY}',{Action}='${safeSessionId}')`);
     const res = await fetch(
       `${airtableUrl()}?filterByFormula=${filter}&maxRecords=1`,
       { headers: headers(), signal: AbortSignal.timeout(8000) }
