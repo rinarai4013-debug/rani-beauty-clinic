@@ -1,5 +1,6 @@
 import { fetchAll, Tables } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 export interface ReactivationOpportunity {
   clientName: string;
@@ -65,7 +66,7 @@ async function fetchTransactionAmounts(transactionIds: string[]): Promise<Map<st
         Tables.transactions(),
         {
           fields: [FIELDS.transactions.amount, FIELDS.transactions.status],
-          filterByFormula: `OR(${ids.map((id) => `RECORD_ID() = '${id}'`).join(',')})`,
+          filterByFormula: `OR(${ids.map((id) => `RECORD_ID() = '${sanitizeFormulaValue(id)}'`).join(',')})`,
         },
         true,
       )

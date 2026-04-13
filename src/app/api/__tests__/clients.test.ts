@@ -338,6 +338,51 @@ describe('GET /api/dashboard/clients/[id]', () => {
     expect(data).toHaveProperty('memberships');
   });
 
+  it('should sanitize linked record ids before full profile Airtable formulas', async () => {
+    setupAuthCEO();
+    mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
+
+    const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
+    (sanitizeFormulaValue as any).mockImplementation((v: string) => v.replace(/['"]/g, ''));
+
+    const mockFind = vi.fn().mockResolvedValue({
+      id: 'rec001',
+      fields: {
+        Client: 'Jane Doe',
+        Email: 'jane@test.com',
+        Phone: '(425) 555-0100',
+        Status: 'Active',
+        'Preferred Contact': 'email',
+        Appointments: ["apt_001' OR TRUE() OR 'bad"],
+        Transactions: ["tx_001' OR TRUE() OR 'bad"],
+        Memberships: ["mem_001' OR TRUE() OR 'bad"],
+        'Messages Log': ["msg_001' OR TRUE() OR 'bad"],
+        Reviews: ["rev_001' OR TRUE() OR 'bad"],
+      },
+    });
+
+    const { Tables } = await import('@/lib/airtable/client');
+    (Tables.clients as any).mockReturnValue({ find: mockFind });
+    mockFetchAll.mockResolvedValue([]);
+
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001', { full: 'true' });
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+
+    expect(response.status).toBe(200);
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("apt_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("tx_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("mem_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("msg_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("rev_001' OR TRUE() OR 'bad");
+
+    const formulas = mockFetchAll.mock.calls
+      .map(([, opts]) => (opts as { filterByFormula?: string })?.filterByFormula || '')
+      .join(' ');
+    expect(formulas).toContain("RECORD_ID() = 'apt_001 OR TRUE() OR bad'");
+    expect(formulas).not.toContain("RECORD_ID() = 'apt_001' OR TRUE() OR 'bad'");
+  });
+
   it('should return cached data when available', async () => {
     setupAuthCEO();
     const cached = { id: 'rec001', name: 'Cached Client' };
@@ -461,6 +506,40 @@ describe('GET /api/dashboard/clients/[id]/churn', () => {
     expect(data.clientName).toBe('Recovery Client');
   });
 
+  it('should sanitize linked record ids before churn Airtable formulas', async () => {
+    setupAuthCEO();
+    mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
+    mockFetchAll.mockResolvedValue([]);
+
+    const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
+    (sanitizeFormulaValue as any).mockImplementation((v: string) => v.replace(/['"]/g, ''));
+
+    const { Tables } = await import('@/lib/airtable/client');
+    (Tables.clients as any).mockReturnValue({
+      find: vi.fn().mockResolvedValue({
+        id: 'rec001',
+        fields: {
+          Client: 'Jane Doe',
+          Status: 'Active',
+          Appointments: ["apt_001' OR TRUE() OR 'bad"],
+          Transactions: ["tx_001' OR TRUE() OR 'bad"],
+          Memberships: ["mem_001' OR TRUE() OR 'bad"],
+          'Messages Log': ["msg_001' OR TRUE() OR 'bad"],
+        },
+      }),
+    });
+
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/churn/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/churn');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+
+    expect(response.status).toBe(200);
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("apt_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("tx_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("mem_001' OR TRUE() OR 'bad");
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("msg_001' OR TRUE() OR 'bad");
+  });
+
   it('should return 500 when client lookup fails', async () => {
     setupAuthCEO();
     mockRateLimitedQuery.mockImplementation(() => {
@@ -552,6 +631,33 @@ describe('GET /api/dashboard/clients/[id]/recommend', () => {
     expect(data.recommendations).toHaveLength(2);
     expect(data.recommendations[0].service).toBe('HydraFacial');
     expect(data.strategies).toEqual(['membership-match']);
+  });
+
+  it('should sanitize appointment ids before recommendation Airtable formula', async () => {
+    setupAuthCEO();
+    mockRateLimitedQuery.mockImplementation((fn: () => unknown) => fn());
+    mockFetchAll.mockResolvedValue([]);
+
+    const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
+    (sanitizeFormulaValue as any).mockImplementation((v: string) => v.replace(/['"]/g, ''));
+
+    const { Tables } = await import('@/lib/airtable/client');
+    (Tables.clients as any).mockReturnValue({
+      find: vi.fn().mockResolvedValue({
+        id: 'rec001',
+        fields: { Appointments: ["apt_001' OR TRUE() OR 'bad"] },
+      }),
+    });
+
+    const { GET } = await import('@/app/api/dashboard/clients/[id]/recommend/route');
+    const req = buildGetRequest('/api/dashboard/clients/rec001/recommend');
+    const response = await GET(req as any, { params: Promise.resolve({ id: 'rec001' }) });
+
+    expect(response.status).toBe(200);
+    expect(sanitizeFormulaValue).toHaveBeenCalledWith("apt_001' OR TRUE() OR 'bad");
+    const formula = (mockFetchAll.mock.calls[0]?.[1] as { filterByFormula?: string })?.filterByFormula || '';
+    expect(formula).toContain("RECORD_ID() = 'apt_001 OR TRUE() OR bad'");
+    expect(formula).not.toContain("RECORD_ID() = 'apt_001' OR TRUE() OR 'bad'");
   });
 
   it('should return 500 on engine error', async () => {

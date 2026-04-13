@@ -5,6 +5,7 @@
  * sibling route files can import resolveToken / saveTokenToAirtable
  * without triggering Next.js "invalid route export" errors.
  */
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 // ── Types ──
 
@@ -84,8 +85,9 @@ async function loadTokenFromAirtable(token: string): Promise<ShareTokenRecord | 
   const pat = getAirtablePat();
   if (!pat) return null;
   try {
+    const safeToken = sanitizeFormulaValue(token);
     const filter = encodeURIComponent(
-      `AND({Workflow}='${SHARE_WORKFLOW_KEY}',{Action}='${token}')`
+      `AND({Workflow}='${SHARE_WORKFLOW_KEY}',{Action}='${safeToken}')`
     );
     const res = await fetch(
       `${airtableUrl()}?filterByFormula=${filter}&maxRecords=1`,

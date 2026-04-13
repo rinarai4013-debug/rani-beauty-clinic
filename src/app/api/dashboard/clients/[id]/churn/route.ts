@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { predictChurn, ChurnInput } from '@/lib/churn/engine';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
@@ -26,6 +27,10 @@ interface MembershipFields {
 
 interface MessageFields {
   'Date': string;
+}
+
+function buildRecordIdOrFilter(ids: string[]): string {
+  return `OR(${ids.map((id) => `RECORD_ID() = '${sanitizeFormulaValue(id)}'`).join(',')})`;
 }
 
 export async function GET(
@@ -80,22 +85,22 @@ export async function GET(
       const [appointments, transactions, memberships, messages] = await Promise.all([
         appointmentIds.length > 0
           ? fetchAll<AppointmentFields>(Tables.appointments(), {
-              filterByFormula: `AND(OR(${appointmentIds.map(aid => `RECORD_ID() = '${aid}'`).join(',')}), IS_AFTER({Date}, '${twelveMonthsAgoISO}'))`,
+              filterByFormula: `AND(${buildRecordIdOrFilter(appointmentIds)}, IS_AFTER({Date}, '${twelveMonthsAgoISO}'))`,
             }).catch(() => [])
           : Promise.resolve([]),
         transactionIds.length > 0
           ? fetchAll<TransactionFields>(Tables.transactions(), {
-              filterByFormula: `AND(OR(${transactionIds.map(tid => `RECORD_ID() = '${tid}'`).join(',')}), IS_AFTER({Date}, '${twelveMonthsAgoISO}'))`,
+              filterByFormula: `AND(${buildRecordIdOrFilter(transactionIds)}, IS_AFTER({Date}, '${twelveMonthsAgoISO}'))`,
             }).catch(() => [])
           : Promise.resolve([]),
         membershipIds.length > 0
           ? fetchAll<MembershipFields>(Tables.memberships(), {
-              filterByFormula: `OR(${membershipIds.map(mid => `RECORD_ID() = '${mid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(membershipIds),
             }).catch(() => [])
           : Promise.resolve([]),
         messageIds.length > 0
           ? fetchAll<MessageFields>(Tables.messagesLog(), {
-              filterByFormula: `OR(${messageIds.map(mid => `RECORD_ID() = '${mid}'`).join(',')})`,
+              filterByFormula: buildRecordIdOrFilter(messageIds),
             }).catch(() => [])
           : Promise.resolve([]),
       ]);
