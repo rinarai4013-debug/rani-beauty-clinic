@@ -9,6 +9,7 @@
 
 import type { TenantDatabaseClient } from '@/lib/tenant/database';
 import type { TenantConfig, FeatureFlags } from '@/lib/tenant/config';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -403,8 +404,9 @@ export async function getConsultBriefing(
   tenant: TenantConfig,
   clientId: string
 ): Promise<ConsultBriefing | null> {
+  const safeClientId = sanitizeFormulaValue(clientId);
   const clientRecords = await db.fetchAll<Record<string, unknown>>('Clients', {
-    filterByFormula: `RECORD_ID() = '${clientId}'`,
+    filterByFormula: `RECORD_ID() = '${safeClientId}'`,
   });
 
   if (clientRecords.length === 0) return null;
