@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -81,7 +82,7 @@ export async function GET(
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
     const today = now.toISOString().split('T')[0];
 
-    const providerName = providerInfo.name;
+    const providerName = sanitizeFormulaValue(providerInfo.name);
 
     const [monthAppts, monthTxns, reviews, todayAppts] = await Promise.all([
       fetchAll<AppointmentFields>(Tables.appointments(), {

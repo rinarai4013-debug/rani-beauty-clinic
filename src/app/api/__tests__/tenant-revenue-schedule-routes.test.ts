@@ -5,6 +5,7 @@ const resolveTenantMock = vi.fn();
 const getTenantDatabaseMock = vi.fn();
 const getRevenueBreakdownMock = vi.fn();
 const getCalendarDataMock = vi.fn();
+const sanitizeFormulaValueMock = vi.fn((value: string) => value.replace(/['"\\\n\r]/g, ''));
 
 vi.mock('@/lib/auth/session', () => ({
   verifySession: (...args: unknown[]) => verifySessionMock(...args),
@@ -24,6 +25,10 @@ vi.mock('@/lib/saas/tenant-dashboard/revenue', () => ({
 
 vi.mock('@/lib/saas/tenant-dashboard/schedule', () => ({
   getCalendarData: (...args: unknown[]) => getCalendarDataMock(...args),
+}));
+
+vi.mock('@/lib/airtable/sanitize', () => ({
+  sanitizeFormulaValue: (...args: unknown[]) => sanitizeFormulaValueMock(...args),
 }));
 
 vi.mock('@/lib/sentry-utils', () => ({
@@ -67,6 +72,7 @@ describe('tenant revenue + schedule routes', () => {
       view: 'day',
       appointments: [{ id: 'appt_1' }],
     });
+    sanitizeFormulaValueMock.mockClear();
   });
 
   it('GET /api/tenant/revenue returns 401 when session cookie is missing', async () => {
@@ -144,6 +150,32 @@ describe('tenant revenue + schedule routes', () => {
     );
   });
 
+  it('GET /api/tenant/revenue returns 400 for invalid date params', async () => {
+    const { GET } = await import('@/app/api/tenant/revenue/route');
+    const response = await GET(
+      tenantRequest(
+        'http://localhost:3000/api/tenant/revenue?start=not-a-date&end=2026-04-30T23:59:59.999Z',
+        'ok',
+      ),
+    );
+
+    expect(response.status).toBe(400);
+    expect(getRevenueBreakdownMock).not.toHaveBeenCalled();
+  });
+
+  it('GET /api/tenant/revenue returns 400 when start is after end', async () => {
+    const { GET } = await import('@/app/api/tenant/revenue/route');
+    const response = await GET(
+      tenantRequest(
+        'http://localhost:3000/api/tenant/revenue?start=2026-05-30T00:00:00.000Z&end=2026-04-30T23:59:59.999Z',
+        'ok',
+      ),
+    );
+
+    expect(response.status).toBe(400);
+    expect(getRevenueBreakdownMock).not.toHaveBeenCalled();
+  });
+
   it('GET /api/tenant/revenue propagates error when revenue service throws', async () => {
     getRevenueBreakdownMock.mockRejectedValueOnce(new Error('revenue calc failed'));
 
@@ -197,6 +229,7 @@ describe('tenant revenue + schedule routes', () => {
     );
 
     expect(response.status).toBe(200);
+    expect(sanitizeFormulaValueMock).toHaveBeenCalledWith('Dr Rina');
     expect(getCalendarDataMock).toHaveBeenCalledWith(
       { tenant: 'db-client' },
       expect.objectContaining({ id: 'rani-beauty-clinic' }),
@@ -204,6 +237,32 @@ describe('tenant revenue + schedule routes', () => {
       '2026-05-01',
       'Dr Rina',
     );
+  });
+
+  it('GET /api/tenant/schedule returns 400 for invalid view', async () => {
+    const { GET } = await import('@/app/api/tenant/schedule/route');
+    const response = await GET(
+      tenantRequest(
+        'http://localhost:3000/api/tenant/schedule?view=quarter&date=2026-05-01',
+        'ok',
+      ),
+    );
+
+    expect(response.status).toBe(400);
+    expect(getCalendarDataMock).not.toHaveBeenCalled();
+  });
+
+  it('GET /api/tenant/schedule returns 400 for invalid date format', async () => {
+    const { GET } = await import('@/app/api/tenant/schedule/route');
+    const response = await GET(
+      tenantRequest(
+        'http://localhost:3000/api/tenant/schedule?view=week&date=05-01-2026',
+        'ok',
+      ),
+    );
+
+    expect(response.status).toBe(400);
+    expect(getCalendarDataMock).not.toHaveBeenCalled();
   });
 
   it('GET /api/tenant/schedule propagates error when schedule service throws', async () => {

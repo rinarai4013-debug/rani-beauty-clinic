@@ -27,6 +27,8 @@ interface ClientFields {
   'Status': string;
 }
 
+const ALLOWED_KPI_RANGES = new Set(['today', '7d', '30d', '90d']);
+
 // ── Date helpers ──
 
 function todayISO(): string {
@@ -132,6 +134,9 @@ export async function GET(req: NextRequest) {
 
     const searchParams = new URL(req.url).searchParams;
     const range = searchParams.get('range') || 'today';
+    if (!ALLOWED_KPI_RANGES.has(range)) {
+      return NextResponse.json({ error: 'Invalid range' }, { status: 400 });
+    }
     const cacheKey = 'kpis';
 
     const cached = cache.get(cacheKey);

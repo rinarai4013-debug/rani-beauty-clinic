@@ -300,6 +300,7 @@ export function mockCommonDeps() {
     captureWebhookEvent: vi.fn(),
     captureCheckoutEvent: vi.fn(),
     captureAgentExecution: vi.fn(),
+    withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
   }));
 }
 

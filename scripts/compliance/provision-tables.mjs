@@ -43,7 +43,15 @@ const TABLE_DEFINITIONS = [
     name: 'PHI Access Log',
     fields: [
       { name: 'Log ID', type: 'singleLineText' },
-      { name: 'Timestamp', type: 'dateTime' },
+      {
+        name: 'Timestamp',
+        type: 'dateTime',
+        options: {
+          dateFormat: { name: 'iso' },
+          timeFormat: { name: '24hour' },
+          timeZone: 'utc',
+        },
+      },
       { name: 'User ID', type: 'singleLineText' },
       { name: 'User Name', type: 'singleLineText' },
       { name: 'User Role', type: 'singleLineText' },
@@ -59,12 +67,12 @@ const TABLE_DEFINITIONS = [
     name: 'HIPAA Breaches',
     fields: [
       { name: 'Breach ID', type: 'singleLineText' },
-      { name: 'Discovery Date', type: 'date' },
-      { name: 'Breach Date', type: 'date' },
-      { name: 'Reported Date', type: 'date' },
+      { name: 'Discovery Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Breach Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Reported Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
       { name: 'Description', type: 'multilineText' },
       { name: 'Data Involved', type: 'multilineText' },
-      { name: 'Individuals Affected', type: 'number' },
+      { name: 'Individuals Affected', type: 'number', options: { precision: 0 } },
       { name: 'Severity', type: 'singleLineText' },
       { name: 'Status', type: 'singleLineText' },
       { name: 'Root Cause', type: 'multilineText' },
@@ -73,7 +81,7 @@ const TABLE_DEFINITIONS = [
       { name: 'Individuals Notified', type: 'checkbox' },
       { name: 'Media Notified', type: 'checkbox' },
       { name: 'Investigator', type: 'singleLineText' },
-      { name: 'Resolution Date', type: 'date' },
+      { name: 'Resolution Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
     ],
   },
   {
@@ -84,14 +92,14 @@ const TABLE_DEFINITIONS = [
       { name: 'Vendor Contact', type: 'singleLineText' },
       { name: 'Vendor Email', type: 'email' },
       { name: 'Service Description', type: 'multilineText' },
-      { name: 'Effective Date', type: 'date' },
-      { name: 'Expiration Date', type: 'date' },
-      { name: 'Renewal Date', type: 'date' },
+      { name: 'Effective Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Expiration Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Renewal Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
       { name: 'Status', type: 'singleLineText' },
       { name: 'Signed By', type: 'singleLineText' },
       { name: 'Document URL', type: 'url' },
-      { name: 'Last Review Date', type: 'date' },
-      { name: 'Next Review Date', type: 'date' },
+      { name: 'Last Review Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Next Review Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
     ],
   },
   {
@@ -102,15 +110,52 @@ const TABLE_DEFINITIONS = [
       { name: 'Staff Name', type: 'singleLineText' },
       { name: 'Staff Role', type: 'singleLineText' },
       { name: 'Training Type', type: 'singleLineText' },
-      { name: 'Completed Date', type: 'date' },
-      { name: 'Expiration Date', type: 'date' },
-      { name: 'Score', type: 'number' },
+      { name: 'Completed Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Expiration Date', type: 'date', options: { dateFormat: { name: 'iso' } } },
+      { name: 'Score', type: 'number', options: { precision: 0 } },
       { name: 'Passed', type: 'checkbox' },
       { name: 'Certificate URL', type: 'url' },
       { name: 'Renewal Required', type: 'checkbox' },
     ],
   },
 ];
+
+/**
+ * Airtable Metadata API requires options for several field types during create.
+ * Normalize definitions so provision runs don't fail on missing options.
+ */
+function withRequiredFieldOptions(field) {
+  if (field.options) return field;
+
+  switch (field.type) {
+    case 'date':
+      return {
+        ...field,
+        options: { dateFormat: { name: 'iso' } },
+      };
+    case 'dateTime':
+      return {
+        ...field,
+        options: {
+          dateFormat: { name: 'iso' },
+          timeFormat: { name: '24hour' },
+          timeZone: 'utc',
+        },
+      };
+    case 'number':
+      return {
+        ...field,
+        options: { precision: 0 },
+      };
+    case 'checkbox':
+      return {
+        ...field,
+        options: { icon: 'check', color: 'greenBright' },
+      };
+    default:
+      return field;
+  }
+}
 
 function info(message) {
   process.stdout.write(`${message}\n`);
@@ -154,6 +199,7 @@ async function checkDataTableExists(tableName) {
 
   if (response.status === 200) return true;
   if (response.status === 404 && body?.error?.type === 'TABLE_NOT_FOUND') return false;
+  if (response.status === 403 && body?.error?.type === 'INVALID_PERMISSIONS_OR_MODEL_NOT_FOUND') return false;
 
   throw new Error(
     `Unable to check "${tableName}" via data API (${response.status}): ${JSON.stringify(body)}`,
@@ -195,7 +241,7 @@ async function createTable(definition) {
   const url = `https://api.airtable.com/v0/meta/bases/${baseId}/tables`;
   const payload = {
     name: definition.name,
-    fields: definition.fields,
+    fields: definition.fields.map(withRequiredFieldOptions),
   };
   const { response, body } = await requestJson(url, {
     method: 'POST',
@@ -216,6 +262,16 @@ async function createTable(definition) {
       `     → In the PAT editor, under "Access", ensure the base is listed with write access.\n\n` +
       `Fallback: create the 4 tables manually in the Airtable UI.\n` +
       `See docs/compliance/AUDIT-RUNBOOK.md section 14 for field specifications.\n\n` +
+      `Raw error: ${JSON.stringify(body)}`,
+    );
+  }
+
+  if (response.status === 422) {
+    throw new Error(
+      `Create failed for "${definition.name}" (422 Unprocessable Entity).\n\n` +
+      `This usually means one or more Airtable field definitions are missing required ` +
+      `type options for Metadata API create.\n` +
+      `Most common example: dateTime fields require dateFormat/timeFormat/timeZone options.\n\n` +
       `Raw error: ${JSON.stringify(body)}`,
     );
   }

@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { COOKIE_NAME, createSession, getSessionCookieConfig } from '@/lib/auth/session';
+import { withSentry } from '@/lib/sentry-utils';
 import type { UserRole } from '@/types/auth';
 import { z } from 'zod';
 
@@ -106,69 +107,73 @@ const LoginBodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const ip = getClientIp(req);
+  return withSentry('dashboard/auth/login', async () => {
+    const ip = getClientIp(req);
 
-  try {
-    const parsed = LoginBodySchema.safeParse(await req.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
-        { status: 400 }
+    try {
+      const parsed = LoginBodySchema.safeParse(await req.json().catch(() => null));
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: parsed.error.issues[0]?.message ?? 'Invalid request body' },
+          { status: 400 }
+        );
+      }
+
+      const { username, password } = parsed.data;
+
+      const normalizedUsername = username.toLowerCase();
+
+      if (isRateLimited(ip)) {
+        return NextResponse.json(
+          { error: 'Too many failed attempts. Please try again later.' },
+          { status: 429 }
+        );
+      }
+
+      const users = getUsers();
+      const user = users.find(
+        (u) =>
+          u.username.toLowerCase() === normalizedUsername && verifyPassword(password, u.password)
       );
+
+      if (!user) {
+        recordFailedAttempt(ip);
+        // Consistent timing to prevent username enumeration
+        await new Promise((r) => setTimeout(r, 200 + Math.random() * 100));
+        return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+      }
+
+      clearFailedAttempts(ip);
+      const token = await createSession(user.username, user.role, user.displayName);
+      const cookieConfig = getCookieConfig(token);
+
+      const response = NextResponse.json({
+        success: true,
+        user: { username: user.username, role: user.role, displayName: user.displayName },
+      });
+
+      response.cookies.set(cookieConfig.name, cookieConfig.value, {
+        httpOnly: cookieConfig.httpOnly,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
+        maxAge: cookieConfig.maxAge,
+        path: cookieConfig.path,
+      });
+      return response;
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+      }
+
+      console.error('[auth/login]', err);
+      return NextResponse.json({ error: 'Login failed' }, { status: 500 });
     }
-
-    const { username, password } = parsed.data;
-
-    const normalizedUsername = username.toLowerCase();
-
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { error: 'Too many failed attempts. Please try again later.' },
-        { status: 429 }
-      );
-    }
-
-    const users = getUsers();
-    const user = users.find(
-      (u) =>
-        u.username.toLowerCase() === normalizedUsername && verifyPassword(password, u.password)
-    );
-
-    if (!user) {
-      recordFailedAttempt(ip);
-      // Consistent timing to prevent username enumeration
-      await new Promise((r) => setTimeout(r, 200 + Math.random() * 100));
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-    }
-
-    clearFailedAttempts(ip);
-    const token = await createSession(user.username, user.role, user.displayName);
-    const cookieConfig = getCookieConfig(token);
-
-    const response = NextResponse.json({
-      success: true,
-      user: { username: user.username, role: user.role, displayName: user.displayName },
-    });
-
-    response.cookies.set(cookieConfig.name, cookieConfig.value, {
-      httpOnly: cookieConfig.httpOnly,
-      secure: cookieConfig.secure,
-      sameSite: cookieConfig.sameSite,
-      maxAge: cookieConfig.maxAge,
-      path: cookieConfig.path,
-    });
-    return response;
-  } catch (err) {
-    if (err instanceof SyntaxError) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-    }
-
-    console.error('[auth/login]', err);
-    return NextResponse.json({ error: 'Login failed' }, { status: 500 });
-  }
+  });
 }
 
 // Block GET (stub was GET-only)
 export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return withSentry('dashboard/auth/login:get', async () =>
+    NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
+  );
 }

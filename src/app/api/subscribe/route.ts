@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { Tables, createRecord } from '@/lib/airtable/client';
 import { upsertClientAttribution } from '@/lib/attribution/upsert-client-attribution';
+import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -29,58 +31,21 @@ const SubscribeSchema = z.object({
   honeypot: z.string().max(0, 'Bot detected').optional().default(''),
 });
 
-// ── In-memory rate limiter (max 5 signups per IP per hour) ──────
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now >= entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return true;
-  }
-
-  entry.count += 1;
-  return false;
-}
-
-// Periodically prune expired entries to avoid memory leak
-function pruneRateLimitMap() {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap) {
-    if (now >= entry.resetAt) {
-      rateLimitMap.delete(ip);
-    }
-  }
-}
-
-// Prune every 10 minutes
-if (typeof setInterval !== 'undefined') {
-  setInterval(pruneRateLimitMap, 10 * 60 * 1000);
-}
+const MAX_SUBSCRIBE_REQUEST_BYTES = 32 * 1024;
 
 // ── POST handler ─────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   return withSentry('subscribe', async () => {
-    // 1. Rate limiting by IP
-    const ip =
-      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      req.headers.get('x-real-ip') ||
-      'unknown';
+    const originError = enforceAllowedPublicOrigin(req);
+    if (originError) return originError;
 
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 },
-      );
-    }
+    const sizeError = enforceContentLength(req, MAX_SUBSCRIBE_REQUEST_BYTES);
+    if (sizeError) return sizeError;
+
+    // 1. Rate limiting by IP
+    const ip = getClientIP(req);
+    const { allowed, resetIn } = rateLimit('subscribe', ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
 
     // 2. Parse body
     let body: unknown;
