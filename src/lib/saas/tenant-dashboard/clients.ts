@@ -8,6 +8,7 @@
 
 import type { TenantDatabaseClient } from '@/lib/tenant/database';
 import type { TenantConfig } from '@/lib/tenant/config';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -389,9 +390,11 @@ export async function getClient360(
   _tenant: TenantConfig,
   clientId: string
 ): Promise<Client360 | null> {
+  const safeClientId = sanitizeFormulaValue(clientId);
+
   // Fetch client record
   const clientRecords = await db.fetchAll<Record<string, unknown>>('Clients', {
-    filterByFormula: `RECORD_ID() = '${clientId}'`,
+    filterByFormula: `RECORD_ID() = "${safeClientId}"`,
   });
 
   if (clientRecords.length === 0) return null;
@@ -401,6 +404,7 @@ export async function getClient360(
   const firstName = (f['First Name'] as string) || '';
   const lastName = (f['Last Name'] as string) || '';
   const email = (f['Email'] as string) || '';
+  const safeEmail = sanitizeFormulaValue(email);
   const totalSpend = (f['Total Spend'] as number) || 0;
   const visitCount = (f['Visit Count'] as number) || 0;
 
@@ -415,7 +419,7 @@ export async function getClient360(
       Amount: number;
       Notes: string;
     }>('Appointments', {
-      filterByFormula: `{Client Email} = '${email}'`,
+      filterByFormula: `{Client Email} = "${safeEmail}"`,
       sort: [{ field: 'Date', direction: 'desc' }],
       fields: ['Date', 'Service', 'Provider', 'Duration', 'Status', 'Amount', 'Notes'],
     }),
@@ -426,7 +430,7 @@ export async function getClient360(
       'Payment Method': string;
       Status: string;
     }>('Transactions', {
-      filterByFormula: `{Client Email} = '${email}'`,
+      filterByFormula: `{Client Email} = "${safeEmail}"`,
       sort: [{ field: 'Date', direction: 'desc' }],
       fields: ['Date', 'Service', 'Amount', 'Payment Method', 'Status'],
     }),
@@ -439,7 +443,7 @@ export async function getClient360(
       Status: string;
       Campaign: string;
     }>('Messages Log', {
-      filterByFormula: `{Client Email} = '${email}'`,
+      filterByFormula: `{Client Email} = "${safeEmail}"`,
       sort: [{ field: 'Date', direction: 'desc' }],
       fields: ['Date', 'Type', 'Direction', 'Subject', 'Preview', 'Status', 'Campaign'],
     }),
@@ -448,7 +452,7 @@ export async function getClient360(
       Date: string;
       Text: string;
     }>('Reviews', {
-      filterByFormula: `{Client Email} = '${email}'`,
+      filterByFormula: `{Client Email} = "${safeEmail}"`,
       fields: ['Rating', 'Date', 'Text'],
     }),
     db.fetchAll<{
@@ -458,7 +462,7 @@ export async function getClient360(
       'Renewal Date': string;
       'Monthly Rate': number;
     }>('Memberships', {
-      filterByFormula: `{Client Email} = '${email}'`,
+      filterByFormula: `{Client Email} = "${safeEmail}"`,
       fields: ['Plan', 'Status', 'Start Date', 'Renewal Date', 'Monthly Rate'],
     }),
   ]);

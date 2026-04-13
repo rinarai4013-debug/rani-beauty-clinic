@@ -255,6 +255,20 @@ describe('GET /api/dashboard/schedule/no-show-risk', () => {
     expect(data.error).toBeDefined();
   });
 
+  it('should return 400 when date query param is malformed', async () => {
+    setupAuthenticatedCEO();
+
+    const req = buildNextUrlRequest('/api/dashboard/schedule/no-show-risk', {
+      date: "2026-04-12' OR TRUE() OR '",
+    });
+    const response = await noShowRiskGET(req as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe('Invalid date parameter');
+    expect(mockFetchAll).not.toHaveBeenCalled();
+  });
+
   it('should return cached data if available', async () => {
     setupAuthenticatedCEO();
     const cachedData = [{ appointmentId: 'apt_001', noShowScore: { score: 30 } }];

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { predictNoShow, type NoShowInput, type NoShowScore } from '@/lib/predictions/no-show';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
@@ -86,6 +87,16 @@ function parseHour(timeStr: string): number {
   return hour;
 }
 
+function parseIsoDateParam(value: string | null): string | null {
+  if (!value) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  if (parsed.toISOString().slice(0, 10) !== value) return null;
+  return value;
+}
+
 // ── Route handler ──
 
 export async function GET(req: NextRequest) {
@@ -96,7 +107,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const dateParam = req.nextUrl.searchParams.get('date');
+    const rawDateParam = req.nextUrl.searchParams.get('date');
+    const dateParam = parseIsoDateParam(rawDateParam);
+    if (rawDateParam && !dateParam) {
+      return NextResponse.json({ error: 'Invalid date parameter' }, { status: 400 });
+    }
+
     const today = todayISO();
 
     // If a specific date is requested, use just that day; otherwise next 7 days
@@ -150,7 +166,7 @@ export async function GET(req: NextRequest) {
 
     // Build OR filter for client records (batch by Airtable RECORD_ID)
     const clientFilter = clientIdArray.length > 0
-      ? `OR(${clientIdArray.map((id) => `RECORD_ID() = '${id}'`).join(',')})`
+      ? `OR(${clientIdArray.map((id) => `RECORD_ID() = '${sanitizeFormulaValue(id)}'`).join(',')})`
       : '';
 
     // Fetch historical appointments (completed or no-show, before today)
