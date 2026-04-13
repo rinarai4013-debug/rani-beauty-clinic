@@ -377,6 +377,14 @@ describe('dashboard critical auth/permission routes', () => {
     expect(body.error).toBe('Invalid action');
   });
 
+  it('GET /api/dashboard/loyalty accepts action case-insensitively', async () => {
+    const { GET } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request('http://localhost:3000/api/dashboard/loyalty?action=ANALYTICS');
+    const response = await GET(request as never);
+
+    expect(response.status).toBe(200);
+  });
+
   it('GET /api/dashboard/loyalty member action requires clientId', async () => {
     const { GET } = await import('@/app/api/dashboard/loyalty/route');
     const request = new Request('http://localhost:3000/api/dashboard/loyalty?action=member');
@@ -385,6 +393,18 @@ describe('dashboard critical auth/permission routes', () => {
 
     expect(response.status).toBe(400);
     expect(body.error).toBe('clientId required');
+  });
+
+  it('GET /api/dashboard/loyalty member action validates clientId format', async () => {
+    const { GET } = await import('@/app/api/dashboard/loyalty/route');
+    const request = new Request(
+      'http://localhost:3000/api/dashboard/loyalty?action=member&clientId=bad%20id%27%20OR%201%3D1',
+    );
+    const response = await GET(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid clientId');
   });
 
   it('GET /api/dashboard/loyalty rewards action validates query params', async () => {

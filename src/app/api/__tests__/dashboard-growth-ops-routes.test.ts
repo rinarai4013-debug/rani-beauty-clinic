@@ -532,6 +532,7 @@ describe('dashboard growth + ops routes', () => {
     expect(body.monthlyStats.revenue).toBeGreaterThanOrEqual(0);
     expect(body.reviews.count).toBeGreaterThanOrEqual(0);
     expect(sanitizeFormulaValueMock).toHaveBeenCalledWith('Rina');
+    expect(sanitizeFormulaValueMock.mock.calls.length).toBeGreaterThanOrEqual(4);
     expect(cacheSetMock).toHaveBeenCalledTimes(1);
   });
 

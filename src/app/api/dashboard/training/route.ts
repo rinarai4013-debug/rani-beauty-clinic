@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const rawRole = searchParams.get('role');
-    const roleFilter = rawRole?.trim() ? rawRole.trim() : null;
+    const roleFilter = rawRole?.trim() ? rawRole.trim().toLowerCase() : null;
 
     if (roleFilter && !TRAINING_ROLES.includes(roleFilter as TrainingRole)) {
       return NextResponse.json({ error: 'Invalid role parameter' }, { status: 400 });

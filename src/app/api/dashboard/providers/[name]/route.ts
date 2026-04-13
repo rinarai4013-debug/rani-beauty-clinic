@@ -83,22 +83,25 @@ export async function GET(
     const today = now.toISOString().split('T')[0];
 
     const providerName = sanitizeFormulaValue(providerInfo.name);
+    const safeMonthStart = sanitizeFormulaValue(monthStart);
+    const safeMonthEnd = sanitizeFormulaValue(monthEnd);
+    const safeToday = sanitizeFormulaValue(today);
 
     const [monthAppts, monthTxns, reviews, todayAppts] = await Promise.all([
       fetchAll<AppointmentFields>(Tables.appointments(), {
-        filterByFormula: `AND({Date} >= '${monthStart}', {Date} <= '${monthEnd}', {Provider} = '${providerName}')`,
+        filterByFormula: `AND({Date} >= '${safeMonthStart}', {Date} <= '${safeMonthEnd}', {Provider} = '${providerName}')`,
         fields: ['Provider', 'Date', 'Duration', 'Status', 'Service Name', 'Service Category', 'Client Name', 'Is Consult'],
       }),
       fetchAll<TransactionFields>(Tables.transactions(), {
-        filterByFormula: `AND({Date} >= '${monthStart}', {Date} <= '${monthEnd}', {Provider} = '${providerName}', {Status} = "Completed")`,
+        filterByFormula: `AND({Date} >= '${safeMonthStart}', {Date} <= '${safeMonthEnd}', {Provider} = '${providerName}', {Status} = "Completed")`,
         fields: ['Provider', 'Date', 'Amount', 'Type', 'Status', 'Service'],
       }),
       fetchAll<ReviewFields>(Tables.reviews(), {
-        filterByFormula: `AND({Date} >= '${monthStart}', {Date} <= '${monthEnd}', {Provider} = '${providerName}')`,
+        filterByFormula: `AND({Date} >= '${safeMonthStart}', {Date} <= '${safeMonthEnd}', {Provider} = '${providerName}')`,
         fields: ['Date', 'Rating', 'Provider', 'Source'],
       }),
       fetchAll<AppointmentFields>(Tables.appointments(), {
-        filterByFormula: `AND(IS_SAME({Date}, '${today}', 'day'), {Provider} = '${providerName}')`,
+        filterByFormula: `AND(IS_SAME({Date}, '${safeToday}', 'day'), {Provider} = '${providerName}')`,
         fields: ['Provider', 'Date', 'Duration', 'Status', 'Service Name', 'Client Name', 'Is Consult'],
       }),
     ]);

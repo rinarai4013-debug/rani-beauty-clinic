@@ -16,8 +16,13 @@ export async function GET(request: NextRequest) {
     if (query && query.length > 200) {
       return NextResponse.json({ error: 'Query too long' }, { status: 400 });
     }
+    if (query && /[\u0000-\u001F\u007F]/.test(query)) {
+      return NextResponse.json({ error: 'Invalid query characters' }, { status: 400 });
+    }
 
-    const cacheKey = query ? `knowledge-base-search:${query}` : 'knowledge-base-stats';
+    const cacheKey = query
+      ? `knowledge-base-search:${encodeURIComponent(query.toLowerCase())}`
+      : 'knowledge-base-stats';
     const cached = cache.get(cacheKey);
     if (cached) return NextResponse.json(cached);
 

@@ -17,6 +17,13 @@ import {
 import { getAvailableRewards } from '@/lib/loyalty/rewards';
 
 const LoyaltyTierSchema = z.enum(['Silver', 'Gold', 'Platinum']);
+const LoyaltyActionSchema = z.enum(['analytics', 'member', 'rewards']);
+const LoyaltyMemberIdSchema = z
+  .string()
+  .trim()
+  .min(1, 'clientId required')
+  .max(64, 'clientId too long')
+  .regex(/^[A-Za-z0-9_-]+$/, 'clientId format invalid');
 const AwardBonusSchema = z.object({
   action: z.literal('award_bonus'),
   clientId: z.string().trim().min(1, 'clientId required'),
@@ -53,7 +60,12 @@ export async function GET(req: NextRequest) {
       }
 
     const { searchParams } = new URL(req.url);
-    const action = searchParams.get('action') || 'analytics';
+    const actionInput = searchParams.get('action')?.trim().toLowerCase() || 'analytics';
+    const parsedAction = LoyaltyActionSchema.safeParse(actionInput);
+    if (!parsedAction.success) {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    }
+    const action = parsedAction.data;
 
     if (action === 'analytics') {
       const cacheKey = 'loyalty:analytics';
@@ -71,10 +83,15 @@ export async function GET(req: NextRequest) {
     }
 
     if (action === 'member') {
-      const clientId = searchParams.get('clientId');
-      if (!clientId) {
+      const rawClientId = searchParams.get('clientId');
+      if (!rawClientId) {
         return NextResponse.json({ error: 'clientId required' }, { status: 400 });
       }
+      const clientIdParsed = LoyaltyMemberIdSchema.safeParse(rawClientId);
+      if (!clientIdParsed.success) {
+        return NextResponse.json({ error: 'Invalid clientId' }, { status: 400 });
+      }
+      const clientId = clientIdParsed.data;
 
       // In production: fetch from Airtable Clients + Loyalty Points tables
       const member = generateSampleMembers().find(m => m.clientId === clientId);
