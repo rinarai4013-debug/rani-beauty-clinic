@@ -8,6 +8,7 @@ import {
   getSegmentDistribution,
   getAtRiskClients,
 } from '../clients';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import type { TenantConfig } from '@/lib/tenant/config';
 import type { TenantDatabaseClient } from '@/lib/tenant/database';
 
@@ -218,6 +219,75 @@ describe('Tenant Clients Module', () => {
       expect(result?.segment).toHaveProperty('monetary');
       expect(result?.segment).toHaveProperty('description');
       expect(result?.segment).toHaveProperty('suggestedAction');
+    });
+
+    it('should sanitize client id and email in Airtable filter formulas', async () => {
+      const riskyClientId = "c1' OR TRUE() OR '";
+      const riskyEmail = "alice'o@test.com";
+      const db = createMockDb({
+        Clients: [
+          {
+            id: 'c1',
+            fields: {
+              'First Name': 'Alice',
+              'Last Name': 'Smith',
+              Email: riskyEmail,
+              Phone: '555-0001',
+              Status: 'Active',
+              'Total Spend': 5000,
+              'Visit Count': 12,
+              'Last Visit': new Date(Date.now() - 7 * 86400000).toISOString(),
+              Membership: 'Gold',
+              Source: 'Online',
+              Tags: 'vip,loyal',
+              'Created Date': '2024-01-01',
+            },
+          },
+        ],
+      });
+
+      await getClient360(db, mockTenant, riskyClientId);
+
+      const fetchAll = db.fetchAll as unknown as ReturnType<typeof vi.fn>;
+      const safeClientId = sanitizeFormulaValue(riskyClientId);
+      const safeEmail = sanitizeFormulaValue(riskyEmail);
+
+      expect(fetchAll).toHaveBeenCalledWith(
+        'Clients',
+        expect.objectContaining({
+          filterByFormula: `RECORD_ID() = "${safeClientId}"`,
+        }),
+      );
+      expect(fetchAll).toHaveBeenCalledWith(
+        'Appointments',
+        expect.objectContaining({
+          filterByFormula: `{Client Email} = "${safeEmail}"`,
+        }),
+      );
+      expect(fetchAll).toHaveBeenCalledWith(
+        'Transactions',
+        expect.objectContaining({
+          filterByFormula: `{Client Email} = "${safeEmail}"`,
+        }),
+      );
+      expect(fetchAll).toHaveBeenCalledWith(
+        'Messages Log',
+        expect.objectContaining({
+          filterByFormula: `{Client Email} = "${safeEmail}"`,
+        }),
+      );
+      expect(fetchAll).toHaveBeenCalledWith(
+        'Reviews',
+        expect.objectContaining({
+          filterByFormula: `{Client Email} = "${safeEmail}"`,
+        }),
+      );
+      expect(fetchAll).toHaveBeenCalledWith(
+        'Memberships',
+        expect.objectContaining({
+          filterByFormula: `{Client Email} = "${safeEmail}"`,
+        }),
+      );
     });
   });
 

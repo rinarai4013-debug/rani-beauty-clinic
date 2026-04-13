@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchFirst, updateRecord } from '@/lib/airtable/client';
 import { FIELDS } from '@/lib/airtable/tables';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -121,11 +122,12 @@ export async function POST(request: NextRequest) {
         }
 
         if (customerId) {
+          const safeCustomerId = sanitizeFormulaValue(customerId);
           treatmentPlans = await fetchFirst<TreatmentPlanFields>(
             Tables.treatmentPlans(),
             1,
             {
-              filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${customerId.replace(/'/g, "\\'")}')`,
+              filterByFormula: `AND(OR({Status} = 'Sent', {Status} = 'Viewed', {Status} = 'Selected'), {Client Name} = '${safeCustomerId}')`,
               sort: [{ field: FIELDS.treatmentPlans.createdDate, direction: 'desc' }],
             },
             true,
