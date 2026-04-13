@@ -234,6 +234,68 @@ export default function PlanEditor({
                           {treatment.clinicalRationale}
                         </p>
                       </div>
+
+                      {treatment.protocol && (
+                        <div className="p-2.5 rounded-lg bg-[#C9A96E]/8 border border-[#C9A96E]/30 space-y-1.5">
+                          <p className="font-body text-[11px] font-semibold text-[#0F1D2C]/80 uppercase tracking-wide">
+                            Provider Protocol
+                          </p>
+                          {treatment.protocol.dosage && (
+                            <p className="font-body text-xs text-[#0F1D2C]/70">
+                              <span className="font-semibold">Dosage:</span> {treatment.protocol.dosage}
+                            </p>
+                          )}
+                          {treatment.protocol.pulsesOrEnergy && (
+                            <p className="font-body text-xs text-[#0F1D2C]/70">
+                              <span className="font-semibold">Pulses/Energy:</span> {treatment.protocol.pulsesOrEnergy}
+                            </p>
+                          )}
+                          {treatment.protocol.frequency && (
+                            <p className="font-body text-xs text-[#0F1D2C]/70">
+                              <span className="font-semibold">Frequency:</span> {treatment.protocol.frequency}
+                            </p>
+                          )}
+                          {treatment.protocol.treatmentAreas && treatment.protocol.treatmentAreas.length > 0 && (
+                            <p className="font-body text-xs text-[#0F1D2C]/70">
+                              <span className="font-semibold">Areas:</span>{' '}
+                              {treatment.protocol.treatmentAreas.join(', ')}
+                            </p>
+                          )}
+                          {treatment.protocol.endpoint && (
+                            <p className="font-body text-xs text-[#0F1D2C]/70">
+                              <span className="font-semibold">Endpoint:</span> {treatment.protocol.endpoint}
+                            </p>
+                          )}
+                          {treatment.protocol.providerNotes && treatment.protocol.providerNotes.length > 0 && (
+                            <ul className="list-disc pl-4 space-y-0.5">
+                              {treatment.protocol.providerNotes.map((note, idx) => (
+                                <li key={idx} className="font-body text-xs text-[#0F1D2C]/65">
+                                  {note}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {treatment.protocol.reference && (
+                            <p className="font-body text-[10px] text-[#0F1D2C]/45">
+                              Reference: {treatment.protocol.reference}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {treatment.improvementTargets && treatment.improvementTargets.length > 0 && (
+                        <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 space-y-1.5">
+                          <p className="font-body text-[11px] font-semibold text-emerald-800 uppercase tracking-wide">
+                            Improvement Targets
+                          </p>
+                          {treatment.improvementTargets.map((target, idx) => (
+                            <p key={idx} className="font-body text-xs text-emerald-900/80">
+                              {target.concern}: {target.targetDelta} in {target.timeframe}
+                              {typeof target.baselineScore === 'number' ? ` (baseline ${target.baselineScore})` : ''}
+                            </p>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}

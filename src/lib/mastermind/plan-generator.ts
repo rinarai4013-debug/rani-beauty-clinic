@@ -18,6 +18,7 @@ import { recommendTreatmentPlan, type ClientProfile, type RecommendedService } f
 import { validatePlan } from '@/lib/plan-builder/constraints';
 import { generatePackages } from '@/lib/plan-builder/package-generator';
 import { PHASE_LABELS } from '@/lib/plan-builder/types';
+import { BOOMRX_FORMULARY_OVERRIDES } from '@/lib/mastermind/boomrx-formulary';
 
 // ── MAIN GENERATOR ──
 
@@ -87,6 +88,8 @@ function buildClientProfile(
   const interests = (intakeData.treatmentInterests as string[]) || [];
   const budget = mapBudgetBand(intakeData.budget as string);
   const timeline = mapUrgency(intakeData.timeline as string);
+  const downtime = mapDowntimeTolerance((intakeData as { downtimeTolerance?: string }).downtimeTolerance);
+  const painTolerance = mapPainTolerance((intakeData as { painTolerance?: string }).painTolerance);
 
   // Map medical data to contraindications
   const contraindications: string[] = [];
@@ -104,8 +107,8 @@ function buildClientProfile(
     budgetBand: budget,
     urgency: timeline,
     contraindications,
-    downtimeTolerance: 'moderate',
-    painTolerance: 'medium',
+    downtimeTolerance: downtime,
+    painTolerance,
   };
 }
 
@@ -126,6 +129,26 @@ function mapUrgency(timeline?: string): 'relaxed' | 'moderate' | 'event-driven' 
     case 'gradual': return 'relaxed';
     case 'ongoing': return 'moderate';
     default: return 'moderate';
+  }
+}
+
+function mapDowntimeTolerance(downtime?: string): 'none' | 'minimal' | 'moderate' | 'flexible' {
+  switch (downtime) {
+    case 'none': return 'none';
+    case 'minimal': return 'minimal';
+    case 'moderate': return 'moderate';
+    case 'flexible': return 'flexible';
+    case 'low': return 'minimal';
+    case 'high': return 'flexible';
+    default: return 'moderate';
+  }
+}
+
+function mapPainTolerance(pain?: string): 'low' | 'medium' | 'high' {
+  switch (pain) {
+    case 'low': return 'low';
+    case 'high': return 'high';
+    default: return 'medium';
   }
 }
 
@@ -196,6 +219,8 @@ function toMastermindTreatment(
   const service = rec.service;
   const concerns = scanResult.detectedConcerns.map((c) => c.concern.replace(/_/g, ' '));
   const zones = scanResult.zoneAnalysis.map((z) => z.zone);
+  const protocol = buildProtocolForService(service.id, service.category, service.bodyAreas);
+  const improvementTargets = buildImprovementTargets(scanResult);
 
   return {
     id: `tx_${service.id}`,
@@ -219,7 +244,111 @@ function toMastermindTreatment(
     aiConfidence: rec.fitScore,
     aiReasoning: rec.reason,
     clinicalRationale: `${rec.whyThisPhase || rec.reason}. Fit score: ${rec.fitScore}/100.`,
+    protocol,
+    improvementTargets,
   };
+}
+
+function buildProtocolForService(
+  serviceId: string,
+  category: string,
+  bodyAreas: string[]
+): MastermindTreatment['protocol'] {
+  const formularyOverride = BOOMRX_FORMULARY_OVERRIDES[serviceId];
+  if (formularyOverride) {
+    return {
+      dosage: formularyOverride.protocolDosage,
+      pulsesOrEnergy: formularyOverride.protocolPulses,
+      treatmentAreas: formularyOverride.protocolAreas || bodyAreas,
+      frequency: formularyOverride.protocolFrequency,
+      endpoint: formularyOverride.protocolEndpoint,
+      providerNotes: formularyOverride.providerNotes,
+      reference: formularyOverride.sourceDocument,
+    };
+  }
+
+  switch (category) {
+    case 'laser-hair-removal':
+      return {
+        pulsesOrEnergy: 'Typical: 8-18 J/cm², 10-25 ms, 1-2 passes with 10-15% overlap',
+        treatmentAreas: bodyAreas,
+        frequency: 'Every 4-6 weeks x 6 sessions',
+        endpoint: 'Perifollicular erythema/edema with progressive terminal hair reduction',
+        providerNotes: ['Adjust fluence by Fitzpatrick type and anatomic area tolerance'],
+      };
+    case 'laser':
+      return {
+        pulsesOrEnergy: 'Nd:YAG protocol range: 1064nm, 8-14 J, pulse duration 5-20 ms',
+        treatmentAreas: bodyAreas,
+        frequency: 'Every 4 weeks x 3 sessions',
+        endpoint: 'Even tone, reduced erythema/pigment burden, texture refinement',
+      };
+    case 'rf-microneedling':
+      return {
+        pulsesOrEnergy: 'Depth 0.5-2.5 mm by zone; low-medium-high energy tier by tolerance',
+        treatmentAreas: bodyAreas,
+        frequency: 'Every 4-6 weeks x 3 sessions',
+        endpoint: 'Controlled pinpoint erythema + collagen remodeling progression',
+      };
+    case 'skin-tightening':
+      return {
+        pulsesOrEnergy: 'Sofwave pulse plan by area (face, jawline, neck) per device protocol',
+        treatmentAreas: bodyAreas,
+        frequency: 'Single treatment with reassessment at 12 weeks',
+        endpoint: 'Measurable lift/tightening with improved contour definition',
+      };
+    case 'injectables':
+      return {
+        dosage: 'Dose per facial anatomy map and dynamic movement assessment',
+        treatmentAreas: bodyAreas,
+        frequency: 'Initial treatment + touch-up at 2 weeks as indicated',
+        endpoint: 'Natural correction with preserved expression and symmetry',
+      };
+    case 'chemical-peel':
+      return {
+        dosage: 'Layer count and contact time selected by skin type and prep tolerance',
+        treatmentAreas: bodyAreas,
+        frequency: 'Every 3-4 weeks x 3 sessions',
+        endpoint: 'Improved pigment, texture, and luminosity without prolonged irritation',
+      };
+    case 'wellness':
+    case 'weight-management':
+    case 'hormones':
+      return {
+        dosage: 'Medication/injection per protocol step and clinical response',
+        frequency: 'Weekly or monthly cadence by protocol',
+        endpoint: 'Symptom and biomarker improvement with tolerable side effects',
+      };
+    default:
+      return {
+        treatmentAreas: bodyAreas,
+        frequency: 'Per provider protocol',
+        endpoint: 'Objective improvement in target concern severity',
+      };
+  }
+}
+
+function buildImprovementTargets(
+  scanResult: AuraScanResult
+): MastermindTreatment['improvementTargets'] {
+  return scanResult.detectedConcerns
+    .slice(0, 3)
+    .map((concern) => ({
+      concern: concern.concern.replace(/_/g, ' '),
+      baselineScore: concern.score,
+      targetDelta:
+        concern.severity === 'severe'
+          ? '-25 to -40 points'
+          : concern.severity === 'moderate'
+            ? '-15 to -25 points'
+            : '-8 to -15 points',
+      timeframe:
+        concern.urgency === 'high'
+          ? '8-12 weeks'
+          : concern.urgency === 'medium'
+            ? '12-16 weeks'
+            : '16-24 weeks',
+    }));
 }
 
 // ── SEQUENCING ──

@@ -60,6 +60,8 @@ interface AuraImportPanelProps {
 // ── COMPONENT ──
 
 export default function AuraImportPanel({ session, onImportComplete }: AuraImportPanelProps) {
+  const MAX_CLIENT_DATA_URL_BYTES = 900_000;
+
   // State
   const [availableScans, setAvailableScans] = useState<AvailableScan[]>([]);
   const [loadingScans, setLoadingScans] = useState(false);
@@ -72,6 +74,41 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   const [lightboxImage, setLightboxImage] = useState<{ src: string; label: string } | null>(null);
   const [fileUploading, setFileUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const optimizeDataUrl = useCallback(async (input: string): Promise<string> => {
+    if (!input || input.length <= MAX_CLIENT_DATA_URL_BYTES) return input;
+
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxWidth = 1000;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context unavailable for compression'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        let output = canvas.toDataURL('image/jpeg', 0.72);
+        if (output.length > MAX_CLIENT_DATA_URL_BYTES) {
+          output = canvas.toDataURL('image/jpeg', 0.58);
+        }
+        resolve(output);
+      };
+      img.onerror = () => reject(new Error('Failed to compress uploaded image'));
+      img.src = input;
+    });
+  }, []);
 
   // Load pdf.js library from CDN with retry
   const loadPdfJs = useCallback(async (): Promise<any> => {
@@ -129,7 +166,10 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       console.log('[AuraImport] PDF loaded into buffer, rendering first page...');
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 2.0 });
+      const baseViewport = page.getViewport({ scale: 1.0 });
+      const targetWidth = 1200;
+      const scale = Math.max(0.75, Math.min(1.35, targetWidth / baseViewport.width));
+      const viewport = page.getViewport({ scale });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
       canvas.height = viewport.height;
@@ -138,7 +178,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       await page.render({ canvasContext: ctx, viewport }).promise;
       console.log('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
 
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
       console.log('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
       return dataUrl;
     }
@@ -171,12 +211,22 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       if (!file) return;
       const isValid = file.type.startsWith('image/') || file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
       if (!isValid) return;
+      if (file.size > 12 * 1024 * 1024) {
+        setImportError('File is too large. Please keep uploads under 12MB.');
+        return;
+      }
       setFileUploading(true);
       setImportError(null);
       try {
         // Step 1: Convert file to JPEG data URL client-side (handles PDFs + large images)
-        const dataUrl = await fileToDataUrl(file);
+        const rawDataUrl = await fileToDataUrl(file);
+        const dataUrl = await optimizeDataUrl(rawDataUrl);
         if (!dataUrl) throw new Error('Failed to process file');
+        if (dataUrl.length > MAX_CLIENT_DATA_URL_BYTES) {
+          throw new Error(
+            'Processed scan is still too large for secure upload. Please crop the PDF/image and retry.',
+          );
+        }
 
         // Step 2: Save photo to session
         const saveRes = await fetch(`/api/mastermind/sessions/${session.id}`, {
@@ -184,17 +234,26 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: { type: 'SET_SOURCE_PHOTO', url: dataUrl } }),
         });
-        if (!saveRes.ok) throw new Error('Failed to save photo to session');
+        if (!saveRes.ok) {
+          const saveMessage = await saveRes.text().catch(() => '');
+          if (saveRes.status === 413) {
+            throw new Error('Upload payload still too large after compression. Try a tighter crop or lower-resolution file.');
+          }
+          throw new Error(`Failed to save photo to session (${saveRes.status}): ${saveMessage.slice(0, 150)}`);
+        }
 
-        // Step 3: Run the AI scan with the uploaded photo
+        // Step 3: Run AI scan from session-stored photo (avoid sending base64 twice)
         console.log('[AuraImport] Running AI scan...');
         const scanRes = await fetch('/api/mastermind/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: session.id, sourcePhotoUrl: dataUrl }),
+          body: JSON.stringify({ sessionId: session.id }),
         });
         if (!scanRes.ok) {
           const errText = await scanRes.text().catch(() => '');
+          if (scanRes.status === 413) {
+            throw new Error('Scan request too large. Please retry with a smaller file.');
+          }
           throw new Error(`AI scan failed (${scanRes.status}): ${errText.slice(0, 200)}`);
         }
         const scanJson = await scanRes.json();
@@ -232,7 +291,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [session.id, session.patientName, onImportComplete, fileToDataUrl]
+    [session.id, session.patientName, onImportComplete, fileToDataUrl, optimizeDataUrl]
   );
 
   // Determine if we already have a device scan imported

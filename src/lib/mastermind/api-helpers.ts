@@ -12,12 +12,62 @@ import { NextRequest, NextResponse } from 'next/server';
  * or a pre-built 400 error response.
  */
 export async function parseJsonBody(
-  request: NextRequest
+  request: NextRequest,
+  options?: {
+    maxBytes?: number;
+  }
 ): Promise<{ body: Record<string, unknown> } | { error: NextResponse }> {
+  const maxBytes = options?.maxBytes ?? 4 * 1024 * 1024;
+  const rawLength = request.headers.get('content-length');
+  const contentLength = rawLength ? Number(rawLength) : NaN;
+
+  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
+    return {
+      error: NextResponse.json(
+        {
+          success: false,
+          error: `Payload too large. Maximum ${Math.round(maxBytes / (1024 * 1024))}MB JSON body.`,
+        },
+        { status: 413 },
+      ),
+    };
+  }
+
   try {
     const body = await request.json();
     return { body };
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : '';
+    const likelyTooLarge =
+      message.includes('too large') ||
+      message.includes('body exceeded') ||
+      message.includes('size limit');
+    const likelyTimeout =
+      message.includes('timeout') ||
+      message.includes('timed out') ||
+      message.includes('aborted');
+
+    if (likelyTooLarge) {
+      return {
+        error: NextResponse.json(
+          {
+            success: false,
+            error: `Payload too large. Maximum ${Math.round(maxBytes / (1024 * 1024))}MB JSON body.`,
+          },
+          { status: 413 },
+        ),
+      };
+    }
+
+    if (likelyTimeout) {
+      return {
+        error: NextResponse.json(
+          { success: false, error: 'Request timed out while parsing JSON body' },
+          { status: 408 },
+        ),
+      };
+    }
+
     return {
       error: NextResponse.json(
         { success: false, error: 'Invalid JSON body' },

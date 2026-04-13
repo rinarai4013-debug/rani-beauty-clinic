@@ -69,6 +69,19 @@ export const BUDGET_OPTIONS = [
   'investment',
 ] as const;
 
+export const DOWNTIME_TOLERANCE_OPTIONS = [
+  'none',
+  'minimal',
+  'moderate',
+  'flexible',
+] as const;
+
+export const PAIN_TOLERANCE_OPTIONS = [
+  'low',
+  'medium',
+  'high',
+] as const;
+
 // ── Step Schemas ──
 
 /** Step 1: Welcome - no user input, just intro screen */
@@ -164,6 +177,8 @@ const step6Schema = z.object({
   budget: z.enum(BUDGET_OPTIONS, {
     message: 'Please select a budget range',
   }),
+  downtimeTolerance: z.enum(DOWNTIME_TOLERANCE_OPTIONS).optional().default('moderate'),
+  painTolerance: z.enum(PAIN_TOLERANCE_OPTIONS).optional().default('medium'),
 });
 
 /** Step 7: Photos - optional uploads, max 3 */

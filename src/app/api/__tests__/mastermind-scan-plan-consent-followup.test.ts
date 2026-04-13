@@ -279,7 +279,7 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     expect(runAIAuraScanWithDeviceMock).toHaveBeenCalledTimes(1);
   });
 
-  it('POST /api/mastermind/scan returns fallback payload when scan execution crashes', async () => {
+  it('POST /api/mastermind/scan returns 500 with error detail when scan execution crashes', async () => {
     runAuraScanMock.mockRejectedValueOnce(new Error('scan pipeline down'));
 
     const { POST } = await import('@/app/api/mastermind/scan/route');
@@ -288,10 +288,9 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     );
     const body = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(body.success).toBe(true);
-    expect(body.meta.source).toBe('fallback');
-    expect(body.meta.fallback).toBe(true);
+    expect(response.status).toBe(500);
+    expect(body.success).toBe(false);
+    expect(body.error).toContain('scan pipeline down');
   });
 
   it('POST /api/mastermind/plan returns 401 without a staff session', async () => {

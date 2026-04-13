@@ -15,6 +15,8 @@ import type { MastermindSessionAction, PlanModification } from '@/types/mastermi
 
 import { withSentry } from '@/lib/sentry-utils';
 
+const MAX_PATCH_JSON_BYTES = 2 * 1024 * 1024;
+
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withSentry('mastermind/sessions/[id]', async () => {
     try {
@@ -59,6 +61,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       if (!session) {
         return apiError('Session not found', 404);
+      }
+
+      const rawLength = request.headers.get('content-length');
+      const contentLength = rawLength ? Number(rawLength) : NaN;
+      if (Number.isFinite(contentLength) && contentLength > MAX_PATCH_JSON_BYTES) {
+        return apiError(
+          'Payload too large for session update. Please upload/attach a smaller scan image.',
+          413,
+        );
       }
 
       const parsed = await parseJsonBody(request);

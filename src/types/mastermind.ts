@@ -169,6 +169,21 @@ export interface MastermindTreatment {
   aiConfidence: number; // 0-100
   aiReasoning: string; // Patient-facing
   clinicalRationale: string; // Provider-facing
+  protocol?: {
+    dosage?: string;
+    pulsesOrEnergy?: string;
+    treatmentAreas?: string[];
+    frequency?: string;
+    endpoint?: string;
+    providerNotes?: string[];
+    reference?: string;
+  };
+  improvementTargets?: {
+    concern: string;
+    baselineScore?: number;
+    targetDelta: string;
+    timeframe: string;
+  }[];
 }
 
 export interface TreatmentSequenceItem {

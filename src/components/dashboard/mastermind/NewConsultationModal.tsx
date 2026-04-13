@@ -140,6 +140,41 @@ const BUDGET_OPTIONS = [
   { value: '5000-plus', label: '$5,000+' },
 ];
 
+const SKIN_TYPE_OPTIONS = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'dry', label: 'Dry' },
+  { value: 'oily', label: 'Oily' },
+  { value: 'combination', label: 'Combination' },
+  { value: 'sensitive', label: 'Sensitive' },
+];
+
+const TIMELINE_PREF_OPTIONS = [
+  { value: 'event', label: 'Event-driven' },
+  { value: 'asap', label: 'ASAP' },
+  { value: 'gradual', label: 'Gradual' },
+  { value: 'ongoing', label: 'Ongoing Maintenance' },
+];
+
+const SUN_PROTECTION_OPTIONS = [
+  { value: 'never', label: 'Never' },
+  { value: 'sometimes', label: 'Sometimes' },
+  { value: 'usually', label: 'Usually' },
+  { value: 'always', label: 'Always' },
+];
+
+const DOWNTIME_TOLERANCE_OPTIONS = [
+  { value: 'none', label: 'No downtime' },
+  { value: 'minimal', label: '1-2 days max' },
+  { value: 'moderate', label: '3-5 days okay' },
+  { value: 'flexible', label: '1+ week okay' },
+];
+
+const PAIN_TOLERANCE_OPTIONS = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+];
+
 // ══════════════════════════════════════════════════════════════
 // STEP DEFINITIONS
 // ══════════════════════════════════════════════════════════════
@@ -499,13 +534,27 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const [allergies, setAllergies] = useState('');
   const [hasMedications, setHasMedications] = useState<'yes' | 'no' | ''>('');
   const [medications, setMedications] = useState('');
+  const [skinType, setSkinType] = useState<string[]>([]);
+  const [pregnant, setPregnant] = useState<'yes' | 'no' | ''>('');
+  const [breastfeeding, setBreastfeeding] = useState<'yes' | 'no' | ''>('');
+  const [bloodThinners, setBloodThinners] = useState<'yes' | 'no' | ''>('');
+  const [keloidHistory, setKeloidHistory] = useState<'yes' | 'no' | ''>('');
+  const [activeSkinInfection, setActiveSkinInfection] = useState<'yes' | 'no' | ''>('');
+  const [recentSunExposure, setRecentSunExposure] = useState<'yes' | 'no' | ''>('');
+  const [isotretinoinHistory, setIsotretinoinHistory] = useState<'yes' | 'no' | ''>('');
+  const [isotretinoinEndDate, setIsotretinoinEndDate] = useState('');
   const [smokingAlcohol, setSmokingAlcohol] = useState<string[]>([]);
   const [waterIntake, setWaterIntake] = useState<string[]>([]);
+  const [sunProtectionHabit, setSunProtectionHabit] = useState<string[]>([]);
 
   // ── Step 4: Skincare Routine & Schedule ──
   const [skincareRoutine, setSkincareRoutine] = useState<string[]>([]);
   const [amRoutine, setAmRoutine] = useState('');
   const [pmRoutine, setPmRoutine] = useState('');
+  const [timelinePreference, setTimelinePreference] = useState<string[]>([]);
+  const [downtimeTolerance, setDowntimeTolerance] = useState<string[]>([]);
+  const [painTolerance, setPainTolerance] = useState<string[]>([]);
+  const [primaryGoalNarrative, setPrimaryGoalNarrative] = useState('');
   const [preferredDays, setPreferredDays] = useState<string[]>([]);
   const [preferredTime, setPreferredTime] = useState<string[]>([]);
   const [budget, setBudget] = useState<string[]>([]);
@@ -546,6 +595,9 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     }
     if (step === 2) {
       if (concerns.length === 0) errors.concerns = true;
+    }
+    if (step === 3) {
+      if (skinType.length === 0) errors.skinType = true;
     }
 
     setValidationErrors(errors);
@@ -601,6 +653,10 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         'undereye': 'undereye-treatment',
         'rosacea': 'redness-reduction',
       };
+      const mappedGoalSummary = concerns.map((c) => goalMap[c] || c).join(', ');
+      const goalsNarrative = primaryGoalNarrative.trim()
+        || mappedGoalSummary
+        || 'Improve skin health, tone, texture, and confidence';
 
       const formData = new FormData();
 
@@ -620,7 +676,8 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           targetAreas,
           treatmentInterests,
           concerns,
-          goals: concerns.map((c) => goalMap[c] || c),
+          goals: goalsNarrative,
+          timeline: timelinePreference[0] || (hasEvent === 'yes' ? 'event' : 'ongoing'),
 
           hasUpcomingEvent: hasEvent === 'yes',
           eventDetails: hasEvent === 'yes' ? `${eventType} - ${eventDate}` : undefined,
@@ -636,14 +693,26 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           hasAllergies: hasAllergies === 'yes',
           medications: hasMedications === 'yes' ? medications : 'None',
           hasMedications: hasMedications === 'yes',
+          skinType: skinType[0] || undefined,
+          pregnant: pregnant === 'yes',
+          breastfeeding: breastfeeding === 'yes',
+          bloodThinners: bloodThinners === 'yes',
+          keloidHistory: keloidHistory === 'yes',
+          activeSkinInfection: activeSkinInfection === 'yes',
+          recentSunExposure: recentSunExposure === 'yes',
+          isotretinoinHistory: isotretinoinHistory === 'yes',
+          isotretinoinEndDate: isotretinoinHistory === 'yes' ? (isotretinoinEndDate || undefined) : undefined,
 
           smokingAlcohol: smokingAlcohol[0] || 'neither',
           smokingStatus: smokingAlcohol[0] === 'smoke-only' || smokingAlcohol[0] === 'both' ? 'current' : 'never',
           waterIntake: waterIntake[0] || undefined,
           skincareRoutine: skincareRoutine[0] || undefined,
+          sunProtectionHabit: sunProtectionHabit[0] || undefined,
 
           skincareAM: amRoutine || undefined,
           skincarePM: pmRoutine || undefined,
+          downtimeTolerance: downtimeTolerance[0] || undefined,
+          painTolerance: painTolerance[0] || undefined,
 
           requiresLabWork: needsLabWork,
 
@@ -926,6 +995,24 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         <StepSubtitle>This helps us keep your client safe and create the best plan</StepSubtitle>
       </div>
 
+      {/* Skin Type */}
+      <div>
+        <FieldLabel>How would you describe your skin type?</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {SKIN_TYPE_OPTIONS.map((o) => (
+            <GoldPill
+              key={o.value}
+              label={o.label}
+              selected={skinType.includes(o.value)}
+              onClick={() => toggleSingle(setSkinType)(o.value)}
+            />
+          ))}
+        </div>
+        {validationErrors.skinType && (
+          <p className="text-xs text-red-400 mt-2">Please select a skin type.</p>
+        )}
+      </div>
+
       {/* Previous Cosmetic Treatments */}
       <div>
         <FieldLabel>Have you had any cosmetic treatments before?</FieldLabel>
@@ -986,6 +1073,55 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         </AnimatePresence>
       </div>
 
+      {/* Clinical Risk Screen */}
+      <div className="rounded-xl border border-[#C9A96E]/20 bg-white/[0.03] p-4 space-y-4">
+        <FieldLabel>Clinical Safety Screen</FieldLabel>
+
+        <div>
+          <FieldLabel>Are you currently pregnant?</FieldLabel>
+          <YesNoToggle value={pregnant} onChange={setPregnant} />
+        </div>
+
+        <div>
+          <FieldLabel>Are you currently breastfeeding?</FieldLabel>
+          <YesNoToggle value={breastfeeding} onChange={setBreastfeeding} />
+        </div>
+
+        <div>
+          <FieldLabel>Are you taking blood thinners?</FieldLabel>
+          <YesNoToggle value={bloodThinners} onChange={setBloodThinners} />
+        </div>
+
+        <div>
+          <FieldLabel>History of keloid or hypertrophic scarring?</FieldLabel>
+          <YesNoToggle value={keloidHistory} onChange={setKeloidHistory} />
+        </div>
+
+        <div>
+          <FieldLabel>Any active rash, infection, or broken skin in treatment areas?</FieldLabel>
+          <YesNoToggle value={activeSkinInfection} onChange={setActiveSkinInfection} />
+        </div>
+
+        <div>
+          <FieldLabel>Significant sun exposure or tanning in the last 14 days?</FieldLabel>
+          <YesNoToggle value={recentSunExposure} onChange={setRecentSunExposure} />
+        </div>
+
+        <div>
+          <FieldLabel>Used isotretinoin (Accutane) in the last 12 months?</FieldLabel>
+          <YesNoToggle value={isotretinoinHistory} onChange={setIsotretinoinHistory} />
+          <AnimatePresence>
+            {isotretinoinHistory === 'yes' && (
+              <motion.div variants={conditionalVariants} initial="hidden" animate="visible" exit="hidden" className="overflow-hidden">
+                <div className="pt-3">
+                  <GoldInput type="date" value={isotretinoinEndDate} onChange={setIsotretinoinEndDate} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
       {/* Smoking / Alcohol */}
       <div>
         <FieldLabel>Do you smoke or consume alcohol?</FieldLabel>
@@ -996,6 +1132,21 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
               label={o.label}
               selected={smokingAlcohol.includes(o.value)}
               onClick={() => toggleSingle(setSmokingAlcohol)(o.value)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* SPF Habit */}
+      <div>
+        <FieldLabel>How consistent are you with daily SPF?</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {SUN_PROTECTION_OPTIONS.map((o) => (
+            <GoldPill
+              key={o.value}
+              label={o.label}
+              selected={sunProtectionHabit.includes(o.value)}
+              onClick={() => toggleSingle(setSunProtectionHabit)(o.value)}
             />
           ))}
         </div>
@@ -1023,6 +1174,62 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       <div>
         <StepTitle>Skincare Routine & Schedule</StepTitle>
         <StepSubtitle>Help us understand their current routine and availability</StepSubtitle>
+      </div>
+
+      {/* Treatment Outcome Priorities */}
+      <div>
+        <FieldLabel>Main goal in their own words</FieldLabel>
+        <GoldTextArea
+          placeholder="Describe what success looks like (for example: clearer skin before wedding in 10 weeks, minimal downtime)..."
+          value={primaryGoalNarrative}
+          onChange={setPrimaryGoalNarrative}
+          rows={4}
+        />
+      </div>
+
+      {/* Timeline */}
+      <div>
+        <FieldLabel>Preferred treatment timeline</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {TIMELINE_PREF_OPTIONS.map((o) => (
+            <GoldPill
+              key={o.value}
+              label={o.label}
+              selected={timelinePreference.includes(o.value)}
+              onClick={() => toggleSingle(setTimelinePreference)(o.value)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Downtime tolerance */}
+      <div>
+        <FieldLabel>Downtime tolerance</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {DOWNTIME_TOLERANCE_OPTIONS.map((o) => (
+            <GoldPill
+              key={o.value}
+              label={o.label}
+              selected={downtimeTolerance.includes(o.value)}
+              onClick={() => toggleSingle(setDowntimeTolerance)(o.value)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Pain tolerance */}
+      <div>
+        <FieldLabel>Pain tolerance</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {PAIN_TOLERANCE_OPTIONS.map((o) => (
+            <GoldPill
+              key={o.value}
+              label={o.label}
+              selected={painTolerance.includes(o.value)}
+              onClick={() => toggleSingle(setPainTolerance)(o.value)}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Skincare Routine Level */}
@@ -1184,11 +1391,50 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           {hasMedications === 'yes' && medications && (
             <SummaryRow label="Medications" value={medications} />
           )}
+          {skinType.length > 0 && (
+            <SummaryRow
+              label="Skin Type"
+              value={SKIN_TYPE_OPTIONS.find((o) => o.value === skinType[0])?.label || skinType[0]}
+            />
+          )}
+          {pregnant && <SummaryRow label="Pregnant" value={pregnant === 'yes' ? 'Yes' : 'No'} />}
+          {breastfeeding && <SummaryRow label="Breastfeeding" value={breastfeeding === 'yes' ? 'Yes' : 'No'} />}
+          {bloodThinners && <SummaryRow label="Blood Thinners" value={bloodThinners === 'yes' ? 'Yes' : 'No'} />}
+          {keloidHistory && <SummaryRow label="Keloid History" value={keloidHistory === 'yes' ? 'Yes' : 'No'} />}
+          {activeSkinInfection && <SummaryRow label="Active Skin Infection" value={activeSkinInfection === 'yes' ? 'Yes' : 'No'} />}
+          {recentSunExposure && <SummaryRow label="Recent Sun Exposure" value={recentSunExposure === 'yes' ? 'Yes' : 'No'} />}
+          {isotretinoinHistory && <SummaryRow label="Recent Isotretinoin" value={isotretinoinHistory === 'yes' ? 'Yes' : 'No'} />}
+          {isotretinoinEndDate && <SummaryRow label="Isotretinoin End Date" value={isotretinoinEndDate} />}
+          {sunProtectionHabit.length > 0 && (
+            <SummaryRow
+              label="SPF Habit"
+              value={SUN_PROTECTION_OPTIONS.find((o) => o.value === sunProtectionHabit[0])?.label || sunProtectionHabit[0]}
+            />
+          )}
 
           {skincareRoutine.length > 0 && (
             <SummaryRow
               label="Routine"
               value={SKINCARE_ROUTINE.find((o) => o.value === skincareRoutine[0])?.label || skincareRoutine[0]}
+            />
+          )}
+          {primaryGoalNarrative && <SummaryRow label="Main Goal" value={primaryGoalNarrative} />}
+          {timelinePreference.length > 0 && (
+            <SummaryRow
+              label="Timeline"
+              value={TIMELINE_PREF_OPTIONS.find((o) => o.value === timelinePreference[0])?.label || timelinePreference[0]}
+            />
+          )}
+          {downtimeTolerance.length > 0 && (
+            <SummaryRow
+              label="Downtime"
+              value={DOWNTIME_TOLERANCE_OPTIONS.find((o) => o.value === downtimeTolerance[0])?.label || downtimeTolerance[0]}
+            />
+          )}
+          {painTolerance.length > 0 && (
+            <SummaryRow
+              label="Pain Tolerance"
+              value={PAIN_TOLERANCE_OPTIONS.find((o) => o.value === painTolerance[0])?.label || painTolerance[0]}
             />
           )}
           {preferredDays.length > 0 && <SummaryRow label="Days" value={preferredDays.join(', ')} />}

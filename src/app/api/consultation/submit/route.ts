@@ -32,7 +32,7 @@ const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_JSON_REQUEST_BYTES = 512 * 1024;
 const MAX_MULTIPART_REQUEST_BYTES = 10 * 1024 * 1024;
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
 
 export async function POST(request: NextRequest) {
   return withSentry('consultation/submit', async () => {
@@ -91,18 +91,24 @@ export async function POST(request: NextRequest) {
     }
     intakeData = parsed.data as Partial<ConsultationFormData>;
 
-    // 2. Process photos — extract first valid photo as source
+    // 2. Process scan media — extract first valid image as source
     let sourcePhotoUrl: string | null = null;
     const photoFiles = formData.getAll('photos');
+    const auraFiles = formData.getAll('aura');
+    const mediaFiles = [...photoFiles, ...auraFiles];
 
-    for (const file of photoFiles) {
+    for (const file of mediaFiles) {
       if (!(file instanceof File)) continue;
       if (!ALLOWED_TYPES.includes(file.type)) continue;
       if (file.size > MAX_PHOTO_SIZE) continue;
 
       try {
         const buffer = Buffer.from(await file.arrayBuffer());
-        let image = sharp(buffer);
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+        let image = isPdf
+          ? sharp(buffer, { density: 144, pages: 1 }).flatten({ background: '#ffffff' })
+          : sharp(buffer);
         const metadata = await image.metadata();
 
         if (metadata.width && metadata.width > MAX_PHOTO_WIDTH) {
@@ -127,6 +133,10 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Email is required' },
         { status: 400 },
       );
+    }
+
+    if (!sourcePhotoUrl && auraFiles.some((f) => f instanceof File && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')))) {
+      console.warn('[Consultation Submit] Aura PDF uploaded but no image could be extracted; continuing without source photo.');
     }
 
     const scopedLimit = rateLimit(

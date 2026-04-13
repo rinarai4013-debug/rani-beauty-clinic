@@ -23,6 +23,8 @@ import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
 
 import { withSentry } from '@/lib/sentry-utils';
 
+const MAX_SCAN_JSON_BYTES = 2 * 1024 * 1024;
+
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/scan', async () => {
     try {
@@ -30,6 +32,15 @@ export async function POST(request: NextRequest) {
       const authSession = await getSessionFromRequest(request).catch(() => null);
       if (!authSession) {
         return unauthorized();
+      }
+
+      const rawLength = request.headers.get('content-length');
+      const contentLength = rawLength ? Number(rawLength) : NaN;
+      if (Number.isFinite(contentLength) && contentLength > MAX_SCAN_JSON_BYTES) {
+        return apiError(
+          'Payload too large for scan request. Save scan media to session first, then re-run scan.',
+          413,
+        );
       }
 
       const parsed = await parseJsonBody(request);
@@ -118,12 +129,10 @@ export async function POST(request: NextRequest) {
       return apiSuccess(result, { source });
     } catch (error) {
       console.error('[Aura Scan API] Error:', error);
-      try {
-        const fallback = mockAuraScanResult();
-        return apiSuccess(fallback, { source: 'fallback', fallback: true, error: String(error) });
-      } catch {
-        return apiError('Scan failed');
-      }
+      return apiError(
+        `Scan failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        500,
+      );
     }
   });
 }
