@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, rateLimitedQuery, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { recommendNextTreatment } from '@/lib/recommendations/engine';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
@@ -37,7 +38,7 @@ export async function GET(
         ? await fetchAll<{ 'Service Name'?: string; 'Service Category'?: string; Date?: string; 'Amount Paid'?: number }>(
             Tables.appointments(),
             {
-              filterByFormula: `OR(${appointmentIds.map((value) => `RECORD_ID() = '${value}'`).join(',')})`,
+              filterByFormula: `OR(${appointmentIds.map((value) => `RECORD_ID() = '${sanitizeFormulaValue(value)}'`).join(',')})`,
             }
           )
         : [];
