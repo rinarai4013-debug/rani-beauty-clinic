@@ -4,6 +4,8 @@ import { TRAINING_MODULES, ROLE_LABELS, ROLE_COLORS } from '@/data/training/modu
 import type { TrainingRole } from '@/data/training/modules';
 import { withSentry } from '@/lib/sentry-utils';
 
+const TRAINING_ROLES: TrainingRole[] = ['front-desk', 'provider', 'all-staff', 'management'];
+
 export async function GET(req: NextRequest) {
   return withSentry('dashboard/training', async () => {
     try {
@@ -13,7 +15,12 @@ export async function GET(req: NextRequest) {
       }
 
     const { searchParams } = new URL(req.url);
-    const roleFilter = searchParams.get('role') as TrainingRole | null;
+    const rawRole = searchParams.get('role');
+    const roleFilter = rawRole?.trim() ? rawRole.trim() : null;
+
+    if (roleFilter && !TRAINING_ROLES.includes(roleFilter as TrainingRole)) {
+      return NextResponse.json({ error: 'Invalid role parameter' }, { status: 400 });
+    }
 
     // Filter modules by role if specified
     let modules = TRAINING_MODULES;
