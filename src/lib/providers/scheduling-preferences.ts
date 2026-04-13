@@ -18,6 +18,18 @@ import type {
   CoverageCheck,
 } from '@/types/providers';
 
+function parseDateUtc(date: string): Date {
+  const value = date.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(`${value}T00:00:00Z`);
+  }
+  return new Date(value);
+}
+
+function formatDateUtc(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
 // ── DEFAULTS ──
 
 export const DEFAULT_WORKING_HOURS: Omit<WorkingHours, 'providerId'>[] = [
@@ -75,8 +87,8 @@ export function isProviderAvailable(
   date: string,
   timeOffRequests: TimeOffRequest[],
 ): boolean {
-  const d = new Date(date);
-  const dayOfWeek = d.getDay();
+  const d = parseDateUtc(date);
+  const dayOfWeek = d.getUTCDay();
   const hours = getHoursForDay(workingHours, dayOfWeek);
 
   if (!hours || !hours.isWorkday) return false;
@@ -96,17 +108,17 @@ export function isProviderAvailable(
 
 export function calculateTimeOffHours(startDate: string, endDate: string, workingHours: WorkingHours[]): number {
   let totalHours = 0;
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseDateUtc(startDate);
+  const end = parseDateUtc(endDate);
 
   const current = new Date(start);
   while (current <= end) {
-    const dayOfWeek = current.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    const dayOfWeek = current.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
     const hours = workingHours.find(h => h.dayOfWeek === dayOfWeek);
     if (hours && hours.isWorkday) {
       totalHours += calculateDailyHours(hours);
     }
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
   }
 
   return Math.round(totalHours * 100) / 100;
@@ -175,7 +187,7 @@ export function validateTimeOffRequest(
 
   // Check minimum notice (at least 2 weeks for PTO)
   if (request.type === 'pto') {
-    const requestDate = new Date(request.startDate);
+    const requestDate = parseDateUtc(request.startDate);
     const now = new Date();
     const daysNotice = (requestDate.getTime() - now.getTime()) / 86400000;
     if (daysNotice < 14) {
@@ -193,8 +205,10 @@ export function validateShiftSwap(
   requesterHours: WorkingHours[],
   targetHours: WorkingHours[],
 ): { valid: boolean; reason?: string } {
-  const originalDay = new Date(swap.originalDate).getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  const swapDay = new Date(swap.swapDate).getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  const originalDate = parseDateUtc(swap.originalDate);
+  const swapDate = parseDateUtc(swap.swapDate);
+  const originalDay = originalDate.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  const swapDay = swapDate.getUTCDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
   const requesterOriginal = requesterHours.find(h => h.dayOfWeek === originalDay);
   const targetSwap = targetHours.find(h => h.dayOfWeek === swapDay);
@@ -209,7 +223,7 @@ export function validateShiftSwap(
 
   // Check dates are in the future
   const now = new Date();
-  if (new Date(swap.originalDate) < now || new Date(swap.swapDate) < now) {
+  if (originalDate < now || swapDate < now) {
     return { valid: false, reason: 'Swap dates must be in the future' };
   }
 
@@ -247,9 +261,9 @@ export function checkCoverage(
   timeOffRequests: TimeOffRequest[],
   minimumProviders: number = MINIMUM_PROVIDERS_ON_DUTY,
 ): CoverageCheck {
-  const d = new Date(date);
-  const dayOfWeek = d.getDay();
-  const dateStr = date.split('T')[0];
+  const d = parseDateUtc(date);
+  const dayOfWeek = d.getUTCDay();
+  const dateStr = formatDateUtc(d);
 
   const providersAvailable: string[] = [];
 
@@ -292,12 +306,12 @@ export function checkWeekCoverage(
   minimumProviders: number = MINIMUM_PROVIDERS_ON_DUTY,
 ): CoverageCheck[] {
   const results: CoverageCheck[] = [];
-  const start = new Date(weekStartDate);
+  const start = parseDateUtc(weekStartDate);
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(start);
-    date.setDate(date.getDate() + i);
-    results.push(checkCoverage(date.toISOString().split('T')[0], allProviderHours, timeOffRequests, minimumProviders));
+    date.setUTCDate(date.getUTCDate() + i);
+    results.push(checkCoverage(formatDateUtc(date), allProviderHours, timeOffRequests, minimumProviders));
   }
 
   return results;
@@ -310,16 +324,16 @@ export function applyScheduleTemplate(
   startDate: string,
 ): { providerId: string; date: string; startTime: string; endTime: string }[] {
   const assignments: { providerId: string; date: string; startTime: string; endTime: string }[] = [];
-  const start = new Date(startDate);
+  const start = parseDateUtc(startDate);
 
   for (let week = 0; week < template.weeks; week++) {
     for (const shift of template.shifts) {
       const date = new Date(start);
-      date.setDate(date.getDate() + week * 7 + shift.dayOfWeek);
+      date.setUTCDate(date.getUTCDate() + week * 7 + shift.dayOfWeek);
 
       assignments.push({
         providerId: shift.providerId,
-        date: date.toISOString().split('T')[0],
+        date: formatDateUtc(date),
         startTime: shift.startTime,
         endTime: shift.endTime,
       });

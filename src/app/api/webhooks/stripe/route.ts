@@ -8,7 +8,7 @@ import { cache } from '@/lib/cache';
 import { env, hasFeature } from '@/lib/env';
 import { logWebhookEvent } from '@/lib/logging/structured-logger';
 import { rateLimit, getClientIP, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
-import { captureWebhookEvent, captureCheckoutEvent } from '@/lib/sentry-utils';
+import { captureWebhookEvent, captureCheckoutEvent, withSentry } from '@/lib/sentry-utils';
 
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET;
@@ -37,34 +37,35 @@ function validateMetadata(
 // Webhook URL to configure in Stripe Dashboard:
 // https://www.ranibeautyclinic.com/api/webhooks/stripe
 export async function POST(request: NextRequest) {
-  // Rate limit
-  const ip = getClientIP(request);
-  const { allowed, resetIn } = rateLimit('stripe-webhook', ip, RATE_LIMITS.WEBHOOK);
-  if (!allowed) return rateLimitResponse(resetIn);
+  return withSentry('webhooks/stripe', async () => {
+    // Rate limit
+    const ip = getClientIP(request);
+    const { allowed, resetIn } = rateLimit('stripe-webhook', ip, RATE_LIMITS.WEBHOOK);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  const body = await request.text();
-  const signature = request.headers.get('stripe-signature');
+    const body = await request.text();
+    const signature = request.headers.get('stripe-signature');
 
-  const endpointSecret = getWebhookSecret();
+    const endpointSecret = getWebhookSecret();
 
-  if (!signature || !endpointSecret) {
-    logWebhookEvent('stripe', 'unknown', false, { error: 'Missing signature or webhook secret' });
-    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 400 });
-  }
+    if (!signature || !endpointSecret) {
+      logWebhookEvent('stripe', 'unknown', false, { error: 'Missing signature or webhook secret' });
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 400 });
+    }
 
-  let event: Stripe.Event;
-  try {
-    const stripe = new Stripe(env.STRIPE_SECRET_KEY);
-    event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
-  } catch (err) {
-    logWebhookEvent('stripe', 'unknown', false, { error: `Signature verification failed: ${String(err)}` });
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-  }
+    let event: Stripe.Event;
+    try {
+      const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+      event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
+    } catch (err) {
+      logWebhookEvent('stripe', 'unknown', false, { error: `Signature verification failed: ${String(err)}` });
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
 
-  logWebhookEvent('stripe', event.type, true, { eventId: event.id });
+    logWebhookEvent('stripe', event.type, true, { eventId: event.id });
 
-  try {
-    switch (event.type) {
+    try {
+      switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const metadata = validateMetadata(session.metadata);
@@ -342,22 +343,25 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      default:
-        logWebhookEvent('stripe', event.type, true, { note: 'Unhandled event type' });
-    }
+        default:
+          logWebhookEvent('stripe', event.type, true, { note: 'Unhandled event type' });
+      }
 
-    captureWebhookEvent('stripe', event.type, true);
-    return NextResponse.json({ received: true, event: event.type });
-  } catch (error) {
-    Sentry.captureException(error, { tags: { route: 'webhook-stripe', event: event.type } });
-    captureWebhookEvent('stripe', event.type, false, { error: String(error) });
-    logWebhookEvent('stripe', event.type, false, { error: String(error) });
-    // Always return 200 for valid signatures - Stripe retries on non-2xx
-    return NextResponse.json({ received: true, event: event.type, error: 'Processing error' });
-  }
+      captureWebhookEvent('stripe', event.type, true);
+      return NextResponse.json({ received: true, event: event.type });
+    } catch (error) {
+      Sentry.captureException(error, { tags: { route: 'webhook-stripe', event: event.type } });
+      captureWebhookEvent('stripe', event.type, false, { error: String(error) });
+      logWebhookEvent('stripe', event.type, false, { error: String(error) });
+      // Always return 200 for valid signatures - Stripe retries on non-2xx
+      return NextResponse.json({ received: true, event: event.type, error: 'Processing error' });
+    }
+  });
 }
 
 // GET - reject non-POST requests (no health check info exposed)
 export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return withSentry('webhooks/stripe:get', async () =>
+    NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
+  );
 }

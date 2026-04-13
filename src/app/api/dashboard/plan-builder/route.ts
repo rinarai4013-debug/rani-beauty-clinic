@@ -7,6 +7,10 @@ import { cache, TTL } from '@/lib/cache';
 
 import { withSentry } from '@/lib/sentry-utils';
 
+const AirtableRecordIdSchema = z
+  .string()
+  .regex(/^rec[a-zA-Z0-9]{10,}$/, 'Invalid plan ID');
+
 const SavePlanSchema = z.object({
   client: z.array(z.string()).optional(),
   clientName: z.string().min(1),
@@ -18,7 +22,7 @@ const SavePlanSchema = z.object({
 });
 
 const UpdatePlanSchema = z.object({
-  id: z.string().min(1),
+  id: AirtableRecordIdSchema,
   planTier: z.string().optional(),
   planValue: z.number().min(0).optional(),
   planName: z.string().min(1).optional(),
@@ -40,6 +44,10 @@ export async function GET(request: NextRequest) {
 
     try {
       if (planId) {
+        const parsedPlanId = AirtableRecordIdSchema.safeParse(planId);
+        if (!parsedPlanId.success) {
+          return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
+        }
         const cacheKey = `treatment-plan-${planId}`;
         const cached = cache.get<Record<string, unknown>>(cacheKey);
         if (cached) return NextResponse.json(cached);
@@ -184,6 +192,10 @@ export async function DELETE(request: NextRequest) {
 
       if (!planId) {
         return NextResponse.json({ error: 'Plan ID required' }, { status: 400 });
+      }
+      const parsedPlanId = AirtableRecordIdSchema.safeParse(planId);
+      if (!parsedPlanId.success) {
+        return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
       }
 
       await updateRecord(Tables.treatmentPlans(), planId, {

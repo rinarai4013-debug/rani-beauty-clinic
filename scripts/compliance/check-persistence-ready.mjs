@@ -118,6 +118,14 @@ async function run() {
         continue;
       }
 
+      if (status === 403 && body?.error?.type === 'INVALID_PERMISSIONS_OR_MODEL_NOT_FOUND') {
+        fail(`Table "${table.name}" — NOT FOUND or inaccessible model (403). Provision it in Airtable.`);
+        info(`  Retention requirement: ${table.retention}`);
+        info(`  Critical fields: ${table.criticalFields.join(', ')}`);
+        failures++;
+        continue;
+      }
+
       if (status === 401 || status === 403) {
         fail(`Table "${table.name}" — AUTH ERROR (${status}). Check AIRTABLE_PAT permissions.`);
         failures++;

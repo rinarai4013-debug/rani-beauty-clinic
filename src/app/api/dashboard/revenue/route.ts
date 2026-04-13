@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { withSentry } from '@/lib/sentry-utils';
 import type { RevenueData, ProviderRevenue, ServiceRevenue, CategoryRevenue, PaymentTypeRevenue, RevenueEntry } from '@/types/dashboard';
 
 interface TransactionFields {
@@ -32,6 +33,8 @@ const PROVIDER_COLORS: Record<string, string> = {
   'Rina': '#0F1D2C',
   'Default': '#6B7280',
 };
+
+const ALLOWED_REVENUE_RANGES = new Set(['wtd', 'mtd', 'last30', 'ytd']);
 
 function getDateFilter(range: string): string {
   switch (range) {
@@ -64,28 +67,32 @@ function getAppointmentDateFilter(range: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  if (!hasPermission(session.role, 'view_revenue')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  return withSentry('dashboard/revenue', async () => {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (!hasPermission(session.role, 'view_revenue')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  const { searchParams } = new URL(request.url);
-  const range = searchParams.get('range') || 'mtd';
-  const cacheKey = `revenue-${range}`;
-  const cached = cache.get<RevenueData>(cacheKey);
-  if (cached) return NextResponse.json(cached);
+    const { searchParams } = new URL(request.url);
+    const range = searchParams.get('range') || 'mtd';
+    if (!ALLOWED_REVENUE_RANGES.has(range)) {
+      return NextResponse.json({ error: 'Invalid range' }, { status: 400 });
+    }
+    const cacheKey = `revenue-${range}`;
+    const cached = cache.get<RevenueData>(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
-  try {
-    const [transactions, appointments] = await Promise.all([
-      fetchAll<TransactionFields>(Tables.transactions(), {
-        filterByFormula: getDateFilter(range),
-        sort: [{ field: 'Date', direction: 'asc' }],
-      }),
-      fetchAll<AppointmentFields>(Tables.appointments(), {
-        filterByFormula: getAppointmentDateFilter(range),
-      }),
-    ]);
+    try {
+      const [transactions, appointments] = await Promise.all([
+        fetchAll<TransactionFields>(Tables.transactions(), {
+          filterByFormula: getDateFilter(range),
+          sort: [{ field: 'Date', direction: 'asc' }],
+        }),
+        fetchAll<AppointmentFields>(Tables.appointments(), {
+          filterByFormula: getAppointmentDateFilter(range),
+        }),
+      ]);
 
     // --- Daily revenue ---
     const dailyMap = new Map<string, number>();
@@ -247,10 +254,11 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    cache.set(cacheKey, data, TTL.STANDARD);
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Revenue route error:', error);
-    return NextResponse.json({ error: 'Failed to fetch revenue data' }, { status: 500 });
-  }
+      cache.set(cacheKey, data, TTL.STANDARD);
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Revenue route error:', error);
+      return NextResponse.json({ error: 'Failed to fetch revenue data' }, { status: 500 });
+    }
+  });
 }

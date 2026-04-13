@@ -343,6 +343,10 @@ function detectCategoryDrop(
 
 export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
   const anomalies: Anomaly[] = [];
+  const now = new Date();
+  const currentYear = now.getUTCFullYear();
+  const currentMonth = now.getUTCMonth();
+  const dayOfMonth = now.getUTCDate();
 
   // 1. Target deviation
   const targetAnomaly = detectTargetDeviation(input.todayRevenue, input.targets.daily);
@@ -380,8 +384,7 @@ export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
   const healthScore = Math.max(0, 100 - (criticalCount * 30) - (warningCount * 15));
 
   // Project month-end
-  const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-  const dayOfMonth = new Date().getDate();
+  const daysInMonth = new Date(Date.UTC(currentYear, currentMonth + 1, 0)).getUTCDate();
   // Defensively sort a COPY newest-first before taking the last-7 window,
   // so that a caller violating the "sorted newest first" contract can't
   // contaminate the projection with stale history. Never mutates input.
@@ -390,8 +393,10 @@ export function detectRevenueAnomalies(input: AnomalyInput): AnomalyResult {
   const last7Avg = last7.reduce((s, d) => s + d.amount, 0) / Math.max(last7.length, 1);
   const mtdRevenue = input.dailyRevenue
     .filter(d => {
-      const dt = new Date(d.date);
-      return dt.getMonth() === new Date().getMonth() && dt.getFullYear() === new Date().getFullYear();
+      const [y, m, day] = d.date.split('-').map(Number);
+      if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(day)) return false;
+      const dt = new Date(Date.UTC(y, m - 1, day));
+      return dt.getUTCMonth() === currentMonth && dt.getUTCFullYear() === currentYear;
     })
     .reduce((s, d) => s + d.amount, 0);
   const remainingDays = daysInMonth - dayOfMonth;

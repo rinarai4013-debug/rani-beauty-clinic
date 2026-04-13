@@ -30,6 +30,7 @@ vi.mock('@/lib/rate-limit', () => ({
   rateLimit: (...args: unknown[]) => rateLimitMock(...args),
   rateLimitResponse: (...args: unknown[]) => rateLimitResponseMock(...args),
   RATE_LIMITS: {
+    FORM: { maxRequests: 5, windowMs: 60_000 },
     VIEW: { maxRequests: 20, windowMs: 60_000 },
   },
 }));
@@ -56,6 +57,23 @@ vi.mock('@/lib/plan-builder/plan-status', () => ({
 
 vi.mock('@/lib/sentry-utils', () => ({
   withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn((req: Request) => {
+    const origin = req.headers.get('origin');
+    if (origin && !['http://localhost:3000', 'https://www.ranibeautyclinic.com'].includes(origin)) {
+      return new Response(JSON.stringify({ error: 'Origin not allowed' }), { status: 403 });
+    }
+    return null;
+  }),
+  enforceContentLength: vi.fn((req: Request, maxBytes: number) => {
+    const len = req.headers.get('content-length');
+    if (len && Number(len) > maxBytes) {
+      return new Response(JSON.stringify({ error: 'Request body too large' }), { status: 413 });
+    }
+    return null;
+  }),
 }));
 
 const originalFetch = global.fetch;
@@ -129,6 +147,57 @@ describe('subscribe + plan track critical routes', () => {
     expect(createRecordMock).not.toHaveBeenCalled();
   });
 
+  it('POST /api/subscribe blocks disallowed browser origins', async () => {
+    const { POST } = await import('@/app/api/subscribe/route');
+    const request = new Request('http://localhost:3000/api/subscribe', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': '10.0.0.4',
+        origin: 'https://evil.example.com',
+      },
+      body: JSON.stringify({ email: 'jane@example.com', source: 'homepage' }),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(403);
+    expect(createRecordMock).not.toHaveBeenCalled();
+  });
+
+  it('POST /api/subscribe blocks oversized payloads via content-length', async () => {
+    const { POST } = await import('@/app/api/subscribe/route');
+    const request = new Request('http://localhost:3000/api/subscribe', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': '10.0.0.5',
+        'content-length': String(40 * 1024),
+      },
+      body: JSON.stringify({ email: 'jane@example.com', source: 'homepage' }),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(413);
+    expect(createRecordMock).not.toHaveBeenCalled();
+  });
+
+  it('POST /api/subscribe returns 429 when rate limited', async () => {
+    rateLimitMock.mockReturnValueOnce({ allowed: false, resetIn: 30 });
+    const { POST } = await import('@/app/api/subscribe/route');
+    const request = new Request('http://localhost:3000/api/subscribe', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': '10.0.0.6',
+      },
+      body: JSON.stringify({ email: 'jane@example.com', source: 'homepage' }),
+    });
+
+    const response = await POST(request as never);
+    expect(response.status).toBe(429);
+    expect(createRecordMock).not.toHaveBeenCalled();
+  });
+
   it('POST /api/plan/[id]/track rejects malformed plan IDs', async () => {
     const { POST } = await import('@/app/api/plan/[id]/track/route');
     const request = new Request('http://localhost:3000/api/plan/bad-id/track', {
@@ -139,6 +208,36 @@ describe('subscribe + plan track critical routes', () => {
 
     const response = await POST(request as never, { params: { id: 'bad-id' } });
     expect(response.status).toBe(400);
+  });
+
+  it('POST /api/plan/[id]/track blocks disallowed browser origins', async () => {
+    const { POST } = await import('@/app/api/plan/[id]/track/route');
+    const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://evil.example.com',
+      },
+      body: JSON.stringify({ action: 'view' }),
+    });
+
+    const response = await POST(request as never, { params: { id: 'recABCDEFGHIJ' } });
+    expect(response.status).toBe(403);
+  });
+
+  it('POST /api/plan/[id]/track blocks oversized payloads via content-length', async () => {
+    const { POST } = await import('@/app/api/plan/[id]/track/route');
+    const request = new Request('http://localhost:3000/api/plan/recABCDEFGHIJ/track', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'content-length': String(20 * 1024),
+      },
+      body: JSON.stringify({ action: 'view' }),
+    });
+
+    const response = await POST(request as never, { params: { id: 'recABCDEFGHIJ' } });
+    expect(response.status).toBe(413);
   });
 
   it('POST /api/plan/[id]/track returns 404 when plan cannot be found', async () => {

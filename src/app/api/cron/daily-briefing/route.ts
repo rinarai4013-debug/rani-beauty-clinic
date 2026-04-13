@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { withSentry } from '@/lib/sentry-utils';
 
 // Vercel Cron — runs daily at 6 AM Pacific (14:00 UTC)
 // Stores a KPI snapshot and sends optional morning briefing SMS
 
 export async function GET(req: NextRequest) {
-  // Verify Vercel cron secret
-  const auth = req.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && auth !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  return withSentry('cron/daily-briefing', async () => {
+    // Verify Vercel cron secret
+    const auth = req.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret && auth !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  try {
-    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
 
     // Pull today's data in parallel
     const [transactions, appointments, leads] = await Promise.all([
@@ -75,9 +77,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ ok: true, date: today, revenue, bookings, leads: newLeads });
-  } catch (err) {
-    console.error('[cron/daily-briefing]', err);
-    return NextResponse.json({ error: 'Briefing failed' }, { status: 500 });
-  }
+      return NextResponse.json({ ok: true, date: today, revenue, bookings, leads: newLeads });
+    } catch (err) {
+      console.error('[cron/daily-briefing]', err);
+      return NextResponse.json({ error: 'Briefing failed' }, { status: 500 });
+    }
+  });
 }

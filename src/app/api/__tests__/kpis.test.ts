@@ -254,6 +254,15 @@ describe('GET /api/dashboard/kpis', () => {
     expect(data.clinicScore).toBeDefined();
     expect(data.clinicScore.total).toBe(75);
   });
+
+  it('should reject invalid range query values', async () => {
+    setupAuthenticatedCEO();
+    const { GET } = await import('@/app/api/dashboard/kpis/route');
+    const req = buildGetRequest('/api/dashboard/kpis', { range: 'all-time' });
+    const response = await GET(req as any);
+
+    expect(response.status).toBe(400);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -319,6 +328,15 @@ describe('GET /api/dashboard/revenue', () => {
     await GET(req as any);
 
     expect(mockCacheSet).toHaveBeenCalledWith('revenue-mtd', expect.any(Object), expect.any(Number));
+  });
+
+  it('should reject invalid range query values', async () => {
+    setupAuthenticatedCEO();
+    const { GET } = await import('@/app/api/dashboard/revenue/route');
+    const req = buildGetRequest('/api/dashboard/revenue', { range: 'all-time' });
+    const response = await GET(req as any);
+
+    expect(response.status).toBe(400);
   });
 
   it('should return cached data when available', async () => {

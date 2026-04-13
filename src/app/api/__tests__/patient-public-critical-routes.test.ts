@@ -12,6 +12,7 @@ const fetchFirstMock = vi.fn();
 const clientFindMock = vi.fn();
 const rateLimitedQueryMock = vi.fn();
 const updateRecordMock = vi.fn();
+const logPHIAccessMock = vi.fn();
 
 vi.mock('@/lib/rate-limit', () => ({
   getClientIP: vi.fn().mockReturnValue('127.0.0.1'),
@@ -40,8 +41,18 @@ vi.mock('@/lib/airtable/client', () => ({
   updateRecord: (...args: unknown[]) => updateRecordMock(...args),
 }));
 
+vi.mock('@/lib/compliance/hipaa-audit', () => ({
+  logPHIAccess: (...args: unknown[]) => logPHIAccessMock(...args),
+}));
+
 vi.mock('@/lib/sentry-utils', () => ({
   withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
+}));
+
+vi.mock('@/lib/security/public-intent-guard', () => ({
+  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
+  enforceContentLength: vi.fn().mockReturnValue(null),
+  normalizeEmailForLimit: vi.fn((v: string) => v.toLowerCase().trim()),
 }));
 
 describe('patient auth + profile critical routes', () => {
@@ -87,6 +98,7 @@ describe('patient auth + profile critical routes', () => {
     });
     rateLimitedQueryMock.mockImplementation(async (fn: () => Promise<unknown>) => fn());
     updateRecordMock.mockResolvedValue(undefined);
+    logPHIAccessMock.mockReturnValue(undefined);
   });
 
   it('POST /api/patient/auth/verify returns session and cookie for valid token', async () => {
@@ -213,11 +225,23 @@ describe('patient auth + profile critical routes', () => {
 
   it('GET /api/patient/profile returns profile payload when authenticated', async () => {
     const { GET } = await import('@/app/api/patient/profile/route');
-    const response = await GET();
+    const request = new Request('http://localhost:3000/api/patient/profile', {
+      method: 'GET',
+      headers: { 'x-forwarded-for': '127.0.0.1' },
+    });
+    const response = await GET(request as never);
     const body = await response.json();
 
     expect(response.status).toBe(200);
     expect(body.profile.id).toBe('rec_client_1');
+    expect(logPHIAccessMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'rec_client_1',
+        patientId: 'rec_client_1',
+        action: 'view',
+        dataCategory: 'demographics',
+      }),
+    );
   });
 
   it('PATCH /api/patient/profile rejects empty updates', async () => {
@@ -246,5 +270,13 @@ describe('patient auth + profile critical routes', () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(updateRecordMock).toHaveBeenCalledTimes(1);
+    expect(logPHIAccessMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'rec_client_1',
+        patientId: 'rec_client_1',
+        action: 'update',
+        dataCategory: 'demographics',
+      }),
+    );
   });
 });

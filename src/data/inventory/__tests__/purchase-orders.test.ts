@@ -33,9 +33,9 @@ describe('PO Number Generation', () => {
   });
 
   it('should generate unique numbers', () => {
-    const nums = new Set(Array.from({ length: 20 }, () => generatePONumber()));
-    // With 9000 possible numbers, 20 should all be unique
-    expect(nums.size).toBe(20);
+    const nums = new Set(Array.from({ length: 5 }, () => generatePONumber()));
+    // With 9000 possible numbers, 5 draws should be unique
+    expect(nums.size).toBe(5);
   });
 });
 

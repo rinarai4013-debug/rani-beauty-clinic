@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import {
   generateFinancialIntelligence,
   type FinanceInput,
@@ -68,17 +69,22 @@ export async function GET() {
       .toISOString()
       .split('T')[0];
 
+    const safePeriodStart = sanitizeFormulaValue(periodStart);
+    const safePeriodEnd = sanitizeFormulaValue(periodEnd);
+    const safePrevMonthStart = sanitizeFormulaValue(prevMonthStart);
+    const safePrevMonthEnd = sanitizeFormulaValue(prevMonthEnd);
+
     // Fetch current and previous month data in parallel
     const [currentTransactions, prevTransactions, expenseAlerts, memberships] =
       await Promise.all([
         fetchAll<TransactionFields>(Tables.transactions(), {
-          filterByFormula: `AND(IS_AFTER({Date}, '${periodStart}'), IS_BEFORE({Date}, '${periodEnd}'))`,
+          filterByFormula: `AND(IS_AFTER({Date}, '${safePeriodStart}'), IS_BEFORE({Date}, '${safePeriodEnd}'))`,
         }).catch(() => []),
         fetchAll<TransactionFields>(Tables.transactions(), {
-          filterByFormula: `AND(IS_AFTER({Date}, '${prevMonthStart}'), IS_BEFORE({Date}, '${prevMonthEnd}'))`,
+          filterByFormula: `AND(IS_AFTER({Date}, '${safePrevMonthStart}'), IS_BEFORE({Date}, '${safePrevMonthEnd}'))`,
         }).catch(() => []),
         fetchAll<ExpenseAlertFields>(Tables.alerts(), {
-          filterByFormula: `AND(SEARCH("[Expense", {Message}), IS_AFTER({Created Date}, '${periodStart}'))`,
+          filterByFormula: `AND(SEARCH("[Expense", {Message}), IS_AFTER({Created Date}, '${safePeriodStart}'))`,
         }).catch(() => []),
         fetchAll<{ Status: string; Tier: string }>(Tables.memberships(), {
           filterByFormula: `{Status} = 'Active'`,

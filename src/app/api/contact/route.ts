@@ -3,6 +3,8 @@ import { z } from "zod";
 import { Tables, createRecord } from "@/lib/airtable/client";
 import { upsertClientAttribution } from "@/lib/attribution/upsert-client-attribution";
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { enforceAllowedPublicOrigin, enforceContentLength } from "@/lib/security/public-intent-guard";
+import { withSentry } from "@/lib/sentry-utils";
 
 const ContactSchema = z.object({
   name: z.string().min(1).max(100),
@@ -30,6 +32,7 @@ const ContactSchema = z.object({
   utm_term: z.string().max(150).optional(),
   honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
+const MAX_CONTACT_REQUEST_BYTES = 64 * 1024;
 
 function appendAttributionLines(lines: Array<string | null>, attribution: Record<string, string | undefined>) {
   const labelMap: Record<string, string> = {
@@ -59,122 +62,71 @@ function appendAttributionLines(lines: Array<string | null>, attribution: Record
 }
 
 export async function POST(req: NextRequest) {
-  const ip = getClientIP(req);
-  const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
-  if (!allowed) return rateLimitResponse(resetIn);
+  return withSentry("contact", async () => {
+    const originError = enforceAllowedPublicOrigin(req);
+    if (originError) return originError;
 
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+    const sizeError = enforceContentLength(req, MAX_CONTACT_REQUEST_BYTES);
+    if (sizeError) return sizeError;
 
-  // Check honeypot first — bots get a silent 200 before any validation
-  const raw = body as Record<string, unknown>;
-  if (typeof raw?.honeypot === "string" && raw.honeypot.length > 0) {
-    return NextResponse.json({ success: true });
-  }
+    const ip = getClientIP(req);
+    const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
+    if (!allowed) return rateLimitResponse(resetIn);
 
-  const parsed = ContactSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid request" },
-      { status: 422 }
-    );
-  }
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
 
-  const {
-    name,
-    email,
-    phone,
-    service,
-    message,
-    source,
-    leadSource,
-    leadMedium,
-    leadCampaign,
-    leadAdSet,
-    leadAd,
-    leadOffer,
-    leadLandingPage,
-    leadKeyword,
-    leadReferrer,
-    attributionId,
-    firstTouchAt,
-    lastTouchAt,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_content,
-    utm_term,
-  } = parsed.data;
+    // Check honeypot first — bots get a silent 200 before any validation
+    const raw = body as Record<string, unknown>;
+    if (typeof raw?.honeypot === "string" && raw.honeypot.length > 0) {
+      return NextResponse.json({ success: true });
+    }
 
-  // Build intake summary for AI pipeline
-  const intakeLines = [
-    `Service Interest: ${service}`,
-    message ? `Message: ${message}` : null,
-  ];
-  appendAttributionLines(intakeLines, {
-    source,
-    leadSource,
-    leadMedium,
-    leadCampaign,
-    leadAdSet,
-    leadAd,
-    leadOffer,
-    leadLandingPage,
-    leadKeyword,
-    leadReferrer,
-    attributionId,
-    firstTouchAt,
-    lastTouchAt,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_content,
-    utm_term,
-  });
-  const intakeSummary = intakeLines.filter(Boolean).join("\n");
-
-  // 1. Write to Airtable Client Intakes
-  // Field names verified against live Airtable schema 2026-03-28
-  const airtablePayload = {
-    "Full Name": name,
-    "Email": email,
-    ...(phone ? { "Phone Number": phone } : {}),
-    "Intake Summary (AI)": intakeSummary,
-    "Processing Status": "New",
-  };
-
-  try {
-    await createRecord(Tables.intakes(), airtablePayload);
-  } catch (err) {
-    const errMsg = err instanceof Error ? err.message : String(err);
-    console.error(
-      "[contact] Airtable write failed:",
-      errMsg,
-      "| Payload fields:",
-      Object.keys(airtablePayload).join(", ")
-    );
-    if (errMsg.includes("UNKNOWN_FIELD_NAME")) {
-      console.error(
-        "[contact] FIELD NAME MISMATCH — one or more fields in",
-        Object.keys(airtablePayload),
-        "do not exist in the Client Intakes table. Verify field names at https://airtable.com/app1SwhSfwe8GKUg4"
+    const parsed = ContactSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 422 }
       );
     }
-    return NextResponse.json(
-      { error: "We couldn't save your request. Please try again or call us directly." },
-      { status: 502 }
-    );
-  }
 
-  try {
-    await upsertClientAttribution({
+    const {
       name,
       email,
       phone,
+      service,
+      message,
+      source,
+      leadSource,
+      leadMedium,
+      leadCampaign,
+      leadAdSet,
+      leadAd,
+      leadOffer,
+      leadLandingPage,
+      leadKeyword,
+      leadReferrer,
+      attributionId,
+      firstTouchAt,
+      lastTouchAt,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+    } = parsed.data;
+
+    // Build intake summary for AI pipeline
+    const intakeLines = [
+      `Service Interest: ${service}`,
+      message ? `Message: ${message}` : null,
+    ];
+    appendAttributionLines(intakeLines, {
+      source,
       leadSource,
       leadMedium,
       leadCampaign,
@@ -193,88 +145,147 @@ export async function POST(req: NextRequest) {
       utm_content,
       utm_term,
     });
-  } catch (err) {
-    console.error("[contact] Client attribution upsert failed:", err instanceof Error ? err.message : err);
-  }
+    const intakeSummary = intakeLines.filter(Boolean).join("\n");
 
-  // 2. Send notification email via Resend
-  const resendKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.CONTACT_EMAIL ?? "info@ranibeautyclinic.com";
-  const fromEmail = process.env.FROM_EMAIL ?? "Rani Beauty Clinic <noreply@ranibeautyclinic.com>";
+    // 1. Write to Airtable Client Intakes
+    // Field names verified against live Airtable schema 2026-03-28
+    const airtablePayload = {
+      "Full Name": name,
+      "Email": email,
+      ...(phone ? { "Phone Number": phone } : {}),
+      "Intake Summary (AI)": intakeSummary,
+      "Processing Status": "New",
+    };
 
-  if (!resendKey) {
-    console.warn("[contact] RESEND_API_KEY not set — skipping email notification");
-  } else {
     try {
-      const emailRes = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: [toEmail],
-          reply_to: email,
-          subject: `New Consultation Request — ${service}`,
-          html: buildNotificationEmail({ name, email, phone, service, message }),
-        }),
-      });
-      if (!emailRes.ok) {
-        const resBody = await emailRes.text().catch(() => "");
-        console.error("[contact] Resend returned", emailRes.status, resBody);
-        if (emailRes.status === 403) {
-          console.error("[contact] Resend 403 — likely domain not verified. Verify at https://resend.com/domains");
-        }
+      await createRecord(Tables.intakes(), airtablePayload);
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error(
+        "[contact] Airtable write failed:",
+        errMsg,
+        "| Payload fields:",
+        Object.keys(airtablePayload).join(", ")
+      );
+      if (errMsg.includes("UNKNOWN_FIELD_NAME")) {
+        console.error(
+          "[contact] FIELD NAME MISMATCH — one or more fields in",
+          Object.keys(airtablePayload),
+          "do not exist in the Client Intakes table. Verify field names at https://airtable.com/app1SwhSfwe8GKUg4"
+        );
       }
-    } catch (err) {
-      console.error("[contact] Resend email failed:", err instanceof Error ? err.message : err);
+      return NextResponse.json(
+        { error: "We couldn't save your request. Please try again or call us directly." },
+        { status: 502 }
+      );
     }
-  }
 
-  // 3. Forward to n8n lead intake webhook
-  const n8nUrl = process.env.N8N_WEBHOOK_URL;
-  if (!n8nUrl) {
-    console.warn("[contact] N8N_WEBHOOK_URL not set — skipping webhook");
-  } else {
     try {
-      await fetch(n8nUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source: "contact_form",
-          leadSource,
-          leadMedium,
-          leadCampaign,
-          leadAdSet,
-          leadAd,
-          leadOffer,
-          leadLandingPage,
-          leadKeyword,
-          leadReferrer,
-          attributionId,
-          firstTouchAt,
-          lastTouchAt,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_content,
-          utm_term,
-          name,
-          email,
-          phone,
-          service,
-          message,
-          submittedAt: new Date().toISOString(),
-        }),
-        signal: AbortSignal.timeout(5000),
+      await upsertClientAttribution({
+        name,
+        email,
+        phone,
+        leadSource,
+        leadMedium,
+        leadCampaign,
+        leadAdSet,
+        leadAd,
+        leadOffer,
+        leadLandingPage,
+        leadKeyword,
+        leadReferrer,
+        attributionId,
+        firstTouchAt,
+        lastTouchAt,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_content,
+        utm_term,
       });
     } catch (err) {
-      console.error("[contact] n8n webhook failed:", err);
+      console.error("[contact] Client attribution upsert failed:", err instanceof Error ? err.message : err);
     }
-  }
 
-  return NextResponse.json({ success: true });
+    // 2. Send notification email via Resend
+    const resendKey = process.env.RESEND_API_KEY;
+    const toEmail = process.env.CONTACT_EMAIL ?? "info@ranibeautyclinic.com";
+    const fromEmail = process.env.FROM_EMAIL ?? "Rani Beauty Clinic <noreply@ranibeautyclinic.com>";
+
+    if (!resendKey) {
+      console.warn("[contact] RESEND_API_KEY not set — skipping email notification");
+    } else {
+      try {
+        const emailRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: [toEmail],
+            reply_to: email,
+            subject: `New Consultation Request — ${service}`,
+            html: buildNotificationEmail({ name, email, phone, service, message }),
+          }),
+        });
+        if (!emailRes.ok) {
+          const resBody = await emailRes.text().catch(() => "");
+          console.error("[contact] Resend returned", emailRes.status, resBody);
+          if (emailRes.status === 403) {
+            console.error("[contact] Resend 403 — likely domain not verified. Verify at https://resend.com/domains");
+          }
+        }
+      } catch (err) {
+        console.error("[contact] Resend email failed:", err instanceof Error ? err.message : err);
+      }
+    }
+
+    // 3. Forward to n8n lead intake webhook
+    const n8nUrl = process.env.N8N_WEBHOOK_URL;
+    if (!n8nUrl) {
+      console.warn("[contact] N8N_WEBHOOK_URL not set — skipping webhook");
+    } else {
+      try {
+        await fetch(n8nUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            source: "contact_form",
+            leadSource,
+            leadMedium,
+            leadCampaign,
+            leadAdSet,
+            leadAd,
+            leadOffer,
+            leadLandingPage,
+            leadKeyword,
+            leadReferrer,
+            attributionId,
+            firstTouchAt,
+            lastTouchAt,
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_content,
+            utm_term,
+            name,
+            email,
+            phone,
+            service,
+            message,
+            submittedAt: new Date().toISOString(),
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
+      } catch (err) {
+        console.error("[contact] n8n webhook failed:", err);
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  });
 }
 
 function buildNotificationEmail(data: {
