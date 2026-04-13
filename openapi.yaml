@@ -1222,6 +1222,426 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  # ── Batch 1: auth, AI, cron, agents, alerts, briefing, backlinks ──
+
+  /api/dashboard/auth/login:
+    post:
+      operationId: dashboardLogin
+      summary: Staff JWT login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [username, password]
+      responses:
+        "200":
+          description: Login successful (sets rani-session cookie)
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/auth/logout:
+    post:
+      operationId: dashboardLogout
+      summary: Clear session cookie
+      tags: [Auth]
+      responses:
+        "200":
+          description: Logged out
+
+  /api/dashboard/auth/me:
+    get:
+      operationId: dashboardMe
+      summary: Current session user info
+      tags: [Auth]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: User session data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/alerts:
+    get:
+      operationId: getAlerts
+      summary: Active operational alerts
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Alerts with severity breakdown
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/briefing:
+    get:
+      operationId: getExecutiveBriefing
+      summary: Daily executive briefing
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Briefing payload
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/backlinks:
+    get:
+      operationId: getBacklinks
+      summary: SEO backlink analysis
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Backlink data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/communications:
+    get:
+      operationId: getCommunicationsOverview
+      summary: Communications analytics overview
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Overview payload
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/compliance:
+    get:
+      operationId: getComplianceStatus
+      summary: HIPAA compliance score and status
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Compliance status
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/dashboard/clients/at-risk:
+    get:
+      operationId: getAtRiskClients
+      summary: At-risk clients sorted by urgency
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: At-risk client list with breakdown
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/dashboard/agents/feed:
+    get:
+      operationId: getAgentsFeed
+      summary: AI agent status feed
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Agent statuses and recommendations
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/agents/{agentId}:
+    get:
+      operationId: getAgentById
+      summary: Single AI agent detail
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent detail
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Agent not found
+
+  /api/contact:
+    post:
+      operationId: submitContactForm
+      summary: Contact form submission
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                service:
+                  type: string
+                message:
+                  type: string
+                honeypot:
+                  type: string
+                  maxLength: 0
+              required: [name, email, service]
+      responses:
+        "200":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          description: Validation error
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Airtable write failed
+
+  /api/ai/chat:
+    post:
+      operationId: aiChat
+      summary: AI concierge chatbot
+      tags: [AI]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+              required: [messages]
+      responses:
+        "200":
+          description: AI response
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/ai/recommend:
+    post:
+      operationId: aiRecommend
+      summary: AI treatment recommender (3-tier)
+      tags: [AI]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Treatment recommendation
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/ai/intake:
+    post:
+      operationId: aiIntake
+      summary: AI intake intelligence
+      tags: [AI]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Intake intelligence
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/ai/advisor:
+    get:
+      operationId: aiAdvisorGet
+      summary: AI advisor (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Advisor response
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiAdvisorPost
+      summary: AI advisor (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Advisor response
+        "501":
+          description: Not implemented
+
+  /api/ai/outcome:
+    get:
+      operationId: aiOutcomeGet
+      summary: AI outcome prediction (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Outcome prediction
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiOutcomePost
+      summary: AI outcome prediction (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Outcome prediction
+        "501":
+          description: Not implemented
+
+  /api/ai/protocols:
+    get:
+      operationId: aiProtocolsGet
+      summary: AI treatment protocols (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Protocols
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiProtocolsPost
+      summary: AI treatment protocols (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Protocols
+        "501":
+          description: Not implemented
+
+  /api/ai/quiz:
+    get:
+      operationId: aiQuizGet
+      summary: AI skin quiz (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Quiz
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiQuizPost
+      summary: AI skin quiz (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Quiz
+        "501":
+          description: Not implemented
+
+  /api/ai/skin-analysis:
+    get:
+      operationId: aiSkinAnalysisGet
+      summary: AI skin analysis (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Analysis
+        "501":
+          description: Not implemented
+    post:
+      operationId: aiSkinAnalysisPost
+      summary: AI skin analysis (stub — 501)
+      tags: [AI]
+      responses:
+        "200":
+          description: Analysis
+        "501":
+          description: Not implemented
+
+  /api/cron/daily-briefing:
+    get:
+      operationId: cronDailyBriefing
+      summary: Daily briefing cron job
+      tags: [Cron]
+      responses:
+        "200":
+          description: Briefing generated
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/cron/daily-kpi:
+    get:
+      operationId: cronDailyKpi
+      summary: Daily KPI snapshot cron job (stub)
+      tags: [Cron]
+      responses:
+        "200":
+          description: KPI snapshot
+        "501":
+          description: Not implemented
+
+  /api/cron/plan-followups:
+    get:
+      operationId: cronPlanFollowups
+      summary: Treatment plan follow-up cron job
+      tags: [Cron]
+      responses:
+        "200":
+          description: Follow-ups processed
+        "500":
+          $ref: "#/components/responses/InternalError"
+
 components:
   securitySchemes:
     SessionCookie:
