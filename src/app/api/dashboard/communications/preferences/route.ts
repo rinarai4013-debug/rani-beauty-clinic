@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const filter = clientId
-      ? `RECORD_ID() = '${clientId}'`
+      ? `RECORD_ID() = "${sanitizeFormulaValue(clientId)}"`
       : '';
 
     const clients = await fetchAll<ClientPreferenceFields>(

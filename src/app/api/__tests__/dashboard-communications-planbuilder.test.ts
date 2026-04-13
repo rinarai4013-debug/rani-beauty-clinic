@@ -220,6 +220,28 @@ describe('dashboard communications and plan-builder routes', () => {
     expect(body.total).toBe(0);
   });
 
+  it('GET /api/dashboard/communications/preferences sanitizes clientId before Airtable filter construction', async () => {
+    const maliciousClientId = "rec_client_1' OR TRUE() OR '";
+    const { sanitizeFormulaValue } = await import('@/lib/airtable/sanitize');
+
+    const { GET } = await import('@/app/api/dashboard/communications/preferences/route');
+    const url = "http://localhost:3000/api/dashboard/communications/preferences?clientId=rec_client_1'%20OR%20TRUE()%20OR%20'";
+    const response = await GET({
+      nextUrl: new URL(url),
+      headers: new Headers(),
+      url,
+    } as never);
+
+    expect(response.status).toBe(200);
+    expect(fetchAllMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        filterByFormula: `RECORD_ID() = "${sanitizeFormulaValue(maliciousClientId)}"`,
+      }),
+      true,
+    );
+  });
+
   it('GET /api/dashboard/communications/preferences serves from cache when available', async () => {
     cacheGetMock.mockReturnValueOnce({
       preferences: [
