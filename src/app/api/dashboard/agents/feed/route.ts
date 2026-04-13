@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-    const cacheKey = 'agent-feed';
+    const cacheKey = `agent-feed:${request.nextUrl.hostname}`;
     const cached = cache.get<AgentFeed>(cacheKey);
     if (cached) {
       return NextResponse.json({ success: true, data: cached });

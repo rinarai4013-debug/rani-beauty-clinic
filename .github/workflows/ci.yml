@@ -58,3 +58,4 @@ jobs:
           cache: 'npm'
       - run: npm ci --ignore-scripts
       - run: npm run -s openapi:lint
+      - run: npm run -s openapi:parity
