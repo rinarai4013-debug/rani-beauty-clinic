@@ -2,7 +2,10 @@ import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
+
+const MAX_AI_RECOMMEND_BYTES = 128 * 1024;
 
 const RecommendSchema = z.object({
   primaryGoal: z.string().min(1),
@@ -35,6 +38,10 @@ const STATIC_RECOMMENDATION = {
 
 export async function POST(request: NextRequest) {
   return withSentry('ai/recommend', async () => {
+    const originError = enforceAllowedPublicOrigin(request);
+    if (originError) return originError;
+    const sizeError = enforceContentLength(request, MAX_AI_RECOMMEND_BYTES);
+    if (sizeError) return sizeError;
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('ai-recommend', ip, RATE_LIMITS.AI);
     if (!allowed) {

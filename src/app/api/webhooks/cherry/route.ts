@@ -42,8 +42,9 @@ export async function POST(request: NextRequest) {
       // ── HMAC-SHA256 Signature Verification ──
       const secret = getCherryWebhookSecret();
       if (!secret) {
-        console.error(
-          '[Cherry Webhook] CHERRY_WEBHOOK_SECRET not set — skipping signature verification',
+        return NextResponse.json(
+          { error: 'Webhook secret not configured — rejecting request' },
+          { status: 503 },
         );
       } else {
         const signature = request.headers.get('x-webhook-signature');
