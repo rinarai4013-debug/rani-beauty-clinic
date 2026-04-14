@@ -52,6 +52,10 @@ vi.mock('sharp', () => ({
   default: (...args: unknown[]) => mockSharp(...args),
 }));
 
+vi.mock('@/lib/auth/session', () => ({
+  getSessionFromRequest: vi.fn().mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' }),
+}));
+
 // ---------------------------------------------------------------------------
 // Imports (after all vi.mock calls)
 // ---------------------------------------------------------------------------
