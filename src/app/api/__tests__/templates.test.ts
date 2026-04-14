@@ -16,6 +16,10 @@ import {
 // Mocks
 // ---------------------------------------------------------------------------
 
+vi.mock('@/lib/auth/session', () => ({
+  getSessionFromRequest: vi.fn().mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' }),
+}));
+
 vi.mock('@/lib/rate-limit', () => ({
   rateLimit: vi.fn().mockReturnValue({ allowed: true, resetIn: 0 }),
   getClientIP: vi.fn().mockReturnValue('127.0.0.1'),
