@@ -278,7 +278,10 @@ export default function PeptideIntakePage() {
       return;
     }
     if (!activeTier.fulfillmentAllowed.includes(mode)) {
-      setSelectionMessage('Selected tier is not eligible for this fulfillment mode.');
+      const allowed = activeTier.fulfillmentAllowed.join(' or ');
+      setSelectionMessage(
+        `${mode === 'home' ? 'Home' : 'Clinic'} fulfillment is not available for this tier. Choose ${allowed} or submit for provider review.`,
+      );
       return;
     }
     setSelectionLoading(true);
@@ -344,7 +347,7 @@ export default function PeptideIntakePage() {
 
       setSelectionMessage(
         result.recommendation.status === 'provider-review-required'
-          ? 'Provider review request submitted. Checkout unlocks after clinical approval.'
+          ? 'Provider review request submitted. Checkout unlocks after clinical approval. Our provider team will contact you with next steps.'
           : mode === 'home'
             ? 'Home fulfillment handoff submitted. Provider team will finalize shipment steps.'
             : 'Clinic fulfillment handoff submitted. Concierge will schedule your onboarding.',
@@ -367,7 +370,13 @@ export default function PeptideIntakePage() {
       setSelectionMessage(`${TRACK_LABELS[track]} is currently ineligible. Provider review is required.`);
       return;
     }
-    if (!option.fulfillmentModes.includes(mode)) return;
+    if (!option.fulfillmentModes.includes(mode)) {
+      const allowed = option.fulfillmentModes.join(' or ');
+      setSelectionMessage(
+        `${mode === 'home' ? 'Home' : 'Clinic'} fulfillment is not available for ${TRACK_LABELS[track]}. Choose ${allowed} or submit for provider review.`,
+      );
+      return;
+    }
     setSelectionLoading(true);
     setSelectionMessage(null);
 
@@ -409,7 +418,7 @@ export default function PeptideIntakePage() {
         window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
       } else {
         setSelectionMessage(
-          `${TRACK_LABELS[track]} request submitted for provider review. Checkout opens after approval.`,
+          `${TRACK_LABELS[track]} request submitted for provider review. Checkout opens after approval, and our team will contact you with next steps.`,
         );
       }
     } catch (submitError) {

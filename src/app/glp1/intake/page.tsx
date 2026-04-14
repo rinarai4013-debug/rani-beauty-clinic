@@ -222,7 +222,13 @@ export default function Glp1IntakePage() {
       setSelectionMessage(`${TRACK_LABELS[packageOption.track]} is currently ineligible. Provider review is required.`);
       return;
     }
-    if (!packageOption.fulfillmentModes.includes(mode)) return;
+    if (!packageOption.fulfillmentModes.includes(mode)) {
+      const allowed = packageOption.fulfillmentModes.join(' or ');
+      setSelectionMessage(
+        `${mode === 'home' ? 'Home' : 'Clinic'} fulfillment is not available for this program. Choose ${allowed} or submit for provider review.`,
+      );
+      return;
+    }
 
     setSelectionLoading(`${packageOption.id}:${mode}`);
     setSelectionMessage(null);
@@ -285,7 +291,7 @@ export default function Glp1IntakePage() {
 
       setSelectionMessage(
         recommendationStatus === 'provider-review-required'
-          ? 'Provider review request submitted. Checkout will unlock after clinical approval.'
+          ? 'Provider review request submitted. Checkout will unlock after clinical approval. Our team will contact you with next steps.'
           : mode === 'home'
             ? 'Home-delivery request submitted. Provider team will finalize and send your shipment workflow.'
             : 'In-clinic program request submitted. Concierge team will contact you to schedule.',

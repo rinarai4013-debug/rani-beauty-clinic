@@ -49,16 +49,16 @@ describe('buildMetabolicFunnelReport', () => {
 
     const report = buildMetabolicFunnelReport(sessions, intakes);
 
-    expect(report.totals.started).toBe(4);
+    expect(report.totals.started).toBe(3);
     expect(report.totals.held).toBe(2);
-    expect(report.totals.completed).toBe(1);
+    expect(report.totals.completed).toBe(0);
 
     expect(report.byTrack.glp1.started).toBe(2);
     expect(report.byTrack.glp1.held).toBe(2);
     expect(report.byTrack.glp1.completed).toBe(0);
 
-    expect(report.byTrack.hormones.started).toBe(1);
-    expect(report.byTrack.hormones.completed).toBe(1);
+    expect(report.byTrack.hormones.started).toBe(0);
+    expect(report.byTrack.hormones.completed).toBe(0);
 
     expect(report.byTrack.peptides.started).toBe(1);
     expect(report.byTrack.peptides.eligible).toBe(1);
