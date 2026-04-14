@@ -335,6 +335,22 @@ export async function POST(request: NextRequest) {
       const goals = typeof intakeData.goals === 'string' ? intakeData.goals : '';
       const timeline = typeof intakeData.timeline === 'string' ? intakeData.timeline : '';
       const budget = typeof intakeData.budget === 'string' ? intakeData.budget : '';
+      const pregnant = intakeData.pregnant === true;
+      const breastfeeding = intakeData.breastfeeding === true;
+      const bloodThinners = intakeData.bloodThinners === true;
+      const keloidHistory = intakeData.keloidHistory === true;
+      const activeSkinInfection = intakeData.activeSkinInfection === true;
+      const isotretinoinHistory = intakeData.isotretinoinHistory === true;
+      const hasAutoimmune = intakeData.hasAutoimmune === true;
+      const medicalFlags = [
+        pregnant ? 'pregnant' : null,
+        breastfeeding ? 'breastfeeding' : null,
+        bloodThinners ? 'blood thinners' : null,
+        keloidHistory ? 'keloid history' : null,
+        activeSkinInfection ? 'active skin infection' : null,
+        isotretinoinHistory ? 'isotretinoin history' : null,
+        hasAutoimmune ? 'autoimmune condition' : null,
+      ].filter(Boolean) as string[];
 
       const intakeSummaryLines = [
         `Skin Concerns: ${concerns || 'Not specified'}`,
@@ -342,6 +358,7 @@ export async function POST(request: NextRequest) {
         goals ? `Goals: ${goals}` : '',
         timeline ? `Timeline: ${timeline}` : '',
         budget ? `Budget: ${budget}` : '',
+        `Medical Flags: ${medicalFlags.length > 0 ? medicalFlags.join(', ') : 'None reported'}`,
         sourcePhotoUrl ? 'Photo: Uploaded' : 'Photo: None',
         `Session ID: ${session.id}`,
       ].filter(Boolean);

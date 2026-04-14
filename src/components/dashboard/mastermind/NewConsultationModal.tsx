@@ -175,6 +175,27 @@ const PAIN_TOLERANCE_OPTIONS = [
   { value: 'high', label: 'High' },
 ];
 
+const AUTOIMMUNE_TERMS = [
+  'autoimmune',
+  'lupus',
+  'hashimoto',
+  'graves',
+  'psoriasis',
+  'rheumatoid',
+  'crohn',
+  'ulcerative colitis',
+  'multiple sclerosis',
+  'sjogren',
+  'scleroderma',
+  'celiac',
+] as const;
+
+function inferAutoimmuneFromHistory(history: string): boolean {
+  const normalized = history.trim().toLowerCase();
+  if (!normalized) return false;
+  return AUTOIMMUNE_TERMS.some((term) => normalized.includes(term));
+}
+
 // ══════════════════════════════════════════════════════════════
 // STEP DEFINITIONS
 // ══════════════════════════════════════════════════════════════
@@ -657,6 +678,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       const goalsNarrative = primaryGoalNarrative.trim()
         || mappedGoalSummary
         || 'Improve skin health, tone, texture, and confidence';
+      const hasAutoimmuneCondition = hasMedical === 'yes' && inferAutoimmuneFromHistory(medicalConditions);
 
       const formData = new FormData();
 
@@ -688,7 +710,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           treatmentHistory: hadTreatments === 'yes' ? previousTreatments : '',
 
           medicalHistory: hasMedical === 'yes' ? medicalConditions : 'None',
-          hasAutoimmune: hasMedical === 'yes',
+          hasAutoimmune: hasAutoimmuneCondition,
           allergies: hasAllergies === 'yes' ? allergies : 'None',
           hasAllergies: hasAllergies === 'yes',
           medications: hasMedications === 'yes' ? medications : 'None',
