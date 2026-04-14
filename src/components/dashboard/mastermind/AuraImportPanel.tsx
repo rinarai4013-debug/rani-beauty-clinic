@@ -187,7 +187,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       document.head.appendChild(script);
     });
 
-    const lib = win.pdfjsLib;
+    const lib: PdfJsLib | undefined = (win as { pdfjsLib?: PdfJsLib }).pdfjsLib;
     if (!lib) throw new Error('PDF renderer not available after load');
     lib.GlobalWorkerOptions.workerSrc = WORKER_URL;
     return lib;
@@ -298,7 +298,9 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId: session.id }),
         });
-        if (!simRes.ok) console.warn('[AuraImport] Simulation trigger failed:', simRes.status);
+        if (!simRes.ok) {
+          // Best effort — scan completion is more important than projection pre-generation.
+        }
 
         if (scanJson.success !== false) {
           onImportComplete?.({

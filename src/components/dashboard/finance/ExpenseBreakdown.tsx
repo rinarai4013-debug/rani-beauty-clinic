@@ -57,7 +57,14 @@ export default function ExpenseBreakdown() {
     setSelectedCategory((prev) => (prev === category ? null : category));
   };
 
-  const tooltipFormatter = (value: number) => formatCurrency(value);
+  const tooltipFormatter = (value: unknown) => {
+    if (typeof value === 'number') return formatCurrency(value);
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) return formatCurrency(parsed);
+    }
+    return formatCurrency(0);
+  };
 
   const chartData = data
     ? Object.entries(data.byCategory)
@@ -139,7 +146,7 @@ export default function ExpenseBreakdown() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={tooltipFormatter}
+                  formatter={tooltipFormatter as never}
                   contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
                 />
               </PieChart>
