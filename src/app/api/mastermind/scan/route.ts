@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const parsed = await parseJsonBody(request);
+      const parsed = await parseJsonBody(request, { maxBytes: MAX_SCAN_JSON_BYTES });
       if ('error' in parsed) return parsed.error;
       const { body } = parsed;
 
@@ -71,6 +71,13 @@ export async function POST(request: NextRequest) {
         return apiError('Missing intake data', 400);
       }
 
+      if (sourcePhotoUrl === '[photo_ref_unavailable]') {
+        return apiError(
+          'Source photo is temporarily unavailable across instances. Please re-upload the Aura image/PDF and retry.',
+          424,
+        );
+      }
+
       const useMock = process.env.USE_MOCK_AI === 'true';
       const hasAIKey = !!process.env.ANTHROPIC_API_KEY;
       let result;
@@ -95,7 +102,9 @@ export async function POST(request: NextRequest) {
           result = await runAIAuraScanWithDevice(deviceScan, intakeData);
           source = 'aura-device-ai';
         } catch (err) {
-          console.warn('[Scan] Aura device import failed, falling back:', err);
+          logEvent('ai', 'warn', '[Scan] Aura device import failed, using fallback', {
+            error: err instanceof Error ? err.message : String(err),
+          });
           if (hasAIKey) {
             const { runAIAuraScan } = await import('@/lib/mastermind/ai-aura-scan');
             result = await runAIAuraScan(intakeData, sourcePhotoUrl);
@@ -112,7 +121,9 @@ export async function POST(request: NextRequest) {
           result = await runAIAuraScan(intakeData, sourcePhotoUrl);
           source = 'ai';
         } catch (err) {
-          console.warn('[Scan] AI scan failed, falling back to rule engine:', err);
+          logEvent('ai', 'warn', '[Scan] AI scan failed, falling back to rule engine', {
+            error: err instanceof Error ? err.message : String(err),
+          });
           result = await runAuraScan(intakeData, medicalData);
           source = 'engine-fallback';
         }

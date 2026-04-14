@@ -21,6 +21,11 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
 const TABLE_NAME = 'Automation%20Log';
 const WORKFLOW_KEY = 'mastermind_session';
+const PHOTO_WORKFLOW_PREFIX = 'mastermind_photo_';
+const PHOTO_REF_PREFIX = 'airtable://photo/';
+const PHOTO_INLINE_LIMIT = 5000;
+const PHOTO_CHUNK_SIZE = 45000;
+const MAX_PHOTO_CHUNKS = 250;
 
 function getAirtablePat(): string | null {
   return process.env.AIRTABLE_PAT || null;
@@ -54,10 +59,18 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
   }
 
   // Strip large base64 data before persisting to Airtable (100KB field limit)
-  // Keep a placeholder so we know an image exists
   const stripped = { ...session };
-  if (stripped.sourcePhotoUrl && stripped.sourcePhotoUrl.length > 5000) {
-    stripped.sourcePhotoUrl = '[base64_stripped]';
+  if (
+    stripped.sourcePhotoUrl &&
+    stripped.sourcePhotoUrl.startsWith('data:image/') &&
+    stripped.sourcePhotoUrl.length > PHOTO_INLINE_LIMIT
+  ) {
+    try {
+      stripped.sourcePhotoUrl = await storeSourcePhotoInChunks(session.id, stripped.sourcePhotoUrl);
+    } catch (error) {
+      console.error('[SessionStore] Source photo chunk storage failed:', error);
+      stripped.sourcePhotoUrl = '[base64_stripped]';
+    }
   }
   if (stripped.simulationComparison) {
     stripped.simulationComparison = {
@@ -214,6 +227,7 @@ export async function getAllSessionsFromAirtable(): Promise<MastermindSession[]>
       try {
         const session = JSON.parse(record.fields?.Details || '{}') as MastermindSession;
         if (session.id) {
+          await hydrateSourcePhoto(session);
           sessions.push(session);
           cache.set(session.id, { session, recordId: record.id });
         }
@@ -262,6 +276,7 @@ async function findSessionRecord(sessionId: string): Promise<{ session: Mastermi
 
     if (record?.fields?.Details) {
       const session = JSON.parse(record.fields.Details) as MastermindSession;
+      await hydrateSourcePhoto(session);
       return { session, recordId: record.id };
     }
   } catch (err) {
@@ -269,4 +284,118 @@ async function findSessionRecord(sessionId: string): Promise<{ session: Mastermi
   }
 
   return null;
+}
+
+function chunkString(value: string, size: number): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < value.length; i += size) {
+    out.push(value.slice(i, i + size));
+  }
+  return out;
+}
+
+function buildPhotoWorkflowKey(sessionId: string): string {
+  const safeSessionId = sessionId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const nonce = Date.now().toString(36);
+  return `${PHOTO_WORKFLOW_PREFIX}${safeSessionId}_${nonce}`;
+}
+
+function buildPhotoRef(workflowKey: string): string {
+  return `${PHOTO_REF_PREFIX}${workflowKey}`;
+}
+
+function getWorkflowKeyFromRef(ref: string): string | null {
+  if (!ref.startsWith(PHOTO_REF_PREFIX)) return null;
+  const workflowKey = ref.slice(PHOTO_REF_PREFIX.length).trim();
+  return workflowKey || null;
+}
+
+async function storeSourcePhotoInChunks(sessionId: string, dataUrl: string): Promise<string> {
+  const chunks = chunkString(dataUrl, PHOTO_CHUNK_SIZE);
+  if (chunks.length > MAX_PHOTO_CHUNKS) {
+    throw new Error(`Source photo has too many chunks (${chunks.length})`);
+  }
+
+  const workflowKey = buildPhotoWorkflowKey(sessionId);
+  const timestamp = new Date().toISOString();
+
+  for (let i = 0; i < chunks.length; i += 10) {
+    const batch = chunks.slice(i, i + 10);
+    const records = batch.map((chunk, batchIndex) => {
+      const chunkIndex = i + batchIndex;
+      return {
+        fields: {
+          Workflow: workflowKey,
+          Action: `chunk_${String(chunkIndex).padStart(4, '0')}`,
+          Status: 'scan_complete',
+          Details: chunk,
+          Timestamp: timestamp,
+        },
+      };
+    });
+
+    const res = await fetch(airtableUrl(), {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ typecast: true, records }),
+      signal: AbortSignal.timeout(12000),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      throw new Error(`Chunk write failed (${res.status}): ${errBody.slice(0, 200)}`);
+    }
+  }
+
+  return buildPhotoRef(workflowKey);
+}
+
+async function loadSourcePhotoFromRef(ref: string): Promise<string | null> {
+  const workflowKey = getWorkflowKeyFromRef(ref);
+  if (!workflowKey) return null;
+
+  try {
+    const safeWorkflow = sanitizeFormulaValue(workflowKey);
+    const filter = encodeURIComponent(`{Workflow}='${safeWorkflow}'`);
+    const res = await fetch(
+      `${airtableUrl()}?filterByFormula=${filter}&sort%5B0%5D%5Bfield%5D=Action&sort%5B0%5D%5Bdirection%5D=asc&maxRecords=${MAX_PHOTO_CHUNKS}`,
+      { headers: headers(), signal: AbortSignal.timeout(12000) }
+    );
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    const chunks = (data?.records || [])
+      .map((record: { fields?: { Details?: string } }) => record.fields?.Details || '')
+      .filter((part: string) => part.length > 0);
+
+    if (chunks.length === 0) return null;
+
+    const combined = chunks.join('');
+    if (!combined.startsWith('data:image/')) return null;
+    return combined;
+  } catch {
+    return null;
+  }
+}
+
+async function hydrateSourcePhoto(session: MastermindSession): Promise<void> {
+  if (!session.sourcePhotoUrl || typeof session.sourcePhotoUrl !== 'string') return;
+
+  if (session.sourcePhotoUrl.startsWith(PHOTO_REF_PREFIX)) {
+    const hydrated = await loadSourcePhotoFromRef(session.sourcePhotoUrl);
+    if (hydrated) {
+      session.sourcePhotoUrl = hydrated;
+      return;
+    }
+
+    // Keep signal explicit for callers that want to report a user-facing error.
+    session.sourcePhotoUrl = '[photo_ref_unavailable]';
+    return;
+  }
+
+  if (session.sourcePhotoUrl === '[base64_stripped]') {
+    session.sourcePhotoUrl = '[photo_ref_unavailable]';
+  }
 }
