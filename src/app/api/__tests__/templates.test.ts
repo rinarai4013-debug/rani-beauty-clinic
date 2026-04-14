@@ -16,8 +16,9 @@ import {
 // Mocks
 // ---------------------------------------------------------------------------
 
+const getSessionFromRequestMock = vi.fn();
 vi.mock('@/lib/auth/session', () => ({
-  getSessionFromRequest: vi.fn().mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' }),
+  getSessionFromRequest: (...args: unknown[]) => getSessionFromRequestMock(...args),
 }));
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -86,6 +87,7 @@ vi.mock('@/lib/templates/pre-consult', () => ({
 describe('POST /api/templates/post-treatment', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getSessionFromRequestMock.mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' });
     delete process.env.N8N_API_KEY;
   });
 
@@ -174,6 +176,7 @@ describe('POST /api/templates/post-treatment', () => {
   });
 
   it('should return 401 when n8n API key is required but wrong', async () => {
+    getSessionFromRequestMock.mockRejectedValue(new Error('no session'));
     process.env.N8N_API_KEY = 'correct-key';
     const { POST } = await import('@/app/api/templates/post-treatment/route');
     const req = buildPostRequest('/api/templates/post-treatment', {
@@ -210,6 +213,7 @@ describe('POST /api/templates/post-treatment', () => {
 describe('POST /api/templates/reactivation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getSessionFromRequestMock.mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' });
     delete process.env.N8N_API_KEY;
   });
 
@@ -275,6 +279,7 @@ describe('POST /api/templates/reactivation', () => {
 describe('POST /api/templates/pre-consult', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getSessionFromRequestMock.mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' });
     delete process.env.N8N_API_KEY;
   });
 
