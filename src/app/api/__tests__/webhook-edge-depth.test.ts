@@ -160,8 +160,8 @@ describe('POST /api/webhooks/cherry edge depth', () => {
         body: JSON.stringify({ event: 'application_submitted', type: 'application_submitted', data: { id: '1' } }),
       }) as never,
     );
-    // Without secret, signature check is skipped (warn-only)
-    expect(response.status).toBe(200);
+    // Without secret, webhook is rejected (fail-closed)
+    expect(response.status).toBe(503);
   });
 
   it('rejects requests with invalid HMAC signature', async () => {
