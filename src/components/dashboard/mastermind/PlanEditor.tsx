@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
-import type { MastermindSession, MastermindTreatment, PlanModification } from '@/types/mastermind';
+import type { MastermindSession, MastermindTreatment, MastermindSessionAction } from '@/types/mastermind';
 
 interface PlanEditorProps {
   session: MastermindSession;
   onValidate: () => Promise<ValidationResult | null>;
-  onDispatch: (action: any) => Promise<void>;
+  onDispatch: (action: MastermindSessionAction) => Promise<void>;
 }
 
 interface ValidationResult {

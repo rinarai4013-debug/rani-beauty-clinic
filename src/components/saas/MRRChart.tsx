@@ -25,6 +25,18 @@ interface MRRChartProps {
   height?: number;
 }
 
+interface TooltipEntry {
+  color?: string;
+  name?: string;
+  value?: number | string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipEntry[];
+  label?: string;
+}
+
 const defaultData: MRRDataPoint[] = [
   { month: 'Sep 2025', mrr: 12400, newMRR: 2800, churnedMRR: 600, expansionMRR: 400 },
   { month: 'Oct 2025', mrr: 15800, newMRR: 4200, churnedMRR: 800, expansionMRR: 600 },
@@ -40,12 +52,12 @@ function formatCurrency(value: number): string {
   return `$${value}`;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-[#0F1D2C] border border-[#1A2A3C] rounded-xl p-4 shadow-xl">
       <p className="text-[#F3D6BE] font-semibold mb-2">{label}</p>
-      {payload.map((entry: any, i: number) => (
+      {payload.map((entry, i: number) => (
         <div key={i} className="flex items-center gap-2 text-sm text-white/80">
           <span
             className="w-2.5 h-2.5 rounded-full"
@@ -53,7 +65,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           />
           <span>{entry.name}:</span>
           <span className="font-medium text-white">
-            ${entry.value.toLocaleString()}
+            ${typeof entry.value === 'number' ? entry.value.toLocaleString() : Number(entry.value || 0).toLocaleString()}
           </span>
         </div>
       ))}

@@ -82,6 +82,13 @@ export const PAIN_TOLERANCE_OPTIONS = [
   'high',
 ] as const;
 
+export const METABOLIC_TRACK_OPTIONS = [
+  'glp1',
+  'hormones',
+  'peptides',
+  'hybrid',
+] as const;
+
 // ── Step Schemas ──
 
 /** Step 1: Welcome - no user input, just intro screen */
@@ -163,6 +170,7 @@ const step5Schema = z.object({
   hasAllergies: z.boolean().optional().default(false),
   smokingStatus: z.enum(['never', 'former', 'current']).optional().default('never'),
   sunProtectionHabit: z.enum(['never', 'sometimes', 'usually', 'always']).optional().default('sometimes'),
+  baselineLabsCompleted: z.boolean().optional().default(false),
 });
 
 /** Step 6: Goals - personal goals, timeline preference, budget range */
@@ -179,6 +187,8 @@ const step6Schema = z.object({
   }),
   downtimeTolerance: z.enum(DOWNTIME_TOLERANCE_OPTIONS).optional().default('moderate'),
   painTolerance: z.enum(PAIN_TOLERANCE_OPTIONS).optional().default('medium'),
+  metabolicTrackPreference: z.enum(METABOLIC_TRACK_OPTIONS).optional(),
+  fulfillmentPreference: z.enum(['clinic', 'home']).optional().default('clinic'),
 });
 
 /** Step 7: Photos - optional uploads, max 3 */

@@ -86,15 +86,6 @@ vi.mock('@/lib/templates/pre-consult', () => ({
   ]),
 }));
 
-vi.mock('@/lib/security/public-intent-guard', () => ({
-  enforceAllowedPublicOrigin: vi.fn().mockReturnValue(null),
-  enforceContentLength: vi.fn().mockReturnValue(null),
-}));
-
-vi.mock('@/lib/auth/session', () => ({
-  getSessionFromRequest: vi.fn().mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' }),
-}));
-
 vi.mock('@/lib/sentry-utils', () => ({
   withSentry: vi.fn(async (_name: string, handler: () => Promise<unknown>) => handler()),
 }));
@@ -208,6 +199,43 @@ describe('POST /api/templates/post-treatment', () => {
       serviceName: 'HydraFacial',
       providerName: 'Mom',
     }, { 'x-webhook-secret': 'wrong-key' });
+
+    const response = await POST(req as never);
+    await expectJsonStatus(response, 200);
+  });
+
+  it('should return 401 when no staff session and no shared secret configured', async () => {
+    getSessionFromRequestMock.mockImplementation(() => Promise.reject(new Error('no session')));
+    delete process.env.N8N_API_KEY;
+    delete process.env.TEMPLATE_API_SECRET;
+
+    const { POST } = await import('@/app/api/templates/post-treatment/route');
+    const req = buildPostRequest('/api/templates/post-treatment', {
+      step: 'immediate',
+      firstName: 'Jane',
+      serviceName: 'HydraFacial',
+      providerName: 'Mom',
+    });
+
+    const response = await POST(req as never);
+    await expectJsonStatus(response, 401);
+  });
+
+  it('should allow webhook secret when no staff session exists', async () => {
+    getSessionFromRequestMock.mockRejectedValueOnce(new Error('no session'));
+    process.env.N8N_API_KEY = 'correct-key';
+
+    const { POST } = await import('@/app/api/templates/post-treatment/route');
+    const req = buildPostRequest(
+      '/api/templates/post-treatment',
+      {
+        step: 'immediate',
+        firstName: 'Jane',
+        serviceName: 'HydraFacial',
+        providerName: 'Mom',
+      },
+      { 'x-webhook-secret': 'correct-key' },
+    );
 
     const response = await POST(req as never);
     await expectJsonStatus(response, 200);

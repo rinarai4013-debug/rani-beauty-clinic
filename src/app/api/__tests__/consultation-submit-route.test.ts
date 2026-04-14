@@ -19,6 +19,7 @@ const rateLimitedQueryMock = vi.fn();
 
 vi.mock('sharp', () => ({
   default: vi.fn().mockImplementation(() => ({
+    flatten: vi.fn().mockReturnThis(),
     metadata: vi.fn().mockResolvedValue({ width: 100, height: 100 }),
     resize: vi.fn().mockReturnThis(),
     jpeg: vi.fn().mockReturnThis(),
@@ -160,5 +161,67 @@ describe('POST /api/consultation/submit', () => {
     expect(body.success).toBe(true);
     expect(body.data.sessionId).toBe('ms_test_1');
     expect(intakeCreateMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses aura PDF upload as source photo when provided', async () => {
+    const formData = new FormData();
+    formData.set(
+      'data',
+      JSON.stringify({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+      }),
+    );
+    const auraPdf = new File([new Uint8Array([37, 80, 68, 70])], 'aura-scan.pdf', {
+      type: 'application/pdf',
+    });
+    formData.append('aura', auraPdf);
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.hasPhoto).toBe(true);
+    expect(createSessionMock).toHaveBeenCalledTimes(1);
+    expect(createSessionMock.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
+        sourcePhotoUrl: expect.stringMatching(/^data:image\/jpeg;base64,/),
+      }),
+    );
+  });
+
+  it('accepts unsupported aura file types without failing submission', async () => {
+    const formData = new FormData();
+    formData.set(
+      'data',
+      JSON.stringify({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+      }),
+    );
+    const unsupported = new File([new Uint8Array([1, 2, 3, 4])], 'aura-scan.txt', {
+      type: 'text/plain',
+    });
+    formData.append('aura', unsupported);
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.hasPhoto).toBe(false);
   });
 });

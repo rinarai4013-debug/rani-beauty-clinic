@@ -41,11 +41,16 @@ import {
 } from '@/lib/metabolic/boomrx-matrix';
 import { buildDosagePlan } from '@/lib/metabolic/dosing-engine';
 import {
+  buildProviderDoseCalculator,
+  type DoseSensitivity,
+} from '@/lib/metabolic/provider-dose-calculator';
+import {
   generateMetabolicRecommendation,
   type FulfillmentOption,
   type MetabolicGoal,
   type MetabolicIntake,
   type MetabolicRecommendation,
+  type MetabolicTrack,
   type MetabolicSymptom,
 } from '@/lib/metabolic/matrix';
 
@@ -741,13 +746,15 @@ function PackageSelectionSlide({
   completing,
 }: SlideProps) {
   const plan = session.mastermindPlan;
-  if (!plan) return <EmptySlide message="Plan not available" />;
 
   const metabolicContext = useMemo(() => buildMetabolicContext(session), [session]);
   const [selectedFulfillment, setSelectedFulfillment] = useState<FulfillmentOption>('clinic');
   const [selectedMetabolicPackageId, setSelectedMetabolicPackageId] = useState<string | null>(null);
   const [handoffLoading, setHandoffLoading] = useState(false);
   const [handoffMessage, setHandoffMessage] = useState<string | null>(null);
+  const [providerWeightKg, setProviderWeightKg] = useState(75);
+  const [providerSensitivity, setProviderSensitivity] = useState<DoseSensitivity>('medium');
+  const [providerAdherenceTarget, setProviderAdherenceTarget] = useState(85);
 
   useEffect(() => {
     if (!metabolicContext) return;
@@ -805,8 +812,29 @@ function PackageSelectionSlide({
     );
   }, [metabolicContext, selectedFulfillment, selectedMetabolicPackage]);
 
+  const providerDoseGuidance = useMemo(() => {
+    if (!dosagePlan || !metabolicContext) return null;
+    return buildProviderDoseCalculator({
+      dosagePlan,
+      patientWeightKg: providerWeightKg,
+      sensitivity: providerSensitivity,
+      adherenceTargetPct: providerAdherenceTarget,
+      labsComplete: metabolicContext.intake.labs.baselineLabsCompleted,
+    });
+  }, [
+    dosagePlan,
+    metabolicContext,
+    providerWeightKg,
+    providerSensitivity,
+    providerAdherenceTarget,
+  ]);
+
   const submitMetabolicHandoff = useCallback(async () => {
     if (!metabolicContext || !selectedMetabolicPackage) return;
+    if (metabolicContext.recommendation.status === 'ineligible') {
+      setHandoffMessage('Metabolic track is ineligible from intake risk flags. Provider review is required.');
+      return;
+    }
 
     const patientName = session.patientName?.trim();
     const patientEmail = session.patientEmail?.trim();
@@ -862,16 +890,49 @@ function PackageSelectionSlide({
         throw new Error((payload as { error?: string }).error || 'Handoff request failed');
       }
 
-      setHandoffMessage(
-        selectedFulfillment === 'home'
-          ? 'Handoff sent. Home checkout opened in a new tab.'
-          : 'Handoff sent. Clinic onboarding checkout opened in a new tab.',
-      );
-      const nextUrl =
-        selectedFulfillment === 'home'
-          ? '/glp1/intake?checkout=home'
-          : '/glp1/intake?checkout=clinic';
-      window.open(nextUrl, '_blank', 'noopener,noreferrer');
+      let protocolPacketReady = false;
+      try {
+        const packetResponse = await fetch('/api/mastermind/protocol-packet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: session.id }),
+        });
+        const packetPayload = await packetResponse.json().catch(() => ({} as { success?: boolean }));
+        protocolPacketReady = !!packetResponse.ok && !!packetPayload.success;
+      } catch {
+        protocolPacketReady = false;
+      }
+
+      if (metabolicContext.recommendation.status === 'provider-review-required') {
+        setHandoffMessage(
+          protocolPacketReady
+            ? 'Handoff sent for provider review. Protocol packet exported. Checkout launch is held pending clinical approval.'
+            : 'Handoff sent for provider review. Checkout launch is held pending clinical approval. Protocol packet export can be retried from session tools.',
+        );
+      } else {
+        setHandoffMessage(
+          selectedFulfillment === 'home'
+            ? protocolPacketReady
+              ? 'Handoff sent. Protocol packet exported. Home checkout opened in a new tab.'
+              : 'Handoff sent. Home checkout opened in a new tab (protocol packet export can be retried).'
+            : protocolPacketReady
+              ? 'Handoff sent. Protocol packet exported. Clinic onboarding checkout opened in a new tab.'
+              : 'Handoff sent. Clinic onboarding checkout opened in a new tab (protocol packet export can be retried).',
+        );
+        const checkoutPathByTrack: Record<MetabolicTrack, string> = {
+          glp1: '/glp1/intake',
+          hormones: '/hormones/intake',
+          peptides: '/peptide/intake',
+          hybrid: '/glp1/intake',
+        };
+        const checkoutBasePath =
+          checkoutPathByTrack[metabolicContext.recommendation.recommendedTrack] || '/glp1/intake';
+        const nextUrl =
+          selectedFulfillment === 'home'
+            ? `${checkoutBasePath}?checkout=home`
+            : `${checkoutBasePath}?checkout=clinic`;
+        window.open(nextUrl, '_blank', 'noopener,noreferrer');
+      }
     } catch (error) {
       setHandoffMessage(
         error instanceof Error ? error.message : 'Unable to submit metabolic handoff.',
@@ -880,6 +941,8 @@ function PackageSelectionSlide({
       setHandoffLoading(false);
     }
   }, [dosagePlan, metabolicContext, selectedFulfillment, selectedMetabolicPackage, session]);
+
+  if (!plan) return <EmptySlide message="Plan not available" />;
 
   return (
     <div className="flex flex-col items-center min-h-full px-6 py-12">
@@ -1039,18 +1102,91 @@ function PackageSelectionSlide({
               </div>
             )}
 
+            {selectedMetabolicPackage && dosagePlan && providerDoseGuidance && (
+              <div className="rounded-xl border border-[#C9A96E]/25 bg-[#0A1A29] p-4 space-y-3">
+                <p className="text-white/85 text-sm font-semibold font-body">
+                  Provider Dose Calculator
+                </p>
+                <div className="grid gap-3 md:grid-cols-3">
+                  <label className="text-[11px] text-white/55 font-body space-y-1">
+                    Weight (kg)
+                    <input
+                      type="number"
+                      min={35}
+                      max={220}
+                      value={providerWeightKg}
+                      onChange={(event) => setProviderWeightKg(Number(event.target.value) || 75)}
+                      className="w-full rounded-lg border border-white/15 bg-[#0F1D2C] px-3 py-2 text-xs text-white"
+                    />
+                  </label>
+                  <label className="text-[11px] text-white/55 font-body space-y-1">
+                    Sensitivity
+                    <select
+                      value={providerSensitivity}
+                      onChange={(event) => setProviderSensitivity(event.target.value as DoseSensitivity)}
+                      className="w-full rounded-lg border border-white/15 bg-[#0F1D2C] px-3 py-2 text-xs text-white"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </label>
+                  <label className="text-[11px] text-white/55 font-body space-y-1">
+                    Adherence target (%)
+                    <input
+                      type="number"
+                      min={40}
+                      max={100}
+                      value={providerAdherenceTarget}
+                      onChange={(event) =>
+                        setProviderAdherenceTarget(Number(event.target.value) || 85)
+                      }
+                      className="w-full rounded-lg border border-white/15 bg-[#0F1D2C] px-3 py-2 text-xs text-white"
+                    />
+                  </label>
+                </div>
+                <div className="space-y-1 text-[11px] text-white/65 font-body">
+                  <p>
+                    <span className="text-[#C9A96E]/90">Start adjustment:</span>{' '}
+                    {providerDoseGuidance.startAdjustment}
+                  </p>
+                  <p>
+                    <span className="text-[#C9A96E]/90">Escalation guidance:</span>{' '}
+                    {providerDoseGuidance.escalationGuidance}
+                  </p>
+                  <p>
+                    <span className="text-[#C9A96E]/90">Hold guidance:</span>{' '}
+                    {providerDoseGuidance.holdGuidance}
+                  </p>
+                  <p>
+                    <span className="text-[#C9A96E]/90">Checkpoint projection:</span>{' '}
+                    {providerDoseGuidance.projectedCheckpointDelta}
+                  </p>
+                  <p className="text-white/45">
+                    {providerDoseGuidance.providerGuardrail}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
                 type="button"
                 onClick={submitMetabolicHandoff}
-                disabled={handoffLoading || !selectedMetabolicPackage}
+                disabled={
+                  handoffLoading ||
+                  !selectedMetabolicPackage ||
+                  metabolicContext.recommendation.status === 'ineligible'
+                }
                 className="px-5 py-2.5 rounded-xl bg-[#059669] text-white text-sm font-semibold font-body hover:bg-[#059669]/90 disabled:opacity-50"
               >
                 {handoffLoading
                   ? 'Sending handoff...'
-                  : selectedFulfillment === 'home'
-                    ? 'One-click handoff + launch home checkout'
-                    : 'One-click handoff + launch clinic checkout'}
+                  : metabolicContext.recommendation.status === 'provider-review-required'
+                    ? 'Send provider-review handoff'
+                    : selectedFulfillment === 'home'
+                      ? 'One-click handoff + launch home checkout'
+                      : 'One-click handoff + launch clinic checkout'}
               </button>
               <p className="text-[11px] text-white/45 font-body">
                 Sends protocol + dosage governance to intake pipeline for provider plug-and-play.
@@ -1122,7 +1258,7 @@ function inferFallbackTrack(intake: Partial<ConsultationFormData>): MetabolicRec
 
 function toMetabolicGoals(intake: Partial<ConsultationFormData>): MetabolicGoal[] {
   const text = normalizeWords(
-    [intake.goals, intake.treatmentHistory, intake.currentRoutine].filter(Boolean).join(' '),
+    [intake.goals, intake.treatmentHistory].filter(Boolean).join(' '),
   );
   const goals = METABOLIC_GOAL_KEYWORDS
     .filter((entry) => includesAny(text, entry.terms))
@@ -1141,7 +1277,6 @@ function toMetabolicSymptoms(intake: Partial<ConsultationFormData>): MetabolicSy
     [
       intake.goals,
       intake.treatmentHistory,
-      intake.currentRoutine,
       Array.isArray(intake.skinConcerns) ? intake.skinConcerns.join(' ') : '',
     ]
       .filter(Boolean)

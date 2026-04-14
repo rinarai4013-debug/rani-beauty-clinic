@@ -176,7 +176,7 @@ export default function WeightLossLandingPage() {
               (425) 539-4440
             </a>
             <a
-              href="#enroll"
+              href="/glp1/intake"
               className="bg-[#C9A96E] text-rani-navy px-5 py-2 rounded-lg font-body font-semibold text-sm hover:bg-[#d4b67e] transition-colors"
             >
               Schedule Your Consultation
@@ -202,7 +202,7 @@ export default function WeightLossLandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="#enroll"
+              href="/glp1/intake"
               className="bg-[#C9A96E] text-rani-navy px-8 py-4 rounded-lg font-body font-bold text-lg hover:bg-[#d4b67e] transition-colors"
             >
               Book Free Consultation
@@ -307,7 +307,7 @@ export default function WeightLossLandingPage() {
                   ))}
                 </ul>
                 <a
-                  href="#enroll"
+                  href="/glp1/intake"
                   className={`block text-center py-3 rounded-lg font-body font-semibold text-sm transition-colors ${
                     tier.highlight
                       ? 'bg-[#C9A96E] text-rani-navy hover:bg-[#d4b67e]'
@@ -554,7 +554,7 @@ export default function WeightLossLandingPage() {
       {/* Floating Mobile CTA */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-rani-border p-3 sm:hidden z-50">
         <a
-          href="#enroll"
+          href="/glp1/intake"
           className="block text-center bg-[#C9A96E] text-rani-navy py-3 rounded-lg font-body font-bold text-sm"
         >
           Book Free Consultation - $0

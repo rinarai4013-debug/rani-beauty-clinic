@@ -16,6 +16,7 @@ import RevenueHealthPanel from '@/components/dashboard/panels/RevenueHealthPanel
 import NoShowRiskPanel from '@/components/dashboard/panels/NoShowRiskPanel';
 import SaveQueuePanel from '@/components/dashboard/panels/SaveQueuePanel';
 import FunnelHealthPanel from '@/components/dashboard/panels/FunnelHealthPanel';
+import MetabolicFunnelPanel from '@/components/dashboard/panels/MetabolicFunnelPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
 import MorningBriefing from '@/components/dashboard/gamification/MorningBriefing';
 import DailyChallenges from '@/components/dashboard/gamification/DailyChallenges';
@@ -176,8 +177,13 @@ export default function ExecutiveHome() {
           </div>
         </div>
 
-        {/* Funnel Health - CEO Only */}
-        {isCeo && <FunnelHealthPanel />}
+        {/* Funnel + Metabolic Conversion Health - CEO Only */}
+        {isCeo && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <FunnelHealthPanel />
+            <MetabolicFunnelPanel />
+          </div>
+        )}
 
         {/* Quick Actions */}
         <QuickActions />

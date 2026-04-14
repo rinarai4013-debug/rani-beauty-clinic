@@ -93,7 +93,7 @@ export default function CommunicationAnalytics({
               <YAxis tick={{ fontSize: 10, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #E5E7EB' }}
-                labelFormatter={((d: any) => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })) as never}
+                labelFormatter={((d: string | number) => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })) as never}
               />
               <Area type="monotone" dataKey="sent" stroke="#0F1D2C" fill="url(#colorSent)" strokeWidth={2} name="Sent" />
               <Area type="monotone" dataKey="opened" stroke="#C9A96E" fill="url(#colorOpened)" strokeWidth={2} name="Opened" />

@@ -49,7 +49,7 @@ export default function ForecastChart({ projections, confidenceIntervals, height
               name === 'expected' ? 'Expected' : name === 'optimistic' ? 'Optimistic' : name === 'conservative' ? 'Conservative' : name,
             ]) as never}
             contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }}
-            labelFormatter={((label: any) => formatMonth(label as string)) as never}
+            labelFormatter={((label: string | number) => formatMonth(String(label))) as never}
           />
           <Legend />
           {confidenceIntervals && (

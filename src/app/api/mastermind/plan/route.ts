@@ -20,6 +20,8 @@ import type { ConsultationFormData } from '@/lib/consultation/schema';
 
 import { withSentry } from '@/lib/sentry-utils';
 
+const MAX_PLAN_JSON_BYTES = 2 * 1024 * 1024;
+
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/plan', async () => {
     try {
@@ -29,7 +31,16 @@ export async function POST(request: NextRequest) {
         return unauthorized();
       }
 
-      const parsed = await parseJsonBody(request);
+      const rawLength = request.headers.get('content-length');
+      const contentLength = rawLength ? Number(rawLength) : NaN;
+      if (Number.isFinite(contentLength) && contentLength > MAX_PLAN_JSON_BYTES) {
+        return apiError(
+          'Payload too large for plan generation request. Please retry with smaller request payload.',
+          413,
+        );
+      }
+
+      const parsed = await parseJsonBody(request, { maxBytes: MAX_PLAN_JSON_BYTES });
       if ('error' in parsed) return parsed.error;
       const { body } = parsed;
 
@@ -76,10 +87,9 @@ export async function POST(request: NextRequest) {
           plan = await generateAIPlan(scanResult, intakeData, UNIFIED_CATALOG);
           source = 'ai';
         } catch (aiErr) {
-          console.warn(
-            '[Mastermind Plan] AI generation failed, falling back to rule engine:',
-            aiErr,
-          );
+          logEvent('ai', 'warn', '[Mastermind Plan] AI generation failed, falling back to rule engine', {
+            error: aiErr instanceof Error ? aiErr.message : String(aiErr),
+          });
           plan = generateMastermindPlan(scanResult, intakeData);
           source = 'engine-fallback';
         }

@@ -190,6 +190,22 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     expect(response.status).toBe(400);
   });
 
+  it('POST /api/mastermind/scan returns 413 when content-length exceeds guard limit', async () => {
+    const { POST } = await import('@/app/api/mastermind/scan/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/scan', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'content-length': String(3 * 1024 * 1024),
+        },
+        body: JSON.stringify({ sessionId: 'ms_1' }),
+      }) as never,
+    );
+
+    expect(response.status).toBe(413);
+  });
+
   it('POST /api/mastermind/scan returns 404 when sessionId does not exist', async () => {
     getSessionByIdAsyncMock.mockResolvedValueOnce(null);
     const { POST } = await import('@/app/api/mastermind/scan/route');
@@ -306,6 +322,22 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     const response = await POST(post('http://localhost:3000/api/mastermind/plan', {}) as never);
 
     expect(response.status).toBe(400);
+  });
+
+  it('POST /api/mastermind/plan returns 413 when content-length exceeds guard limit', async () => {
+    const { POST } = await import('@/app/api/mastermind/plan/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/plan', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'content-length': String(3 * 1024 * 1024),
+        },
+        body: JSON.stringify({ sessionId: 'ms_1' }),
+      }) as never,
+    );
+
+    expect(response.status).toBe(413);
   });
 
   it('POST /api/mastermind/plan returns 404 when sessionId does not exist', async () => {

@@ -20,6 +20,8 @@ import { withSentry } from '@/lib/sentry-utils';
 export const maxDuration = 30;
 const SimulateSessionSchema = z.object({
   sessionId: z.string().min(1).optional(),
+  selectedTreatmentIds: z.array(z.string().min(1)).optional(),
+  scenarioMode: z.enum(['conservative', 'typical', 'aggressive']).optional(),
 });
 
 function buildDataDrivenSimulation(
@@ -28,6 +30,9 @@ function buildDataDrivenSimulation(
   chronologicalAge: number,
   concerns: string[],
   planCost?: number,
+  treatmentNames: string[] = [],
+  scenarioMode: 'conservative' | 'typical' | 'aggressive' = 'typical',
+  selectedTreatmentIds: string[] = [],
 ): SimulationComparison {
   const frame = (
     timepoint: string,
@@ -46,11 +51,15 @@ function buildDataDrivenSimulation(
 
   // Calculate improvement trajectory based on starting score
   // Lower scores = more room for improvement
-  const improvementPotential = Math.min(40, Math.round((100 - auraScore) * 0.6));
-  const skinAgeReduction = Math.min(12, Math.round((skinAge - chronologicalAge + 5) * 0.8));
+  const scenarioMultiplier =
+    scenarioMode === 'conservative' ? 0.82 : scenarioMode === 'aggressive' ? 1.18 : 1;
+  const improvementPotential = Math.min(40, Math.round((100 - auraScore) * 0.6 * scenarioMultiplier));
+  const skinAgeReduction = Math.min(12, Math.round((skinAge - chronologicalAge + 5) * 0.8 * scenarioMultiplier));
 
   // Build concern-specific descriptions
   const topConcerns = concerns.slice(0, 3).join(', ') || 'skin concerns';
+  const topTreatments = treatmentNames.slice(0, 3);
+  const treatmentSummary = topTreatments.length > 0 ? topTreatments.join(', ') : 'your selected protocol';
 
   const withTreatmentFrames = [
     frame(
@@ -58,7 +67,7 @@ function buildDataDrivenSimulation(
       1,
       auraScore + improvementPotential * 0.25,
       skinAge - skinAgeReduction * 0.15,
-      `Initial results visible — early improvement in ${topConcerns}`,
+      `Initial results visible — early improvement in ${topConcerns} with ${treatmentSummary}`,
     ),
     frame(
       '3M',
@@ -72,7 +81,7 @@ function buildDataDrivenSimulation(
       6,
       auraScore + improvementPotential * 0.8,
       skinAge - skinAgeReduction * 0.75,
-      `Full treatment effects realized — significant visible transformation`,
+      `Full treatment effects realized — significant visible transformation from ${treatmentSummary}`,
     ),
     frame(
       '1Y',
@@ -84,8 +93,8 @@ function buildDataDrivenSimulation(
   ];
 
   // Without treatment: gradual decline
-  const declineRate = Math.max(2, Math.round(auraScore * 0.04));
-  const agingRate = Math.max(1, Math.round((skinAge - chronologicalAge + 3) * 0.3));
+  const declineRate = Math.max(2, Math.round(auraScore * 0.04 * (scenarioMode === 'conservative' ? 1.15 : 1)));
+  const agingRate = Math.max(1, Math.round((skinAge - chronologicalAge + 3) * 0.3 * (scenarioMode === 'conservative' ? 1.15 : 0.95)));
 
   const withoutTreatmentFrames = [
     frame(
@@ -132,11 +141,16 @@ function buildDataDrivenSimulation(
   return {
     withTreatment: {
       frames: withTreatmentFrames,
-      narrative: `Starting from an Aura Score of ${auraScore}, your personalized treatment plan progressively improves skin health. By 12 months, we project a score of ${Math.round(finalWithScore)} with a skin age reduction of ${Math.round(skinAgeReduction)} years — addressing ${topConcerns} through targeted interventions.`,
+      narrative: `Starting from an Aura Score of ${auraScore}, your personalized treatment plan progressively improves skin health. By 12 months, we project a score of ${Math.round(finalWithScore)} with a skin age reduction of ${Math.round(skinAgeReduction)} years — addressing ${topConcerns} through ${treatmentSummary}.`,
     },
     withoutTreatment: {
       frames: withoutTreatmentFrames,
       narrative: `Without intervention, natural aging combined with environmental factors will progressively worsen ${topConcerns}. Your Aura Score is projected to decline to ${Math.round(finalWithoutScore)} over 5 years, with skin age advancing to ${Math.round(finalWithoutAge)}.`,
+    },
+    selection: {
+      scope: selectedTreatmentIds.length > 0 ? 'single-treatment' : 'full-plan',
+      selectedTreatmentIds,
+      scenarioMode,
     },
     comparison: {
       auraScoreDelta: scoreDelta,
@@ -174,6 +188,8 @@ export async function POST(request: NextRequest) {
       }
 
       const { sessionId } = parsed.data;
+      const selectedTreatmentIds = parsed.data.selectedTreatmentIds || [];
+      const scenarioMode = parsed.data.scenarioMode || 'typical';
 
       let result: SimulationComparison;
       let renderMode = 'mock';
@@ -197,15 +213,44 @@ export async function POST(request: NextRequest) {
             : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
 
           // Get plan cost if available
-          const planCost = session.mastermindPlan?.recommendations
+          const planTreatments = session.mastermindPlan?.recommendations
             ? [
                 ...(session.mastermindPlan.recommendations.primary || []),
                 ...(session.mastermindPlan.recommendations.complementary || []),
-              ].reduce(
+              ]
+            : [];
+          const selectedTreatmentSet = new Set(selectedTreatmentIds);
+          const scopedTreatments =
+            selectedTreatmentSet.size > 0
+              ? planTreatments.filter((t: { id?: string }) => t.id && selectedTreatmentSet.has(t.id))
+              : planTreatments;
+          const planCost = planTreatments.length > 0
+            ? planTreatments.reduce(
                 (sum: number, t: { totalEstimate?: number }) => sum + (t.totalEstimate || 0),
                 0,
               )
             : undefined;
+          const treatmentNames = scopedTreatments.map((t: { treatmentName?: string }) => t.treatmentName || '').filter(Boolean);
+
+          const relatedFromFlags = (scan.medicalFlags || [])
+            .flatMap((flag: { relatedTreatments?: string[] }) => flag.relatedTreatments || [])
+            .map((entry: string) => entry.toLowerCase());
+          const hasContraindicationConflict = scopedTreatments.some((t: { id?: string; treatmentName?: string }) => {
+            const id = (t.id || '').toLowerCase();
+            const name = (t.treatmentName || '').toLowerCase();
+            return relatedFromFlags.some((related) => id.includes(related) || name.includes(related) || related.includes(id));
+          });
+
+          if (selectedTreatmentSet.size > 0 && hasContraindicationConflict) {
+            return NextResponse.json(
+              {
+                success: false,
+                error:
+                  'Selected treatment is flagged with contraindications for this session context. Switch to full-plan simulation or resolve provider review flags.',
+              },
+              { status: 422 },
+            );
+          }
 
           result = buildDataDrivenSimulation(
             scan.auraScore.overall,
@@ -213,6 +258,9 @@ export async function POST(request: NextRequest) {
             chronoAge,
             concerns,
             planCost,
+            treatmentNames,
+            scenarioMode,
+            selectedTreatmentIds,
           );
           renderMode = 'data-driven';
         } else {

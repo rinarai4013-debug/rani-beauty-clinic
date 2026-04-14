@@ -47,6 +47,9 @@ export interface UnifiedConsultation {
   sessionId: string | null;
   // For intake records, keep Airtable record ID
   airtableRecordId: string | null;
+  // Metabolic funnel metadata (optional for non-metabolic consults)
+  metabolicTrack?: 'glp1' | 'hormones' | 'peptides' | 'hybrid' | 'unknown';
+  metabolicRecommendationStatus?: 'eligible' | 'provider-review-required' | 'ineligible' | 'unknown';
 }
 
 // ── Pipeline Analytics Summary ──

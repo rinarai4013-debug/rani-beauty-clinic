@@ -1,13 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import type { SimulationComparison, AuraScanResult, MastermindPlan } from '@/types/mastermind';
-import { generateSimulationComparison } from '@/lib/mastermind/simulation-engine';
+import type {
+  SimulationComparison,
+  AuraScanResult,
+  MastermindPlan,
+  MastermindTreatment,
+} from '@/types/mastermind';
+import {
+  SIMULATION_SERVICE_SCOPES,
+  generateSimulationComparison,
+} from '@/lib/mastermind/simulation-engine';
 import TimelineScrubber from './TimelineScrubber';
 import SimulationMetrics from './SimulationMetrics';
 import SimulationDisclaimer from '@/components/photo-simulation/SimulationDisclaimer';
+import { trackAnalyticsEvent } from '@/lib/analytics/events';
 
 interface PredictiveSimulationProps {
   scanResult: AuraScanResult;
@@ -25,12 +34,59 @@ export default function PredictiveSimulation({
   const [error, setError] = useState<string | null>(null);
   const [withIndex, setWithIndex] = useState(0);
   const [withoutIndex, setWithoutIndex] = useState(0);
-  const generatedRef = useRef(false);
+  const [selectedTreatmentId, setSelectedTreatmentId] = useState<string>('all');
+  const [scenarioMode, setScenarioMode] = useState<'conservative' | 'typical' | 'aggressive'>('typical');
 
-  // Generate simulation on mount if we have a source photo
+  const selectableTreatments = useMemo(() => {
+    if (!plan) return [] as MastermindTreatment[];
+    const seen = new Set<string>();
+    const combined = [
+      ...(plan.recommendations.primary || []),
+      ...(plan.recommendations.complementary || []),
+      ...(plan.recommendations.maintenance || []),
+    ];
+    const unique: MastermindTreatment[] = [];
+    for (const treatment of combined) {
+      if (seen.has(treatment.id)) continue;
+      seen.add(treatment.id);
+      unique.push(treatment);
+    }
+    return unique;
+  }, [plan]);
+
+  const serviceScopeLabelMap = useMemo(
+    () => new Map(SIMULATION_SERVICE_SCOPES.map((scope) => [scope.id, scope.label])),
+    [],
+  );
+
+  const selectedTreatmentIds = selectedTreatmentId === 'all' ? undefined : [selectedTreatmentId];
+  const isServiceScopeSelection = selectedTreatmentId.startsWith('preset:');
+  const selectedTreatment = selectedTreatmentId === 'all'
+    ? null
+    : selectableTreatments.find((t) => t.id === selectedTreatmentId) || null;
+
+  const hasContraindicationConflict = Boolean(
+    !isServiceScopeSelection &&
+    selectedTreatment &&
+    selectedTreatment.contraindications?.length &&
+    scanResult.medicalFlags?.some((flag) => {
+      const related = (flag.relatedTreatments || []).map((t) => t.toLowerCase());
+      const treatmentId = selectedTreatment.id.toLowerCase();
+      const treatmentName = selectedTreatment.treatmentName.toLowerCase();
+      return related.some((r) => treatmentId.includes(r) || treatmentName.includes(r) || r.includes(treatmentId));
+    }),
+  );
+
+  // Generate simulation on mount and whenever the selected scope changes
   useEffect(() => {
-    if (!sourcePhotoDataUrl || generatedRef.current) return;
-    generatedRef.current = true;
+    if (!sourcePhotoDataUrl) return;
+    if (hasContraindicationConflict) {
+      setComparison(null);
+      setError(
+        'Selected treatment is flagged by medical contraindications for this session. Switch to full-plan simulation or complete provider review.',
+      );
+      return;
+    }
 
     (async () => {
       setIsGenerating(true);
@@ -40,8 +96,12 @@ export default function PredictiveSimulation({
           sourceImageDataUrl: sourcePhotoDataUrl,
           scanResult,
           plan,
+          selectedTreatmentIds,
+          scenarioMode,
         });
         setComparison(result);
+        setWithIndex(0);
+        setWithoutIndex(0);
       } catch (err) {
         console.error('Simulation generation failed:', err);
         setError('Failed to generate simulation. Please try again.');
@@ -49,7 +109,7 @@ export default function PredictiveSimulation({
         setIsGenerating(false);
       }
     })();
-  }, [sourcePhotoDataUrl, scanResult, plan]);
+  }, [sourcePhotoDataUrl, scanResult, plan, selectedTreatmentId, scenarioMode, hasContraindicationConflict]);
 
   const handleRegenerate = useCallback(async () => {
     if (!sourcePhotoDataUrl) return;
@@ -60,6 +120,8 @@ export default function PredictiveSimulation({
         sourceImageDataUrl: sourcePhotoDataUrl,
         scanResult,
         plan,
+        selectedTreatmentIds,
+        scenarioMode,
       });
       setComparison(result);
       setWithIndex(0);
@@ -69,7 +131,7 @@ export default function PredictiveSimulation({
     } finally {
       setIsGenerating(false);
     }
-  }, [sourcePhotoDataUrl, scanResult, plan]);
+  }, [sourcePhotoDataUrl, scanResult, plan, selectedTreatmentId, scenarioMode]);
 
   // No source photo
   if (!sourcePhotoDataUrl) {
@@ -137,6 +199,82 @@ export default function PredictiveSimulation({
       <h2 className="font-[family-name:var(--font-heading)] text-xl text-[#0F1D2C] text-center">
         Your Skin&apos;s Two Futures
       </h2>
+
+      {selectableTreatments.length > 0 && (
+        <div className="rounded-xl border border-[#0F1D2C]/10 bg-white p-4">
+          <label className="block text-xs uppercase tracking-[0.08em] text-[#0F1D2C]/60 mb-2">
+            Simulation scope
+          </label>
+          <select
+            value={selectedTreatmentId}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedTreatmentId(value);
+              trackAnalyticsEvent('pricing_interaction', {
+                interaction_type: 'simulation_scope_switch',
+              service_name:
+                value === 'all'
+                  ? 'full-plan'
+                  : serviceScopeLabelMap.get(value) || value,
+              plan_id: plan?.planId,
+            });
+              if (value !== 'all') {
+                trackAnalyticsEvent('plan_tier_selected', {
+                  tier: scenarioMode,
+                  service_name: value,
+                  plan_id: plan?.planId,
+                });
+              }
+            }}
+            className="w-full rounded-lg border border-[#0F1D2C]/20 bg-[#F8F6F1] px-3 py-2 text-sm text-[#0F1D2C]"
+          >
+            <option value="all">Full plan (all selected treatments)</option>
+            <optgroup label="Core service projections">
+              {SIMULATION_SERVICE_SCOPES.map((scope) => (
+                <option key={scope.id} value={scope.id}>
+                  {scope.label}
+                </option>
+              ))}
+            </optgroup>
+            {selectableTreatments.length > 0 && (
+              <optgroup label="Current plan treatments">
+                {selectableTreatments.map((treatment) => (
+                  <option key={treatment.id} value={treatment.id}>
+                    {treatment.treatmentName}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+          </select>
+          <p className="mt-2 text-xs text-[#0F1D2C]/50">
+            Switch between full-plan simulation and single-treatment projection during consults.
+          </p>
+        </div>
+      )}
+
+      <div className="rounded-xl border border-[#0F1D2C]/10 bg-white p-4">
+        <label className="block text-xs uppercase tracking-[0.08em] text-[#0F1D2C]/60 mb-2">
+          Scenario mode
+        </label>
+        <select
+          value={scenarioMode}
+          onChange={(e) => {
+            const mode = e.target.value as 'conservative' | 'typical' | 'aggressive';
+            setScenarioMode(mode);
+            trackAnalyticsEvent('pricing_interaction', {
+              interaction_type: 'simulation_scenario_switch',
+              tier: mode,
+              service_name: selectedTreatmentId === 'all' ? 'full-plan' : selectedTreatmentId,
+              plan_id: plan?.planId,
+            });
+          }}
+          className="w-full rounded-lg border border-[#0F1D2C]/20 bg-[#F8F6F1] px-3 py-2 text-sm text-[#0F1D2C]"
+        >
+          <option value="conservative">Conservative (slower/safer trajectory)</option>
+          <option value="typical">Typical (balanced trajectory)</option>
+          <option value="aggressive">Aggressive (faster trajectory)</option>
+        </select>
+      </div>
 
       {/* Dual Image Panels */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

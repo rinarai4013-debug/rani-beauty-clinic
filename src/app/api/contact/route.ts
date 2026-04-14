@@ -30,6 +30,12 @@ const ContactSchema = z.object({
   utm_campaign: z.string().max(150).optional(),
   utm_content: z.string().max(150).optional(),
   utm_term: z.string().max(150).optional(),
+  recommendedTrack: z.enum(['glp1', 'hormones', 'peptides', 'hybrid']).optional(),
+  protocolTier: z.enum(['start', 'transform', 'elite']).optional(),
+  fulfillmentPreference: z.enum(['clinic', 'home']).optional(),
+  homeDeliveryRequested: z.boolean().optional().default(false),
+  goalsSummary: z.string().max(1200).optional(),
+  symptomsSummary: z.string().max(1200).optional(),
   honeypot: z.string().max(0, "Bot detected").optional().default(""),
 });
 const MAX_CONTACT_REQUEST_BYTES = 64 * 1024;
@@ -118,12 +124,24 @@ export async function POST(req: NextRequest) {
       utm_campaign,
       utm_content,
       utm_term,
+      recommendedTrack,
+      protocolTier,
+      fulfillmentPreference,
+      homeDeliveryRequested,
+      goalsSummary,
+      symptomsSummary,
     } = parsed.data;
 
     // Build intake summary for AI pipeline
     const intakeLines = [
       `Service Interest: ${service}`,
       message ? `Message: ${message}` : null,
+      recommendedTrack ? `Recommended Track: ${recommendedTrack}` : null,
+      protocolTier ? `Preferred Tier: ${protocolTier}` : null,
+      fulfillmentPreference ? `Fulfillment Preference: ${fulfillmentPreference}` : null,
+      homeDeliveryRequested ? 'Home Delivery Requested: yes' : null,
+      goalsSummary ? `Goals Summary: ${goalsSummary}` : null,
+      symptomsSummary ? `Symptoms Summary: ${symptomsSummary}` : null,
     ];
     appendAttributionLines(intakeLines, {
       source,
@@ -270,6 +288,12 @@ export async function POST(req: NextRequest) {
             utm_campaign,
             utm_content,
             utm_term,
+            recommendedTrack,
+            protocolTier,
+            fulfillmentPreference,
+            homeDeliveryRequested,
+            goalsSummary,
+            symptomsSummary,
             name,
             email,
             phone,

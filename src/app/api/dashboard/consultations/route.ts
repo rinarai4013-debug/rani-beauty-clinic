@@ -23,6 +23,9 @@ import { withSentry } from '@/lib/sentry-utils';
 import type { MastermindSession, ClinicStatus, ActivityLogEntry, ProviderReviewState, MastermindPhase } from '@/types/mastermind';
 import type { UnifiedConsultation } from '@/types/consultations';
 
+type MetabolicTrack = 'glp1' | 'hormones' | 'peptides' | 'hybrid' | 'unknown';
+type MetabolicStatus = 'eligible' | 'provider-review-required' | 'ineligible' | 'unknown';
+
 // ── Communication signal derivation ──
 
 function deriveCommSignals(
@@ -56,6 +59,56 @@ function deriveCommSignals(
     lastSentAt: lastSent,
     sendCount: sendEvents.length,
   };
+}
+
+function parseMetabolicTrack(text: string): MetabolicTrack {
+  const normalized = text.toLowerCase();
+  const explicit =
+    normalized.match(/recommended track:\s*(glp1|hormones|peptides|hybrid)/)?.[1] ||
+    normalized.match(/metabolic track:\s*(glp1|hormones|peptides|hybrid)/)?.[1];
+  if (explicit === 'glp1' || explicit === 'hormones' || explicit === 'peptides' || explicit === 'hybrid') {
+    return explicit;
+  }
+  if (normalized.includes('glp') || normalized.includes('weight')) return 'glp1';
+  if (normalized.includes('hormone') || normalized.includes('hrt') || normalized.includes('trt')) return 'hormones';
+  if (normalized.includes('peptide') || normalized.includes('nad')) return 'peptides';
+  if (normalized.includes('hybrid')) return 'hybrid';
+  return 'unknown';
+}
+
+function parseMetabolicStatus(text: string): MetabolicStatus {
+  const normalized = text.toLowerCase();
+  const explicit = normalized.match(/recommendation status:\s*(eligible|provider-review-required|ineligible)/)?.[1];
+  if (explicit === 'eligible' || explicit === 'provider-review-required' || explicit === 'ineligible') {
+    return explicit;
+  }
+  if (normalized.includes('provider review required') || normalized.includes('provider-review-required')) {
+    return 'provider-review-required';
+  }
+  if (normalized.includes('ineligible')) return 'ineligible';
+  return 'unknown';
+}
+
+function deriveMetabolicFromSession(s: MastermindSession): { track: MetabolicTrack; status: MetabolicStatus } {
+  const noteText = `${s.clinicNotes || ''}\n${(s.activityLog || []).map((e) => e.detail || '').join('\n')}`;
+  let track = parseMetabolicTrack(noteText);
+  let status = parseMetabolicStatus(noteText);
+
+  if (status === 'unknown' && (s.phase === 'provider_review' || s.providerReview?.approvalStatus === 'pending')) {
+    status = 'provider-review-required';
+  }
+
+  if (track === 'unknown') {
+    const intake = s.intakeData as Record<string, unknown> | null;
+    const preferred = typeof intake?.preferredTrack === 'string' ? parseMetabolicTrack(intake.preferredTrack) : 'unknown';
+    if (preferred !== 'unknown') {
+      track = preferred;
+    } else if (Array.isArray(intake?.serviceInterests)) {
+      track = parseMetabolicTrack((intake?.serviceInterests as unknown[]).join(' '));
+    }
+  }
+
+  return { track, status };
 }
 
 // ── Revenue estimation helpers ──
@@ -120,6 +173,7 @@ function fromMastermindSession(s: MastermindSession): UnifiedConsultation {
   // Extract medical flags and contraindications for clinical oversight
   const medicalFlags = s.auraScanResult?.medicalFlags?.map(f => f.flag) || [];
   const contraindications = s.mastermindPlan?.contraindications?.map(c => `${c.treatment}: ${c.reason} (${c.severity})`) || [];
+  const metabolic = deriveMetabolicFromSession(s);
 
   // Revenue estimation
   const { estimatedValue, revenueSource } = estimateSessionValue(s);
@@ -168,6 +222,8 @@ function fromMastermindSession(s: MastermindSession): UnifiedConsultation {
     isStuck: estimatedValue > 500 && daysSinceLastActivity > 3 && !['booked', 'contacted'].includes(clinicStatus),
     sessionId: s.id,
     airtableRecordId: null,
+    metabolicTrack: metabolic.track,
+    metabolicRecommendationStatus: metabolic.status,
   };
 }
 
@@ -195,6 +251,8 @@ function fromAirtableIntake(
 
   // Parse session ID from intake summary (the submit route writes it)
   const summaryText = f['Intake Summary (AI)'] || '';
+  const metabolicTrack = parseMetabolicTrack(summaryText);
+  const metabolicStatus = parseMetabolicStatus(summaryText);
   const sessionMatch = summaryText.match(/Session ID:\s*(ms_\w+)/);
   const linkedSessionId = sessionMatch?.[1] || null;
 
@@ -298,6 +356,8 @@ function fromAirtableIntake(
     isStuck: estimatedValue > 500 && daysSinceCreated > 3 && clinicStatus === 'new',
     sessionId: linkedSessionId,
     airtableRecordId: record.id,
+    metabolicTrack,
+    metabolicRecommendationStatus: metabolicStatus,
   };
 }
 

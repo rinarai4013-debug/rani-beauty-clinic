@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSWR, { mutate as globalMutate } from 'swr';
 import {
@@ -144,9 +145,22 @@ function formatTimelineTime(iso: string): string {
 
 export default function ConsultationPipelinePage() {
   const { consultations, isLoading, mutate } = useUnifiedConsultations();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<ClinicStatus | 'all' | 'needs_review'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const metabolicTrackFilter = useMemo(() => {
+    const raw = searchParams.get('metabolicTrack')?.toLowerCase();
+    if (raw === 'glp1' || raw === 'hormones' || raw === 'peptides' || raw === 'hybrid' || raw === 'unknown') return raw;
+    return null;
+  }, [searchParams]);
+
+  const metabolicStatusFilter = useMemo(() => {
+    const raw = searchParams.get('metabolicStatus')?.toLowerCase();
+    if (raw === 'eligible' || raw === 'provider-review-required' || raw === 'ineligible') return raw;
+    return null;
+  }, [searchParams]);
 
   const filteredConsultations = useMemo(() => {
     let list = [...consultations];
@@ -167,6 +181,14 @@ export default function ConsultationPipelinePage() {
       );
     }
 
+    if (metabolicTrackFilter) {
+      list = list.filter((c) => c.metabolicTrack === metabolicTrackFilter);
+    }
+
+    if (metabolicStatusFilter) {
+      list = list.filter((c) => c.metabolicRecommendationStatus === metabolicStatusFilter);
+    }
+
     // Sort: newest first, prioritize "new" and "needs review"
     list.sort((a, b) => {
       if (a.needsReview && !b.needsReview) return -1;
@@ -177,7 +199,7 @@ export default function ConsultationPipelinePage() {
     });
 
     return list;
-  }, [consultations, statusFilter, searchQuery]);
+  }, [consultations, statusFilter, searchQuery, metabolicTrackFilter, metabolicStatusFilter]);
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: consultations.length };
@@ -299,6 +321,32 @@ export default function ConsultationPipelinePage() {
             />
           ))}
         </div>
+
+        {(metabolicTrackFilter || metabolicStatusFilter) && (
+          <div className="mt-3 flex items-center gap-2 text-xs">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md" style={{ backgroundColor: '#C9A96E1A', color: '#0F1D2C' }}>
+              <Filter className="w-3 h-3" />
+              Metabolic filter
+            </span>
+            {metabolicTrackFilter && (
+              <span className="px-2 py-1 rounded-md" style={{ backgroundColor: '#0F1D2C08', color: '#0F1D2C80' }}>
+                Track: {metabolicTrackFilter.toUpperCase()}
+              </span>
+            )}
+            {metabolicStatusFilter && (
+              <span className="px-2 py-1 rounded-md" style={{ backgroundColor: '#0F1D2C08', color: '#0F1D2C80' }}>
+                Status: {metabolicStatusFilter}
+              </span>
+            )}
+            <a
+              href="/dashboard/consultations"
+              className="px-2 py-1 rounded-md hover:opacity-80"
+              style={{ backgroundColor: '#fff', border: '1px solid #0F1D2C15', color: '#0F1D2C80' }}
+            >
+              Clear
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Content */}

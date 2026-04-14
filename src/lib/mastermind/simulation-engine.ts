@@ -22,11 +22,12 @@ import type {
 } from '@/types/mastermind';
 import type { FilterStep, DegradationFilterStep } from '@/lib/photo-simulation/filters';
 import { applyFilterChain } from '@/lib/photo-simulation/filters';
-import { TREATMENT_PRESETS } from '@/lib/photo-simulation/filter-presets';
+import { TREATMENT_PRESETS, getPresetsForService } from '@/lib/photo-simulation/filter-presets';
 import {
   DEGRADATION_PRESETS,
   getAgeAdjustedDegradation,
 } from '@/lib/photo-simulation/degradation-presets';
+import type { ServiceCategory } from '@/data/services/unified-catalog';
 
 // ── TYPES ──
 
@@ -34,6 +35,8 @@ interface SimulationInput {
   sourceImageDataUrl: string;
   scanResult: AuraScanResult;
   plan: MastermindPlan | null; // null = use draft/mock data
+  selectedTreatmentIds?: string[]; // optional focused simulation scope
+  scenarioMode?: 'conservative' | 'typical' | 'aggressive';
   canvasWidth?: number;
   canvasHeight?: number;
 }
@@ -43,6 +46,26 @@ interface TimeframeConfig {
   label: string;
   monthNumber: number;
 }
+
+export interface SimulationServiceScopeOption {
+  id: string;
+  label: string;
+  presetKeys: string[];
+}
+
+export const SIMULATION_SERVICE_SCOPES: SimulationServiceScopeOption[] = [
+  { id: 'preset:botox', label: 'Botox projection', presetKeys: ['anti-aging'] },
+  { id: 'preset:fillers', label: 'Filler projection', presetKeys: ['volume-restoration'] },
+  { id: 'preset:sculptra', label: 'Sculptra projection', presetKeys: ['volume-restoration', 'collagen-boost'] },
+  { id: 'preset:prx', label: 'PRX peel projection', presetKeys: ['collagen-boost', 'brightening-hydration'] },
+  { id: 'preset:rfmn', label: 'RFMN projection', presetKeys: ['skin-rejuvenation'] },
+  { id: 'preset:laser-hair', label: 'Laser hair projection', presetKeys: ['skin-rejuvenation'] },
+  { id: 'preset:sofwave', label: 'Sofwave projection', presetKeys: ['skin-tightening'] },
+];
+
+const SERVICE_SCOPE_MAP = new Map(
+  SIMULATION_SERVICE_SCOPES.map((scope) => [scope.id, scope]),
+);
 
 // ── WITH-TREATMENT TIMEFRAMES ──
 
@@ -62,12 +85,47 @@ const WITHOUT_TREATMENT_TIMEFRAMES: TimeframeConfig[] = [
   { key: '5Y', label: '5 Years', monthNumber: 60 },
 ];
 
+const SERVICE_CATEGORIES = new Set<ServiceCategory>([
+  'laser-hair-removal',
+  'facial',
+  'chemical-peel',
+  'rf-microneedling',
+  'skin-tightening',
+  'scar-reduction',
+  'laser',
+  'injectables',
+  'wellness',
+  'weight-management',
+  'hormones',
+  'labs',
+  'skincare',
+  'hair',
+  'consultation',
+]);
+
+const CATEGORY_ALIASES: Record<string, ServiceCategory> = {
+  neurotoxin: 'injectables',
+  injectable: 'injectables',
+  injectable_filler: 'injectables',
+  filler: 'injectables',
+  'rf microneedling': 'rf-microneedling',
+  'rf-micro': 'rf-microneedling',
+  'laser hair': 'laser-hair-removal',
+  lhr: 'laser-hair-removal',
+};
+
 // ── MAIN GENERATOR ──
 
 export async function generateSimulationComparison(
   input: SimulationInput
 ): Promise<SimulationComparison> {
-  const { sourceImageDataUrl, scanResult, plan } = input;
+  const {
+    sourceImageDataUrl,
+    scanResult,
+    plan,
+    selectedTreatmentIds,
+    scenarioMode = 'typical',
+  } = input;
   const maxWidth = input.canvasWidth || 600;
   const maxHeight = input.canvasHeight || 600;
 
@@ -86,14 +144,17 @@ export async function generateSimulationComparison(
     width,
     height,
     scanResult,
-    plan
+    plan,
+    selectedTreatmentIds,
+    scenarioMode,
   );
 
   const withoutTreatment = await generateWithoutTreatmentPath(
     sourceImage,
     width,
     height,
-    scanResult
+    scanResult,
+    scenarioMode,
   );
 
   // Build comparison metadata
@@ -116,6 +177,11 @@ export async function generateSimulationComparison(
   return {
     withTreatment,
     withoutTreatment,
+    selection: {
+      scope: selectedTreatmentIds && selectedTreatmentIds.length > 0 ? 'single-treatment' : 'full-plan',
+      selectedTreatmentIds: selectedTreatmentIds || [],
+      scenarioMode,
+    },
     comparison: {
       auraScoreDelta,
       skinAgeDelta,
@@ -142,18 +208,20 @@ async function generateWithTreatmentPath(
   width: number,
   height: number,
   scanResult: AuraScanResult,
-  plan: MastermindPlan | null
+  plan: MastermindPlan | null,
+  selectedTreatmentIds?: string[],
+  scenarioMode: 'conservative' | 'typical' | 'aggressive' = 'typical',
 ): Promise<SimulationPath> {
   const frames: SimulationFrame[] = [];
   const baseScore = scanResult.auraScore.overall;
   const baseSkinAge = scanResult.auraScore.skinAge;
 
   // Collect treatment filter presets from the plan
-  const treatmentFilters = getTreatmentFilterSteps(plan);
+  const treatmentFilters = getTreatmentFilterSteps(plan, selectedTreatmentIds);
 
   for (const timeframe of WITH_TREATMENT_TIMEFRAMES) {
     // Progressive intensity: ramp up with time
-    const progressFactor = getProgressFactor(timeframe.monthNumber);
+    const progressFactor = getProgressFactor(timeframe.monthNumber, scenarioMode);
 
     // Scale treatment filters by progress
     const scaledFilters: FilterStep[] = treatmentFilters.map((f) => ({
@@ -182,7 +250,7 @@ async function generateWithTreatmentPath(
       imageDataUrl,
       timepoint: timeframe.key,
       monthNumber: timeframe.monthNumber,
-      description: getWithTreatmentDescription(timeframe, plan),
+      description: getWithTreatmentDescription(timeframe, plan, scenarioMode),
       auraScoreProjection: Math.min(98, baseScore + scoreImprovement),
       skinAgeProjection: Math.max(
         scanResult.auraScore.chronologicalAge - 5,
@@ -205,7 +273,8 @@ async function generateWithoutTreatmentPath(
   sourceImage: HTMLImageElement,
   width: number,
   height: number,
-  scanResult: AuraScanResult
+  scanResult: AuraScanResult,
+  scenarioMode: 'conservative' | 'typical' | 'aggressive' = 'typical',
 ): Promise<SimulationPath> {
   const frames: SimulationFrame[] = [];
   const baseScore = scanResult.auraScore.overall;
@@ -213,7 +282,7 @@ async function generateWithoutTreatmentPath(
   const age = scanResult.auraScore.chronologicalAge;
 
   // Calculate risk multiplier from lifestyle
-  const riskMultiplier = calculateRiskMultiplier(scanResult);
+  const riskMultiplier = calculateRiskMultiplier(scanResult, scenarioMode);
 
   const timeframeKeys = ['6months', '1year', '3years', '5years'];
 
@@ -279,7 +348,10 @@ async function generateWithoutTreatmentPath(
 // ── HELPER FUNCTIONS ──
 
 /** Get filter steps for the planned treatments */
-function getTreatmentFilterSteps(plan: MastermindPlan | null): FilterStep[] {
+function getTreatmentFilterSteps(
+  plan: MastermindPlan | null,
+  selectedTreatmentIds?: string[],
+): FilterStep[] {
   if (!plan) {
     // Default fallback for draft/incomplete plans
     return [
@@ -293,25 +365,53 @@ function getTreatmentFilterSteps(plan: MastermindPlan | null): FilterStep[] {
   const allFilters: FilterStep[] = [];
   const seen = new Set<string>();
 
-  const treatments = [
+  const allTreatments = [
     ...plan.recommendations.primary,
     ...plan.recommendations.complementary,
   ];
+  const selectedSet = new Set(selectedTreatmentIds || []);
+  const presetSelections = Array.from(selectedSet)
+    .map((scopeId) => SERVICE_SCOPE_MAP.get(scopeId))
+    .filter((scope): scope is SimulationServiceScopeOption => Boolean(scope));
+  const selectedTreatmentOnly = Array.from(selectedSet).filter((scopeId) => !scopeId.startsWith('preset:'));
+
+  for (const scope of presetSelections) {
+    for (const presetKey of scope.presetKeys) {
+      const preset = TREATMENT_PRESETS[presetKey];
+      if (!preset) continue;
+      for (const filter of preset.filters) {
+        const dedupeKey = `${filter.filter}_${filter.intensity}`;
+        if (!seen.has(dedupeKey)) {
+          seen.add(dedupeKey);
+          allFilters.push(filter);
+        }
+      }
+    }
+  }
+
+  const treatments =
+    selectedTreatmentOnly.length > 0
+      ? allTreatments.filter((tx) => selectedTreatmentOnly.includes(tx.id))
+      : allTreatments;
 
   for (const tx of treatments) {
-    // Try to match treatment to a preset
-    const presetKey = findPresetKey(tx);
-    const preset = presetKey ? TREATMENT_PRESETS[presetKey] : null;
-
-    if (preset) {
+    const presetKeys = resolvePresetKeys(tx);
+    for (const presetKey of presetKeys) {
+      const preset = TREATMENT_PRESETS[presetKey];
+      if (!preset) continue;
       for (const f of preset.filters) {
-        const key = `${f.filter}_${f.intensity}`;
-        if (!seen.has(key)) {
-          seen.add(key);
+        const dedupeKey = `${f.filter}_${f.intensity}`;
+        if (!seen.has(dedupeKey)) {
+          seen.add(dedupeKey);
           allFilters.push(f);
         }
       }
     }
+  }
+
+  // If selected treatment IDs yielded no matches, try full plan fallback
+  if (allFilters.length === 0 && selectedSet.size > 0 && allTreatments.length > 0) {
+    return getTreatmentFilterSteps(plan);
   }
 
   // If no presets matched, use default improvement filters
@@ -327,34 +427,118 @@ function getTreatmentFilterSteps(plan: MastermindPlan | null): FilterStep[] {
   return allFilters;
 }
 
+function normalizeServiceCategory(raw: string): ServiceCategory | null {
+  const normalized = raw.trim().toLowerCase();
+  if (SERVICE_CATEGORIES.has(normalized as ServiceCategory)) {
+    return normalized as ServiceCategory;
+  }
+  return CATEGORY_ALIASES[normalized] || null;
+}
+
+function resolvePresetKeys(tx: MastermindTreatment): string[] {
+  const keys = new Set<string>();
+  const name = tx.treatmentName.toLowerCase();
+  const id = tx.id.toLowerCase();
+  const normalizedCategory = normalizeServiceCategory(tx.category);
+
+  if (normalizedCategory) {
+    for (const preset of getPresetsForService(tx.id, normalizedCategory)) keys.add(preset);
+    for (const preset of getPresetsForService(id, normalizedCategory)) keys.add(preset);
+  }
+
+  const fallback = findPresetKey(tx);
+  if (fallback) keys.add(fallback);
+
+  if (name.includes('sculptra') || id.includes('sculptra')) {
+    keys.add('volume-restoration');
+    keys.add('collagen-boost');
+  }
+  if (name.includes('botox') || name.includes('dysport') || name.includes('xeomin')) {
+    keys.add('anti-aging');
+  }
+  if (
+    name.includes('filler') ||
+    name.includes('juvederm') ||
+    name.includes('restylane') ||
+    name.includes('radiesse')
+  ) {
+    keys.add('volume-restoration');
+  }
+  if (name.includes('prx')) {
+    keys.add('collagen-boost');
+    keys.add('brightening-hydration');
+  }
+  if (name.includes('laser hair') || id.startsWith('lhr-')) {
+    keys.add('skin-rejuvenation');
+  }
+  if (name.includes('glp') || name.includes('semaglutide') || name.includes('tirzepatide')) {
+    keys.add('body-contouring');
+    keys.add('wellness-vitality');
+  }
+  if (
+    name.includes('hormone') ||
+    name.includes('trt') ||
+    name.includes('hrt') ||
+    name.includes('thyroid')
+  ) {
+    keys.add('wellness-vitality');
+  }
+  if (
+    name.includes('peptide') ||
+    name.includes('bpc') ||
+    name.includes('ipamorelin') ||
+    name.includes('cjc') ||
+    name.includes('sermorelin')
+  ) {
+    keys.add('wellness-vitality');
+    keys.add('collagen-boost');
+  }
+
+  return Array.from(keys).filter((key) => Boolean(TREATMENT_PRESETS[key]));
+}
+
 /** Map a treatment to a TREATMENT_PRESETS key */
 function findPresetKey(tx: MastermindTreatment): string | null {
   const name = tx.treatmentName.toLowerCase();
   const category = tx.category.toLowerCase();
 
   if (name.includes('botox') || category.includes('neurotoxin')) return 'anti-aging';
-  if (name.includes('filler') || category.includes('filler')) return 'skin-tightening';
+  if (name.includes('filler') || category.includes('filler')) return 'volume-restoration';
+  if (name.includes('sculptra')) return 'volume-restoration';
   if (name.includes('rf') || name.includes('microneedling')) return 'skin-rejuvenation';
   if (name.includes('hydrafacial')) return 'brightening-hydration';
   if (name.includes('peel') || name.includes('vi peel')) return 'tone-correction';
+  if (name.includes('prx')) return 'collagen-boost';
   if (name.includes('laser') || name.includes('picoway')) return 'pigment-targeting';
   if (name.includes('sofwave')) return 'skin-tightening';
+  if (name.includes('laser hair') || category.includes('laser-hair-removal')) return 'skin-rejuvenation';
+  if (name.includes('glp') || name.includes('semaglutide') || name.includes('tirzepatide')) return 'body-contouring';
+  if (name.includes('hormone') || name.includes('trt') || name.includes('hrt')) return 'wellness-vitality';
+  if (name.includes('peptide') || name.includes('bpc') || name.includes('ipamorelin') || name.includes('cjc')) return 'wellness-vitality';
   if (category.includes('facial')) return 'overall-glow';
 
   return null;
 }
 
 /** Calculate progressive intensity factor (0→1) over treatment timeline */
-function getProgressFactor(monthNumber: number): number {
+function getProgressFactor(
+  monthNumber: number,
+  scenarioMode: 'conservative' | 'typical' | 'aggressive' = 'typical',
+): number {
+  const scenarioMultiplier =
+    scenarioMode === 'conservative' ? 0.82 : scenarioMode === 'aggressive' ? 1.18 : 1;
   // Quick initial results (month 1 = 0.4), plateaus around month 6-12
-  if (monthNumber <= 1) return 0.35;
-  if (monthNumber <= 3) return 0.6;
-  if (monthNumber <= 6) return 0.85;
-  return 1.0;
+  if (monthNumber <= 1) return Math.min(1, 0.35 * scenarioMultiplier);
+  if (monthNumber <= 3) return Math.min(1, 0.6 * scenarioMultiplier);
+  if (monthNumber <= 6) return Math.min(1, 0.85 * scenarioMultiplier);
+  return Math.min(1, 1.0 * scenarioMultiplier);
 }
 
 /** Calculate risk multiplier from scan data */
-function calculateRiskMultiplier(scanResult: AuraScanResult): number {
+function calculateRiskMultiplier(
+  scanResult: AuraScanResult,
+  scenarioMode: 'conservative' | 'typical' | 'aggressive' = 'typical',
+): number {
   let multiplier = 1.0;
 
   for (const risk of scanResult.predictiveMetrics.riskFactors) {
@@ -363,25 +547,34 @@ function calculateRiskMultiplier(scanResult: AuraScanResult): number {
     else multiplier += 0.05;
   }
 
-  return Math.min(2.0, multiplier);
+  const scenarioDrag =
+    scenarioMode === 'conservative' ? 1.15 : scenarioMode === 'aggressive' ? 0.9 : 1;
+  return Math.min(2.0, multiplier * scenarioDrag);
 }
 
 /** Generate description for with-treatment timeframe */
 function getWithTreatmentDescription(
   timeframe: TimeframeConfig,
-  plan: MastermindPlan | null
+  plan: MastermindPlan | null,
+  scenarioMode: 'conservative' | 'typical' | 'aggressive' = 'typical',
 ): string {
   if (!plan) return `Projected improvement at ${timeframe.label}`;
+  const scenarioText =
+    scenarioMode === 'conservative'
+      ? 'using conservative escalation'
+      : scenarioMode === 'aggressive'
+        ? 'using accelerated escalation'
+        : 'using balanced escalation';
 
   switch (timeframe.key) {
     case '1M':
-      return 'Initial treatments taking effect. Wrinkle softening and volume restoration visible.';
+      return `Initial treatments taking effect ${scenarioText}. Wrinkle softening and volume restoration visible.`;
     case '3M':
-      return 'Core treatment series underway. Progressive texture and tone improvement.';
+      return `Core treatment series underway ${scenarioText}. Progressive texture and tone improvement.`;
     case '6M':
-      return 'Full treatment effects realized. Significant improvement across all concerns.';
+      return `Full treatment effects realized ${scenarioText}. Significant improvement across all concerns.`;
     case '1Y':
-      return 'Peak results with maintenance protocol. Optimal skin health achieved.';
+      return `Peak results with maintenance protocol ${scenarioText}. Optimal skin health achieved.`;
     default:
       return `Treatment progress at ${timeframe.label}`;
   }

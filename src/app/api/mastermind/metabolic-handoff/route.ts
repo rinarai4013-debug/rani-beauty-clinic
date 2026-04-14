@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
       }
 
       const data = validated.data;
+      const providerName = authSession.name || authSession.username || 'Staff';
+      const providerId = authSession.username || 'staff';
 
       // Verify session exists
       const session = await getSessionByIdAsync(data.sessionId);
@@ -95,11 +97,41 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Log handoff to session activity log
-      const providerName = authSession.name || authSession.username || 'Staff';
-      const updated = sessionReducer(session, {
+      // Push handoff into provider-review queue state first
+      const withProviderReview = sessionReducer(session, {
+        type: 'SET_PROVIDER_REVIEW',
+        review: {
+          providerId,
+          providerName,
+          modifications: [],
+          clinicalNotes: [
+            'Metabolic protocol handoff pending provider signoff before launch.',
+            `Track: ${data.recommendedTrack}`,
+            `Tier: ${data.protocolTier}`,
+            `Fulfillment: ${data.fulfillmentPreference}`,
+            `Home Delivery Requested: ${data.homeDeliveryRequested ? 'Yes' : 'No'}`,
+            `Dosage Governance: ${data.dosageGovernanceSummary}`,
+          ],
+          approvalStatus: 'pending',
+        },
+      });
+
+      const withStatus = sessionReducer(withProviderReview, {
+        type: 'SET_CLINIC_STATUS',
+        status: 'reviewed',
+        actor: providerName,
+      });
+
+      const nextNotes = [
+        withStatus.clinicNotes,
+        `Metabolic handoff submitted by ${providerName}: ${data.recommendedTrack} track, ${data.protocolTier} tier, ${data.fulfillmentPreference} fulfillment. Provider signoff required before launch.`,
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+      const updated = sessionReducer(withStatus, {
         type: 'SET_CLINIC_NOTES',
-        notes: `Metabolic handoff submitted by ${providerName}: ${data.recommendedTrack} track, ${data.protocolTier} tier, ${data.fulfillmentPreference} fulfillment.`,
+        notes: nextNotes,
         actor: providerName,
       });
       await saveSessionAsync(updated);
@@ -117,6 +149,8 @@ export async function POST(request: NextRequest) {
         tier: data.protocolTier,
         fulfillment: data.fulfillmentPreference,
         homeDeliveryRequested: data.homeDeliveryRequested,
+        providerReviewRequired: true,
+        approvalStatus: 'pending',
       });
     } catch (error) {
       logEvent('api', 'error', '[Metabolic Handoff] Error', {

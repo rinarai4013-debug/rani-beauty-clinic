@@ -20,6 +20,14 @@ import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
 import { submitIntakeSchema } from '@/lib/consultation/schema';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
+import {
+  metabolicIntakeSchema,
+  type MetabolicGoal,
+  type MetabolicRecommendation,
+  type MetabolicSymptom,
+  type MetabolicTrack,
+} from '@/lib/metabolic/matrix';
+import { buildUnifiedIntakeDecisionBundle } from '@/lib/metabolic/unified-intake-engine';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import {
   enforceAllowedPublicOrigin,
@@ -34,6 +42,136 @@ const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_JSON_REQUEST_BYTES = 512 * 1024;
 const MAX_MULTIPART_REQUEST_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
+
+type ConsultationIntakePayload = Partial<ConsultationFormData> & {
+  metabolicRecommendation?: MetabolicRecommendation;
+  metabolicProgramBundle?: {
+    primaryTrack: MetabolicTrack;
+    alternatives: Array<{
+      track: MetabolicTrack;
+      status: MetabolicRecommendation['status'];
+      recommendedFulfillment: 'clinic' | 'home';
+    }>;
+  };
+};
+
+const TRACK_HINTS: Array<{ track: MetabolicTrack; terms: string[] }> = [
+  { track: 'glp1', terms: ['glp', 'semaglutide', 'tirzepatide', 'weight-management', 'weight loss', 'ozempic', 'mounjaro'] },
+  { track: 'hormones', terms: ['hormone', 'hrt', 'trt', 'thyroid', 'menopause', 'andropause'] },
+  { track: 'peptides', terms: ['peptide', 'bpc', 'cjc', 'ipamorelin', 'recovery', 'performance'] },
+  { track: 'hybrid', terms: ['hybrid', 'combined', 'combination', 'glp + hormone'] },
+];
+
+const GOAL_HINTS: Array<{ goal: MetabolicGoal; terms: string[] }> = [
+  { goal: 'weight-loss', terms: ['weight loss', 'lose weight', 'fat loss', 'slim'] },
+  { goal: 'body-recomposition', terms: ['recomposition', 'tone', 'muscle', 'body contour'] },
+  { goal: 'metabolic-health', terms: ['metabolic', 'blood sugar', 'insulin', 'a1c'] },
+  { goal: 'energy', terms: ['energy', 'fatigue', 'tired'] },
+  { goal: 'hormone-balance', terms: ['hormone', 'menopause', 'libido', 'cycle'] },
+  { goal: 'recovery', terms: ['recovery', 'injury', 'inflammation'] },
+  { goal: 'longevity', terms: ['longevity', 'healthy aging', 'optimize healthspan'] },
+  { goal: 'performance', terms: ['performance', 'athletic', 'stamina'] },
+];
+
+const SYMPTOM_HINTS: Array<{ symptom: MetabolicSymptom; terms: string[] }> = [
+  { symptom: 'appetite-dysregulation', terms: ['appetite', 'hungry', 'overeating'] },
+  { symptom: 'sugar-cravings', terms: ['sugar craving', 'sweet craving', 'carb craving'] },
+  { symptom: 'weight-plateau', terms: ['plateau', 'stalled', 'not losing'] },
+  { symptom: 'fatigue', terms: ['fatigue', 'low energy', 'tired'] },
+  { symptom: 'brain-fog', terms: ['brain fog', 'focus', 'concentration'] },
+  { symptom: 'low-libido', terms: ['low libido', 'libido'] },
+  { symptom: 'poor-sleep', terms: ['poor sleep', 'insomnia', 'sleep'] },
+  { symptom: 'mood-swings', terms: ['mood', 'irritable', 'anxious'] },
+  { symptom: 'slow-recovery', terms: ['slow recovery', 'recover slowly', 'sore'] },
+  { symptom: 'inflammation', terms: ['inflammation', 'inflamed'] },
+  { symptom: 'muscle-loss', terms: ['muscle loss', 'sarcopenia'] },
+  { symptom: 'water-retention', terms: ['water retention', 'bloating fluid'] },
+  { symptom: 'gut-bloating', terms: ['gut', 'bloating', 'bloat'] },
+];
+
+function normalizeList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0);
+}
+
+function hasAnyTerm(text: string, terms: string[]): boolean {
+  return terms.some((term) => text.includes(term));
+}
+
+function inferTrack(intakeData: Partial<ConsultationFormData>): MetabolicTrack | undefined {
+  const intakeRecord = intakeData as Record<string, unknown>;
+  if (typeof intakeRecord.metabolicTrackPreference === 'string') {
+    const raw = intakeRecord.metabolicTrackPreference;
+    if (raw === 'glp1' || raw === 'hormones' || raw === 'peptides' || raw === 'hybrid') return raw;
+  }
+
+  const interests = normalizeList(intakeData.treatmentInterests).join(' ').toLowerCase();
+  if (!interests) return undefined;
+  return TRACK_HINTS.find((entry) => hasAnyTerm(interests, entry.terms))?.track;
+}
+
+function inferGoals(text: string): MetabolicGoal[] {
+  const matches = GOAL_HINTS.filter((entry) => hasAnyTerm(text, entry.terms)).map((entry) => entry.goal);
+  return matches.length > 0 ? matches : ['metabolic-health'];
+}
+
+function inferSymptoms(text: string): MetabolicSymptom[] {
+  const matches = SYMPTOM_HINTS.filter((entry) => hasAnyTerm(text, entry.terms)).map((entry) => entry.symptom);
+  return matches.length > 0 ? matches : ['fatigue'];
+}
+
+function buildMetabolicFromConsultation(
+  intakeData: Partial<ConsultationFormData>,
+  patientName: string,
+  patientEmail: string,
+) {
+  const intakeRecord = intakeData as Record<string, unknown>;
+  const concernText = normalizeList(intakeData.skinConcerns).join(', ');
+  const targetAreaText = normalizeList(intakeData.targetAreas).join(', ');
+  const treatmentText = normalizeList(intakeData.treatmentInterests).join(', ');
+  const goalsText = typeof intakeData.goals === 'string' ? intakeData.goals : '';
+  const historyText = typeof intakeData.treatmentHistory === 'string' ? intakeData.treatmentHistory : '';
+
+  const inferenceText = [goalsText, historyText, concernText, targetAreaText, treatmentText]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  const [firstToken, ...restTokens] = patientName.trim().split(/\s+/).filter(Boolean);
+  const firstName = (typeof intakeData.firstName === 'string' && intakeData.firstName.trim()) || firstToken || 'Patient';
+  const lastName = (typeof intakeData.lastName === 'string' && intakeData.lastName.trim()) || restTokens.join(' ') || 'Consultation';
+
+  const candidate = {
+    firstName,
+    lastName,
+    email: patientEmail,
+    phone: typeof intakeData.phone === 'string' ? intakeData.phone : '',
+    goals: inferGoals(inferenceText),
+    symptoms: inferSymptoms(inferenceText),
+    preferredTrack: inferTrack(intakeData),
+    fulfillmentPreference: intakeRecord.fulfillmentPreference === 'home' ? 'home' : 'clinic',
+    timelineWeeks: intakeData.timeline === 'asap' ? 4 : undefined,
+    currentMeds: historyText,
+    notes: goalsText,
+    source: 'consultation-submit',
+    medicalFlags: {
+      pregnant: intakeData.pregnant === true,
+      breastfeeding: intakeData.breastfeeding === true,
+      thyroidCancerHistory: intakeRecord.thyroidCancerHistory === true,
+      pancreatitisHistory: intakeRecord.pancreatitisHistory === true,
+      gallbladderDisease: intakeRecord.gallbladderDisease === true,
+      uncontrolledHypertension: intakeRecord.uncontrolledHypertension === true,
+      severeDepression: intakeRecord.severeDepression === true,
+      eatingDisorderHistory: intakeRecord.eatingDisorderHistory === true,
+    },
+    labs: {
+      baselineLabsCompleted: intakeRecord.baselineLabsCompleted === true,
+    },
+  };
+
+  const parsed = metabolicIntakeSchema.safeParse(candidate);
+  return parsed.success ? parsed.data : null;
+}
 
 export async function POST(request: NextRequest) {
   return withSentry('consultation/submit', async () => {
@@ -120,7 +258,9 @@ export async function POST(request: NextRequest) {
         sourcePhotoUrl = `data:image/jpeg;base64,${processed.toString('base64')}`;
         break; // Use first valid photo as simulation source
       } catch (err) {
-        console.warn('[Consultation Submit] Photo processing failed:', err);
+        logEvent('api', 'warn', '[Consultation Submit] Photo processing failed', {
+          error: err instanceof Error ? err.message : String(err),
+        });
         continue;
       }
     }
@@ -137,8 +277,17 @@ export async function POST(request: NextRequest) {
     }
 
     if (!sourcePhotoUrl && auraFiles.some((f) => f instanceof File && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')))) {
-      console.warn('[Consultation Submit] Aura PDF uploaded but no image could be extracted; continuing without source photo.');
+      logEvent('api', 'warn', '[Consultation Submit] Aura PDF uploaded but no image extracted');
     }
+
+    const metabolicIntake = buildMetabolicFromConsultation(intakeData, patientName, patientEmail);
+    const metabolicBundle = metabolicIntake
+      ? buildUnifiedIntakeDecisionBundle(metabolicIntake)
+      : null;
+    const metabolicRecommendation = metabolicBundle?.primary.recommendation ?? null;
+    const metabolicPackages = metabolicBundle?.primary.packages ?? [];
+    const dosagePlan = metabolicBundle?.primary.dosagePlan ?? null;
+    const trajectory = metabolicBundle?.primary.trajectory ?? null;
 
     const scopedLimit = rateLimit(
       'consultation-submit-email',
@@ -147,8 +296,27 @@ export async function POST(request: NextRequest) {
     );
     if (!scopedLimit.allowed) return rateLimitResponse(scopedLimit.resetIn);
 
+    const intakePayload: ConsultationIntakePayload = metabolicRecommendation
+      ? {
+          ...intakeData,
+          metabolicRecommendation,
+          ...(metabolicBundle
+            ? {
+                metabolicProgramBundle: {
+                  primaryTrack: metabolicBundle.primaryTrack,
+                  alternatives: metabolicBundle.alternatives.map((program) => ({
+                    track: program.track,
+                    status: program.recommendation.status,
+                    recommendedFulfillment: program.recommendation.fulfillment.recommended,
+                  })),
+                },
+              }
+            : {}),
+        }
+      : intakeData;
+
     const session = createSession({
-      intakeData,
+      intakeData: intakePayload,
       patientName,
       patientEmail,
       sourcePhotoUrl,
@@ -168,7 +336,7 @@ export async function POST(request: NextRequest) {
       const timeline = typeof intakeData.timeline === 'string' ? intakeData.timeline : '';
       const budget = typeof intakeData.budget === 'string' ? intakeData.budget : '';
 
-      const intakeSummary = [
+      const intakeSummaryLines = [
         `Skin Concerns: ${concerns || 'Not specified'}`,
         `Target Areas: ${areas || 'Not specified'}`,
         goals ? `Goals: ${goals}` : '',
@@ -176,7 +344,27 @@ export async function POST(request: NextRequest) {
         budget ? `Budget: ${budget}` : '',
         sourcePhotoUrl ? 'Photo: Uploaded' : 'Photo: None',
         `Session ID: ${session.id}`,
-      ].filter(Boolean).join('\n');
+      ].filter(Boolean);
+
+      if (metabolicRecommendation) {
+        const tierSummary = metabolicRecommendation.tiers
+          .map((tier) => `${tier.title} (${tier.monthlyEstimate})`)
+          .join(' | ');
+
+        intakeSummaryLines.push(
+          '',
+          `Metabolic Track: ${metabolicRecommendation.recommendedTrack}`,
+          `Metabolic Status: ${metabolicRecommendation.status}`,
+          `Metabolic Fulfillment: ${metabolicRecommendation.fulfillment.recommended}`,
+          ...(metabolicBundle
+            ? [`Metabolic Alternatives: ${metabolicBundle.alternatives.map((program) => program.track).join(', ')}`]
+            : []),
+          `Metabolic Tiers: ${tierSummary}`,
+          `Provider Dosing Framework: ${metabolicRecommendation.providerHandoff.dosingFramework.slice(0, 2).join(' / ')}`,
+        );
+      }
+
+      const intakeSummary = intakeSummaryLines.join('\n');
 
       await rateLimitedQuery(async () => {
         await Tables.intakes().create(
@@ -192,7 +380,9 @@ export async function POST(request: NextRequest) {
       });
     } catch (err) {
       // Airtable write failure is non-blocking — session still created
-      console.warn('[Consultation Submit] Airtable intake write failed:', err);
+      logEvent('api', 'warn', '[Consultation Submit] Airtable intake write failed', {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // 5. Auto-run Aura Scan (truly non-blocking — don't hold up the response)
@@ -245,6 +435,40 @@ export async function POST(request: NextRequest) {
         patientName,
         hasPhoto: !!sourcePhotoUrl,
         phase: session.phase,
+        metabolicRecommendation: metabolicRecommendation
+          ? {
+              track: metabolicRecommendation.recommendedTrack,
+              status: metabolicRecommendation.status,
+              fulfillment: metabolicRecommendation.fulfillment.recommended,
+              tiers: metabolicRecommendation.tiers.map((tier) => ({
+                tier: tier.tier,
+                title: tier.title,
+                monthlyEstimate: tier.monthlyEstimate,
+              })),
+            }
+          : null,
+        metabolicPackages: metabolicPackages.map((pkg) => ({
+          id: pkg.id,
+          name: pkg.name,
+          tier: pkg.tier,
+          monthlyEstimate: pkg.monthlyEstimate,
+          fulfillmentModes: pkg.fulfillmentModes,
+          pulseSchedule: pkg.pulseSchedule,
+          doseFramework: pkg.doseFramework,
+          improvementTargets: pkg.improvementTargets,
+        })),
+        metabolicProgramBundle: metabolicBundle
+          ? {
+              primaryTrack: metabolicBundle.primaryTrack,
+              alternatives: metabolicBundle.alternatives.map((program) => ({
+                track: program.track,
+                status: program.recommendation.status,
+                fulfillment: program.recommendation.fulfillment.recommended,
+              })),
+            }
+          : null,
+        dosagePlan,
+        trajectory,
       },
     });
     } catch (error) {

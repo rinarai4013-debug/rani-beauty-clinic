@@ -266,6 +266,11 @@ export interface SimulationPath {
 export interface SimulationComparison {
   withTreatment: SimulationPath;
   withoutTreatment: SimulationPath;
+  selection?: {
+    scope: 'full-plan' | 'single-treatment';
+    selectedTreatmentIds: string[];
+    scenarioMode: 'conservative' | 'typical' | 'aggressive';
+  };
   comparison: {
     auraScoreDelta: number;
     skinAgeDelta: number;

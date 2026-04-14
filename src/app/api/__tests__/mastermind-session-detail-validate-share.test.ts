@@ -314,6 +314,28 @@ describe('mastermind session detail + validate + share token routes', () => {
     expect(response.status).toBe(400);
   });
 
+  it('PATCH /api/mastermind/sessions/[id] returns 413 when content-length exceeds guard limit', async () => {
+    const { PATCH } = await import('@/app/api/mastermind/sessions/[id]/route');
+    const response = await PATCH(
+      new Request('http://localhost:3000/api/mastermind/sessions/ms_1', {
+        method: 'PATCH',
+        headers: {
+          'content-type': 'application/json',
+          'content-length': String(3 * 1024 * 1024),
+        },
+        body: JSON.stringify({
+          action: {
+            type: 'SET_SOURCE_PHOTO',
+            url: 'data:image/jpeg;base64,abc',
+          },
+        }),
+      }) as never,
+      { params: Promise.resolve({ id: 'ms_1' }) },
+    );
+
+    expect(response.status).toBe(413);
+  });
+
   it('PATCH /api/mastermind/sessions/[id] enriches SET_PROVIDER_REVIEW with provider identity', async () => {
     const { PATCH } = await import('@/app/api/mastermind/sessions/[id]/route');
     const response = await PATCH(

@@ -119,8 +119,8 @@ describe('GET /api/dashboard/training', () => {
 
     expect(response.status).toBe(200);
     expect(Array.isArray(body.modules)).toBe(true);
-    for (const module of body.modules) {
-      expect(module.role).toBe('provider');
+    for (const trainingModule of body.modules) {
+      expect(trainingModule.role).toBe('provider');
     }
   });
 

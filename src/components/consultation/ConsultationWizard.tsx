@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -29,6 +29,9 @@ import {
   SKIN_TYPES,
   TIMELINE_OPTIONS,
   BUDGET_OPTIONS,
+  METABOLIC_TRACK_OPTIONS,
+  DOWNTIME_TOLERANCE_OPTIONS,
+  PAIN_TOLERANCE_OPTIONS,
 } from '@/lib/consultation/schema';
 import {
   getFollowUpQuestions,
@@ -37,6 +40,8 @@ import {
 } from '@/lib/consultation/conditional-logic';
 import { UNIFIED_CATALOG, type ServiceCategory } from '@/data/services/unified-catalog';
 import type { AuraScanResult } from '@/types/mastermind';
+import type { MetabolicTrack } from '@/lib/metabolic/matrix';
+import type { MetabolicPackageOption } from '@/lib/metabolic/boomrx-matrix';
 
 // ── Constants ──
 
@@ -109,6 +114,37 @@ const BUDGET_LABELS: Record<string, string> = {
   investment: 'Investment ($3,500+)',
 };
 
+const METABOLIC_TRACK_LABELS: Record<string, string> = {
+  glp1: 'GLP-1 / Weight Loss',
+  hormones: 'Hormone Optimization',
+  peptides: 'Peptide Protocols',
+  hybrid: 'Hybrid (GLP + Hormone/Peptide)',
+};
+
+const FULFILLMENT_LABELS: Record<string, string> = {
+  clinic: 'In Clinic',
+  home: 'Ship to Home',
+};
+
+const DOWNTIME_LABELS: Record<string, string> = {
+  none: 'None',
+  minimal: 'Minimal',
+  moderate: 'Moderate',
+  flexible: 'Flexible',
+};
+
+const PAIN_LABELS: Record<string, string> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+};
+
+const SMOKING_STATUS_LABELS: Record<string, string> = {
+  never: 'Never',
+  former: 'Former',
+  current: 'Current',
+};
+
 // ── State ──
 
 interface WizardState {
@@ -120,6 +156,16 @@ interface WizardState {
   isSubmitted: boolean;
   auraScanResult: AuraScanResult | null;
   isScanning: boolean;
+}
+
+interface SubmissionPayload {
+  sessionId: string | null;
+  metabolicRecommendation: {
+    track: MetabolicTrack;
+    status: 'eligible' | 'provider-review-required' | 'ineligible';
+    fulfillment: 'clinic' | 'home';
+  } | null;
+  metabolicPackages: MetabolicPackageOption[];
 }
 
 type WizardAction =
@@ -145,6 +191,20 @@ const initialState: WizardState = {
     photos: [],
     smsConsent: false,
     treatmentHistory: '',
+    fulfillmentPreference: 'clinic',
+    baselineLabsCompleted: false,
+    pregnant: false,
+    breastfeeding: false,
+    bloodThinners: false,
+    keloidHistory: false,
+    activeSkinInfection: false,
+    recentSunExposure: false,
+    isotretinoinHistory: false,
+    hasAutoimmune: false,
+    smokingStatus: 'never',
+    sunProtectionHabit: 'sometimes',
+    downtimeTolerance: 'moderate',
+    painTolerance: 'medium',
   },
   errors: {},
   isSubmitting: false,
@@ -232,6 +292,9 @@ const slideVariants = {
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
   const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
+  const [submissionPayload, setSubmissionPayload] = useState<SubmissionPayload | null>(null);
+  const [programSelectionMessage, setProgramSelectionMessage] = useState<string | null>(null);
+  const [programSelectionLoading, setProgramSelectionLoading] = useState<string | null>(null);
 
   // ── Handlers ──
 
@@ -299,6 +362,25 @@ export default function ConsultationWizard() {
       const result = await res.json();
 
       dispatch({ type: 'SUBMIT_END', success: true });
+      setProgramSelectionMessage(null);
+
+      const recommendationRaw = result?.data?.metabolicRecommendation as
+        | { track?: MetabolicTrack; status?: 'eligible' | 'provider-review-required' | 'ineligible'; fulfillment?: 'clinic' | 'home' }
+        | undefined;
+      const packagesRaw = Array.isArray(result?.data?.metabolicPackages) ? result.data.metabolicPackages : [];
+
+      setSubmissionPayload({
+        sessionId: typeof result?.data?.sessionId === 'string' ? result.data.sessionId : null,
+        metabolicRecommendation:
+          recommendationRaw && recommendationRaw.track && recommendationRaw.status && recommendationRaw.fulfillment
+            ? {
+                track: recommendationRaw.track,
+                status: recommendationRaw.status,
+                fulfillment: recommendationRaw.fulfillment,
+              }
+            : null,
+        metabolicPackages: packagesRaw as MetabolicPackageOption[],
+      });
 
       // Store session ID for post-submit reference (e.g., dashboard redirect)
       if (result.data?.sessionId) {
@@ -375,12 +457,24 @@ export default function ConsultationWizard() {
       treatmentInterests: ['facial', 'chemical-peel', 'skin-tightening'],
       skinType: 'combination',
       treatmentHistory: 'Had a HydraFacial 6 months ago and loved it. First time considering peels.',
+      bloodThinners: false,
+      keloidHistory: false,
+      activeSkinInfection: false,
+      recentSunExposure: false,
+      isotretinoinHistory: false,
+      hasAutoimmune: false,
+      baselineLabsCompleted: false,
+      smokingStatus: 'never',
       currentRoutine: 'Cetaphil cleanser, vitamin C serum, SPF 50 daily.',
       allergies: 'None known',
       goals: 'I want glowing, even-toned skin for my sister\'s wedding in September. Also interested in preventative treatments for fine lines.',
       timeline: 'event',
       eventDate: '2026-09-15',
       budget: 'premium',
+      metabolicTrackPreference: 'hormones',
+      fulfillmentPreference: 'clinic',
+      downtimeTolerance: 'minimal',
+      painTolerance: 'medium',
       smsConsent: true,
     };
     Object.entries(testData).forEach(([field, value]) => {
@@ -389,6 +483,65 @@ export default function ConsultationWizard() {
     // Jump to summary step
     dispatch({ type: 'GO_TO_STEP', step: TOTAL_STEPS - 1 });
   }, []);
+
+  const submitProgramSelection = useCallback(
+    async (pkg: MetabolicPackageOption, mode: 'clinic' | 'home') => {
+      if (!submissionPayload?.metabolicRecommendation) return;
+      if (!pkg.fulfillmentModes.includes(mode)) return;
+
+      const key = `${pkg.id}:${mode}`;
+      setProgramSelectionLoading(key);
+      setProgramSelectionMessage(null);
+
+      const goalsSummary = typeof formData.goals === 'string' ? formData.goals : '';
+      const concerns = ((formData.skinConcerns as string[]) || []).map((c) => CONCERN_LABELS[c] || c).join(', ');
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
+            email: (formData.email as string) || '',
+            phone: (formData.phone as string) || '',
+            service: pkg.name,
+            message: [
+              `Consultation Session: ${submissionPayload.sessionId || 'unknown'}`,
+              `Track: ${submissionPayload.metabolicRecommendation.track}`,
+              `Tier: ${pkg.tier}`,
+              `Fulfillment: ${mode}`,
+              `Pulse: ${pkg.pulseSchedule}`,
+              `Dose: ${pkg.doseFramework}`,
+              `Targets: ${pkg.improvementTargets.join(', ')}`,
+            ].join('\n'),
+            source: 'consultation-wizard',
+            recommendedTrack: submissionPayload.metabolicRecommendation.track,
+            protocolTier: pkg.tier,
+            fulfillmentPreference: mode,
+            homeDeliveryRequested: mode === 'home',
+            goalsSummary: goalsSummary || undefined,
+            symptomsSummary: concerns || undefined,
+          }),
+        });
+
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok || payload?.success === false) {
+          throw new Error(payload?.error || 'Unable to submit program selection');
+        }
+
+        setProgramSelectionMessage(
+          mode === 'home'
+            ? 'Home-delivery request submitted. Our provider team will finalize eligibility and shipping steps.'
+            : 'In-clinic request submitted. Concierge will contact you to schedule your protocol launch.',
+        );
+      } catch (error) {
+        setProgramSelectionMessage(error instanceof Error ? error.message : 'Unable to submit your selection.');
+      } finally {
+        setProgramSelectionLoading(null);
+      }
+    },
+    [formData, submissionPayload],
+  );
 
   // ── Success State ──
 
@@ -416,6 +569,49 @@ export default function ConsultationWizard() {
             Thank you, {formData.firstName}! Our team will review your consultation
             and reach out within 24 hours with a personalized treatment plan.
           </p>
+          {submissionPayload?.metabolicRecommendation && submissionPayload.metabolicPackages.length > 0 && (
+            <div className="mb-8 rounded-xl border border-[#0F1D2C]/10 bg-[#F8F6F1] p-4 text-left">
+              <p className="mb-3 text-xs font-body uppercase tracking-[0.12em] text-[#C9A96E]">
+                Recommended Track: {METABOLIC_TRACK_LABELS[submissionPayload.metabolicRecommendation.track]}
+              </p>
+              <div className="space-y-3">
+                {submissionPayload.metabolicPackages.map((pkg) => (
+                  <div key={pkg.id} className="rounded-lg border border-[#0F1D2C]/10 bg-white p-3">
+                    <p className="font-body text-sm font-semibold text-[#0F1D2C]">{pkg.name}</p>
+                    <p className="mt-0.5 text-xs text-[#0F1D2C]/65">
+                      {pkg.tier.toUpperCase()} • {pkg.monthlyEstimate}
+                    </p>
+                    <p className="mt-1 text-xs text-[#0F1D2C]/70">
+                      Pulse: {pkg.pulseSchedule}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => submitProgramSelection(pkg, 'clinic')}
+                        disabled={!pkg.fulfillmentModes.includes('clinic') || Boolean(programSelectionLoading)}
+                        className="rounded-md border border-[#0F1D2C]/25 px-3 py-1.5 text-xs text-[#0F1D2C] disabled:opacity-40"
+                      >
+                        {programSelectionLoading === `${pkg.id}:clinic` ? 'Submitting...' : 'Do in clinic'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => submitProgramSelection(pkg, 'home')}
+                        disabled={!pkg.fulfillmentModes.includes('home') || Boolean(programSelectionLoading)}
+                        className="rounded-md bg-[#0F1D2C] px-3 py-1.5 text-xs text-white disabled:opacity-40"
+                      >
+                        {programSelectionLoading === `${pkg.id}:home` ? 'Submitting...' : 'Ship to home'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {programSelectionMessage && (
+                <p className="mt-3 rounded-md bg-white px-3 py-2 text-xs text-[#0F1D2C]/80">
+                  {programSelectionMessage}
+                </p>
+              )}
+            </div>
+          )}
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F1D2C] text-white font-body font-medium rounded-xl hover:bg-[#0F1D2C]/90 transition-colors"
@@ -1003,6 +1199,57 @@ function StepHistory({
             ))}
           </div>
         )}
+
+        <div className="space-y-4 pt-2 border-t border-[#0F1D2C]/5">
+          <p className="text-xs font-body text-[#0F1D2C]/50 uppercase tracking-wider">
+            Medical Safety Check
+          </p>
+          {[
+            { key: 'pregnant', label: 'Currently pregnant' },
+            { key: 'breastfeeding', label: 'Currently breastfeeding' },
+            { key: 'bloodThinners', label: 'Taking blood thinners' },
+            { key: 'isotretinoinHistory', label: 'Used isotretinoin in the last 12 months' },
+            { key: 'activeSkinInfection', label: 'Active skin infection or open lesions' },
+            { key: 'keloidHistory', label: 'History of keloid scarring' },
+            { key: 'hasAutoimmune', label: 'Autoimmune condition' },
+            { key: 'recentSunExposure', label: 'Recent heavy sun exposure or tanning' },
+          ].map((field) => (
+            <div key={field.key} className="flex items-center justify-between gap-3">
+              <span className="text-sm font-body text-[#0F1D2C]">{field.label}</span>
+              <div className="flex gap-2">
+                <ChipButton
+                  label="Yes"
+                  selected={(formData as Record<string, unknown>)[field.key] === true}
+                  onClick={() => setField(field.key, true)}
+                  size="sm"
+                />
+                <ChipButton
+                  label="No"
+                  selected={(formData as Record<string, unknown>)[field.key] === false}
+                  onClick={() => setField(field.key, false)}
+                  size="sm"
+                />
+              </div>
+            </div>
+          ))}
+
+          <div>
+            <label className="block text-sm font-body font-medium text-[#0F1D2C] mb-2">
+              Smoking status
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {(['never', 'former', 'current'] as const).map((status) => (
+                <ChipButton
+                  key={status}
+                  label={SMOKING_STATUS_LABELS[status]}
+                  selected={formData.smokingStatus === status}
+                  onClick={() => setField('smokingStatus', status)}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1082,6 +1329,92 @@ function StepGoals({
           {errors.budget && (
             <p className="mt-1.5 text-sm font-body text-red-600">{errors.budget}</p>
           )}
+        </div>
+
+        <div className="space-y-4 pt-2 border-t border-[#0F1D2C]/5">
+          <p className="text-xs font-body text-[#0F1D2C]/50 uppercase tracking-wider">
+            Wellness Program Preferences
+          </p>
+
+          <div>
+            <label className="block text-sm font-body font-medium text-[#0F1D2C] mb-2">
+              Preferred medical track (optional)
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {METABOLIC_TRACK_OPTIONS.map((track) => (
+                <ChipButton
+                  key={track}
+                  label={METABOLIC_TRACK_LABELS[track]}
+                  selected={formData.metabolicTrackPreference === track}
+                  onClick={() => setField('metabolicTrackPreference', track)}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-body font-medium text-[#0F1D2C] mb-2">
+              Fulfillment preference
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {(['clinic', 'home'] as const).map((option) => (
+                <ChipButton
+                  key={option}
+                  label={FULFILLMENT_LABELS[option]}
+                  selected={formData.fulfillmentPreference === option}
+                  onClick={() => setField('fulfillmentPreference', option)}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-body font-medium text-[#0F1D2C] mb-2">
+              Downtime tolerance
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {DOWNTIME_TOLERANCE_OPTIONS.map((option) => (
+                <ChipButton
+                  key={option}
+                  label={DOWNTIME_LABELS[option]}
+                  selected={formData.downtimeTolerance === option}
+                  onClick={() => setField('downtimeTolerance', option)}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-body font-medium text-[#0F1D2C] mb-2">
+              Pain tolerance
+            </label>
+            <div className="grid grid-cols-3 gap-2.5">
+              {PAIN_TOLERANCE_OPTIONS.map((option) => (
+                <ChipButton
+                  key={option}
+                  label={PAIN_LABELS[option]}
+                  selected={formData.painTolerance === option}
+                  onClick={() => setField('painTolerance', option)}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={(formData.baselineLabsCompleted as boolean) || false}
+              onChange={(e) => setField('baselineLabsCompleted', e.target.checked)}
+              className="w-4 h-4 rounded border-[#0F1D2C]/20 text-[#C9A96E] focus:ring-[#C9A96E]/30 accent-[#C9A96E]"
+            />
+            <span className="text-sm font-body text-[#0F1D2C]">
+              I already have baseline metabolic/hormone labs in the last 90 days
+            </span>
+          </label>
         </div>
       </div>
     </div>
@@ -1216,6 +1549,39 @@ function StepSummary({
         <SummaryRow
           label="Budget"
           value={BUDGET_LABELS[(formData.budget as string) || ''] || ''}
+        />
+        <SummaryRow
+          label="Preferred Track"
+          value={METABOLIC_TRACK_LABELS[(formData.metabolicTrackPreference as string) || ''] || ''}
+        />
+        <SummaryRow
+          label="Fulfillment"
+          value={FULFILLMENT_LABELS[(formData.fulfillmentPreference as string) || ''] || ''}
+        />
+        <SummaryRow
+          label="Downtime Tolerance"
+          value={DOWNTIME_LABELS[(formData.downtimeTolerance as string) || ''] || ''}
+        />
+        <SummaryRow
+          label="Pain Tolerance"
+          value={PAIN_LABELS[(formData.painTolerance as string) || ''] || ''}
+        />
+        <SummaryRow
+          label="Baseline Labs"
+          value={(formData.baselineLabsCompleted as boolean) ? 'Yes (last 90 days)' : 'No / Not sure'}
+        />
+        <SummaryRow
+          label="Medical Flags"
+          value={[
+            (formData.pregnant as boolean) ? 'pregnant' : null,
+            (formData.breastfeeding as boolean) ? 'breastfeeding' : null,
+            (formData.bloodThinners as boolean) ? 'blood thinners' : null,
+            (formData.isotretinoinHistory as boolean) ? 'recent isotretinoin' : null,
+            (formData.activeSkinInfection as boolean) ? 'active skin infection' : null,
+            (formData.keloidHistory as boolean) ? 'keloid history' : null,
+            (formData.hasAutoimmune as boolean) ? 'autoimmune condition' : null,
+            (formData.recentSunExposure as boolean) ? 'recent sun exposure' : null,
+          ].filter(Boolean).join(', ')}
         />
         {photos.length > 0 && (
           <SummaryRow label="Photos" value={`${photos.length} uploaded`} />

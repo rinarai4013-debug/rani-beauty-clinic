@@ -56,6 +56,15 @@ export const TREATMENT_PRESETS: Record<string, TreatmentPreset> = {
     ],
     description: 'Youthful, refreshed look',
   },
+  'volume-restoration': {
+    label: 'Volume Restoration & Contour Support',
+    filters: [
+      { filter: 'skinSmoothing', intensity: 0.45 },
+      { filter: 'glow', intensity: 0.55 },
+      { filter: 'toneEvening', intensity: 0.25 },
+    ],
+    description: 'Restored facial volume with smoother contour transitions',
+  },
   'overall-glow': {
     label: 'Healthy Glow',
     filters: [
@@ -192,7 +201,21 @@ export const SERVICE_TO_PRESETS: Record<string, string[]> = {
 
   // Injectables
   'botox': ['anti-aging', 'skin-tightening'],
-  'dermal-fillers': ['anti-aging', 'collagen-boost'],
+  'botox-dysport': ['anti-aging', 'skin-tightening'],
+  'dysport': ['anti-aging'],
+  'xeomin': ['anti-aging'],
+  'dermal-fillers': ['volume-restoration', 'anti-aging'],
+  'filler': ['volume-restoration', 'anti-aging'],
+  'fillers': ['volume-restoration', 'anti-aging'],
+  'juvederm': ['volume-restoration'],
+  'restylane': ['volume-restoration'],
+  'radiesse': ['volume-restoration'],
+  'sculptra': ['volume-restoration', 'collagen-boost'],
+
+  // Broad service aliases for simulation ingestion
+  'rf-microneedling': ['collagen-boost', 'scar-improvement', 'skin-tightening'],
+  'sofwave': ['skin-tightening', 'anti-aging', 'collagen-boost'],
+  'laser-hair-removal': ['skin-rejuvenation'],
 
   // Wellness
   'glutathione-injection': ['brightening-hydration', 'overall-glow'],
@@ -202,6 +225,22 @@ export const SERVICE_TO_PRESETS: Record<string, string[]> = {
   // Weight Management
   'glp1-semaglutide-m1': ['body-contouring', 'wellness-vitality'],
   'glp1-tirzepatide-m1': ['body-contouring', 'wellness-vitality'],
+  'glp1-semaglutide-m2': ['body-contouring', 'wellness-vitality'],
+  'glp1-semaglutide-m3': ['body-contouring', 'wellness-vitality'],
+  'glp1-semaglutide-m4': ['body-contouring', 'wellness-vitality'],
+  'glp1-tirzepatide-m2': ['body-contouring', 'wellness-vitality'],
+  'glp1-tirzepatide-m3': ['body-contouring', 'wellness-vitality'],
+  'glp-1': ['body-contouring', 'wellness-vitality'],
+
+  // Hormones / peptides
+  'hrt-female-start': ['wellness-vitality', 'overall-glow'],
+  'hrt-female-optimize': ['wellness-vitality', 'overall-glow'],
+  'trt-male-start': ['wellness-vitality', 'overall-glow'],
+  'trt-male-optimize': ['wellness-vitality', 'overall-glow'],
+  'thyroid-optimization': ['wellness-vitality'],
+  'peptide-bpc157-recovery': ['wellness-vitality', 'collagen-boost'],
+  'peptide-cjc1295-ipamorelin': ['wellness-vitality', 'collagen-boost'],
+  'peptide-elite-stack': ['wellness-vitality', 'collagen-boost'],
 
   // Skincare
   'tretinoin': ['acne-improvement', 'anti-aging', 'tone-correction'],

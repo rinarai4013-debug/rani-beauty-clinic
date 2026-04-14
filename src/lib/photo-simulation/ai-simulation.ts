@@ -29,7 +29,13 @@ const TREATMENT_PROMPTS: Record<string, string> = {
   'Sofwave': 'firmer jawline, lifted brow, tighter neck skin',
   'VI Peel': 'even skin tone, reduced dark spots, brighter complexion',
   'Botox': 'smoothed forehead lines, reduced crow\'s feet',
+  'Dysport': 'softened dynamic expression lines with natural movement',
+  'Xeomin': 'subtle wrinkle relaxation with preserved facial balance',
   'Dermal Fillers': 'fuller lips, defined cheekbones, smoother nasolabial folds',
+  'Sculptra': 'progressively restored mid-face volume and firmer collagen-rich skin structure',
+  'Juvederm': 'restored contour and softened fold depth with natural volume support',
+  'Restylane': 'balanced contour restoration with smooth facial transitions',
+  'Radiesse': 'structural lift and collagen stimulation for firmer contours',
   'Laser Facial': 'clear, even skin, reduced redness and sun damage',
   'BioRePeel': 'radiant, refreshed skin with zero downtime glow',
   'PRX-T33': 'deep hydration, plumper skin, collagen-rich appearance',
@@ -39,6 +45,8 @@ const TREATMENT_PROMPTS: Record<string, string> = {
   'NAD+': 'revitalized, youthful appearance, improved skin elasticity',
   'Tretinoin': 'refined skin texture, reduced fine lines, clearer complexion',
   'Laser Hair Removal': 'smooth, hair-free skin with even texture',
+  'Hormone Optimization': 'improved skin vitality, reduced puffiness, steadier facial tone and energy-linked glow',
+  'Peptide Therapy': 'enhanced recovery appearance, reduced inflammatory puffiness, tighter skin quality',
   'Folix Hair Restoration': 'thicker, fuller hair with improved density',
 };
 
@@ -258,10 +266,28 @@ function getTreatmentFilters(treatment: string): FilterStep[] {
       { filter: 'glow', intensity: 0.5 },
     ];
   }
+  if (key.includes('dysport') || key.includes('xeomin')) {
+    return [
+      { filter: 'skinSmoothing', intensity: 0.7 },
+      { filter: 'glow', intensity: 0.45 },
+    ];
+  }
   if (key.includes('filler')) {
     return [
       { filter: 'skinSmoothing', intensity: 0.5 },
       { filter: 'glow', intensity: 0.7 },
+    ];
+  }
+  if (
+    key.includes('sculptra') ||
+    key.includes('juvederm') ||
+    key.includes('restylane') ||
+    key.includes('radiesse')
+  ) {
+    return [
+      { filter: 'skinSmoothing', intensity: 0.45 },
+      { filter: 'glow', intensity: 0.65 },
+      { filter: 'toneEvening', intensity: 0.35 },
     ];
   }
   if (key.includes('laser')) {
@@ -288,6 +314,26 @@ function getTreatmentFilters(treatment: string): FilterStep[] {
   if (key.includes('glp') || key.includes('semaglutide') || key.includes('tirzepatide')) {
     return [
       { filter: 'skinSmoothing', intensity: 0.4 },
+      { filter: 'toneEvening', intensity: 0.3 },
+    ];
+  }
+  if (key.includes('hormone') || key.includes('trt') || key.includes('hrt') || key.includes('thyroid')) {
+    return [
+      { filter: 'toneEvening', intensity: 0.45 },
+      { filter: 'glow', intensity: 0.4 },
+      { filter: 'brightening', intensity: 0.35 },
+    ];
+  }
+  if (
+    key.includes('peptide') ||
+    key.includes('bpc') ||
+    key.includes('ipamorelin') ||
+    key.includes('cjc') ||
+    key.includes('sermorelin')
+  ) {
+    return [
+      { filter: 'skinSmoothing', intensity: 0.35 },
+      { filter: 'glow', intensity: 0.45 },
       { filter: 'toneEvening', intensity: 0.3 },
     ];
   }

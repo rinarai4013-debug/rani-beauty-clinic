@@ -161,7 +161,7 @@ export default function GLP1LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="#enroll"
+              href="/glp1/intake"
               className="bg-[#C9A96E] text-rani-navy px-8 py-4 rounded-lg font-body font-bold text-lg hover:bg-[#d4b67e] transition-colors"
             >
               Schedule Your Consultation
@@ -266,7 +266,7 @@ export default function GLP1LandingPage() {
                   ))}
                 </ul>
                 <a
-                  href="#enroll"
+                  href="/glp1/intake"
                   className={`block text-center py-3 rounded-lg font-body font-semibold text-sm transition-colors ${
                     tier.highlight
                       ? 'bg-[#C9A96E] text-rani-navy hover:bg-[#d4b67e]'

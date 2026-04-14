@@ -5,7 +5,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const getSessionFromRequestMock = vi.fn();
 const getSessionByIdAsyncMock = vi.fn();
 const saveSessionAsyncMock = vi.fn();
-const sessionReducerMock = vi.fn((state: unknown) => state);
+const sessionReducerMock = vi.fn((state: unknown, action: { type?: string; notes?: string }) => {
+  const current = state as Record<string, unknown>;
+  if (action?.type === 'SET_CLINIC_NOTES') {
+    return { ...current, clinicNotes: action.notes };
+  }
+  if (action?.type === 'SET_PROVIDER_REVIEW') {
+    return { ...current, phase: 'provider_review', providerReview: (action as Record<string, unknown>).review };
+  }
+  return state;
+});
 const intakeCreateMock = vi.fn();
 
 vi.mock('@/lib/auth/session', () => ({
@@ -133,6 +142,8 @@ describe('POST /api/mastermind/metabolic-handoff', () => {
     expect(body.data.tier).toBe('start');
     expect(body.data.fulfillment).toBe('clinic');
     expect(body.data.homeDeliveryRequested).toBe(false);
+    expect(body.data.providerReviewRequired).toBe(true);
+    expect(body.data.approvalStatus).toBe('pending');
 
     // Airtable write
     expect(intakeCreateMock).toHaveBeenCalledTimes(1);
@@ -142,8 +153,18 @@ describe('POST /api/mastermind/metabolic-handoff', () => {
     expect(fields['Intake Summary (AI)']).toContain('Metabolic Track: glp1');
     expect(fields['Intake Summary (AI)']).toContain('Dosage Governance Summary');
 
-    // Session activity log updated
-    expect(sessionReducerMock).toHaveBeenCalledTimes(1);
+    // Session provider-review queue + notes updated
+    expect(sessionReducerMock).toHaveBeenCalledTimes(3);
+    expect(sessionReducerMock.mock.calls[0][1]).toMatchObject({
+      type: 'SET_PROVIDER_REVIEW',
+    });
+    expect(sessionReducerMock.mock.calls[1][1]).toMatchObject({
+      type: 'SET_CLINIC_STATUS',
+      status: 'reviewed',
+    });
+    expect(sessionReducerMock.mock.calls[2][1]).toMatchObject({
+      type: 'SET_CLINIC_NOTES',
+    });
     expect(saveSessionAsyncMock).toHaveBeenCalledTimes(1);
   });
 

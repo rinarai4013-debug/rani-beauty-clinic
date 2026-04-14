@@ -39,7 +39,13 @@ export type IntentEvent =
   | 'membership_page_view'
   | 'results_gallery_view'
   | 'booking_widget_opened'
-  | 'consultation_form_opened';
+  | 'consultation_form_opened'
+  | 'peptide_intake_started'
+  | 'peptide_intake_step_completed'
+  | 'peptide_recommendation_viewed'
+  | 'peptide_tier_selected'
+  | 'peptide_fulfillment_selected'
+  | 'metabolic_fulfillment_selected';
 
 /** Conversion events - measurable actions */
 export type ConversionEvent =
@@ -47,7 +53,14 @@ export type ConversionEvent =
   | 'contact_form_submitted'
   | 'consultation_booked'
   | 'booking_started'
-  | 'booking_completed';
+  | 'booking_completed'
+  | 'metabolic_intake_submitted'
+  | 'metabolic_checkout_started'
+  | 'metabolic_checkout_held_for_provider_review'
+  | 'peptide_intake_submitted'
+  | 'peptide_checkout_started'
+  | 'peptide_checkout_held_for_provider_review'
+  | 'peptide_intake_abandoned';
 
 /** Revenue events - tied to dollar values */
 export type RevenueEvent =

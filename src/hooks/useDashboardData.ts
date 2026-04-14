@@ -276,6 +276,12 @@ export function usePhoneAgent() {
   });
 }
 
+export function useMetabolicFunnel() {
+  return useDashboardData('/metabolic-funnel', {
+    refreshInterval: 60000, // 1 min
+  });
+}
+
 export function useGLP1Program() {
   return useDashboardData('/glp1', {
     refreshInterval: 60000, // 1 min

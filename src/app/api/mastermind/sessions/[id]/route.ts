@@ -75,7 +75,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         );
       }
 
-      const parsed = await parseJsonBody(request);
+      const parsed = await parseJsonBody(request, { maxBytes: MAX_PATCH_JSON_BYTES });
       if ('error' in parsed) return parsed.error;
       const { body } = parsed;
 
