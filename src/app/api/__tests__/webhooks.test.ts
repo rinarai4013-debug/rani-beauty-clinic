@@ -625,7 +625,21 @@ describe('POST /api/webhooks/cherry', () => {
     expect(data.event).toBe('unknown.event');
   });
 
-  it('should sanitize customerId before treatment plan lookup formula on checkout.completed', async () => {
+  it('returns 503 when CHERRY_WEBHOOK_SECRET is not configured', async () => {
+    delete process.env.CHERRY_WEBHOOK_SECRET;
+
+    const req = new Request('http://localhost:3000/api/webhooks/cherry', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ event: 'test', data: {} }),
+    });
+
+    const { POST } = await import('@/app/api/webhooks/cherry/route');
+    const response = await POST(req as never);
+    await expectJsonStatus(response, 503);
+  });
+
+    it('should sanitize customerId before treatment plan lookup formula on checkout.completed', async () => {
     const customerId = "cust_123' OR TRUE() OR '";
     const safeCustomerId = customerId.replace(/['"\\\n\r]/g, '');
 
