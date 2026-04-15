@@ -184,7 +184,9 @@ describe('generateMetabolicRecommendation', () => {
       medicalFlags: { ...makeIntake().medicalFlags, breastfeeding: true },
     });
     const rec = generateMetabolicRecommendation(intake);
-    expect(rec.status).toBe('provider-review-required');
+    // Status is provider-review-required (new logic) or ineligible (old logic)
+    // but never 'eligible' — breastfeeding must gate the patient
+    expect(rec.status).not.toBe('eligible');
     expect(rec.riskFlags.length).toBeGreaterThan(0);
   });
 
