@@ -165,3 +165,54 @@ describe('generateMetabolicRecommendation', () => {
     expect(rec1.fulfillment.allowed).toEqual(rec2.fulfillment.allowed);
   });
 });
+  it('breastfeeding: blocks all 3 tracks (parity with pregnancy exclusions)', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, breastfeeding: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    expect(rec.blockedTracks).toContain('glp1');
+    expect(rec.blockedTracks).toContain('hormones');
+    expect(rec.blockedTracks).toContain('peptides');
+  });
+
+  it('breastfeeding: sets non-eligible status (parity with pregnancy)', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, breastfeeding: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    // Status is provider-review-required (new logic) or ineligible (old logic)
+    // but never 'eligible' — breastfeeding must gate the patient
+    expect(rec.status).not.toBe('eligible');
+    expect(rec.riskFlags.length).toBeGreaterThan(0);
+  });
+
+  it('breastfeeding: riskFlags mention breastfeeding explicitly', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, breastfeeding: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    expect(rec.riskFlags.some((f) => /breastfeeding/i.test(f))).toBe(true);
+  });
+
+  it('breastfeeding + pregnancy: both flags produce the same blocked outcome', () => {
+    const breastfeedingOnly = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, breastfeeding: true },
+    });
+    const bothFlags = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, pregnant: true, breastfeeding: true },
+    });
+    const recB = generateMetabolicRecommendation(breastfeedingOnly);
+    const recBP = generateMetabolicRecommendation(bothFlags);
+    expect([...recB.blockedTracks].sort()).toEqual([...recBP.blockedTracks].sort());
+  });
+});
