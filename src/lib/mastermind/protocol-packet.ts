@@ -61,15 +61,12 @@ export function generateProtocolPacket(
 
   // ── Section 2 data ──
   const medicalFlags = (scan.medicalFlags ?? []).map((f) => ({
-    flag: typeof f === 'string' ? f : (f as Record<string, string>).flag ?? String(f),
-    severity:
-      typeof f === 'object' && f !== null
-        ? ((f as Record<string, string>).severity ?? 'unknown')
-        : 'unknown',
+    flag: f.flag,
+    severity: f.severity as string,
   }));
 
   const planContraindications = (plan.contraindications ?? []).map((c) =>
-    typeof c === 'string' ? c : (c as Record<string, string>).description ?? String(c),
+    c.reason,
   );
 
   const treatmentContraindications = [
