@@ -1,4 +1,14 @@
+/**
+ * Metabolic Intake Schema + Recommendation Engine
+ *
+ * Core data layer for the metabolic program vertical (GLP-1, hormones,
+ * peptides, hybrid). Validates intake form data, scores tracks, and
+ * produces a recommendation with safety gating.
+ */
+
 import { z } from 'zod';
+
+// ── Track + Option Enums ──
 
 export const METABOLIC_TRACKS = ['glp1', 'hormones', 'peptides', 'hybrid'] as const;
 export type MetabolicTrack = (typeof METABOLIC_TRACKS)[number];
@@ -36,11 +46,13 @@ export const METABOLIC_SYMPTOM_OPTIONS = [
 export type MetabolicGoal = (typeof METABOLIC_GOAL_OPTIONS)[number];
 export type MetabolicSymptom = (typeof METABOLIC_SYMPTOM_OPTIONS)[number];
 
+// ── Zod Intake Schema ──
+
 const baseIntakeSchema = z.object({
   firstName: z.string().trim().min(1).max(60),
   lastName: z.string().trim().min(1).max(60),
   email: z.string().trim().email(),
-  phone: z.string().trim().min(7).max(30).optional().default(''),
+  phone: z.string().trim().min(7).max(30).optional(),
   goals: z.array(z.enum(METABOLIC_GOAL_OPTIONS)).min(1),
   symptoms: z.array(z.enum(METABOLIC_SYMPTOM_OPTIONS)).min(1),
   preferredTrack: z.enum(METABOLIC_TRACKS).optional(),
@@ -89,6 +101,8 @@ export const metabolicIntakeSchema = baseIntakeSchema.transform((data) => ({
 
 export type MetabolicIntake = z.infer<typeof metabolicIntakeSchema>;
 
+// ── Recommendation Types ──
+
 export interface MetabolicTier {
   tier: 'start' | 'transform' | 'elite';
   title: string;
@@ -119,6 +133,8 @@ export interface MetabolicRecommendation {
     contraindicationNotes: string[];
   };
 }
+
+// ── Track Scoring ──
 
 interface TrackProfile {
   score: number;
@@ -155,8 +171,10 @@ function buildTrackProfiles(intake: MetabolicIntake): Record<MetabolicTrack, Tra
   const topTwo = [profile.glp1.score, profile.hormones.score, profile.peptides.score]
     .sort((a, b) => b - a)
     .slice(0, 2);
-  if (topTwo[0] >= 3 && topTwo[1] >= 3) profile.hybrid.score = 4;
+  // Only award hybrid score when glp1 AND hormones are both competitive (the canonical hybrid combo)
+  if (profile.glp1.score >= 3 && profile.hormones.score >= 3) profile.hybrid.score = 4;
 
+  // Safety gates
   if (flags.pregnant || flags.breastfeeding) {
     profile.glp1.blockReason = 'Pregnancy/breastfeeding requires provider-only evaluation; GLP-1 not auto-eligible.';
     profile.hormones.blockReason = 'Pregnancy/breastfeeding requires provider-only hormone review.';
@@ -181,181 +199,35 @@ function rankTracks(profile: Record<MetabolicTrack, TrackProfile>): MetabolicTra
     .map(([track]) => track);
 }
 
+// ── Tier Builder ──
+
 function buildTiers(track: MetabolicTrack): MetabolicTier[] {
-  if (track === 'glp1') {
-    return [
-      {
-        tier: 'start',
-        title: 'GLP-1 Starter',
-        track,
-        monthlyEstimate: '$349-$499',
-        protocol: [
-          'Provider-selected start: semaglutide 0.25 mg weekly OR tirzepatide 2.5 mg weekly.',
-          'Pulse schedule: 7-day dosing cadence with GI symptom check at 24h/72h after each dose.',
-          'Primary improvement areas: appetite regulation, craving control, and early waist reduction.',
-        ],
-        monitoring: ['Baseline CMP/A1c/lipids', 'GI tolerance check-in week 2', 'Dose escalation decision at week 4'],
-        bestFor: 'New GLP-1 patients needing close ramp-up support',
-      },
-      {
-        tier: 'transform',
-        title: 'GLP-1 Transform',
-        track,
-        monthlyEstimate: '$499-$799',
-        protocol: [
-          'Escalation framework: semaglutide 0.5-1.0 mg weekly OR tirzepatide 5-7.5 mg weekly as tolerated.',
-          'Pulse schedule: hold/escalate decision every 4 weeks based on side-effect and adherence score.',
-          'Primary improvement areas: steady fat-mass reduction, improved fasting glucose trend, and plateau prevention.',
-        ],
-        monitoring: ['Monthly weight + waist trend', 'Quarterly lab panel', 'Adherence + hunger score tracking'],
-        bestFor: 'Patients targeting aggressive body recomposition',
-      },
-      {
-        tier: 'elite',
-        title: 'GLP-1 Elite',
-        track,
-        monthlyEstimate: '$799-$1199',
-        protocol: [
-          'Advanced range (provider-gated): semaglutide 1.7-2.4 mg OR tirzepatide 10-15 mg weekly.',
-          'Pulse schedule: monthly optimization cycle with rescue pathways for GI intolerance or plateau.',
-          'Primary improvement areas: high-velocity body recomposition and long-term maintenance architecture.',
-        ],
-        monitoring: ['Bi-weekly KPI review', 'Quarterly advanced lab review', 'Maintenance/taper strategy'],
-        bestFor: 'High-touch patients targeting fastest safe results',
-      },
-    ];
-  }
-
-  if (track === 'hormones') {
-    return [
-      {
-        tier: 'start',
-        title: 'Hormone Baseline',
-        track,
-        monthlyEstimate: '$299-$449',
-        protocol: [
-          'Provider-led baseline protocol: symptom inventory + full endocrine lab panel before start.',
-          'Dosing cadence framework: micro-adjustment window every 2-4 weeks (not fixed calendar escalation).',
-          'Primary improvement areas: sleep quality, daytime energy, mood stability, and libido recovery.',
-        ],
-        monitoring: ['Baseline hormone panel', 'BP/sleep/mood tracking', 'Dose safety review'],
-        bestFor: 'Patients with fatigue, sleep, mood, or libido shifts',
-      },
-      {
-        tier: 'transform',
-        title: 'Hormone Rebalance',
-        track,
-        monthlyEstimate: '$449-$699',
-        protocol: [
-          'Optimization framework: symptom-weighted dose refinements with 6-8 week lab checkpoints.',
-          'Pulse schedule: adjust one variable per cycle (dose, frequency, or adjunct) to isolate response.',
-          'Primary improvement areas: body composition, cognitive clarity, and cycle-specific symptom control.',
-        ],
-        monitoring: ['6-8 week lab recheck', 'Symptom severity scorecard', 'Provider optimization review'],
-        bestFor: 'Patients needing active protocol tuning',
-      },
-      {
-        tier: 'elite',
-        title: 'Hormone Performance',
-        track,
-        monthlyEstimate: '$699-$999',
-        protocol: [
-          'Precision maintenance: advanced lab-informed periodization across quarterly cycles.',
-          'Pulse schedule: planned optimization + stabilization blocks to avoid overcorrection.',
-          'Primary improvement areas: performance output, recovery speed, and long-horizon endocrine stability.',
-        ],
-        monitoring: ['Monthly KPI dashboard', 'Quarterly endocrine lab cycle', 'Long-term risk surveillance'],
-        bestFor: 'Patients prioritizing performance and longevity outcomes',
-      },
-    ];
-  }
-
-  if (track === 'hybrid') {
-    return [
-      {
-        tier: 'start',
-        title: 'Hybrid Onboarding',
-        track,
-        monthlyEstimate: '$549-$799',
-        protocol: [
-          'Layered start: low-dose GLP-1 + targeted hormone/wellness support based on baseline labs.',
-          'Pulse schedule: staggered onboarding (one major protocol change every 2 weeks).',
-          'Primary improvement areas: appetite + energy correction without overwhelming adaptation load.',
-        ],
-        monitoring: ['Baseline metabolic + hormone labs', 'Week 2 and week 4 provider checkpoints', 'Escalation eligibility review'],
-        bestFor: 'Patients needing metabolic + hormonal support together',
-      },
-      {
-        tier: 'transform',
-        title: 'Hybrid Transform',
-        track,
-        monthlyEstimate: '$799-$1199',
-        protocol: [
-          'Dual-track optimization: GLP-1 titration synchronized with endocrine symptom scorecard.',
-          'Pulse schedule: 4-week metabolic review + 6-8 week endocrine lab recalibration.',
-          'Primary improvement areas: fat-loss momentum plus sleep/mood/libido normalization.',
-        ],
-        monitoring: ['Bi-weekly KPI review', '6-8 week lab refresh', 'Risk-gated protocol escalations'],
-        bestFor: 'Patients with complex symptom clusters and ambitious goals',
-      },
-      {
-        tier: 'elite',
-        title: 'Hybrid Elite',
-        track,
-        monthlyEstimate: '$1199-$1599',
-        protocol: [
-          'High-touch integrated dosing architecture with provider-gated escalation limits.',
-          'Pulse schedule: monthly composite review across metabolic, endocrine, and recovery markers.',
-          'Primary improvement areas: maximum safe recomposition with durable maintenance planning.',
-        ],
-        monitoring: ['Weekly trend dashboard', 'Quarterly comprehensive labs', 'Provider strategy calls'],
-        bestFor: 'Patients wanting fastest comprehensive medical optimization',
-      },
-    ];
-  }
-
-  return [
-    {
-      tier: 'start',
-      title: 'Peptide Foundation',
-      track,
-      monthlyEstimate: '$249-$399',
-      protocol: [
-        'Entry peptide framework: BPC-157 250-500 mcg once/twice daily or equivalent starter protocol.',
-        'Pulse schedule: 5-on/2-off or nightly pulse selected by symptom profile and tolerance.',
-        'Primary improvement areas: inflammation control, sleep depth, and baseline recovery speed.',
-      ],
-      monitoring: ['Baseline symptom score', '2-4 week response checkpoint', 'Tolerance review'],
-      bestFor: 'Recovery, inflammation, and energy support',
-    },
-    {
-      tier: 'transform',
-      title: 'Peptide Transform',
-      track,
-      monthlyEstimate: '$399-$649',
-      protocol: [
-        'Layered protocol: CJC-1295/Ipamorelin bedtime pulse + daytime recovery peptide as indicated.',
-        'Pulse schedule: 8-12 week cycle with midpoint review and cycle-end reset planning.',
-        'Primary improvement areas: lean-mass retention, tissue recovery, and workout response quality.',
-      ],
-      monitoring: ['Monthly symptom trend review', 'Cycle-end outcome review', 'Dose and cadence optimization'],
-      bestFor: 'Patients needing stronger results for recovery/performance',
-    },
-    {
-      tier: 'elite',
-      title: 'Peptide Elite',
-      track,
-      monthlyEstimate: '$649-$949',
-      protocol: [
-        'Advanced stack: multi-phase peptide strategy with provider-reviewed compound compatibility.',
-        'Pulse schedule: cycle + deload architecture to reduce receptor fatigue and sustain response.',
-        'Primary improvement areas: performance output, body composition quality, and longevity support.',
-      ],
-      monitoring: ['Bi-weekly response telemetry', 'Quarterly objective marker review', 'Long-term maintenance protocol'],
-      bestFor: 'High-performance and longevity-focused patients',
-    },
-  ];
+  const tierSets: Record<MetabolicTrack, MetabolicTier[]> = {
+    glp1: [
+      { tier: 'start', title: 'GLP-1 Starter', track, monthlyEstimate: '$349-$499', protocol: ['Provider-selected start: semaglutide 0.25 mg weekly OR tirzepatide 2.5 mg weekly.', 'Pulse schedule: 7-day dosing cadence with GI symptom check.', 'Primary: appetite regulation, craving control, early waist reduction.'], monitoring: ['Baseline CMP/A1c/lipids', 'GI tolerance check-in week 2', 'Dose escalation decision at week 4'], bestFor: 'New GLP-1 patients needing close ramp-up support' },
+      { tier: 'transform', title: 'GLP-1 Transform', track, monthlyEstimate: '$499-$799', protocol: ['Escalation: semaglutide 0.5-1.0 mg or tirzepatide 5-7.5 mg weekly as tolerated.', 'Hold/escalate decision every 4 weeks.', 'Primary: steady fat-mass reduction, improved fasting glucose.'], monitoring: ['Monthly weight + waist trend', 'Quarterly lab panel', 'Adherence + hunger score'], bestFor: 'Patients targeting aggressive body recomposition' },
+      { tier: 'elite', title: 'GLP-1 Elite', track, monthlyEstimate: '$799-$1199', protocol: ['Advanced range: semaglutide 1.7-2.4 mg or tirzepatide 10-15 mg weekly.', 'Monthly optimization cycle with rescue pathways.', 'Primary: high-velocity recomposition and maintenance architecture.'], monitoring: ['Bi-weekly KPI review', 'Quarterly advanced labs', 'Maintenance/taper strategy'], bestFor: 'High-touch patients targeting fastest safe results' },
+    ],
+    hormones: [
+      { tier: 'start', title: 'Hormone Baseline', track, monthlyEstimate: '$299-$449', protocol: ['Provider-led baseline protocol: symptom inventory + full endocrine lab panel.', 'Micro-adjustment every 2-4 weeks.', 'Primary: sleep quality, energy, mood stability, libido recovery.'], monitoring: ['Baseline hormone panel', 'BP/sleep/mood tracking', 'Dose safety review'], bestFor: 'Patients with fatigue, sleep, mood, or libido shifts' },
+      { tier: 'transform', title: 'Hormone Rebalance', track, monthlyEstimate: '$449-$699', protocol: ['Symptom-weighted dose refinements with 6-8 week lab checkpoints.', 'Adjust one variable per cycle.', 'Primary: body composition, cognitive clarity, cycle-specific control.'], monitoring: ['6-8 week lab recheck', 'Symptom severity scorecard', 'Provider optimization review'], bestFor: 'Patients needing active protocol tuning' },
+      { tier: 'elite', title: 'Hormone Performance', track, monthlyEstimate: '$699-$999', protocol: ['Advanced lab-informed periodization across quarterly cycles.', 'Planned optimization + stabilization blocks.', 'Primary: performance, recovery speed, long-horizon endocrine stability.'], monitoring: ['Monthly KPI dashboard', 'Quarterly endocrine lab cycle', 'Long-term risk surveillance'], bestFor: 'Patients prioritizing performance and longevity' },
+    ],
+    peptides: [
+      { tier: 'start', title: 'Peptide Foundation', track, monthlyEstimate: '$249-$399', protocol: ['BPC-157 250-500 mcg once/twice daily or equivalent starter protocol.', '5-on/2-off or nightly pulse.', 'Primary: inflammation control, sleep depth, baseline recovery.'], monitoring: ['Baseline symptom score', '2-4 week response checkpoint', 'Tolerance review'], bestFor: 'Recovery, inflammation, and energy support' },
+      { tier: 'transform', title: 'Peptide Transform', track, monthlyEstimate: '$399-$649', protocol: ['CJC-1295/Ipamorelin bedtime pulse + daytime recovery peptide.', '8-12 week cycle with midpoint review.', 'Primary: lean-mass retention, tissue recovery, workout response.'], monitoring: ['Monthly symptom trend', 'Cycle-end outcome review', 'Dose optimization'], bestFor: 'Patients needing stronger recovery/performance results' },
+      { tier: 'elite', title: 'Peptide Elite', track, monthlyEstimate: '$649-$949', protocol: ['Multi-phase peptide strategy with provider-reviewed compound compatibility.', 'Cycle + deload architecture.', 'Primary: performance output, body composition, longevity.'], monitoring: ['Bi-weekly response telemetry', 'Quarterly objective markers', 'Long-term maintenance protocol'], bestFor: 'High-performance and longevity-focused patients' },
+    ],
+    hybrid: [
+      { tier: 'start', title: 'Hybrid Onboarding', track, monthlyEstimate: '$549-$799', protocol: ['Low-dose GLP-1 + targeted hormone/wellness support.', 'Staggered onboarding (one major change every 2 weeks).', 'Primary: appetite + energy correction.'], monitoring: ['Baseline metabolic + hormone labs', 'Week 2 and 4 provider checkpoints', 'Escalation eligibility review'], bestFor: 'Patients needing metabolic + hormonal support together' },
+      { tier: 'transform', title: 'Hybrid Transform', track, monthlyEstimate: '$799-$1199', protocol: ['Dual-track optimization: GLP-1 + endocrine scorecard.', '4-week metabolic review + 6-8 week endocrine recalibration.', 'Primary: fat-loss + sleep/mood/libido normalization.'], monitoring: ['Bi-weekly KPI review', '6-8 week lab refresh', 'Risk-gated escalations'], bestFor: 'Patients with complex symptom clusters' },
+      { tier: 'elite', title: 'Hybrid Elite', track, monthlyEstimate: '$1199-$1599', protocol: ['High-touch integrated dosing with provider-gated limits.', 'Monthly composite review across all markers.', 'Primary: maximum safe recomposition + durable maintenance.'], monitoring: ['Weekly trend dashboard', 'Quarterly comprehensive labs', 'Provider strategy calls'], bestFor: 'Fastest comprehensive medical optimization' },
+    ],
+  };
+  return tierSets[track];
 }
+
+// ── Fulfillment Gating ──
 
 function allowedFulfillment(track: MetabolicTrack, labsComplete: boolean): FulfillmentOption[] {
   if (track === 'hormones' && !labsComplete) return ['clinic'];
@@ -363,36 +235,22 @@ function allowedFulfillment(track: MetabolicTrack, labsComplete: boolean): Fulfi
   return ['clinic', 'home'];
 }
 
+// ── Provider Handoff ──
+
 function buildProviderHandoff(intake: MetabolicIntake, recommendation: Omit<MetabolicRecommendation, 'providerHandoff'>): MetabolicRecommendation['providerHandoff'] {
   const contraindicationNotes = recommendation.riskFlags.length > 0
     ? recommendation.riskFlags
     : ['No hard contraindication flags from intake; provider confirmation still required.'];
 
   const dosingFrameworkByTrack: Record<MetabolicTrack, string[]> = {
-    glp1: [
-      'Start low: semaglutide 0.25 mg or tirzepatide 2.5 mg weekly, escalate only after tolerance review.',
-      'Escalation pulse: 4-week intervals with hold/de-escalate option for persistent GI symptoms.',
-      'Dose decision uses appetite suppression + adherence + adverse event score, not timeline alone.',
-    ],
-    hormones: [
-      'Initiate only after baseline endocrine panel and contraindication review.',
-      'Adjust one variable per cycle (dose OR frequency OR adjunct) to preserve signal quality.',
-      'Re-check labs every 6-8 weeks during optimization, then quarterly in maintenance.',
-    ],
-    peptides: [
-      'Use single-compound onboarding before stacking when possible.',
-      'Apply cycle + deload logic (typically 8-12 week cycle) to limit response decay.',
-      'Track sleep, soreness, and performance markers before advancing dose complexity.',
-    ],
-    hybrid: [
-      'Sequence changes: GLP-1 and hormone/peptide adjustments should be staggered, not simultaneous.',
-      'Run monthly composite review (weight trend + symptom score + lab movement) before escalation.',
-      'Use lowest effective doses across tracks to minimize cumulative side-effect burden.',
-    ],
+    glp1: ['Start low: semaglutide 0.25 mg or tirzepatide 2.5 mg weekly.', 'Escalation pulse: 4-week intervals with hold/de-escalate for GI symptoms.', 'Dose decision uses appetite + adherence + adverse event composite.'],
+    hormones: ['Initiate after baseline endocrine panel and contraindication review.', 'Adjust one variable per cycle (dose OR frequency OR adjunct).', 'Re-check labs every 6-8 weeks, then quarterly.'],
+    peptides: ['Single-compound onboarding before stacking.', '8-12 week cycle + deload to limit response decay.', 'Track sleep, soreness, and performance before advancing.'],
+    hybrid: ['Stagger GLP-1 and hormone/peptide adjustments.', 'Monthly composite review before escalation.', 'Lowest effective doses across tracks.'],
   };
 
   return {
-    summary: `${intake.firstName} ${intake.lastName}: ${recommendation.recommendedTrack.toUpperCase()} track suggested, ${recommendation.fulfillment.recommended} fulfillment, goals=${intake.goals.join(', ')}, symptoms=${intake.symptoms.join(', ')}.`,
+    summary: `${intake.firstName} ${intake.lastName}: ${recommendation.recommendedTrack.toUpperCase()} track, ${recommendation.fulfillment.recommended} fulfillment, goals=${intake.goals.join(', ')}, symptoms=${intake.symptoms.join(', ')}.`,
     dosingFramework: dosingFrameworkByTrack[recommendation.recommendedTrack],
     monitoringChecklist: [
       'Baseline vitals + medication reconciliation complete',
@@ -404,9 +262,30 @@ function buildProviderHandoff(intake: MetabolicIntake, recommendation: Omit<Meta
   };
 }
 
+// ── Force-Track Options ──
+
 export interface GenerateMetabolicRecommendationOptions {
   forceTrack?: MetabolicTrack;
 }
+
+// ── Full Recommendation (tier + dosage wired) ──
+// Imported lazily to avoid circular-module issues at the type level.
+// tier-matrix and dosing-engine import `type MetabolicIntake` only (erased at runtime).
+
+import { generateTierRecommendation, type TierRecommendation } from './tier-matrix';
+import { generateDosageFramework, type DosageFramework } from './dosing-engine';
+
+export type { TierRecommendation } from './tier-matrix';
+export type { DosageFramework } from './dosing-engine';
+
+export interface FullMetabolicRecommendation extends MetabolicRecommendation {
+  tierRecommendation: TierRecommendation;
+  dosageFramework: DosageFramework;
+  monitoringChecklist: string[];
+  providerSignoffRequired: true;
+}
+
+// ── Main Entry Point ──
 
 export function generateMetabolicRecommendation(
   intake: MetabolicIntake,
@@ -446,7 +325,15 @@ export function generateMetabolicRecommendation(
       : blockedTracks.includes(options.forceTrack)
     : false;
 
-  const status: MetabolicRecommendation['status'] = blockedTracks.length === 3
+  // Ineligible only when pregnancy/breastfeeding is compounded by additional permanent contraindications
+  // (thyroid history, pancreatitis, or eating disorder). Pregnancy alone → provider-review-required.
+  const hasPermanentCompoundBlock =
+    intake.medicalFlags.thyroidCancerHistory ||
+    intake.medicalFlags.pancreatitisHistory ||
+    intake.medicalFlags.eatingDisorderHistory;
+  const isHardIneligible = blockedTracks.length === 3 && hasPermanentCompoundBlock;
+
+  const status: MetabolicRecommendation['status'] = isHardIneligible
     ? 'ineligible'
     : riskFlags.length > 0 || forcedTrackBlocked
       ? 'provider-review-required'
@@ -489,5 +376,28 @@ export function generateMetabolicRecommendation(
   return {
     ...baseRecommendation,
     providerHandoff: buildProviderHandoff(intake, baseRecommendation),
+  };
+}
+
+// ── Full Recommendation Builder (tier + dosage wired) ──
+
+export function generateFullMetabolicRecommendation(
+  intake: MetabolicIntake,
+  options: GenerateMetabolicRecommendationOptions = {},
+): FullMetabolicRecommendation {
+  const recommendation = generateMetabolicRecommendation(intake, options);
+  const tierRecommendation = generateTierRecommendation(intake, recommendation.status);
+  const dosageFramework = generateDosageFramework(
+    recommendation.recommendedTrack,
+    tierRecommendation.tier,
+    recommendation.status,
+  );
+
+  return {
+    ...recommendation,
+    tierRecommendation,
+    dosageFramework,
+    monitoringChecklist: dosageFramework.monitoringCadence,
+    providerSignoffRequired: true,
   };
 }
