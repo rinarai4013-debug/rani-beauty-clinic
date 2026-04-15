@@ -311,7 +311,9 @@ export function generateMetabolicRecommendation(
   // Ineligible only when pregnancy/breastfeeding is compounded by additional permanent contraindications
   // (thyroid history, pancreatitis, or eating disorder). Pregnancy alone → provider-review-required.
   const hasPermanentCompoundBlock =
-    flags.thyroidCancerHistory || flags.pancreatitisHistory || flags.eatingDisorderHistory;
+    intake.medicalFlags.thyroidCancerHistory ||
+    intake.medicalFlags.pancreatitisHistory ||
+    intake.medicalFlags.eatingDisorderHistory;
   const isHardIneligible = blockedTracks.length === 3 && hasPermanentCompoundBlock;
 
   const status: MetabolicRecommendation['status'] = isHardIneligible
