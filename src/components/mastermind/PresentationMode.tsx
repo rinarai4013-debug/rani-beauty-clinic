@@ -34,6 +34,8 @@ import PackageSelector from './PackageSelector';
 import FinancingCalculator from './FinancingCalculator';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 import type { FinancingOption } from '@/lib/mastermind/index';
+import SimulationComparisonSlider from './SimulationComparisonSlider';
+import type { TrajectoryScenario } from '@/lib/photo-simulation/trajectory-scenarios';
 
 // ── Props ──
 
@@ -58,6 +60,8 @@ interface PresentationModeProps {
   metabolicStatus?: 'eligible' | 'provider-review-required' | 'ineligible';
   /** Called for provider-review-required patients in lieu of onComplete */
   onMetabolicHandoff?: () => Promise<void>;
+  /** Optional trajectory scenario for simulation slide comparison block */
+  trajectoryScenario?: TrajectoryScenario;
   scoreProjection: {
     current: number;
     threeMonth: number;
@@ -127,6 +131,7 @@ export default function PresentationMode({
   completing,
   metabolicStatus,
   onMetabolicHandoff,
+  trajectoryScenario,
   scoreProjection,
   costOfDelay,
   comparisonMetrics,
@@ -240,6 +245,7 @@ export default function PresentationMode({
               completing,
               metabolicStatus,
               onMetabolicHandoff,
+              trajectoryScenario,
             })}
           </motion.div>
         </AnimatePresence>
@@ -320,6 +326,7 @@ interface SlideProps {
   completing: boolean;
   metabolicStatus?: 'eligible' | 'provider-review-required' | 'ineligible';
   onMetabolicHandoff?: () => Promise<void>;
+  trajectoryScenario?: TrajectoryScenario;
 }
 
 function renderSlide(slideId: SlideId, props: SlideProps) {
@@ -631,7 +638,7 @@ function TreatmentPlanSlide({ session }: SlideProps) {
 
 // ── Slide 4: Simulation ──
 
-function SimulationSlide({ session, comparisonMetrics, costOfDelay }: SlideProps) {
+function SimulationSlide({ session, comparisonMetrics, costOfDelay, trajectoryScenario }: SlideProps) {
   const sim = session.simulationComparison;
   if (!sim) return <EmptySlide message="Simulation not generated yet" />;
 
@@ -717,6 +724,14 @@ function SimulationSlide({ session, comparisonMetrics, costOfDelay }: SlideProps
           Individual results vary based on skin type, lifestyle, and treatment adherence.
           These are not guarantees of outcomes.
         </p>
+
+        {/* Trajectory comparison block — additive, no coupling with plan flow */}
+        {trajectoryScenario && (
+          <SimulationComparisonSlider
+            scenario={trajectoryScenario}
+            className="mt-6"
+          />
+        )}
       </div>
     </div>
   );
