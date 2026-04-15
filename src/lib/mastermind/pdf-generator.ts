@@ -9,6 +9,8 @@
  */
 
 import type { MastermindSession, AuraScanResult, MastermindPlan, MastermindTreatment } from '@/types/mastermind';
+import { generateProtocolPacket } from './protocol-packet';
+import type { ProtocolPacketResult } from './protocol-packet';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 import { getSelectedPackage, calculateFinancingOptions, getPlanTotalCost, getAllTreatments } from './index';
 
@@ -507,3 +509,19 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// ── Protocol Packet PDF ──────────────────────────────────────────────────────
+
+/**
+ * Generate a provider-facing protocol packet PDF for a session.
+ * Delegates to the protocol-packet module for content generation.
+ *
+ * Requires: intakeData, auraScanResult, mastermindPlan (throws if missing).
+ */
+export function generateProtocolPacketPdf(
+  session: MastermindSession,
+  actor: string,
+): ProtocolPacketResult {
+  return generateProtocolPacket(session, actor);
+}
+

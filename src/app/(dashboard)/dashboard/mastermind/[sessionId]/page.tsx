@@ -35,6 +35,7 @@ import {
   History,
   Upload,
   Camera,
+  PackageOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useMastermindSession } from '@/hooks/useMastermindSessions';
@@ -136,6 +137,9 @@ export default function MastermindSessionPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [photoUploading, setPhotoUploading] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [packetGenerating, setPacketGenerating] = useState(false);
+  const [packetUrl, setPacketUrl] = useState<string | null>(null);
+  const [packetSuccess, setPacketSuccess] = useState(false);
 
   // ── PHOTO UPLOAD HANDLER ──
   const handlePhotoUpload = useCallback(
@@ -293,6 +297,31 @@ export default function MastermindSessionPage() {
       console.error('Delete failed:', err);
     }
   }, [sessionId, router]);
+  const handleGenerateProtocolPacket = useCallback(async () => {
+    setPacketGenerating(true);
+    setPacketSuccess(false);
+    try {
+      const res = await fetch('/api/mastermind/protocol-packet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('[Protocol Packet] generation failed:', (err as { error?: string }).error ?? res.status);
+        return;
+      }
+      const data = await res.json() as { packetUrl: string };
+      setPacketUrl(data.packetUrl);
+      setPacketSuccess(true);
+      await mutate();
+    } catch (err) {
+      console.error('[Protocol Packet] unexpected error:', err instanceof Error ? err.message : 'unknown');
+    } finally {
+      setPacketGenerating(false);
+    }
+  }, [sessionId, mutate]);
+
 
   // ── COMPUTED ──
 
@@ -739,8 +768,60 @@ export default function MastermindSessionPage() {
               </>
             )}
 
+            {/* Protocol Packet — available when plan is ready */}
+            {hasPlan && (
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  type="button"
+                  onClick={handleGenerateProtocolPacket}
+                  disabled={packetGenerating}
+                  data-testid="generate-protocol-packet-btn"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-body text-xs font-medium transition-all border border-white/10 text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {packetGenerating ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <PackageOpen className="w-3.5 h-3.5" />
+                  )}
+                  {packetGenerating ? 'Generating...' : 'Protocol Packet'}
+                </button>
+                {(packetSuccess || session.protocolPacket?.packetUrl) && (
+                  <a
+                    href={packetUrl ?? session.protocolPacket?.packetUrl ?? '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-testid="open-packet-link"
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl font-body text-xs font-medium text-green-400 border border-green-400/20 hover:bg-green-400/10 transition-all"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Open Packet
+                  </a>
+                )}
+                {session.providerReview?.approvalStatus && (
+                  <span
+                    data-testid="provider-review-status-badge"
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-body text-[10px] font-medium ${
+                      session.providerReview.approvalStatus === 'approved'
+                        ? 'bg-green-400/10 text-green-400 border border-green-400/20'
+                        : session.providerReview.approvalStatus === 'rejected'
+                          ? 'bg-red-400/10 text-red-400 border border-red-400/20'
+                          : 'bg-[#C9A96E]/10 text-[#C9A96E] border border-[#C9A96E]/20'
+                    }`}
+                  >
+                    {session.providerReview.approvalStatus === 'approved'
+                      ? 'Provider Approved'
+                      : session.providerReview.approvalStatus === 'rejected'
+                        ? 'Provider Rejected'
+                        : session.providerReview.approvalStatus === 'modified'
+                          ? 'Changes Requested'
+                          : 'Review Pending'}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Phase indicator pill */}
-            <div className="ml-auto">
+            <div className={hasPlan ? '' : 'ml-auto'}>
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-body text-xs text-white/50" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <div
                   className={`w-2 h-2 rounded-full ${
@@ -2000,3 +2081,4 @@ function generateCopilotClosing(session: NonNullable<ReturnType<typeof useMaster
 
   return techniques;
 }
+
