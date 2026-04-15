@@ -268,6 +268,23 @@ export interface GenerateMetabolicRecommendationOptions {
   forceTrack?: MetabolicTrack;
 }
 
+// ── Full Recommendation (tier + dosage wired) ──
+// Imported lazily to avoid circular-module issues at the type level.
+// tier-matrix and dosing-engine import `type MetabolicIntake` only (erased at runtime).
+
+import { generateTierRecommendation, type TierRecommendation } from './tier-matrix';
+import { generateDosageFramework, type DosageFramework } from './dosing-engine';
+
+export type { TierRecommendation } from './tier-matrix';
+export type { DosageFramework } from './dosing-engine';
+
+export interface FullMetabolicRecommendation extends MetabolicRecommendation {
+  tierRecommendation: TierRecommendation;
+  dosageFramework: DosageFramework;
+  monitoringChecklist: string[];
+  providerSignoffRequired: true;
+}
+
 // ── Main Entry Point ──
 
 export function generateMetabolicRecommendation(
@@ -359,5 +376,28 @@ export function generateMetabolicRecommendation(
   return {
     ...baseRecommendation,
     providerHandoff: buildProviderHandoff(intake, baseRecommendation),
+  };
+}
+
+// ── Full Recommendation Builder (tier + dosage wired) ──
+
+export function generateFullMetabolicRecommendation(
+  intake: MetabolicIntake,
+  options: GenerateMetabolicRecommendationOptions = {},
+): FullMetabolicRecommendation {
+  const recommendation = generateMetabolicRecommendation(intake, options);
+  const tierRecommendation = generateTierRecommendation(intake, recommendation.status);
+  const dosageFramework = generateDosageFramework(
+    recommendation.recommendedTrack,
+    tierRecommendation.tier,
+    recommendation.status,
+  );
+
+  return {
+    ...recommendation,
+    tierRecommendation,
+    dosageFramework,
+    monitoringChecklist: dosageFramework.monitoringCadence,
+    providerSignoffRequired: true,
   };
 }
