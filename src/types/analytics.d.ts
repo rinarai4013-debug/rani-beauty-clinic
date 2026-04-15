@@ -58,19 +58,29 @@ export type RevenueEvent =
   | 'plan_financing_clicked'
   | 'membership_signup';
 
-/** Metabolic protocol checkout events — split held vs started for funnel accuracy */
-export type MetabolicCheckoutEvent =
+/** Metabolic protocol funnel events — intake → fulfillment → started/held */
+export type MetabolicFunnelEvent =
+  // Intake submitted (all statuses — fires at handoff initiation, no PII)
+  | 'metabolic_intake_submitted'
+  | 'peptide_intake_submitted'
+  // Fulfillment preference confirmed (no PII)
+  | 'metabolic_fulfillment_selected'
+  | 'peptide_fulfillment_selected'
+  // Checkout split: eligible only fires started; provider-review-only fires held
   | 'metabolic_checkout_started'
   | 'metabolic_checkout_held_for_provider_review'
   | 'peptide_checkout_started'
   | 'peptide_checkout_held_for_provider_review';
+
+/** @deprecated Use MetabolicFunnelEvent */
+export type MetabolicCheckoutEvent = MetabolicFunnelEvent;
 
 export type AnalyticsEventName =
   | BehavioralEvent
   | IntentEvent
   | ConversionEvent
   | RevenueEvent
-  | MetabolicCheckoutEvent;
+  | MetabolicFunnelEvent;
 
 /* ── Event Parameters ────────────────────────────────────────── */
 
@@ -136,12 +146,14 @@ export interface AnalyticsEventParams {
   payment_method?: string;
   provider?: string;
 
-  // Metabolic protocol checkout (no PII)
+  // Metabolic funnel (no PII)
   recommended_track?: string;
   protocol_tier?: string;
   fulfillment_preference?: string;
   hold_reason?: string;
+  intake_status?: string;
 
   // Generic catch-all
   [key: string]: string | number | boolean | undefined;
 }
+
