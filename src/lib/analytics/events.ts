@@ -31,6 +31,11 @@ const metaEventMap: Record<string, string> = {
   quiz_completed: 'CompleteRegistration',
   service_page_view: 'ViewContent',
   phone_click: 'Contact',
+  // Metabolic protocol checkout
+  metabolic_checkout_started: 'InitiateCheckout',
+  peptide_checkout_started: 'InitiateCheckout',
+  metabolic_checkout_held_for_provider_review: 'Lead',
+  peptide_checkout_held_for_provider_review: 'Lead',
 };
 
 /* ── Device Type Helper ──────────────────────────────────────── */
@@ -235,6 +240,58 @@ export function trackPhoneCall(source: string) {
     window.fbq?.("track", "Contact", { content_name: "phone_call", content_category: source });
     window.dataLayer?.push({ event: "phone_call_click", source });
   }
+}
+
+/* ── Metabolic Protocol Checkout Helpers ─────────────────────── */
+
+/**
+ * Fired when an eligible patient proceeds to metabolic checkout.
+ * No PII — track/tier/fulfillment only.
+ */
+export function trackMetabolicCheckoutStarted(
+  track: string,
+  tier: string,
+  fulfillmentPreference: string,
+) {
+  trackAnalyticsEvent('metabolic_checkout_started', {
+    recommended_track: track,
+    protocol_tier: tier,
+    fulfillment_preference: fulfillmentPreference,
+  });
+}
+
+/**
+ * Fired when a provider-review-required patient submits handoff.
+ * Checkout is held — not started.
+ */
+export function trackMetabolicCheckoutHeld(track: string, tier: string) {
+  trackAnalyticsEvent('metabolic_checkout_held_for_provider_review', {
+    recommended_track: track,
+    protocol_tier: tier,
+    hold_reason: 'provider_review_required',
+  });
+}
+
+/**
+ * Fired when an eligible patient proceeds to peptide checkout.
+ */
+export function trackPeptideCheckoutStarted(tier: string) {
+  trackAnalyticsEvent('peptide_checkout_started', {
+    protocol_tier: tier,
+    recommended_track: 'peptides',
+  });
+}
+
+/**
+ * Fired when a provider-review-required patient submits peptide handoff.
+ * Checkout is held — not started.
+ */
+export function trackPeptideCheckoutHeld(tier: string) {
+  trackAnalyticsEvent('peptide_checkout_held_for_provider_review', {
+    protocol_tier: tier,
+    recommended_track: 'peptides',
+    hold_reason: 'provider_review_required',
+  });
 }
 
 // Re-export types for convenience
