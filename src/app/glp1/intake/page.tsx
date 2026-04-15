@@ -16,6 +16,8 @@ import { useState } from 'react';
 import {
   trackMetabolicCheckoutStarted,
   trackMetabolicCheckoutHeld,
+  trackMetabolicIntakeSubmitted,
+  trackMetabolicFulfillmentSelected,
 } from '@/lib/analytics/events';
 
 export type MetabolicStatus = 'eligible' | 'provider-review-required' | 'ineligible';
@@ -45,6 +47,12 @@ export default function Glp1IntakePage() {
     metabolicStatus: MetabolicStatus,
     payload: Glp1HandoffPayload,
   ) {
+    // Fire intake submitted event (no PII) — tracks all non-ineligible handoff initiations
+    if (metabolicStatus !== 'ineligible') {
+      trackMetabolicIntakeSubmitted(payload.recommendedTrack, metabolicStatus);
+      trackMetabolicFulfillmentSelected(payload.recommendedTrack, payload.fulfillmentPreference);
+    }
+
     // Block immediately for ineligible — no handoff submitted, no checkout launched
     if (metabolicStatus === 'ineligible') {
       setHandoff({ status: 'blocked', metabolicStatus });
@@ -187,3 +195,4 @@ export default function Glp1IntakePage() {
     </div>
   );
 }
+

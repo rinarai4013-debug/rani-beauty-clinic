@@ -13,6 +13,8 @@ import { useState } from 'react';
 import {
   trackPeptideCheckoutStarted,
   trackPeptideCheckoutHeld,
+  trackPeptideIntakeSubmitted,
+  trackPeptideFulfillmentSelected,
 } from '@/lib/analytics/events';
 
 export type MetabolicStatus = 'eligible' | 'provider-review-required' | 'ineligible';
@@ -42,6 +44,12 @@ export default function PeptideIntakePage() {
     metabolicStatus: MetabolicStatus,
     payload: PeptideHandoffPayload,
   ) {
+    // Fire intake submitted event (no PII) — tracks all non-ineligible handoff initiations
+    if (metabolicStatus !== 'ineligible') {
+      trackPeptideIntakeSubmitted(metabolicStatus);
+      trackPeptideFulfillmentSelected(payload.fulfillmentPreference);
+    }
+
     // Block immediately for ineligible — no handoff submitted, no checkout launched
     if (metabolicStatus === 'ineligible') {
       setHandoff({ status: 'blocked', metabolicStatus });
@@ -180,3 +188,4 @@ export default function PeptideIntakePage() {
     </div>
   );
 }
+

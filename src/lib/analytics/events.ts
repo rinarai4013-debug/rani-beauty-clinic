@@ -32,6 +32,10 @@ const metaEventMap: Record<string, string> = {
   service_page_view: 'ViewContent',
   phone_click: 'Contact',
   // Metabolic protocol checkout
+  metabolic_intake_submitted: 'Lead',
+  metabolic_fulfillment_selected: 'Lead',
+  peptide_intake_submitted: 'Lead',
+  peptide_fulfillment_selected: 'Lead',
   metabolic_checkout_started: 'InitiateCheckout',
   peptide_checkout_started: 'InitiateCheckout',
   metabolic_checkout_held_for_provider_review: 'Lead',
@@ -294,5 +298,48 @@ export function trackPeptideCheckoutHeld(tier: string) {
   });
 }
 
+/**
+ * Fired when a metabolic intake is submitted for handoff processing.
+ * Fires for all non-ineligible paths. No PII.
+ */
+export function trackMetabolicIntakeSubmitted(track: string, intakeStatus: string) {
+  trackAnalyticsEvent('metabolic_intake_submitted', {
+    recommended_track: track,
+    intake_status: intakeStatus,
+  });
+}
+
+/**
+ * Fired when the patient's fulfillment preference is confirmed at handoff.
+ * No PII.
+ */
+export function trackMetabolicFulfillmentSelected(track: string, fulfillmentPreference: string) {
+  trackAnalyticsEvent('metabolic_fulfillment_selected', {
+    recommended_track: track,
+    fulfillment_preference: fulfillmentPreference,
+  });
+}
+
+/**
+ * Fired when a peptide intake is submitted for handoff processing. No PII.
+ */
+export function trackPeptideIntakeSubmitted(intakeStatus: string) {
+  trackAnalyticsEvent('peptide_intake_submitted', {
+    recommended_track: 'peptides',
+    intake_status: intakeStatus,
+  });
+}
+
+/**
+ * Fired when the patient's fulfillment preference is confirmed for peptide handoff. No PII.
+ */
+export function trackPeptideFulfillmentSelected(fulfillmentPreference: string) {
+  trackAnalyticsEvent('peptide_fulfillment_selected', {
+    recommended_track: 'peptides',
+    fulfillment_preference: fulfillmentPreference,
+  });
+}
+
 // Re-export types for convenience
 export type { AnalyticsEventName, AnalyticsEventParams };
+
