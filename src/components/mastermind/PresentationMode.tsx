@@ -54,6 +54,10 @@ interface PresentationModeProps {
   onSelectFinancing: (months: number | null) => void;
   pdfLoading: boolean;
   completing: boolean;
+  /** Optional metabolic status for status-aware checkout CTA */
+  metabolicStatus?: 'eligible' | 'provider-review-required' | 'ineligible';
+  /** Called for provider-review-required patients in lieu of onComplete */
+  onMetabolicHandoff?: () => Promise<void>;
   scoreProjection: {
     current: number;
     threeMonth: number;
@@ -121,6 +125,8 @@ export default function PresentationMode({
   onSelectFinancing,
   pdfLoading,
   completing,
+  metabolicStatus,
+  onMetabolicHandoff,
   scoreProjection,
   costOfDelay,
   comparisonMetrics,
@@ -232,6 +238,8 @@ export default function PresentationMode({
               onComplete,
               pdfLoading,
               completing,
+              metabolicStatus,
+              onMetabolicHandoff,
             })}
           </motion.div>
         </AnimatePresence>
@@ -310,6 +318,8 @@ interface SlideProps {
   onComplete: () => Promise<unknown>;
   pdfLoading: boolean;
   completing: boolean;
+  metabolicStatus?: 'eligible' | 'provider-review-required' | 'ineligible';
+  onMetabolicHandoff?: () => Promise<void>;
 }
 
 function renderSlide(slideId: SlideId, props: SlideProps) {
@@ -725,6 +735,8 @@ function PackageSelectionSlide({
   onComplete,
   pdfLoading,
   completing,
+  metabolicStatus,
+  onMetabolicHandoff,
 }: SlideProps) {
   const plan = session.mastermindPlan;
   if (!plan) return <EmptySlide message="Plan not available" />;
@@ -782,15 +794,34 @@ function PackageSelectionSlide({
               {pdfLoading ? 'Generating...' : 'Download Plan PDF'}
             </button>
 
-            <button
-              type="button"
-              onClick={onComplete}
-              disabled={completing}
-              className="flex items-center gap-2 px-8 py-3 rounded-xl bg-[#C9A96E] text-[#0F1D2C] font-body text-sm font-semibold hover:bg-[#C9A96E]/90 transition-colors disabled:opacity-50"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              {completing ? 'Completing...' : 'Book My Transformation'}
-            </button>
+            {/* Status-aware checkout CTA */}
+            {metabolicStatus === 'ineligible' ? (
+              <div className="flex flex-col items-center gap-2 py-1">
+                <p className="text-sm font-body text-white/40 text-center">
+                  Protocol not available for this patient — contact clinic for consultation
+                </p>
+              </div>
+            ) : metabolicStatus === 'provider-review-required' && onMetabolicHandoff ? (
+              <button
+                type="button"
+                onClick={onMetabolicHandoff}
+                disabled={completing}
+                className="flex items-center gap-2 px-8 py-3 rounded-xl border border-white/20 text-white font-body text-sm font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {completing ? 'Submitting...' : 'Submit for Provider Review'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onComplete}
+                disabled={completing}
+                className="flex items-center gap-2 px-8 py-3 rounded-xl bg-[#C9A96E] text-[#0F1D2C] font-body text-sm font-semibold hover:bg-[#C9A96E]/90 transition-colors disabled:opacity-50"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {completing ? 'Completing...' : 'Book My Transformation'}
+              </button>
+            )}
           </motion.div>
         )}
       </div>

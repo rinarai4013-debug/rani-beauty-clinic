@@ -58,11 +58,19 @@ export type RevenueEvent =
   | 'plan_financing_clicked'
   | 'membership_signup';
 
+/** Metabolic protocol checkout events — split held vs started for funnel accuracy */
+export type MetabolicCheckoutEvent =
+  | 'metabolic_checkout_started'
+  | 'metabolic_checkout_held_for_provider_review'
+  | 'peptide_checkout_started'
+  | 'peptide_checkout_held_for_provider_review';
+
 export type AnalyticsEventName =
   | BehavioralEvent
   | IntentEvent
   | ConversionEvent
-  | RevenueEvent;
+  | RevenueEvent
+  | MetabolicCheckoutEvent;
 
 /* ── Event Parameters ────────────────────────────────────────── */
 
@@ -127,6 +135,12 @@ export interface AnalyticsEventParams {
   monthly_value?: number;
   payment_method?: string;
   provider?: string;
+
+  // Metabolic protocol checkout (no PII)
+  recommended_track?: string;
+  protocol_tier?: string;
+  fulfillment_preference?: string;
+  hold_reason?: string;
 
   // Generic catch-all
   [key: string]: string | number | boolean | undefined;
