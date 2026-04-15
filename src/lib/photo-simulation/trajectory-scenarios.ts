@@ -51,7 +51,7 @@ const WITHOUT_TREATMENT_CURVE: Record<SimulationTimeframe, number> = {
   '12m': -12,
 };
 
-const BASELINE_WITHOUT_SCORE = 50;
+const BASELINE_WITHOUT_SCORE = 8;  // must stay below minimum treatmentCurve[1m] across all services (15)
 
 /** Confidence levels: shorter timeframes = less certainty */
 const CONFIDENCE_BY_TIMEFRAME: Record<SimulationTimeframe, number> = {
