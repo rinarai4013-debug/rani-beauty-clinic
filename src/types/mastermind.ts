@@ -381,7 +381,7 @@ export type MastermindSessionAction =
   | { type: 'COMPLETE' }
   | { type: 'SET_CLINIC_STATUS'; status: ClinicStatus; actor?: string }
   | { type: 'SET_CLINIC_NOTES'; notes: string; actor?: string }
-  | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string };
+  | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string }
   | { type: 'SET_PROTOCOL_PACKET'; packetUrl: string; generatedAt: string; generatorActor: string; packetVersion: number };
 
 
