@@ -52,7 +52,7 @@ const baseIntakeSchema = z.object({
   firstName: z.string().trim().min(1).max(60),
   lastName: z.string().trim().min(1).max(60),
   email: z.string().trim().email(),
-  phone: z.string().trim().min(7).max(30).optional().default(''),
+  phone: z.string().trim().min(7).max(30).optional(),
   goals: z.array(z.enum(METABOLIC_GOAL_OPTIONS)).min(1),
   symptoms: z.array(z.enum(METABOLIC_SYMPTOM_OPTIONS)).min(1),
   preferredTrack: z.enum(METABOLIC_TRACKS).optional(),
