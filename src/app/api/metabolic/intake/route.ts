@@ -2,8 +2,8 @@
  * POST /api/metabolic/intake
  *
  * Public metabolic intake endpoint. Validates intake data, runs the
- * deterministic recommendation engine, and returns the structured
- * recommendation with safety gating.
+ * deterministic recommendation engine + tier/dosage framework, and
+ * returns the structured recommendation with safety gating.
  *
  * No AI dependency — pure deterministic scoring + safety logic.
  */
@@ -16,7 +16,7 @@ import { logEvent } from '@/lib/logging/structured-logger';
 import { withSentry } from '@/lib/sentry-utils';
 import {
   metabolicIntakeSchema,
-  generateMetabolicRecommendation,
+  generateFullMetabolicRecommendation,
 } from '@/lib/metabolic/matrix';
 
 const MAX_REQUEST_BYTES = 128 * 1024;
@@ -49,11 +49,20 @@ export async function POST(req: NextRequest) {
     }
 
     const intake = parsed.data;
-    const recommendation = generateMetabolicRecommendation(intake);
+    const fullRec = generateFullMetabolicRecommendation(intake);
+
+    const {
+      tierRecommendation,
+      dosageFramework,
+      monitoringChecklist,
+      providerSignoffRequired,
+      ...recommendation
+    } = fullRec;
 
     const intakeSummary = [
       `Track: ${recommendation.recommendedTrack}`,
       `Status: ${recommendation.status}`,
+      `Tier: ${tierRecommendation.tier}`,
       `Goals: ${intake.goals.join(', ')}`,
       `Symptoms: ${intake.symptoms.join(', ')}`,
       `Fulfillment Preference: ${intake.fulfillmentPreference}`,
@@ -90,6 +99,10 @@ export async function POST(req: NextRequest) {
           fulfillmentPreference: intake.fulfillmentPreference,
         },
         recommendation,
+        tierRecommendation,
+        dosageFramework,
+        monitoringChecklist,
+        providerSignoffRequired,
       },
     });
   });
