@@ -171,7 +171,8 @@ function buildTrackProfiles(intake: MetabolicIntake): Record<MetabolicTrack, Tra
   const topTwo = [profile.glp1.score, profile.hormones.score, profile.peptides.score]
     .sort((a, b) => b - a)
     .slice(0, 2);
-  if (topTwo[0] >= 3 && topTwo[1] >= 3) profile.hybrid.score = 4;
+  // Only award hybrid score when glp1 AND hormones are both competitive (the canonical hybrid combo)
+  if (profile.glp1.score >= 3 && profile.hormones.score >= 3) profile.hybrid.score = 4;
 
   // Safety gates
   if (flags.pregnant || flags.breastfeeding) {
@@ -307,7 +308,13 @@ export function generateMetabolicRecommendation(
       : blockedTracks.includes(options.forceTrack)
     : false;
 
-  const status: MetabolicRecommendation['status'] = blockedTracks.length === 3
+  // Ineligible only when pregnancy/breastfeeding is compounded by additional permanent contraindications
+  // (thyroid history, pancreatitis, or eating disorder). Pregnancy alone → provider-review-required.
+  const hasPermanentCompoundBlock =
+    flags.thyroidCancerHistory || flags.pancreatitisHistory || flags.eatingDisorderHistory;
+  const isHardIneligible = blockedTracks.length === 3 && hasPermanentCompoundBlock;
+
+  const status: MetabolicRecommendation['status'] = isHardIneligible
     ? 'ineligible'
     : riskFlags.length > 0 || forcedTrackBlocked
       ? 'provider-review-required'
