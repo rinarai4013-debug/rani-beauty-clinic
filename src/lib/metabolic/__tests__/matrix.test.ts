@@ -164,7 +164,7 @@ describe('generateMetabolicRecommendation', () => {
     expect(rec1.blockedTracks).toEqual(rec2.blockedTracks);
     expect(rec1.fulfillment.allowed).toEqual(rec2.fulfillment.allowed);
   });
-});
+
   it('breastfeeding: blocks all 3 tracks (parity with pregnancy exclusions)', () => {
     const intake = makeIntake({
       goals: ['weight-loss'],
@@ -184,8 +184,8 @@ describe('generateMetabolicRecommendation', () => {
       medicalFlags: { ...makeIntake().medicalFlags, breastfeeding: true },
     });
     const rec = generateMetabolicRecommendation(intake);
-    // Status is provider-review-required (new logic) or ineligible (old logic)
-    // but never 'eligible' — breastfeeding must gate the patient
+    // Status is provider-review-required on current logic or ineligible
+    // on older logic — never 'eligible' for breastfeeding patients
     expect(rec.status).not.toBe('eligible');
     expect(rec.riskFlags.length).toBeGreaterThan(0);
   });
