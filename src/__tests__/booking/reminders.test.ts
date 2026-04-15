@@ -22,7 +22,7 @@ const mockAppointment: Appointment = {
   providerId: 'dr-landfield',
   providerName: 'Dr. Alexander Landfield',
   roomId: 'glow',
-  date: '2026-04-15',
+  date: '2027-01-15',
   startTime: '10:00',
   endTime: '10:30',
   duration: 30,
