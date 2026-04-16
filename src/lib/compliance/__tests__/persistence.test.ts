@@ -13,6 +13,9 @@
  *      are swallowed — caller never sees an exception
  *   4. Opt-in safety: when the flag is off, NO Airtable client code
  *      runs (verified via dynamic-import spy)
+ *   5. Production warning: a single critical logEvent is emitted the
+ *      first time any persist function is called in a production process
+ *      with persistence disabled
  */
 
 import {
@@ -30,16 +33,12 @@ import type {
   TrainingCompletion,
 } from '@/types/compliance';
 
-// ── Hoisted spies for the Airtable client import ────────────────────
+// ── Hoisted spies ────────────────────────────────────────────────────
 
 const mockCreateRecord = vi.fn().mockResolvedValue('rec_test_001');
 const mockUpdateRecord = vi.fn().mockResolvedValue(undefined);
+const mockLogEvent = vi.fn();
 
-// `getAirtableBase()` returns a function that's itself callable:
-//   const base = getAirtableBase();
-//   const table = base('Table Name');
-// We need to mock it as a callable that returns a table-shaped object.
-// The simplest way is a factory that returns a fresh callable each time.
 function makeMockBase() {
   return (tableName: string) => ({ name: tableName });
 }
@@ -50,7 +49,11 @@ vi.mock('@/lib/airtable/client', () => ({
   updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
 }));
 
-// Import under test AFTER the mock is declared
+vi.mock('@/lib/logging/structured-logger', () => ({
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
+}));
+
+// Import under test AFTER mocks are declared
 import {
   persistPhiAccessLog,
   persistBreach,
@@ -58,6 +61,7 @@ import {
   persistTraining,
   getPersistenceStatus,
   COMPLIANCE_TABLE_NAMES,
+  _resetPersistenceWarningForTest,
 } from '../persistence';
 
 // ── Fixtures ─────────────────────────────────────────────────────────
@@ -134,23 +138,28 @@ function makeTraining(overrides: Partial<TrainingCompletion> = {}): TrainingComp
 
 // ── Setup ────────────────────────────────────────────────────────────
 
-const originalEnv = process.env.COMPLIANCE_PERSISTENCE_ENABLED;
+const originalEnv = {
+  COMPLIANCE_PERSISTENCE_ENABLED: process.env.COMPLIANCE_PERSISTENCE_ENABLED,
+  NODE_ENV: process.env.NODE_ENV,
+};
 
 beforeEach(() => {
   mockCreateRecord.mockReset().mockResolvedValue('rec_test_001');
   mockUpdateRecord.mockReset();
+  mockLogEvent.mockReset();
+  _resetPersistenceWarningForTest();
 });
 
 afterEach(() => {
-  if (originalEnv === undefined) {
+  if (originalEnv.COMPLIANCE_PERSISTENCE_ENABLED === undefined) {
     delete process.env.COMPLIANCE_PERSISTENCE_ENABLED;
   } else {
-    process.env.COMPLIANCE_PERSISTENCE_ENABLED = originalEnv;
+    process.env.COMPLIANCE_PERSISTENCE_ENABLED = originalEnv.COMPLIANCE_PERSISTENCE_ENABLED;
   }
+  process.env.NODE_ENV = originalEnv.NODE_ENV;
   vi.restoreAllMocks();
 });
 
-// Tiny helper to let the fire-and-forget promise run
 async function flushMicrotasks() {
   await new Promise((resolve) => setImmediate(resolve));
 }
@@ -277,12 +286,10 @@ describe('persistence enabled', () => {
     expect(fields['Discovery Date']).toBe('2026-04-10');
     expect(fields['Individuals Affected']).toBe(42);
     expect(fields['Severity']).toBe('medium');
-    // Array fields become comma-separated strings for Long text cells
     expect(fields['Data Involved']).toBe('demographics, treatment_records');
     expect(fields['Corrective Actions']).toBe(
       'full-disk encryption, remote wipe executed',
     );
-    // Checkbox fields
     expect(fields['HHS Reported']).toBe(false);
     expect(fields['Individuals Notified']).toBe(false);
   });
@@ -364,24 +371,91 @@ describe('persistence enabled', () => {
 
     expect(result).toBeUndefined();
     await flushMicrotasks();
-    // createRecord was called and threw
     expect(mockCreateRecord).toHaveBeenCalledTimes(1);
-    // The error was logged but NOT propagated to the caller
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 
   it('all persist functions are sync-call-void-return contract', () => {
-    // Verify none of the exports return a Promise — callers should
-    // never have to `await` these.
-    const entry = makePhiEntry();
-    const breach = makeBreach();
-    const baa = makeBaa();
-    const training = makeTraining();
+    expect(persistPhiAccessLog(makePhiEntry())).toBeUndefined();
+    expect(persistBreach(makeBreach())).toBeUndefined();
+    expect(persistBaa(makeBaa())).toBeUndefined();
+    expect(persistTraining(makeTraining())).toBeUndefined();
+  });
 
-    expect(persistPhiAccessLog(entry)).toBeUndefined();
-    expect(persistBreach(breach)).toBeUndefined();
-    expect(persistBaa(baa)).toBeUndefined();
-    expect(persistTraining(training)).toBeUndefined();
+  it('does NOT emit production warning when persistence is enabled', () => {
+    process.env.NODE_ENV = 'production';
+    persistPhiAccessLog(makePhiEntry());
+    expect(mockLogEvent).not.toHaveBeenCalled();
+  });
+});
+
+// ── Production warning when persistence is disabled ──────────────────
+
+describe('production warning (disabled in production)', () => {
+  beforeEach(() => {
+    delete process.env.COMPLIANCE_PERSISTENCE_ENABLED;
+    process.env.NODE_ENV = 'production';
+    _resetPersistenceWarningForTest();
+  });
+
+  it('emits one critical logEvent on first persist call in production', () => {
+    persistPhiAccessLog(makePhiEntry());
+    expect(mockLogEvent).toHaveBeenCalledTimes(1);
+    const [domain, level, message] = mockLogEvent.mock.calls[0] as [string, string, string];
+    expect(domain).toBe('compliance');
+    expect(level).toBe('critical');
+    expect(message).toMatch(/HIPAA audit persistence is DISABLED/i);
+  });
+
+  it('includes action and impact fields in the logEvent payload', () => {
+    persistPhiAccessLog(makePhiEntry());
+    const [, , , fields] = mockLogEvent.mock.calls[0] as [
+      string,
+      string,
+      string,
+      Record<string, unknown>,
+    ];
+    expect(fields).toHaveProperty('action');
+    expect(fields).toHaveProperty('impact');
+    expect(String(fields['action'])).toMatch(/COMPLIANCE_PERSISTENCE_ENABLED/);
+    expect(String(fields['impact'])).toMatch(/HIPAA/);
+  });
+
+  it('emits the warning exactly once across multiple persist calls (latch)', () => {
+    persistPhiAccessLog(makePhiEntry());
+    persistBreach(makeBreach());
+    persistBaa(makeBaa());
+    persistTraining(makeTraining());
+    expect(mockLogEvent).toHaveBeenCalledTimes(1);
+  });
+
+  it('does NOT emit in development (NODE_ENV=development)', () => {
+    process.env.NODE_ENV = 'development';
+    persistPhiAccessLog(makePhiEntry());
+    expect(mockLogEvent).not.toHaveBeenCalled();
+  });
+
+  it('does NOT emit in test (NODE_ENV=test)', () => {
+    process.env.NODE_ENV = 'test';
+    persistPhiAccessLog(makePhiEntry());
+    expect(mockLogEvent).not.toHaveBeenCalled();
+  });
+
+  it('does NOT emit when NODE_ENV is unset', () => {
+    delete process.env.NODE_ENV;
+    persistPhiAccessLog(makePhiEntry());
+    expect(mockLogEvent).not.toHaveBeenCalled();
+  });
+
+  it('_resetPersistenceWarningForTest re-arms the latch for subsequent tests', () => {
+    persistPhiAccessLog(makePhiEntry());
+    expect(mockLogEvent).toHaveBeenCalledTimes(1);
+
+    mockLogEvent.mockReset();
+    _resetPersistenceWarningForTest();
+
+    persistBreach(makeBreach());
+    expect(mockLogEvent).toHaveBeenCalledTimes(1);
   });
 });

@@ -109,6 +109,7 @@
  *   - `Renewal Required` (Checkbox)
  */
 
+import { logEvent } from '@/lib/logging/structured-logger';
 import type {
   PHIAccessLog,
   BreachNotification,
@@ -127,6 +128,46 @@ export const COMPLIANCE_TABLE_NAMES = {
 
 function isPersistenceEnabled(): boolean {
   return process.env.COMPLIANCE_PERSISTENCE_ENABLED === '1';
+}
+
+// ── One-time production warning ──────────────────────────────────────
+
+/**
+ * Tracks whether the disabled-in-production warning has already been
+ * emitted this process lifetime. Module-level so it fires at most once
+ * regardless of how many persist calls are made.
+ */
+let _persistenceWarnedOnce = false;
+
+/**
+ * Emits a single `critical` structured log when COMPLIANCE_PERSISTENCE_ENABLED
+ * is not set in a production process. Silent in development and test
+ * environments — only triggers where `NODE_ENV === 'production'`.
+ *
+ * Called at the start of every persist function so the warning fires on
+ * the first actual persist attempt, giving the clearest possible signal
+ * that audit data is being silently dropped.
+ */
+function warnOnceIfDisabledInProduction(): void {
+  if (_persistenceWarnedOnce) return;
+  if (process.env.NODE_ENV !== 'production') return;
+  if (isPersistenceEnabled()) return;
+  _persistenceWarnedOnce = true;
+  logEvent(
+    'compliance',
+    'critical',
+    'HIPAA audit persistence is DISABLED in production — PHI access logs, breach notifications, BAAs, and training records are NOT being persisted. Set COMPLIANCE_PERSISTENCE_ENABLED=1 in Vercel environment variables.',
+    {
+      COMPLIANCE_PERSISTENCE_ENABLED: process.env.COMPLIANCE_PERSISTENCE_ENABLED ?? '(unset)',
+      action: 'set COMPLIANCE_PERSISTENCE_ENABLED=1 in Vercel environment variables',
+      impact: 'audit trail is not persisting — HIPAA §164.530(j) retention requirement unmet',
+    },
+  );
+}
+
+/** @internal — test-only reset for the once-per-process warning latch. */
+export function _resetPersistenceWarningForTest(): void {
+  _persistenceWarnedOnce = false;
 }
 
 // ── Internal helpers ─────────────────────────────────────────────────
@@ -273,6 +314,7 @@ function mapTrainingToFields(record: TrainingCompletion): Record<string, unknown
  *
  * Behavior:
  *   - persistence disabled (COMPLIANCE_PERSISTENCE_ENABLED != '1') → no-op
+ *     (emits one critical log in production to surface the misconfiguration)
  *   - Airtable client unavailable → no-op
  *   - persistence enabled + client available:
  *       → writes to the `PHI Access Log` table
@@ -280,6 +322,7 @@ function mapTrainingToFields(record: TrainingCompletion): Record<string, unknown
  *         which happens when the table hasn't been provisioned yet)
  */
 export function persistPhiAccessLog(entry: PHIAccessLog): void {
+  warnOnceIfDisabledInProduction();
   if (!isPersistenceEnabled()) return;
   void safelyPersist('persistPhiAccessLog', async () => {
     const client = await loadAirtable();
@@ -291,6 +334,7 @@ export function persistPhiAccessLog(entry: PHIAccessLog): void {
 }
 
 export function persistBreach(breach: BreachNotification): void {
+  warnOnceIfDisabledInProduction();
   if (!isPersistenceEnabled()) return;
   void safelyPersist('persistBreach', async () => {
     const client = await loadAirtable();
@@ -302,6 +346,7 @@ export function persistBreach(breach: BreachNotification): void {
 }
 
 export function persistBaa(baa: BusinessAssociateAgreement): void {
+  warnOnceIfDisabledInProduction();
   if (!isPersistenceEnabled()) return;
   void safelyPersist('persistBaa', async () => {
     const client = await loadAirtable();
@@ -313,6 +358,7 @@ export function persistBaa(baa: BusinessAssociateAgreement): void {
 }
 
 export function persistTraining(record: TrainingCompletion): void {
+  warnOnceIfDisabledInProduction();
   if (!isPersistenceEnabled()) return;
   void safelyPersist('persistTraining', async () => {
     const client = await loadAirtable();
