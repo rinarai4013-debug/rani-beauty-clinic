@@ -403,7 +403,7 @@ describe('production warning (disabled in production)', () => {
     persistPhiAccessLog(makePhiEntry());
     expect(mockLogEvent).toHaveBeenCalledTimes(1);
     const [domain, level, message] = mockLogEvent.mock.calls[0] as [string, string, string];
-    expect(domain).toBe('compliance');
+    expect(domain).toBe('api'); // LogCategory does not include 'compliance'; 'api' is used as closest available domain
     expect(level).toBe('critical');
     expect(message).toMatch(/HIPAA audit persistence is DISABLED/i);
   });
