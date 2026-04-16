@@ -287,6 +287,19 @@ describe('Tenant AI Engines Module', () => {
       expect(result).toHaveProperty('closingStrategy');
     });
 
+    it('should sanitize clientId before building Airtable filterByFormula', async () => {
+      const fetchAll = vi.fn(async () => []);
+      const db = { ...createMockDb(), fetchAll } as unknown as TenantDatabaseClient;
+      const maliciousClientId = `rec123' OR TRUE() OR 'x`;
+      const safeClientId = maliciousClientId.replace(/['"\\\n\r]/g, '');
+
+      await getConsultBriefing(db, makeTenant('professional'), maliciousClientId);
+
+      const [, options] = fetchAll.mock.calls[0] as [string, { filterByFormula: string }];
+      expect(options.filterByFormula).toBe(`RECORD_ID() = '${safeClientId}'`);
+      expect(options.filterByFormula).not.toContain(maliciousClientId);
+    });
+
     it('should include talking points by timing', async () => {
       const db = createMockDb();
       const result = await getConsultBriefing(db, makeTenant('professional'), 'c1');
