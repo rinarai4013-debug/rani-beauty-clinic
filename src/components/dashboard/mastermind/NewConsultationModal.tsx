@@ -117,6 +117,18 @@ const SKINCARE_ROUTINE = [
   { value: 'advanced', label: 'Advanced (6+ products)' },
 ];
 
+const AUTOIMMUNE_TERMS = [
+  'autoimmune', 'lupus', 'hashimoto', 'graves', 'psoriasis',
+  'rheumatoid', 'crohn', 'ulcerative colitis', 'multiple sclerosis',
+  'sjogren', 'scleroderma', 'celiac',
+] as const;
+
+function inferAutoimmuneFromHistory(history: string): boolean {
+  const normalized = history.trim().toLowerCase();
+  if (!normalized) return false;
+  return AUTOIMMUNE_TERMS.some((term) => normalized.includes(term));
+}
+
 const DAYS_OPTIONS = [
   { value: 'mon', label: 'Mon' },
   { value: 'tue', label: 'Tue' },
@@ -631,7 +643,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           treatmentHistory: hadTreatments === 'yes' ? previousTreatments : '',
 
           medicalHistory: hasMedical === 'yes' ? medicalConditions : 'None',
-          hasAutoimmune: hasMedical === 'yes',
+          hasAutoimmune: hasMedical === 'yes' && inferAutoimmuneFromHistory(medicalConditions),
           allergies: hasAllergies === 'yes' ? allergies : 'None',
           hasAllergies: hasAllergies === 'yes',
           medications: hasMedications === 'yes' ? medications : 'None',

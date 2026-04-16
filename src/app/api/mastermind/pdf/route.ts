@@ -14,6 +14,7 @@ import { storePdf } from '@/lib/mastermind/pdf-storage';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 const PdfBodySchema = z.object({
   sessionId: z.string().min(1),
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('[Mastermind PDF API] Error:', error);
+      logEvent('api', 'error', '[Mastermind PDF API] Error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json(
         {
           success: false,

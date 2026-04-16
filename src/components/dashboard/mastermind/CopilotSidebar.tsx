@@ -16,6 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import type { MastermindSession, MastermindPhase } from '@/types/mastermind';
+import { sanitizeHtml } from '@/lib/security/sanitize-html';
 
 // ── TYPES ──
 
@@ -832,5 +833,6 @@ function formatMessageContent(content: string): string {
     html = `<p>${html}</p>`;
   }
 
-  return html;
+  // Defense-in-depth: sanitize before rendering as dangerouslySetInnerHTML
+  return sanitizeHtml(html);
 }

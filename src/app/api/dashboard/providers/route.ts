@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -56,14 +57,16 @@ export async function GET() {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    const safeMonthStart = sanitizeFormulaValue(monthStart);
+    const safeMonthEnd = sanitizeFormulaValue(monthEnd);
 
     // Fetch this month's appointments and transactions
     const [appointments, transactions] = await Promise.all([
       fetchAll<AppointmentFields>(Tables.appointments(), {
-        filterByFormula: `AND(IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'))`,
+        filterByFormula: `AND(IS_AFTER({Date}, '${safeMonthStart}'), IS_BEFORE({Date}, '${safeMonthEnd}'))`,
       }),
       fetchAll<TransactionFields>(Tables.transactions(), {
-        filterByFormula: `AND(IS_AFTER({Date}, '${monthStart}'), IS_BEFORE({Date}, '${monthEnd}'), {Type} = 'Service', {Status} = 'Completed')`,
+        filterByFormula: `AND(IS_AFTER({Date}, '${safeMonthStart}'), IS_BEFORE({Date}, '${safeMonthEnd}'), {Type} = 'Service', {Status} = 'Completed')`,
       }),
     ]);
 

@@ -42,7 +42,7 @@ export default function CashFlowWaterfall({ projections, height = 320 }: CashFlo
             formatter={((value: number, name: string) => [
               `$${Math.abs(value).toLocaleString()}`,
               name === 'inflow' ? 'Inflow' : name === 'outflow' ? 'Outflow' : 'Net',
-            ]) as any}
+            ]) as never}
             contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }}
           />
           <ReferenceLine y={0} stroke="#9CA3AF" />

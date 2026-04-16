@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { detectRevenueAnomalies, type AnomalyInput } from '@/lib/predictions/revenue-anomaly';
 import { TARGETS } from '@/data/dashboard/score-weights';
@@ -47,9 +48,10 @@ export async function GET() {
     const thirtyFiveDaysAgo = new Date();
     thirtyFiveDaysAgo.setDate(thirtyFiveDaysAgo.getDate() - 35);
     const cutoff = thirtyFiveDaysAgo.toISOString().split('T')[0];
+    const safeCutoff = sanitizeFormulaValue(cutoff);
 
     const transactions = await fetchAll<TransactionFields>(Tables.transactions(), {
-      filterByFormula: `IS_AFTER({Date}, '${cutoff}')`,
+      filterByFormula: `IS_AFTER({Date}, '${safeCutoff}')`,
       sort: [{ field: 'Date', direction: 'desc' }],
     });
 

@@ -73,7 +73,7 @@ export default function TenantsPage() {
                 ))}
               </Pie>
               <Tooltip
-                formatter={((value: number, name: string) => [`${value} clinics`, name]) as any}
+                formatter={((value: number, name: string) => [`${value} clinics`, name]) as never}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
@@ -99,7 +99,7 @@ export default function TenantsPage() {
                 ))}
               </Pie>
               <Tooltip
-                formatter={((value: number, name: string) => [`${value} clinics`, name]) as any}
+                formatter={((value: number, name: string) => [`${value} clinics`, name]) as never}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />

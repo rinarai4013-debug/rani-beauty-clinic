@@ -297,6 +297,16 @@ export interface ActivityLogEntry {
   actor?: string;     // staff name if available
 }
 
+
+// ── PROTOCOL PACKET ──
+
+export interface ProtocolPacketMeta {
+  packetUrl: string;
+  generatedAt: string;
+  generatorActor: string;
+  packetVersion: number;
+}
+
 // ── MASTERMIND SESSION ──
 
 export type MastermindPhase =
@@ -348,6 +358,9 @@ export interface MastermindSession {
   clinicNotes?: string;
   shareToken?: string;
   activityLog?: ActivityLogEntry[];
+
+  // Protocol Packet (provider-internal, generated on demand)
+  protocolPacket?: ProtocolPacketMeta;
 }
 
 // ── SESSION ACTIONS ──
@@ -368,4 +381,7 @@ export type MastermindSessionAction =
   | { type: 'COMPLETE' }
   | { type: 'SET_CLINIC_STATUS'; status: ClinicStatus; actor?: string }
   | { type: 'SET_CLINIC_NOTES'; notes: string; actor?: string }
-  | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string };
+  | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string }
+  | { type: 'SET_PROTOCOL_PACKET'; packetUrl: string; generatedAt: string; generatorActor: string; packetVersion: number };
+
+

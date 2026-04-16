@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/rate-limit";
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { withSentry } from '@/lib/sentry-utils';
 
 // Allow up to 30s for large file processing
@@ -16,6 +17,10 @@ const MAX_WIDTH = 1200;
 
 export async function POST(request: NextRequest) {
   return withSentry('photo/upload', async () => {
+    const staffSession = await getSessionFromRequest(request).catch(() => null);
+    if (!staffSession) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit("form", ip, RATE_LIMITS.FORM);
     if (!allowed) return rateLimitResponse(resetIn);

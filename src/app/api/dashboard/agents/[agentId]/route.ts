@@ -36,7 +36,7 @@ export async function GET(
       return NextResponse.json({ error: `Unknown agent: ${agentId}` }, { status: 404 });
     }
 
-    const cacheKey = `agent-report-${agentId}`;
+    const cacheKey = `agent-report-${agentId}:${request.nextUrl.hostname}`;
     const cached = cache.get<AgentReport>(cacheKey);
     if (cached) {
       return NextResponse.json({ success: true, data: cached });
