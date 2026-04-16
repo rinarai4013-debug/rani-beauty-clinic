@@ -14,6 +14,7 @@ import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helper
 import type { ConsentRecord } from '@/types/consent';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 // ── POST: Store a consent record ──
 
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
         { totalConsents: filteredConsents.length },
       );
     } catch (error) {
-      console.error('[Mastermind Consent] POST error:', error);
+      logEvent('api', 'error', '[Mastermind Consent] POST error', { error: error instanceof Error ? error.message : String(error) });
       return apiError('Failed to store consent record');
     }
   });
@@ -174,7 +175,7 @@ export async function GET(request: NextRequest) {
         totalSigned: consents.length,
       });
     } catch (error) {
-      console.error('[Mastermind Consent] GET error:', error);
+      logEvent('api', 'error', '[Mastermind Consent] GET error', { error: error instanceof Error ? error.message : String(error) });
       return apiError('Failed to retrieve consent records');
     }
   });

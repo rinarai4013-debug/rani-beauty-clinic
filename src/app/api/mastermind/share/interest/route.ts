@@ -17,6 +17,7 @@ import { rateLimitedQuery } from '@/lib/airtable/client';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 // ── Validation ──
 
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
         );
         airtableSuccess = true;
       } catch (err) {
-        console.error('[Interest] Airtable write failed:', err);
+        logEvent('integration', 'error', '[Interest] Airtable write failed', { error: err instanceof Error ? err.message : String(err) });
         // Don't fail the request — webhook may still succeed
       }
 
@@ -149,11 +150,11 @@ export async function POST(request: NextRequest) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(webhookPayload),
           }).catch((err) => {
-            console.error('[Interest] n8n webhook failed:', err);
+            logEvent('webhook', 'error', '[Interest] n8n webhook failed', { error: err instanceof Error ? err.message : String(err) });
           });
           webhookFired = true;
         } catch (err) {
-          console.error('[Interest] n8n webhook error:', err);
+          logEvent('webhook', 'error', '[Interest] n8n webhook error', { error: err instanceof Error ? err.message : String(err) });
         }
       }
 
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (err) {
-      console.error('[Interest] Submission failed:', err);
+      logEvent('api', 'error', '[Interest] Submission failed', { error: err instanceof Error ? err.message : String(err) });
       return NextResponse.json(
         {
           success: false,
