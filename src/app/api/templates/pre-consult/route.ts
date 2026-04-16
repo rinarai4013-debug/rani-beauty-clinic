@@ -1,9 +1,20 @@
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import { getPreConsultTemplate, getAllPreConsultTemplates } from '@/lib/templates/pre-consult';
 
 import { withSentry } from '@/lib/sentry-utils';
+
+async function authorizeTemplateRequest(request: NextRequest): Promise<NextResponse | null> {
+  const staffSession = await getSessionFromRequest(request).catch(() => null);
+  if (staffSession) return null;
+  const expectedSecret = process.env.TEMPLATE_API_SECRET || process.env.N8N_API_KEY;
+  if (!expectedSecret) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const provided = request.headers.get('x-webhook-secret') || request.headers.get('x-cron-secret');
+  if (provided !== expectedSecret) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  return null;
+}
 
 const Schema = z.object({
   step: z.string().optional().default('booking-confirmation'),
@@ -22,6 +33,9 @@ export async function POST(request: NextRequest) {
     const ip = getClientIP(request);
     const { allowed, resetIn } = rateLimit('templates-pre-consult', ip, RATE_LIMITS.WEBHOOK);
     if (!allowed) return rateLimitResponse(resetIn);
+
+    const unauthorized = await authorizeTemplateRequest(request);
+    if (unauthorized) return unauthorized;
 
     let body: unknown;
     try {

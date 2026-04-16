@@ -7,6 +7,7 @@
 
 import type { TenantDatabaseClient } from '@/lib/tenant/database';
 import type { TenantConfig } from '@/lib/tenant/config';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -164,22 +165,24 @@ export async function generateReport(
   if (!definition) throw new Error(`Unknown report: ${reportId}`);
 
   const { start, end } = dateRange || getDefaultDateRange(definition.defaultDateRange);
+  const safeStart = sanitizeFormulaValue(start);
+  const safeEnd = sanitizeFormulaValue(end);
 
   const generators: Partial<Record<ReportId, () => Promise<ReportResult>>> = {
-    daily_summary: () => generateDailySummary(db, tenant, start, end, definition),
-    weekly_summary: () => generatePeriodSummary(db, tenant, start, end, definition, 'weekly'),
-    monthly_summary: () => generatePeriodSummary(db, tenant, start, end, definition, 'monthly'),
-    revenue_by_service: () => generateRevenueByDimension(db, tenant, start, end, definition, 'Service'),
-    revenue_by_provider: () => generateRevenueByDimension(db, tenant, start, end, definition, 'Provider'),
-    revenue_by_source: () => generateRevenueByDimension(db, tenant, start, end, definition, 'Source'),
-    treatment_popularity: () => generateTreatmentPopularity(db, tenant, start, end, definition),
-    provider_utilization: () => generateProviderUtilization(db, tenant, start, end, definition),
-    client_acquisition: () => generateClientAcquisition(db, tenant, start, end, definition),
-    retention_analysis: () => generateRetentionAnalysis(db, tenant, start, end, definition),
-    client_satisfaction: () => generateClientSatisfaction(db, tenant, start, end, definition),
-    membership_metrics: () => generateMembershipMetrics(db, tenant, start, end, definition),
-    financial_summary: () => generateFinancialSummary(db, tenant, start, end, definition),
-    staff_performance: () => generateStaffPerformance(db, tenant, start, end, definition),
+    daily_summary: () => generateDailySummary(db, tenant, safeStart, safeEnd, definition),
+    weekly_summary: () => generatePeriodSummary(db, tenant, safeStart, safeEnd, definition, 'weekly'),
+    monthly_summary: () => generatePeriodSummary(db, tenant, safeStart, safeEnd, definition, 'monthly'),
+    revenue_by_service: () => generateRevenueByDimension(db, tenant, safeStart, safeEnd, definition, 'Service'),
+    revenue_by_provider: () => generateRevenueByDimension(db, tenant, safeStart, safeEnd, definition, 'Provider'),
+    revenue_by_source: () => generateRevenueByDimension(db, tenant, safeStart, safeEnd, definition, 'Source'),
+    treatment_popularity: () => generateTreatmentPopularity(db, tenant, safeStart, safeEnd, definition),
+    provider_utilization: () => generateProviderUtilization(db, tenant, safeStart, safeEnd, definition),
+    client_acquisition: () => generateClientAcquisition(db, tenant, safeStart, safeEnd, definition),
+    retention_analysis: () => generateRetentionAnalysis(db, tenant, safeStart, safeEnd, definition),
+    client_satisfaction: () => generateClientSatisfaction(db, tenant, safeStart, safeEnd, definition),
+    membership_metrics: () => generateMembershipMetrics(db, tenant, safeStart, safeEnd, definition),
+    financial_summary: () => generateFinancialSummary(db, tenant, safeStart, safeEnd, definition),
+    staff_performance: () => generateStaffPerformance(db, tenant, safeStart, safeEnd, definition),
   };
 
   const generator = generators[reportId];
@@ -192,7 +195,7 @@ export async function generateReport(
     reportId,
     name: definition.name,
     generatedAt: new Date().toISOString(),
-    period: { start, end },
+    period: { start: safeStart, end: safeEnd },
     summary: { status: 'Report generation pending' },
     data: [],
     charts: [],
@@ -699,8 +702,11 @@ export async function buildCustomReport(
   const primarySource = config.dataSources[0];
   const tableName = tableMap[primarySource] || 'Transactions';
 
+  const safeStart = sanitizeFormulaValue(config.dateRange.start);
+  const safeEnd = sanitizeFormulaValue(config.dateRange.end);
+
   const records = await db.fetchAll<Record<string, unknown>>(tableName, {
-    filterByFormula: `AND(IS_AFTER({Date}, '${config.dateRange.start}'), IS_BEFORE({Date}, '${config.dateRange.end}'))`,
+    filterByFormula: `AND(IS_AFTER({Date}, '${safeStart}'), IS_BEFORE({Date}, '${safeEnd}'))`,
   });
 
   // Apply custom metrics and grouping
@@ -736,7 +742,7 @@ export async function buildCustomReport(
     reportId: 'custom_date_range',
     name: config.name,
     generatedAt: new Date().toISOString(),
-    period: config.dateRange,
+    period: { start: safeStart, end: safeEnd },
     summary: { rows: data.length },
     data,
     charts: [{ type: config.chartType, title: config.name, data, xAxis: 'group', yAxis: config.metrics[0]?.label }],

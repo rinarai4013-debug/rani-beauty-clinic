@@ -39,7 +39,7 @@ export default function MRRMovementChart({ movements, height = 300 }: MRRMovemen
                 reactivationMRR: 'Reactivation', contractionMRR: 'Contraction', churnedMRR: 'Churned',
               };
               return [formatCurrency(Math.abs(value)), labels[name] || name];
-            }) as any}
+            }) as never}
             contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }}
           />
           <Legend

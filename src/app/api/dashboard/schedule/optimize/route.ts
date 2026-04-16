@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
+import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { optimizeSchedule, type ScheduleInput, type AppointmentData } from '@/lib/schedule/optimizer';
 import { withSentry } from '@/lib/sentry-utils';
@@ -45,9 +46,10 @@ export async function GET() {
     }
 
     const today = new Date().toISOString().split('T')[0];
+    const safeToday = sanitizeFormulaValue(today);
 
     const appointments = await fetchAll<AppointmentFields>(Tables.appointments(), {
-      filterByFormula: `{Date} = '${today}'`,
+      filterByFormula: `{Date} = '${safeToday}'`,
       sort: [{ field: 'Start Time', direction: 'asc' }],
     }).catch(() => []);
 

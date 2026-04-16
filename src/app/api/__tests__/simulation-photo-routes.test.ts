@@ -39,6 +39,12 @@ vi.mock('@/lib/rate-limit', () => ({
 vi.mock('@/lib/photo-simulation/ai-simulation', () => ({
   generateAISimulation: (...args: unknown[]) => mockGenerateAISimulation(...args),
 }));
+const mockGenerateTrajectoryScenario = vi.fn();
+
+vi.mock('@/lib/photo-simulation/trajectory-scenarios', () => ({
+  generateTrajectoryScenario: (...args: unknown[]) => mockGenerateTrajectoryScenario(...args),
+}));
+
 
 vi.mock('@/lib/sentry-utils', () => ({
   withSentry: (_name: string, handler: () => Promise<unknown>) => handler(),
@@ -50,6 +56,10 @@ vi.mock('@/lib/sentry-utils', () => ({
 
 vi.mock('sharp', () => ({
   default: (...args: unknown[]) => mockSharp(...args),
+}));
+
+vi.mock('@/lib/auth/session', () => ({
+  getSessionFromRequest: vi.fn().mockResolvedValue({ userId: 'u1', role: 'ceo', username: 'test' }),
 }));
 
 // ---------------------------------------------------------------------------
@@ -309,5 +319,110 @@ describe('POST /api/photo/upload', () => {
     const req = buildPhotoUploadRequest(file);
     const response = await photoUploadPOST(req as any);
     await expectServerError(response);
+  });
+});
+
+// ==========================================================================
+// POST /api/simulation/generate — scenario extension (additive tests)
+// ==========================================================================
+
+describe('POST /api/simulation/generate — scenario params', () => {
+  const MOCK_TRAJECTORY_SCENARIO = {
+    serviceKey: 'botox',
+    displayName: 'Botox / Neuromodulator',
+    isVisual: true,
+    withTreatment: [
+      { timeframe: '1m', improvementScore: 75, confidenceLevel: 0.55, label: 'Initial improvements emerging' },
+      { timeframe: '3m', improvementScore: 80, confidenceLevel: 0.70, label: 'Visible treatment response' },
+      { timeframe: '6m', improvementScore: 72, confidenceLevel: 0.80, label: 'Progressive results evident' },
+      { timeframe: '12m', improvementScore: 55, confidenceLevel: 0.75, label: 'Sustained outcome at 12 months' },
+    ],
+    withoutTreatment: [
+      { timeframe: '1m', improvementScore: 50, confidenceLevel: 0.55, label: 'Baseline maintained' },
+      { timeframe: '3m', improvementScore: 47, confidenceLevel: 0.70, label: 'Early natural changes continue' },
+      { timeframe: '6m', improvementScore: 43, confidenceLevel: 0.80, label: 'Untreated progression' },
+      { timeframe: '12m', improvementScore: 38, confidenceLevel: 0.75, label: 'Cumulative untreated change' },
+    ],
+    assumptions: ['Patient follows recommended treatment protocol'],
+    disclaimer: 'Illustrative simulation, not a diagnosis or guaranteed outcome. Individual results vary.',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setupRateLimitAllow();
+    mockGenerateAISimulation.mockResolvedValue({
+      imageUrl: 'data:image/jpeg;base64,result',
+      confidence: 0.85,
+      timeframe: '3-months',
+      treatments: ['HydraFacial'],
+    });
+    mockGenerateTrajectoryScenario.mockReturnValue(MOCK_TRAJECTORY_SCENARIO);
+  });
+
+  it('accepts optional serviceKey and returns scenario fields', async () => {
+    const req = buildSimulationRequest({
+      ...validSimulationBody,
+      serviceKey: 'botox',
+    });
+    const response = await simulationPOST(req as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    // Existing contract intact
+    expect(data).toHaveProperty('imageUrl');
+    expect(data).toHaveProperty('confidence');
+    expect(data).toHaveProperty('timeframe');
+    expect(data).toHaveProperty('treatments');
+    // Additive scenario fields
+    expect(data).toHaveProperty('scenarios');
+    expect(data.scenarios).toHaveProperty('withTreatment');
+    expect(data.scenarios).toHaveProperty('withoutTreatment');
+    expect(data).toHaveProperty('timeline');
+    expect(data).toHaveProperty('assumptions');
+    expect(Array.isArray(data.scenarios.withTreatment)).toBe(true);
+    expect(data.scenarios.withTreatment.length).toBe(4);
+  });
+
+  it('backward compat: old payload without serviceKey returns no scenario fields', async () => {
+    const req = buildSimulationRequest(validSimulationBody);
+    const response = await simulationPOST(req as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    // Existing fields present
+    expect(data).toHaveProperty('imageUrl');
+    expect(data).toHaveProperty('confidence');
+    // No scenario fields injected
+    expect(data.scenarios).toBeUndefined();
+    expect(data.timeline).toBeUndefined();
+    expect(data.assumptions).toBeUndefined();
+  });
+
+  it('malformed scenario: invalid timeframe value returns 400', async () => {
+    const req = buildSimulationRequest({
+      ...validSimulationBody,
+      timeframe: 'not-a-valid-timeframe',
+    });
+    const response = await simulationPOST(req as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBeDefined();
+  });
+
+  it('accepts 12-months as a valid timeframe', async () => {
+    const req = buildSimulationRequest({
+      ...validSimulationBody,
+      timeframe: '12-months',
+    });
+    const response = await simulationPOST(req as any);
+    expect(response.status).toBe(200);
+  });
+
+  it('rate-limit behavior unchanged with new scenario params', async () => {
+    setupRateLimitDeny();
+    const req = buildSimulationRequest({ ...validSimulationBody, serviceKey: 'botox' });
+    const response = await simulationPOST(req as any);
+    expect(response.status).toBe(429);
   });
 });

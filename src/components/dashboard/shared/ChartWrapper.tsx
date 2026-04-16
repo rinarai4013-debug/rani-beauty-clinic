@@ -184,7 +184,7 @@ export default function ChartWrapper({
       <div className={`p-4 sm:p-5 ${expanded ? 'flex-1' : ''}`}>
         {isEmpty ? (
           <EmptyState
-            icon={emptyIcon as any}
+            icon={emptyIcon as never}
             title={emptyTitle}
             description={emptyDescription}
             compact

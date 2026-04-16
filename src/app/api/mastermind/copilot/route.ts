@@ -15,6 +15,7 @@ import { parseJsonBody, apiError } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 type CopilotContext =
   | 'scan_review'
@@ -582,7 +583,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (err) {
-      console.error('[Copilot API Error]', err);
+      logEvent('api', 'error', '[Copilot API Error]', { error: err instanceof Error ? err.message : String(err) });
       return apiError('Failed to generate copilot response', 500);
     }
   });

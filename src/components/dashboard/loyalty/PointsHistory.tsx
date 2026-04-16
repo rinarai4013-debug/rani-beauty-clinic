@@ -57,7 +57,7 @@ export default function PointsHistory({ analytics }: PointsHistoryProps) {
                 formatter={((value: number, name: string) => [
                   formatNumber(value),
                   name === 'earned' ? 'Earned' : 'Redeemed',
-                ]) as any}
+                ]) as never}
               />
               <Legend />
               <Bar dataKey="earned" fill="#C9A96E" name="Earned" radius={[4, 4, 0, 0]} />

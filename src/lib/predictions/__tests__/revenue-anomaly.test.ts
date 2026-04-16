@@ -1,8 +1,3 @@
-// Force UTC for all Date operations in this file — prevents TZ-dependent
-// test failures between local (Pacific) and CI (Ubuntu/UTC). Must be set
-// before any imports that construct Date objects at module load time.
-process.env.TZ = 'UTC';
-
 /**
  * Revenue Anomaly Detection Engine — Test Suite
  *
