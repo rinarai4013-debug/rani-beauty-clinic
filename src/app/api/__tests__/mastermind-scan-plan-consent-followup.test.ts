@@ -200,6 +200,30 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     expect(response.status).toBe(404);
   });
 
+  it('POST /api/mastermind/scan returns 424 when source photo reference cannot be resolved', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce({
+      id: 'ms_1',
+      patientName: 'Jane Doe',
+      patientEmail: 'jane@example.com',
+      phase: 'scan_review',
+      intakeData: { firstName: 'Jane', lastName: 'Doe', email: 'jane@example.com' },
+      sourcePhotoUrl: '[photo_ref_unavailable]',
+      mastermindPlan: { recommendations: { primary: [], complementary: [], maintenance: [] } },
+      activityLog: [],
+      clinicNotes: '',
+    });
+
+    const { POST } = await import('@/app/api/mastermind/scan/route');
+    const response = await POST(
+      post('http://localhost:3000/api/mastermind/scan', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(424);
+    expect(body.success).toBe(false);
+    expect(String(body.error || '')).toContain('temporarily unavailable');
+  });
+
   it('POST /api/mastermind/scan runs engine mode and persists result', async () => {
     const { POST } = await import('@/app/api/mastermind/scan/route');
     const response = await POST(
@@ -547,3 +571,4 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     );
   });
 });
+
