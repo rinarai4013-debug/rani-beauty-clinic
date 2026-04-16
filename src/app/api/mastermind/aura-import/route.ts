@@ -18,6 +18,7 @@ import { getSessionFromAirtable, saveSessionToAirtable } from '@/lib/mastermind/
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 /**
  * GET — List available scans from the Aura device.
@@ -29,7 +30,7 @@ export async function GET() {
       const scans = listAvailableScans();
       return apiSuccess(scans, { source: 'aura-device', count: scans.length });
     } catch (error) {
-      console.error('[Aura Import API] GET error:', error);
+      logEvent('api', 'error', '[Aura Import API] GET error', { error: error instanceof Error ? error.message : String(error) });
       return apiError('Failed to list Aura scans');
     }
   });
@@ -72,9 +73,7 @@ export async function POST(request: NextRequest) {
       }
 
       // 2. Import the Aura scan (specific date or latest)
-      console.error(
-        `[Aura Import API] Importing scan for "${patientName}"${scanDate ? ` on ${scanDate}` : ' (latest)'}`,
-      );
+      logEvent('api', 'info', '[Aura Import API] Importing scan', { patientName, scanDate: scanDate || 'latest' });
 
       let deviceScan;
       if (scanDate) {
@@ -98,7 +97,7 @@ export async function POST(request: NextRequest) {
       await saveSessionToAirtable(session);
 
       // 4. Run AI analysis on the device scan images
-      console.error('[Aura Import API] Running AI analysis on device scan images...');
+      logEvent('ai', 'info', '[Aura Import API] Running AI analysis on device scan images');
 
       const useMock = process.env.USE_MOCK_AI === 'true';
       let scanResult;
@@ -107,7 +106,7 @@ export async function POST(request: NextRequest) {
         // In mock mode, use the existing mock scan result
         const { mockAuraScanResult } = await import('@/lib/mastermind/mock-data');
         scanResult = mockAuraScanResult();
-        console.error('[Aura Import API] Using mock scan result (USE_MOCK_AI=true)');
+        logEvent('ai', 'warn', '[Aura Import API] Using mock scan result (USE_MOCK_AI=true)');
       } else {
         // Run the real AI analysis with device images
         scanResult = await runAIAuraScanWithDevice(deviceScan, session.intakeData || {});
@@ -119,9 +118,7 @@ export async function POST(request: NextRequest) {
       session.updatedAt = new Date().toISOString();
       await saveSessionToAirtable(session);
 
-      console.error(
-        `[Aura Import API] Import complete. Aura Score: ${scanResult.auraScore.overall}/100 (${scanResult.auraScore.grade})`,
-      );
+      logEvent('ai', 'info', '[Aura Import API] Import complete', { auraScoreOverall: scanResult?.auraScore?.overall, auraScoreGrade: scanResult?.auraScore?.grade });
 
       return apiSuccess(
         {
@@ -151,7 +148,7 @@ export async function POST(request: NextRequest) {
         },
       );
     } catch (error) {
-      console.error('[Aura Import API] POST error:', error);
+      logEvent('api', 'error', '[Aura Import API] POST error', { error: error instanceof Error ? error.message : String(error) });
       return apiError(
         `Aura import failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );

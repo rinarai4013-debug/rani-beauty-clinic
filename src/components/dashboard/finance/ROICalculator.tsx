@@ -71,7 +71,7 @@ export default function ROICalculator({ defaults }: ROICalculatorProps) {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#6B7280' }} interval={2} />
               <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}K`} tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <Tooltip formatter={((v: number) => [`$${v.toLocaleString()}`, 'Cumulative Profit']) as any} contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }} />
+              <Tooltip formatter={((v: number) => [`$${v.toLocaleString()}`, 'Cumulative Profit']) as never} contentStyle={{ background: '#0F1D2C', border: 'none', borderRadius: '8px', color: '#fff', fontSize: 13 }} />
               <ReferenceLine y={0} stroke="#9CA3AF" strokeDasharray="3 3" />
               <Bar dataKey="profit" radius={[3, 3, 0, 0]}>
                 {paybackData.map((entry, i) => (

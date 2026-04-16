@@ -14,6 +14,7 @@ import type { ServiceCategory } from '@/data/services/unified-catalog';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withSentry('mastermind/sessions/[id]/validate', async () => {
@@ -107,7 +108,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
         },
       });
     } catch (error) {
-      console.error('[Mastermind Validate] Error:', error);
+      logEvent('api', 'error', '[Mastermind Validate] Error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json({ success: false, error: 'Validation failed' }, { status: 500 });
     }
   });
