@@ -154,7 +154,7 @@ function warnOnceIfDisabledInProduction(): void {
   if (isPersistenceEnabled()) return;
   _persistenceWarnedOnce = true;
   logEvent(
-    'compliance',
+    'api', // 'compliance' not in LogCategory; message body carries compliance context
     'critical',
     'HIPAA audit persistence is DISABLED in production — PHI access logs, breach notifications, BAAs, and training records are NOT being persisted. Set COMPLIANCE_PERSISTENCE_ENABLED=1 in Vercel environment variables.',
     {
