@@ -17,6 +17,7 @@ import crypto from 'crypto';
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const PlanSendSchema = z.object({
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
           html: buildPlanEmailHtml(firstName, shareUrl),
         });
       } catch (emailErr) {
-        console.error('[Share Send] Email send failed:', emailErr);
+        logEvent('integration', 'error', '[Share Send] Email send failed', { error: emailErr instanceof Error ? emailErr.message : String(emailErr) });
         return NextResponse.json(
           { success: false, error: 'Email delivery failed' },
           { status: 502 },
@@ -171,7 +172,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ success: true, shareUrl, sentTo: email });
     } catch (err) {
-      console.error('[Share Send] Error:', err);
+      logEvent('api', 'error', '[Share Send] Error', { error: err instanceof Error ? err.message : String(err) });
       return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
   });

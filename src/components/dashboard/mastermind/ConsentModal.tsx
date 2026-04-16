@@ -12,6 +12,7 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import SignaturePad from './SignaturePad';
 import { renderConsentTemplate } from '@/lib/mastermind/consent-templates';
 import type { ConsentRecord, ConsentTemplate } from '@/types/consent';
+import { sanitizeHtml } from '@/lib/security/sanitize-html';
 
 interface ConsentModalProps {
   open: boolean;
@@ -152,7 +153,7 @@ export default function ConsentModal({
             <h2
               className="text-lg font-semibold text-white"
               style={{ fontFamily: 'Playfair Display, serif' }}
-              dangerouslySetInnerHTML={{ __html: template.title }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(template.title) }}
             />
             <p
               className="text-xs mt-0.5"
@@ -189,7 +190,7 @@ export default function ConsentModal({
               color: '#0F1D2C',
               fontFamily: 'Montserrat, sans-serif',
             }}
-            dangerouslySetInnerHTML={{ __html: renderedBody }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderedBody) }}
           />
 
           {/* Acknowledgment checkboxes */}

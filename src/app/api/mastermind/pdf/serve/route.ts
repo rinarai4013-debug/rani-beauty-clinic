@@ -11,6 +11,7 @@ import { retrievePdf } from '@/lib/mastermind/pdf-storage';
 import { getSession } from '@/lib/auth/session';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 export async function GET(request: NextRequest) {
   return withSentry('mastermind/pdf/serve', async () => {
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('[PDF Serve] Error:', error);
+      logEvent('api', 'error', '[PDF Serve] Error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json({ success: false, error: 'Failed to serve PDF' }, { status: 500 });
     }
   });

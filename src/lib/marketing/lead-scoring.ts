@@ -545,7 +545,7 @@ export function assignGrade(score: number): LeadGradeInfo {
  * Get all grade definitions.
  */
 export function getGradeDefinitions(): LeadGradeInfo[] {
-  return [...GRADE_DEFINITIONS];
+  return GRADE_DEFINITIONS.map((d) => ({ ...d }));
 }
 
 /**

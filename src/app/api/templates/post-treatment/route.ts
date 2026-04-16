@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { getSessionFromRequest } from '@/lib/auth/session';
 import {
   getPostTreatmentTemplate,
   getAllPostTreatmentTemplates,
@@ -18,12 +19,20 @@ const Schema = z.object({
   appointmentDate: z.string().optional(),
 });
 
-function authorizeWebhook(request: NextRequest): NextResponse | null {
-  if (!process.env.N8N_API_KEY) return null;
-  const provided = request.headers.get('x-webhook-secret');
-  if (provided !== process.env.N8N_API_KEY) {
+async function authorizeTemplateRequest(request: NextRequest): Promise<NextResponse | null> {
+  const staffSession = await getSessionFromRequest(request).catch(() => null);
+  if (staffSession) return null;
+
+  const expectedSecret = process.env.TEMPLATE_API_SECRET || process.env.N8N_API_KEY;
+  if (!expectedSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const provided = request.headers.get('x-webhook-secret') || request.headers.get('x-cron-secret');
+  if (provided !== expectedSecret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   return null;
 }
 
@@ -33,7 +42,7 @@ export async function POST(request: NextRequest) {
     const { allowed, resetIn } = rateLimit('templates-post-treatment', ip, RATE_LIMITS.WEBHOOK);
     if (!allowed) return rateLimitResponse(resetIn);
 
-    const unauthorized = authorizeWebhook(request);
+    const unauthorized = await authorizeTemplateRequest(request);
     if (unauthorized) return unauthorized;
 
     let body: unknown;

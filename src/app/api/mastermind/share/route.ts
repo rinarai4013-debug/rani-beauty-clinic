@@ -22,6 +22,7 @@ import {
 import { z } from 'zod';
 
 import { withSentry } from '@/lib/sentry-utils';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 // Re-export the type so existing `import type { ShareTokenRecord }` from sibling
 // routes that may have used `../route` still work at the type level.
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
         expiresAt: expiresAt.toISOString(),
       });
     } catch (err) {
-      console.error('[Share] Token generation failed:', err);
+      logEvent('api', 'error', '[Share] Token generation failed', { error: err instanceof Error ? err.message : String(err) });
       return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
   });

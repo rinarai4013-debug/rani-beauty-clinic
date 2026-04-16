@@ -56,7 +56,7 @@ export default function TierDistribution({ distribution }: TierDistributionProps
                 formatter={((value: number, name: string) => [
                   `${value} members (${total > 0 ? Math.round((value / total) * 100) : 0}%)`,
                   name,
-                ]) as any}
+                ]) as never}
               />
             </PieChart>
           </ResponsiveContainer>

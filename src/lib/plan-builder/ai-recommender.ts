@@ -126,9 +126,17 @@ const ANCHOR_IDS = new Set([
 // Premium-tier service IDs (only included for premium budget)
 const PREMIUM_SERVICE_SLUGS = new Set(['sofwave', 'dermal-fillers']);
 
+// Shared exclusion set for pregnancy and breastfeeding — same clinical contraindications
+const PREGNANCY_BREASTFEEDING_EXCLUSIONS = new Set([
+  'botox', 'dermal-fillers', 'tretinoin', 'vi-peel',
+  'biorepeel-face', 'biorepeel-face-neck', 'biorepeel-back',
+  'biorepeel-intimate', 'biorepeel-underarms', 'biorepeel-hands', 'prx-t33',
+]);
+
 // Contraindication hard-exclusion map
 const CONTRAINDICATION_EXCLUSIONS: Record<string, Set<string>> = {
-  'pregnancy': new Set(['botox', 'dermal-fillers', 'tretinoin', 'vi-peel', 'biorepeel-face', 'biorepeel-face-neck', 'biorepeel-back', 'biorepeel-intimate', 'biorepeel-underarms', 'biorepeel-hands', 'prx-t33']),
+  'pregnancy': new Set(PREGNANCY_BREASTFEEDING_EXCLUSIONS),
+  'breastfeeding': new Set(PREGNANCY_BREASTFEEDING_EXCLUSIONS),
   'blood-thinners': new Set(['botox', 'dermal-fillers', 'rf-micro-face', 'rf-micro-face-neck', 'rf-micro-abdomen-small', 'rf-micro-back-legs', 'rf-micro-arms', 'rf-micro-buttocks', 'rf-micro-abdomen-large', 'rf-micro-legs']),
   'retinoid-use': new Set(['vi-peel', 'laser-facial-ndyag']),
   'active-infection': new Set(['rf-micro-face', 'rf-micro-face-neck', 'botox', 'dermal-fillers']),

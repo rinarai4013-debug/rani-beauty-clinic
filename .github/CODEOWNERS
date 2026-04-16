@@ -1,1 +1,20 @@
+# Global default owners
 * @sukhithebanker
+
+# API + business logic
+/src/app/api/** @sukhithebanker
+/src/lib/** @sukhithebanker
+/src/middleware.ts @sukhithebanker
+/middleware.ts @sukhithebanker
+
+# Compliance + security critical
+/src/lib/compliance/** @sukhithebanker
+/src/lib/security/** @sukhithebanker
+/scripts/compliance/** @sukhithebanker
+
+# CI/CD and governance
+/.github/workflows/** @sukhithebanker
+/.github/CODEOWNERS @sukhithebanker
+
+# API contract
+/openapi.yaml @sukhithebanker

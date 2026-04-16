@@ -4,7 +4,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildRAGContext } from '@/lib/rag/knowledge-base';
 import { RANI_SYSTEM_PROMPT } from '@/lib/voice/rani-voice';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { enforceAllowedPublicOrigin, enforceContentLength } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
+
+const MAX_AI_CHAT_BYTES = 256 * 1024;
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']).default('user'),
@@ -41,6 +44,10 @@ function buildFallbackReply(message: string): string {
 
 export async function POST(req: NextRequest) {
   return withSentry('ai/chat', async () => {
+    const originError = enforceAllowedPublicOrigin(req);
+    if (originError) return originError;
+    const sizeError = enforceContentLength(req, MAX_AI_CHAT_BYTES);
+    if (sizeError) return sizeError;
     const ip = getClientIP(req);
     const { allowed, resetIn } = rateLimit('ai', ip, RATE_LIMITS.AI);
     if (!allowed) return rateLimitResponse(resetIn);

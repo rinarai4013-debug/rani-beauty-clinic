@@ -75,7 +75,7 @@ interface DataTableProps<T> {
 
 type SortDirection = 'asc' | 'desc' | null;
 
-export default function DataTable<T extends Record<string, any>>({
+export default function DataTable<T extends Record<string, unknown>>({
   columns,
   data,
   rowKey,
@@ -272,7 +272,7 @@ export default function DataTable<T extends Record<string, any>>({
               <tr>
                 <td colSpan={columns.length} className="p-0">
                   {data.length === 0 ? (
-                    <EmptyState icon={emptyIcon as any} title={emptyTitle} description={emptyDescription} compact />
+                    <EmptyState icon={emptyIcon as never} title={emptyTitle} description={emptyDescription} compact />
                   ) : hasSearch ? (
                     <NoSearchResults query={search} onClear={() => setSearch('')} />
                   ) : (

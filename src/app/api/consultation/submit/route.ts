@@ -157,12 +157,24 @@ export async function POST(request: NextRequest) {
       const timeline = typeof intakeData.timeline === 'string' ? intakeData.timeline : '';
       const budget = typeof intakeData.budget === 'string' ? intakeData.budget : '';
 
+      const flagLabels: [boolean, string][] = [
+        [intakeData.pregnant === true, 'pregnant'],
+        [intakeData.breastfeeding === true, 'breastfeeding'],
+        [intakeData.bloodThinners === true, 'blood thinners'],
+        [intakeData.keloidHistory === true, 'keloid history'],
+        [intakeData.activeSkinInfection === true, 'active skin infection'],
+        [intakeData.isotretinoinHistory === true, 'isotretinoin history'],
+        [intakeData.hasAutoimmune === true, 'autoimmune condition'],
+      ];
+      const activeFlags = flagLabels.filter(([v]) => v).map(([, l]) => l);
+
       const intakeSummary = [
         `Skin Concerns: ${concerns || 'Not specified'}`,
         `Target Areas: ${areas || 'Not specified'}`,
         goals ? `Goals: ${goals}` : '',
         timeline ? `Timeline: ${timeline}` : '',
         budget ? `Budget: ${budget}` : '',
+        `Medical Flags: ${activeFlags.length > 0 ? activeFlags.join(', ') : 'None reported'}`,
         sourcePhotoUrl ? 'Photo: Uploaded' : 'Photo: None',
         `Session ID: ${session.id}`,
       ].filter(Boolean).join('\n');
