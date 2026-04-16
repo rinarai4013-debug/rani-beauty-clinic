@@ -1,103 +1,136 @@
-#!/usr/bin/env node
-import fs from 'node:fs';
-import path from 'node:path';
+import { readdir, readFile, access } from 'fs/promises';
+import path from 'path';
 
 const ROOT = process.cwd();
 const API_ROOT = path.join(ROOT, 'src', 'app', 'api');
-const API_TESTS_ROOT = path.join(API_ROOT, '__tests__');
+const SRC_ROOT = path.join(ROOT, 'src');
 
-function walkFiles(dir, matcher, acc = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+async function walk(dir, out = []) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      walkFiles(fullPath, matcher, acc);
+      await walk(fullPath, out);
       continue;
     }
-    if (entry.isFile() && matcher(fullPath)) {
-      acc.push(fullPath);
-    }
+    out.push(fullPath);
   }
-  return acc;
+  return out;
 }
 
-function normalizeApiPath(apiPath) {
-  return apiPath.replace(/\[(.+?)\]/g, '{$1}');
+function isRouteFile(filePath) {
+  return filePath.endsWith(`${path.sep}route.ts`);
 }
 
-function routeFileToApiPath(filePath) {
-  const rel = path.relative(API_ROOT, filePath).replace(/\\/g, '/');
-  const noSuffix = rel.replace(/\/route\.ts$/, '');
-  return normalizeApiPath(`/api/${noSuffix}`);
+function isTestFile(filePath) {
+  return filePath.endsWith('.test.ts');
 }
 
-function extractImportedRoutePaths(filePath) {
-  const source = fs.readFileSync(filePath, 'utf8');
-  const patterns = [
-    /from\s+['"]@\/app\/api([^'"]+)\/route['"]/g,
-    /import\(\s*['"]@\/app\/api([^'"]+)\/route['"]\s*\)/g,
-    /require\(\s*['"]@\/app\/api([^'"]+)\/route['"]\s*\)/g,
-  ];
-  const imports = [];
-  for (const pattern of patterns) {
-    for (const match of source.matchAll(pattern)) {
-      const segment = match[1];
-      imports.push(normalizeApiPath(`/api${segment}`));
-    }
-  }
-  return imports;
+function toRouteFilePath(candidate) {
+  if (!candidate) return null;
+  if (candidate.endsWith('/route')) return `${candidate}.ts`;
+  if (candidate.endsWith('/route.ts')) return candidate;
+  return null;
 }
 
-function printList(label, values) {
-  if (!values.length) return;
-  console.error(`\n${label} (${values.length}):`);
-  for (const value of values) {
-    console.error(`- ${value}`);
+function resolveImportToRoute(importSpec, testFile) {
+  let candidate = null;
+
+  if (importSpec.startsWith('@/app/api/')) {
+    candidate = path.join(ROOT, 'src', importSpec.slice(2));
+  } else if (importSpec.startsWith('src/app/api/')) {
+    candidate = path.join(ROOT, importSpec);
+  } else if (importSpec.startsWith('/src/app/api/')) {
+    candidate = path.join(ROOT, importSpec.slice(1));
+  } else if (importSpec.startsWith('./') || importSpec.startsWith('../')) {
+    candidate = path.resolve(path.dirname(testFile), importSpec);
+  }
+
+  if (!candidate) return null;
+  return toRouteFilePath(path.normalize(candidate));
+}
+
+function collectImportSpecs(content) {
+  const specs = new Set();
+  const fromRegex = /\bfrom\s+['"]([^'"]+)['"]/g;
+  const dynamicRegex = /\bimport\(\s*['"]([^'"]+)['"]\s*\)/g;
+
+  let match = fromRegex.exec(content);
+  while (match) {
+    specs.add(match[1]);
+    match = fromRegex.exec(content);
+  }
+
+  match = dynamicRegex.exec(content);
+  while (match) {
+    specs.add(match[1]);
+    match = dynamicRegex.exec(content);
+  }
+
+  return [...specs];
+}
+
+async function fileExists(filePath) {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
   }
 }
 
-function main() {
-  if (!fs.existsSync(API_ROOT)) {
-    console.error(`Missing API root: ${API_ROOT}`);
-    process.exit(1);
-  }
-  if (!fs.existsSync(API_TESTS_ROOT)) {
-    console.error(`Missing API tests root: ${API_TESTS_ROOT}`);
-    process.exit(1);
-  }
+function rel(filePath) {
+  return path.relative(ROOT, filePath).split(path.sep).join('/');
+}
 
-  const routeFiles = walkFiles(API_ROOT, (p) => p.endsWith('/route.ts'));
-  const testFiles = walkFiles(API_TESTS_ROOT, (p) => p.endsWith('.test.ts'));
+async function main() {
+  const apiFiles = await walk(API_ROOT);
+  const srcFiles = await walk(SRC_ROOT);
 
-  const routePaths = routeFiles.map(routeFileToApiPath).sort();
-  const routePathSet = new Set(routePaths);
+  const routeFiles = apiFiles.filter(isRouteFile).map((f) => path.normalize(f));
+  const testFiles = srcFiles.filter(isTestFile).map((f) => path.normalize(f));
+  const coveredRoutes = new Set();
 
-  const importedRoutePaths = new Set();
   for (const testFile of testFiles) {
-    for (const routePath of extractImportedRoutePaths(testFile)) {
-      importedRoutePaths.add(routePath);
+    if (testFile.endsWith(`${path.sep}route.test.ts`)) {
+      const siblingRoute = path.join(path.dirname(testFile), 'route.ts');
+      if (await fileExists(siblingRoute)) {
+        coveredRoutes.add(path.normalize(siblingRoute));
+      }
+    }
+
+    const content = await readFile(testFile, 'utf8');
+    const importSpecs = collectImportSpecs(content);
+
+    for (const spec of importSpecs) {
+      const routePath = resolveImportToRoute(spec, testFile);
+      if (!routePath) continue;
+      if (routeFiles.includes(routePath)) {
+        coveredRoutes.add(routePath);
+      }
     }
   }
 
-  const missingRouteImports = routePaths
-    .filter((routePath) => !importedRoutePaths.has(routePath))
-    .sort();
+  const uncovered = routeFiles.filter((f) => !coveredRoutes.has(f)).sort();
 
-  const staleTestImports = [...importedRoutePaths]
-    .filter((routePath) => !routePathSet.has(routePath))
-    .sort();
+  console.log(`Route files: ${routeFiles.length}`);
+  console.log(`Covered by tests: ${coveredRoutes.size}`);
+  console.log(`Uncovered: ${uncovered.length}`);
 
-  console.log(`API route files: ${routePaths.length}`);
-  console.log(`Imported by API tests: ${importedRoutePaths.size}`);
-
-  if (!missingRouteImports.length && !staleTestImports.length) {
-    console.log('Route test parity passed: every API route file is covered by at least one route import in API integration tests.');
-    process.exit(0);
+  if (uncovered.length > 0) {
+    console.error('\nUncovered route files:');
+    for (const filePath of uncovered) {
+      console.error(`- ${rel(filePath)}`);
+    }
+    process.exit(1);
   }
 
-  printList('Routes missing from API integration test imports', missingRouteImports);
-  printList('Stale API route imports (no matching route file)', staleTestImports);
-  process.exit(1);
+  console.log('\nAPI route test parity check passed.');
 }
 
-main();
+main().catch((error) => {
+  console.error('Route parity check failed with an unexpected error.');
+  console.error(error);
+  process.exit(1);
+});
 
