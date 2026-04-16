@@ -1872,6 +1872,9 @@ paths:
   /api/dashboard/social:
     get: { operationId: getSocialPlan, summary: Social media content plan, tags: [Dashboard], security: [{ SessionCookie: [] }], responses: { "200": { description: Weekly content calendar }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" } } }
 
+  /api/dashboard/metabolic-funnel:
+    get: { operationId: getMetabolicFunnel, summary: Metabolic protocol funnel metrics, tags: [Dashboard], security: [{ SessionCookie: [] }], parameters: [{ name: since, in: query, required: false, schema: { type: string, format: date } }], responses: { "200": { description: Funnel aggregate metrics }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" } } }
+
   /api/mastermind/aura-import:
     get: { operationId: getAuraImportStatus, summary: Aura scan import status, tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Import status }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { operationId: importAuraScan, summary: Import Aura 3D scan, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Import result }, "401": { $ref: "#/components/responses/Unauthorized" } } }
@@ -1890,6 +1893,9 @@ paths:
     get: { operationId: getFollowUps, summary: Get follow-up queue (stub), tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Follow-up queue }, "501": { description: Not implemented } } }
     post: { operationId: sendFollowUp, summary: Send follow-up (stub), tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Follow-up sent }, "501": { description: Not implemented } } }
 
+  /api/mastermind/metabolic-handoff:
+    post: { operationId: submitMetabolicHandoff, summary: Record metabolic protocol handoff and route checkout, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string }, metabolicStatus: { type: string, enum: [eligible, provider-review-required, ineligible] }, recommendedTrack: { type: string }, protocolTier: { type: string } }, required: [sessionId, metabolicStatus, recommendedTrack, protocolTier] } } } }, responses: { "200": { description: Handoff recorded }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "404": { description: Session not found }, "422": { description: Patient ineligible or invalid payload } } }
+
   /api/mastermind/pdf:
     post: { operationId: generatePdf, summary: Generate treatment plan PDF, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: PDF generated }, "401": { $ref: "#/components/responses/Unauthorized" } } }
 
@@ -1901,6 +1907,9 @@ paths:
 
   /api/mastermind/plan-send:
     post: { operationId: sendPlan, summary: Send plan via email, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string } }, required: [sessionId] } } } }, responses: { "200": { description: Plan sent }, "401": { $ref: "#/components/responses/Unauthorized" }, "422": { description: No patient email }, "502": { description: Email delivery failed } } }
+
+  /api/mastermind/protocol-packet:
+    post: { operationId: generateProtocolPacket, summary: Generate provider-facing protocol packet PDF, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string }, format: { type: string, enum: [pdf] } }, required: [sessionId] } } } }, responses: { "200": { description: Protocol packet generated }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "404": { description: Session not found }, "422": { description: Preconditions not met } } }
 
   /api/mastermind/scan:
     post: { operationId: runScan, summary: Run Aura scan analysis, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Scan result }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
@@ -1927,6 +1936,9 @@ paths:
 
   /api/mastermind/simulate:
     post: { operationId: runSimulation, summary: Run treatment simulation, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Simulation result }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
+
+  /api/metabolic/intake:
+    post: { operationId: submitMetabolicIntake, summary: Public metabolic intake form — deterministic scoring, tags: [Public], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Metabolic recommendation }, "400": { $ref: "#/components/responses/BadRequest" }, "422": { description: Invalid intake payload }, "429": { $ref: "#/components/responses/RateLimited" } } }
 
   /api/patient/appointments:
     get: { operationId: getPatientAppointments, summary: Patient appointment history, tags: [Patient], security: [{ SessionCookie: [] }], responses: { "200": { description: Appointments }, "401": { $ref: "#/components/responses/Unauthorized" } } }
