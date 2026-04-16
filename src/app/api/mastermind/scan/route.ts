@@ -59,6 +59,11 @@ export async function POST(request: NextRequest) {
         return apiError('Missing intake data', 400);
       }
 
+      // 424 — photo reference placeholder means the source file is not yet available
+      if (sourcePhotoUrl === '[photo_ref_unavailable]') {
+        return apiError('Source photo is temporarily unavailable — please retry after the photo reference resolves', 424);
+      }
+
       const useMock = process.env.USE_MOCK_AI === 'true';
       const hasAIKey = !!process.env.ANTHROPIC_API_KEY;
       let result;
