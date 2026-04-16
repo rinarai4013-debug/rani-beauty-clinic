@@ -21,7 +21,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
 import type { AuraDeviceScan } from '@/lib/mastermind/aura-device-integration';
-import type { AuraScanResult } from '@/types/mastermind';
+import type { AuraScanResult, FacialZone, ConcernSeverity, ConcernUrgency, TreatmentReadiness } from '@/types/mastermind';
+import type { FitzpatrickType, GlogauScale } from '@/types/ai-treatment';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 
@@ -500,7 +501,7 @@ function validateZoneAnalysis(raw: any[]) {
   if (!Array.isArray(raw) || raw.length === 0) {
     // Return minimal default zones
     return ['forehead', 'cheeks_left', 'cheeks_right', 'jawline'].map((z) => ({
-      zone: z as any,
+      zone: z as FacialZone,
       zoneName: z.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
       overallScore: 60,
       skinAge: 40,
@@ -544,11 +545,11 @@ function validateConcerns(raw: any[]) {
     .map((c: any) => ({
       id: String(c.id || `concern_${c.concern}_${Math.random().toString(36).slice(2, 5)}`),
       concern: c.concern,
-      severity: (validSev.includes(c.severity) ? c.severity : 'mild') as any,
+      severity: (validSev.includes(c.severity) ? c.severity : 'mild') as ConcernSeverity,
       score: clamp(Math.round(c.score ?? 40), 0, 100),
       zones: Array.isArray(c.zones) ? c.zones : [],
-      trending: (validTrending.includes(c.trending) ? c.trending : 'stable') as any,
-      urgency: (validUrgency.includes(c.urgency) ? c.urgency : 'medium') as any,
+      trending: (validTrending.includes(c.trending) ? c.trending : 'stable') as 'improving' | 'stable' | 'worsening',
+      urgency: (validUrgency.includes(c.urgency) ? c.urgency : 'medium') as ConcernUrgency,
       description: String(c.description || ''),
       clinicalNote: String(c.clinicalNote || ''),
     }));
@@ -591,16 +592,16 @@ function validateTreatmentReadiness(raw: Record<string, any>) {
     readyForTreatment: raw.readyForTreatment !== false,
     requiredPrep: Array.isArray(raw.requiredPrep) ? raw.requiredPrep.map(String) : [],
     seasonalConsiderations: Array.isArray(raw.seasonalConsiderations) ? raw.seasonalConsiderations.map(String) : [],
-    skinBarrierStatus: (validBarrier.includes(raw.skinBarrierStatus) ? raw.skinBarrierStatus : 'adequate') as any,
+    skinBarrierStatus: (validBarrier.includes(raw.skinBarrierStatus) ? raw.skinBarrierStatus : 'adequate') as TreatmentReadiness['skinBarrierStatus'],
   };
 }
 
 function validateSkinAnalysis(raw: Record<string, any>) {
   const dims = raw.skinHealthScore?.dimensions || {};
   return {
-    fitzpatrickType: clamp(Math.round(raw.fitzpatrickType ?? 3), 1, 6) as any,
+    fitzpatrickType: clamp(Math.round(raw.fitzpatrickType ?? 3), 1, 6) as FitzpatrickType,
     fitzpatrickDescription: String(raw.fitzpatrickDescription || 'Type III'),
-    glogauScale: clamp(Math.round(raw.glogauScale ?? 2), 1, 4) as any,
+    glogauScale: clamp(Math.round(raw.glogauScale ?? 2), 1, 4) as GlogauScale,
     glogauDescription: String(raw.glogauDescription || 'Type II'),
     skinHealthScore: {
       overall: clamp(Math.round(raw.skinHealthScore?.overall ?? 65), 0, 100),
