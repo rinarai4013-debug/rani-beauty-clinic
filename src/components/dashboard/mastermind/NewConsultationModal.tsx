@@ -117,18 +117,6 @@ const SKINCARE_ROUTINE = [
   { value: 'advanced', label: 'Advanced (6+ products)' },
 ];
 
-const AUTOIMMUNE_TERMS = [
-  'autoimmune', 'lupus', 'hashimoto', 'graves', 'psoriasis',
-  'rheumatoid', 'crohn', 'ulcerative colitis', 'multiple sclerosis',
-  'sjogren', 'scleroderma', 'celiac',
-] as const;
-
-function inferAutoimmuneFromHistory(history: string): boolean {
-  const normalized = history.trim().toLowerCase();
-  if (!normalized) return false;
-  return AUTOIMMUNE_TERMS.some((term) => normalized.includes(term));
-}
-
 const DAYS_OPTIONS = [
   { value: 'mon', label: 'Mon' },
   { value: 'tue', label: 'Tue' },
@@ -386,7 +374,7 @@ function PhotoDropZone({
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const handleDrop = (e: DragEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
     const dropped = Array.from(e.dataTransfer.files).filter(
@@ -409,7 +397,7 @@ function PhotoDropZone({
         type="file"
         accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
         multiple
-        className="hidden"
+        className="sr-only"
         onChange={handleSelect}
       />
 
@@ -443,10 +431,10 @@ function PhotoDropZone({
         </div>
       )}
 
-      {files.length < maxFiles && (
+      {files.length < maxFiles ? (
         <div
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
+          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOver(false); }}
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
           className={`
@@ -461,6 +449,12 @@ function PhotoDropZone({
           <Icon className="w-6 h-6 text-[#C9A96E]/60" />
           <span className="text-xs text-[#F8F6F1]/40" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             {sublabel}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#C9A96E]/20 bg-[#C9A96E]/5">
+          <span className="text-xs text-[#C9A96E]/60" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            Maximum {maxFiles} {maxFiles === 1 ? 'file' : 'files'} reached — remove one to add more
           </span>
         </div>
       )}
@@ -643,7 +637,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           treatmentHistory: hadTreatments === 'yes' ? previousTreatments : '',
 
           medicalHistory: hasMedical === 'yes' ? medicalConditions : 'None',
-          hasAutoimmune: hasMedical === 'yes' && inferAutoimmuneFromHistory(medicalConditions),
+          hasAutoimmune: hasMedical === 'yes',
           allergies: hasAllergies === 'yes' ? allergies : 'None',
           hasAllergies: hasAllergies === 'yes',
           medications: hasMedications === 'yes' ? medications : 'None',
