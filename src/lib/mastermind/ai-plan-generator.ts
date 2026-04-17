@@ -166,6 +166,11 @@ function formatIntakeForPrompt(intake: Partial<ConsultationFormData>): string {
     `Autoimmune Condition: ${intake.hasAutoimmune ? 'YES' : 'No'}`,
     `Sun Protection Habit: ${intake.sunProtectionHabit || 'unknown'}`,
     `Smoking Status: ${intake.smokingStatus || 'unknown'}`,
+    '',
+    ...(intake.clinicalNotes ? [
+      '### Provider Clinical Observations (treat as high-priority context):',
+      `${intake.clinicalNotes}`,
+    ] : []),
   ];
 
   return lines.filter(l => l !== '').join('\n');

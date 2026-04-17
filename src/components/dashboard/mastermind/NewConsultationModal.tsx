@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useCallback, DragEvent } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect, DragEvent } from 'react';
 import {
   X, Loader2, Sparkles, Upload, Camera, Check, ChevronLeft, ChevronRight,
   User, Heart, Stethoscope, Clock, ImageIcon,
@@ -516,9 +516,80 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const [preferredTime, setPreferredTime] = useState<string[]>([]);
   const [budget, setBudget] = useState<string[]>([]);
 
+  // ── Step 3: Clinical Notes (provider observations) ──
+  const [clinicalNotes, setClinicalNotes] = useState('');
+
   // ── Step 5: Photos ──
   const [skinPhotos, setSkinPhotos] = useState<File[]>([]);
   const [auraPhotos, setAuraPhotos] = useState<File[]>([]);
+
+  // ── Draft auto-save / restore (localStorage) ──
+  const DRAFT_KEY = 'rani_consult_draft';
+
+  // Restore draft on mount
+  useEffect(() => {
+    if (!open) return;
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d.firstName) setFirstName(d.firstName);
+      if (d.lastName) setLastName(d.lastName);
+      if (d.dob) setDob(d.dob);
+      if (d.email) setEmail(d.email);
+      if (d.phone) setPhone(d.phone);
+      if (d.contactPref) setContactPref(d.contactPref);
+      if (d.referralSource) setReferralSource(d.referralSource);
+      if (d.concerns) setConcerns(d.concerns);
+      if (d.targetAreas) setTargetAreas(d.targetAreas);
+      if (d.treatmentInterests) setTreatmentInterests(d.treatmentInterests);
+      if (d.hasEvent) setHasEvent(d.hasEvent);
+      if (d.eventDate) setEventDate(d.eventDate);
+      if (d.eventType) setEventType(d.eventType);
+      if (d.hadTreatments) setHadTreatments(d.hadTreatments);
+      if (d.previousTreatments) setPreviousTreatments(d.previousTreatments);
+      if (d.hasMedical) setHasMedical(d.hasMedical);
+      if (d.medicalConditions) setMedicalConditions(d.medicalConditions);
+      if (d.hasAllergies) setHasAllergies(d.hasAllergies);
+      if (d.allergies) setAllergies(d.allergies);
+      if (d.hasMedications) setHasMedications(d.hasMedications);
+      if (d.medications) setMedications(d.medications);
+      if (d.smokingAlcohol) setSmokingAlcohol(d.smokingAlcohol);
+      if (d.waterIntake) setWaterIntake(d.waterIntake);
+      if (d.clinicalNotes) setClinicalNotes(d.clinicalNotes);
+      if (d.skincareRoutine) setSkincareRoutine(d.skincareRoutine);
+      if (d.amRoutine) setAmRoutine(d.amRoutine);
+      if (d.pmRoutine) setPmRoutine(d.pmRoutine);
+      if (d.preferredDays) setPreferredDays(d.preferredDays);
+      if (d.preferredTime) setPreferredTime(d.preferredTime);
+      if (d.budget) setBudget(d.budget);
+      if (d.currentStep && d.currentStep > 1) setCurrentStep(d.currentStep);
+    } catch { /* ignore corrupt drafts */ }
+  }, [open]);
+
+  // Save draft whenever any field changes
+  useEffect(() => {
+    if (!open) return;
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        currentStep,
+        firstName, lastName, dob, email, phone, contactPref, referralSource,
+        concerns, targetAreas, treatmentInterests, hasEvent, eventDate, eventType,
+        hadTreatments, previousTreatments, hasMedical, medicalConditions,
+        hasAllergies, allergies, hasMedications, medications, smokingAlcohol, waterIntake,
+        clinicalNotes,
+        skincareRoutine, amRoutine, pmRoutine, preferredDays, preferredTime, budget,
+      }));
+    } catch { /* ignore storage errors */ }
+  }, [
+    open, currentStep,
+    firstName, lastName, dob, email, phone, contactPref, referralSource,
+    concerns, targetAreas, treatmentInterests, hasEvent, eventDate, eventType,
+    hadTreatments, previousTreatments, hasMedical, medicalConditions,
+    hasAllergies, allergies, hasMedications, medications, smokingAlcohol, waterIntake,
+    clinicalNotes,
+    skincareRoutine, amRoutine, pmRoutine, preferredDays, preferredTime, budget,
+  ]);
 
   // ── Derived ──
   const calculatedAge = useMemo(() => calculateAge(dob), [dob]);
@@ -657,6 +728,8 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           preferredTime: preferredTime[0] || undefined,
 
           budget: budget[0] || undefined,
+
+          clinicalNotes: clinicalNotes.trim() || undefined,
         })
       );
 
@@ -674,6 +747,9 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Submission failed');
+
+      // Clear saved draft on successful submit
+      try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
 
       const sessionId = json.data.sessionId;
 
@@ -1020,6 +1096,22 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
             />
           ))}
         </div>
+      </div>
+
+      {/* Clinical Notes — provider observations fed directly into AI */}
+      <div>
+        <FieldLabel>Clinical Observations</FieldLabel>
+        <p className="text-[10px] text-[#C9A96E]/50 mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          Provider notes injected directly into AI analysis — skin texture, buildup, tone irregularities, anything you observe in person
+        </p>
+        <textarea
+          value={clinicalNotes}
+          onChange={(e) => setClinicalNotes(e.target.value)}
+          placeholder="e.g. Keratin buildup around nose and forehead, visible sebaceous filaments, mild perioral hyperpigmentation, skin appears dehydrated despite oily T-zone…"
+          rows={4}
+          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-[#C9A96E]/30 text-[#F8F6F1] placeholder-[#F8F6F1]/20 text-sm resize-none focus:outline-none focus:border-[#C9A96E]/60 focus:bg-white/8 transition-all duration-200"
+          style={{ fontFamily: 'Montserrat, sans-serif' }}
+        />
       </div>
     </div>
   );

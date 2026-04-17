@@ -150,6 +150,7 @@ const step5Schema = z.object({
   hasAllergies: z.boolean().optional().default(false),
   smokingStatus: z.enum(['never', 'former', 'current']).optional().default('never'),
   sunProtectionHabit: z.enum(['never', 'sometimes', 'usually', 'always']).optional().default('sometimes'),
+  clinicalNotes: z.string().optional(),
 });
 
 /** Step 6: Goals - personal goals, timeline preference, budget range */
