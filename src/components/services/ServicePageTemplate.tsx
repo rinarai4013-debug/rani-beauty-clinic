@@ -20,6 +20,7 @@ import { getServiceImage } from "@/data/service-images";
 import { galleryPages } from "@/data/results/gallery";
 import { testimonials } from "@/data/testimonials";
 import { getConcernsForService, getComparisonsForService } from "@/data/internal-links";
+import { UNIFIED_CATALOG } from "@/data/services/unified-catalog";
 
 /** Maps service slug → cost page slug (only for services that have a cost page) */
 const COST_SLUG_MAP: Record<string, string> = {
@@ -107,6 +108,12 @@ export default function ServicePageTemplate({
     ? `https://www.ranibeautyclinic.com${serviceImageData.image}`
     : "https://www.ranibeautyclinic.com/images/logo/logo-dark.png";
 
+  // Catalog lookup — pulls pricing, concerns, duration, sessions, and body areas
+  // so we can emit a rich MedicalProcedure + Offer pair that LLMs cite.
+  const catalogEntry = UNIFIED_CATALOG.find(
+    (c) => c.id === service.slug || c.parentSlug === service.slug
+  );
+
   const serviceStructuredData = {
     "@context": "https://schema.org",
     "@type": "MedicalProcedure",
@@ -116,11 +123,46 @@ export default function ServicePageTemplate({
     image: serviceImage,
     procedureType: "https://health-lifesci.schema.org/NoninvasiveProcedure",
     howPerformed: service.howItWorks.map((s) => s.description).join(" "),
+    // Indications — what this treatment addresses. LLMs use this to match
+    // user queries like "what helps melasma" to the right service page.
+    ...(catalogEntry?.concerns && catalogEntry.concerns.length > 0
+      ? {
+          indication: catalogEntry.concerns.map((concern) => ({
+            "@type": "MedicalIndication",
+            name: concern.replace(/-/g, " "),
+          })),
+        }
+      : {}),
+    // Body location — helps AI match "undereye treatment" or "face rejuvenation"
+    ...(catalogEntry?.bodyAreas && catalogEntry.bodyAreas.length > 0
+      ? {
+          bodyLocation: catalogEntry.bodyAreas.map((a) => a.replace(/-/g, " ")),
+        }
+      : {}),
+    // Preparation — AI Overviews cite these heavily for "how to prepare for X"
+    ...(service.whatToExpect?.before
+      ? {
+          preparation: service.whatToExpect.before,
+        }
+      : {}),
+    // Follow-up — aftercare is high-value content for LLM answers
+    ...(service.whatToExpect?.after
+      ? {
+          followup: service.whatToExpect.after,
+        }
+      : {}),
+    medicalSpecialty: {
+      "@type": "MedicalSpecialty",
+      name: "Dermatology",
+    },
     provider: {
       "@type": "MedicalBusiness",
+      "@id": `${clinicInfo.website}#organization`,
       name: clinicInfo.name,
       telephone: clinicInfo.phone,
       url: clinicInfo.website,
+      priceRange: "$$$",
+      medicalSpecialty: ["Dermatology", "CosmeticSurgery", "Medical-aesthetics"],
       address: {
         "@type": "PostalAddress",
         streetAddress: clinicInfo.address.street,
@@ -141,11 +183,52 @@ export default function ServicePageTemplate({
         bestRating: 5,
       },
     },
-    areaServed: {
-      "@type": "State",
-      name: "Washington",
-    },
+    areaServed: [
+      { "@type": "State", name: "Washington" },
+      { "@type": "City", name: "Renton" },
+      { "@type": "City", name: "Bellevue" },
+      { "@type": "City", name: "Seattle" },
+      { "@type": "City", name: "Kent" },
+      { "@type": "City", name: "Tukwila" },
+      { "@type": "City", name: "Newcastle" },
+      { "@type": "City", name: "Mercer Island" },
+      { "@type": "AdministrativeArea", name: "King County" },
+    ],
   };
+
+  // Separate Service + Offer schema — enables AI shopping / pricing answers
+  // ("how much does cosmelan peel cost near me?")
+  const offerStructuredData = catalogEntry
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        serviceType: service.title,
+        name: service.title,
+        description: service.shortDescription,
+        url: serviceUrl,
+        image: serviceImage,
+        provider: {
+          "@type": "MedicalBusiness",
+          "@id": `${clinicInfo.website}#organization`,
+          name: clinicInfo.name,
+        },
+        areaServed: { "@type": "AdministrativeArea", name: "King County, Washington" },
+        offers: {
+          "@type": "Offer",
+          price: catalogEntry.price,
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: `${clinicInfo.booking.url}`,
+          priceValidUntil: "2027-12-31",
+          validFrom: "2026-04-17",
+          seller: {
+            "@type": "MedicalBusiness",
+            "@id": `${clinicInfo.website}#organization`,
+            name: clinicInfo.name,
+          },
+        },
+      }
+    : null;
 
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
@@ -176,6 +259,7 @@ export default function ServicePageTemplate({
     <>
       <StructuredData data={faqStructuredData} />
       <StructuredData data={serviceStructuredData} />
+      {offerStructuredData && <StructuredData data={offerStructuredData} />}
       <StructuredData data={breadcrumbStructuredData} />
       {service.howItWorks.length > 0 && (
         <StructuredData
