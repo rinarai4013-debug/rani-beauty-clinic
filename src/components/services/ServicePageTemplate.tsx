@@ -20,7 +20,7 @@ import { getServiceImage } from "@/data/service-images";
 import { galleryPages } from "@/data/results/gallery";
 import { testimonials } from "@/data/testimonials";
 import { getConcernsForService, getComparisonsForService } from "@/data/internal-links";
-import { UNIFIED_CATALOG } from "@/data/services/unified-catalog";
+import { UNIFIED_CATALOG, type UnifiedService } from "@/data/services/unified-catalog";
 
 /** Maps service slug → cost page slug (only for services that have a cost page) */
 const COST_SLUG_MAP: Record<string, string> = {
@@ -53,6 +53,63 @@ const RESULTS_SLUGS = new Set([
   "glp1-weight-management",
   "sofwave",
 ]);
+
+type OfferMappingRule = {
+  ids?: string[];
+  parentSlugs?: string[];
+  categories?: UnifiedService["category"][];
+};
+
+const OFFER_MAPPING: Record<string, OfferMappingRule> = {
+  "botox-dysport": { ids: ["botox", "dysport"], parentSlugs: ["botox", "dysport"] },
+  "chemical-peels": { parentSlugs: ["chemical-peels", "vi-peel", "biorepeel", "prx-t33", "cosmelan-peel"] },
+  "laser-acne-facial": { ids: ["laser-acne-facial", "laser-facial-ndyag"], parentSlugs: ["laser-acne-facial", "laser-facial"] },
+  "ai-skin-analysis": { ids: ["ai-skin-analysis"], parentSlugs: ["ai-skin-analysis"] },
+  "glp1-weight-management": { parentSlugs: ["glp1-weight-management", "glp-1-weight-management"] },
+  "nad-injections": { ids: ["nad-injection"], parentSlugs: ["nad-injections", "wellness-injections"] },
+  "vitamin-injections": {
+    ids: ["b12-injection", "lipo-b-injection", "biotin-injection", "glutathione-injection", "tri-immune-injection", "vitamin-d3-injection"],
+    parentSlugs: ["vitamin-injections", "wellness-injections"],
+  },
+  "peptide-therapy": {
+    ids: ["sermorelin", "nad-injection", "glutathione-injection"],
+    parentSlugs: ["peptide-therapy", "wellness-injections"],
+  },
+  "hormone-therapy": { parentSlugs: ["hormone-therapy", "hormones"], categories: ["hormones"] },
+  "blood-work": { parentSlugs: ["blood-work"], ids: ["blood-work-wellness-panel"] },
+};
+
+function getCatalogEntriesForServiceSlug(slug: string): UnifiedService[] {
+  const mapping = OFFER_MAPPING[slug];
+  const idSet = new Set([slug, ...(mapping?.ids ?? [])]);
+  const parentSlugSet = new Set([slug, ...(mapping?.parentSlugs ?? [])]);
+  const categorySet = new Set(mapping?.categories ?? []);
+  const matched = UNIFIED_CATALOG.filter((entry) => {
+    if (idSet.has(entry.id)) return true;
+    if (entry.parentSlug && parentSlugSet.has(entry.parentSlug)) return true;
+    if (categorySet.size > 0 && categorySet.has(entry.category)) return true;
+    return false;
+  });
+
+  const deduped = new Map<string, UnifiedService>();
+  for (const entry of matched) {
+    deduped.set(entry.id, entry);
+  }
+
+  return Array.from(deduped.values());
+}
+
+function summarizeCatalogPricing(entries: UnifiedService[]) {
+  if (entries.length === 0) return null;
+  const prices = entries.map((entry) => entry.price).filter((price) => Number.isFinite(price));
+  if (prices.length === 0) return null;
+
+  return {
+    lowPrice: Math.min(...prices),
+    highPrice: Math.max(...prices),
+    offerCount: prices.length,
+  };
+}
 
 interface ServiceData {
   slug: string;
@@ -107,12 +164,14 @@ export default function ServicePageTemplate({
   const serviceImage = serviceImageData?.image
     ? `https://www.ranibeautyclinic.com${serviceImageData.image}`
     : "https://www.ranibeautyclinic.com/images/logo/logo-dark.png";
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
 
   // Catalog lookup — pulls pricing, concerns, duration, sessions, and body areas
   // so we can emit a rich MedicalProcedure + Offer pair that LLMs cite.
-  const catalogEntry = UNIFIED_CATALOG.find(
-    (c) => c.id === service.slug || c.parentSlug === service.slug
-  );
+  const catalogEntries = getCatalogEntriesForServiceSlug(service.slug);
+  const concernSet = new Set(catalogEntries.flatMap((entry) => entry.concerns));
+  const bodyAreaSet = new Set(catalogEntries.flatMap((entry) => entry.bodyAreas));
+  const priceSummary = summarizeCatalogPricing(catalogEntries);
 
   const serviceStructuredData = {
     "@context": "https://schema.org",
@@ -125,18 +184,18 @@ export default function ServicePageTemplate({
     howPerformed: service.howItWorks.map((s) => s.description).join(" "),
     // Indications — what this treatment addresses. LLMs use this to match
     // user queries like "what helps melasma" to the right service page.
-    ...(catalogEntry?.concerns && catalogEntry.concerns.length > 0
+    ...(concernSet.size > 0
       ? {
-          indication: catalogEntry.concerns.map((concern) => ({
+          indication: Array.from(concernSet).map((concern) => ({
             "@type": "MedicalIndication",
             name: concern.replace(/-/g, " "),
           })),
         }
       : {}),
     // Body location — helps AI match "undereye treatment" or "face rejuvenation"
-    ...(catalogEntry?.bodyAreas && catalogEntry.bodyAreas.length > 0
+    ...(bodyAreaSet.size > 0
       ? {
-          bodyLocation: catalogEntry.bodyAreas.map((a) => a.replace(/-/g, " ")),
+          bodyLocation: Array.from(bodyAreaSet).map((area) => area.replace(/-/g, " ")),
         }
       : {}),
     // Preparation — AI Overviews cite these heavily for "how to prepare for X"
@@ -159,7 +218,7 @@ export default function ServicePageTemplate({
       "@type": "MedicalBusiness",
       "@id": `${clinicInfo.website}#organization`,
       name: clinicInfo.name,
-      telephone: clinicInfo.phone,
+      telephone: schemaPhone,
       url: clinicInfo.website,
       priceRange: "$$$",
       medicalSpecialty: ["Dermatology", "CosmeticSurgery", "Medical-aesthetics"],
@@ -198,7 +257,7 @@ export default function ServicePageTemplate({
 
   // Separate Service + Offer schema — enables AI shopping / pricing answers
   // ("how much does cosmelan peel cost near me?")
-  const offerStructuredData = catalogEntry
+  const offerStructuredData = priceSummary
     ? {
         "@context": "https://schema.org",
         "@type": "Service",
@@ -213,20 +272,36 @@ export default function ServicePageTemplate({
           name: clinicInfo.name,
         },
         areaServed: { "@type": "AdministrativeArea", name: "King County, Washington" },
-        offers: {
-          "@type": "Offer",
-          price: catalogEntry.price,
-          priceCurrency: "USD",
-          availability: "https://schema.org/InStock",
-          url: `${clinicInfo.booking.url}`,
-          priceValidUntil: "2027-12-31",
-          validFrom: "2026-04-17",
-          seller: {
-            "@type": "MedicalBusiness",
-            "@id": `${clinicInfo.website}#organization`,
-            name: clinicInfo.name,
-          },
-        },
+        offers:
+          priceSummary.lowPrice === priceSummary.highPrice
+            ? {
+                "@type": "Offer",
+                price: priceSummary.lowPrice,
+                priceCurrency: "USD",
+                availability: "https://schema.org/InStock",
+                url: `${clinicInfo.booking.url}`,
+                priceValidUntil: "2027-12-31",
+                validFrom: "2026-04-17",
+                seller: {
+                  "@type": "MedicalBusiness",
+                  "@id": `${clinicInfo.website}#organization`,
+                  name: clinicInfo.name,
+                },
+              }
+            : {
+                "@type": "AggregateOffer",
+                lowPrice: priceSummary.lowPrice,
+                highPrice: priceSummary.highPrice,
+                offerCount: priceSummary.offerCount,
+                priceCurrency: "USD",
+                availability: "https://schema.org/InStock",
+                url: `${clinicInfo.booking.url}`,
+                seller: {
+                  "@type": "MedicalBusiness",
+                  "@id": `${clinicInfo.website}#organization`,
+                  name: clinicInfo.name,
+                },
+              },
       }
     : null;
 

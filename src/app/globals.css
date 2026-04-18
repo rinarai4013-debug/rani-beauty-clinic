@@ -170,6 +170,27 @@ h1 {
   display: none;
 }
 
+/* ── Accessibility: Gold text contrast on light backgrounds ───────────────── */
+
+/*
+ * #C9A96E is only 2.24:1 against white and fails WCAG AA for text.
+ * Use an accessible gold for text states while preserving the brand tone.
+ */
+.text-rani-gold,
+.hover\:text-rani-gold:hover,
+.group:hover .group-hover\:text-rani-gold {
+  color: #8E6A2D !important;
+}
+
+.bg-rani-navy .text-rani-gold,
+[class*="bg-rani-navy"] .text-rani-gold,
+.bg-rani-navy .hover\:text-rani-gold:hover,
+[class*="bg-rani-navy"] .hover\:text-rani-gold:hover,
+.bg-rani-navy .group:hover .group-hover\:text-rani-gold,
+[class*="bg-rani-navy"] .group:hover .group-hover\:text-rani-gold {
+  color: #C9A96E !important;
+}
+
 /* ── Accessibility: Focus-visible styles ──────────────────────────────────── */
 
 /*
@@ -178,7 +199,7 @@ h1 {
  * not on mouse clicks.
  */
 :focus-visible {
-  outline: 2px solid #C9A96E; /* rani-gold */
+  outline: 2px solid #8E6A2D; /* rani-gold-accessible */
   outline-offset: 2px;
   border-radius: 4px;
 }

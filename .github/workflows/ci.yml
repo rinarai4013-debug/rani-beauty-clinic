@@ -61,3 +61,16 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run -s openapi:lint
       - run: npm run -s openapi:parity
+
+  seo-geo:
+    name: SEO/GEO Guardrails
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci --ignore-scripts
+      - run: npm run -s seo:guardrails
