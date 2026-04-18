@@ -40,7 +40,7 @@ export default function TeamPage() {
     "@type": "MedicalBusiness",
     name: clinicInfo.name,
     url: `${clinicInfo.website}/team`,
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

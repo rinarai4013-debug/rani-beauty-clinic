@@ -45,39 +45,26 @@ const wellnessSlugs = [
 ];
 
 /**
- * Sitemap index strategy — splits ~3,100 URLs into categorized sub-sitemaps.
- *
- * This gives Google clear crawl-priority signals:
- * - Sub-sitemap 0: Core pages (highest value, ~250 URLs)
- * - Sub-sitemap 1: Blog posts (~192 URLs)
- * - Sub-sitemap 2: SEO content pages (~307 URLs)
- * - Sub-sitemap 3: Geo hub pages — /locations/ + /near/[city] (~175 URLs)
- * - Sub-sitemap 4: Near service pages A-K (~850 URLs)
- * - Sub-sitemap 5: Near service pages L-Z (~1,400 URLs)
- *
- * Google auto-discovers the index at /sitemap.xml → /sitemap/0.xml, /sitemap/1.xml, etc.
+ * Single root sitemap endpoint (`/sitemap.xml`) for deterministic discovery.
+ * Keeps robots pointer stable and eliminates index-route drift.
  */
-export async function generateSitemaps() {
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
-}
+export default function sitemap(): MetadataRoute.Sitemap {
+  const merged = [
+    ...buildCoreSitemap(),
+    ...buildBlogSitemap(),
+    ...buildSeoContentSitemap(),
+    ...buildGeoHubSitemap(),
+    ...buildNearServiceSitemap("a-k"),
+    ...buildNearServiceSitemap("l-z"),
+  ];
 
-export default function sitemap({ id }: { id: number }): MetadataRoute.Sitemap {
-  switch (id) {
-    case 0:
-      return buildCoreSitemap();
-    case 1:
-      return buildBlogSitemap();
-    case 2:
-      return buildSeoContentSitemap();
-    case 3:
-      return buildGeoHubSitemap();
-    case 4:
-      return buildNearServiceSitemap("a-k");
-    case 5:
-      return buildNearServiceSitemap("l-z");
-    default:
-      return [];
+  // Deduplicate URLs when sources overlap.
+  const deduped = new Map<string, (typeof merged)[number]>();
+  for (const entry of merged) {
+    deduped.set(entry.url, entry);
   }
+
+  return Array.from(deduped.values());
 }
 
 // ── Sub-sitemap 0: Core pages (~250 URLs) ────────────────────────────

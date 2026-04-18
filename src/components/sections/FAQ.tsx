@@ -57,7 +57,7 @@ function FAQAccordionItem({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <p className="pb-5 font-body text-sm leading-relaxed text-rani-muted">
+            <p className="faq-answer pb-5 font-body text-sm leading-relaxed text-rani-muted" data-speakable>
               {item.answer}
             </p>
           </motion.div>

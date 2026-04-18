@@ -97,7 +97,7 @@ export default function NearCityPage({ params }: PageProps) {
     name: clinicInfo.name,
     description: `Physician-supervised medspa in Renton, WA serving ${city.name} with Botox, HydraFacial, laser hair removal, Sofwave, GLP-1 weight management, and medical wellness treatments.`,
     url: `${clinicInfo.website}/near/${city.slug}`,
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

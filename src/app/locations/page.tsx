@@ -69,7 +69,7 @@ export default function LocationsPage() {
     "@type": "MedicalBusiness",
     name: clinicInfo.name,
     url: `${clinicInfo.website}/locations`,
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

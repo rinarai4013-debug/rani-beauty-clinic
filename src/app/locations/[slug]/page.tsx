@@ -107,7 +107,7 @@ export default function LocationPage({ params }: PageProps) {
     name: clinicInfo.name,
     description: page.metaDescription,
     url: `${clinicInfo.website}/locations/${page.slug}`,
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

@@ -2,8 +2,7 @@ import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import TrustStrip from "@/components/sections/TrustStrip";
-import StructuredData from "@/components/seo/StructuredData";
-import { HomepageSchema, AICitationSchemas } from "@/components/seo/EnhancedSchemas";
+import { AICitationSchemas } from "@/components/seo/EnhancedSchemas";
 import ServiceCategoryPanels from "@/components/sections/ServiceCategoryPanels";
 import { clinicInfo } from "@/data/clinic-info";
 import { faqItems } from "@/data/faqs";
@@ -52,7 +51,6 @@ export default function HomePage() {
   return (
     <>
       {/* Schema Markup */}
-      <HomepageSchema />
       <AICitationSchemas reviews={reviews} faqs={homepageFaqs} />
 
       {/* 1. Hero - Cinematic Split Layout */}

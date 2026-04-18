@@ -12,6 +12,8 @@ const wellnessVariations = serviceVariations.filter(
   (v) => v.category === "wellness"
 );
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return wellnessVariations.map((v) => ({
     slug: v.parentSlug,
@@ -27,7 +29,15 @@ export function generateMetadata({
   const variation = wellnessVariations.find(
     (v) => v.parentSlug === params.slug && v.slug === params.variation
   );
-  if (!variation) return { title: "Service Not Found" };
+  if (!variation) {
+    return {
+      title: "Service Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 
   const canonical = `${clinicInfo.website}/wellness/${variation.parentSlug}/${variation.slug}`;
 
@@ -48,6 +58,12 @@ export function generateMetadata({
           alt: `${variation.metaTitle} - Rani Beauty Clinic`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: variation.metaTitle,
+      description: variation.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }
@@ -170,6 +186,10 @@ export default function WellnessVariationPage({
           <p className="text-lg sm:text-xl text-white/80 max-w-3xl leading-relaxed">
             {variation.description}
           </p>
+          <p className="mt-6 max-w-3xl rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85">
+            Educational content only, not medical advice. Your treatment plan
+            is finalized during a clinician-led consultation.
+          </p>
         </div>
       </section>
 
@@ -227,7 +247,7 @@ export default function WellnessVariationPage({
                 <h3 className="text-lg font-semibold text-[#0F1D2C] mb-2">
                   {faq.question}
                 </h3>
-                <p className="text-[#0F1D2C]/70 leading-relaxed">{faq.answer}</p>
+                <p className="faq-answer text-[#0F1D2C]/70 leading-relaxed" data-speakable>{faq.answer}</p>
               </div>
             ))}
           </div>

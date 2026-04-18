@@ -17,6 +17,8 @@ interface BlogPostPageProps {
   params: { slug: string };
 }
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return blogPosts.map((post) => ({
     slug: post.slug,
@@ -27,7 +29,13 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
   const post = blogPosts.find((p) => p.slug === params.slug);
 
   if (!post) {
-    return { title: "Post Not Found" };
+    return {
+      title: "Post Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 
   return {
@@ -44,6 +52,12 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
       publishedTime: post.date,
       authors: [post.author],
       images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${post.metaTitle} - Rani Beauty Clinic` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.metaTitle,
+      description: post.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }
@@ -127,7 +141,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     // Assistant) from the article summary blocks.
     speakable: {
       "@type": "SpeakableSpecification",
-      cssSelector: ["h1", "h2", ".article-summary", ".faq-answer"],
+      cssSelector: ["h1", ".article-summary", ".faq-answer", "[data-speakable]"],
     },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -179,11 +193,18 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Article paragraphs */}
           <FadeInOnScroll delay={0.2}>
-            <div className="prose-rani">
+            <div className="prose-rani article-body" data-speakable>
+              <div className="mb-8 rounded-lg border border-rani-gold/25 bg-rani-gold/5 px-4 py-3">
+                <p className="font-body text-xs leading-relaxed text-rani-navy">
+                  Educational content only. This article is not individualized medical advice and does not replace a consultation with a licensed clinician.
+                </p>
+              </div>
               {paragraphs.map((paragraph, index) => (
                 <p
                   key={index}
-                  className="mb-6 font-body text-base leading-[1.85] text-rani-text"
+                  className={`mb-6 font-body text-base leading-[1.85] text-rani-text ${
+                    index === 0 ? "article-summary" : ""
+                  }`}
                 >
                   {paragraph}
                 </p>

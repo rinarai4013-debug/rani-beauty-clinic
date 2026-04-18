@@ -123,6 +123,11 @@ export const UNIFIED_CATALOG: UnifiedService[] = [
   { id: 'nad-injection', name: 'NAD+ Injection', category: 'wellness', price: 149, duration: 15, sessions: 1, description: 'Cellular energy, brain health, and longevity support', concerns: ['aging-skin'], bodyAreas: [], financingEligible: false, parentSlug: 'wellness-injections' },
   { id: 'sermorelin', name: 'Sermorelin (Growth Hormone Peptide)', category: 'wellness', price: 299, duration: 15, sessions: 1, description: 'Growth hormone stimulation for recovery, body composition, and vitality', concerns: ['aging-skin', 'body-contouring'], bodyAreas: [], financingEligible: false, parentSlug: 'wellness-injections', note: 'Monthly program' },
 
+  // ═══ HORMONE THERAPY ═══
+  { id: 'hrt-female', name: 'Female HRT (Estradiol + Progesterone)', category: 'hormones', price: 199, duration: 30, sessions: 1, description: 'Bioidentical hormone replacement protocol for perimenopause/menopause symptom management', concerns: ['aging-skin'], bodyAreas: [], financingEligible: true, parentSlug: 'hormone-therapy' },
+  { id: 'trt-male', name: 'Male TRT (Testosterone Cypionate)', category: 'hormones', price: 199, duration: 30, sessions: 1, description: 'Physician-supervised testosterone optimization protocol for low testosterone symptoms', concerns: ['aging-skin'], bodyAreas: [], financingEligible: true, parentSlug: 'hormone-therapy' },
+  { id: 'thyroid-optimization', name: 'Thyroid Optimization', category: 'hormones', price: 149, duration: 30, sessions: 1, description: 'Thyroid hormone optimization to support energy, metabolism, and wellness goals', concerns: ['aging-skin'], bodyAreas: [], financingEligible: true, parentSlug: 'hormone-therapy' },
+
   // ═══ WEIGHT MANAGEMENT (GLP-1) ═══
   { id: 'glp1-semaglutide-m1', name: 'Semaglutide - Month 1 (0.25mg)', category: 'weight-management', price: 349, duration: 15, sessions: 1, description: 'GLP-1 weight loss program - starting dose', concerns: ['body-contouring'], bodyAreas: [], financingEligible: true, parentSlug: 'glp-1-weight-management' },
   { id: 'glp1-semaglutide-m2', name: 'Semaglutide - Month 2 (0.5mg)', category: 'weight-management', price: 399, duration: 15, sessions: 1, description: 'GLP-1 weight loss program - titration dose', concerns: ['body-contouring'], bodyAreas: [], financingEligible: true, parentSlug: 'glp-1-weight-management' },

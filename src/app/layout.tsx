@@ -153,7 +153,7 @@ export default function RootLayout({
                     "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
                   slogan: clinicInfo.tagline,
                   foundingDate: String(clinicInfo.established),
-                  telephone: clinicInfo.phone,
+                  telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
                   email: clinicInfo.email,
                   priceRange: "$$$",
                   currenciesAccepted: "USD",

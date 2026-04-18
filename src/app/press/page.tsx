@@ -130,7 +130,7 @@ const organizationSchema = {
     postalCode: clinicInfo.address.zip,
     addressCountry: "US",
   },
-  telephone: clinicInfo.phone,
+  telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
   email: clinicInfo.email,
   sameAs: [
     clinicInfo.social.instagram,

@@ -39,7 +39,7 @@ export default function FAQSection({ faqs }: { faqs: FAQ[] }) {
               />
             </button>
             {openIndex === index && (
-              <div className="px-4 pb-4 text-rani-navy/70 leading-relaxed">
+              <div className="faq-answer px-4 pb-4 text-rani-navy/70 leading-relaxed" data-speakable>
                 {faq.answer}
               </div>
             )}

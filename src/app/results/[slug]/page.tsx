@@ -105,7 +105,7 @@ export default function ResultsPage({
       "@type": "MedicalBusiness",
       name: "Rani Beauty Clinic",
       url: baseUrl,
-      telephone: clinicInfo.phone,
+      telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
       address: {
         "@type": "PostalAddress",
         streetAddress: clinicInfo.address.street,

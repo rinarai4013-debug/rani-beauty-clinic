@@ -18,7 +18,7 @@ const contactStructuredData = {
   "@type": "MedicalBusiness",
   name: clinicInfo.name,
   url: clinicInfo.website,
-  telephone: clinicInfo.phone,
+  telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
   email: clinicInfo.email,
   address: {
     "@type": "PostalAddress",
@@ -41,7 +41,7 @@ const contactStructuredData = {
   },
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     contactType: "customer service",
     availableLanguage: ["English"],
   },

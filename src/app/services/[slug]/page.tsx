@@ -11,6 +11,8 @@ const allServices = [
   ...wellnessServices,
 ];
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return aestheticServices.map((service) => ({
     slug: service.slug,
@@ -23,7 +25,15 @@ export function generateMetadata({
   params: { slug: string };
 }): Metadata {
   const service = aestheticServices.find((s) => s.slug === params.slug);
-  if (!service) return { title: "Service Not Found" };
+  if (!service) {
+    return {
+      title: "Service Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
   return {
     title: { absolute: service.metaTitle },
     description: service.metaDescription,
@@ -43,6 +53,12 @@ export function generateMetadata({
           alt: `${service.metaTitle} - Rani Beauty Clinic`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: service.metaTitle,
+      description: service.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }

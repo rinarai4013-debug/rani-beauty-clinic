@@ -92,7 +92,7 @@ const physicianStructuredData = {
       postalCode: clinicInfo.address.zip,
       addressCountry: "US",
     },
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     url: clinicInfo.website,
   },
 };
@@ -106,7 +106,7 @@ const organizationStructuredData = {
   image: "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
   description:
     "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections, hormone therapy and more.",
-  telephone: clinicInfo.phone,
+  telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
   email: clinicInfo.email,
   priceRange: "$$$",
   foundingDate: "2022",

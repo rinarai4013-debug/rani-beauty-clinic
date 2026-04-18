@@ -8,7 +8,7 @@ const CLINIC_BASE = {
   name: clinicInfo.name,
   image: `${clinicInfo.website}/opengraph-image`,
   url: clinicInfo.website,
-  telephone: clinicInfo.phone,
+  telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
   email: clinicInfo.email,
   address: {
     "@type": "PostalAddress",
@@ -61,7 +61,7 @@ export function HomepageSchema() {
   const organization = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "@id": `${clinicInfo.website}/#organization`,
+    "@id": `${clinicInfo.website}#organization`,
     name: clinicInfo.name,
     alternateName: "Rani Beauty Clinic Renton",
     url: clinicInfo.website,
@@ -87,7 +87,7 @@ export function HomepageSchema() {
     contactPoint: [
       {
         "@type": "ContactPoint",
-        telephone: clinicInfo.phone,
+        telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
         contactType: "customer service",
         areaServed: "US",
         availableLanguage: ["English"],
@@ -100,7 +100,7 @@ export function HomepageSchema() {
       },
       {
         "@type": "ContactPoint",
-        telephone: clinicInfo.phone,
+        telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
         contactType: "reservations",
         areaServed: "US",
         availableLanguage: ["English"],
@@ -143,7 +143,7 @@ export function HomepageSchema() {
     "@context": "https://schema.org",
     ...CLINIC_BASE,
     "@type": ["LocalBusiness", "MedicalBusiness"] as const,
-    "@id": `${clinicInfo.website}/#localbusiness`,
+    "@id": `${clinicInfo.website}#localbusiness`,
     name: clinicInfo.name,
     alternateName: "Rani Medspa Renton WA",
     description:
@@ -153,13 +153,13 @@ export function HomepageSchema() {
     paymentAccepted: "Cash, Credit Card, Debit Card, HSA, FSA",
     employee: {
       "@type": "Physician",
-      "@id": `${clinicInfo.website}/#physician`,
+      "@id": `${clinicInfo.website}#physician`,
       name: clinicInfo.medicalDirector.name,
       jobTitle: clinicInfo.medicalDirector.title,
       description: `${clinicInfo.medicalDirector.specialty} serving as Medical Director. Provides neurological expertise for neurotoxin injections (Botox, Dysport) and oversees all medical treatments and wellness programs.`,
       medicalSpecialty: "Neurology",
       worksFor: {
-        "@id": `${clinicInfo.website}/#organization`,
+        "@id": `${clinicInfo.website}#organization`,
       },
     },
     hasOfferCatalog: {
@@ -206,12 +206,12 @@ export function HomepageSchema() {
   const website = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": `${clinicInfo.website}/#website`,
+    "@id": `${clinicInfo.website}#website`,
     name: clinicInfo.name,
     url: clinicInfo.website,
     description: "Official website of Rani Beauty Clinic - physician-supervised medspa in Renton, WA.",
     publisher: {
-      "@id": `${clinicInfo.website}/#organization`,
+      "@id": `${clinicInfo.website}#organization`,
     },
     inLanguage: "en-US",
     potentialAction: {
@@ -259,7 +259,7 @@ export function AICitationSchemas({
   const speakable = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "@id": `${clinicInfo.website}/#webpage`,
+    "@id": `${clinicInfo.website}#webpage`,
     name: "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
     url: clinicInfo.website,
     description:
@@ -275,13 +275,13 @@ export function AICitationSchemas({
       ],
     },
     isPartOf: {
-      "@id": `${clinicInfo.website}/#website`,
+      "@id": `${clinicInfo.website}#website`,
     },
     about: {
-      "@id": `${clinicInfo.website}/#organization`,
+      "@id": `${clinicInfo.website}#organization`,
     },
     mainEntity: {
-      "@id": `${clinicInfo.website}/#localbusiness`,
+      "@id": `${clinicInfo.website}#localbusiness`,
     },
   };
 
@@ -289,7 +289,7 @@ export function AICitationSchemas({
   const reviewSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "@id": `${clinicInfo.website}/#localbusiness`,
+    "@id": `${clinicInfo.website}#localbusiness`,
     name: clinicInfo.name,
     review: reviews.map((r) => ({
       "@type": "Review",
@@ -398,7 +398,7 @@ export function ServiceSchema({ service }: ServiceSchemaProps) {
       "@type": "LocalBusiness",
       name: clinicInfo.name,
       url: clinicInfo.website,
-      telephone: clinicInfo.phone,
+      telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
       address: CLINIC_BASE.address,
     },
     areaServed: {
@@ -587,13 +587,13 @@ export function LocationSchema({ location, services }: LocationSchemaProps) {
   const localBusiness = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "MedicalBusiness"],
-    "@id": `${locationUrl}/#localbusiness`,
+    "@id": `${locationUrl}#localbusiness`,
     name: `${clinicInfo.name} - Serving ${location.city}, ${location.state}`,
     description:
       location.metaDescription ??
       `${clinicInfo.name} serves ${location.city}, ${location.state} residents with physician-supervised aesthetic and wellness treatments. ${location.driveTime} from ${location.city}.`,
     url: locationUrl,
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     email: clinicInfo.email,
     address: CLINIC_BASE.address,
     geo: {

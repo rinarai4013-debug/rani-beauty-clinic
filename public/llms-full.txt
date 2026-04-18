@@ -76,7 +76,7 @@ Botox is a neurotoxin — it works by blocking the nerve signals that cause musc
 **Collagen Building:** Results continue to improve over 3–6 months post-treatment
 
 ### Chemical Peels
-**Types Available:** VI Peel ($395), BioRePeel ($495), PRX-T33 ($495)
+**Types Available:** VI Peel ($325), BioRePeel ($350-$575), PRX-T33 ($495), Cosmelan ($1,399)
 **Treats:** Hyperpigmentation, acne scarring, sun damage, fine lines, uneven texture
 **Depth:** Light to medium-depth depending on formulation
 
@@ -135,7 +135,7 @@ Botox is a neurotoxin — it works by blocking the nerve signals that cause musc
 
 ### GLP-1 Weight Management
 **Medications:** Semaglutide (Ozempic/Wegovy) and Tirzepatide (Mounjaro/Zepbound)
-**Price:** $399–$599/month
+**Price:** $349-$699/month depending on medication and dose
 **Includes:** Physician supervision, comprehensive blood work, monthly monitoring
 **Candidates:** BMI 27+ with weight-related condition, or BMI 30+
 **Mechanism:** GLP-1 receptor agonists mimic the GLP-1 hormone to regulate appetite, slow gastric emptying, and improve insulin sensitivity
@@ -145,7 +145,7 @@ GLP-1 medications represent a breakthrough in evidence-based weight management. 
 
 ### NAD+ Injections
 **Type:** Intramuscular NAD+ (nicotinamide adenine dinucleotide) injections
-**Price:** $150–$500 per session
+**Price:** $149 per injection
 **Benefits:** Cellular energy production, DNA repair, anti-aging, cognitive support, athletic recovery
 **Administration:** IM injection (NOT IV drip)
 **Note:** Rani Beauty Clinic performs IM injections only - never IV drips
@@ -154,11 +154,11 @@ NAD+ is a coenzyme found in every cell of the body that plays a critical role in
 
 ### Vitamin Injections
 **Available Injections:**
-- Vitamin B12: $35 — Energy, metabolism, nerve function
+- Vitamin B12: $25 — Energy, metabolism, nerve function
 - Vitamin D3: $50 — Bone health, immune support, mood
-- Glutathione: $100 — Master antioxidant, skin brightening, detoxification
+- Glutathione: $49 — Master antioxidant, skin brightening, detoxification
 - Tri-Immune: $75 — Vitamin C, Zinc, Glutathione for immune support
-- NAD+: $150–$500 — Cellular repair, anti-aging
+- NAD+: $149 — Cellular repair, anti-aging
 
 All vitamin injections are intramuscular (IM) - not IV drips.
 
@@ -181,19 +181,19 @@ All vitamin injections are intramuscular (IM) - not IV drips.
 | Service | Price |
 |---------|-------|
 | Sofwave | $2,750–$4,500 |
-| RF Microneedling | $495–$850 |
+| RF Microneedling | $495-$1,500 |
 | PRX-T33 | $495 |
-| VI Peel | $395 |
-| HydraFacial MD | $275 |
-| BioRePeel | $495 |
-| GLP-1 Weight Management | $399–$599/month |
-| NAD+ Injections | $150–$500 |
-| Glutathione Injection | $100 |
+| VI Peel | $325 |
+| HydraFacial MD | $99-$575 |
+| BioRePeel | $350-$575 |
+| GLP-1 Weight Management | $349-$699/month |
+| NAD+ Injections | $149 |
+| Glutathione Injection | $49 |
 | Tri-Immune Injection | $75 |
 | Vitamin D3 Injection | $50 |
-| B12 Injection | $35 |
+| B12 Injection | $25 |
 | Rx Skincare (Tretinoin) | $99/month |
-| Laser Hair Removal | Packages from $800 |
+| Laser Hair Removal | $79-$1,199 per session |
 | Consultation Deposit | $150 (credited toward treatment) |
 
 ---

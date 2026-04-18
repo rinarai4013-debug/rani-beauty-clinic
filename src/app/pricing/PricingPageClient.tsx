@@ -267,6 +267,25 @@ export default function PricingPageClient() {
         </CollapsibleSection>
         <CollapsibleSection title="Chemical Peels & BioRePeel" defaultOpen>
           <PriceGrid items={pricingData.chemicalPeels} />
+          <FadeInOnScroll delay={0.1}>
+            <div className="mt-4 rounded-lg border border-rani-gold/30 bg-rani-gold/5 px-4 py-3">
+              <p className="font-body text-sm text-rani-navy">
+                Looking for pigment correction or under-eye regeneration?
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button href="/services/cosmelan-peel" className="!py-2 !px-4 !text-xs">
+                  Cosmelan Peel Details
+                </Button>
+                <Button
+                  href="/services/microneedling-arrissence-undereye"
+                  variant="ghost"
+                  className="!py-2 !px-4 !text-xs"
+                >
+                  Arrissence Undereye Details
+                </Button>
+              </div>
+            </div>
+          </FadeInOnScroll>
         </CollapsibleSection>
         <CollapsibleSection title="Scar Reduction">
           <PriceGrid items={pricingData.scarReduction} columns={2} />
@@ -293,6 +312,17 @@ export default function PricingPageClient() {
                 onClick={() => { trackCTAClick('Ask About Financing', 'pricing_rf_micro', '/contact'); trackAnalyticsEvent('plan_financing_clicked', { service_name: 'RF Microneedling' }); }}
               >
                 Ask About Financing
+              </Button>
+            </div>
+          </FadeInOnScroll>
+          <FadeInOnScroll delay={0.15}>
+            <div className="mt-3">
+              <Button
+                href="/services/microneedling-arrissence-undereye"
+                variant="ghost"
+                className="!py-2 !px-4 !text-xs"
+              >
+                See Microneedling with Arrissence (Dark Undereyes)
               </Button>
             </div>
           </FadeInOnScroll>

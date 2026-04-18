@@ -54,6 +54,24 @@ const RESULTS_SLUGS = new Set([
   "sofwave",
 ]);
 
+/**
+ * Some page slugs represent grouped service families, while catalog rows are
+ * stored as specific line items (e.g., `glp-1-weight-management`, `vi-peel`).
+ * This map keeps Offer schema coverage complete for those grouped pages.
+ */
+const OFFER_SLUG_ALIASES: Record<string, string[]> = {
+  "botox-dysport": ["botox", "dysport"],
+  "chemical-peels": [
+    "vi-peel",
+    "biorepeel",
+    "prx-t33",
+    "cosmelan-peel",
+    "microneedling-arrissence-undereye",
+  ],
+  "glp1-weight-management": ["glp-1-weight-management"],
+  "hormone-therapy": ["hormone-therapy", "hormones"],
+};
+
 interface ServiceData {
   slug: string;
   title: string;
@@ -108,10 +126,28 @@ export default function ServicePageTemplate({
     ? `https://www.ranibeautyclinic.com${serviceImageData.image}`
     : "https://www.ranibeautyclinic.com/images/logo/logo-dark.png";
 
+  const slugCandidates = new Set([
+    service.slug,
+    ...(OFFER_SLUG_ALIASES[service.slug] || []),
+  ]);
+
   // Catalog lookup — pulls pricing, concerns, duration, sessions, and body areas
   // so we can emit a rich MedicalProcedure + Offer pair that LLMs cite.
-  const catalogEntry = UNIFIED_CATALOG.find(
-    (c) => c.id === service.slug || c.parentSlug === service.slug
+  const catalogEntries = UNIFIED_CATALOG.filter((entry) => {
+    if (slugCandidates.has(entry.id)) return true;
+    if (entry.parentSlug && slugCandidates.has(entry.parentSlug)) return true;
+    // "Chemical Peels" is a grouped page with multiple line-item SKUs.
+    if (service.slug === "chemical-peels" && entry.category === "chemical-peel") return true;
+    return false;
+  });
+
+  const sortedCatalogEntries = [...catalogEntries].sort((a, b) => a.price - b.price);
+  const primaryCatalogEntry = sortedCatalogEntries[0];
+  const catalogConcerns = Array.from(
+    new Set(sortedCatalogEntries.flatMap((entry) => entry.concerns || []))
+  );
+  const catalogBodyAreas = Array.from(
+    new Set(sortedCatalogEntries.flatMap((entry) => entry.bodyAreas || []))
   );
 
   const serviceStructuredData = {
@@ -125,18 +161,18 @@ export default function ServicePageTemplate({
     howPerformed: service.howItWorks.map((s) => s.description).join(" "),
     // Indications — what this treatment addresses. LLMs use this to match
     // user queries like "what helps melasma" to the right service page.
-    ...(catalogEntry?.concerns && catalogEntry.concerns.length > 0
+    ...(catalogConcerns.length > 0
       ? {
-          indication: catalogEntry.concerns.map((concern) => ({
+          indication: catalogConcerns.map((concern) => ({
             "@type": "MedicalIndication",
             name: concern.replace(/-/g, " "),
           })),
         }
       : {}),
     // Body location — helps AI match "undereye treatment" or "face rejuvenation"
-    ...(catalogEntry?.bodyAreas && catalogEntry.bodyAreas.length > 0
+    ...(catalogBodyAreas.length > 0
       ? {
-          bodyLocation: catalogEntry.bodyAreas.map((a) => a.replace(/-/g, " ")),
+          bodyLocation: catalogBodyAreas.map((a) => a.replace(/-/g, " ")),
         }
       : {}),
     // Preparation — AI Overviews cite these heavily for "how to prepare for X"
@@ -159,7 +195,7 @@ export default function ServicePageTemplate({
       "@type": "MedicalBusiness",
       "@id": `${clinicInfo.website}#organization`,
       name: clinicInfo.name,
-      telephone: clinicInfo.phone,
+      telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
       url: clinicInfo.website,
       priceRange: "$$$",
       medicalSpecialty: ["Dermatology", "CosmeticSurgery", "Medical-aesthetics"],
@@ -198,7 +234,7 @@ export default function ServicePageTemplate({
 
   // Separate Service + Offer schema — enables AI shopping / pricing answers
   // ("how much does cosmelan peel cost near me?")
-  const offerStructuredData = catalogEntry
+  const offerStructuredData = primaryCatalogEntry
     ? {
         "@context": "https://schema.org",
         "@type": "Service",
@@ -213,20 +249,46 @@ export default function ServicePageTemplate({
           name: clinicInfo.name,
         },
         areaServed: { "@type": "AdministrativeArea", name: "King County, Washington" },
-        offers: {
-          "@type": "Offer",
-          price: catalogEntry.price,
-          priceCurrency: "USD",
-          availability: "https://schema.org/InStock",
-          url: `${clinicInfo.booking.url}`,
-          priceValidUntil: "2027-12-31",
-          validFrom: "2026-04-17",
-          seller: {
-            "@type": "MedicalBusiness",
-            "@id": `${clinicInfo.website}#organization`,
-            name: clinicInfo.name,
-          },
-        },
+        offers:
+          sortedCatalogEntries.length === 1
+            ? {
+                "@type": "Offer",
+                price: primaryCatalogEntry.price,
+                priceCurrency: "USD",
+                availability: "https://schema.org/InStock",
+                url: `${clinicInfo.booking.url}`,
+                priceValidUntil: "2027-12-31",
+                validFrom: "2026-04-17",
+                seller: {
+                  "@type": "MedicalBusiness",
+                  "@id": `${clinicInfo.website}#organization`,
+                  name: clinicInfo.name,
+                },
+              }
+            : {
+                "@type": "AggregateOffer",
+                lowPrice: sortedCatalogEntries[0].price,
+                highPrice: sortedCatalogEntries[sortedCatalogEntries.length - 1].price,
+                offerCount: sortedCatalogEntries.length,
+                priceCurrency: "USD",
+                availability: "https://schema.org/InStock",
+                url: `${clinicInfo.booking.url}`,
+                offers: sortedCatalogEntries.map((entry) => ({
+                  "@type": "Offer",
+                  name: entry.name,
+                  price: entry.price,
+                  priceCurrency: "USD",
+                  availability: "https://schema.org/InStock",
+                  url: `${clinicInfo.booking.url}`,
+                  priceValidUntil: "2027-12-31",
+                  validFrom: "2026-04-17",
+                })),
+                seller: {
+                  "@type": "MedicalBusiness",
+                  "@id": `${clinicInfo.website}#organization`,
+                  name: clinicInfo.name,
+                },
+              },
       }
     : null;
 
@@ -310,6 +372,17 @@ export default function ServicePageTemplate({
           </nav>
         </div>
       </div>
+
+      {/* Medical Disclaimer */}
+      <section className="bg-rani-cream/50 py-4">
+        <div className="mx-auto max-w-7xl px-6">
+          <p className="rounded-lg border border-rani-border bg-white px-4 py-3 font-body text-sm leading-relaxed text-rani-muted">
+            Educational content only and not a substitute for medical advice.
+            Final treatment eligibility, risks, and protocol details are
+            confirmed during an in-person clinician consultation.
+          </p>
+        </div>
+      </section>
 
       {/* What Is It */}
       <section className="bg-white py-12 md:py-20 lg:py-28">
@@ -782,7 +855,7 @@ function FAQItem({
         </span>
       </summary>
       <div className="px-6 pb-4">
-        <p className="font-body text-sm text-rani-muted leading-relaxed">
+        <p className="faq-answer font-body text-sm text-rani-muted leading-relaxed" data-speakable>
           {answer}
         </p>
       </div>

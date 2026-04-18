@@ -98,7 +98,7 @@ export default function ServiceCityPage({ params }: PageProps) {
     name: clinicInfo.name,
     description: `${entry.serviceName} for ${entry.cityName} residents. Physician-supervised ${template.category === "aesthetic" ? "aesthetic" : "medical wellness"} treatment at Rani Beauty Clinic in Renton, WA.`,
     url: `${clinicInfo.website}/near/${params.city}/${params.service}`,
-    telephone: clinicInfo.phone,
+    telephone: clinicInfo.phoneTel.replace(/^tel:/, ""),
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

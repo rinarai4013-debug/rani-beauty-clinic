@@ -87,7 +87,7 @@ export default function Hero({
               </h1>
 
               {subtitle && (
-                <p className="mt-5 max-w-[380px] font-body text-[15px] leading-[1.7] text-white/60">
+                <p className="hero-subtitle mt-5 max-w-[380px] font-body text-[15px] leading-[1.7] text-white/60" data-speakable>
                   {subtitle}
                 </p>
               )}
@@ -201,9 +201,10 @@ export default function Hero({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className={`mt-6 max-w-xl font-body text-lg leading-relaxed ${
+              className={`hero-subtitle mt-6 max-w-xl font-body text-lg leading-relaxed ${
                 dark ? "text-gray-300" : "text-rani-muted"
               }`}
+              data-speakable
             >
               {subtitle}
             </motion.p>

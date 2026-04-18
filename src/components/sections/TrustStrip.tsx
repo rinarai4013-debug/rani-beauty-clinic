@@ -83,7 +83,12 @@ export default function TrustStrip() {
   const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
-    <section ref={ref} className="bg-rani-navy border-t border-white/5" aria-label="Clinic statistics and trust indicators">
+    <section
+      ref={ref}
+      className="trust-bar bg-rani-navy border-t border-white/5"
+      aria-label="Clinic statistics and trust indicators"
+      data-speakable
+    >
       <div className="mx-auto max-w-7xl px-4">
         {/* Desktop: single row */}
         <div className="hidden md:flex items-center justify-center py-5">
