@@ -31,7 +31,7 @@ export default function ServiceCard({ service, showPrice = true, isSelected = fa
           {service.name}
         </h3>
         {showPrice && (
-          <span className="text-lg font-bold text-[#C9A96E]">
+          <span className="text-lg font-bold text-rani-gold-accessible">
             {service.price > 0 ? `$${service.price}` : 'Complimentary'}
           </span>
         )}
@@ -55,7 +55,7 @@ export default function ServiceCard({ service, showPrice = true, isSelected = fa
       </div>
 
       {isSelected && (
-        <div className="mt-3 flex items-center gap-2 text-sm text-[#C9A96E] font-medium">
+        <div className="mt-3 flex items-center gap-2 text-sm text-rani-gold-accessible font-medium">
           <CheckIcon />
           Selected
         </div>

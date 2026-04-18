@@ -147,7 +147,7 @@ export default function TreatmentAreaPage({ params }: PageProps) {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-[#F8F6F1] rounded-xl p-6 text-center">
-              <div className="text-[#C9A96E] text-sm font-semibold uppercase tracking-wider mb-2">
+              <div className="text-rani-gold-accessible text-sm font-semibold uppercase tracking-wider mb-2">
                 Duration
               </div>
               <div className="text-[#0F1D2C] text-xl font-bold">
@@ -155,7 +155,7 @@ export default function TreatmentAreaPage({ params }: PageProps) {
               </div>
             </div>
             <div className="bg-[#F8F6F1] rounded-xl p-6 text-center">
-              <div className="text-[#C9A96E] text-sm font-semibold uppercase tracking-wider mb-2">
+              <div className="text-rani-gold-accessible text-sm font-semibold uppercase tracking-wider mb-2">
                 Sessions
               </div>
               <div className="text-[#0F1D2C] text-xl font-bold">
@@ -163,7 +163,7 @@ export default function TreatmentAreaPage({ params }: PageProps) {
               </div>
             </div>
             <div className="bg-[#F8F6F1] rounded-xl p-6 text-center">
-              <div className="text-[#C9A96E] text-sm font-semibold uppercase tracking-wider mb-2">
+              <div className="text-rani-gold-accessible text-sm font-semibold uppercase tracking-wider mb-2">
                 Downtime
               </div>
               <div className="text-[#0F1D2C] text-xl font-bold">
@@ -171,7 +171,7 @@ export default function TreatmentAreaPage({ params }: PageProps) {
               </div>
             </div>
             <div className="bg-[#F8F6F1] rounded-xl p-6 text-center">
-              <div className="text-[#C9A96E] text-sm font-semibold uppercase tracking-wider mb-2">
+              <div className="text-rani-gold-accessible text-sm font-semibold uppercase tracking-wider mb-2">
                 Pain Level
               </div>
               <div className="text-[#0F1D2C] text-xl font-bold">
@@ -250,7 +250,7 @@ export default function TreatmentAreaPage({ params }: PageProps) {
           </p>
           <Link
             href={parentPath}
-            className="text-[#C9A96E] font-semibold hover:underline text-lg"
+            className="text-rani-gold-accessible font-semibold hover:underline text-lg"
           >
             Learn more about {page.treatment} at Rani Beauty Clinic &rarr;
           </Link>

@@ -89,7 +89,7 @@ export default function ClientTimeline({ timeline, maxEvents = 20 }: ClientTimel
 
       {timeline.totalEvents > maxEvents && (
         <div className="text-center pt-2">
-          <button className="text-xs text-rani-gold hover:text-rani-gold/80 font-medium">
+          <button className="text-xs text-rani-gold-accessible hover:text-rani-gold/80 font-medium">
             View all {timeline.totalEvents} events
           </button>
         </div>

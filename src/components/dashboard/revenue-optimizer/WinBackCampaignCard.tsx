@@ -59,7 +59,7 @@ export default function WinBackCampaignCard({ campaign, onLaunch }: WinBackCampa
       <div className="bg-white/60 rounded-lg p-3 mb-3">
         <p className="text-xs font-body text-rani-text italic">&ldquo;{campaign.campaign.message}&rdquo;</p>
         {campaign.campaign.offer && (
-          <p className="text-xs font-body text-rani-gold mt-1.5 font-medium">
+          <p className="text-xs font-body text-rani-gold-accessible mt-1.5 font-medium">
             Offer: {campaign.campaign.offer}
           </p>
         )}

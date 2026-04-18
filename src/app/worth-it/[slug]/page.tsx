@@ -207,7 +207,7 @@ export default function WorthItSlugPage({
               <p className="text-sm text-gray-500 mb-2 uppercase tracking-wide">
                 Satisfaction Rate
               </p>
-              <p className="text-2xl font-bold text-[#C9A96E]">
+              <p className="text-2xl font-bold text-rani-gold-accessible">
                 {page.satisfactionRate}
               </p>
             </div>
@@ -270,7 +270,7 @@ export default function WorthItSlugPage({
                   className="flex items-start gap-3 text-gray-700"
                 >
                   <svg
-                    className="w-5 h-5 text-[#C9A96E] mt-0.5 flex-shrink-0"
+                    className="w-5 h-5 text-rani-gold-accessible mt-0.5 flex-shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

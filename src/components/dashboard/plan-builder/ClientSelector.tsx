@@ -147,9 +147,9 @@ export default function ClientSelector({ selected, onSelect }: ClientSelectorPro
                 className="w-full px-4 py-2.5 text-left hover:bg-[#F8F6F1] transition-colors flex items-center gap-3 border-t border-gray-100"
               >
                 <div className="w-8 h-8 rounded-full bg-[#C9A96E]/10 flex items-center justify-center flex-shrink-0">
-                  <UserPlus className="h-4 w-4 text-[#C9A96E]" />
+                  <UserPlus className="h-4 w-4 text-rani-gold-accessible" />
                 </div>
-                <span className="text-sm font-medium text-[#C9A96E]">New Client</span>
+                <span className="text-sm font-medium text-rani-gold-accessible">New Client</span>
               </button>
             </>
           ) : query.length >= 2 ? (
@@ -157,7 +157,7 @@ export default function ClientSelector({ selected, onSelect }: ClientSelectorPro
               <p className="text-sm text-gray-400">No clients found</p>
               <button
                 onClick={() => setIsOpen(false)}
-                className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[#C9A96E] hover:underline"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-rani-gold-accessible hover:underline"
               >
                 <UserPlus className="h-3.5 w-3.5" />
                 New Client

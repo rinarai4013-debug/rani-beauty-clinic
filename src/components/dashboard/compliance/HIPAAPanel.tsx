@@ -39,7 +39,7 @@ export default function HIPAAPanel({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-rani-gold/10 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-rani-gold" />
+              <Shield className="w-5 h-5 text-rani-gold-accessible" />
             </div>
             <div>
               <h2 className="text-lg font-body font-bold text-rani-navy">HIPAA Compliance</h2>

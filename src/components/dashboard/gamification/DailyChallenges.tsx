@@ -24,7 +24,7 @@ export default function DailyChallenges() {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
       <div className="flex items-center gap-2 mb-4">
-        <Target className="w-4 h-4 text-rani-gold" />
+        <Target className="w-4 h-4 text-rani-gold-accessible" />
         <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
           Daily Challenges
         </h3>
@@ -55,7 +55,7 @@ export default function DailyChallenges() {
                     <p className={`text-sm font-body font-medium ${challenge.completed ? 'text-green-700 line-through' : 'text-rani-text'}`}>
                       {challenge.title}
                     </p>
-                    <span className="text-xs font-body text-rani-gold font-semibold">
+                    <span className="text-xs font-body text-rani-gold-accessible font-semibold">
                       +{challenge.xpReward} XP
                     </span>
                   </div>

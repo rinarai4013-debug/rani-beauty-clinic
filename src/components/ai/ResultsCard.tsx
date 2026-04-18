@@ -125,7 +125,7 @@ export default function ResultsCard({ skinAnalysis, treatmentPlan, onBookConsult
           </div>
         </div>
         {treatmentPlan.costEstimate.paymentOptions.some(p => p.type === 'financing') && (
-          <p className="text-center text-sm text-[#C9A96E] font-montserrat mt-3">
+          <p className="text-center text-sm text-rani-gold-accessible font-montserrat mt-3">
             Financing available from ${treatmentPlan.costEstimate.paymentOptions.find(p => p.type === 'financing')?.perMonth}/month
           </p>
         )}

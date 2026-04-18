@@ -78,7 +78,7 @@ export default function BankMatchSuggestion({
     <div className="overflow-hidden">
       <div className="mt-3 p-3 rounded-lg bg-rani-gold/5 border border-rani-gold/20">
           <div className="flex items-center gap-2 mb-2">
-            <ArrowLeftRight className="w-3.5 h-3.5 text-rani-gold" />
+            <ArrowLeftRight className="w-3.5 h-3.5 text-rani-gold-accessible" />
             <span className="text-xs font-body font-semibold text-rani-navy">
               Bank Feed Match
             </span>
@@ -119,7 +119,7 @@ export default function BankMatchSuggestion({
                       <span className={`text-xs font-body font-semibold ${isCredit ? 'text-green-600' : 'text-rani-navy'}`}>
                         ${displayAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
-                      <Link2 className="w-3 h-3 text-rani-gold" />
+                      <Link2 className="w-3 h-3 text-rani-gold-accessible" />
                     </div>
                   </button>
                 );

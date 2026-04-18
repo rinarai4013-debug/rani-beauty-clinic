@@ -321,7 +321,7 @@ export default function PlanBuilderPage() {
         <div className="flex items-center justify-between gap-4 max-w-[1800px] mx-auto">
           <div className="flex items-center gap-4 flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#C9A96E]" />
+              <FileText className="h-5 w-5 text-rani-gold-accessible" />
               <h1 className="text-lg font-heading font-semibold text-[#0F1D2C] hidden sm:block">
                 Treatment Plan Builder
               </h1>
@@ -359,7 +359,7 @@ export default function PlanBuilderPage() {
             <button
               onClick={handleAISuggest}
               disabled={!state.client}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#C9A96E] bg-[#C9A96E]/10 rounded-lg hover:bg-[#C9A96E]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-rani-gold-accessible bg-[#C9A96E]/10 rounded-lg hover:bg-[#C9A96E]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               title="Auto-populate plan with AI-recommended treatments based on client concerns"
             >
               <Wand2 className="h-4 w-4" />
@@ -492,7 +492,7 @@ export default function PlanBuilderPage() {
                     href={`/plan/${state.savedPlanId}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[#C9A96E] hover:underline break-all"
+                    className="text-sm text-rani-gold-accessible hover:underline break-all"
                   >
                     /plan/{state.savedPlanId}
                   </a>

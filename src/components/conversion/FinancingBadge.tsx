@@ -30,9 +30,9 @@ export default function FinancingBadge({
       }
       className={`inline-flex items-center gap-2 rounded-full border border-rani-gold/30 bg-rani-gold/5 px-4 py-1.5 font-body text-xs text-rani-navy transition-colors hover:bg-rani-gold/10 ${className}`}
     >
-      <CreditCard size={14} className="text-rani-gold" />
+      <CreditCard size={14} className="text-rani-gold-accessible" />
       <span>
-        From <span className="font-bold text-rani-gold">${monthlyFrom}/mo</span> with financing
+        From <span className="font-bold text-rani-gold-accessible">${monthlyFrom}/mo</span> with financing
       </span>
     </a>
   );

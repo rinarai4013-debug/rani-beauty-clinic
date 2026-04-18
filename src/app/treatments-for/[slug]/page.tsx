@@ -180,7 +180,7 @@ export default function DemographicPage({
                 <p className="text-[#0F1D2C]/70 leading-relaxed text-sm">
                   {treatment.whyRecommended}
                 </p>
-                <span className="inline-block mt-4 text-[#C9A96E] text-sm font-medium">
+                <span className="inline-block mt-4 text-rani-gold-accessible text-sm font-medium">
                   Learn more &rarr;
                 </span>
               </Link>

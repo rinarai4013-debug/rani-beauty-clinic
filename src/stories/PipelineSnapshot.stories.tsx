@@ -64,7 +64,7 @@ function PipelineSnapshot({ stages, conversionRate, avgTimeInPipeline, newThisWe
         </div>
         <div className="bg-gray-50 rounded-lg p-3 text-center">
           <p className="text-xs text-gray-500">Completed (Mo)</p>
-          <p className="text-lg font-bold text-[#C9A96E]">{completedThisMonth}</p>
+          <p className="text-lg font-bold text-rani-gold-accessible">{completedThisMonth}</p>
         </div>
       </div>
     </div>

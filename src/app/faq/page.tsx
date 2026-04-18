@@ -361,7 +361,7 @@ export default function FAQPage() {
                     href={`#${cat.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                     className="group flex items-center gap-2 rounded-full border border-rani-border bg-rani-cream px-4 py-2 font-body text-sm font-medium text-rani-navy transition-all hover:border-rani-gold hover:bg-rani-navy hover:text-white"
                   >
-                    <Icon size={14} className="text-rani-gold group-hover:text-rani-gold" />
+                    <Icon size={14} className="text-rani-gold-accessible group-hover:text-rani-gold" />
                     {cat}
                     <span className="rounded-full bg-rani-navy/10 px-2 py-0.5 text-xs group-hover:bg-white/20">
                       {count}
@@ -411,7 +411,7 @@ export default function FAQPage() {
                       <summary className="flex cursor-pointer items-start gap-3 px-6 py-5 font-body text-base font-semibold text-rani-navy [&::-webkit-details-marker]:hidden">
                         <ChevronDown
                           size={18}
-                          className="mt-0.5 shrink-0 text-rani-gold transition-transform group-open:rotate-180"
+                          className="mt-0.5 shrink-0 text-rani-gold-accessible transition-transform group-open:rotate-180"
                         />
                         <span>{faq.question}</span>
                       </summary>

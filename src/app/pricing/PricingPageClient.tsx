@@ -32,7 +32,7 @@ function PriceGrid({ items, columns = 3 }: { items: PriceItem[]; columns?: 2 | 3
               )}
             </div>
             <div className="shrink-0 text-right">
-              <p className="font-body text-sm font-bold text-rani-gold">{item.price}</p>
+              <p className="font-body text-sm font-bold text-rani-gold-accessible">{item.price}</p>
               {item.time && (
                 <p className="font-body text-[10px] text-rani-muted">{item.time}</p>
               )}
@@ -162,11 +162,11 @@ export default function PricingPageClient() {
                 </span>
               </div>
               <div className="flex flex-col items-center text-center pt-2">
-                <Sparkles size={28} className="text-rani-gold" />
+                <Sparkles size={28} className="text-rani-gold-accessible" />
                 <h3 className="mt-3 font-body text-lg font-bold text-rani-navy">
                   HydraFacial Signature
                 </h3>
-                <p className="mt-1 font-body text-2xl font-bold text-rani-gold">$249</p>
+                <p className="mt-1 font-body text-2xl font-bold text-rani-gold-accessible">$249</p>
                 <p className="mt-2 font-body text-sm text-rani-muted">
                   Deep cleanse, exfoliate, and hydrate in one session. Immediate glow, zero downtime.
                 </p>
@@ -474,11 +474,11 @@ export default function PricingPageClient() {
                         key={index}
                         className={`flex items-start gap-3 font-body text-sm ${
                           feature.startsWith("Everything")
-                            ? "text-rani-gold font-semibold"
+                            ? "text-rani-gold-accessible font-semibold"
                             : "text-rani-text"
                         }`}
                       >
-                        <span className="mt-0.5 shrink-0 text-rani-gold">
+                        <span className="mt-0.5 shrink-0 text-rani-gold-accessible">
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path
                               d="M13.3 4.3L6 11.6L2.7 8.3"
@@ -567,10 +567,10 @@ export default function PricingPageClient() {
           <StaggerChildren className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {pricingData.loyaltyProgram.rewards.map((r) => (
               <Card key={r.tier} hover={false} className="!p-4 text-center">
-                <Gift size={20} className="mx-auto text-rani-gold" />
+                <Gift size={20} className="mx-auto text-rani-gold-accessible" />
                 <h3 className="mt-2 font-body text-sm font-bold text-rani-navy">{r.tier}</h3>
                 <p className="mt-1 font-body text-xs text-rani-muted">{r.requirement}</p>
-                <p className="mt-2 font-body text-sm font-semibold text-rani-gold">{r.reward}</p>
+                <p className="mt-2 font-body text-sm font-semibold text-rani-gold-accessible">{r.reward}</p>
               </Card>
             ))}
           </StaggerChildren>
@@ -603,7 +603,7 @@ export default function PricingPageClient() {
                       key={provider}
                       className="flex items-center gap-3 rounded-xl border border-rani-border bg-rani-cream px-6 py-4"
                     >
-                      <CreditCard size={20} className="text-rani-gold" />
+                      <CreditCard size={20} className="text-rani-gold-accessible" />
                       <span className="font-body text-base font-bold text-rani-navy">
                         {provider}
                       </span>
@@ -624,7 +624,7 @@ export default function PricingPageClient() {
 
             <FadeInOnScroll direction="right">
               <div className="flex h-full flex-col justify-center rounded-xl border border-rani-border bg-rani-cream p-8">
-                <Shield size={32} className="text-rani-gold" />
+                <Shield size={32} className="text-rani-gold-accessible" />
                 <h3 className="mt-4 font-body text-xl font-bold text-rani-navy">
                   HSA & FSA Accepted
                 </h3>

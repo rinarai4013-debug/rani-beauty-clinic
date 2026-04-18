@@ -48,7 +48,7 @@ export default function SyncStatusBadge({ lastSync, onSyncComplete }: SyncStatus
     >
       {syncing ? (
         <>
-          <RefreshCw className="w-3 h-3 text-rani-gold animate-spin" />
+          <RefreshCw className="w-3 h-3 text-rani-gold-accessible animate-spin" />
           <span className="text-rani-muted">Syncing...</span>
         </>
       ) : error ? (

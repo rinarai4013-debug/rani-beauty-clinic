@@ -40,7 +40,7 @@ export default function BookingSettingsPage() {
               type="checkbox"
               checked={config.sameDayBookingEnabled}
               onChange={e => setConfig(prev => ({ ...prev, sameDayBookingEnabled: e.target.checked }))}
-              className="rounded text-[#C9A96E] focus:ring-[#C9A96E]"
+              className="rounded text-rani-gold-accessible focus:ring-[#C9A96E]"
             />
             <span className="text-sm">Enabled</span>
           </label>

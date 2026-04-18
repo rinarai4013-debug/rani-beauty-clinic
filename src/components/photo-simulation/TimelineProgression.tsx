@@ -331,7 +331,7 @@ export default function TimelineProgression({
                       {/* Shimmer placeholder */}
                       <div className="w-full h-full animate-pulse bg-gradient-to-br from-[#F8F6F1] via-[#E8E4DD] to-[#F8F6F1]" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                        <Loader2 className="w-8 h-8 text-[#C9A96E] animate-spin" />
+                        <Loader2 className="w-8 h-8 text-rani-gold-accessible animate-spin" />
                         <p className="text-sm text-[#0F1D2C]/60 font-medium">
                           Generating simulation...
                         </p>
@@ -349,7 +349,7 @@ export default function TimelineProgression({
                       <p className="text-sm text-red-500 text-center">{sim.error}</p>
                       <button
                         onClick={() => generateSimulation(panel.timeframe)}
-                        className="text-xs text-[#C9A96E] hover:text-[#B8944D] underline font-medium"
+                        className="text-xs text-rani-gold-accessible hover:text-[#B8944D] underline font-medium"
                       >
                         Retry
                       </button>
@@ -382,7 +382,7 @@ export default function TimelineProgression({
               {/* Info area */}
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-[#C9A96E]" />
+                  <Clock className="w-4 h-4 text-rani-gold-accessible" />
                   <h3
                     className="text-lg font-bold text-[#0F1D2C]"
                     style={{ fontFamily: 'Playfair Display, serif' }}
@@ -404,7 +404,7 @@ export default function TimelineProgression({
                       transition={{ delay: index * 0.2 + i * 0.1 + 0.3 }}
                       className="flex items-start gap-2 text-sm text-[#0F1D2C]/80"
                     >
-                      <span className="text-[#C9A96E] mt-0.5 flex-shrink-0">&#10003;</span>
+                      <span className="text-rani-gold-accessible mt-0.5 flex-shrink-0">&#10003;</span>
                       {improvement}
                     </motion.li>
                   ))}
@@ -423,7 +423,7 @@ export default function TimelineProgression({
         className="bg-white rounded-2xl border border-[#0F1D2C]/10 p-6"
       >
         <div className="flex items-center gap-2 mb-6">
-          <TrendingUp className="w-5 h-5 text-[#C9A96E]" />
+          <TrendingUp className="w-5 h-5 text-rani-gold-accessible" />
           <h3
             className="text-lg font-bold text-[#0F1D2C]"
             style={{ fontFamily: 'Playfair Display, serif' }}

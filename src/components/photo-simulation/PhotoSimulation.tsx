@@ -88,7 +88,7 @@ export default function PhotoSimulation({
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="rounded-full bg-[#C9A96E]/10 p-2.5">
-          <Sparkles className="h-5 w-5 text-[#C9A96E]" />
+          <Sparkles className="h-5 w-5 text-rani-gold-accessible" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-[#0F1D2C]">

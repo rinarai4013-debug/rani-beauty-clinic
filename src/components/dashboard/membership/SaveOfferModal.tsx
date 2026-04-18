@@ -88,13 +88,13 @@ export default function SaveOfferModal({
               >
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-lg ${isSelected ? 'bg-rani-gold/20' : 'bg-rani-cream'}`}>
-                    <Icon className={`w-4 h-4 ${isSelected ? 'text-rani-gold' : 'text-rani-muted'}`} />
+                    <Icon className={`w-4 h-4 ${isSelected ? 'text-rani-gold-accessible' : 'text-rani-muted'}`} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-body font-semibold text-rani-navy">{offer.label}</h4>
                       {offer.value > 0 && (
-                        <span className="text-xs font-body font-bold text-rani-gold">${offer.value} value</span>
+                        <span className="text-xs font-body font-bold text-rani-gold-accessible">${offer.value} value</span>
                       )}
                     </div>
                     <p className="text-xs font-body text-rani-muted mt-1">{offer.description}</p>

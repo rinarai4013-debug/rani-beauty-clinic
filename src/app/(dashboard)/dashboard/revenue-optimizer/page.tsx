@@ -192,7 +192,7 @@ function RevenueOptimizerContent() {
                 className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 bg-white hover:border-rani-gold/30 hover:shadow-sm transition-all group"
               >
                 <div className="p-2 rounded-lg bg-rani-cream group-hover:bg-rani-gold/10 transition-colors">
-                  <link.icon className="w-4 h-4 text-rani-gold" />
+                  <link.icon className="w-4 h-4 text-rani-gold-accessible" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-body font-medium text-rani-navy">{link.label}</p>
@@ -236,28 +236,28 @@ function RevenueOptimizerContent() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="bg-white rounded-lg border border-gray-100 p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-rani-gold" />
+              <Users className="w-4 h-4 text-rani-gold-accessible" />
               <p className="text-xs font-body text-rani-muted">Retention Rate</p>
             </div>
             <p className="text-xl font-heading text-rani-navy">{summary.retentionRate}%</p>
           </div>
           <div className="bg-white rounded-lg border border-gray-100 p-4">
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="w-4 h-4 text-rani-gold" />
+              <DollarSign className="w-4 h-4 text-rani-gold-accessible" />
               <p className="text-xs font-body text-rani-muted">Avg Ticket</p>
             </div>
             <p className="text-xl font-heading text-rani-navy">${summary.avgTicket}</p>
           </div>
           <div className="bg-white rounded-lg border border-gray-100 p-4">
             <div className="flex items-center gap-2 mb-1">
-              <CreditCard className="w-4 h-4 text-rani-gold" />
+              <CreditCard className="w-4 h-4 text-rani-gold-accessible" />
               <p className="text-xs font-body text-rani-muted">Membership MRR</p>
             </div>
             <p className="text-xl font-heading text-rani-navy">${summary.membershipMRR.toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-lg border border-gray-100 p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Target className="w-4 h-4 text-rani-gold" />
+              <Target className="w-4 h-4 text-rani-gold-accessible" />
               <p className="text-xs font-body text-rani-muted">Pricing Health</p>
             </div>
             <p className="text-xl font-heading text-rani-navy">{summary.pricingHealthScore}/100</p>

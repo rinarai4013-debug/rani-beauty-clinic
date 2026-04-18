@@ -231,7 +231,7 @@ export default function CostPage({ params }: PageProps) {
                     {page.priceRanges.map((range, i) => (
                       <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
                         <td className="px-6 py-4 font-medium text-[#0F1D2C]">{range.item}</td>
-                        <td className="px-6 py-4 text-lg font-bold text-[#C9A96E]">{range.price}</td>
+                        <td className="px-6 py-4 text-lg font-bold text-rani-gold-accessible">{range.price}</td>
                         <td className="px-6 py-4 text-gray-500">{range.note || "—"}</td>
                       </tr>
                     ))}
@@ -248,7 +248,7 @@ export default function CostPage({ params }: PageProps) {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-semibold text-[#0F1D2C] text-base">{range.item}</p>
-                      <p className="text-lg font-bold text-[#C9A96E] whitespace-nowrap">{range.price}</p>
+                      <p className="text-lg font-bold text-rani-gold-accessible whitespace-nowrap">{range.price}</p>
                     </div>
                     {range.note && (
                       <p className="mt-1.5 text-sm text-gray-500">{range.note}</p>
@@ -261,7 +261,7 @@ export default function CostPage({ params }: PageProps) {
                 <div className="mt-6">
                   <Link
                     href={serviceLink.href}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-rani-gold-accessible hover:underline"
                   >
                     Learn more about {serviceLink.label} <ChevronRight className="h-4 w-4" />
                   </Link>
@@ -276,7 +276,7 @@ export default function CostPage({ params }: PageProps) {
                 <ul className="mt-6 space-y-4">
                   {page.factors.map((factor, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <DollarSign className="mt-0.5 h-5 w-5 shrink-0 text-[#C9A96E]" />
+                      <DollarSign className="mt-0.5 h-5 w-5 shrink-0 text-rani-gold-accessible" />
                       <span className="text-base leading-relaxed text-gray-700">{factor}</span>
                     </li>
                   ))}
@@ -320,17 +320,17 @@ export default function CostPage({ params }: PageProps) {
                 <h3 className="text-lg font-bold text-[#0F1D2C]">Rani Beauty Clinic</h3>
                 <ul className="mt-4 space-y-3 text-sm text-gray-700">
                   <li className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-[#C9A96E]" /> {clinicInfo.hours.formatted}
+                    <Clock className="h-4 w-4 text-rani-gold-accessible" /> {clinicInfo.hours.formatted}
                   </li>
                   <li className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-[#C9A96E]" />
-                    <a href={clinicInfo.phoneTel} className="text-[#C9A96E] hover:underline">{clinicInfo.phone}</a>
+                    <Phone className="h-4 w-4 text-rani-gold-accessible" />
+                    <a href={clinicInfo.phoneTel} className="text-rani-gold-accessible hover:underline">{clinicInfo.phone}</a>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-[#C9A96E]" /> {clinicInfo.medicalDirector.name}
+                    <Shield className="h-4 w-4 text-rani-gold-accessible" /> {clinicInfo.medicalDirector.name}
                   </li>
                   <li className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-[#C9A96E]" /> {clinicInfo.reviews.aggregateRating} Stars ({clinicInfo.reviews.reviewCount} reviews)
+                    <Star className="h-4 w-4 text-rani-gold-accessible" /> {clinicInfo.reviews.aggregateRating} Stars ({clinicInfo.reviews.reviewCount} reviews)
                   </li>
                 </ul>
                 <a
@@ -349,7 +349,7 @@ export default function CostPage({ params }: PageProps) {
                 </p>
                 <Link
                   href="/membership"
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#C9A96E] hover:underline"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-rani-gold-accessible hover:underline"
                 >
                   View Membership Plans <ChevronRight className="h-4 w-4" />
                 </Link>
@@ -415,7 +415,7 @@ export default function CostPage({ params }: PageProps) {
           <div className="mt-8 text-center">
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-rani-gold-accessible hover:underline"
             >
               View Full Pricing Menu <ChevronRight className="h-4 w-4" />
             </Link>

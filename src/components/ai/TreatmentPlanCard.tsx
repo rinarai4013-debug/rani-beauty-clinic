@@ -17,7 +17,7 @@ export default function TreatmentPlanCard({ plan, compact = false }: TreatmentPl
       <div className="bg-white rounded-xl border border-[#F8F6F1] p-4">
         <div className="flex items-center justify-between mb-2">
           <h4 className="font-montserrat font-semibold text-[#0F1D2C]">{primary.treatment}</h4>
-          <span className="text-sm font-montserrat text-[#C9A96E] font-semibold">{primary.fitScore}%</span>
+          <span className="text-sm font-montserrat text-rani-gold-accessible font-semibold">{primary.fitScore}%</span>
         </div>
         <p className="text-sm text-[#0F1D2C]/60 font-montserrat">{primary.reasoning}</p>
         <div className="flex gap-4 mt-3 text-xs font-montserrat text-[#0F1D2C]/50">
@@ -39,31 +39,31 @@ export default function TreatmentPlanCard({ plan, compact = false }: TreatmentPl
       <div className="p-6 border-b border-[#F8F6F1]">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <span className="text-xs font-montserrat text-[#C9A96E] uppercase tracking-wide">Recommended Treatment</span>
+            <span className="text-xs font-montserrat text-rani-gold-accessible uppercase tracking-wide">Recommended Treatment</span>
             <h3 className="text-xl font-playfair text-[#0F1D2C] mt-1">{primary.treatment}</h3>
           </div>
           <div className="bg-[#C9A96E]/10 rounded-lg px-3 py-1">
-            <span className="text-[#C9A96E] font-montserrat font-bold text-lg">{primary.fitScore}%</span>
-            <span className="text-xs text-[#C9A96E]/70 block text-center">match</span>
+            <span className="text-rani-gold-accessible font-montserrat font-bold text-lg">{primary.fitScore}%</span>
+            <span className="text-xs text-rani-gold-accessible/70 block text-center">match</span>
           </div>
         </div>
         <p className="text-sm text-[#0F1D2C]/70 font-montserrat">{primary.reasoning}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
           <div className="flex items-center gap-2 text-sm">
-            <DollarSign className="w-4 h-4 text-[#C9A96E]" />
+            <DollarSign className="w-4 h-4 text-rani-gold-accessible" />
             <span className="font-montserrat text-[#0F1D2C]">${primary.price}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <Clock className="w-4 h-4 text-[#C9A96E]" />
+            <Clock className="w-4 h-4 text-rani-gold-accessible" />
             <span className="font-montserrat text-[#0F1D2C]">{primary.downtime}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <Zap className="w-4 h-4 text-[#C9A96E]" />
+            <Zap className="w-4 h-4 text-rani-gold-accessible" />
             <span className="font-montserrat text-[#0F1D2C] capitalize">{primary.painLevel} pain</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <Calendar className="w-4 h-4 text-[#C9A96E]" />
+            <Calendar className="w-4 h-4 text-rani-gold-accessible" />
             <span className="font-montserrat text-[#0F1D2C]">{primary.sessions} session{primary.sessions > 1 ? 's' : ''}</span>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function TreatmentPlanCard({ plan, compact = false }: TreatmentPl
       {plan.timeline.milestones.length > 0 && (
         <div className="p-6 border-b border-[#F8F6F1]">
           <h4 className="text-sm font-montserrat font-semibold text-[#0F1D2C] mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#C9A96E]" />
+            <TrendingUp className="w-4 h-4 text-rani-gold-accessible" />
             Your Treatment Timeline
           </h4>
           <div className="space-y-3">
@@ -84,7 +84,7 @@ export default function TreatmentPlanCard({ plan, compact = false }: TreatmentPl
                   {i < plan.timeline.milestones.length - 1 && <div className="w-0.5 h-full bg-[#C9A96E]/20 mt-1" />}
                 </div>
                 <div className="pb-3">
-                  <div className="text-xs font-montserrat text-[#C9A96E]">
+                  <div className="text-xs font-montserrat text-rani-gold-accessible">
                     {m.weekNumber === 0 ? 'Start' : `Week ${m.weekNumber}`}
                   </div>
                   <div className="text-sm font-montserrat font-medium text-[#0F1D2C]">{m.treatment}</div>
@@ -145,7 +145,7 @@ export default function TreatmentPlanCard({ plan, compact = false }: TreatmentPl
           <div className="text-right text-sm font-montserrat text-[#0F1D2C]/60">
             <div>Annual maintenance: ${plan.costEstimate.annualMaintenance.toLocaleString()}</div>
             {plan.costEstimate.paymentOptions.find(p => p.type === 'financing') && (
-              <div className="text-[#C9A96E]">
+              <div className="text-rani-gold-accessible">
                 From ${plan.costEstimate.paymentOptions.find(p => p.type === 'financing')?.perMonth}/mo financing
               </div>
             )}

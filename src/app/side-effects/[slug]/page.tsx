@@ -147,7 +147,7 @@ export default function SideEffectsSlugPage({
                 <p className="text-gray-600 text-sm mb-3">
                   {effect.management}
                 </p>
-                <p className="text-xs text-[#C9A96E] font-medium">
+                <p className="text-xs text-rani-gold-accessible font-medium">
                   Duration: {effect.duration}
                 </p>
               </div>

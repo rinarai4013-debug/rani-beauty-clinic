@@ -26,7 +26,7 @@ export default function WizardTrustBar() {
             key={label}
             className="flex items-center gap-1.5 text-[#0F1D2C]/70"
           >
-            <Icon className="w-4 h-4 text-[#C9A96E] flex-shrink-0" />
+            <Icon className="w-4 h-4 text-rani-gold-accessible flex-shrink-0" />
             <span className="text-[11px] md:text-xs font-body font-medium whitespace-nowrap">
               {label}
             </span>

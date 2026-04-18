@@ -86,7 +86,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-rani-gold" />
+        <Loader2 className="h-8 w-8 animate-spin text-rani-gold-accessible" />
         <p className="text-sm text-rani-navy/60">Loading your profile...</p>
       </div>
     );
@@ -116,12 +116,12 @@ export default function ProfilePage() {
       <div className="rounded-xl border border-rani-navy/10 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rani-gold/10 text-rani-gold">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rani-gold/10 text-rani-gold-accessible">
               <User className="h-7 w-7" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-rani-navy">{profile.name}</h2>
-              <span className="inline-block mt-1 rounded-full bg-rani-gold/10 px-2.5 py-0.5 text-xs font-medium text-rani-gold capitalize">
+              <span className="inline-block mt-1 rounded-full bg-rani-gold/10 px-2.5 py-0.5 text-xs font-medium text-rani-gold-accessible capitalize">
                 {profile.status}
               </span>
             </div>
@@ -238,7 +238,7 @@ export default function ProfilePage() {
       {/* Skin Concerns */}
       <div className="rounded-xl border border-rani-navy/10 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-rani-gold" />
+          <Sparkles className="h-5 w-5 text-rani-gold-accessible" />
           <h3 className="text-base font-medium text-rani-navy">Skin Concerns</h3>
         </div>
         {profile.skinConcerns.length === 0 ? (
@@ -248,7 +248,7 @@ export default function ProfilePage() {
             {profile.skinConcerns.map((concern) => (
               <span
                 key={concern}
-                className="rounded-full bg-rani-gold/10 px-3 py-1 text-xs font-medium text-rani-gold"
+                className="rounded-full bg-rani-gold/10 px-3 py-1 text-xs font-medium text-rani-gold-accessible"
               >
                 {concern}
               </span>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
       {/* Treatment Interests */}
       <div className="rounded-xl border border-rani-navy/10 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
-          <Heart className="h-5 w-5 text-rani-gold" />
+          <Heart className="h-5 w-5 text-rani-gold-accessible" />
           <h3 className="text-base font-medium text-rani-navy">Treatment Interests</h3>
         </div>
         {profile.treatmentInterests.length === 0 ? (

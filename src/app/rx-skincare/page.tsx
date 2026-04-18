@@ -222,7 +222,7 @@ export default function RxSkincarePage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="font-serif text-3xl sm:text-4xl text-center text-[#0F1D2C] mb-12">
-            Our <span className="text-[#C9A96E]">Rx Skincare</span> Menu
+            Our <span className="text-rani-gold-accessible">Rx Skincare</span> Menu
           </h2>
 
           {PRODUCTS.map((cat) => (
@@ -241,7 +241,7 @@ export default function RxSkincarePage() {
                     }`}
                   >
                     {item.popular && (
-                      <span className="text-[#C9A96E] text-xs uppercase tracking-wider font-semibold">
+                      <span className="text-rani-gold-accessible text-xs uppercase tracking-wider font-semibold">
                         Most Popular
                       </span>
                     )}

@@ -87,7 +87,7 @@ export default function ResultsPageClient() {
                   className="rounded-xl border border-rani-border bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-md"
                 >
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rani-cream">
-                    <item.icon size={24} className="text-rani-gold" />
+                    <item.icon size={24} className="text-rani-gold-accessible" />
                   </div>
                   <h3 className="mt-4 font-heading text-lg font-bold text-rani-navy">
                     {item.title}
@@ -144,7 +144,7 @@ export default function ResultsPageClient() {
                   key={stat.label}
                   className="rounded-xl border border-rani-border bg-rani-cream p-4 text-center"
                 >
-                  <p className="font-heading text-2xl font-bold text-rani-gold">
+                  <p className="font-heading text-2xl font-bold text-rani-gold-accessible">
                     {stat.value}
                   </p>
                   <p className="mt-1 font-body text-xs text-rani-muted">

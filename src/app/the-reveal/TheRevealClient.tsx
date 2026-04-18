@@ -215,7 +215,7 @@ function FAQItem({
         </h3>
         <ChevronDown
           size={18}
-          className={`shrink-0 text-rani-gold transition-transform duration-300 ${
+          className={`shrink-0 text-rani-gold-accessible transition-transform duration-300 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -289,7 +289,7 @@ export default function TheRevealClient() {
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle2
                         size={18}
-                        className="mt-0.5 shrink-0 text-rani-gold"
+                        className="mt-0.5 shrink-0 text-rani-gold-accessible"
                       />
                       <span className="font-body text-sm text-rani-text">
                         {item}
@@ -327,7 +327,7 @@ export default function TheRevealClient() {
             {sciencePillars.map((pillar) => (
               <Card key={pillar.title} goldTop>
                 <div className="flex flex-col items-center text-center">
-                  <pillar.icon size={32} className="text-rani-gold" />
+                  <pillar.icon size={32} className="text-rani-gold-accessible" />
                   <h3 className="mt-4 font-body text-lg font-bold text-rani-navy">
                     {pillar.title}
                   </h3>
@@ -376,7 +376,7 @@ export default function TheRevealClient() {
                   <h3 className="mt-2 font-body text-xl font-bold text-rani-navy">
                     {tier.name}
                   </h3>
-                  <p className="mt-1 font-body text-xs uppercase tracking-wider text-rani-gold">
+                  <p className="mt-1 font-body text-xs uppercase tracking-wider text-rani-gold-accessible">
                     {tier.subtitle}
                   </p>
                   <div className="mt-4">
@@ -391,7 +391,7 @@ export default function TheRevealClient() {
                   <ul className="mt-6 w-full space-y-3 text-left">
                     {tier.includes.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-3">
-                        <span className="mt-0.5 shrink-0 text-rani-gold">
+                        <span className="mt-0.5 shrink-0 text-rani-gold-accessible">
                           <svg
                             width="16"
                             height="16"
@@ -470,7 +470,7 @@ export default function TheRevealClient() {
                   </div>
                   {/* Content */}
                   <div className="pt-1">
-                    <span className="font-body text-xs font-bold uppercase tracking-wider text-rani-gold">
+                    <span className="font-body text-xs font-bold uppercase tracking-wider text-rani-gold-accessible">
                       {step.week}
                     </span>
                     <h3 className="mt-1 font-body text-lg font-bold text-rani-navy">
@@ -581,7 +581,7 @@ export default function TheRevealClient() {
             ].map((item) => (
               <Card key={item.title} hover={false}>
                 <div className="flex flex-col items-center text-center">
-                  <item.icon size={28} className="text-rani-gold" />
+                  <item.icon size={28} className="text-rani-gold-accessible" />
                   <h3 className="mt-4 font-body text-sm font-bold text-rani-navy">
                     {item.title}
                   </h3>

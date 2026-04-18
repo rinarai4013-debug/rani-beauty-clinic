@@ -30,7 +30,7 @@ export default function ProviderCard({ provider, selected, onSelect }: ProviderC
             className="w-full h-full rounded-full object-cover"
           />
         ) : (
-          <span className="text-lg font-heading font-bold text-[#C9A96E]">
+          <span className="text-lg font-heading font-bold text-rani-gold-accessible">
             {provider.name.charAt(0)}
           </span>
         )}
@@ -49,7 +49,7 @@ export default function ProviderCard({ provider, selected, onSelect }: ProviderC
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <Clock size={10} className="text-[#C9A96E]" />
+            <Clock size={10} className="text-rani-gold-accessible" />
             <span className="text-[10px] text-rani-muted font-body">
               Next: {provider.nextAvailable}
             </span>

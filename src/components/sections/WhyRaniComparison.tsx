@@ -121,7 +121,7 @@ export default function WhyRaniComparison() {
               >
                 {/* Category label */}
                 <div className="md:px-5 md:py-4">
-                  <span className="font-body text-xs font-semibold uppercase tracking-wider text-rani-gold md:text-sm">
+                  <span className="font-body text-xs font-semibold uppercase tracking-wider text-rani-gold-accessible md:text-sm">
                     {row.category}
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export default function WhyRaniComparison() {
                 {/* Rani (highlighted) */}
                 <div className="flex items-start gap-3 rounded-lg bg-rani-cream/60 px-4 py-3 md:h-full md:items-center md:rounded-none md:border-l md:border-rani-gold/30">
                   {/* Mobile label */}
-                  <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rani-gold md:hidden">
+                  <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rani-gold-accessible md:hidden">
                     Rani Beauty Clinic
                   </span>
                   <div className="flex items-start gap-3">

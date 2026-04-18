@@ -55,7 +55,7 @@ export default function WhyRaniCards() {
               className="text-center"
             >
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
-                <item.icon size={28} className="text-rani-gold" />
+                <item.icon size={28} className="text-rani-gold-accessible" />
               </div>
               <h3 className="mt-4 font-body text-lg font-bold text-rani-navy">
                 {item.title}

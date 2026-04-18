@@ -29,7 +29,7 @@ export default function EmptySlotsList({ slots, onFillSlot }: EmptySlotsListProp
       {Object.entries(groupedByDate).slice(0, 7).map(([date, dateSlots]) => (
         <div key={date}>
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-4 h-4 text-rani-gold" />
+            <Calendar className="w-4 h-4 text-rani-gold-accessible" />
             <h4 className="text-sm font-heading text-rani-navy">
               {dateSlots[0].dayOfWeek}, {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </h4>
@@ -90,7 +90,7 @@ export default function EmptySlotsList({ slots, onFillSlot }: EmptySlotsListProp
                   {onFillSlot && (
                     <button
                       onClick={() => onFillSlot(slot)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg bg-rani-gold/10 text-rani-gold hover:bg-rani-gold/20"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg bg-rani-gold/10 text-rani-gold-accessible hover:bg-rani-gold/20"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>

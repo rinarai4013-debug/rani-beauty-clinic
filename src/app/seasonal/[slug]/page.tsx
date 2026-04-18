@@ -160,7 +160,7 @@ export default function SeasonalSlugPage({
                 <p className="text-gray-600 text-sm leading-relaxed">
                   {treatment.whyNow}
                 </p>
-                <span className="inline-block mt-4 text-[#C9A96E] text-sm font-medium group-hover:underline">
+                <span className="inline-block mt-4 text-rani-gold-accessible text-sm font-medium group-hover:underline">
                   Learn more &rarr;
                 </span>
               </Link>

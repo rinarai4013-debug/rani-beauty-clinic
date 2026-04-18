@@ -119,7 +119,7 @@ export default function ExitIntentPopup() {
             <div className="text-center">
               {/* Sparkles Icon */}
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rani-gold/20">
-                <Phone className="h-7 w-7 text-rani-gold" />
+                <Phone className="h-7 w-7 text-rani-gold-accessible" />
               </div>
 
               {/* Headline */}
@@ -137,7 +137,7 @@ export default function ExitIntentPopup() {
               <div className="mt-4 flex items-center justify-center gap-1.5">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-rani-gold text-rani-gold" />
+                    <Star key={i} className="h-4 w-4 fill-rani-gold text-rani-gold-accessible" />
                   ))}
                 </div>
                 <span className="font-body text-sm font-semibold text-rani-navy">

@@ -47,7 +47,7 @@ export default function ConsultationUrgency({ className = "" }: { className?: st
     <div className={`rounded-xl border border-rani-gold/20 bg-gradient-to-r from-rani-gold/5 to-transparent px-5 py-4 ${className}`}>
       <div className="flex items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rani-gold/10">
-          <Clock size={18} className="text-rani-gold" />
+          <Clock size={18} className="text-rani-gold-accessible" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-body text-sm font-bold text-rani-navy">{message}</p>

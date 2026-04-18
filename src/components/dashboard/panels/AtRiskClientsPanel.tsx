@@ -77,7 +77,7 @@ export default function AtRiskClientsPanel() {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
         <div className="flex items-center gap-2 mb-3">
-          <TrendingDown className="w-4 h-4 text-rani-gold" />
+          <TrendingDown className="w-4 h-4 text-rani-gold-accessible" />
           <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
             At-Risk Clients
           </h3>
@@ -92,7 +92,7 @@ export default function AtRiskClientsPanel() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <TrendingDown className="w-4 h-4 text-rani-gold" />
+          <TrendingDown className="w-4 h-4 text-rani-gold-accessible" />
           <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
             At-Risk Clients
           </h3>

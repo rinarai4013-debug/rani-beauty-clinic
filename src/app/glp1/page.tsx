@@ -205,7 +205,7 @@ export default function GLP1LandingPage() {
       <section id="how-it-works" className="py-20 sm:py-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Simple Process</p>
+            <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Simple Process</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy">
               How It Works
             </h2>
@@ -213,7 +213,7 @@ export default function GLP1LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {STEPS.map((step) => (
               <div key={step.num} className="bg-white rounded-2xl p-8 shadow-sm border border-rani-border hover:shadow-md transition-shadow">
-                <span className="font-heading text-4xl text-[#C9A96E]/30">{step.num}</span>
+                <span className="font-heading text-4xl text-rani-gold-accessible/30">{step.num}</span>
                 <h3 className="font-heading text-xl text-rani-navy mt-3 mb-3">{step.title}</h3>
                 <p className="font-body text-rani-muted leading-relaxed text-sm">{step.desc}</p>
               </div>
@@ -226,7 +226,7 @@ export default function GLP1LandingPage() {
       <section id="pricing" className="py-20 sm:py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Choose Your Program</p>
+            <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Choose Your Program</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy mb-4">
               Program Tiers
             </h2>
@@ -353,7 +353,7 @@ export default function GLP1LandingPage() {
       <section id="faq" className="py-20 sm:py-24 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Questions?</p>
+            <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Questions?</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy">Frequently Asked Questions</h2>
           </div>
           <div className="space-y-3">

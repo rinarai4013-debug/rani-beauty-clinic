@@ -45,7 +45,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <Link href="/docs" className="text-xl font-bold text-[#0F1D2C]" style={{ fontFamily: 'Playfair Display, serif' }}>
               RaniOS
             </Link>
-            <span className="rounded-full bg-[#C9A96E]/10 px-3 py-1 text-xs font-medium text-[#C9A96E]">
+            <span className="rounded-full bg-[#C9A96E]/10 px-3 py-1 text-xs font-medium text-rani-gold-accessible">
               Developer Docs
             </span>
           </div>
@@ -92,7 +92,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                           href={link.href}
                           className={`block rounded-md px-3 py-2 text-sm transition ${
                             isActive
-                              ? 'bg-[#C9A96E]/10 font-medium text-[#C9A96E]'
+                              ? 'bg-[#C9A96E]/10 font-medium text-rani-gold-accessible'
                               : 'text-[#0F1D2C]/70 hover:bg-[#C9A96E]/5 hover:text-[#0F1D2C]'
                           }`}
                         >

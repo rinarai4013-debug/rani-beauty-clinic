@@ -21,7 +21,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  treatment_spend: 'text-rani-gold',
+  treatment_spend: 'text-rani-gold-accessible',
   referral_bonus: 'text-purple-600',
   birthday_bonus: 'text-pink-600',
   review_bonus: 'text-blue-600',

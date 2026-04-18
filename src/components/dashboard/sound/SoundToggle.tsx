@@ -13,7 +13,7 @@ export default function SoundToggle() {
         if (muted) play('click');
       }}
       className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-        muted ? 'text-rani-muted hover:text-rani-text' : 'text-rani-gold hover:text-rani-gold/80'
+        muted ? 'text-rani-muted hover:text-rani-text' : 'text-rani-gold-accessible hover:text-rani-gold/80'
       }`}
       title={muted ? 'Unmute sounds' : 'Mute sounds'}
     >

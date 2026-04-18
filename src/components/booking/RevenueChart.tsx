@@ -22,7 +22,7 @@ export default function RevenueChart({ hourlyRevenue }: RevenueChartProps) {
         <div className="flex gap-4 text-sm">
           <div>
             <span className="text-[#6B7280]">Total: </span>
-            <span className="font-bold text-[#C9A96E]">${totalRevenue.toLocaleString()}</span>
+            <span className="font-bold text-rani-gold-accessible">${totalRevenue.toLocaleString()}</span>
           </div>
           {peakHour && (
             <div>

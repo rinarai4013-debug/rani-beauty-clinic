@@ -186,7 +186,7 @@ export default function StatCard({
         <div className="flex items-center gap-2 min-w-0">
           {Icon && (
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-rani-gold/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rani-gold" />
+              <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rani-gold-accessible" />
             </div>
           )}
           <span className="text-[10px] sm:text-xs font-body font-semibold uppercase tracking-wider text-rani-muted truncate">

@@ -87,7 +87,7 @@ export default function TimeSlotPicker({ slots, selectedSlot, onSelect, isLoadin
               <span className="block">{slot.startTime}</span>
               <span className="block text-xs opacity-70 mt-0.5">{slot.providerName.split(' ')[0]}</span>
               {slot.isOptimal && !isSelected && (
-                <span className="block text-[10px] text-[#C9A96E] mt-0.5">Recommended</span>
+                <span className="block text-[10px] text-rani-gold-accessible mt-0.5">Recommended</span>
               )}
             </button>
           );

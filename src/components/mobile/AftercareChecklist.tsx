@@ -138,7 +138,7 @@ export default function AftercareChecklist({ items, onToggle }: AftercareCheckli
                             <motion.div
                               animate={{ opacity: [1, 0.5, 1] }}
                               transition={{ duration: 1, repeat: Infinity }}
-                              className="text-sm font-mono text-[#C9A96E] font-bold"
+                              className="text-sm font-mono text-rani-gold-accessible font-bold"
                             >
                               {formatTimer(timers[item.id])}
                             </motion.div>
@@ -146,7 +146,7 @@ export default function AftercareChecklist({ items, onToggle }: AftercareCheckli
                         ) : (
                           <button
                             onClick={() => startTimer(item.id, item.timerMinutes!)}
-                            className="text-[10px] text-[#C9A96E] font-body font-semibold flex items-center gap-1"
+                            className="text-[10px] text-rani-gold-accessible font-body font-semibold flex items-center gap-1"
                           >
                             <Clock size={10} />
                             Start {item.timerMinutes}min timer

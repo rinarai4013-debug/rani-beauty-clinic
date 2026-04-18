@@ -115,7 +115,7 @@ export default function ProvidersOverviewPage() {
             <div className="mt-4 pt-3 border-t border-gray-50 space-y-1">
               {comparison.insights.map((insight, i) => (
                 <p key={i} className="text-xs text-rani-muted font-body flex items-start gap-2">
-                  <TrendingUp className="w-3 h-3 text-rani-gold mt-0.5 flex-shrink-0" />
+                  <TrendingUp className="w-3 h-3 text-rani-gold-accessible mt-0.5 flex-shrink-0" />
                   {insight}
                 </p>
               ))}

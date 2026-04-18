@@ -14,7 +14,7 @@ export default function BundleOptimizationGrid({ bundles }: BundleOptimizationGr
         <div key={i} className="bg-white rounded-lg border border-gray-100 p-4 hover:shadow-sm transition-shadow">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Package className="w-4 h-4 text-rani-gold" />
+              <Package className="w-4 h-4 text-rani-gold-accessible" />
               <h4 className="text-sm font-heading text-rani-navy">{bundle.bundleName}</h4>
             </div>
             <span className={`text-xs px-2 py-0.5 rounded-full font-body ${

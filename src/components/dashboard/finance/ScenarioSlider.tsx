@@ -127,7 +127,7 @@ export default function ScenarioSlider({ onScenarioChange, activeScenario }: Sce
         className="space-y-4 p-4 bg-white rounded-xl border border-gray-200"
       >
         <div className="flex items-center gap-2 mb-2">
-          <Sliders className="w-4 h-4 text-rani-gold" />
+          <Sliders className="w-4 h-4 text-rani-gold-accessible" />
           <h4 className="text-sm font-heading font-semibold text-rani-navy">{scenario.label} Parameters</h4>
         </div>
 

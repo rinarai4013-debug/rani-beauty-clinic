@@ -255,7 +255,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                       {col.sortable !== false && (
                         <span className="inline-flex flex-col -space-y-1.5">
                           {isSorted ? (
-                            sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-rani-gold" /> : <ChevronDown className="w-3.5 h-3.5 text-rani-gold" />
+                            sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-rani-gold-accessible" /> : <ChevronDown className="w-3.5 h-3.5 text-rani-gold-accessible" />
                           ) : (
                             <ChevronsUpDown className="w-3.5 h-3.5 opacity-0 group-hover:opacity-40 transition-opacity" />
                           )}

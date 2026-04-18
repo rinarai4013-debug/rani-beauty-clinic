@@ -204,7 +204,7 @@ export default function MensHealthPage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="font-serif text-3xl sm:text-4xl text-center text-[#0F1D2C] mb-4">
-            Choose Your <span className="text-[#C9A96E]">Program</span>
+            Choose Your <span className="text-rani-gold-accessible">Program</span>
           </h2>
           <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
             All programs include telehealth consultation, physician oversight, and medication shipped to your door.
@@ -220,7 +220,7 @@ export default function MensHealthPage() {
                 }`}
               >
                 {tier.highlight && (
-                  <p className="text-[#C9A96E] text-xs uppercase tracking-widest mb-2 font-semibold">
+                  <p className="text-rani-gold-accessible text-xs uppercase tracking-widest mb-2 font-semibold">
                     Most Popular
                   </p>
                 )}
@@ -232,7 +232,7 @@ export default function MensHealthPage() {
                 <ul className="space-y-3 mb-8">
                   {tier.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <span className="text-[#C9A96E] mt-0.5">&#10003;</span>
+                      <span className="text-rani-gold-accessible mt-0.5">&#10003;</span>
                       <span>{f}</span>
                     </li>
                   ))}
@@ -359,7 +359,7 @@ export default function MensHealthPage() {
                   className="w-full text-left px-6 py-4 flex justify-between items-center"
                 >
                   <span className="font-semibold text-[#0F1D2C]">{faq.q}</span>
-                  <span className="text-[#C9A96E] text-xl ml-4">{openFaq === i ? '−' : '+'}</span>
+                  <span className="text-rani-gold-accessible text-xl ml-4">{openFaq === i ? '−' : '+'}</span>
                 </button>
                 {openFaq === i && (
                   <div className="px-6 pb-4 text-gray-600 text-sm">{faq.a}</div>

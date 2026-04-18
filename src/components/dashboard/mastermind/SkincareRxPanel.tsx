@@ -41,7 +41,7 @@ const ACTION_CONFIG: Record<
   add: {
     label: 'Add',
     bg: 'bg-[#C9A96E]/10',
-    text: 'text-[#C9A96E]',
+    text: 'text-rani-gold-accessible',
     border: 'border-[#C9A96E]/30',
     dot: 'bg-[#C9A96E]',
   },
@@ -293,7 +293,7 @@ function StockSection({ stocks }: { stocks: StockRecommendation[] }) {
     <div className="rounded-2xl border border-[#C9A96E]/20 bg-[#F8F6F1] p-6">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-[#C9A96E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-5 h-5 text-rani-gold-accessible" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
           <h3 className="font-display text-lg font-bold text-[#0F1D2C]">
@@ -302,7 +302,7 @@ function StockSection({ stocks }: { stocks: StockRecommendation[] }) {
         </div>
         <div className="text-right">
           <p className="text-xs text-[#0F1D2C]/40">Projected monthly</p>
-          <p className="font-display text-lg font-bold text-[#C9A96E]">
+          <p className="font-display text-lg font-bold text-rani-gold-accessible">
             ${totalMonthlyRevenue.toLocaleString()}
           </p>
           <p className="text-[10px] text-emerald-600 font-medium">
@@ -340,7 +340,7 @@ function StockSection({ stocks }: { stocks: StockRecommendation[] }) {
                 </p>
               </div>
               <div className="text-right min-w-[80px]">
-                <p className="text-xs font-semibold text-[#C9A96E]">
+                <p className="text-xs font-semibold text-rani-gold-accessible">
                   ${stock.projectedMonthlyRevenue.toLocaleString()}/mo
                 </p>
                 <p className="text-[10px] text-[#0F1D2C]/40">
@@ -355,7 +355,7 @@ function StockSection({ stocks }: { stocks: StockRecommendation[] }) {
       {stocks.length > 5 && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="mt-3 w-full text-center text-xs font-semibold text-[#C9A96E] hover:text-[#b8943d] transition-colors"
+          className="mt-3 w-full text-center text-xs font-semibold text-rani-gold-accessible hover:text-[#b8943d] transition-colors"
         >
           {showAll ? 'Show Less' : `Show All ${stocks.length} Products`}
         </button>
@@ -432,7 +432,7 @@ export default function SkincareRxPanel({ rx, patientName }: SkincareRxPanelProp
             <p className="text-[10px] font-medium text-[#0F1D2C]/40 uppercase tracking-widest">
               Products Recommended
             </p>
-            <p className="font-display text-2xl font-bold text-[#C9A96E]">
+            <p className="font-display text-2xl font-bold text-rani-gold-accessible">
               {totalRecommended}
             </p>
           </div>
@@ -463,7 +463,7 @@ export default function SkincareRxPanel({ rx, patientName }: SkincareRxPanelProp
           {
             label: 'Add',
             count: [...rx.amRoutine, ...rx.pmRoutine].filter((r) => r.action === 'add').length,
-            color: 'text-[#C9A96E]',
+            color: 'text-rani-gold-accessible',
             bg: 'bg-[#C9A96E]/10',
           },
         ].map(({ label, count, color, bg }) => (

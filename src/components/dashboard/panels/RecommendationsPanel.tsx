@@ -25,7 +25,7 @@ interface RecommendationData {
 const STRATEGY_CONFIG = {
   pathway: { icon: ArrowRight, label: 'Next Step', color: 'text-blue-600 bg-blue-50' },
   category_gap: { icon: Target, label: 'New Category', color: 'text-purple-600 bg-purple-50' },
-  goal_based: { icon: Sparkles, label: 'Goal Match', color: 'text-rani-gold bg-rani-gold/10' },
+  goal_based: { icon: Sparkles, label: 'Goal Match', color: 'text-rani-gold-accessible bg-rani-gold/10' },
   timing: { icon: Clock, label: 'Overdue', color: 'text-orange-600 bg-orange-50' },
   membership_upsell: { icon: Zap, label: 'Membership', color: 'text-green-600 bg-green-50' },
 };
@@ -54,7 +54,7 @@ export default function RecommendationsPanel({ clientId }: { clientId: string })
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-rani-border p-5">
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-rani-gold" />
+          <Sparkles className="w-4 h-4 text-rani-gold-accessible" />
           <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
             AI Recommendations
           </h3>
@@ -78,7 +78,7 @@ export default function RecommendationsPanel({ clientId }: { clientId: string })
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-rani-gold" />
+          <Sparkles className="w-4 h-4 text-rani-gold-accessible" />
           <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
             AI Recommendations
           </h3>

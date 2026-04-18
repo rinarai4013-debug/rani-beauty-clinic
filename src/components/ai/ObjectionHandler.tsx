@@ -43,7 +43,7 @@ export default function ObjectionHandler({ handlers }: ObjectionHandlerProps) {
               className="w-full flex items-center justify-between p-4 hover:bg-[#F8F6F1]/30 transition-colors"
             >
               <div className="flex items-center gap-3 text-left">
-                <MessageCircle className="w-4 h-4 text-[#C9A96E] flex-shrink-0" />
+                <MessageCircle className="w-4 h-4 text-rani-gold-accessible flex-shrink-0" />
                 <div>
                   <span className="text-sm font-montserrat font-medium text-[#0F1D2C]">
                     &ldquo;{handler.objection}&rdquo;
@@ -68,7 +68,7 @@ export default function ObjectionHandler({ handlers }: ObjectionHandlerProps) {
                   <div className="px-4 pb-4 space-y-3">
                     <div className="bg-[#C9A96E]/5 rounded-lg p-3 relative">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-montserrat text-[#C9A96E] font-semibold uppercase">Response ({handler.technique})</span>
+                        <span className="text-xs font-montserrat text-rani-gold-accessible font-semibold uppercase">Response ({handler.technique})</span>
                         <button
                           onClick={() => handleCopy(handler.response, id)}
                           className="text-[#0F1D2C]/30 hover:text-[#C9A96E] transition-colors"

@@ -57,7 +57,7 @@ export default function AreasWeServe() {
               href={`/near/${city.slug}`}
               className="group flex items-center gap-2 rounded-lg border border-rani-border bg-rani-cream/40 px-4 py-3 transition-all hover:border-rani-gold/30 hover:bg-rani-cream hover:shadow-sm"
             >
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-rani-gold" />
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-rani-gold-accessible" />
               <span className="font-body text-sm font-medium text-rani-navy group-hover:text-rani-navy/80">
                 {city.name}
               </span>

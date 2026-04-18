@@ -40,7 +40,7 @@ export default function FinancingCalculator({
       }`}
     >
       <div className="flex items-center gap-2 mb-4">
-        <Calculator className={`w-5 h-5 ${isDark ? 'text-[#C9A96E]' : 'text-[#0F1D2C]/60'}`} />
+        <Calculator className={`w-5 h-5 ${isDark ? 'text-rani-gold-accessible' : 'text-[#0F1D2C]/60'}`} />
         <h3
           className={`font-[family-name:var(--font-heading)] text-lg ${
             isDark ? 'text-white' : 'text-[#0F1D2C]'
@@ -80,14 +80,14 @@ export default function FinancingCalculator({
         <div className="flex items-center gap-2">
           <span
             className={`font-[family-name:var(--font-heading)] text-lg font-bold ${
-              isDark ? 'text-[#C9A96E]' : 'text-[#0F1D2C]'
+              isDark ? 'text-rani-gold-accessible' : 'text-[#0F1D2C]'
             }`}
           >
             ${amount.toLocaleString()}
           </span>
           {!selectedOption && (
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-              <Check className="w-5 h-5 text-[#C9A96E]" />
+              <Check className="w-5 h-5 text-rani-gold-accessible" />
             </motion.div>
           )}
         </div>
@@ -119,7 +119,7 @@ export default function FinancingCalculator({
               <div
                 className={`font-[family-name:var(--font-heading)] text-xl font-bold mt-1 ${
                   isSelected
-                    ? 'text-[#C9A96E]'
+                    ? 'text-rani-gold-accessible'
                     : isDark
                       ? 'text-white'
                       : 'text-[#0F1D2C]'
@@ -142,7 +142,7 @@ export default function FinancingCalculator({
               )}
               {isSelected && (
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mt-1">
-                  <Check className="w-4 h-4 text-[#C9A96E] mx-auto" />
+                  <Check className="w-4 h-4 text-rani-gold-accessible mx-auto" />
                 </motion.div>
               )}
             </button>
@@ -169,7 +169,7 @@ export default function FinancingCalculator({
               </div>
             </div>
             <div className="text-right">
-              <span className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#C9A96E]">
+              <span className="font-[family-name:var(--font-heading)] text-2xl font-bold text-rani-gold-accessible">
                 ${selectedOption.monthlyPayment}
               </span>
               <span className={`font-body text-xs ${isDark ? 'text-white/30' : 'text-[#0F1D2C]/30'}`}>

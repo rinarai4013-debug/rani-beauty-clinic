@@ -43,7 +43,7 @@ export default function ProviderComparisonTable({ rankings, providers }: Provide
                   return (
                     <td key={name} className="text-center p-3">
                       <div className="flex flex-col items-center">
-                        <span className={`font-display font-semibold ${isTop ? 'text-rani-gold' : 'text-rani-navy'}`}>
+                        <span className={`font-display font-semibold ${isTop ? 'text-rani-gold-accessible' : 'text-rani-navy'}`}>
                           {r ? (metric.includes('Revenue') ? `$${r.value.toLocaleString()}` : r.value.toFixed(1)) : '—'}
                         </span>
                         {r && (

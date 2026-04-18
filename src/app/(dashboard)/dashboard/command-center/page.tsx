@@ -46,7 +46,7 @@ export default function CommandCenterPage() {
         <p className="text-sm text-red-700 mb-3">Failed to load agent command feed.</p>
         <button
           onClick={retry}
-          className="text-sm font-medium text-rani-gold hover:text-rani-navy transition-colors"
+          className="text-sm font-medium text-rani-gold-accessible hover:text-rani-navy transition-colors"
         >
           Retry
         </button>

@@ -76,7 +76,7 @@ export default function TreatmentEffectSelector({
           <label className="text-sm font-medium text-[#0F1D2C]/70">
             Effect Strength
           </label>
-          <span className="text-sm font-medium text-[#C9A96E]">
+          <span className="text-sm font-medium text-rani-gold-accessible">
             {Math.round(intensity * 100)}%
           </span>
         </div>

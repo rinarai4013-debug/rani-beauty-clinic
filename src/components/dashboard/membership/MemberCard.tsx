@@ -20,7 +20,7 @@ interface MemberCardProps {
 
 const TIER_STYLES: Record<MembershipTier, { label: string; badge: string; icon: string }> = {
   halo: { label: 'Halo', badge: 'bg-blue-100 text-blue-700', icon: 'text-blue-500' },
-  glow: { label: 'Glow', badge: 'bg-amber-100 text-amber-700', icon: 'text-rani-gold' },
+  glow: { label: 'Glow', badge: 'bg-amber-100 text-amber-700', icon: 'text-rani-gold-accessible' },
   elite: { label: 'Elite', badge: 'bg-purple-100 text-purple-700', icon: 'text-purple-600' },
 };
 

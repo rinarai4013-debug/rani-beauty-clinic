@@ -162,7 +162,7 @@ export default function ZoneDetailPanel({
                       className="flex items-center gap-3 p-3 rounded-xl border border-[#C9A96E]/20 bg-[#C9A96E]/5 hover:border-[#C9A96E]/40 transition-colors"
                     >
                       <div className="w-8 h-8 rounded-full bg-[#C9A96E]/20 flex items-center justify-center shrink-0">
-                        <span className="font-body text-xs font-bold text-[#C9A96E]">
+                        <span className="font-body text-xs font-bold text-rani-gold-accessible">
                           {i + 1}
                         </span>
                       </div>

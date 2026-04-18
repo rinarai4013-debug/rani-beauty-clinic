@@ -37,7 +37,7 @@ export default function ChallengeCard({ challenge }: ChallengeCardProps) {
           {challenge.completed ? (
             <Trophy size={18} className="text-emerald-600" />
           ) : (
-            <Icon size={18} className="text-[#C9A96E]" />
+            <Icon size={18} className="text-rani-gold-accessible" />
           )}
         </div>
 
@@ -53,7 +53,7 @@ export default function ChallengeCard({ challenge }: ChallengeCardProps) {
               <span className="text-[10px] text-rani-muted font-body">
                 {challenge.progress}/{challenge.target}
               </span>
-              <span className="text-[10px] text-[#C9A96E] font-body font-semibold">
+              <span className="text-[10px] text-rani-gold-accessible font-body font-semibold">
                 +{challenge.bonusPoints} pts
               </span>
             </div>

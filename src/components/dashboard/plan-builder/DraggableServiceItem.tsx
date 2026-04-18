@@ -88,7 +88,7 @@ export default function DraggableServiceItem({
             onClick={() => setShowNotes(!showNotes)}
             className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
               showNotes || service.notes
-                ? 'text-[#C9A96E] bg-[#C9A96E]/10'
+                ? 'text-rani-gold-accessible bg-[#C9A96E]/10'
                 : 'text-gray-400 hover:text-gray-600'
             }`}
             title="Toggle notes"

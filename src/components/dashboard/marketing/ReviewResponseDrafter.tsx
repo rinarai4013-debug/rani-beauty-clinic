@@ -44,7 +44,7 @@ export default function ReviewResponseDrafter({ review, onApprove, onClose }: Re
             {Array.from({ length: 5 }, (_, i) => (
               <Star
                 key={i}
-                className={`w-3 h-3 ${i < review.rating ? 'fill-rani-gold text-rani-gold' : 'text-slate-200'}`}
+                className={`w-3 h-3 ${i < review.rating ? 'fill-rani-gold text-rani-gold-accessible' : 'text-slate-200'}`}
               />
             ))}
           </div>

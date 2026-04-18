@@ -18,7 +18,7 @@ export default function ServiceCatalogCard({ service, onAdd }: ServiceCatalogCar
             {service.name}
           </h4>
           <div className="flex items-center gap-2 mt-1.5">
-            <span className="text-sm font-bold text-[#C9A96E]">
+            <span className="text-sm font-bold text-rani-gold-accessible">
               ${service.price.toLocaleString()}
             </span>
             <span className="text-xs text-gray-400">

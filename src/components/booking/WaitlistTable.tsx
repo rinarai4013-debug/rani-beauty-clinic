@@ -99,7 +99,7 @@ export default function WaitlistTable({ entries, onNotify, onRemove, onConvert }
 function PriorityBadge({ priority }: { priority: string }) {
   const colors: Record<string, string> = {
     vip: 'bg-purple-100 text-purple-700',
-    member: 'bg-[#C9A96E]/10 text-[#C9A96E]',
+    member: 'bg-[#C9A96E]/10 text-rani-gold-accessible',
     standard: 'bg-gray-100 text-gray-600',
   };
 

@@ -38,7 +38,7 @@ export default function RewardCatalog({ tier, balance, onRedeem }: RewardCatalog
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-heading font-semibold text-rani-navy">Reward Catalog</h3>
         <span className="text-xs font-body text-rani-muted">
-          Your balance: <span className="font-semibold text-rani-gold">{formatNumber(balance)} pts</span>
+          Your balance: <span className="font-semibold text-rani-gold-accessible">{formatNumber(balance)} pts</span>
         </span>
       </div>
 
@@ -48,7 +48,7 @@ export default function RewardCatalog({ tier, balance, onRedeem }: RewardCatalog
           return (
             <div key={category}>
               <div className="flex items-center gap-2 mb-3">
-                <Icon className="w-4 h-4 text-rani-gold" />
+                <Icon className="w-4 h-4 text-rani-gold-accessible" />
                 <h4 className="text-xs font-heading font-semibold text-rani-navy uppercase tracking-wide">{label}</h4>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -74,7 +74,7 @@ export default function RewardCatalog({ tier, balance, onRedeem }: RewardCatalog
                       <p className="text-sm font-heading font-semibold text-rani-navy">{reward.name}</p>
                       <p className="text-xs text-rani-muted mt-1 line-clamp-2">{reward.description}</p>
                       <div className="flex items-center justify-between mt-3">
-                        <span className="text-xs font-semibold text-rani-gold">
+                        <span className="text-xs font-semibold text-rani-gold-accessible">
                           {formatNumber(reward.pointsCost)} pts
                         </span>
                         {onRedeem && (

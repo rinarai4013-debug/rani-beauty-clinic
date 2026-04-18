@@ -96,7 +96,7 @@ export default function PopularPackages() {
                     <pkg.icon
                       size={20}
                       className={
-                        pkg.featured ? "text-rani-gold" : "text-rani-navy"
+                        pkg.featured ? "text-rani-gold-accessible" : "text-rani-navy"
                       }
                     />
                   </div>
@@ -124,7 +124,7 @@ export default function PopularPackages() {
                     >
                       <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-rani-gold/15">
                         <svg
-                          className="h-3 w-3 text-rani-gold"
+                          className="h-3 w-3 text-rani-gold-accessible"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

@@ -108,7 +108,7 @@ export default function CalendarPage() {
                 {format(new Date(dayData.date), 'EEE d')}
               </p>
               <p className="text-sm font-bold text-[#0F1D2C]">{dayData.totalAppointments} apt</p>
-              <p className="text-xs text-[#C9A96E]">${dayData.totalRevenue}</p>
+              <p className="text-xs text-rani-gold-accessible">${dayData.totalRevenue}</p>
               <div className="mt-2 space-y-1">
                 {dayData.events.slice(0, 3).map(evt => (
                   <div
@@ -145,7 +145,7 @@ export default function CalendarPage() {
               {dayData.totalAppointments > 0 && (
                 <>
                   <p className="text-[10px] text-[#6B7280]">{dayData.totalAppointments} apt</p>
-                  <p className="text-[10px] text-[#C9A96E]">${dayData.totalRevenue}</p>
+                  <p className="text-[10px] text-rani-gold-accessible">${dayData.totalRevenue}</p>
                 </>
               )}
             </button>

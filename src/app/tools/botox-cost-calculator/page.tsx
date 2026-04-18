@@ -214,7 +214,7 @@ export default function BotoxCostCalculatorPage() {
             {/* Header */}
             <div className="px-6 py-5 border-b border-rani-border flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-rani-gold/10 flex items-center justify-center">
-                <Calculator className="w-5 h-5 text-rani-gold" />
+                <Calculator className="w-5 h-5 text-rani-gold-accessible" />
               </div>
               <div>
                 <h2 className="font-heading text-xl text-rani-navy">
@@ -357,7 +357,7 @@ export default function BotoxCostCalculatorPage() {
                 },
               ].map((item) => (
                 <div key={item.step} className="text-center">
-                  <div className="w-12 h-12 rounded-full bg-rani-gold/10 text-rani-gold font-heading text-lg flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 rounded-full bg-rani-gold/10 text-rani-gold-accessible font-heading text-lg flex items-center justify-center mx-auto mb-3">
                     {item.step}
                   </div>
                   <h3 className="font-heading text-lg text-rani-navy mb-1">
@@ -436,7 +436,7 @@ export default function BotoxCostCalculatorPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/services/botox-dysport"
-                className="inline-flex items-center gap-1.5 font-body text-rani-gold hover:text-rani-gold/80 font-medium text-sm transition-colors"
+                className="inline-flex items-center gap-1.5 font-body text-rani-gold-accessible hover:text-rani-gold/80 font-medium text-sm transition-colors"
               >
                 Botox &amp; Dysport Services
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -444,7 +444,7 @@ export default function BotoxCostCalculatorPage() {
               <span className="hidden sm:inline text-rani-border">|</span>
               <Link
                 href="/cost/botox-cost"
-                className="inline-flex items-center gap-1.5 font-body text-rani-gold hover:text-rani-gold/80 font-medium text-sm transition-colors"
+                className="inline-flex items-center gap-1.5 font-body text-rani-gold-accessible hover:text-rani-gold/80 font-medium text-sm transition-colors"
               >
                 Botox Pricing Guide
                 <ArrowRight className="w-3.5 h-3.5" />

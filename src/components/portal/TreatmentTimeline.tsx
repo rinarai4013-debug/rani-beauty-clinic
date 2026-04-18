@@ -21,7 +21,7 @@ export default function TreatmentTimeline({ treatments }: TreatmentTimelineProps
   if (treatments.length === 0) {
     return (
       <div className="text-center py-12">
-        <Sparkles className="mx-auto h-10 w-10 text-rani-gold/40" />
+        <Sparkles className="mx-auto h-10 w-10 text-rani-gold-accessible/40" />
         <p className="mt-4 text-rani-muted font-body">No treatments yet.</p>
         <p className="text-sm text-rani-muted/60">Your treatment journey starts here.</p>
       </div>

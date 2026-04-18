@@ -21,7 +21,7 @@ export default function ScheduleEfficiency({
 }: ScheduleEfficiencyProps) {
   const getScoreColor = (s: number) => {
     if (s >= 80) return 'text-green-600';
-    if (s >= 60) return 'text-[#C9A96E]';
+    if (s >= 60) return 'text-rani-gold-accessible';
     if (s >= 40) return 'text-amber-500';
     return 'text-red-500';
   };
@@ -52,7 +52,7 @@ export default function ScheduleEfficiency({
           <p className="text-sm font-medium text-[#0F1D2C]">Recommendations</p>
           {recommendations.map((rec, i) => (
             <div key={i} className="flex items-start gap-2 text-sm text-[#6B7280]">
-              <span className="text-[#C9A96E] mt-0.5">&#8226;</span>
+              <span className="text-rani-gold-accessible mt-0.5">&#8226;</span>
               {rec}
             </div>
           ))}

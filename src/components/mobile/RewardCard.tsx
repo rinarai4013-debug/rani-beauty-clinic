@@ -30,7 +30,7 @@ export default function RewardCard({ reward, userPoints, onRedeem }: RewardCardP
             className="w-full h-full object-cover rounded-xl"
           />
         ) : (
-          <Gift size={32} className="text-[#C9A96E]/40" />
+          <Gift size={32} className="text-rani-gold-accessible/40" />
         )}
         {isLocked && (
           <div className="absolute inset-0 bg-white/60 rounded-xl flex items-center justify-center">
@@ -48,7 +48,7 @@ export default function RewardCard({ reward, userPoints, onRedeem }: RewardCardP
       {/* Points cost + action */}
       <div className="flex items-center justify-between mt-3">
         <div className="flex items-center gap-1">
-          <Coins size={12} className="text-[#C9A96E]" />
+          <Coins size={12} className="text-rani-gold-accessible" />
           <span className="text-xs font-semibold text-rani-navy font-body">
             {reward.pointsCost.toLocaleString()}
           </span>

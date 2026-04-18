@@ -19,14 +19,14 @@ export default function ProductCard({ product, onAddToCart, onToggleFavorite }: 
           <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ShoppingBag size={40} className="text-[#C9A96E]/20" />
+            <ShoppingBag size={40} className="text-rani-gold-accessible/20" />
           </div>
         )}
 
         {/* AI Recommended badge */}
         {product.isRecommended && (
           <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-rani-navy/80 backdrop-blur-sm rounded-lg">
-            <Sparkles size={10} className="text-[#C9A96E]" />
+            <Sparkles size={10} className="text-rani-gold-accessible" />
             <span className="text-[9px] text-white font-body font-medium">AI Pick</span>
           </div>
         )}
@@ -49,7 +49,7 @@ export default function ProductCard({ product, onAddToCart, onToggleFavorite }: 
 
       {/* Info */}
       <div className="p-3">
-        <p className="text-[10px] text-[#C9A96E] font-body font-semibold uppercase tracking-wider">
+        <p className="text-[10px] text-rani-gold-accessible font-body font-semibold uppercase tracking-wider">
           {product.brand}
         </p>
         <h4 className="font-heading text-rani-navy text-sm font-semibold leading-tight mt-0.5 line-clamp-2">

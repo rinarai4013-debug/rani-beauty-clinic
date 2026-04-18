@@ -67,7 +67,7 @@ export default function ChartingHeader({
 
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="flex items-center gap-2">
-          <User className="h-4 w-4 text-[#C9A96E]" />
+          <User className="h-4 w-4 text-rani-gold-accessible" />
           <div>
             <p className="text-xs text-white/50">Client</p>
             <p className="text-sm font-semibold">{clientName || ' - '}</p>
@@ -75,7 +75,7 @@ export default function ChartingHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Stethoscope className="h-4 w-4 text-[#C9A96E]" />
+          <Stethoscope className="h-4 w-4 text-rani-gold-accessible" />
           <div>
             <p className="text-xs text-white/50">Provider</p>
             <p className="text-sm font-semibold">{providerName || ' - '}</p>
@@ -83,7 +83,7 @@ export default function ChartingHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-[#C9A96E]" />
+          <Calendar className="h-4 w-4 text-rani-gold-accessible" />
           <div>
             <p className="text-xs text-white/50">Date</p>
             <p className="text-sm font-semibold">
@@ -95,7 +95,7 @@ export default function ChartingHeader({
 
         {serviceName && (
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-[#C9A96E]" />
+            <FileText className="h-4 w-4 text-rani-gold-accessible" />
             <div>
               <p className="text-xs text-white/50">Service</p>
               <p className="text-sm font-semibold">{serviceName}</p>

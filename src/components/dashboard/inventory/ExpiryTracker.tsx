@@ -115,7 +115,7 @@ export default function ExpiryTracker({ lots: externalLots, loading = false }: E
           </p>
         </div>
         <div className="flex items-center gap-1.5">
-          <Calendar className="w-4 h-4 text-rani-gold" />
+          <Calendar className="w-4 h-4 text-rani-gold-accessible" />
           <span className="text-xs font-body font-medium text-rani-navy">
             {lots.length} lots tracked
           </span>

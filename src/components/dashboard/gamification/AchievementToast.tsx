@@ -26,7 +26,7 @@ export function showAchievementToast(
         <div className="flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">{achievement.icon}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-body uppercase tracking-wider text-rani-gold font-semibold">
+            <p className="text-xs font-body uppercase tracking-wider text-rani-gold-accessible font-semibold">
               Achievement Unlocked!
             </p>
             <p className="text-sm font-body font-bold text-rani-navy mt-0.5">
@@ -35,7 +35,7 @@ export function showAchievementToast(
             <p className="text-xs font-body text-rani-muted mt-0.5">
               {achievement.description}
             </p>
-            <p className="text-xs font-body text-rani-gold font-semibold mt-1">
+            <p className="text-xs font-body text-rani-gold-accessible font-semibold mt-1">
               +{achievement.xpReward} XP
             </p>
           </div>

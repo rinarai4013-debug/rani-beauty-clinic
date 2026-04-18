@@ -52,7 +52,7 @@ export default function StockLevelCard({ product, avgDailyUsage = 0, compact = f
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-rani-gold/10 flex items-center justify-center flex-shrink-0">
-            <Package className="w-3.5 h-3.5 text-rani-gold" />
+            <Package className="w-3.5 h-3.5 text-rani-gold-accessible" />
           </div>
           <div className="min-w-0">
             <p className={`font-body font-semibold text-rani-navy truncate ${compact ? 'text-xs' : 'text-sm'}`}>

@@ -181,7 +181,7 @@ export default function PhotoSimulationEmbed({
     return (
       <div className="text-center space-y-6">
         <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#C9A96E]/20 to-[#C9A96E]/5 flex items-center justify-center">
-          <Camera className="w-8 h-8 text-[#C9A96E]" />
+          <Camera className="w-8 h-8 text-rani-gold-accessible" />
         </div>
         <div>
           <h3 className="font-heading text-xl text-[#0F1D2C] mb-2">
@@ -194,15 +194,15 @@ export default function PhotoSimulationEmbed({
 
         <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto text-center">
           <div className="p-3 rounded-xl bg-[#F8F6F1]">
-            <Brain className="w-5 h-5 text-[#C9A96E] mx-auto mb-1" />
+            <Brain className="w-5 h-5 text-rani-gold-accessible mx-auto mb-1" />
             <p className="text-[10px] text-[#0F1D2C]/50 font-medium">AI Skin Analysis</p>
           </div>
           <div className="p-3 rounded-xl bg-[#F8F6F1]">
-            <Sparkles className="w-5 h-5 text-[#C9A96E] mx-auto mb-1" />
+            <Sparkles className="w-5 h-5 text-rani-gold-accessible mx-auto mb-1" />
             <p className="text-[10px] text-[#0F1D2C]/50 font-medium">Visual Simulation</p>
           </div>
           <div className="p-3 rounded-xl bg-[#F8F6F1]">
-            <TrendingUp className="w-5 h-5 text-[#C9A96E] mx-auto mb-1" />
+            <TrendingUp className="w-5 h-5 text-rani-gold-accessible mx-auto mb-1" />
             <p className="text-[10px] text-[#0F1D2C]/50 font-medium">Timeline Preview</p>
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function PhotoSimulationEmbed({
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           className="mx-auto w-16 h-16 rounded-full border-2 border-[#C9A96E] border-t-transparent flex items-center justify-center"
         >
-          <Brain className="w-6 h-6 text-[#C9A96E]" />
+          <Brain className="w-6 h-6 text-rani-gold-accessible" />
         </motion.div>
         <div>
           <h3 className="font-heading text-xl text-[#0F1D2C]">Analyzing Your Skin</h3>
@@ -246,7 +246,7 @@ export default function PhotoSimulationEmbed({
                 animate={{ scale: 1 }}
                 transition={{ delay: i * 1.2 + 0.8 }}
               >
-                <CheckCircle2 className="w-4 h-4 text-[#C9A96E]" />
+                <CheckCircle2 className="w-4 h-4 text-rani-gold-accessible" />
               </motion.div>
               <span className="text-sm text-[#0F1D2C]/60">{step}</span>
             </motion.div>
@@ -272,10 +272,10 @@ export default function PhotoSimulationEmbed({
               <p className="text-xs uppercase tracking-widest text-[#0F1D2C]/40 mb-1">Current Score</p>
               <p className="font-heading text-4xl text-[#0F1D2C]">{analysis.overallScore}</p>
             </div>
-            <ChevronRight className="w-6 h-6 text-[#C9A96E]" />
+            <ChevronRight className="w-6 h-6 text-rani-gold-accessible" />
             <div className="text-center">
-              <p className="text-xs uppercase tracking-widest text-[#C9A96E] mb-1">Projected Score</p>
-              <p className="font-heading text-4xl text-[#C9A96E]">{analysis.projectedScore}</p>
+              <p className="text-xs uppercase tracking-widest text-rani-gold-accessible mb-1">Projected Score</p>
+              <p className="font-heading text-4xl text-rani-gold-accessible">{analysis.projectedScore}</p>
             </div>
           </div>
 
@@ -324,7 +324,7 @@ export default function PhotoSimulationEmbed({
                       rec.priority === 'primary' ? 'bg-[#C9A96E]/15' : 'bg-[#0F1D2C]/5'
                     }`}>
                       <Sparkles className={`w-3 h-3 ${
-                        rec.priority === 'primary' ? 'text-[#C9A96E]' : 'text-[#0F1D2C]/40'
+                        rec.priority === 'primary' ? 'text-rani-gold-accessible' : 'text-[#0F1D2C]/40'
                       }`} />
                     </div>
                     <div className="min-w-0">
@@ -355,7 +355,7 @@ export default function PhotoSimulationEmbed({
               key={presetId}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C9A96E]/10 border border-[#C9A96E]/20 rounded-full text-xs font-medium text-[#0F1D2C]/70"
             >
-              <Sparkles className="w-3 h-3 text-[#C9A96E]" />
+              <Sparkles className="w-3 h-3 text-rani-gold-accessible" />
               {preset.label}
             </span>
           );

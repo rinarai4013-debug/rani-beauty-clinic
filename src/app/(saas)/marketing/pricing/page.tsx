@@ -315,7 +315,7 @@ export default function PricingPage() {
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       {feature.includes('Everything in') ? (
-                        <span className="text-xs font-semibold text-[#C9A96E] mt-0.5">{feature}</span>
+                        <span className="text-xs font-semibold text-rani-gold-accessible mt-0.5">{feature}</span>
                       ) : (
                         <>
                           <svg className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -26,7 +26,7 @@ export default function TestimonialCard({
       transition={{ duration: 0.6 }}
       className="relative border-l-[3px] border-l-rani-gold bg-white p-8 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
     >
-      <span className="absolute -top-2 left-6 font-heading text-6xl text-rani-gold leading-none select-none">
+      <span className="absolute -top-2 left-6 font-heading text-6xl text-rani-gold-accessible leading-none select-none">
         &ldquo;
       </span>
       <div className="mt-4">
@@ -49,7 +49,7 @@ export default function TestimonialCard({
               <Star
                 key={i}
                 size={16}
-                className="fill-rani-gold text-rani-gold"
+                className="fill-rani-gold text-rani-gold-accessible"
               />
             ))}
           </div>

@@ -17,7 +17,7 @@ const ACTIONS = [
   { label: 'Add Review', icon: Star, href: '/dashboard/entry/review', color: 'text-yellow-500 bg-yellow-50' },
   { label: 'EOD Recap', icon: Moon, href: '/dashboard/entry/eod-recap', color: 'text-rani-navy bg-rani-navy/10' },
   { label: 'Room Issue', icon: Wrench, href: '/dashboard/entry/room-issue', color: 'text-orange-500 bg-orange-50' },
-  { label: 'CEO Note', icon: Brain, href: '/dashboard/entry/ceo-note', color: 'text-rani-gold bg-rani-gold/10' },
+  { label: 'CEO Note', icon: Brain, href: '/dashboard/entry/ceo-note', color: 'text-rani-gold-accessible bg-rani-gold/10' },
 ];
 
 export default function QuickActions() {

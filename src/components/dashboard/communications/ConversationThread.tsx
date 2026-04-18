@@ -87,7 +87,7 @@ export default function ConversationThread({
           </button>
         )}
         <div className="w-10 h-10 rounded-full bg-rani-gold/10 flex items-center justify-center flex-shrink-0">
-          <User className="w-5 h-5 text-rani-gold" />
+          <User className="w-5 h-5 text-rani-gold-accessible" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-body font-semibold text-rani-navy truncate">
@@ -132,7 +132,7 @@ export default function ConversationThread({
       {smartReplies.length > 0 && (
         <div className="px-4 py-2 border-t border-rani-border/50 bg-gray-50/50">
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Sparkles className="w-3 h-3 text-rani-gold" />
+            <Sparkles className="w-3 h-3 text-rani-gold-accessible" />
             <span className="text-[10px] font-body font-semibold text-rani-muted uppercase tracking-wider">
               Suggested Replies
             </span>

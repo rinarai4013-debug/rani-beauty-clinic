@@ -26,7 +26,7 @@ export default function OutcomePrediction({ prediction }: OutcomePredictionProps
       <div className="p-6 grid grid-cols-3 gap-4 border-b border-[#F8F6F1]">
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <Star className="w-4 h-4 text-[#C9A96E]" />
+            <Star className="w-4 h-4 text-rani-gold-accessible" />
             <span className={`text-2xl font-montserrat font-bold ${satisfactionColor}`}>
               {prediction.satisfactionLikelihood}
             </span>
@@ -51,7 +51,7 @@ export default function OutcomePrediction({ prediction }: OutcomePredictionProps
       {/* Duration */}
       <div className="p-6 border-b border-[#F8F6F1]">
         <h4 className="text-sm font-montserrat font-semibold text-[#0F1D2C] mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-[#C9A96E]" />
+          <Clock className="w-4 h-4 text-rani-gold-accessible" />
           Results Duration
         </h4>
         <div className="grid grid-cols-3 gap-3 text-center text-sm font-montserrat">
@@ -60,7 +60,7 @@ export default function OutcomePrediction({ prediction }: OutcomePredictionProps
             <div className="font-medium text-[#0F1D2C]">{prediction.resultsDuration.minimum}</div>
           </div>
           <div className="bg-[#C9A96E]/5 rounded-lg p-2 border border-[#C9A96E]/20">
-            <div className="text-[#C9A96E] text-xs">Typical</div>
+            <div className="text-rani-gold-accessible text-xs">Typical</div>
             <div className="font-semibold text-[#0F1D2C]">{prediction.resultsDuration.typical}</div>
           </div>
           <div className="bg-[#F8F6F1]/50 rounded-lg p-2">
@@ -73,7 +73,7 @@ export default function OutcomePrediction({ prediction }: OutcomePredictionProps
       {/* Side Effects */}
       <div className="p-6 border-b border-[#F8F6F1]">
         <h4 className="text-sm font-montserrat font-semibold text-[#0F1D2C] mb-3 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-[#C9A96E]" />
+          <AlertCircle className="w-4 h-4 text-rani-gold-accessible" />
           Possible Side Effects
         </h4>
         <div className="space-y-2">

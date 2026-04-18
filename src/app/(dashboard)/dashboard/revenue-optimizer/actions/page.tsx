@@ -78,7 +78,7 @@ function ActionsContent() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-white rounded-lg border border-gray-100 p-4">
               <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="w-4 h-4 text-rani-gold" />
+                <DollarSign className="w-4 h-4 text-rani-gold-accessible" />
                 <p className="text-xs font-body text-rani-muted">Addressable Gap</p>
               </div>
               <p className="text-xl font-heading text-rani-navy">
@@ -87,7 +87,7 @@ function ActionsContent() {
             </div>
             <div className="bg-white rounded-lg border border-gray-100 p-4">
               <div className="flex items-center gap-2 mb-1">
-                <Target className="w-4 h-4 text-rani-gold" />
+                <Target className="w-4 h-4 text-rani-gold-accessible" />
                 <p className="text-xs font-body text-rani-muted">Today&apos;s Remaining Gap</p>
               </div>
               <p className="text-xl font-heading text-rani-navy">
@@ -96,7 +96,7 @@ function ActionsContent() {
             </div>
             <div className="bg-white rounded-lg border border-gray-100 p-4">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="w-4 h-4 text-rani-gold" />
+                <TrendingUp className="w-4 h-4 text-rani-gold-accessible" />
                 <p className="text-xs font-body text-rani-muted">Forecast Shortfall</p>
               </div>
               <p className="text-xl font-heading text-rani-navy">
@@ -105,7 +105,7 @@ function ActionsContent() {
             </div>
             <div className="bg-white rounded-lg border border-gray-100 p-4">
               <div className="flex items-center gap-2 mb-1">
-                <Zap className="w-4 h-4 text-rani-gold" />
+                <Zap className="w-4 h-4 text-rani-gold-accessible" />
                 <p className="text-xs font-body text-rani-muted">Live Opportunities</p>
               </div>
               <p className="text-xl font-heading text-rani-navy">{summary.opportunityCount}</p>

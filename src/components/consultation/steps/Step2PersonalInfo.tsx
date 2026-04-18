@@ -171,7 +171,7 @@ export default function Step2PersonalInfo({
         className="mt-8 flex items-start gap-2 p-4 rounded-xl bg-[#C9A96E]/5 border border-[#C9A96E]/10"
       >
         <svg
-          className="w-4 h-4 text-[#C9A96E] mt-0.5 flex-shrink-0"
+          className="w-4 h-4 text-rani-gold-accessible mt-0.5 flex-shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

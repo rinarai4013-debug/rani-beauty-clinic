@@ -170,19 +170,19 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
       <section className="bg-rani-cream border-y border-rani-gold/20 py-6">
         <div className="mx-auto max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-6 px-6 text-center text-rani-navy">
           <div className="flex flex-col items-center gap-1">
-            <Star className="h-5 w-5 text-rani-gold fill-rani-gold" />
+            <Star className="h-5 w-5 text-rani-gold-accessible fill-rani-gold" />
             <span className="font-semibold text-sm">4.9&#9733; 127+ Reviews</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <Award className="h-5 w-5 text-rani-gold" />
+            <Award className="h-5 w-5 text-rani-gold-accessible" />
             <span className="font-semibold text-sm">Board-Certified MD</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <Clock className="h-5 w-5 text-rani-gold" />
+            <Clock className="h-5 w-5 text-rani-gold-accessible" />
             <span className="font-semibold text-sm">Open 7 Days</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <Shield className="h-5 w-5 text-rani-gold" />
+            <Shield className="h-5 w-5 text-rani-gold-accessible" />
             <span className="font-semibold text-sm">Physician-Supervised</span>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
                 className="bg-rani-cream rounded-xl p-6 border border-rani-gold/10"
               >
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-rani-gold flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-6 w-6 text-rani-gold-accessible flex-shrink-0 mt-0.5" />
                   <p className="text-rani-navy leading-relaxed">{benefit}</p>
                 </div>
               </div>
@@ -227,7 +227,7 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
                     {Array.from({ length: t.rating }).map((_, i) => (
                       <Star
                         key={i}
-                        className="h-4 w-4 text-rani-gold fill-rani-gold"
+                        className="h-4 w-4 text-rani-gold-accessible fill-rani-gold"
                       />
                     ))}
                   </div>
@@ -237,7 +237,7 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
                   <div className="text-sm font-semibold text-rani-navy">
                     {t.name}
                     {t.verified && (
-                      <span className="ml-2 text-xs font-normal text-rani-gold">
+                      <span className="ml-2 text-xs font-normal text-rani-gold-accessible">
                         Verified Patient
                       </span>
                     )}
@@ -258,7 +258,7 @@ export default function LandingPage({ params }: { params: { slug: string } }) {
           <h2 className="text-2xl md:text-3xl font-bold text-rani-navy mb-4">
             Transparent Pricing
           </h2>
-          <p className="text-4xl md:text-5xl font-bold text-rani-gold mb-3">
+          <p className="text-4xl md:text-5xl font-bold text-rani-gold-accessible mb-3">
             Starting at {data.price}
           </p>
           <p className="text-rani-navy/60 mb-2">{data.priceNote}</p>

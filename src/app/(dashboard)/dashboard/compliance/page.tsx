@@ -11,7 +11,7 @@ import ComplianceDashboard from '@/components/dashboard/compliance/ComplianceDas
 import type { ComplianceScore } from '@/types/compliance';
 
 const NAV_ITEMS = [
-  { href: '/dashboard/compliance/hipaa', label: 'HIPAA', icon: Shield, color: 'bg-rani-gold/10 text-rani-gold' },
+  { href: '/dashboard/compliance/hipaa', label: 'HIPAA', icon: Shield, color: 'bg-rani-gold/10 text-rani-gold-accessible' },
   { href: '/dashboard/compliance/osha', label: 'OSHA', icon: HardHat, color: 'bg-orange-100 text-orange-600' },
   { href: '/dashboard/compliance/licenses', label: 'Licenses', icon: Award, color: 'bg-purple-100 text-purple-600' },
   { href: '/dashboard/compliance/consents', label: 'Consents', icon: FileSignature, color: 'bg-blue-100 text-blue-600' },

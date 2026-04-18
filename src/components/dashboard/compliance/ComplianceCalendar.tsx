@@ -62,7 +62,7 @@ export default function ComplianceCalendar({ deadlines, overdueItems }: Complian
       <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-rani-gold/10 flex items-center justify-center">
-            <Calendar className="w-5 h-5 text-rani-gold" />
+            <Calendar className="w-5 h-5 text-rani-gold-accessible" />
           </div>
           <div>
             <h2 className="text-lg font-body font-bold text-rani-navy">Compliance Calendar</h2>
@@ -116,7 +116,7 @@ export default function ComplianceCalendar({ deadlines, overdueItems }: Complian
                         : 'hover:bg-rani-cream/30'
                   }`}
                 >
-                  <span className={`text-[11px] font-medium ${isToday(day) ? 'text-rani-gold' : 'text-rani-muted'}`}>
+                  <span className={`text-[11px] font-medium ${isToday(day) ? 'text-rani-gold-accessible' : 'text-rani-muted'}`}>
                     {day}
                   </span>
                   <div className="flex flex-wrap gap-0.5 mt-0.5">

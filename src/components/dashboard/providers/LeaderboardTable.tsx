@@ -16,7 +16,7 @@ export default function LeaderboardTable({ entries, metric, formatValue }: Leade
   return (
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
       <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2">
-        <Trophy className="w-4 h-4 text-rani-gold" />
+        <Trophy className="w-4 h-4 text-rani-gold-accessible" />
         <h3 className="font-display font-semibold text-rani-navy text-sm">{metric} Leaderboard</h3>
       </div>
       <div className="divide-y divide-gray-50">
@@ -33,7 +33,7 @@ export default function LeaderboardTable({ entries, metric, formatValue }: Leade
               className="flex items-center gap-3 px-5 py-3"
             >
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-display font-bold ${
-                entry.rank === 1 ? 'bg-rani-gold/20 text-rani-gold' : entry.rank === 2 ? 'bg-gray-200 text-gray-600' : entry.rank === 3 ? 'bg-amber-100 text-amber-700' : 'bg-gray-50 text-gray-500'
+                entry.rank === 1 ? 'bg-rani-gold/20 text-rani-gold-accessible' : entry.rank === 2 ? 'bg-gray-200 text-gray-600' : entry.rank === 3 ? 'bg-amber-100 text-amber-700' : 'bg-gray-50 text-gray-500'
               }`}>
                 {entry.rank}
               </div>

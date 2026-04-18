@@ -75,7 +75,7 @@ export default function QuickConsult() {
       <FadeInOnScroll>
         <div className="rounded-2xl border border-rani-gold/30 bg-gradient-to-br from-rani-cream to-white p-8 text-center md:p-12">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rani-gold/10">
-            <CheckCircle size={32} className="text-rani-gold" />
+            <CheckCircle size={32} className="text-rani-gold-accessible" />
           </div>
           <h3 className="mt-6 font-heading text-2xl font-bold text-rani-navy">
             Thank You, {name.split(" ")[0]}
@@ -85,7 +85,7 @@ export default function QuickConsult() {
             team will help you find the perfect treatment plan for your goals.
           </p>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-rani-navy/5 px-5 py-2.5">
-            <Phone size={14} className="text-rani-gold" />
+            <Phone size={14} className="text-rani-gold-accessible" />
             <span className="font-body text-xs font-semibold text-rani-navy">
               Expect a call {callTime ? `in the ${callTime.toLowerCase()}` : "soon"}
             </span>
@@ -101,7 +101,7 @@ export default function QuickConsult() {
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rani-gold/10">
-            <Phone size={22} className="text-rani-gold" />
+            <Phone size={22} className="text-rani-gold-accessible" />
           </div>
           <h3 className="mt-4 font-heading text-2xl font-bold text-rani-navy md:text-3xl">
             Get Your Personalized Treatment Plan
@@ -120,7 +120,7 @@ export default function QuickConsult() {
                 htmlFor="qc-name"
                 className="mb-1.5 block font-body text-xs font-semibold uppercase tracking-wider text-rani-navy/70"
               >
-                Name <span className="text-rani-gold">*</span>
+                Name <span className="text-rani-gold-accessible">*</span>
               </label>
               <input
                 id="qc-name"
@@ -139,7 +139,7 @@ export default function QuickConsult() {
                 htmlFor="qc-phone"
                 className="mb-1.5 block font-body text-xs font-semibold uppercase tracking-wider text-rani-navy/70"
               >
-                Phone <span className="text-rani-gold">*</span>
+                Phone <span className="text-rani-gold-accessible">*</span>
               </label>
               <input
                 id="qc-phone"

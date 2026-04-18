@@ -225,7 +225,7 @@ export default function BlogPage() {
                 {searchQuery && (
                   <button
                     onClick={() => handleSearchChange("")}
-                    className="mt-4 font-body text-sm font-semibold text-rani-gold hover:text-rani-navy transition-colors"
+                    className="mt-4 font-body text-sm font-semibold text-rani-gold-accessible hover:text-rani-navy transition-colors"
                   >
                     Clear search
                   </button>

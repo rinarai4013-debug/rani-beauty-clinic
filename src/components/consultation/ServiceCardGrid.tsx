@@ -133,7 +133,7 @@ export default function ServiceCardGrid({
       <p className="font-body text-xs text-[#0F1D2C]/40">
         {filteredServices.length} treatment{filteredServices.length !== 1 ? 's' : ''}
         {selectedIds.length > 0 && (
-          <span className="text-[#C9A96E] font-medium">
+          <span className="text-rani-gold-accessible font-medium">
             {' '}
             &middot; {selectedIds.length} selected
           </span>
@@ -170,7 +170,7 @@ export default function ServiceCardGrid({
                     inline-flex self-start px-2 py-0.5 rounded-full font-body text-[10px] font-medium mb-2
                     ${
                       isSelected
-                        ? 'bg-[#C9A96E]/15 text-[#C9A96E]'
+                        ? 'bg-[#C9A96E]/15 text-rani-gold-accessible'
                         : 'bg-[#F8F6F1] text-[#0F1D2C]/40'
                     }
                   `}
@@ -191,7 +191,7 @@ export default function ServiceCardGrid({
                 <div className="mt-auto flex items-center justify-between pt-2 border-t border-[#0F1D2C]/5">
                   <span
                     className={`font-body text-sm font-bold ${
-                      isSelected ? 'text-[#C9A96E]' : 'text-[#0F1D2C]/70'
+                      isSelected ? 'text-rani-gold-accessible' : 'text-[#0F1D2C]/70'
                     }`}
                   >
                     {formatPrice(service)}
@@ -242,7 +242,7 @@ export default function ServiceCardGrid({
               setSearchQuery('');
               setActiveCategory('all');
             }}
-            className="mt-2 font-body text-xs text-[#C9A96E] hover:underline"
+            className="mt-2 font-body text-xs text-rani-gold-accessible hover:underline"
           >
             Clear filters
           </button>

@@ -30,7 +30,7 @@ export default function ProtocolViewer({ protocol }: ProtocolViewerProps) {
           className="w-full flex items-center justify-between p-4 hover:bg-[#F8F6F1]/30 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <Icon className="w-5 h-5 text-[#C9A96E]" />
+            <Icon className="w-5 h-5 text-rani-gold-accessible" />
             <span className="font-montserrat font-semibold text-[#0F1D2C]">{title}</span>
           </div>
           {isOpen ? <ChevronUp className="w-4 h-4 text-[#0F1D2C]/40" /> : <ChevronDown className="w-4 h-4 text-[#0F1D2C]/40" />}

@@ -19,7 +19,7 @@ export default function GoalDecompositionPanel({ goals }: GoalDecompositionPanel
     <div className="space-y-4">
       <div className="bg-rani-cream/50 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Target className="w-5 h-5 text-rani-gold" />
+          <Target className="w-5 h-5 text-rani-gold-accessible" />
           <h4 className="font-heading text-rani-navy">Monthly Target: ${goals.monthlyTarget.toLocaleString()}</h4>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -79,7 +79,7 @@ export default function GoalDecompositionPanel({ goals }: GoalDecompositionPanel
               <ul className="space-y-1">
                 {gap.actions.map((action, j) => (
                   <li key={j} className="text-xs font-body text-rani-muted flex items-start gap-1.5">
-                    <CheckCircle className="w-3 h-3 text-rani-gold mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="w-3 h-3 text-rani-gold-accessible mt-0.5 flex-shrink-0" />
                     {action}
                   </li>
                 ))}
@@ -94,7 +94,7 @@ export default function GoalDecompositionPanel({ goals }: GoalDecompositionPanel
         <ul className="space-y-1.5">
           {goals.plan.map((step, i) => (
             <li key={i} className="text-xs font-body text-rani-text flex items-start gap-2">
-              <span className="text-rani-gold font-heading mt-px">{i + 1}.</span>
+              <span className="text-rani-gold-accessible font-heading mt-px">{i + 1}.</span>
               {step}
             </li>
           ))}

@@ -157,7 +157,7 @@ function SliderCard({ pair }: { pair: BeforeAfterPair }) {
       <p className="mt-3 text-center font-body text-sm text-rani-muted">
         {pair.label}
         {pair.sessions && (
-          <span className="text-rani-gold"> &middot; {pair.sessions}</span>
+          <span className="text-rani-gold-accessible"> &middot; {pair.sessions}</span>
         )}
       </p>
     </div>

@@ -41,7 +41,7 @@ export default function MembershipBillingPage() {
       <div className="space-y-6 sm:space-y-8">
         <div>
           <div className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-rani-gold" />
+            <DollarSign className="w-5 h-5 text-rani-gold-accessible" />
             <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Billing</h1>
           </div>
           <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
@@ -79,7 +79,7 @@ export default function MembershipBillingPage() {
             {/* KPI Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Total MRR', value: `$${data.summary.totalMRR.toLocaleString()}`, icon: DollarSign, color: 'text-rani-gold bg-amber-50' },
+                { label: 'Total MRR', value: `$${data.summary.totalMRR.toLocaleString()}`, icon: DollarSign, color: 'text-rani-gold-accessible bg-amber-50' },
                 { label: 'Failed Payments', value: data.summary.failedPayments.toString(), icon: AlertTriangle, color: data.summary.failedPayments > 0 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50' },
                 { label: 'Expiring Cards', value: data.summary.expiringCards.toString(), icon: CreditCard, color: data.summary.expiringCards > 0 ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50' },
                 { label: 'In Grace Period', value: data.summary.inGracePeriod.toString(), icon: Clock, color: data.summary.inGracePeriod > 0 ? 'text-orange-600 bg-orange-50' : 'text-emerald-600 bg-emerald-50' },
@@ -154,7 +154,7 @@ export default function MembershipBillingPage() {
                           }`}>
                             {member.failedPaymentCount >= 3 ? 'SUSPEND' : `Retry ${member.failedPaymentCount}`}
                           </span>
-                          <button className="flex items-center gap-1 px-2 py-1 rounded text-xs font-body font-medium text-rani-gold hover:bg-rani-cream transition-colors">
+                          <button className="flex items-center gap-1 px-2 py-1 rounded text-xs font-body font-medium text-rani-gold-accessible hover:bg-rani-cream transition-colors">
                             <RefreshCw className="w-3 h-3" />
                             Retry
                           </button>

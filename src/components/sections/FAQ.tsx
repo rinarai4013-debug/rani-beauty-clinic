@@ -41,7 +41,7 @@ function FAQAccordionItem({
             className="flex-shrink-0"
             aria-hidden="true"
           >
-            <ChevronDown size={20} className="text-rani-gold" />
+            <ChevronDown size={20} className="text-rani-gold-accessible" />
           </motion.span>
         </button>
       </h3>
@@ -87,13 +87,13 @@ export default function FAQ() {
               <div className="mt-4 flex flex-col gap-2">
                 <a
                   href="/faq"
-                  className="font-body text-sm font-semibold text-rani-gold hover:text-rani-gold-light transition-colors"
+                  className="font-body text-sm font-semibold text-rani-gold-accessible hover:text-rani-gold-light transition-colors"
                 >
                   See All FAQs &rarr;
                 </a>
                 <a
                   href={clinicInfo.phoneTel}
-                  className="font-body text-sm font-semibold text-rani-gold hover:text-rani-gold-light transition-colors"
+                  className="font-body text-sm font-semibold text-rani-gold-accessible hover:text-rani-gold-light transition-colors"
                 >
                   Call {clinicInfo.phone} &rarr;
                 </a>

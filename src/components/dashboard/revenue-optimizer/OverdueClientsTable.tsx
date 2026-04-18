@@ -72,7 +72,7 @@ export default function OverdueClientsTable({ clients, onContact }: OverdueClien
                   {onContact ? (
                     <button
                       onClick={() => onContact(client)}
-                      className="p-1.5 rounded-lg bg-rani-gold/10 text-rani-gold hover:bg-rani-gold/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-rani-gold/10 text-rani-gold-accessible hover:bg-rani-gold/20 transition-colors"
                     >
                       <ContactIcon className="w-4 h-4" />
                     </button>

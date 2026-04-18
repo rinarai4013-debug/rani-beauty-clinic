@@ -31,7 +31,7 @@ export default function MembershipAnalyticsPage() {
       <div className="space-y-6 sm:space-y-8">
         <div>
           <div className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-rani-gold" />
+            <BarChart3 className="w-5 h-5 text-rani-gold-accessible" />
             <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Analytics</h1>
           </div>
           <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">

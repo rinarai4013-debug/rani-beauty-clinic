@@ -20,13 +20,13 @@ export default function MapSection() {
 
               <div className="mt-8 space-y-4">
                 <div className="flex items-start gap-4">
-                  <MapPin className="mt-1 shrink-0 text-rani-gold" size={20} />
+                  <MapPin className="mt-1 shrink-0 text-rani-gold-accessible" size={20} />
                   <p className="font-body text-rani-text">
                     {clinicInfo.address.full}
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Phone className="mt-1 shrink-0 text-rani-gold" size={20} />
+                  <Phone className="mt-1 shrink-0 text-rani-gold-accessible" size={20} />
                   <a
                     href={clinicInfo.phoneTel}
                     className="font-body text-rani-text hover:text-rani-navy transition-colors"
@@ -35,7 +35,7 @@ export default function MapSection() {
                   </a>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Clock className="mt-1 shrink-0 text-rani-gold" size={20} />
+                  <Clock className="mt-1 shrink-0 text-rani-gold-accessible" size={20} />
                   <div className="font-body text-rani-text">
                     <p>{clinicInfo.hours.days}</p>
                     <p>{clinicInfo.hours.time}</p>

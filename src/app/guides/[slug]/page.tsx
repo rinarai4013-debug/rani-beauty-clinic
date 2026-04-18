@@ -160,7 +160,7 @@ export default function PillarGuidePage({
                     href={`#${item.id}`}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#F8F6F1] transition-colors group"
                   >
-                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#C9A96E]/20 text-[#C9A96E] flex items-center justify-center text-xs font-bold group-hover:bg-[#C9A96E] group-hover:text-white transition-colors">
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#C9A96E]/20 text-rani-gold-accessible flex items-center justify-center text-xs font-bold group-hover:bg-[#C9A96E] group-hover:text-white transition-colors">
                       {i + 1}
                     </span>
                     <span className="text-[#0F1D2C]/80 group-hover:text-[#0F1D2C] text-sm font-medium transition-colors">
@@ -210,7 +210,7 @@ export default function PillarGuidePage({
                   href={`/${basePath}/${service.slug}`}
                   className="group block bg-white rounded-xl border border-[#C9A96E]/20 p-6 hover:border-[#C9A96E] hover:shadow-lg transition-all"
                 >
-                  <span className="inline-block mb-3 text-xs uppercase tracking-wider font-medium text-[#C9A96E]">
+                  <span className="inline-block mb-3 text-xs uppercase tracking-wider font-medium text-rani-gold-accessible">
                     {service.category === "wellness"
                       ? "Wellness"
                       : "Aesthetic"}
@@ -218,7 +218,7 @@ export default function PillarGuidePage({
                   <h3 className="text-xl font-serif font-bold text-[#0F1D2C] group-hover:text-[#C9A96E] transition-colors">
                     {service.title}
                   </h3>
-                  <span className="inline-block mt-4 text-[#C9A96E] text-sm font-medium">
+                  <span className="inline-block mt-4 text-rani-gold-accessible text-sm font-medium">
                     View service &rarr;
                   </span>
                 </Link>

@@ -19,7 +19,7 @@ export default function CECreditTracker({ summary }: CECreditTrackerProps) {
     <div className="bg-white rounded-xl border border-gray-100 p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <GraduationCap className="w-5 h-5 text-rani-gold" />
+          <GraduationCap className="w-5 h-5 text-rani-gold-accessible" />
           <h3 className="font-display font-semibold text-rani-navy">CE Credits</h3>
         </div>
         <div className={`flex items-center gap-1 text-xs font-body px-2 py-1 rounded-full ${summary.onTrack ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>

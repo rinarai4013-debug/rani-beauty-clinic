@@ -246,7 +246,7 @@ export default function WeightLossLandingPage() {
       <section id="how-it-works" className="py-20 sm:py-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Simple & Convenient</p>
+            <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Simple & Convenient</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy">
               How It Works
             </h2>
@@ -254,7 +254,7 @@ export default function WeightLossLandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {STEPS.map((step) => (
               <div key={step.num} className="bg-white rounded-2xl p-8 shadow-sm border border-rani-border hover:shadow-md transition-shadow">
-                <span className="font-heading text-4xl text-[#C9A96E]/30">{step.num}</span>
+                <span className="font-heading text-4xl text-rani-gold-accessible/30">{step.num}</span>
                 <h3 className="font-heading text-xl text-rani-navy mt-3 mb-3">{step.title}</h3>
                 <p className="font-body text-rani-muted leading-relaxed text-sm">{step.desc}</p>
               </div>
@@ -267,7 +267,7 @@ export default function WeightLossLandingPage() {
       <section id="pricing" className="py-20 sm:py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Transparent Pricing</p>
+            <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Transparent Pricing</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy mb-4">
               Medical Weight Loss Programs
             </h2>
@@ -374,7 +374,7 @@ export default function WeightLossLandingPage() {
       <section id="faq" className="py-20 sm:py-24 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Common Questions</p>
+            <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Common Questions</p>
             <h2 className="font-heading text-3xl sm:text-4xl text-rani-navy">Frequently Asked Questions</h2>
           </div>
           <div className="space-y-3">
@@ -509,7 +509,7 @@ export default function WeightLossLandingPage() {
       {/* Cross-sell */}
       <section className="py-16 sm:py-20 bg-rani-cream">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <p className="font-body text-[#C9A96E] uppercase tracking-[0.15em] text-sm mb-3">Complete Your Transformation</p>
+          <p className="font-body text-rani-gold-accessible uppercase tracking-[0.15em] text-sm mb-3">Complete Your Transformation</p>
           <h2 className="font-heading text-2xl sm:text-3xl text-rani-navy mb-4">
             Love Your New Body. Love Your Skin Too.
           </h2>

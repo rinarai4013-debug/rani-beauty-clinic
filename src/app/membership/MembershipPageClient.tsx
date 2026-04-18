@@ -237,7 +237,7 @@ function MembershipFAQ() {
       <div className="mx-auto max-w-3xl px-6">
         <FadeInOnScroll>
           <div className="text-center">
-            <span className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold">
+            <span className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold-accessible">
               FAQ
             </span>
             <div className="mx-auto mt-4 h-0.5 w-[60px] bg-rani-gold" />
@@ -264,7 +264,7 @@ function MembershipFAQ() {
                     transition={{ duration: 0.3 }}
                     className="flex-shrink-0"
                   >
-                    <ChevronDown size={20} className="text-rani-gold" />
+                    <ChevronDown size={20} className="text-rani-gold-accessible" />
                   </motion.span>
                 </button>
                 <AnimatePresence initial={false}>
@@ -369,7 +369,7 @@ export default function MembershipPageClient() {
         <div className="mx-auto max-w-6xl px-6">
           <FadeInOnScroll>
             <div className="text-center">
-              <span className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold">
+              <span className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-rani-gold-accessible">
                 Choose Your Glow
               </span>
               <div className="mx-auto mt-4 h-0.5 w-[60px] bg-rani-gold" />
@@ -417,7 +417,7 @@ export default function MembershipPageClient() {
                   <ul className="mt-6 flex-1 space-y-3">
                     {tier.features.map((f) => (
                       <li key={f} className="flex items-start gap-3">
-                        <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-rani-gold" />
+                        <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-rani-gold-accessible" />
                         <span className="font-body text-sm text-rani-text">
                           {f}
                         </span>
@@ -453,7 +453,7 @@ export default function MembershipPageClient() {
         <div className="mx-auto max-w-4xl px-6 text-center">
           <FadeInOnScroll>
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rani-gold/20">
-              <Users className="h-7 w-7 text-rani-gold" />
+              <Users className="h-7 w-7 text-rani-gold-accessible" />
             </div>
             <h2 className="mt-6 font-heading text-3xl font-bold text-rani-navy sm:text-4xl">
               Join 200+ Members Who Glow Every Month

@@ -65,7 +65,7 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
               {/* Tier header */}
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-[#C9A96E]" />
+                  <Icon className="h-4 w-4 text-rani-gold-accessible" />
                   <span className="text-sm font-bold text-[#0F1D2C]">{pkg.name}</span>
                 </div>
                 {pkg.highlighted && (
@@ -104,7 +104,7 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
 
               {/* Result intensity */}
               <div className="flex items-center gap-1.5 mb-2">
-                <Zap className="h-3 w-3 text-[#C9A96E]" />
+                <Zap className="h-3 w-3 text-rani-gold-accessible" />
                 <span className="text-[11px] font-medium text-[#0F1D2C] capitalize">
                   {pkg.resultIntensity}
                 </span>
@@ -146,7 +146,7 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
                 <div className="border-t border-gray-100 pt-3 mb-3 space-y-1">
                   {pkg.extras.map((extra, idx) => (
                     <div key={idx} className="flex items-center gap-1.5 text-xs text-gray-600">
-                      <Check className="h-3 w-3 text-[#C9A96E] flex-shrink-0" />
+                      <Check className="h-3 w-3 text-rani-gold-accessible flex-shrink-0" />
                       <span>{extra}</span>
                     </div>
                   ))}
@@ -167,7 +167,7 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
                     href="https://patient.withcherry.com/apply/rani-beauty-clinic"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] font-medium text-[#C9A96E] hover:underline"
+                    className="text-[10px] font-medium text-rani-gold-accessible hover:underline"
                   >
                     Cherry
                   </a>
@@ -176,7 +176,7 @@ export default function PackageCalculator({ packages }: PackageCalculatorProps) 
                     href="https://app.patientfi.com/v2/rani-beauty-clinic/apply"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] font-medium text-[#C9A96E] hover:underline"
+                    className="text-[10px] font-medium text-rani-gold-accessible hover:underline"
                   >
                     PatientFi
                   </a>

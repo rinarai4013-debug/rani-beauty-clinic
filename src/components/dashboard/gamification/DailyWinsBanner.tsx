@@ -18,11 +18,11 @@ export default function DailyWinsBanner({ className = '' }: DailyWinsBannerProps
   return (
     <div className={`bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5 ${className}`}>
       <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-4 h-4 text-rani-gold" />
+        <Sparkles className="w-4 h-4 text-rani-gold-accessible" />
         <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
           Wins Today
         </h3>
-        <span className="ml-auto px-2 py-0.5 bg-rani-gold/10 rounded-full text-xs font-body font-semibold text-rani-gold">
+        <span className="ml-auto px-2 py-0.5 bg-rani-gold/10 rounded-full text-xs font-body font-semibold text-rani-gold-accessible">
           {wins.length}
         </span>
       </div>

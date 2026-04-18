@@ -139,7 +139,7 @@ export default function PlanProgress({ plan, compact = false }: PlanProgressProp
                     </p>
                   )}
                   {step.scheduledDate && step.status === 'scheduled' && (
-                    <p className="mt-1 text-xs text-rani-gold">
+                    <p className="mt-1 text-xs text-rani-gold-accessible">
                       Scheduled {formatDate(step.scheduledDate)}
                     </p>
                   )}

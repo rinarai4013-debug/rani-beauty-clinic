@@ -112,7 +112,7 @@ function ResultCard({ icon: Icon, label, value, color }: { icon: React.ElementTy
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-xl bg-white border border-gray-200">
       <div className="flex items-center gap-2 mb-1">
-        <Icon className="w-4 h-4 text-rani-gold" />
+        <Icon className="w-4 h-4 text-rani-gold-accessible" />
         <span className="text-xs font-body text-rani-muted">{label}</span>
       </div>
       <p className={`text-lg font-heading font-semibold ${color}`}>{value}</p>

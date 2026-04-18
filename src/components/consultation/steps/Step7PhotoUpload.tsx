@@ -216,7 +216,7 @@ export default function Step7PhotoUpload({
             <div
               className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors duration-300 ${
                 isDragging
-                  ? 'bg-[#C9A96E]/20 text-[#C9A96E]'
+                  ? 'bg-[#C9A96E]/20 text-rani-gold-accessible'
                   : 'bg-[#0F1D2C]/5 text-[#0F1D2C]/40'
               }`}
             >
@@ -325,7 +325,7 @@ export default function Step7PhotoUpload({
             transition={{ delay: 0.25 + i * 0.08, duration: 0.3 }}
             className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#F8F6F1] border border-[#0F1D2C]/10"
           >
-            <span className="text-[#C9A96E]">{tip.icon}</span>
+            <span className="text-rani-gold-accessible">{tip.icon}</span>
             <span className="font-body text-xs text-[#0F1D2C]/70">
               {tip.text}
             </span>
@@ -389,7 +389,7 @@ export default function Step7PhotoUpload({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-14 h-14 rounded-full bg-[#C9A96E]/20 flex items-center justify-center">
-                <span className="font-heading text-xl text-[#C9A96E] font-bold">
+                <span className="font-heading text-xl text-rani-gold-accessible font-bold">
                   {auraScanResult.auraScore.overall}
                 </span>
               </div>
@@ -403,7 +403,7 @@ export default function Step7PhotoUpload({
               </div>
             </div>
             <div className="text-right">
-              <p className="font-body text-xs text-[#C9A96E] font-medium">
+              <p className="font-body text-xs text-rani-gold-accessible font-medium">
                 {auraScanResult.detectedConcerns.length} concerns detected
               </p>
               <p className="font-body text-xs text-[#0F1D2C]/40">
@@ -421,7 +421,7 @@ export default function Step7PhotoUpload({
         transition={{ delay: 0.4, duration: 0.4 }}
         className="flex items-center gap-3 p-4 rounded-xl bg-[#0F1D2C]/5 border border-[#0F1D2C]/10"
       >
-        <Lock className="w-4 h-4 text-[#C9A96E] shrink-0" />
+        <Lock className="w-4 h-4 text-rani-gold-accessible shrink-0" />
         <p className="font-body text-xs text-[#0F1D2C]/60">
           Your photos are encrypted and visible only to your treatment team
         </p>

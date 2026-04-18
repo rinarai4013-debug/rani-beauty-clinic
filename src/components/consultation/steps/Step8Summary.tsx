@@ -44,7 +44,7 @@ function SummarySection({
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-[#C9A96E]">{icon}</span>
+          <span className="text-rani-gold-accessible">{icon}</span>
           <h3 className="font-body text-sm font-semibold text-[#0F1D2C]">
             {title}
           </h3>
@@ -52,7 +52,7 @@ function SummarySection({
         <button
           type="button"
           onClick={onEdit}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[#C9A96E] hover:bg-[#C9A96E]/10 transition-colors duration-200 font-body text-xs font-medium"
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-rani-gold-accessible hover:bg-[#C9A96E]/10 transition-colors duration-200 font-body text-xs font-medium"
         >
           <Edit3 className="w-3 h-3" />
           Edit
@@ -330,10 +330,10 @@ export default function Step8Summary({
             type="checkbox"
             checked={formData.smsConsent || false}
             onChange={(e) => onUpdate('smsConsent', e.target.checked)}
-            className="mt-0.5 w-4 h-4 rounded border-[#C9A96E]/40 text-[#C9A96E] focus:ring-[#C9A96E]/30 accent-[#C9A96E]"
+            className="mt-0.5 w-4 h-4 rounded border-[#C9A96E]/40 text-rani-gold-accessible focus:ring-[#C9A96E]/30 accent-[#C9A96E]"
           />
           <div className="flex items-start gap-2">
-            <MessageSquare className="w-4 h-4 text-[#C9A96E] mt-0.5 shrink-0" />
+            <MessageSquare className="w-4 h-4 text-rani-gold-accessible mt-0.5 shrink-0" />
             <span className="font-body text-sm text-[#0F1D2C]/70">
               I&apos;d like to receive updates and appointment reminders via text
             </span>
@@ -348,7 +348,7 @@ export default function Step8Summary({
         transition={{ delay: 0.45, duration: 0.4 }}
         className="flex items-start gap-3 p-4 rounded-2xl bg-[#C9A96E]/10 border border-[#C9A96E]/20"
       >
-        <CreditCard className="w-5 h-5 text-[#C9A96E] shrink-0 mt-0.5" />
+        <CreditCard className="w-5 h-5 text-rani-gold-accessible shrink-0 mt-0.5" />
         <div>
           <p className="font-body text-sm font-medium text-[#0F1D2C]">
             $150 Consultation Deposit

@@ -166,7 +166,7 @@ export default function InboxView({
                   <div className="flex items-start gap-3">
                     <div className="relative flex-shrink-0">
                       <div className="w-10 h-10 rounded-full bg-rani-gold/10 flex items-center justify-center">
-                        <User className="w-5 h-5 text-rani-gold" />
+                        <User className="w-5 h-5 text-rani-gold-accessible" />
                       </div>
                       {conv.unreadCount > 0 && (
                         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">

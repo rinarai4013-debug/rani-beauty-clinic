@@ -74,7 +74,7 @@ export default function AutomationCard({ automation, onToggle }: AutomationCardP
 
       <div className="mt-4 flex items-center justify-between text-xs text-rani-muted">
         <div className="inline-flex items-center gap-1">
-          <Sparkles className="h-3.5 w-3.5 text-rani-gold" />
+          <Sparkles className="h-3.5 w-3.5 text-rani-gold-accessible" />
           ${automation.avgRevenueGenerated.toLocaleString()} avg revenue
         </div>
         <div className="inline-flex items-center gap-1">
