@@ -1252,4 +1252,210 @@ For complex or stubborn scars, we offer combination therapies that sequence lase
       "biorepeel",
     ],
   },
+
+  {
+    slug: "cosmelan-peel",
+    title: "Cosmelan Peel",
+    shortDescription:
+      "The world's #1 professional depigmentation system. Cosmelan's two-phase clinical protocol delivers a 90% reduction in hyperpigmentation in 12 weeks — targeting melasma, sun spots, PIH, and uneven skin tone at the enzymatic root cause.",
+    icon: "Layers",
+    metaTitle:
+      "Cosmelan Peel Renton WA | Hyperpigmentation Treatment | Rani Beauty Clinic",
+    metaDescription:
+      "Cosmelan Peel at Rani Beauty Clinic in Renton, WA. The #1 global depigmentation treatment — 90% reduction in hyperpigmentation in 12 weeks. Book your consultation.",
+    heroDescription:
+      "Some dark spots fade. Others are woven into the skin's biology — driven by enzyme overactivity, hormonal shifts, and years of sun damage. Cosmelan is the clinical answer. Ranked the #1 professional depigmentation treatment worldwide by Institute BCN, this two-phase system dismantles hyperpigmentation at its source and keeps it from returning — delivering visibly even, luminous skin that holds.",
+    whatIsIt: `Cosmelan is a professional-grade depigmentation system developed by Institute BCN and recognized as the #1 depigmentation treatment worldwide across more than 80 countries. Unlike brightening facials or superficial peels that address surface discoloration temporarily, Cosmelan works by targeting the tyrosinase enzyme — the key driver of melanin production — effectively interrupting hyperpigmentation at its biochemical origin. The result is not just lighter-looking skin, but a genuine reduction in the overactive melanocyte activity that causes dark spots to form and recur.
+
+The system operates in two phases. Phase one is an in-clinic application of the Cosmelan 1 mask — a concentrated depigmenting complex that is applied in the treatment room and worn for 8 to 12 hours post-application before being removed at home. This mask delivers the treatment's core active payload: azelaic acid, kojic acid, phytic acid, and TCA (trichloroacetic acid), which work together to chemically exfoliate the epidermis, suppress melanin synthesis, and begin the skin-renewal process. Phase two is an at-home protocol using the Cosmelan 2 maintenance cream, applied daily for several months to sustain tyrosinase inhibition, prevent melanin rebound, and continue refining skin tone as the skin completes its renewal cycle.
+
+What makes Cosmelan the gold standard for hyperpigmentation is this combination: simultaneous enzymatic inhibition, controlled chemical exfoliation, and a structured maintenance phase that addresses the one failure point of most pigmentation treatments — recurrence. Clinical data demonstrates a 90% reduction in hyperpigmentation after 12 weeks of the full protocol. For clients who have tried vitamin C serums, retinoids, or standard peels without achieving lasting evenness, Cosmelan represents a step-change in both depth and durability of results.
+
+Cosmelan is clinically validated for Fitzpatrick skin types I through IV, with a modified protocol available for types V and VI. It is indicated for melasma (including hormonal melasma), post-inflammatory hyperpigmentation (PIH) from acne or injury, solar lentigines (sun spots), chloasma, and generalized uneven skin tone. At Rani Beauty Clinic, every Cosmelan protocol is supervised by Dr. Alexander Landfield, our board-certified Medical Director, and includes a personalized plan for the at-home phase to ensure your results are both dramatic and lasting.`,
+    howItWorks: [
+      {
+        step: "In-Depth Consultation & Skin Assessment",
+        description:
+          "Before your Cosmelan treatment, your clinician performs a thorough skin assessment to confirm your Fitzpatrick type, evaluate the distribution and depth of your hyperpigmentation, and review your full history including medications, recent sun exposure, and any contraindications. This consultation shapes your mask wear time (8 to 12 hours) and your customized Cosmelan 2 maintenance schedule. Your clinician will also take clinical photographs to track your progress over the 12-week protocol.",
+      },
+      {
+        step: "Cosmelan 1 Mask Application",
+        description:
+          "In the treatment room, your skin is thoroughly cleansed and degreased to ensure even absorption. The Cosmelan 1 mask — a caramel-colored paste containing azelaic acid, kojic acid, phytic acid, TCA, and ascorbic acid — is applied in an even layer across the treatment area. You leave our clinic with the mask on your skin. Your clinician will confirm your personal wear time (typically 8 to 12 hours) based on your skin type and sensitivity profile. You remove the mask at home as instructed, then apply the soothing aftercare cream provided in your kit.",
+      },
+      {
+        step: "Controlled Exfoliation Phase (Days 3–7)",
+        description:
+          "Over the days following the in-clinic application, you will experience controlled peeling and flaking — this is an expected and necessary part of the process. The TCA and exfoliating acids are shedding the melanin-loaded epidermal cells, making way for fresher, less pigmented skin beneath. During this phase, your skin may appear red or feel tight. You will use only the Rani-approved gentle cleanser, healing moisturizer, and SPF 50+ provided in your post-treatment protocol. This phase is temporary; most peeling resolves within 7 to 10 days.",
+      },
+      {
+        step: "Cosmelan 2 At-Home Maintenance Protocol",
+        description:
+          "Once peeling subsides, you begin applying the Cosmelan 2 maintenance cream daily. This phase — which runs for several months — is where the long-term results are built. The Cosmelan 2 cream continues to inhibit tyrosinase activity, prevent melanin rebound, and refine skin tone as cell turnover completes. Your clinician schedules a check-in appointment at 4 to 6 weeks to assess your progress, adjust application frequency if needed, and confirm you are on track. Strict daily SPF 50+ use is non-negotiable throughout this phase and beyond.",
+      },
+    ],
+    whoIsItFor: [
+      "Clients with melasma — especially hormonal melasma resistant to other treatments",
+      "Anyone with post-inflammatory hyperpigmentation (PIH) from acne, injury, or previous procedures",
+      "Those with sun spots, age spots, or solar lentigines that have not responded to topical brighteners",
+      "Clients with chloasma or pregnancy-related skin discoloration",
+      "Anyone with generalized uneven skin tone and persistent dullness",
+      "Fitzpatrick types I–IV seeking a clinically proven, high-efficacy depigmentation protocol",
+      "Clients who have tried multiple brightening products without achieving lasting, even results",
+      "Anyone ready to commit to a full at-home maintenance protocol for durable, long-term skin evenness",
+    ],
+    whatToExpect: {
+      before:
+        "Discontinue retinoids, tretinoin, and all exfoliating acids for 7 days before your appointment. Avoid sun exposure and tanning for 2 weeks prior — even a mild tan will affect the treatment outcome. Arrive with clean, makeup-free skin. Notify your clinician if you are pregnant, breastfeeding, or have recently used isotretinoin (Accutane) within the past 6 months, as Cosmelan is contraindicated in these cases. Do not use blood-thinning supplements (vitamin E, fish oil) for 5 days before your appointment. Plan to be at the clinic for approximately 90 minutes for the full consultation and mask application, and arrange to have your schedule clear for the 8 to 12 hours the mask is worn at home.",
+      during:
+        "The in-clinic portion of your Cosmelan appointment takes approximately 90 minutes. After your consultation and skin prep, the mask application itself takes 15 to 20 minutes. Once applied, you will leave the clinic with the mask on and instructions for removal at home at your prescribed wear time. During the wearing period, you may experience mild warmth, tingling, or tightness beneath the mask — this is normal. Avoid sweating, exercising, or exposing the mask to water until the prescribed removal time.",
+      after:
+        "Expect visible peeling and flaking between days 3 and 7 — this is not a side effect, it is the treatment working. Your skin will shed the melanin-loaded surface cells to reveal the cleaner, more even skin beneath. During this phase, use only the gentle products provided in your kit: a mild cleanser, a barrier-repair moisturizer, and SPF 50+. Do not pick or forcibly remove peeling skin. After peeling resolves, begin the Cosmelan 2 maintenance cream as directed. Avoid sun exposure diligently for a minimum of 4 weeks post-treatment and continue SPF 50+ daily throughout the protocol — UV exposure is the primary trigger for melanin rebound. A follow-up appointment is scheduled at 4 to 6 weeks to assess your progress and adjust your protocol as needed.",
+    },
+    resultsAndRecovery:
+      "Clinical data from Institute BCN demonstrates a 90% reduction in hyperpigmentation after 12 weeks of the complete Cosmelan two-phase protocol. Most clients begin to see visible brightening and tone evenness within 2 to 4 weeks as the surface exfoliation clears and the new skin emerges. The full depth of results — particularly for deep melasma and hormonal pigmentation — continues to develop over the 3-month maintenance phase as tyrosinase suppression takes effect and sustained cell turnover completes. A second in-clinic session may be recommended for clients with deep or recalcitrant melasma. The recovery period centers around the peeling phase (days 3 to 7), during which most clients prefer to work from home or plan social commitments around this window. Beyond the peel phase, daily life can resume normally with diligent SPF use. Cosmelan results are durable — particularly with ongoing SPF discipline and annual maintenance — because the treatment addresses the enzymatic mechanism, not just the surface pigment.",
+    whyRani:
+      "Rani Beauty Clinic offers the authentic Cosmelan protocol, sourced directly from Institute BCN. Every treatment is performed and supervised by our clinical team under the medical oversight of Dr. Alexander Landfield, our board-certified Medical Director, who reviews every client's contraindication profile before treatment proceeds. We do not shortcut the protocol: your Cosmelan 1 wear time, your Cosmelan 2 maintenance schedule, and your follow-up appointments are all individualized to your skin type, pigmentation depth, and lifestyle. We pair the clinical treatment with a rigorous aftercare kit and scheduled check-ins so that your results are earned and held. For clients who have spent years cycling through brightening serums and superficial peels without resolution, Cosmelan at Rani represents a definitive, clinically grounded answer.",
+    faqs: [
+      {
+        question: "What exactly is the Cosmelan Peel?",
+        answer:
+          "Cosmelan is a two-phase professional depigmentation system — not a traditional peel. Phase one is an in-clinic application of the Cosmelan 1 mask, which you wear for 8 to 12 hours and remove at home. Phase two is a months-long at-home protocol using Cosmelan 2 maintenance cream. Together, they inhibit the tyrosinase enzyme responsible for melanin overproduction, exfoliate pigmented surface cells, and prevent hyperpigmentation from returning. It is ranked the #1 professional depigmentation treatment globally by Institute BCN and used in over 80 countries.",
+      },
+      {
+        question: "Who is the ideal candidate for Cosmelan?",
+        answer:
+          "Cosmelan is ideal for clients with melasma, post-inflammatory hyperpigmentation (PIH from acne or injury), sun spots, chloasma, or persistent uneven skin tone. It is clinically validated for Fitzpatrick skin types I through IV, with a modified protocol available for types V and VI. Cosmelan is not suitable for clients who are pregnant, breastfeeding, have active skin infections, or have used isotretinoin (Accutane) in the past 6 months. A thorough consultation with your clinician will confirm your candidacy before any treatment is planned.",
+      },
+      {
+        question: "Is the peeling normal? How bad does it get?",
+        answer:
+          "Yes — the peeling between days 3 and 7 is an expected and necessary part of the Cosmelan protocol. The TCA and exfoliating acids in the Cosmelan 1 mask shed the melanin-loaded surface cells, creating space for fresher, less pigmented skin beneath. The intensity of peeling varies by skin type and mask wear time but is typically described as moderate: visible flaking and tightness, not raw or weeping skin. Most clients plan their social commitments around this window and work from home during peak peeling days. Using only the approved gentle kit products during this phase protects the barrier and supports a smooth recovery.",
+      },
+      {
+        question: "How many Cosmelan sessions are needed?",
+        answer:
+          "The standard protocol includes one in-clinic Cosmelan 1 mask application followed by 3 to 4 months of at-home Cosmelan 2 maintenance cream. Clinical data shows 90% reduction in hyperpigmentation at 12 weeks. For clients with deep or recalcitrant melasma, a second in-clinic session may be recommended at 3 to 6 months. Annual maintenance sessions or ongoing at-home Cosmelan 2 use are commonly recommended to maintain results long-term, particularly for hormonal melasma where the trigger (sun, hormones) is ongoing.",
+      },
+      {
+        question: "Is Cosmelan safe for darker skin tones?",
+        answer:
+          "Cosmelan is clinically validated for Fitzpatrick types I through IV. For types V and VI, a modified protocol is available and must be discussed thoroughly during your consultation. The risk with darker skin types is post-inflammatory hyperpigmentation from the treatment itself if the protocol is too aggressive — which is why wear time customization and a conservative introduction to Cosmelan 2 are essential. At Rani, we take Fitzpatrick typing seriously and will not proceed with treatment on any skin tone without a full consultation and an individualized plan that prioritizes your safety and your outcome.",
+      },
+      {
+        question: "How much does the Cosmelan Peel cost?",
+        answer:
+          "The Cosmelan Peel is $1,399 per session (90 min in-clinic application), which includes the Cosmelan 1 mask treatment, your aftercare kit, and your follow-up progress appointment. The at-home Cosmelan 2 maintenance cream is included in your protocol plan. Financing is available through Cherry and PatientFi with no credit impact pre-qualification. Call us at (425) 539-4440 to schedule your consultation and confirm your candidacy.",
+      },
+    ],
+    relatedSlugs: [
+      "chemical-peels",
+      "biorepeel",
+      "rf-microneedling",
+      "ai-skin-analysis",
+    ],
+  },
+
+  {
+    slug: "microneedling-arrissence-undereye",
+    title: "Microneedling with Arrissence — Dark Undereyes",
+    shortDescription:
+      "A precision RF microneedling protocol for the periorbital area, paired with Arrissence growth factor and exosome serum, to rebuild undereye skin thickness, reduce dark circles, and smooth fine lines at the source.",
+    icon: "Eye",
+    metaTitle:
+      "Dark Undereye Treatment Renton WA | RF Microneedling + Arrissence | Rani Beauty Clinic",
+    metaDescription:
+      "Precision RF microneedling with Arrissence growth factor serum for dark circles and undereye hollowness at Rani Beauty Clinic in Renton, WA. Book your consultation.",
+    heroDescription:
+      "The undereye is the most delicate skin on your face — just half a millimeter thin — and it shows every sign of fatigue, volume loss, and time. Standard facials cannot reach it. Topical creams cannot rebuild it. Microneedling with Arrissence does. Using precision RF energy delivered at the exact depths the periorbital skin demands, combined with Arrissence's growth factor and exosome serum, this treatment triggers genuine collagen remodeling in the undereye dermis — thickening the skin, reducing the translucency that causes dark circles, and restoring a well-rested, lifted appearance.",
+    whatIsIt: `Microneedling with Arrissence for dark undereyes is one of the most technically precise treatments we offer at Rani Beauty Clinic — and one of the most transformative for clients who have exhausted topical options. It combines Cutera Secret RF microneedling, a gold-standard radiofrequency device with insulated needles, with Arrissence: a cutting-edge regenerative serum formulated with polydeoxyribonucleotide (PDRN), growth factors, exosomes, and peptides specifically designed to activate fibroblasts and drive tissue regeneration in the undereye zone.
+
+The periorbital skin — the skin surrounding the eyes — is the thinnest on the entire face, averaging just 0.5mm in depth compared to 2mm on the cheeks. This thinness is precisely why dark circles develop: as the dermis thins with age, the vascular network beneath becomes more visible through the skin, creating the characteristic bluish-purple shadow. Loss of collagen and elastin in this region also produces the hollowing, crepiness, and fine lines that compound the appearance of fatigue and age. Addressing these concerns requires tools calibrated to periorbital anatomy — shallow needle depths (0.5 to 1.5mm), careful RF energy titration, and biologics that can penetrate and activate at this scale.
+
+Arrissence is the differentiator in this protocol. While standard serums applied over microneedled skin provide some benefit, Arrissence's PDRN molecules actively stimulate fibroblast proliferation — the cellular machinery responsible for producing collagen and elastin. Its exosome payload carries growth factor signaling directly into the dermis through the microchannels created by the needles, driving a regenerative response that is measurably deeper than topical application alone. The result is progressive skin thickening in the undereye dermis, improved structural support, and a reduction in the translucency that creates dark circles from skin thinning.
+
+It is important to understand that dark circles have multiple causes: vascular (visible blood vessels), pigmentary (melanin deposition), and structural (skin thinning and hollowness). This treatment is most effective for the structural component — skin thinning and loss of undereye dermis — and will produce meaningful improvement in circles caused by or worsened by these factors. Clients with predominantly vascular or pigmentary dark circles may benefit from complementary treatments, which your clinician will discuss during your consultation. A series of three sessions spaced four to six weeks apart is recommended, with visible improvement appearing from four to six weeks after each session and full results at three months per treatment.`,
+    howItWorks: [
+      {
+        step: "Topical Numbing & Preparation",
+        description:
+          "A prescription-strength topical anesthetic is applied to the periorbital area 30 to 45 minutes before treatment to ensure your comfort throughout the procedure. The undereye skin is among the most sensitive areas of the face, and adequate numbing time is non-negotiable in our protocol. Once the numbing agent is removed, the skin is cleansed and prepared for treatment. Eye shields are placed to protect the eyes during the RF microneedling phase.",
+      },
+      {
+        step: "Cutera Secret RF Microneedling — Periorbital Delivery",
+        description:
+          "The Cutera Secret RF handpiece — equipped with insulated gold-tipped needles — is applied to the undereye and periorbital area at carefully calibrated shallow depths (0.5 to 1.5mm). The insulated needles deliver radiofrequency thermal energy precisely at the needle tip, protecting the skin surface while heating the dermis at the exact depth required to stimulate collagen and elastin synthesis. This precision is what makes the Secret RF safe for the periorbital area — where standard microneedling or uninsulated RF devices carry meaningful risk in untrained hands. The clinician moves systematically across the undereye, adjusting needle depth and energy as periorbital anatomy demands.",
+      },
+      {
+        step: "Arrissence Serum Infusion",
+        description:
+          "Immediately following the RF microneedling pass, Arrissence growth factor and exosome serum is applied to the treated periorbital skin. The microchannels created by the needles allow Arrissence's active molecules — PDRN, growth factors, peptides, and exosomes — to penetrate directly into the dermis rather than resting on the surface. PDRN activates fibroblasts to produce new collagen and elastin. Exosomes carry cell-signaling instructions that accelerate tissue repair and reduce melanin-stimulating signals, supporting both structural improvement and the reduction of pigmentary discoloration. The serum is pressed gently into the skin and left to absorb.",
+      },
+      {
+        step: "Soothing Aftercare Application",
+        description:
+          "A calming peptide cream and gentle barrier repair moisturizer are applied to the undereye area to support the healing response and minimize post-treatment redness. Your clinician reviews aftercare instructions covering the first 48 hours (no eye makeup, no rubbing, gentle cleansing only), your recommended SPF protocol, and the timeline for visible results. Your next session is scheduled before you leave, as consistent timing in a series of three is key to achieving the cumulative collagen remodeling this treatment is designed to deliver.",
+      },
+    ],
+    whoIsItFor: [
+      "Clients with dark circles caused or worsened by skin thinning and undereye hollowness",
+      "Anyone with visible crepiness, fine lines, or loss of firmness in the periorbital area",
+      "Those who have noticed their undereyes appearing more hollow, sunken, or shadowed with age",
+      "Clients who want to reduce undereye darkness without dermal filler",
+      "Anyone looking for a regenerative, non-filler approach to undereye rejuvenation",
+      "Clients who have tried eye creams and topical treatments without meaningful improvement",
+      "Those seeking a long-term structural improvement in undereye skin quality, not just surface hydration",
+      "Clients who are not candidates for or prefer to avoid undereye filler injections",
+    ],
+    whatToExpect: {
+      before:
+        "Avoid retinoids, retinol, and exfoliating acids around the eye area for 5 days before your appointment. Do not take blood-thinning supplements (aspirin for non-medical use, fish oil, vitamin E) for 5 days prior. Arrive without eye makeup. Inform your clinician if you have had eyelid surgery (blepharoplasty) within the past 6 months, have active eye infections or styes, have a keloid history, or are taking prescription blood thinners — these are contraindications for this treatment. Plan for the full session to take approximately 60 minutes, which includes numbing time.",
+      during:
+        "After 30 to 45 minutes of topical numbing, the active treatment portion takes approximately 20 to 30 minutes. With proper numbing, most clients describe the sensation as mild pressure or warmth — the periorbital area is very well-tolerated after adequate anesthetic application. Eye shields protect your eyes throughout the procedure. Your clinician works precisely and methodically across the undereye and orbital rim. There is no significant discomfort for the vast majority of clients.",
+      after:
+        "Expect mild redness, puffiness, and swelling around the eyes for 24 to 48 hours post-treatment — this is a normal and expected inflammatory response that signals the healing cascade has begun. Some clients experience light bruising in the undereye area, which typically resolves within 3 to 5 days. Avoid eye makeup for 24 hours. Do not rub or apply pressure to the treated area. Use only the gentle cleanser and provided aftercare cream for 48 hours. Apply SPF 30+ (formulated for the eye area) whenever outdoors. Visible improvement typically appears 4 to 6 weeks after each session as collagen remodeling progresses. Full results from each session are visible at 3 months. A series of 3 sessions is recommended for optimal cumulative improvement.",
+    },
+    resultsAndRecovery:
+      "Visible improvement from each session typically becomes apparent at 4 to 6 weeks as new collagen and elastin fibers begin to thicken the undereye dermis. Full results per session develop over 3 months. For most clients, a series of 3 sessions spaced 4 to 6 weeks apart produces meaningful, lasting improvement in undereye skin thickness, the reduction of shadowing from skin thinning, and a smoother, less crepey periorbital texture. Bruising and swelling from each session resolve within 2 to 5 days. There is minimal social downtime beyond the first 24 to 48 hours — most clients return to work the next day with light concealer cleared after 24 hours. Results are progressive and build with each session. Maintenance treatments once or twice per year sustain the collagen remodeling response and protect the results over time.",
+    whyRani:
+      "The undereye is not a place for improvisation. It demands precise device settings, shallow needle calibration, and a provider who understands periorbital anatomy — and the consequences of getting it wrong. At Rani Beauty Clinic, our clinicians are specifically trained in periorbital RF microneedling using the Cutera Secret RF, one of the few devices with the insulated needle technology required to work safely this close to the eye. Every Microneedling with Arrissence treatment is performed under the medical supervision of Dr. Alexander Landfield, our board-certified Medical Director. We pair the clinical precision of the Secret RF with Arrissence — a next-generation growth factor and exosome serum — because we believe your undereye deserves the most regeneratively advanced biologic available. If you have spent years searching for a genuine solution to undereye darkness and hollowness that does not involve filler, this is it.",
+    faqs: [
+      {
+        question: "What kind of dark circles does this treatment address?",
+        answer:
+          "Dark circles have three primary causes: vascular (visible blood vessels showing through thin skin), pigmentary (melanin deposits in the undereye skin), and structural (skin thinning and hollowness that creates shadow). Microneedling with Arrissence is most effective for the structural component — it rebuilds undereye skin thickness, reduces translucency, and improves the dermis so that the vascular network beneath is less visible. For predominantly pigmentary circles, complementary treatments such as Cosmelan or laser may be recommended. During your consultation, your clinician will assess which type of dark circles you have and design a protocol accordingly.",
+      },
+      {
+        question: "Is the treatment painful?",
+        answer:
+          "With proper numbing, the vast majority of clients describe the sensation as mild pressure or warmth — not pain. We apply prescription-strength topical anesthetic for 30 to 45 minutes before the procedure begins, which is non-negotiable in our undereye protocol. The periorbital area is sensitive, and we do not begin treatment until your clinician confirms adequate numbing. Clients are frequently surprised by how well-tolerated the treatment is. If at any point you experience discomfort beyond mild pressure, your clinician will pause and address it.",
+      },
+      {
+        question: "Will I bruise? How long is the downtime?",
+        answer:
+          "Bruising is possible and not uncommon in the undereye area — this is among the most vascular skin on the face. Expect mild to moderate bruising in 30 to 50% of sessions, typically resolving within 3 to 5 days. Swelling and redness for 24 to 48 hours is standard and expected. Most clients return to work the next day and apply light concealer after 24 hours. We recommend scheduling your first session at least 7 to 10 days before any significant social event to allow bruising to fully clear. Arnica supplements and cold compresses can help accelerate bruise resolution.",
+      },
+      {
+        question: "How many sessions are needed and how far apart?",
+        answer:
+          "A series of 3 sessions spaced 4 to 6 weeks apart is the recommended protocol for optimal cumulative results. Each session builds on the last as the collagen remodeling response compounds over time. You will begin to see visible improvement 4 to 6 weeks after each session, with full results per session at 3 months. After completing a series of 3, most clients maintain results with 1 to 2 sessions per year. Your clinician will assess your progress at each appointment and confirm whether additional sessions are indicated.",
+      },
+      {
+        question: "How does this compare to undereye filler?",
+        answer:
+          "Undereye filler (typically hyaluronic acid) adds volume to hollow tear troughs and can provide an immediate improvement in shadowing — it does not change the quality or thickness of the undereye skin itself. Microneedling with Arrissence does the opposite: it rebuilds the skin's own collagen and dermal structure over time, making it a regenerative and increasingly durable solution. Many clients use both in combination — filler to restore volume and microneedling with Arrissence to improve the skin quality overlying it. For clients who are not candidates for filler, have had filler and want to address residual darkness, or prefer a natural regenerative approach, this treatment is the right path. Your clinician will discuss which option or combination is optimal for your anatomy.",
+      },
+      {
+        question: "How much does the treatment cost?",
+        answer:
+          "Microneedling with Arrissence for dark undereyes is $695 per session (60 min). A package of 3 sessions is available — ask your clinician for current package pricing. Financing is available through Cherry and PatientFi with no credit impact pre-qualification. Given the technical precision required for periorbital treatment and the quality of the Arrissence serum, this protocol is designed to deliver results that topical eye creams and standard facials cannot match. Call us at (425) 539-4440 to schedule your consultation.",
+      },
+    ],
+    relatedSlugs: [
+      "rf-microneedling",
+      "dermal-fillers",
+      "biorepeel",
+      "ai-skin-analysis",
+    ],
+  },
 ];

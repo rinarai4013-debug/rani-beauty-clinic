@@ -45,6 +45,16 @@ export const serviceImages: Record<string, ServiceImageEntry> = {
     hoverImage: "/images/services/biorepeel/2.webp",
     category: "face",
   },
+  "cosmelan-peel": {
+    image: "/images/services/cosmelan/1.png",
+    hoverImage: "/images/services/cosmelan/2.jpg",
+    category: "face",
+  },
+  "microneedling-arrissence-undereye": {
+    image: "/images/services/eyefiller/1.webp",
+    hoverImage: "/images/services/eyefiller/2.webp",
+    category: "face",
+  },
   "botox-dysport": {
     image: "/images/services/botox/1.png",
     hoverImage: "/images/services/botox/2.webp",

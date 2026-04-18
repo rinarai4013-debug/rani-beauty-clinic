@@ -35,6 +35,22 @@ const faceSkinServices = [
     hoverImage: serviceImages["biorepeel"]?.hoverImage,
   },
   {
+    title: "Cosmelan Peel",
+    description: "The gold standard for melasma and hyperpigmentation. Clinically proven to reduce pigmentation by up to 90% in 12 weeks.",
+    icon: "Layers",
+    href: "/services/cosmelan-peel",
+    image: serviceImages["cosmelan-peel"]?.image,
+    hoverImage: serviceImages["cosmelan-peel"]?.hoverImage,
+  },
+  {
+    title: "Microneedling w/ Arrissence — Undereyes",
+    description: "Targeted RF microneedling with Arrissence growth factor serum for dark circles, hollowness, and undereye fine lines.",
+    icon: "Eye",
+    href: "/services/microneedling-arrissence-undereye",
+    image: serviceImages["microneedling-arrissence-undereye"]?.image,
+    hoverImage: serviceImages["microneedling-arrissence-undereye"]?.hoverImage,
+  },
+  {
     title: "Laser Acne Facial",
     description: "Clinical-grade laser technology to target active acne, bacteria, and scarring.",
     icon: "ScanFace",
