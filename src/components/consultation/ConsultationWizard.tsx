@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -52,6 +52,7 @@ const STEP_LABELS = [
 ] as const;
 
 const TOTAL_STEPS = STEP_LABELS.length;
+const CONSULTATION_SUBMIT_TIMEOUT_MS = 45_000;
 
 const STEP_ICONS = [
   Sparkles,
@@ -121,6 +122,46 @@ interface WizardState {
   auraScanResult: AuraScanResult | null;
   isScanning: boolean;
 }
+
+type ConsultationOfferProduct = {
+  id: string;
+  product: string;
+  label: string;
+  category: string;
+  score: number;
+  monthlyCostEstimate: number;
+  suggestedRetail: number;
+  suggestedGrossProfit: number;
+  suggestedMarginPercent: number;
+  rationale: string[];
+};
+
+type ConsultationMedicalOffers = {
+  providerReviewRequired: boolean;
+  checkoutPaths: { clinic: string; home: string };
+  requestedTrack: string;
+  normalizedSymptoms: string[];
+  recommendationCount: number;
+  projectedMonthlyRetail: number;
+  projectedMonthlyCOGS: number;
+  projectedMonthlyGrossProfit: number;
+  averageMarginPercent: number;
+  recommendedProducts: ConsultationOfferProduct[];
+};
+
+type ConsultationSubmitResponse = {
+  success?: boolean;
+  error?: string;
+  message?: string;
+  sessionId?: string;
+  data?: {
+    sessionId?: string;
+    patientName?: string;
+    hasPhoto?: boolean;
+    phase?: string;
+  };
+  medicalOffers?: ConsultationMedicalOffers;
+};
 
 type WizardAction =
   | { type: 'SET_FIELD'; field: string; value: unknown }
@@ -232,6 +273,8 @@ const slideVariants = {
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
   const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
+  const [submittedMedicalOffers, setSubmittedMedicalOffers] = useState<ConsultationMedicalOffers | null>(null);
+  const [submitSuccessMessage, setSubmitSuccessMessage] = useState('');
 
   // ── Handlers ──
 
@@ -274,8 +317,13 @@ export default function ConsultationWizard() {
     }
 
     dispatch({ type: 'SUBMIT_START' });
+    setSubmittedMedicalOffers(null);
+    setSubmitSuccessMessage('');
 
     try {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), CONSULTATION_SUBMIT_TIMEOUT_MS);
+
       // Build multipart form data for file uploads
       const body = new FormData();
       const { photos, ...jsonData } = formData;
@@ -290,27 +338,65 @@ export default function ConsultationWizard() {
       const res = await fetch('/api/consultation/submit', {
         method: 'POST',
         body,
+        signal: controller.signal,
       });
 
+      window.clearTimeout(timeoutId);
+
       if (!res.ok) {
-        throw new Error('Submission failed');
+        let errorMessage = 'Submission failed';
+        try {
+          const errorBody = await res.json();
+          if (typeof errorBody?.error === 'string' && errorBody.error.trim()) {
+            errorMessage = errorBody.error.trim();
+          }
+        } catch {
+          if (res.status === 413) {
+            errorMessage = 'Upload is too large. Keep each photo under 10MB and total uploads under 30MB.';
+          } else if (res.status >= 500) {
+            errorMessage = 'Server is temporarily unavailable. Please retry in a moment.';
+          }
+        }
+        throw new Error(errorMessage);
       }
 
-      const result = await res.json();
+      const result = (await res.json()) as ConsultationSubmitResponse;
+      const sessionId = result.data?.sessionId || result.sessionId;
+      if (!sessionId) {
+        throw new Error('Submission succeeded but no session ID was returned. Please retry.');
+      }
 
       dispatch({ type: 'SUBMIT_END', success: true });
 
       // Store session ID for post-submit reference (e.g., dashboard redirect)
-      if (result.data?.sessionId) {
-        try {
-          sessionStorage.setItem('mastermind_last_session', result.data.sessionId);
-        } catch { /* sessionStorage unavailable */ }
+      try {
+        sessionStorage.setItem('mastermind_last_session', sessionId);
+      } catch {
+        // sessionStorage unavailable
       }
-    } catch {
+
+      if (result.medicalOffers) {
+        setSubmittedMedicalOffers(result.medicalOffers);
+        setSubmitSuccessMessage(
+          `We found ${result.medicalOffers.recommendationCount} medically supervised options matched to your intake.`
+        );
+      } else {
+        setSubmitSuccessMessage(
+          'Our team will review your consultation and reach out within 24 hours with a personalized treatment plan.'
+        );
+      }
+    } catch (error) {
+      const message =
+        error instanceof DOMException && error.name === 'AbortError'
+          ? 'Upload timed out. Please retry with fewer or smaller photos.'
+          : error instanceof Error && error.message
+            ? error.message
+            : 'Something went wrong. Please try again.';
+
       dispatch({ type: 'SUBMIT_END', success: false });
       dispatch({
         type: 'SET_ERRORS',
-        errors: { submit: 'Something went wrong. Please try again.' },
+        errors: { submit: message },
       });
     }
   }, [currentStep, formData]);
@@ -413,9 +499,45 @@ export default function ConsultationWizard() {
             You&apos;re All Set
           </h2>
           <p className="font-body text-[#0F1D2C]/60 max-w-md mx-auto mb-8">
-            Thank you, {formData.firstName}! Our team will review your consultation
-            and reach out within 24 hours with a personalized treatment plan.
+            Thank you, {formData.firstName}! {submitSuccessMessage || 'Our team will review your consultation and follow up soon.'}
           </p>
+          {submittedMedicalOffers?.recommendedProducts?.length ? (
+            <div className="rounded-xl border border-[#C9A96E]/30 bg-[#F8F6F1] p-4 mb-6 text-left">
+              <p className="font-body text-sm text-[#0F1D2C]/70 mb-3">
+                Recommended track: <strong className="text-[#0F1D2C]">{submittedMedicalOffers.requestedTrack}</strong>
+                {' '}• Projected monthly gross profit:{' '}
+                <strong className="text-[#0F1D2C]">${submittedMedicalOffers.projectedMonthlyGrossProfit.toFixed(2)}</strong>
+              </p>
+              <div className="space-y-2 mb-4">
+                {submittedMedicalOffers.recommendedProducts.slice(0, 3).map((product) => (
+                  <div key={product.id} className="rounded-lg bg-white border border-[#0F1D2C]/10 p-3">
+                    <p className="font-body font-semibold text-[#0F1D2C]">{product.label}</p>
+                    <p className="font-body text-xs text-[#0F1D2C]/60">
+                      Retail ${product.suggestedRetail.toFixed(2)} • Margin {product.suggestedMarginPercent.toFixed(1)}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <a
+                  href={submittedMedicalOffers.checkoutPaths.clinic}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F1D2C] text-white font-body text-sm font-medium hover:bg-[#1A2D3E] transition-colors"
+                >
+                  Continue in Clinic
+                </a>
+                <a
+                  href={submittedMedicalOffers.checkoutPaths.home}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#0F1D2C]/20 text-[#0F1D2C] bg-white font-body text-sm font-medium hover:border-[#C9A96E]/60 transition-colors"
+                >
+                  Continue at Home
+                </a>
+              </div>
+            </div>
+          ) : null}
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F1D2C] text-white font-body font-medium rounded-xl hover:bg-[#0F1D2C]/90 transition-colors"
