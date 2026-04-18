@@ -474,6 +474,43 @@ export const AFTERCARE_PROTOCOLS: Record<string, AftercareProtocol> = {
     expectedTimeline: 'Immediate hydration boost; progressive firming and radiance over the treatment series',
   },
 
+  'microneedling-arrissence-undereye': {
+    treatmentId: 'microneedling-arrissence-undereye',
+    treatmentName: 'Microneedling with Arrissence — Dark Undereyes',
+    immediateAftercare: [
+      'No makeup for 24 hours after treatment',
+      'Avoid rubbing or touching the eye area for 48 hours',
+      'Apply the recommended Arrissence eye serum as directed by your provider',
+      'Use a cold compress gently if needed for comfort — do not press',
+      'Mild bruising or swelling around the eye area is normal and expected',
+    ],
+    weekOneGuidance: [
+      'Continue applying the Arrissence serum as prescribed',
+      'Apply SPF 50+ daily — reapply if outdoors',
+      'Avoid active ingredients (retinoids, AHA/BHA, vitamin C) near the eye area for 5 days',
+      'Do not wear contact lenses for 24 hours',
+      'Swelling and bruising may peak at day 2-3 and resolves within a week',
+    ],
+    longTermCare: [
+      'A series of 3 sessions spaced 4-6 weeks apart is recommended for optimal results',
+      'Continue with an eye-specific serum to maintain and enhance results',
+      'Results become increasingly visible from 4-6 weeks post-treatment',
+      'Protect the undereye area with SPF and avoid excess sun exposure long-term',
+    ],
+    productsRecommended: [
+      { product: 'Arrissence Eye Serum', reason: 'Growth factor serum to enhance regeneration and dark circle correction', raniCarries: true },
+      { product: 'SPF 50 Sunscreen', reason: 'Protects treated skin and prevents hyperpigmentation', raniCarries: true },
+      { product: 'Gentle Eye Cream', reason: 'Supports healing and hydration in the delicate undereye area', raniCarries: true },
+    ],
+    warningSignals: [
+      'Severe swelling or bruising that worsens after day 3',
+      'Vision changes — contact your provider immediately',
+      'Signs of infection: increasing pain, warmth, pus, or fever',
+      'Blistering or open skin in the treatment area',
+    ],
+    expectedTimeline: 'Initial improvement in dark circles and texture visible at 2-4 weeks; optimal results after completing the 3-session series',
+  },
+
   ariessence: {
     treatmentId: 'ariessence',
     treatmentName: 'Ariessence',
@@ -691,6 +728,9 @@ export function getAftercareProtocol(treatmentIdOrName: string): AftercareProtoc
     'biorepeel': 'biorepeel',
     'bio re peel': 'biorepeel',
     'cosmelan': 'cosmelan-peel',
+    'arrissence undereye': 'microneedling-arrissence-undereye',
+    'arrissence': 'microneedling-arrissence-undereye',
+    'undereye microneedling': 'microneedling-arrissence-undereye',
     'hair removal': 'laser-hair-removal',
     'lhr': 'laser-hair-removal',
     'prx': 'prx-t33',
