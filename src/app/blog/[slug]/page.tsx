@@ -76,8 +76,11 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
   const articleStructuredData = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    // Dual typing — MedicalWebPage signals clinical trust for AI health queries,
+    // BlogPosting keeps Google News / regular blog indexing intact.
+    "@type": ["BlogPosting", "MedicalWebPage"],
     headline: post.title,
+    name: post.title,
     description: post.metaDescription,
     url: `https://www.ranibeautyclinic.com/blog/${post.slug}`,
     inLanguage: "en-US",
@@ -86,8 +89,23 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       name: post.author,
       jobTitle: post.authorCredentials,
     },
+    // reviewedBy — Dr. Landfield as medical reviewer gives AI answer engines
+    // a verified E-E-A-T signal (Expertise, Experience, Authority, Trust).
+    reviewedBy: {
+      "@type": "Person",
+      "@id": "https://www.ranibeautyclinic.com#medical-director",
+      name: "Dr. Alexander Landfield",
+      jobTitle: "Medical Director",
+      hasCredential: {
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "Board Certification",
+        name: "Board-Certified Neurologist",
+      },
+    },
+    lastReviewed: post.date,
     publisher: {
-      "@type": "Organization",
+      "@type": ["Organization", "MedicalBusiness"],
+      "@id": "https://www.ranibeautyclinic.com#organization",
       name: "Rani Beauty Clinic",
       url: "https://www.ranibeautyclinic.com",
       logo: {
@@ -96,10 +114,27 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       },
     },
     datePublished: post.date,
+    dateModified: post.date,
     articleSection: post.category,
+    keywords: [post.category, ...(post.relatedSlugs || [])].join(", "),
+    // medicalAudience — tells AI this is consumer-facing patient education
+    // vs. clinical literature. Improves match rate for user questions.
+    medicalAudience: {
+      "@type": "PatientsAudience",
+      requiredMinAge: 18,
+    },
+    // speakable — enables voice-AI answer extraction (Siri / Alexa / Google
+    // Assistant) from the article summary blocks.
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "h2", ".article-summary", ".faq-answer"],
+    },
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `https://www.ranibeautyclinic.com/blog/${post.slug}`,
+    },
+    isPartOf: {
+      "@id": "https://www.ranibeautyclinic.com#website",
     },
   };
 
