@@ -17,6 +17,8 @@ interface BlogPostPageProps {
   params: { slug: string };
 }
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return blogPosts.map((post) => ({
     slug: post.slug,
@@ -44,6 +46,12 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
       publishedTime: post.date,
       authors: [post.author],
       images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${post.metaTitle} - Rani Beauty Clinic` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.metaTitle,
+      description: post.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }
@@ -183,11 +191,21 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               {paragraphs.map((paragraph, index) => (
                 <p
                   key={index}
-                  className="mb-6 font-body text-base leading-[1.85] text-rani-text"
+                  className={`mb-6 font-body text-base leading-[1.85] text-rani-text ${index === 0 ? "article-summary" : ""}`}
+                  data-speakable={index === 0 ? "true" : undefined}
                 >
                   {paragraph}
                 </p>
               ))}
+            </div>
+          </FadeInOnScroll>
+
+          <FadeInOnScroll delay={0.15}>
+            <div className="mt-8 rounded-xl border border-rani-gold/20 bg-rani-cream p-5">
+              <p className="font-body text-sm leading-relaxed text-rani-text">
+                Medical disclaimer: This content is educational and does not replace individualized medical advice,
+                diagnosis, or treatment. Always consult a qualified medical professional before starting any treatment.
+              </p>
             </div>
           </FadeInOnScroll>
 

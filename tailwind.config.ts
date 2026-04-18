@@ -12,6 +12,7 @@ const config: Config = {
         "rani-navy": "#0F1D2C",
         "rani-navy-light": "#1A2A3C",
         "rani-gold": "#C9A96E",
+        "rani-gold-accessible": "#8E6A2D",
         "rani-gold-light": "#D4B87A",
         "rani-gold-dark": "#B8944F",
         "rani-cream": "#FAF8F5",

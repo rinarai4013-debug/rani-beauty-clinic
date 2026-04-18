@@ -1,0 +1,243 @@
+--- public/robots.txt	2026-04-17 22:20:24
++++ audits/evidence/live/www.ranibeautyclinic.com_robots.txt.body.txt	2026-04-17 22:25:49
+@@ -1,192 +1,105 @@
+-# Rani Beauty Clinic — robots.txt
+-# Updated: 2026-04-17
+-# Explicitly welcomes AI/LLM crawlers — we want to be cited by Claude,
+-# ChatGPT, Perplexity, Google AI Overviews, Bing Copilot, and others.
+-
+-# ─── AI / LLM crawlers (explicit allow for answer-engine citations) ──
+-# Google's AI training crawler (Gemini + AI Overviews)
+-User-agent: Google-Extended
++User-Agent: GPTBot
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-# OpenAI ChatGPT / GPT-powered tools (crawling + live browsing + search)
+-User-agent: GPTBot
++User-Agent: ChatGPT-User
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-User-agent: ChatGPT-User
++User-Agent: Google-Extended
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-User-agent: OAI-SearchBot
++User-Agent: PerplexityBot
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-# Anthropic Claude (training + live browsing)
+-User-agent: ClaudeBot
++User-Agent: Applebot-Extended
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-User-agent: Claude-Web
++User-Agent: anthropic-ai
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-User-agent: anthropic-ai
++User-Agent: ClaudeBot
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-# Perplexity answer engine
+-User-agent: PerplexityBot
++User-Agent: cohere-ai
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-# Common Crawl (powers many LLM training corpora)
+-User-agent: CCBot
++User-Agent: Bytespider
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-# Apple Intelligence / Siri
+-User-agent: Applebot-Extended
++User-Agent: CCBot
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
++Disallow: /_next/
+ 
+-# Meta / Llama training
+-User-agent: FacebookBot
++User-Agent: *
+ Allow: /
+ Disallow: /api/
+ Disallow: /dashboard/
+ Disallow: /portal/
+-Disallow: /admin/
+-
+-User-agent: Meta-ExternalAgent
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# Bytedance / DouYin / TikTok AI
+-User-agent: Bytespider
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# Amazon Bedrock / Rufus
+-User-agent: Amazonbot
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# You.com AI search
+-User-agent: YouBot
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# Diffbot knowledge graph (feeds many AI models)
+-User-agent: Diffbot
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# Mistral AI
+-User-agent: MistralAI-User
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# Cohere
+-User-agent: cohere-ai
+-Allow: /
+-Disallow: /api/
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+-
+-# ─── Default (all other crawlers) ────────────────────────────────────
+-User-agent: *
+-Allow: /
+-
+-# Block API routes (server-only endpoints)
+-Disallow: /api/
+-
+-# Block protected/private routes
+-Disallow: /dashboard/
+-Disallow: /portal/
+-Disallow: /admin/
+ Disallow: /provider/
+-Disallow: /m/
++Disallow: /admin/
++Disallow: /tenant/
++Disallow: /onboarding/
++Disallow: /docs/
++Disallow: /plan/
+ Disallow: /tv/
+ Disallow: /offline/
+-Disallow: /plan/
+-Disallow: /lp/
+-Disallow: /thank-you
+-
+-# Block legacy WordPress paths (site migrated to Next.js — saves crawl budget)
++Disallow: /_next/
++Disallow: /wp-admin/
+ Disallow: /wp-content/
+ Disallow: /wp-includes/
+-Disallow: /wp-admin/
+ Disallow: /wp-json/
+ Disallow: /wp-login.php
+-Disallow: /wp-*.php
+-Disallow: /product/
+-Disallow: /product-category/
+-Disallow: /category/
++Disallow: /xmlrpc.php
++Disallow: /wp-cron.php
+ Disallow: /cart/
+ Disallow: /checkout/
+ Disallow: /my-account/
++Disallow: /product/
++Disallow: /product-category/
++Disallow: /product-tag/
+ Disallow: /shop/
++Disallow: /*?s=*
++Disallow: /*?replytocom=*
++Disallow: /*?remove_item=*
++Disallow: /*?add-to-cart=*
++Disallow: /feed/
++Disallow: /comments/feed/
++Disallow: /author/
++Disallow: /tag/
++Disallow: /category/
++Disallow: /service_category/
++Disallow: /cmsms_doctor/
++Disallow: /*?templately_library=*
++Disallow: /*?wc-ajax=*
++Disallow: /*?post_type=*
++Disallow: /*?p=*
+ 
+-# Block Next.js build artifacts (data JSON) but allow static assets for rendering
+-Disallow: /_next/data/
+-
+-# Allow CSS/JS/images that Googlebot needs to render pages
+-Allow: /_next/static/
+-
+ Sitemap: https://www.ranibeautyclinic.com/sitemap.xml
+-
+-# LLM-friendly directory (Anthropic llms.txt standard — see https://llmstxt.org)
+-# Describes every service, pricing, location, and medical director in plain text.
+-# AI agents should prefer this over scraping the full site for overview queries.
+-# Primary:  https://www.ranibeautyclinic.com/llms.txt
+-# Extended: https://www.ranibeautyclinic.com/llms-full.txt

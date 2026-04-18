@@ -53,6 +53,8 @@ const regionOrder = [
 ];
 
 export default function LocationsPage() {
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
+
   // Group pages by region
   const grouped = regionOrder
     .map((region) => ({
@@ -69,7 +71,7 @@ export default function LocationsPage() {
     "@type": "MedicalBusiness",
     name: clinicInfo.name,
     url: `${clinicInfo.website}/locations`,
-    telephone: clinicInfo.phone,
+    telephone: schemaPhone,
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

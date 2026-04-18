@@ -12,6 +12,8 @@ const wellnessVariations = serviceVariations.filter(
   (v) => v.category === "wellness"
 );
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return wellnessVariations.map((v) => ({
     slug: v.parentSlug,
@@ -48,6 +50,12 @@ export function generateMetadata({
           alt: `${variation.metaTitle} - Rani Beauty Clinic`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: variation.metaTitle,
+      description: variation.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }

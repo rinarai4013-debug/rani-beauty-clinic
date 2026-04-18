@@ -101,6 +101,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
+
   return (
     <html lang="en" className={fontVariables}>
       <head>
@@ -153,7 +155,7 @@ export default function RootLayout({
                     "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
                   slogan: clinicInfo.tagline,
                   foundingDate: String(clinicInfo.established),
-                  telephone: clinicInfo.phone,
+                  telephone: schemaPhone,
                   email: clinicInfo.email,
                   priceRange: "$$$",
                   currenciesAccepted: "USD",

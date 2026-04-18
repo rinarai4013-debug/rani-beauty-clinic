@@ -1,0 +1,39 @@
+HTTP/2 301 
+date: Sat, 18 Apr 2026 05:32:51 GMT
+content-type: text/html; charset=UTF-8
+location: https://www.seattleplasticsurgery.com/
+server: cloudflare
+x-dns-prefetch-control: on
+expires: Sat, 18 Apr 2026 06:32:51 GMT
+cache-control: max-age=3600
+x-redirect-by: WordPress
+set-cookie: server_name_session=f311dd8a4822fc9878a975bb1a3d1b41; Max-Age=86400; httponly; path=/
+strict-transport-security: max-age=7776000
+cf-cache-status: DYNAMIC
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+x-content-type-options: nosniff
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=wauMNlxclW1eqOrXM%2BP2WSGWMgpHf%2FBjpT33JCDX8Zdh731u0B%2Ftwr8wzJOzIEk1shlv45%2FTBjp0Fa%2FSGhBgAcp45irwiBXXAo3G9OHmP2AJF8rcfN8ynomBIjhYZLRiWT%2B3BwvjC4hf0nYYAqg7sr2bYZk47AJj"}]}
+cf-ray: 9ee14a8d9f67985d-SEA
+alt-svc: h3=":443"; ma=86400
+
+HTTP/2 200 
+date: Sat, 18 Apr 2026 05:32:51 GMT
+content-type: text/html; charset=UTF-8
+server: cloudflare
+vary: Accept-Encoding
+x-dns-prefetch-control: on
+link: <https://www.seattleplasticsurgery.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.seattleplasticsurgery.com/wp-json/wp/v2/pages/5>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://www.seattleplasticsurgery.com/>; rel=shortlink
+x-litespeed-tag: 21c_front,21c_URL.6666cd76f96956469e7be39d750cc7d9,21c_F,21c_Po.5,21c_PGS,21c_,21c_MIN.557bc26e434ec09b7be3aa3626bcac17.css,21c_MIN.b7cd447898a83bb1faaf08da11c7b0b2.js
+strict-transport-security: max-age=7776000
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=BjYCsu8%2FkUUIf7ZsAI4efRFWNphFY3fAqVDL5YSwphadR2QSLnRhwtdovH%2BF%2FEC%2BIGsJzasY1ThmusNUMWainZgBx8WSWbCB3mjUVGwV1cqCZGMPydmeZgeEOCvTWYQBXewpj73mJWvHJexKr1qBKiQX3UyE4Q74jG8Jrw%3D%3D"}]}
+last-modified: Sat, 18 Apr 2026 05:18:08 GMT
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+age: 883
+cache-control: max-age=2678400
+cf-cache-status: HIT
+x-content-type-options: nosniff
+cf-ray: 9ee14a95faa44d48-SEA
+alt-svc: h3=":443"; ma=86400
+

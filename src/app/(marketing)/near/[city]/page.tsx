@@ -57,20 +57,20 @@ export function generateMetadata({ params }: PageProps): Metadata {
 }
 
 const topServices = [
-  { name: "Botox & Dysport", slug: "botox", price: "From $12/unit", description: "Smooth fine lines and wrinkles with expert injections. Natural-looking results that refresh without freezing your expressions." },
-  { name: "HydraFacial MD", slug: "hydrafacial", price: "$249", description: "Deep cleansing, extraction, and hydration in one session using Vortex-Fusion technology. Instant glow with zero downtime." },
+  { name: "Botox & Dysport", slug: "botox", price: "From $4/unit", description: "Smooth fine lines and wrinkles with expert injections. Natural-looking results that refresh without freezing your expressions." },
+  { name: "HydraFacial MD", slug: "hydrafacial", price: "From $99", description: "Deep cleansing, extraction, and hydration in one session using Vortex-Fusion technology. Instant glow with zero downtime." },
   { name: "Laser Hair Removal", slug: "laser-hair-removal", price: "From $79/session", description: "Permanent hair reduction for all skin types using the Candela GentleMax Pro Plus with dual-wavelength technology." },
   { name: "RF Microneedling", slug: "rf-microneedling", price: "From $495", description: "Stimulate collagen production with the Cutera Secret Pro for firmer, smoother, tighter skin with minimal downtime." },
-  { name: "Sofwave", slug: "sofwave", price: "From $2,750", description: "Non-invasive skin tightening using SUPERB ultrasound technology. Lift brows, tighten jawline, and smooth wrinkles in one session." },
-  { name: "Chemical Peels", slug: "chemical-peels", price: "From $150", description: "Medical-grade peels including VI Peel and BioRePeel for acne, hyperpigmentation, texture, and anti-aging concerns." },
-  { name: "GLP-1 Weight Management", slug: "glp1", price: "From $399/mo", description: "The Rani Protocol - physician-supervised weight loss with Semaglutide and Tirzepatide. Includes blood work, custom dosing, and ongoing support." },
+  { name: "Sofwave", slug: "sofwave", price: "From $1,150", description: "Non-invasive skin tightening using SUPERB ultrasound technology. Lift brows, tighten jawline, and smooth wrinkles in one session." },
+  { name: "Chemical Peels", slug: "chemical-peels", price: "From $225", description: "Medical-grade peels including VI Peel, BioRePeel, PRX-T33, and Cosmelan for acne, hyperpigmentation, texture, and anti-aging concerns." },
+  { name: "GLP-1 Weight Management", slug: "glp1", price: "From $249/mo", description: "The Rani Protocol - physician-supervised weight loss with Semaglutide and Tirzepatide. Includes blood work, custom dosing, and ongoing support." },
   { name: "Vitamin Injections", slug: "vitamin-injections", price: "From $35", description: "IM vitamin injections including B12, D3, Tri-Immune, Glutathione, and custom blends for energy, immunity, and vitality." },
   { name: "Peptide Therapy", slug: "peptide-therapy", price: "Consultation required", description: "Targeted peptide protocols for recovery, sleep optimization, body composition, and overall vitality under medical supervision." },
   { name: "Lip Filler", slug: "lip-filler", price: "From $650", description: "Expert lip augmentation with hyaluronic acid fillers for natural volume, definition, and symmetry. Customized to your facial proportions." },
   { name: "Lip Filler (Geo)", slug: "lip-filler-geo", price: "From $650", description: "Natural lip enhancement with premium hyaluronic acid fillers. Personalized volume, definition, and symmetry under physician supervision." },
   { name: "Scar Treatment", slug: "scar-treatment", price: "From $350", description: "Advanced scar reduction for acne scars, surgical scars, and stretch marks using RF microneedling, laser therapy, and medical-grade peels." },
-  { name: "Skin Tightening (Sofwave)", slug: "skin-tightening", price: "From $2,750", description: "Non-invasive lifting and firming using SUPERB ultrasound technology. Tighten jawline, lift brows, and smooth neck lines without surgery." },
-  { name: "Weight Loss (GLP-1)", slug: "weight-loss-glp1", price: "From $399/mo", description: "The Rani Protocol for sustainable weight management with Semaglutide and Tirzepatide. Full medical oversight including blood work and custom dosing." },
+  { name: "Skin Tightening (Sofwave)", slug: "skin-tightening", price: "From $1,150", description: "Non-invasive lifting and firming using SUPERB ultrasound technology. Tighten jawline, lift brows, and smooth neck lines without surgery." },
+  { name: "Weight Loss (GLP-1)", slug: "weight-loss-glp1", price: "From $249/mo", description: "The Rani Protocol for sustainable weight management with Semaglutide and Tirzepatide. Full medical oversight including blood work and custom dosing." },
   { name: "Hormone Therapy (HRT)", slug: "hormone-therapy-hrt", price: "Consultation required", description: "Bioidentical hormone replacement therapy for men and women. Address fatigue, weight gain, low libido, and mood changes with physician-supervised protocols." },
 ];
 
@@ -79,6 +79,7 @@ export default function NearCityPage({ params }: PageProps) {
   if (!city) {
     notFound();
   }
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
 
   const allServiceList = [
     ...nearServiceList,
@@ -97,7 +98,7 @@ export default function NearCityPage({ params }: PageProps) {
     name: clinicInfo.name,
     description: `Physician-supervised medspa in Renton, WA serving ${city.name} with Botox, HydraFacial, laser hair removal, Sofwave, GLP-1 weight management, and medical wellness treatments.`,
     url: `${clinicInfo.website}/near/${city.slug}`,
-    telephone: clinicInfo.phone,
+    telephone: schemaPhone,
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,
@@ -389,21 +390,21 @@ export default function NearCityPage({ params }: PageProps) {
           </p>
           {(() => {
             const pricingRows = [
-              { name: "Botox / Dysport", price: "$12/unit", category: "Injectable" },
+              { name: "Botox / Dysport", price: "From $4/unit", category: "Injectable" },
               { name: "Dermal Fillers", price: "$650/syringe", category: "Injectable" },
               { name: "Lip Filler", price: "$650", category: "Injectable" },
-              { name: "HydraFacial MD", price: "$249", category: "Facial" },
-              { name: "Chemical Peels (VI Peel)", price: "$395", category: "Facial" },
-              { name: "BioRePeel (PRX-T33)", price: "$495", category: "Facial" },
+              { name: "HydraFacial MD", price: "From $99", category: "Facial" },
+              { name: "Chemical Peels (VI Peel)", price: "$325", category: "Facial" },
+              { name: "BioRePeel / PRX-T33", price: "$225-$495", category: "Facial" },
               { name: "Laser Hair Removal", price: "$79/session", category: "Laser" },
               { name: "RF Microneedling", price: "$495", category: "Skin Renewal" },
-              { name: "Sofwave", price: "$2,750", category: "Skin Tightening" },
-              { name: "GLP-1 Weight Management", price: "From $399", category: "Wellness" },
-              { name: "NAD+ Injections", price: "$150", category: "Wellness" },
+              { name: "Sofwave", price: "$1,150", category: "Skin Tightening" },
+              { name: "GLP-1 Weight Management", price: "From $249", category: "Wellness" },
+              { name: "NAD+ Injections", price: "$149", category: "Wellness" },
               { name: "Vitamin Injections", price: "$35", category: "Wellness" },
               { name: "Peptide Therapy", price: "Consultation", category: "Wellness" },
               { name: "Hormone Therapy", price: "Consultation", category: "Wellness" },
-              { name: "Blood Work Panel", price: "$99", category: "Wellness" },
+              { name: "Blood Work Panel", price: "$99-$249", category: "Wellness" },
             ];
             return (
               <>

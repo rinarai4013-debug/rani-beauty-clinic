@@ -19,6 +19,7 @@ export const clinicInfo = {
   },
   established: 2022,
   ownership: "Woman-Owned Business",
+  contentReviewDate: "April 18, 2026",
   medicalDirector: {
     name: "Dr. Alexander Landfield",
     title: "Medical Director",

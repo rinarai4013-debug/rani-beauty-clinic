@@ -112,7 +112,7 @@ ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, S
   {
     slug: "sofwave",
     name: "Sofwave",
-    priceRange: "From $2,750",
+    priceRange: "From $1,150",
     technology: "Sofwave SUPERB",
     category: "aesthetic",
     faqs: [
@@ -127,14 +127,14 @@ Sofwave's SUPERB technology delivers focused ultrasound energy at a precise dept
 
 The Sofwave treatment at Rani Beauty Clinic is ideal for ${cityName} clients who want to lift the brow area, tighten the jawline and jowls, smooth neck lines, reduce submental fullness, and improve overall skin firmness without surgery or significant downtime. The treatment typically takes 30 to 45 minutes for the full face and neck, and clients can return to their normal activities immediately. Some mild redness may occur but typically resolves within hours.
 
-Results from Sofwave develop gradually as new collagen forms over the following 3 to 6 months. Many clients notice an initial tightening effect within the first few weeks, with continued improvement as the collagen remodeling process progresses. Results can last 12 months or longer with proper skincare and sun protection. Sofwave pricing at Rani Beauty Clinic starts at $2,750 for the full face, with full face and neck treatments available at $4,500. Financing through PatientFi and Cherry is available for qualified applicants.
+Results from Sofwave develop gradually as new collagen forms over the following 3 to 6 months. Many clients notice an initial tightening effect within the first few weeks, with continued improvement as the collagen remodeling process progresses. Results can last 12 months or longer with proper skincare and sun protection. Sofwave pricing at Rani Beauty Clinic starts at $1,150 for brow lift, with full face and neck treatments available at $3,999. Financing through PatientFi and Cherry is available for qualified applicants.
 
 ${cityName} residents in ${county} can reach Rani Beauty Clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your Sofwave consultation online.`,
   },
   {
     slug: "chemical-peels",
     name: "Chemical Peels",
-    priceRange: "From $150",
+    priceRange: "From $225",
     category: "aesthetic",
     faqs: [
       { question: "What types of chemical peels does Rani offer?", answer: "We offer a range of chemical peels including VI Peel, BioRePeel (PRX-T33), and medical-grade peels at various strengths. Your provider will recommend the best peel for your skin type and concerns during your consultation." },
@@ -144,18 +144,18 @@ ${cityName} residents in ${county} can reach Rani Beauty Clinic at 401 Olympia A
     generateContent: (cityName, county, drivingTime, distance) =>
       `${cityName} residents can transform their skin with medical-grade chemical peels at Rani Beauty Clinic in Renton, just ${distance} away. Our chemical peel treatments address a wide range of skin concerns including acne, hyperpigmentation, melasma, fine lines, sun damage, uneven texture, and dull complexion. Every chemical peel at Rani is performed under the supervision of Dr. Alexander Landfield, our board-certified Medical Director.
 
-Rani Beauty Clinic offers several types of chemical peels to match every skin type and concern. The VI Peel is one of our most popular options - a medium-depth peel that uses a blend of TCA, retinoic acid, salicylic acid, and vitamin C to address pigmentation, acne, fine lines, and texture. The VI Peel is safe for all skin types and involves approximately 5 to 7 days of peeling as the old skin is replaced with fresh, vibrant new skin. Results include a more even complexion, reduced acne scarring, and a noticeable improvement in skin clarity. VI Peel treatments are priced at $395 at Rani Beauty Clinic.
+Rani Beauty Clinic offers several types of chemical peels to match every skin type and concern. The VI Peel is one of our most popular options - a medium-depth peel that uses a blend of TCA, retinoic acid, salicylic acid, and vitamin C to address pigmentation, acne, fine lines, and texture. The VI Peel is safe for all skin types and involves approximately 5 to 7 days of peeling as the old skin is replaced with fresh, vibrant new skin. Results include a more even complexion, reduced acne scarring, and a noticeable improvement in skin clarity. VI Peel treatments are priced at $325 at Rani Beauty Clinic.
 
-For ${cityName} clients seeking a no-downtime option, the BioRePeel (PRX-T33) is an innovative biorevitalization treatment that stimulates collagen production and cell turnover without visible peeling. This makes it ideal for clients with busy schedules who cannot accommodate downtime. The BioRePeel uses a unique TCA-based formula combined with amino acids, vitamins, and GABA to deliver deep revitalization while keeping the skin surface intact. BioRePeel is priced at $495 per treatment.
+For ${cityName} clients seeking a no-downtime option, the BioRePeel (PRX-T33) is an innovative biorevitalization treatment that stimulates collagen production and cell turnover without visible peeling. This makes it ideal for clients with busy schedules who cannot accommodate downtime. The BioRePeel uses a unique TCA-based formula combined with amino acids, vitamins, and GABA to deliver deep revitalization while keeping the skin surface intact. BioRePeel starts at $225 per treatment, while PRX-T33 is $495.
 
-We also offer light chemical peels starting at $150 that are perfect for first-time peel clients or those seeking gentle, ongoing maintenance. During your consultation, your provider will assess your skin type, current concerns, and goals to recommend the best chemical peel protocol. Many clients benefit from a series of peels spaced 4 to 6 weeks apart for cumulative improvement.
+We also offer medical-grade peel options starting at $225 that are perfect for first-time peel clients or those seeking gentle, ongoing maintenance. During your consultation, your provider will assess your skin type, current concerns, and goals to recommend the best chemical peel protocol. Many clients benefit from a series of peels spaced 4 to 6 weeks apart for cumulative improvement.
 
 ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book online.`,
   },
   {
     slug: "glp1",
     name: "GLP-1 Weight Management",
-    priceRange: "From $399",
+    priceRange: "From $249",
     category: "wellness",
     faqs: [
       { question: "What is The Rani Protocol?", answer: "The Rani Protocol is our physician-supervised GLP-1 weight management program using Semaglutide and Tirzepatide. It includes in-house blood work, custom dosing, regular follow-ups, and ongoing medical support from Dr. Landfield's team." },
@@ -169,7 +169,7 @@ GLP-1 receptor agonists like Semaglutide (the active ingredient in Wegovy and Oz
 
 What makes The Rani Protocol different from online GLP-1 prescribers is our commitment to comprehensive medical oversight. Your journey begins with in-house blood work to establish your baseline health markers, followed by a thorough medical consultation to determine the right medication and starting dose for your body. We start with conservative dosing and titrate gradually based on your response, tolerance, and progress. Regular follow-up appointments ensure that your dosing is optimized and any side effects are managed promptly.
 
-${cityName} residents appreciate the convenience of having blood work, medical consultations, medication management, and follow-up visits all in one clinic. There is no need to visit separate labs or coordinate between multiple providers. The Rani Protocol includes everything - initial blood work, medication, custom dosing, and ongoing support - starting at $399 per month for Semaglutide and $599 per month for Tirzepatide.
+${cityName} residents appreciate the convenience of having blood work, medical consultations, medication management, and follow-up visits all in one clinic. There is no need to visit separate labs or coordinate between multiple providers. The Rani Protocol includes initial blood work, medication, custom dosing, and ongoing support, with program pricing ranging from $249 to $699 per month depending on medication and dose tier.
 
 We understand that weight management is a personal journey, and we provide a supportive, judgment-free environment for every client. ${cityName} residents in ${county} can reach our clinic at 401 Olympia Ave NE, Suite 101, Renton, WA 98056 in approximately ${drivingTime}. Free parking, open seven days a week from 10 AM to 7 PM. Call (425) 539-4440 or book your GLP-1 consultation online.`,
   },
@@ -179,18 +179,18 @@ We understand that weight management is a personal journey, and we provide a sup
     priceRange: "From $35",
     category: "wellness",
     faqs: [
-      { question: "What vitamin injections does Rani offer?", answer: "We offer B12 ($35), Vitamin D3 ($50), Tri-Immune ($75), Glutathione ($100), NAD+ ($150-$500), and custom vitamin blends. All injections are IM (intramuscular) for maximum absorption." },
+      { question: "What vitamin injections does Rani offer?", answer: "We offer B12 ($25), Vitamin D3 ($50), Tri-Immune ($75), Glutathione ($49), NAD+ ($149), and custom vitamin blends. All injections are IM (intramuscular) for maximum absorption." },
       { question: "How often should I get vitamin injections?", answer: "Frequency depends on the injection and your needs. B12 and Tri-Immune are commonly administered weekly or bi-weekly. Glutathione and NAD+ may be scheduled weekly to monthly. Your provider will recommend a schedule based on your blood work and goals." },
       { question: "Are vitamin injections better than oral supplements?", answer: "IM vitamin injections deliver nutrients directly into the muscle for near-complete absorption, bypassing the digestive system. Oral supplements typically have 10 to 50 percent absorption depending on the nutrient. Injections provide faster, more reliable results." },
     ],
     generateContent: (cityName, county, drivingTime, distance) =>
       `${cityName} residents seeking a fast, effective wellness boost can access physician-supervised vitamin injections at Rani Beauty Clinic in Renton, just ${distance} away. Our IM (intramuscular) vitamin injections deliver essential nutrients directly into the muscle for near-complete absorption, bypassing the digestive system for faster and more reliable results than oral supplements. Every injection at Rani is administered under the supervision of Dr. Alexander Landfield, our board-certified Medical Director.
 
-Our vitamin injection menu is designed to address the most common wellness concerns among ${cityName} residents. B12 injections ($35) are our most popular option, providing an energy boost, supporting nervous system function, and addressing deficiency that affects up to 15 percent of the general population. Vitamin D3 injections ($50) are particularly relevant for Pacific Northwest residents, who often have insufficient vitamin D levels due to limited sun exposure throughout much of the year.
+Our vitamin injection menu is designed to address the most common wellness concerns among ${cityName} residents. B12 injections ($25) are our most popular option, providing an energy boost, supporting nervous system function, and addressing deficiency that affects up to 15 percent of the general population. Vitamin D3 injections ($50) are particularly relevant for Pacific Northwest residents, who often have insufficient vitamin D levels due to limited sun exposure throughout much of the year.
 
-For immune support, our Tri-Immune injection ($75) combines Vitamin C, Zinc, and Glutathione in a single IM injection that strengthens immune function and provides antioxidant protection. The Glutathione injection ($100) is our premier antioxidant treatment, supporting detoxification, skin brightening, and cellular health. Many ${cityName} clients add Glutathione to their regular wellness routine for its skin-brightening and anti-aging benefits.
+For immune support, our Tri-Immune injection ($75) combines Vitamin C, Zinc, and Glutathione in a single IM injection that strengthens immune function and provides antioxidant protection. The Glutathione injection ($49) is our premier antioxidant treatment, supporting detoxification, skin brightening, and cellular health. Many ${cityName} clients add Glutathione to their regular wellness routine for its skin-brightening and anti-aging benefits.
 
-NAD+ injections ($150 to $500 depending on dosage) are our most advanced wellness offering, supporting cellular energy production, DNA repair, mental clarity, and healthy aging. NAD+ levels naturally decline with age, and supplementation through IM injection can help restore cellular function and vitality. We offer various NAD+ protocols from single injections to multi-session programs depending on your wellness goals.
+NAD+ injections ($149 per injection) are our most advanced wellness offering, supporting cellular energy production, DNA repair, mental clarity, and healthy aging. NAD+ levels naturally decline with age, and supplementation through IM injection can help restore cellular function and vitality. We offer various NAD+ protocols from single injections to multi-session programs depending on your wellness goals.
 
 All vitamin injections at Rani Beauty Clinic are quick - typically 5 to 10 minutes - with no downtime. ${cityName} residents often combine vitamin injections with aesthetic treatments to make the most of each visit. We recommend baseline blood work to identify specific deficiencies and create a targeted supplementation plan.
 

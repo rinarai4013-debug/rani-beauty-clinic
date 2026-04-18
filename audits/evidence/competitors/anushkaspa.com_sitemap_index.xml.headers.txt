@@ -1,0 +1,20 @@
+HTTP/2 200 
+date: Sat, 18 Apr 2026 05:35:12 GMT
+content-type: text/xml; charset=UTF-8
+cf-ray: 9ee14e05389ddeea-SEA
+vary: Accept-Encoding
+vary: Accept-Encoding
+vary: Accept-Encoding
+vary: Accept-Encoding,Cookie
+x-powered-by: WP Engine
+x-robots-tag: noindex, follow
+x-cacheable: SHORT
+cache-control: max-age=600, must-revalidate
+x-cache: MISS
+x-cache-group: normal
+strict-transport-security: max-age=63072000
+cf-cache-status: DYNAMIC
+set-cookie: __cf_bm=uxW3iSCHNXYgqdlqche_oiSUu3yx4vpRvG9xNO3yI_U-1776490512-1.0.1.1-xObGuHpuKjNRZM5XNrJJ5di3CHcJgIkiAXoGg.RuICs8mOAFK2dBq9ZPWip43pzLm4oC93RJh1c_95KEhulenjUbUNdW3Kbc92uYqdpRTRA; path=/; expires=Sat, 18-Apr-26 06:05:12 GMT; domain=.anushkaspa.com; HttpOnly; Secure; SameSite=None
+server: cloudflare
+alt-svc: h3=":443"; ma=86400
+

@@ -11,6 +11,8 @@ const allServices = [
   ...wellnessServices,
 ];
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return wellnessServices.map((service) => ({
     slug: service.slug,
@@ -36,6 +38,12 @@ export function generateMetadata({
       type: "website",
       url: `${clinicInfo.website}/wellness/${service.slug}`,
       images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${service.metaTitle} - Rani Beauty Clinic` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: service.metaTitle,
+      description: service.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }

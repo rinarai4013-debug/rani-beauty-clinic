@@ -1,0 +1,486 @@
+{
+  "file": "anushkaspa.com_.body.txt",
+  "scriptCount": 5,
+  "scripts": [
+    {
+      "index": 0,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": "https://www.anushkaspa.com/",
+            "url": "https://www.anushkaspa.com/",
+            "name": "Spa in West Palm Beach | Anushka Spa & Salon",
+            "isPartOf": {
+              "@id": "https://www.anushkaspa.com/#website"
+            },
+            "primaryImageOfPage": {
+              "@id": "https://www.anushkaspa.com/#primaryimage"
+            },
+            "image": {
+              "@id": "https://www.anushkaspa.com/#primaryimage"
+            },
+            "thumbnailUrl": "https://www.anushkaspa.com/wp-content/uploads/2024/05/Anushka-Spa-Salon-msc-walkin-BI2A5471.jpg",
+            "datePublished": "2024-02-05T14:58:12+00:00",
+            "dateModified": "2025-10-28T19:28:28+00:00",
+            "description": "Anushka is a hair salon and spa in West Palm Beach that has defined the luxury self-care experience for over 5 decades.",
+            "breadcrumb": {
+              "@id": "https://www.anushkaspa.com/#breadcrumb"
+            },
+            "inLanguage": "en-US",
+            "potentialAction": [
+              {
+                "@type": "ReadAction",
+                "target": [
+                  "https://www.anushkaspa.com/"
+                ]
+              }
+            ]
+          },
+          {
+            "@type": "ImageObject",
+            "inLanguage": "en-US",
+            "@id": "https://www.anushkaspa.com/#primaryimage",
+            "url": "https://www.anushkaspa.com/wp-content/uploads/2024/05/Anushka-Spa-Salon-msc-walkin-BI2A5471.jpg",
+            "contentUrl": "https://www.anushkaspa.com/wp-content/uploads/2024/05/Anushka-Spa-Salon-msc-walkin-BI2A5471.jpg",
+            "width": 2000,
+            "height": 1333,
+            "caption": "Woman walking into Anushka Spa Salon from the front door."
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://www.anushkaspa.com/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home"
+              }
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.anushkaspa.com/#website",
+            "url": "https://www.anushkaspa.com/",
+            "name": "Anushka Salon &amp; Spa",
+            "description": "Spa in West Palm Beach, Florida",
+            "potentialAction": [
+              {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://www.anushkaspa.com/?s={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            ],
+            "inLanguage": "en-US"
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "json": {
+        "@context": "http://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Anushka Salon &amp; Spa",
+        "url": "https://www.anushkaspa.com",
+        "telephone": "5618200500",
+        "email": "",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "701 S. Rosemary Ave Suite 200",
+          "postalCode": "33401",
+          "addressLocality": "West Palm Beach",
+          "addressRegion": "FL",
+          "addressCountry": "United States"
+        },
+        "logo": "https://www.anushkaspa.com/wp-content/uploads/2024/02/Schema-Logo-151x151-1.png",
+        "image": "https://www.anushkaspa.com/wp-content/uploads/2024/02/Schema-Photo-of-Building-200x200-1.png",
+        "sameAs": [
+          "https://www.facebook.com/AnushkaSpaSalon/",
+          "https://www.instagram.com/anushkaspa/",
+          "https://www.youtube.com/@AnushkaSpaSalon1",
+          "https://www.pinterest.com/anushkaspa/"
+        ],
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday"
+            ],
+            "opens": "10:00 am",
+            "closes": "5:00 pm"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Tuesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ],
+            "opens": "8:00 am",
+            "closes": "8:00 pm"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Wednesday"
+            ],
+            "opens": "8:00 am",
+            "closes": "7:00 pm"
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "MedicalBusiness",
+        "name": "Anushka Salon & Spa",
+        "url": "https://www.anushkaspa.com",
+        "description": "Anushka Salon & Spa provides aesthetics, wellness, and spa treatments in the West Palm Beach, FL metro area. Our services include facials, microneedling, laser hair removal, massages, and more.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "701 S. Rosemary Ave Suite 200",
+          "addressLocality": "West Palm Beach",
+          "addressRegion": "FL",
+          "postalCode": "33401",
+          "addressCountry": "US"
+        },
+        "telephone": "+1-561-820-0500",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "26.7067820993621",
+          "longitude": "-80.0574984359082"
+        },
+        "openingHours": [
+          "Mo 10:00-17:00",
+          "Tu 08:00-20:00",
+          "We 08:00-19:00",
+          "Th 08:00-20:00",
+          "Fr 08:00-20:00",
+          "Sa 08:00-20:00"
+        ],
+        "hasMap": "https://maps.app.goo.gl/XAQHqGLXmNAthEV9A",
+        "sameAs": [
+          "https://www.facebook.com/AnushkaSpaSalon/",
+          "https://www.instagram.com/anushkaspa/",
+          "https://www.youtube.com/@AnushkaSpaSalon1",
+          "https://www.pinterest.com/anushkaspa/"
+        ],
+        "areaServed": [
+          {
+            "@type": "Place",
+            "name": "West Palm Beach - Ft. Pierce (metro)"
+          },
+          {
+            "@type": "Place",
+            "name": "Palm Beach Gardens"
+          },
+          {
+            "@type": "Place",
+            "name": "Palm Beach"
+          },
+          {
+            "@type": "Place",
+            "name": "Palm Beach Island"
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "HairSalon",
+        "name": "Anushka Salon & Spa",
+        "url": "https://www.anushkaspa.com",
+        "description": "Anushka Salon & Spa provides hair salon and spa services in addition to a range of wellness and aesthetics treatments in the West Palm Beach, FL area. We specialize in hair coloring, extensions, styling, and much more.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "701 S. Rosemary Ave Suite 200",
+          "addressLocality": "West Palm Beach",
+          "addressRegion": "FL",
+          "postalCode": "33401",
+          "addressCountry": "US"
+        },
+        "telephone": "561.820.0500",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "26.7067820993621",
+          "longitude": "-80.0574984359082"
+        },
+        "openingHours": [
+          "Mo 10:00-17:00",
+          "Tu 08:00-20:00",
+          "We 08:00-19:00",
+          "Th 08:00-20:00",
+          "Fr 08:00-20:00",
+          "Sa 08:00-20:00"
+        ],
+        "hasMap": "https://maps.app.goo.gl/XAQHqGLXmNAthEV9A",
+        "sameAs": [
+          "https://www.facebook.com/AnushkaSpaSalon/",
+          "https://www.instagram.com/anushkaspa/",
+          "https://www.youtube.com/@AnushkaSpaSalon1",
+          "https://www.pinterest.com/anushkaspa/"
+        ],
+        "hasofferCatalog": [
+          "Hair Salon in West Palm Beach",
+          "Hair Coloring in West Palm Beach",
+          "Hair Extensions in West Palm Beach",
+          "Hair Styling in West Palm Beach",
+          "Head Spa in West Palm Beach",
+          "Nail Salon in West Palm Beach",
+          "Makeup Artist in West Palm Beach",
+          "Microblading in West Palm Beach",
+          "Lashes in West Palm Beach",
+          "Eyelash Extensions in West Palm Beach",
+          "Brow Lamination in West Palm Beach",
+          "Men's Haircut in West Palm Beach",
+          "Wedding Hair and Makeup in West Palm Beach",
+          "Beauty Boutique in West Palm Beach",
+          "Facials in West Palm Beach",
+          "Microneedling in West Palm Beach",
+          "HydraFacial in West Palm Beach",
+          "Massages in West Palm Beach",
+          "Cellulite Treatments in West Palm Beach",
+          "Waxing in West Palm Beach",
+          "Spa Day Packages in West Palm Beach",
+          "Laser Hair Removal in West Palm Beach"
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "HairSalon",
+        "name": "Anushka Salon &amp; Spa",
+        "url": "https://www.anushkaspa.com",
+        "description": "Anushka Salon &amp; Spa provides hair salon and spa services in addition to a range of wellness and aesthetics treatments in the West Palm Beach, FL area. We specialize in hair coloring, extensions, styling, and much more.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "701 S. Rosemary Ave Suite 200",
+          "addressLocality": "West Palm Beach",
+          "addressRegion": "FL",
+          "postalCode": "33401",
+          "addressCountry": "US"
+        },
+        "telephone": "+1-561-820-0500",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "26.7067820993621",
+          "longitude": "-80.0574984359082"
+        },
+        "openingHours": [
+          "Mo 10:00-17:00",
+          "Tu 08:00-20:00",
+          "We 08:00-19:00",
+          "Th 08:00-20:00",
+          "Fr 08:00-20:00",
+          "Sa 08:00-20:00"
+        ],
+        "hasMap": "https://maps.app.goo.gl/XAQHqGLXmNAthEV9A",
+        "sameAs": [
+          "https://www.facebook.com/AnushkaSpaSalon/",
+          "https://www.instagram.com/anushkaspa/",
+          "https://www.youtube.com/@AnushkaSpaSalon1",
+          "https://www.pinterest.com/anushkaspa/"
+        ],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Salon &amp; Spa Services",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/hair-salon-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Hair Salon in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/hair-coloring-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Hair Coloring in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/hair-extensions-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Hair Extensions in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/hair-styling-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Hair Styling in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/nail-salon-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Nail Salon in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/makeup-artist-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Makeup Artist in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/microblading-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Microblading in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/lashes-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Lashes in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/eyelash-extensions-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Eyelash Extensions in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/brow-lamination-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Brow Lamination in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/mens-haircut-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Men's Haircut in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/wedding-hair-and-makeup-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Wedding Hair and Makeup in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/beauty-boutique-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Beauty Boutique in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/facials-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Facials in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/microneedling-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Microneedling in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/hydrafacial-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "HydraFacial in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/massages-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Massages in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/cellulite-treatments-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Cellulite Treatments in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/waxing-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Waxing in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/spa-day-packages-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Spa Day Packages in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/laser-hair-removal-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Laser Hair Removal in West Palm Beach"
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://www.anushkaspa.com/services/red-light-therapy-in-west-palm-beach/",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Red Light Therapy in West Palm Beach"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

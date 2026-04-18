@@ -35,12 +35,14 @@ export const metadata: Metadata = {
 };
 
 export default function TeamPage() {
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "MedicalBusiness",
     name: clinicInfo.name,
     url: `${clinicInfo.website}/team`,
-    telephone: clinicInfo.phone,
+    telephone: schemaPhone,
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

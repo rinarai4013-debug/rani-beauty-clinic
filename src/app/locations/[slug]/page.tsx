@@ -99,6 +99,7 @@ export default function LocationPage({ params }: PageProps) {
     notFound();
   }
 
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
   const paragraphs = page.content.split("\n\n").filter((p) => p.trim());
 
   const structuredData = {
@@ -107,7 +108,7 @@ export default function LocationPage({ params }: PageProps) {
     name: clinicInfo.name,
     description: page.metaDescription,
     url: `${clinicInfo.website}/locations/${page.slug}`,
-    telephone: clinicInfo.phone,
+    telephone: schemaPhone,
     address: {
       "@type": "PostalAddress",
       streetAddress: clinicInfo.address.street,

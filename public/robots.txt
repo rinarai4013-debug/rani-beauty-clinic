@@ -64,6 +64,13 @@ Disallow: /dashboard/
 Disallow: /portal/
 Disallow: /admin/
 
+User-agent: Perplexity-User
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
 # Common Crawl (powers many LLM training corpora)
 User-agent: CCBot
 Allow: /

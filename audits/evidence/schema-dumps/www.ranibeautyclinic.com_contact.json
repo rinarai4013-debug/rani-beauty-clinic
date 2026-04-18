@@ -1,0 +1,309 @@
+{
+  "url": "https://www.ranibeautyclinic.com/contact",
+  "scriptCount": 2,
+  "scripts": [
+    {
+      "index": 0,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "Organization",
+              "MedicalBusiness",
+              "MedicalClinic",
+              "LocalBusiness"
+            ],
+            "@id": "https://www.ranibeautyclinic.com#organization",
+            "name": "Rani Beauty Clinic",
+            "alternateName": "Rani Medspa",
+            "url": "https://www.ranibeautyclinic.com",
+            "logo": {
+              "@type": "ImageObject",
+              "@id": "https://www.ranibeautyclinic.com#logo",
+              "url": "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
+              "width": 600,
+              "height": 200,
+              "caption": "Rani Beauty Clinic"
+            },
+            "image": {
+              "@id": "https://www.ranibeautyclinic.com#logo"
+            },
+            "description": "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
+            "slogan": "Your Skin. Your Wellness. Our Expertise.",
+            "foundingDate": "2022",
+            "telephone": "(425) 539-4440",
+            "email": "info@ranibeautyclinic.com",
+            "priceRange": "$$$",
+            "currenciesAccepted": "USD",
+            "paymentAccepted": [
+              "Cash",
+              "Credit Card",
+              "HSA",
+              "FSA",
+              "Financing"
+            ],
+            "medicalSpecialty": [
+              "Dermatology",
+              "CosmeticSurgery",
+              "Medical-aesthetics",
+              "PlasticSurgery"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "401 Olympia Ave NE, Suite 101",
+              "addressLocality": "Renton",
+              "addressRegion": "WA",
+              "postalCode": "98056",
+              "addressCountry": "US"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 47.4856,
+              "longitude": -122.2031
+            },
+            "hasMap": "https://g.page/ranibeautyclinic",
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "opens": "10:00",
+                "closes": "19:00"
+              }
+            ],
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": 4.9,
+              "reviewCount": 127,
+              "bestRating": 5,
+              "worstRating": 1
+            },
+            "sameAs": [
+              "https://www.instagram.com/ranibeautyclinic",
+              "https://www.facebook.com/ranibeautyclinic",
+              "https://www.tiktok.com/@ranibeautyclinic",
+              "https://g.page/ranibeautyclinic"
+            ],
+            "employee": {
+              "@id": "https://www.ranibeautyclinic.com#medical-director"
+            },
+            "areaServed": [
+              {
+                "@type": "State",
+                "name": "Washington"
+              },
+              {
+                "@type": "AdministrativeArea",
+                "name": "King County"
+              },
+              {
+                "@type": "City",
+                "name": "Renton"
+              },
+              {
+                "@type": "City",
+                "name": "Bellevue"
+              },
+              {
+                "@type": "City",
+                "name": "Seattle"
+              },
+              {
+                "@type": "City",
+                "name": "Kent"
+              },
+              {
+                "@type": "City",
+                "name": "Tukwila"
+              },
+              {
+                "@type": "City",
+                "name": "Newcastle"
+              },
+              {
+                "@type": "City",
+                "name": "Mercer Island"
+              },
+              {
+                "@type": "City",
+                "name": "Kirkland"
+              },
+              {
+                "@type": "City",
+                "name": "Redmond"
+              },
+              {
+                "@type": "City",
+                "name": "Issaquah"
+              },
+              {
+                "@type": "City",
+                "name": "Sammamish"
+              },
+              {
+                "@type": "City",
+                "name": "Auburn"
+              },
+              {
+                "@type": "City",
+                "name": "Federal Way"
+              }
+            ],
+            "knowsAbout": [
+              "Laser Hair Removal",
+              "Botox",
+              "Dysport",
+              "Dermal Fillers",
+              "HydraFacial",
+              "RF Microneedling",
+              "Chemical Peels",
+              "Cosmelan Peel",
+              "BioRePeel",
+              "VI Peel",
+              "PRX-T33",
+              "Sofwave",
+              "Red Light Therapy",
+              "Melasma Treatment",
+              "Hyperpigmentation",
+              "Acne Scars",
+              "Skin Tightening",
+              "Dark Circles",
+              "Undereye Rejuvenation",
+              "Scar Reduction",
+              "GLP-1 Weight Management",
+              "Semaglutide",
+              "Tirzepatide",
+              "Hormone Replacement Therapy",
+              "NAD+ Injections",
+              "Vitamin B12 Injections",
+              "Glutathione Injections",
+              "Peptide Therapy",
+              "Testosterone Replacement Therapy"
+            ],
+            "potentialAction": {
+              "@type": "ReserveAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://booking.mangomint.com/ranibeautyclinic1",
+                "actionPlatform": [
+                  "https://schema.org/DesktopWebPlatform",
+                  "https://schema.org/MobileWebPlatform"
+                ]
+              },
+              "result": {
+                "@type": "Reservation",
+                "name": "Medspa Appointment"
+              }
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.ranibeautyclinic.com#medical-director",
+            "name": "Dr. Alexander Landfield",
+            "jobTitle": "Medical Director",
+            "description": "Every medical treatment at Rani Beauty Clinic is performed under the supervision of Dr. Alexander Landfield, a board-certified neurologist.",
+            "hasCredential": {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Board Certification",
+              "name": "Board-Certified Neurologist"
+            },
+            "worksFor": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "knowsAbout": [
+              "Neurology",
+              "Botox",
+              "Dysport",
+              "Neurotoxin Injections",
+              "Facial Nerve Anatomy",
+              "Medical Aesthetics"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.ranibeautyclinic.com#website",
+            "url": "https://www.ranibeautyclinic.com",
+            "name": "Rani Beauty Clinic",
+            "description": "Premier physician-supervised medspa in Renton, WA — laser, injectables, skin rejuvenation, and medical wellness.",
+            "publisher": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "inLanguage": "en-US",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.ranibeautyclinic.com/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "MedicalBusiness",
+        "name": "Rani Beauty Clinic",
+        "url": "https://www.ranibeautyclinic.com",
+        "telephone": "(425) 539-4440",
+        "email": "info@ranibeautyclinic.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "401 Olympia Ave NE, Suite 101",
+          "addressLocality": "Renton",
+          "addressRegion": "WA",
+          "postalCode": "98056",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 47.4856,
+          "longitude": -122.2031
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "10:00",
+          "closes": "19:00"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "(425) 539-4440",
+          "contactType": "customer service",
+          "availableLanguage": [
+            "English"
+          ]
+        },
+        "priceRange": "$$$",
+        "paymentAccepted": "Cash, Credit Card, Debit Card, HSA, Cherry Financing, PatientFi",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": 4.9,
+          "reviewCount": 127,
+          "bestRating": 5
+        }
+      }
+    }
+  ]
+}

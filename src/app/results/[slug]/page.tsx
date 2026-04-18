@@ -56,6 +56,7 @@ export default function ResultsPage({
 }) {
   const gallery = galleryPages.find((g) => g.slug === params.slug);
   if (!gallery) notFound();
+  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
 
   // Filter testimonials that match this service
   const serviceTestimonials = testimonials.filter(
@@ -105,7 +106,7 @@ export default function ResultsPage({
       "@type": "MedicalBusiness",
       name: "Rani Beauty Clinic",
       url: baseUrl,
-      telephone: clinicInfo.phone,
+      telephone: schemaPhone,
       address: {
         "@type": "PostalAddress",
         streetAddress: clinicInfo.address.street,

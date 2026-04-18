@@ -11,6 +11,8 @@ const allServices = [
   ...wellnessServices,
 ];
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return aestheticServices.map((service) => ({
     slug: service.slug,
@@ -43,6 +45,12 @@ export function generateMetadata({
           alt: `${service.metaTitle} - Rani Beauty Clinic`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: service.metaTitle,
+      description: service.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }

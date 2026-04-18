@@ -1,0 +1,20 @@
+HTTP/2 404 
+date: Sat, 18 Apr 2026 05:34:24 GMT
+content-type: text/html; charset=UTF-8
+cf-ray: 9ee14cd93ef677cd-SEA
+vary: Accept-Encoding
+vary: Accept-Encoding
+vary: Accept-Encoding
+link: <https://www.anushkaspa.com/wp-json/>; rel="https://api.w.org/"
+status: 404 Not Found
+x-powered-by: WP Engine
+x-cacheable: non200
+cache-control: max-age=600, must-revalidate
+x-cache: MISS
+x-cache-group: normal
+strict-transport-security: max-age=63072000
+cf-cache-status: DYNAMIC
+set-cookie: __cf_bm=97RwFQ8mzb4SXRgCV5DXEgNmZydhujNyEcy.i.fpNmo-1776490464-1.0.1.1-bXkN.KQk49HngrKXsvdvpkgoMHJLPguW95KkpzjjBPMXvpdWhDKJgUS54lUzW2xolZBJX4ksYzAz8ZrW4SoUp63e_ytNYSTsbE_kSSSWs4Q; path=/; expires=Sat, 18-Apr-26 06:04:24 GMT; domain=.anushkaspa.com; HttpOnly; Secure; SameSite=None
+server: cloudflare
+alt-svc: h3=":443"; ma=86400
+

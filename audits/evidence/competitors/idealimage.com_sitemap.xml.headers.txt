@@ -1,0 +1,38 @@
+HTTP/2 301 
+date: Sat, 18 Apr 2026 05:34:23 GMT
+content-type: text/html
+content-length: 167
+location: https://www.idealimage.com/sitemap.xml
+cf-ray: 9ee14cd6fd2deb3d-SEA
+cf-cache-status: BYPASS
+cache-control: max-age=3600
+expires: Sat, 18 Apr 2026 06:34:23 GMT
+server: cloudflare
+vary: Accept-Encoding
+cross-origin-opener-policy: same-origin
+cross-origin-opener-policy: same-origin
+cf-apo-via: origin,resnok
+speculation-rules: "/cdn-cgi/speculation"
+set-cookie: __cf_bm=XyqUOChk.lIoYTb6ohYodqUgYXdUuEOieXw38ATeEpg-1776490463.8327148-1.0.1.1-yQ5bMLMmCfg_WsQtFzIkZTqDL6m3Yl4B4l1RG8PGd1CTzqII92Hcl4UgTfKnIShEOGuiog6tc8yj3DDaPDpQbRo5dcV2_PZ.EyXnQ.6613Uh.CXzJ2zWMgvafkUdVuVK; HttpOnly; Secure; Path=/; Domain=idealimage.com; Expires=Sat, 18 Apr 2026 06:04:23 GMT
+alt-svc: h3=":443"; ma=86400
+
+HTTP/2 530 
+date: Sat, 18 Apr 2026 05:34:24 GMT
+content-type: text/html; charset=UTF-8
+cf-ray: 9ee14cd7be8516ae-SEA
+cf-cache-status: BYPASS
+cache-control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+expires: Thu, 01 Jan 1970 00:00:01 GMT
+server: cloudflare
+content-security-policy: default-src 'self' 'unsafe-eval' 'unsafe-inline' https://bat.bing.net https://sourcemaps.quiq.sh https://ps.w.org https://*.google.de https://applepay.cdn-apple.com https://eu.accelerate.altis.cloud https://pixel.tapad.com https://*.mgln.ai https://mgln.ai https://heatmap-events-collector.instapage.com https://*.google.cz https://*.google.nl https://*.google.pl https://*.google.fr https://analytics-ipv6.tiktokw.us https://*.google.ba https://arttrk.com https://*.veritone-ce.com https://*.newrelic.com https://*.nr-data.net https://connect.facebook.net https://api-v2.mutinyhq.io/v2/b https://gtm.idealimage.com https://l.clarity.ms/collect https://td.doubleclick.net https://bam.nr-data.net https://*.simpli.fi https://*.goquiq.com https://*.postimg.cc https://*.quiq-api.com https://*.quiq-cdn.com https://*.sentry-cdn.com https://*.userway.org https://cdn.acsbapp.com/config/store.idealimage.com/config.json https://cdn.acsbapp.com/config/idealimage.com/config.json https://cdn.acsbapp.com/config/beideal.idealimage.com/config.json https://*.peek-achoo.com https://*.googlesyndication.com https://*.ally.com https://acsbapp.com https://*.bing.com https://*.bugsnag.com https://*.cloudflare.com https://*.cloudflareinsights.com https://*.cloudfront.net https://*.cookielaw.org https://*.crazyegg.com https://*.doubleclick.net https://*.e-signlive.com https://*.facebook.com https://*.facebook.net https://*.fontawesome.com https://*.ggpht.com https://*.go2sdk.com https://*.gonift.com https://*.google-analytics.com https://*.google.at https://*.google.co.in https://*.google.com https://*.google.it https://*.googleadservices.com https://*.googleapis.com https://*.googleoptimize.com https://*.googletagmanager.com https://*.googleusercontent.com https://*.gstatic.com https://*.hotjar.com https://*.hotjar.io http://*.idealimage.com https://*.idealimage.com https://*.jsdelivr.net https://*.litix.io https://*.mutinyhq.com https://*.mutinycdn.com https://*.mutinyhq.io https://*.myfortiva.com https://*.nmi.com https://*.onetrust.com https://*.pardot.com https://*.pingdom.net https://*.puntpunt.fun https://s3.amazonaws.com/documents.idealimage.com/ https://*.securedvisit.com https://*.snapchat.com https://*.sv.rkdms.com https://*.taboola.com https://*.tiktok.com https://*.typekit.net https://player.vimeo.com https://*.wistia.com https://*.wistia.net https://*.xg4ken.com https://aspireiq.go2cloud.org https://e-signlive.com https://google.com https://*.salesforce-sites.com https://idealimage.secure.force.com https://imagedelivery.net https://pixel.locker2.com https://pixel.wp.com https://res.cloudinary.com https://s.w.org https://s3.us-east-1.amazonaws.com https://sc-static.net https://stats.wp.com https://tsdtocl.com https://assets.scrippsdigital.com https://us01ccistatic.zoom.us wss://*.hotjar.com data: blob: https://*.clarity.ms https://cdn.segment.com https://api.segment.io https://secure.gravatar.com; frame-ancestors https://*.puntpunt.fun https://*.idealimage.com https://app.mutinyhq.com https://*.nmi.com;
+cross-origin-opener-policy: same-origin
+cross-origin-opener-policy: same-origin
+referrer-policy: same-origin
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+cf-apo-via: origin,page-rules
+speculation-rules: "/cdn-cgi/speculation"
+vary: accept-encoding
+set-cookie: __cf_bm=npX2in5nfnshT0Ps9j_14SXatTnTo98buGgENHL18ME-1776490463.9540095-1.0.1.1-vj3sxPB23i.Qnj6UZVc_fu7Byph2x2yzR1Fq_vKXl8KGxEtTA0P4CEJappBZtlSdYhp6oouqKXTWvEQOLSBAIw5X2D71OyXHmByXf4E01mrd3IhbH3oODgO5wKqW8QOK; HttpOnly; Secure; Path=/; Domain=idealimage.com; Expires=Sat, 18 Apr 2026 06:04:24 GMT
+alt-svc: h3=":443"; ma=86400
+

@@ -1,0 +1,23 @@
+HTTP/2 200 
+age: 16
+cache-control: public, max-age=0, must-revalidate
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://booking.mangomint.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.airtable.com https://www.google-analytics.com https://stats.g.doubleclick.net https://www.clarity.ms https://connect.facebook.net https://www.facebook.com https://booking.mangomint.com https://*.ingest.us.sentry.io; frame-src 'self' https://www.googletagmanager.com https://booking.mangomint.com https://app.mangomint.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+content-type: text/html; charset=utf-8
+date: Sat, 18 Apr 2026 05:28:59 GMT
+etag: "ur66md8lk93diy"
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Vercel
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-matched-path: /services/[slug]
+x-tenant-host: www.ranibeautyclinic.com
+x-tenant-id: rani-beauty-clinic
+x-tenant-source: default
+x-vercel-cache: HIT
+x-vercel-id: pdx1::iad1::4bxjf-1776490156713-013c240ef5e3
+x-xss-protection: 1; mode=block
+content-length: 157880
+
