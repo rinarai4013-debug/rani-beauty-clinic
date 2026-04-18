@@ -81,7 +81,7 @@ export default function PortalMembershipPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Crown className="w-5 h-5 text-rani-gold" />
+        <Crown className="w-5 h-5 text-rani-gold-accessible" />
         <h1 className="text-xl font-heading font-bold text-rani-navy">My Membership</h1>
       </div>
 
@@ -130,7 +130,7 @@ export default function PortalMembershipPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-body font-semibold text-rani-gold">-${usage.creditUsed} credit</p>
+                  <p className="text-sm font-body font-semibold text-rani-gold-accessible">-${usage.creditUsed} credit</p>
                   {usage.outOfPocket > 0 && (
                     <p className="text-xs font-body text-gray-500">${usage.outOfPocket} out of pocket</p>
                   )}
@@ -161,11 +161,11 @@ export default function PortalMembershipPage() {
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-3">
         <a href="/portal/membership/upgrade" className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow group">
-          <ArrowRight className="w-4 h-4 text-rani-gold mb-2 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-4 h-4 text-rani-gold-accessible mb-2 group-hover:translate-x-1 transition-transform" />
           <span className="text-sm font-body font-semibold text-rani-navy">Upgrade Plan</span>
         </a>
         <a href="/portal/membership/billing" className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow group">
-          <CreditCard className="w-4 h-4 text-rani-gold mb-2" />
+          <CreditCard className="w-4 h-4 text-rani-gold-accessible mb-2" />
           <span className="text-sm font-body font-semibold text-rani-navy">Manage Billing</span>
         </a>
       </div>
@@ -176,7 +176,7 @@ export default function PortalMembershipPage() {
 function BenefitCard({ icon: Icon, label, value }: { icon: typeof CreditCard; label: string; value: string }) {
   return (
     <div className="p-3 bg-rani-cream/30 rounded-lg">
-      <Icon className="w-4 h-4 text-rani-gold mb-1" />
+      <Icon className="w-4 h-4 text-rani-gold-accessible mb-1" />
       <p className="text-[10px] font-body text-gray-500 uppercase tracking-wide">{label}</p>
       <p className="text-xs font-body font-semibold text-rani-navy">{value}</p>
     </div>

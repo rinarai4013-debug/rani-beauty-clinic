@@ -65,22 +65,22 @@ export default function AppointmentCard({
       {/* Details */}
       <div className="mt-3 space-y-2">
         <div className="flex items-center gap-2 text-sm text-rani-muted">
-          <Calendar className="h-4 w-4 text-rani-gold" />
+          <Calendar className="h-4 w-4 text-rani-gold-accessible" />
           <span>{formattedDate}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-rani-muted">
-          <Clock className="h-4 w-4 text-rani-gold" />
+          <Clock className="h-4 w-4 text-rani-gold-accessible" />
           <span>
             {appointment.time} &middot; {appointment.duration} min
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm text-rani-muted">
-          <User className="h-4 w-4 text-rani-gold" />
+          <User className="h-4 w-4 text-rani-gold-accessible" />
           <span>{appointment.provider}</span>
         </div>
         {appointment.location && (
           <div className="flex items-center gap-2 text-sm text-rani-muted">
-            <MapPin className="h-4 w-4 text-rani-gold" />
+            <MapPin className="h-4 w-4 text-rani-gold-accessible" />
             <span>{appointment.location}</span>
           </div>
         )}

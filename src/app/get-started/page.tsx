@@ -77,9 +77,9 @@ export default function GetStartedPage() {
             { num: '03', title: 'See Your Transformation', desc: "Review your custom plan, explore financing options, and book your first appointment when you're ready." },
           ].map((step, i) => (
             <motion.div key={i} variants={fadeUp} className="relative bg-white rounded-2xl p-8 shadow-sm border border-rani-border hover:shadow-md transition-shadow">
-              <span className="text-5xl font-heading text-rani-gold/20 absolute top-4 right-6">{step.num}</span>
+              <span className="text-5xl font-heading text-rani-gold-accessible/20 absolute top-4 right-6">{step.num}</span>
               <div className="w-12 h-12 bg-rani-gold/10 rounded-xl flex items-center justify-center mb-5">
-                <span className="text-2xl font-heading text-rani-gold">{step.num}</span>
+                <span className="text-2xl font-heading text-rani-gold-accessible">{step.num}</span>
               </div>
               <h3 className="text-lg font-heading text-rani-navy mb-3">{step.title}</h3>
               <p className="text-sm font-body text-rani-muted leading-relaxed">{step.desc}</p>
@@ -91,7 +91,7 @@ export default function GetStartedPage() {
       <section className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-14">
-            <motion.p variants={fadeUp} className="text-xs font-body font-semibold uppercase tracking-[0.2em] text-rani-gold mb-3">Our Services</motion.p>
+            <motion.p variants={fadeUp} className="text-xs font-body font-semibold uppercase tracking-[0.2em] text-rani-gold-accessible mb-3">Our Services</motion.p>
             <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-heading text-rani-navy">Medical-Grade Aesthetic Treatments</motion.h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -100,7 +100,7 @@ export default function GetStartedPage() {
                 <Link href={svc.href} className="block bg-rani-cream/50 rounded-2xl p-6 border border-rani-border hover:border-rani-gold/30 hover:shadow-md transition-all group">
                   <span className="text-3xl mb-4 block">{svc.icon}</span>
                   <h3 className="text-base font-heading text-rani-navy mb-1 group-hover:text-rani-gold transition-colors">{svc.name}</h3>
-                  <p className="text-sm font-body font-semibold text-rani-gold mb-2">{svc.price}</p>
+                  <p className="text-sm font-body font-semibold text-rani-gold-accessible mb-2">{svc.price}</p>
                   <p className="text-xs font-body text-rani-muted leading-relaxed">{svc.desc}</p>
                 </Link>
               </motion.div>
@@ -113,7 +113,7 @@ export default function GetStartedPage() {
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {TRUST_POINTS.map((tp, i) => (
             <motion.div key={i} variants={fadeUp} className="text-center p-6">
-              <tp.icon className="w-10 h-10 text-rani-gold mx-auto mb-4" />
+              <tp.icon className="w-10 h-10 text-rani-gold-accessible mx-auto mb-4" />
               <h3 className="text-sm font-heading text-rani-navy mb-2">{tp.label}</h3>
               <p className="text-xs font-body text-rani-muted">{tp.desc}</p>
             </motion.div>

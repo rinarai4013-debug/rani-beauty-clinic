@@ -277,7 +277,7 @@ export default function AuraScoreGauge({
               duration={2000}
               decimals={0}
               className={`font-bold`}
-              color="text-[#C9A96E]"
+              color="text-rani-gold-accessible"
               formatThousands={false}
               revealOnScroll={false}
               startFrom={0}

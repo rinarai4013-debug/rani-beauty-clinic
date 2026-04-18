@@ -41,7 +41,7 @@ export default function PlanTotals({ totalServices, totalValue, packages }: Plan
         {/* Total value */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
-            <DollarSign className="h-4 w-4 text-[#C9A96E]" />
+            <DollarSign className="h-4 w-4 text-rani-gold-accessible" />
           </div>
           <div>
             <p className="text-xs text-gray-500">Estimated Value</p>
@@ -70,7 +70,7 @@ export default function PlanTotals({ totalServices, totalValue, packages }: Plan
                   href="https://patient.withcherry.com/apply/rani-beauty-clinic"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-medium text-[#C9A96E] hover:underline"
+                  className="text-[10px] font-medium text-rani-gold-accessible hover:underline"
                 >
                   Apply with Cherry
                 </a>
@@ -79,7 +79,7 @@ export default function PlanTotals({ totalServices, totalValue, packages }: Plan
                   href="https://app.patientfi.com/v2/rani-beauty-clinic/apply"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-medium text-[#C9A96E] hover:underline"
+                  className="text-[10px] font-medium text-rani-gold-accessible hover:underline"
                 >
                   Apply with PatientFi
                 </a>

@@ -150,7 +150,7 @@ export default function AudienceBuilder({
       {/* Audience Size Preview */}
       {audienceSize !== undefined && (
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-rani-gold/5 border border-rani-gold/20">
-          <Users className="w-5 h-5 text-rani-gold" />
+          <Users className="w-5 h-5 text-rani-gold-accessible" />
           <div>
             <span className="text-lg font-body font-bold text-rani-navy">
               {audienceSize.toLocaleString()}
@@ -339,7 +339,7 @@ export default function AudienceBuilder({
 
                 <button
                   onClick={() => addCondition(group.id)}
-                  className="flex items-center gap-1.5 text-[11px] font-body font-medium text-rani-gold hover:text-rani-navy transition-colors mt-1"
+                  className="flex items-center gap-1.5 text-[11px] font-body font-medium text-rani-gold-accessible hover:text-rani-navy transition-colors mt-1"
                 >
                   <Plus className="w-3 h-3" />
                   Add Condition

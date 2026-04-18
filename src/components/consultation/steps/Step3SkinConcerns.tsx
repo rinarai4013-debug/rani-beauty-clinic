@@ -136,7 +136,7 @@ export default function Step3SkinConcerns({
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                     selected
-                      ? 'bg-[#C9A96E]/15 text-[#C9A96E]'
+                      ? 'bg-[#C9A96E]/15 text-rani-gold-accessible'
                       : 'bg-[#0F1D2C]/5 text-[#0F1D2C]/50'
                   }`}
                 >

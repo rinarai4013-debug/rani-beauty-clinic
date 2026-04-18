@@ -154,7 +154,7 @@ export default function CombinationPageRoute({ params }: PageProps) {
                 key={i}
                 className="flex items-start gap-4 rounded-xl border border-[#C9A96E]/15 bg-[#F8F6F1]/50 p-6"
               >
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#C9A96E]/10 text-sm font-medium text-[#C9A96E]">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#C9A96E]/10 text-sm font-medium text-rani-gold-accessible">
                   {i + 1}
                 </span>
                 <p className="text-[#0F1D2C]/80 leading-relaxed">{benefit}</p>

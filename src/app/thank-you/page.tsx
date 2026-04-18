@@ -81,11 +81,11 @@ export default function ThankYouPage() {
 
           <div className="mt-8 flex flex-col items-center gap-2 text-center">
             <div className="flex items-center gap-2 font-body text-sm text-rani-muted">
-              <MapPin size={14} className="text-rani-gold" />
+              <MapPin size={14} className="text-rani-gold-accessible" />
               {clinicInfo.address.full}
             </div>
             <div className="flex items-center gap-2 font-body text-sm text-rani-muted">
-              <Calendar size={14} className="text-rani-gold" />
+              <Calendar size={14} className="text-rani-gold-accessible" />
               {clinicInfo.hours.formatted}
             </div>
           </div>

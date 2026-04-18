@@ -92,7 +92,7 @@ export default function SyncStatus() {
       </div>
 
       {status?.syncInProgress && (
-        <div className="mt-3 flex items-center gap-2 text-sm text-[#C9A96E]">
+        <div className="mt-3 flex items-center gap-2 text-sm text-rani-gold-accessible">
           <div className="h-2 w-2 animate-pulse rounded-full bg-[#C9A96E]" />
           Sync in progress...
         </div>

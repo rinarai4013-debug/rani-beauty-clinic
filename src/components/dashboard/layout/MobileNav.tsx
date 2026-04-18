@@ -30,7 +30,7 @@ export default function MobileNav({ role }: MobileNavProps) {
             key={item.href}
             href={item.href}
             className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-              isActive ? 'text-rani-gold' : 'text-rani-muted'
+              isActive ? 'text-rani-gold-accessible' : 'text-rani-muted'
             }`}
           >
             <Icon className="w-5 h-5" />

@@ -232,8 +232,8 @@ export default function ShareableResult({
                 <span className="text-2xl font-bold text-[#0F1D2C]">
                   {skinScore.current}
                 </span>
-                <ArrowRight className="w-5 h-5 text-[#C9A96E]" />
-                <span className="text-2xl font-bold text-[#C9A96E]">
+                <ArrowRight className="w-5 h-5 text-rani-gold-accessible" />
+                <span className="text-2xl font-bold text-rani-gold-accessible">
                   {skinScore.projected}
                 </span>
               </div>
@@ -270,7 +270,7 @@ export default function ShareableResult({
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-[#C9A96E]/10 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C9A96E]" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-rani-gold-accessible" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#0F1D2C]">{rec.name}</p>
@@ -280,7 +280,7 @@ export default function ShareableResult({
                   </div>
                 </div>
                 {rec.price && (
-                  <span className="text-sm font-medium text-[#C9A96E]">{rec.price}</span>
+                  <span className="text-sm font-medium text-rani-gold-accessible">{rec.price}</span>
                 )}
               </div>
             ))}

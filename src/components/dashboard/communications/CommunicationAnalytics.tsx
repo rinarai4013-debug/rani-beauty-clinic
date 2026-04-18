@@ -140,8 +140,8 @@ export default function CommunicationAnalytics({
               {/* Email Metrics */}
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Mail className="w-4 h-4 text-rani-gold" />
-                  <span className="text-xs font-body font-semibold text-rani-gold">Email</span>
+                  <Mail className="w-4 h-4 text-rani-gold-accessible" />
+                  <span className="text-xs font-body font-semibold text-rani-gold-accessible">Email</span>
                 </div>
                 <div className="space-y-1 text-[11px] font-body text-rani-muted">
                   <p>Sent: <span className="font-semibold text-rani-text">{data.byChannel.email.sent.toLocaleString()}</span></p>

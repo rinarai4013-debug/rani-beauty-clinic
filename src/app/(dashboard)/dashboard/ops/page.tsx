@@ -376,7 +376,7 @@ export default function OpsCommandCenter() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-800/50 rounded-lg p-3">
-                  <p className="text-lg font-bold text-[#C9A96E]">
+                  <p className="text-lg font-bold text-rani-gold-accessible">
                     ${morningData.pipeline.mrr.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500">GLP-1 MRR</p>

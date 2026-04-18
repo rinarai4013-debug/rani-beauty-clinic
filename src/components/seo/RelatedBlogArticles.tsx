@@ -40,7 +40,7 @@ export default function RelatedBlogArticles({
   return (
     <section className="bg-rani-cream py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="text-center font-body text-[11px] font-bold uppercase tracking-[0.2em] text-rani-gold">
+        <p className="text-center font-body text-[11px] font-bold uppercase tracking-[0.2em] text-rani-gold-accessible">
           LEARN MORE
         </p>
         <h2 className="mt-4 text-center font-heading text-2xl md:text-3xl text-rani-navy">

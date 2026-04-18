@@ -55,7 +55,7 @@ export default function PricingMatrix({ services, competitorComparison }: Pricin
                   <td className="text-right py-3 px-3 font-body text-rani-muted">
                     {s.competitorAvgPrice > 0 ? `$${s.competitorAvgPrice}` : '—'}
                   </td>
-                  <td className="text-right py-3 px-3 font-body font-semibold text-rani-gold">${s.optimalPrice}</td>
+                  <td className="text-right py-3 px-3 font-body font-semibold text-rani-gold-accessible">${s.optimalPrice}</td>
                   <td className="text-center py-3 px-3">
                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-body font-medium ${badge.color}`}>
                       {badge.label}

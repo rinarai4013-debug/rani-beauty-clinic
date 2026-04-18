@@ -145,7 +145,7 @@ export default function LoyaltyPage() {
               key={stat.label}
               className="rounded-xl border border-rani-navy/10 bg-white p-4 shadow-sm"
             >
-              <stat.icon className="mb-2 h-5 w-5 text-rani-gold" />
+              <stat.icon className="mb-2 h-5 w-5 text-rani-gold-accessible" />
               <p className="text-xs text-rani-navy/50">{stat.label}</p>
               <p className="text-lg font-semibold text-rani-navy">{stat.value}</p>
             </div>
@@ -179,7 +179,7 @@ export default function LoyaltyPage() {
                   <ul className="mt-4 space-y-2">
                     {config.benefits.map((benefit) => (
                       <li key={benefit} className="flex items-start gap-2 text-sm text-rani-navy/80">
-                        <Star className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-rani-gold" />
+                        <Star className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-rani-gold-accessible" />
                         {benefit}
                       </li>
                     ))}
@@ -205,7 +205,7 @@ export default function LoyaltyPage() {
                     : 'border-rani-navy/10 bg-white'
                 }`}
               >
-                <item.icon className="mb-3 h-6 w-6 text-rani-gold" />
+                <item.icon className="mb-3 h-6 w-6 text-rani-gold-accessible" />
                 <h3 className="font-semibold text-rani-navy">{item.label}</h3>
                 <p className="mt-1 text-sm text-rani-navy/70">{item.detail}</p>
               </div>

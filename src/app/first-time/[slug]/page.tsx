@@ -109,7 +109,7 @@ export default function FirstTimePage({ params }: PageProps) {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li className="text-[#C9A96E] font-medium">First Time</li>
+            <li className="text-rani-gold-accessible font-medium">First Time</li>
           </ol>
         </div>
       </nav>
@@ -144,7 +144,7 @@ export default function FirstTimePage({ params }: PageProps) {
           <ul className="space-y-4">
             {page.beforeAppointment.map((item, i) => (
               <li key={i} className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#C9A96E]/10 text-[#C9A96E] flex items-center justify-center font-semibold text-sm">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#C9A96E]/10 text-rani-gold-accessible flex items-center justify-center font-semibold text-sm">
                   {i + 1}
                 </span>
                 <p className="text-[#0F1D2C]/80 leading-relaxed pt-1">{item}</p>
@@ -195,7 +195,7 @@ export default function FirstTimePage({ params }: PageProps) {
                 key={i}
                 className="flex items-start gap-3 bg-[#F8F6F1] rounded-lg p-4"
               >
-                <span className="flex-shrink-0 text-[#C9A96E] mt-0.5">
+                <span className="flex-shrink-0 text-rani-gold-accessible mt-0.5">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                     <path d="M16.667 5L7.5 14.167 3.333 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -248,7 +248,7 @@ export default function FirstTimePage({ params }: PageProps) {
               >
                 <summary className="flex items-center justify-between cursor-pointer px-6 py-5 font-semibold text-[#0F1D2C] hover:text-[#C9A96E] transition-colors">
                   {faq.question}
-                  <span className="ml-4 flex-shrink-0 text-[#C9A96E] group-open:rotate-45 transition-transform text-xl">
+                  <span className="ml-4 flex-shrink-0 text-rani-gold-accessible group-open:rotate-45 transition-transform text-xl">
                     +
                   </span>
                 </summary>

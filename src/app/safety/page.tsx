@@ -111,7 +111,7 @@ export default function SafetyPage() {
             {safetyPillars.map((pillar, index) => (
               <FadeInOnScroll key={pillar.title} delay={index * 0.1}>
                 <div className="h-full rounded-xl border border-rani-gold/10 bg-rani-cream p-8">
-                  <pillar.icon size={28} className="mb-4 text-rani-gold" />
+                  <pillar.icon size={28} className="mb-4 text-rani-gold-accessible" />
                   <h3 className="mb-3 font-body text-lg font-bold text-rani-navy">
                     {pillar.title}
                   </h3>

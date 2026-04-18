@@ -60,7 +60,7 @@ export default function NewPatientPaths() {
               }`}
             >
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rani-cream">
-                <path.icon size={24} className="text-rani-gold" />
+                <path.icon size={24} className="text-rani-gold-accessible" />
               </div>
               <h3 className="mt-5 font-body text-lg font-bold text-rani-navy">
                 {path.title}

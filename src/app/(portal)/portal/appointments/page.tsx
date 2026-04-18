@@ -32,7 +32,7 @@ export default function AppointmentsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-rani-gold" />
+        <Loader2 className="h-8 w-8 animate-spin text-rani-gold-accessible" />
         <p className="text-sm text-rani-navy/60">Loading your appointments...</p>
       </div>
     );
@@ -70,9 +70,9 @@ export default function AppointmentsPage() {
       {/* Upcoming Section */}
       <section>
         <div className="flex items-center gap-2 mb-4">
-          <Calendar className="h-5 w-5 text-rani-gold" />
+          <Calendar className="h-5 w-5 text-rani-gold-accessible" />
           <h2 className="text-lg font-medium text-rani-navy">Upcoming</h2>
-          <span className="ml-1 rounded-full bg-rani-gold/10 px-2.5 py-0.5 text-xs font-medium text-rani-gold">
+          <span className="ml-1 rounded-full bg-rani-gold/10 px-2.5 py-0.5 text-xs font-medium text-rani-gold-accessible">
             {upcoming.length}
           </span>
         </div>
@@ -88,7 +88,7 @@ export default function AppointmentsPage() {
               href={clinicInfo.booking.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-rani-gold hover:underline"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-rani-gold-accessible hover:underline"
             >
               <Plus className="h-4 w-4" />
               Book an appointment

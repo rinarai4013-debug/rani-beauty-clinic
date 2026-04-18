@@ -22,7 +22,7 @@ export default function PlanComparison() {
               {tiers.map(tier => (
                 <th key={tier} className="text-center p-3">
                   <div className="text-sm font-heading font-semibold text-rani-navy">{PLANS[tier].name}</div>
-                  <div className="text-xs font-body text-rani-gold font-medium">${PLANS[tier].monthlyPrice}/mo</div>
+                  <div className="text-xs font-body text-rani-gold-accessible font-medium">${PLANS[tier].monthlyPrice}/mo</div>
                 </th>
               ))}
             </tr>

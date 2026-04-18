@@ -79,7 +79,7 @@ export default function CareerPathVisualization({ careerPath }: CareerPathVisual
             <h4 className="text-sm font-body font-semibold text-rani-navy">
               Path to {LEVEL_LABELS[careerPath.nextLevel]}
             </h4>
-            <span className="text-xs font-body text-rani-gold font-semibold">{careerPath.progressPercent}% complete</span>
+            <span className="text-xs font-body text-rani-gold-accessible font-semibold">{careerPath.progressPercent}% complete</span>
           </div>
 
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-4">

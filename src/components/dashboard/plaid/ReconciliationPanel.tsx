@@ -35,7 +35,7 @@ export default function ReconciliationPanel({
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b border-rani-border">
             <div className="flex items-center gap-2">
-              <ArrowLeftRight className="w-5 h-5 text-rani-gold" />
+              <ArrowLeftRight className="w-5 h-5 text-rani-gold-accessible" />
               <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
                 Reconcile Transaction
               </h3>
@@ -89,8 +89,8 @@ export default function ReconciliationPanel({
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
-                          <Sparkles className="w-3 h-3 text-rani-gold" />
-                          <span className="text-xs font-body font-bold text-rani-gold">
+                          <Sparkles className="w-3 h-3 text-rani-gold-accessible" />
+                          <span className="text-xs font-body font-bold text-rani-gold-accessible">
                             {match.confidence}%
                           </span>
                         </div>

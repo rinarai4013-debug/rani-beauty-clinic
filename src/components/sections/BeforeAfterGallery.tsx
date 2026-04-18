@@ -122,7 +122,7 @@ export default function BeforeAfterGallery() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-10 text-center">
-          <p className="mb-2 font-body text-sm font-semibold uppercase tracking-wider text-rani-gold">
+          <p className="mb-2 font-body text-sm font-semibold uppercase tracking-wider text-rani-gold-accessible">
             Real Results
           </p>
           <h2 className="font-heading text-3xl font-bold text-rani-navy sm:text-4xl">

@@ -92,7 +92,7 @@ function ComplianceAlert({ alerts }: ComplianceAlertProps) {
       {/* Footer */}
       <div className="px-5 py-3 bg-gray-50 flex items-center justify-between">
         <span className="text-xs text-gray-500">{alerts.length} total alerts</span>
-        <button className="text-xs text-[#C9A96E] font-medium">View All</button>
+        <button className="text-xs text-rani-gold-accessible font-medium">View All</button>
       </div>
     </div>
   );

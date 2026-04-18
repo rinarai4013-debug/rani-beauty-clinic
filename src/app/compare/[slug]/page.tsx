@@ -248,7 +248,7 @@ export default function ComparePage({ params }: PageProps) {
               {page.relatedServiceA && (
                 <Link
                   href={page.relatedServiceA}
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#C9A96E] hover:underline"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-rani-gold-accessible hover:underline"
                 >
                   Learn more about {page.treatmentA} <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -283,7 +283,7 @@ export default function ComparePage({ params }: PageProps) {
               {page.relatedServiceB && (
                 <Link
                   href={page.relatedServiceB}
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#C9A96E] hover:underline"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-rani-gold-accessible hover:underline"
                 >
                   Learn more about {page.treatmentB} <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -298,7 +298,7 @@ export default function ComparePage({ params }: PageProps) {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-[#C9A96E]/20 bg-white p-5 sm:p-8 shadow-sm lg:p-10">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="h-6 w-6 text-[#C9A96E]" />
+              <Shield className="h-6 w-6 text-rani-gold-accessible" />
               <h2 className="font-playfair text-2xl font-bold text-[#0F1D2C] sm:text-3xl">
                 Our Verdict
               </h2>
@@ -378,7 +378,7 @@ export default function ComparePage({ params }: PageProps) {
           <div className="mt-8 text-center">
             <Link
               href="/compare"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A96E] hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-rani-gold-accessible hover:underline"
             >
               View All Comparisons <ChevronRight className="h-4 w-4" />
             </Link>

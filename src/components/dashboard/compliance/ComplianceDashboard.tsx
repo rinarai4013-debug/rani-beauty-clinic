@@ -60,7 +60,7 @@ function CategoryCard({
 }) {
   const percentage = Math.round((score / maxScore) * 100);
   const color = percentage >= 90 ? 'bg-emerald-500' : percentage >= 75 ? 'bg-rani-gold' : percentage >= 50 ? 'bg-amber-500' : 'bg-red-500';
-  const textColor = percentage >= 90 ? 'text-emerald-600' : percentage >= 75 ? 'text-rani-gold' : percentage >= 50 ? 'text-amber-600' : 'text-red-600';
+  const textColor = percentage >= 90 ? 'text-emerald-600' : percentage >= 75 ? 'text-rani-gold-accessible' : percentage >= 50 ? 'text-amber-600' : 'text-red-600';
 
   return (
     <motion.div
@@ -150,7 +150,7 @@ export default function ComplianceDashboard({ complianceScore }: ComplianceDashb
 
           <div className="flex-1 text-center lg:text-left">
             <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-              <StatusIcon className="w-5 h-5 text-rani-gold" />
+              <StatusIcon className="w-5 h-5 text-rani-gold-accessible" />
               <h2 className="text-lg font-body font-bold text-rani-navy">
                 Compliance Score
               </h2>
@@ -218,7 +218,7 @@ export default function ComplianceDashboard({ complianceScore }: ComplianceDashb
         {/* Upcoming Deadlines */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Calendar className="w-5 h-5 text-rani-gold" />
+            <Calendar className="w-5 h-5 text-rani-gold-accessible" />
             <h3 className="text-sm font-body font-semibold uppercase tracking-wider text-rani-muted">
               Upcoming Deadlines ({upcomingDeadlines.length})
             </h3>

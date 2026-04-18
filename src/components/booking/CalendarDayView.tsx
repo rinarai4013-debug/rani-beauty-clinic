@@ -39,7 +39,7 @@ export default function CalendarDayView({
           </div>
           <div>
             <p className="text-xs text-[#6B7280]">Revenue</p>
-            <p className="text-lg font-bold text-[#C9A96E]">${data.totalRevenue.toLocaleString()}</p>
+            <p className="text-lg font-bold text-rani-gold-accessible">${data.totalRevenue.toLocaleString()}</p>
           </div>
           <div>
             <p className="text-xs text-[#6B7280]">Utilization</p>

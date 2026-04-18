@@ -82,7 +82,7 @@ export default function PortalLogin() {
           <div className="bg-white rounded-2xl shadow-sm border border-rani-border p-8">
             <div className="text-center mb-6">
               <div className="mx-auto h-12 w-12 rounded-full bg-rani-cream flex items-center justify-center mb-3">
-                <Sparkles className="h-6 w-6 text-rani-gold" />
+                <Sparkles className="h-6 w-6 text-rani-gold-accessible" />
               </div>
               <h2 className="font-heading text-xl text-rani-navy">Welcome Back</h2>
               <p className="text-sm text-rani-muted mt-1">

@@ -38,7 +38,7 @@ export default function MembershipKPICards({
       change: mrrGrowth,
       changeLabel: 'vs last month',
       icon: DollarSign,
-      iconColor: 'text-rani-gold bg-amber-50',
+      iconColor: 'text-rani-gold-accessible bg-amber-50',
     },
     {
       label: 'Active Members',

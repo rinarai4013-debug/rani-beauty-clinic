@@ -81,7 +81,7 @@ export default function QuizStep({
           )}
 
           {question.type === 'multiple' && question.maxSelect && (
-            <p className="text-sm text-[#C9A96E] font-montserrat mb-4">
+            <p className="text-sm text-rani-gold-accessible font-montserrat mb-4">
               Select up to {question.maxSelect}
               {question.minSelect ? ` (minimum ${question.minSelect})` : ''}
             </p>

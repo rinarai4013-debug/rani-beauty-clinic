@@ -99,7 +99,7 @@ export default function MembershipUpgradePage() {
       <div className="mx-auto max-w-5xl space-y-10">
         {/* Header */}
         <div className="text-center">
-          <Crown className="mx-auto mb-3 h-8 w-8 text-rani-gold" />
+          <Crown className="mx-auto mb-3 h-8 w-8 text-rani-gold-accessible" />
           <h1 className="font-serif text-3xl font-bold text-rani-navy">
             Membership Plans
           </h1>

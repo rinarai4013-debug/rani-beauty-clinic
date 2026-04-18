@@ -55,11 +55,11 @@ export default function AppointmentCard({ appointment, compact, onTap }: Appoint
       {/* Details */}
       <div className="space-y-1.5">
         <div className="flex items-center gap-2 text-sm text-rani-text">
-          <Calendar size={14} className="text-[#C9A96E] flex-shrink-0" />
+          <Calendar size={14} className="text-rani-gold-accessible flex-shrink-0" />
           <span className="font-body">{dayLabel}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-rani-text">
-          <Clock size={14} className="text-[#C9A96E] flex-shrink-0" />
+          <Clock size={14} className="text-rani-gold-accessible flex-shrink-0" />
           <span className="font-body">
             {appointment.time} ({appointment.duration} min)
           </span>
@@ -67,11 +67,11 @@ export default function AppointmentCard({ appointment, compact, onTap }: Appoint
         {!compact && (
           <>
             <div className="flex items-center gap-2 text-sm text-rani-text">
-              <User size={14} className="text-[#C9A96E] flex-shrink-0" />
+              <User size={14} className="text-rani-gold-accessible flex-shrink-0" />
               <span className="font-body">{appointment.provider}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-rani-muted">
-              <MapPin size={14} className="text-[#C9A96E] flex-shrink-0" />
+              <MapPin size={14} className="text-rani-gold-accessible flex-shrink-0" />
               <span className="font-body text-xs">{appointment.location}</span>
             </div>
           </>

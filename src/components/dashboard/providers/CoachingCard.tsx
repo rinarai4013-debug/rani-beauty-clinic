@@ -49,7 +49,7 @@ export default function CoachingCard({ recommendations }: CoachingCardProps) {
                 <ul className="space-y-1">
                   {rec.actionItems.map((item, j) => (
                     <li key={j} className="flex items-start gap-1.5 text-xs font-body text-rani-navy">
-                      <ChevronRight className="w-3 h-3 text-rani-gold mt-0.5 flex-shrink-0" />
+                      <ChevronRight className="w-3 h-3 text-rani-gold-accessible mt-0.5 flex-shrink-0" />
                       {item}
                     </li>
                   ))}

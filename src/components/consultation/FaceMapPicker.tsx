@@ -261,7 +261,7 @@ export default function FaceMapPicker({
               <button
                 key={area}
                 onClick={() => onToggle(area)}
-                className="font-body text-xs px-3 py-1.5 rounded-full bg-[#C9A96E]/10 text-[#C9A96E] border border-[#C9A96E]/30 hover:bg-[#C9A96E]/20 transition-colors"
+                className="font-body text-xs px-3 py-1.5 rounded-full bg-[#C9A96E]/10 text-rani-gold-accessible border border-[#C9A96E]/30 hover:bg-[#C9A96E]/20 transition-colors"
               >
                 {zone?.label} &times;
               </button>

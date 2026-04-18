@@ -67,7 +67,7 @@ export default function KeywordRankChart({ keywords, loading }: KeywordRankChart
                   <div>
                     <span className="text-rani-navy font-medium">{kw.keyword}</span>
                     {kw.featured && (
-                      <span className="ml-1 text-[9px] bg-rani-gold/20 text-rani-gold px-1 py-0.5 rounded">
+                      <span className="ml-1 text-[9px] bg-rani-gold/20 text-rani-gold-accessible px-1 py-0.5 rounded">
                         Featured
                       </span>
                     )}

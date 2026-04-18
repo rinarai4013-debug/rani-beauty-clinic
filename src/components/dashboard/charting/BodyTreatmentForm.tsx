@@ -20,7 +20,7 @@ export default function BodyTreatmentForm({ data, errors, onChange, readOnly }: 
       {template.sections.map((section) => (
         <div key={section} className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2 border-b border-gray-100 pb-3">
-            <Dumbbell className="h-4 w-4 text-[#C9A96E]" />
+            <Dumbbell className="h-4 w-4 text-rani-gold-accessible" />
             <h3 className="text-sm font-bold uppercase tracking-wide text-[#0F1D2C]">
               {section}
             </h3>

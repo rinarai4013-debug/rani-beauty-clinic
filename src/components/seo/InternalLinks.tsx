@@ -143,7 +143,7 @@ function getRelatedLocations(currentSlug: string, limit: number): RelatedItem[] 
 /* ─── Icon per type ───────────────────────────────────────── */
 
 function TypeIcon({ type }: { type: ContentType }) {
-  const className = "h-5 w-5 text-rani-gold";
+  const className = "h-5 w-5 text-rani-gold-accessible";
   switch (type) {
     case "service":
       return <Sparkles className={className} />;

@@ -259,7 +259,7 @@ function FieldRenderer({
             type="checkbox"
             checked={(field.value as boolean) ?? false}
             onChange={e => onUpdate(sectionId, field.id, e.target.checked)}
-            className="w-5 h-5 mt-0.5 rounded border-[#E8E4DF] text-[#C9A96E] focus:ring-[#C9A96E]"
+            className="w-5 h-5 mt-0.5 rounded border-[#E8E4DF] text-rani-gold-accessible focus:ring-[#C9A96E]"
           />
           <span className="text-sm text-[#0F1D2C]">
             {field.label} {field.required && <span className="text-red-500">*</span>}
@@ -317,7 +317,7 @@ function FieldRenderer({
                   value={opt.value}
                   checked={field.value === opt.value}
                   onChange={() => onUpdate(sectionId, field.id, opt.value)}
-                  className="text-[#C9A96E] focus:ring-[#C9A96E]"
+                  className="text-rani-gold-accessible focus:ring-[#C9A96E]"
                 />
                 <span className="text-sm">{opt.label}</span>
               </label>

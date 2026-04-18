@@ -407,7 +407,7 @@ export default function KnowledgePage() {
               <strong>Phone:</strong>{" "}
               <a
                 href={clinicInfo.phoneTel}
-                className="text-rani-gold hover:underline"
+                className="text-rani-gold-accessible hover:underline"
               >
                 {clinicInfo.phone}
               </a>
@@ -416,7 +416,7 @@ export default function KnowledgePage() {
               <strong>Email:</strong>{" "}
               <a
                 href={`mailto:${clinicInfo.email}`}
-                className="text-rani-gold hover:underline"
+                className="text-rani-gold-accessible hover:underline"
               >
                 {clinicInfo.email}
               </a>
@@ -428,7 +428,7 @@ export default function KnowledgePage() {
               <strong>Book Online:</strong>{" "}
               <a
                 href={clinicInfo.booking.shareableUrl}
-                className="text-rani-gold hover:underline"
+                className="text-rani-gold-accessible hover:underline"
               >
                 booking.mangomint.com/ranibeautyclinic1
               </a>
@@ -437,7 +437,7 @@ export default function KnowledgePage() {
               <strong>Website:</strong>{" "}
               <a
                 href={clinicInfo.website}
-                className="text-rani-gold hover:underline"
+                className="text-rani-gold-accessible hover:underline"
               >
                 ranibeautyclinic.com
               </a>

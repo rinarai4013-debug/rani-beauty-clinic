@@ -41,12 +41,12 @@ export default function MobileTabBar({ activeTab }: MobileTabBarProps) {
                 <Icon
                   size={22}
                   strokeWidth={isActive ? 2.5 : 1.5}
-                  className={isActive ? 'text-[#C9A96E]' : 'text-rani-muted'}
+                  className={isActive ? 'text-rani-gold-accessible' : 'text-rani-muted'}
                 />
               </div>
               <span
                 className={`text-[10px] font-body leading-tight ${
-                  isActive ? 'text-[#C9A96E] font-semibold' : 'text-rani-muted'
+                  isActive ? 'text-rani-gold-accessible font-semibold' : 'text-rani-muted'
                 }`}
               >
                 {tab.label}

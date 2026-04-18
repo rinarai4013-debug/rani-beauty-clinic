@@ -101,7 +101,7 @@ export default function BriefingPreview({ type }: BriefingPreviewProps) {
 
         {loading && (
           <div className="text-center py-16">
-            <Loader2 className="w-8 h-8 mx-auto mb-3 text-[#C9A96E] animate-spin" />
+            <Loader2 className="w-8 h-8 mx-auto mb-3 text-rani-gold-accessible animate-spin" />
             <p className="text-sm text-gray-500">Generating {type} briefing...</p>
           </div>
         )}

@@ -67,7 +67,7 @@ export default function ChatBubble({ message, onAction }: ChatBubbleProps) {
                   onClick={() => onAction?.(action)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C9A96E]/10 border border-[#C9A96E]/20 rounded-xl"
                 >
-                  <Icon size={12} className="text-[#C9A96E]" />
+                  <Icon size={12} className="text-rani-gold-accessible" />
                   <span className="text-xs text-rani-navy font-body font-medium">
                     {action.label}
                   </span>

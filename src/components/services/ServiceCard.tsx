@@ -113,7 +113,7 @@ export default function ServiceCard({
             {/* Show small icon next to title when image is present */}
             {image && image.length > 0 && (
               <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-md bg-rani-cream">
-                <IconComponent size={16} className="text-rani-gold" />
+                <IconComponent size={16} className="text-rani-gold-accessible" />
               </div>
             )}
             <h3 className="font-body text-lg font-bold text-rani-navy transition-colors group-hover:text-rani-gold">

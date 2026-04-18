@@ -68,7 +68,7 @@ export default function SimulationMetrics({
               transition={{ delay: i * 0.1 }}
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#C9A96E]/5 border border-[#C9A96E]/15"
             >
-              <span className="font-body text-sm text-[#C9A96E]">&#10024;</span>
+              <span className="font-body text-sm text-rani-gold-accessible">&#10024;</span>
               <span className="font-body text-xs text-[#0F1D2C]/70">{diff}</span>
             </motion.div>
           ))}

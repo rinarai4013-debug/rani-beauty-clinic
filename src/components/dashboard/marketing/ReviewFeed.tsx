@@ -33,7 +33,7 @@ export default function ReviewFeed({ reviews, loading, onRespond }: ReviewFeedPr
   return (
     <div className="rounded-xl border border-rani-border/30 bg-white p-5 shadow-sm">
       <h3 className="font-heading text-sm font-semibold text-rani-navy flex items-center gap-2 mb-4">
-        <Star className="w-4 h-4 text-rani-gold" />
+        <Star className="w-4 h-4 text-rani-gold-accessible" />
         Recent Reviews
       </h3>
 
@@ -66,7 +66,7 @@ export default function ReviewFeed({ reviews, loading, onRespond }: ReviewFeedPr
                       {Array.from({ length: 5 }, (_, i) => (
                         <Star
                           key={i}
-                          className={`w-3 h-3 ${i < review.rating ? 'fill-rani-gold text-rani-gold' : 'text-slate-200'}`}
+                          className={`w-3 h-3 ${i < review.rating ? 'fill-rani-gold text-rani-gold-accessible' : 'text-slate-200'}`}
                         />
                       ))}
                     </div>
@@ -109,7 +109,7 @@ export default function ReviewFeed({ reviews, loading, onRespond }: ReviewFeedPr
               {review.responseStatus === 'pending' && onRespond && (
                 <button
                   onClick={() => onRespond(review)}
-                  className="text-[11px] font-body text-rani-gold hover:text-rani-navy transition-colors flex items-center gap-1"
+                  className="text-[11px] font-body text-rani-gold-accessible hover:text-rani-navy transition-colors flex items-center gap-1"
                 >
                   <MessageSquare className="w-3 h-3" />
                   Draft Response

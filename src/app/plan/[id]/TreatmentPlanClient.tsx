@@ -118,7 +118,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
       <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center px-4">
         <motion.div {...fadeIn} className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
           <div className="w-14 h-14 rounded-full bg-[#C9A96E]/10 flex items-center justify-center mx-auto mb-4">
-            <Lock className="h-7 w-7 text-[#C9A96E]" />
+            <Lock className="h-7 w-7 text-rani-gold-accessible" />
           </div>
           <h1 className="font-heading text-2xl font-bold text-[#0F1D2C] mb-2">
             Your Treatment Plan
@@ -166,7 +166,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#C9A96E] mx-auto mb-3" />
+          <Loader2 className="h-8 w-8 animate-spin text-rani-gold-accessible mx-auto mb-3" />
           <p className="text-sm text-gray-500">Loading your treatment plan...</p>
         </div>
       </div>
@@ -241,7 +241,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#C9A96E]/10 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-[#C9A96E]" />
+                <Sparkles className="h-5 w-5 text-rani-gold-accessible" />
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[#0F1D2C]">See Your Transformation</p>
@@ -323,7 +323,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
                     <ul className="space-y-2">
                       {phase.treatments.map((treatment: string, i: number) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                          <CheckCircle className="h-4 w-4 text-[#C9A96E] flex-shrink-0 mt-0.5" />
+                          <CheckCircle className="h-4 w-4 text-rani-gold-accessible flex-shrink-0 mt-0.5" />
                           <span>{treatment}</span>
                         </li>
                       ))}
@@ -351,11 +351,11 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {care.preCare.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-semibold text-[#C9A96E] uppercase tracking-wider mb-1">Before Treatment</p>
+                          <p className="text-[10px] font-semibold text-rani-gold-accessible uppercase tracking-wider mb-1">Before Treatment</p>
                           <ul className="space-y-1">
                             {care.preCare.map((item, i) => (
                               <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
-                                <Check className="h-3 w-3 text-[#C9A96E] flex-shrink-0 mt-0.5" />
+                                <Check className="h-3 w-3 text-rani-gold-accessible flex-shrink-0 mt-0.5" />
                                 <span>{item}</span>
                               </li>
                             ))}
@@ -396,11 +396,11 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
               {packages.map((pkg) => {
                 const isHighlighted = pkg.highlight;
                 const tierIcon = pkg.tier === 'Start' ? (
-                  <Star className="h-4 w-4 text-[#C9A96E]" />
+                  <Star className="h-4 w-4 text-rani-gold-accessible" />
                 ) : pkg.tier === 'Transform' ? (
-                  <Sparkles className="h-4 w-4 text-[#C9A96E]" />
+                  <Sparkles className="h-4 w-4 text-rani-gold-accessible" />
                 ) : (
-                  <Crown className="h-4 w-4 text-[#C9A96E]" />
+                  <Crown className="h-4 w-4 text-rani-gold-accessible" />
                 );
                 return (
                   <div
@@ -494,7 +494,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
                       <div className="border-t border-gray-100 pt-3 mb-3 space-y-1.5">
                         {pkg.extras.map((extra, i) => (
                           <div key={i} className="flex items-center gap-1.5 text-xs text-gray-600">
-                            <Check className="h-3 w-3 text-[#C9A96E] flex-shrink-0" />
+                            <Check className="h-3 w-3 text-rani-gold-accessible flex-shrink-0" />
                             <span>{extra}</span>
                           </div>
                         ))}
@@ -537,7 +537,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
               className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#C9A96E] hover:shadow-sm transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
-                <CreditCard className="h-5 w-5 text-[#C9A96E]" />
+                <CreditCard className="h-5 w-5 text-rani-gold-accessible" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-[#0F1D2C] group-hover:text-[#C9A96E] transition-colors">
@@ -554,7 +554,7 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
               className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#C9A96E] hover:shadow-sm transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
-                <CreditCard className="h-5 w-5 text-[#C9A96E]" />
+                <CreditCard className="h-5 w-5 text-rani-gold-accessible" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-[#0F1D2C] group-hover:text-[#C9A96E] transition-colors">
@@ -582,14 +582,14 @@ export default function TreatmentPlanClient({ planId }: TreatmentPlanClientProps
                   <div key={idx} className="flex gap-4">
                     <div className="flex flex-col items-center">
                       <div className="w-8 h-8 rounded-full bg-[#C9A96E]/10 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="h-4 w-4 text-[#C9A96E]" />
+                        <Calendar className="h-4 w-4 text-rani-gold-accessible" />
                       </div>
                       {idx < parsedTimeline.length - 1 && (
                         <div className="w-0.5 flex-1 bg-gray-100 mt-2" />
                       )}
                     </div>
                     <div className="pb-4">
-                      <p className="text-xs font-semibold text-[#C9A96E]">{item.week}</p>
+                      <p className="text-xs font-semibold text-rani-gold-accessible">{item.week}</p>
                       <p className="text-sm text-gray-700">{item.description}</p>
                     </div>
                   </div>

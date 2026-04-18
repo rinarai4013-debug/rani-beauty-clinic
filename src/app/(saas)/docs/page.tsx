@@ -98,7 +98,7 @@ yarn add @ranios/sdk`}
             href={card.href}
             className="group rounded-xl border border-[#C9A96E]/10 bg-white p-6 transition hover:border-[#C9A96E]/30 hover:shadow-md"
           >
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#C9A96E]/10 text-sm font-bold text-[#C9A96E]">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#C9A96E]/10 text-sm font-bold text-rani-gold-accessible">
               {card.icon}
             </div>
             <h3 className="mb-2 text-lg font-semibold text-[#0F1D2C] group-hover:text-[#C9A96E] transition">

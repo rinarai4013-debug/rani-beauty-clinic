@@ -63,7 +63,7 @@ export default function PortalBillingPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <CreditCard className="w-5 h-5 text-rani-gold" />
+        <CreditCard className="w-5 h-5 text-rani-gold-accessible" />
         <h1 className="text-xl font-heading font-bold text-rani-navy">Billing & Payments</h1>
       </div>
 
@@ -91,7 +91,7 @@ export default function PortalBillingPage() {
       <div className="bg-white rounded-2xl border border-gray-200 p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-heading font-semibold text-rani-navy">Payment Methods</h3>
-          <button className="flex items-center gap-1 text-xs font-body font-medium text-rani-gold hover:text-rani-gold/80">
+          <button className="flex items-center gap-1 text-xs font-body font-medium text-rani-gold-accessible hover:text-rani-gold/80">
             <Plus className="w-3.5 h-3.5" />
             Add Card
           </button>

@@ -149,7 +149,7 @@ export default function BulkSendPreview({
         <div>
           <button
             onClick={() => setShowAll(!showAll)}
-            className="text-[11px] font-body font-medium text-rani-gold hover:text-rani-navy transition-colors"
+            className="text-[11px] font-body font-medium text-rani-gold-accessible hover:text-rani-navy transition-colors"
           >
             {showAll ? 'Hide' : 'Show'} all {recipients.length} recipients
           </button>

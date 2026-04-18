@@ -30,7 +30,7 @@ export default function MembershipDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <Crown className="w-5 h-5 text-rani-gold" />
+              <Crown className="w-5 h-5 text-rani-gold-accessible" />
               <h1 className="text-xl sm:text-2xl font-heading text-rani-navy">Membership</h1>
             </div>
             <p className="text-xs sm:text-sm font-body text-rani-muted mt-1">
@@ -109,7 +109,7 @@ export default function MembershipDashboard() {
                   href={link.href}
                   className="bg-white rounded-xl border border-rani-border p-4 hover:shadow-md transition-shadow group"
                 >
-                  <link.icon className="w-5 h-5 text-rani-gold mb-2 group-hover:scale-110 transition-transform" />
+                  <link.icon className="w-5 h-5 text-rani-gold-accessible mb-2 group-hover:scale-110 transition-transform" />
                   <h4 className="text-sm font-heading font-semibold text-rani-navy">{link.label}</h4>
                   <p className="text-xs font-body text-rani-muted">{link.count}</p>
                 </a>

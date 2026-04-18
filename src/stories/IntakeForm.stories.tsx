@@ -128,7 +128,7 @@ function IntakeForm({ variant, onSubmit }: IntakeFormProps) {
               <div
                 className={`h-1.5 rounded-full transition-colors ${i <= currentSection ? 'bg-[#C9A96E]' : 'bg-gray-200'}`}
               />
-              <p className={`text-xs mt-1 ${i <= currentSection ? 'text-[#C9A96E] font-medium' : 'text-gray-400'}`}>
+              <p className={`text-xs mt-1 ${i <= currentSection ? 'text-rani-gold-accessible font-medium' : 'text-gray-400'}`}>
                 {section.name}
               </p>
             </div>

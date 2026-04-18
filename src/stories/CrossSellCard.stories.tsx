@@ -37,7 +37,7 @@ function CrossSellCard({ patientName, currentTreatment, recommendations }: Cross
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">{patientName} &middot; Currently on {currentTreatment}</p>
           </div>
-          <div className="bg-[#C9A96E]/10 text-[#C9A96E] text-xs font-bold px-2.5 py-1 rounded-full">
+          <div className="bg-[#C9A96E]/10 text-rani-gold-accessible text-xs font-bold px-2.5 py-1 rounded-full">
             {recommendations.length} recs
           </div>
         </div>
@@ -65,7 +65,7 @@ function CrossSellCard({ patientName, currentTreatment, recommendations }: Cross
             </div>
             <p className="text-xs text-gray-500 mb-1.5">{rec.reason}</p>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#C9A96E] font-medium">{rec.priceRange}</span>
+              <span className="text-rani-gold-accessible font-medium">{rec.priceRange}</span>
               <span className="text-gray-400">{rec.timing}</span>
             </div>
           </div>

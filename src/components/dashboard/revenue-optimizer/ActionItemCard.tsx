@@ -77,8 +77,8 @@ export default function ActionItemCard({ action, rank, onExecute }: ActionItemCa
               ${Math.round(action.estimatedRevenue).toLocaleString()}
             </p>
             <div className="flex items-center gap-1 justify-end mt-1">
-              <Target className="w-3 h-3 text-rani-gold" />
-              <span className="text-xs font-body text-rani-gold">{action.priority}/100</span>
+              <Target className="w-3 h-3 text-rani-gold-accessible" />
+              <span className="text-xs font-body text-rani-gold-accessible">{action.priority}/100</span>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function ActionItemCard({ action, rank, onExecute }: ActionItemCa
         {(action.suggestedScript || action.targetClients) && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="mt-3 flex items-center gap-1 text-xs font-body text-rani-gold hover:text-rani-navy transition-colors"
+            className="mt-3 flex items-center gap-1 text-xs font-body text-rani-gold-accessible hover:text-rani-navy transition-colors"
           >
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             {expanded ? 'Hide details' : 'Show details'}
@@ -105,7 +105,7 @@ export default function ActionItemCard({ action, rank, onExecute }: ActionItemCa
           {action.suggestedScript && (
             <div className="mt-3 p-3 rounded-lg bg-rani-cream/50">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-rani-gold" />
+                <MessageSquare className="w-3.5 h-3.5 text-rani-gold-accessible" />
                 <span className="text-xs font-body font-medium text-rani-navy">Suggested Script</span>
               </div>
               <p className="text-xs font-body text-rani-text italic leading-relaxed">

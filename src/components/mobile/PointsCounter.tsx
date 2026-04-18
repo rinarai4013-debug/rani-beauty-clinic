@@ -54,7 +54,7 @@ export default function PointsCounter({
     <div className="flex items-center gap-2">
       {showIcon && (
         <div className="w-8 h-8 rounded-full bg-[#C9A96E]/15 flex items-center justify-center">
-          <Coins size={16} className="text-[#C9A96E]" />
+          <Coins size={16} className="text-rani-gold-accessible" />
         </div>
       )}
       <div>

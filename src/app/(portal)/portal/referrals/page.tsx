@@ -94,14 +94,14 @@ export default function ReferralsPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-xl border border-rani-navy/10 bg-white p-5 shadow-sm">
-            <Users className="mb-2 h-5 w-5 text-rani-gold" />
+            <Users className="mb-2 h-5 w-5 text-rani-gold-accessible" />
             <p className="text-xs text-rani-navy/50">Friends Referred</p>
             <p className="text-2xl font-bold text-rani-navy">
               {referral.totalReferred}
             </p>
           </div>
           <div className="rounded-xl border border-rani-navy/10 bg-white p-5 shadow-sm">
-            <DollarSign className="mb-2 h-5 w-5 text-rani-gold" />
+            <DollarSign className="mb-2 h-5 w-5 text-rani-gold-accessible" />
             <p className="text-xs text-rani-navy/50">Total Earned</p>
             <p className="text-2xl font-bold text-rani-navy">
               {referral.totalEarned.toLocaleString()} pts

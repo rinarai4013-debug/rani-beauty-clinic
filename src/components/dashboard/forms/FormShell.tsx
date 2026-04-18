@@ -36,7 +36,7 @@ export default function FormShell({
         className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-6"
       >
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-rani-border">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-rani-gold/10 text-rani-gold">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-rani-gold/10 text-rani-gold-accessible">
             {icon}
           </div>
           <div>

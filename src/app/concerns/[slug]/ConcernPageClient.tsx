@@ -185,7 +185,7 @@ export default function ConcernPageClient({
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle
                         size={16}
-                        className="mt-0.5 shrink-0 text-rani-gold"
+                        className="mt-0.5 shrink-0 text-rani-gold-accessible"
                       />
                       <span className="font-body text-sm text-rani-text">
                         {symptom}
@@ -294,7 +294,7 @@ export default function ConcernPageClient({
                 <details className="group rounded-xl border border-rani-border bg-white transition-all hover:shadow-sm">
                   <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-body text-base font-semibold text-rani-navy">
                     {faq.question}
-                    <span className="ml-4 shrink-0 transition-transform duration-300 group-open:rotate-45 text-rani-gold text-xl">
+                    <span className="ml-4 shrink-0 transition-transform duration-300 group-open:rotate-45 text-rani-gold-accessible text-xl">
                       +
                     </span>
                   </summary>
@@ -334,7 +334,7 @@ export default function ConcernPageClient({
                     <p className="mt-2 font-body text-sm text-rani-muted line-clamp-2">
                       {related.heroDescription}
                     </p>
-                    <span className="mt-4 inline-flex items-center gap-1 font-body text-xs font-semibold text-rani-gold">
+                    <span className="mt-4 inline-flex items-center gap-1 font-body text-xs font-semibold text-rani-gold-accessible">
                       Learn More
                       <ArrowRight size={12} />
                     </span>

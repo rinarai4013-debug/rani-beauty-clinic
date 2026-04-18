@@ -51,7 +51,7 @@ export default function MetricGauge({
       </div>
       <p className={`font-body text-rani-muted text-center ${size === 'sm' ? 'text-[10px]' : 'text-xs'}`}>{label}</p>
       {showPercentile && percentile !== undefined && (
-        <p className="text-[10px] font-body text-rani-gold">{percentile}th percentile</p>
+        <p className="text-[10px] font-body text-rani-gold-accessible">{percentile}th percentile</p>
       )}
     </div>
   );

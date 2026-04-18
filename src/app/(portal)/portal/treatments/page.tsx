@@ -177,7 +177,7 @@ export default function TreatmentsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-8 h-8 text-rani-gold animate-spin" />
+        <Loader2 className="w-8 h-8 text-rani-gold-accessible animate-spin" />
         <p className="font-body text-rani-muted text-sm">Loading your treatment history...</p>
       </div>
     );
@@ -198,7 +198,7 @@ export default function TreatmentsPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 px-6 text-center">
         <div className="w-16 h-16 rounded-full bg-rani-cream flex items-center justify-center">
-          <CalendarDays className="w-7 h-7 text-rani-gold" />
+          <CalendarDays className="w-7 h-7 text-rani-gold-accessible" />
         </div>
         <div>
           <h2 className="font-heading text-2xl text-rani-navy mb-2">No Treatments Yet</h2>
@@ -271,7 +271,7 @@ export default function TreatmentsPage() {
           </p>
           <button
             onClick={() => setActiveFilter('All')}
-            className="font-body text-sm text-rani-gold hover:text-rani-gold/80 transition-colors font-medium"
+            className="font-body text-sm text-rani-gold-accessible hover:text-rani-gold/80 transition-colors font-medium"
           >
             View all treatments
           </button>
@@ -286,7 +286,7 @@ export default function TreatmentsPage() {
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-rani-cream flex items-center justify-center">
-              <Camera className="w-5 h-5 text-rani-gold" />
+              <Camera className="w-5 h-5 text-rani-gold-accessible" />
             </div>
             <div className="text-left">
               <h3 className="font-heading text-lg text-rani-navy">Track Your Progress</h3>

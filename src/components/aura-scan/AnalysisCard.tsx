@@ -105,7 +105,7 @@ export default function AnalysisCard({
       )}
 
       {/* Hover hint */}
-      <span className="font-body text-xs text-[#C9A96E] opacity-0 group-hover:opacity-100 transition-opacity">
+      <span className="font-body text-xs text-rani-gold-accessible opacity-0 group-hover:opacity-100 transition-opacity">
         View details
       </span>
     </motion.button>

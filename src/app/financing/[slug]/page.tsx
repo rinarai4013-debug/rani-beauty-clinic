@@ -107,7 +107,7 @@ export default function FinancingPage({ params }: PageProps) {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li className="text-[#C9A96E] font-medium">{page.title}</li>
+            <li className="text-rani-gold-accessible font-medium">{page.title}</li>
           </ol>
         </div>
       </nav>
@@ -156,7 +156,7 @@ export default function FinancingPage({ params }: PageProps) {
                 key={i}
                 className="flex items-start gap-3 bg-white rounded-xl p-5 border border-[#C9A96E]/10 shadow-sm"
               >
-                <span className="flex-shrink-0 text-[#C9A96E] mt-0.5">
+                <span className="flex-shrink-0 text-rani-gold-accessible mt-0.5">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                     <path d="M16.667 5L7.5 14.167 3.333 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -182,7 +182,7 @@ export default function FinancingPage({ params }: PageProps) {
               >
                 <summary className="flex items-center justify-between cursor-pointer px-6 py-5 font-semibold text-[#0F1D2C] hover:text-[#C9A96E] transition-colors">
                   {faq.question}
-                  <span className="ml-4 flex-shrink-0 text-[#C9A96E] group-open:rotate-45 transition-transform text-xl">
+                  <span className="ml-4 flex-shrink-0 text-rani-gold-accessible group-open:rotate-45 transition-transform text-xl">
                     +
                   </span>
                 </summary>

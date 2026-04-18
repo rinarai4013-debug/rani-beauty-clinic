@@ -49,7 +49,7 @@ export default function PayrollSummary() {
           </div>
           <div className="rounded-lg bg-[#F8F6F1] p-3 text-center">
             <p className="text-xs text-gray-500">Commissions</p>
-            <p className="mt-1 text-lg font-bold text-[#C9A96E]">{formatCurrency(data.totalCommissions)}</p>
+            <p className="mt-1 text-lg font-bold text-rani-gold-accessible">{formatCurrency(data.totalCommissions)}</p>
           </div>
           <div className="rounded-lg bg-[#F8F6F1] p-3 text-center">
             <p className="text-xs text-gray-500">Benefits + Tax</p>
@@ -118,7 +118,7 @@ export default function PayrollSummary() {
                   <td className="py-2 font-medium text-gray-700">{p.providerName}</td>
                   <td className="py-2 text-right text-green-600">{formatCurrency(p.serviceRevenue)}</td>
                   <td className="py-2 text-right text-[#0F1D2C]">{formatCurrency(p.totalCompensation)}</td>
-                  <td className="py-2 text-right text-[#C9A96E]">{formatCurrency(p.revenuePerHour)}</td>
+                  <td className="py-2 text-right text-rani-gold-accessible">{formatCurrency(p.revenuePerHour)}</td>
                   <td className="py-2 text-right">
                     <span className={`rounded-full px-2 py-0.5 ${
                       p.laborCostRatio <= 35 ? 'bg-green-50 text-green-600' :

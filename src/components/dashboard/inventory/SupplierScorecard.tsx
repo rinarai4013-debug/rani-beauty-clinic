@@ -99,7 +99,7 @@ export default function SupplierScorecard({
                     <p className="text-[10px] font-body text-rani-muted">on-time</p>
                   </div>
                   <div className="flex items-center">
-                    <Star className="w-3 h-3 text-rani-gold fill-rani-gold" />
+                    <Star className="w-3 h-3 text-rani-gold-accessible fill-rani-gold" />
                     <span className="text-xs font-body font-medium text-rani-navy ml-0.5">
                       {supplier.qualityScore.toFixed(1)}
                     </span>
@@ -136,7 +136,7 @@ export default function SupplierScorecard({
             ].map((metric) => (
               <div key={metric.label} className="rounded-lg bg-rani-cream/40 p-3">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <metric.Icon className="w-3 h-3 text-rani-gold" />
+                  <metric.Icon className="w-3 h-3 text-rani-gold-accessible" />
                   <span className="text-[10px] font-body font-semibold uppercase tracking-wider text-rani-muted">
                     {metric.label}
                   </span>

@@ -66,7 +66,7 @@ export default function ConcernsPage() {
                       {concern.treatments.length} treatment
                       {concern.treatments.length !== 1 ? "s" : ""}
                     </span>
-                    <span className="inline-flex items-center gap-1 font-body text-xs font-semibold text-rani-gold group-hover:gap-2 transition-all">
+                    <span className="inline-flex items-center gap-1 font-body text-xs font-semibold text-rani-gold-accessible group-hover:gap-2 transition-all">
                       Explore
                       <ArrowRight size={12} />
                     </span>

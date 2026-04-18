@@ -56,7 +56,7 @@ export default function StreakFlame({ days, type = 'visit', size = 'md' }: Strea
         <span className={`${sizes[size].label} text-rani-muted font-body block`}>
           {days === 1 ? 'day' : 'days'}
         </span>
-        <span className={`${sizes[size].label} text-[#C9A96E] font-body font-medium`}>
+        <span className={`${sizes[size].label} text-rani-gold-accessible font-body font-medium`}>
           {typeLabels[type]}
         </span>
       </div>

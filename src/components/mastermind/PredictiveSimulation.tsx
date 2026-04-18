@@ -95,7 +95,7 @@ export default function PredictiveSimulation({
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-4">
         <div className="relative">
-          <Loader2 className="w-10 h-10 text-[#C9A96E] animate-spin" />
+          <Loader2 className="w-10 h-10 text-rani-gold-accessible animate-spin" />
         </div>
         <div className="text-center">
           <h3 className="font-body text-sm font-medium text-[#0F1D2C]">

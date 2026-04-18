@@ -311,7 +311,7 @@ export default function AdsWarMachinePage() {
               {/* Auto-Scaler */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white border border-rani-navy/10 rounded-xl p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Activity className="w-4 h-4 text-rani-gold" />
+                  <Activity className="w-4 h-4 text-rani-gold-accessible" />
                   <h3 className="text-sm font-heading text-rani-navy">Auto-Scaler</h3>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
@@ -342,7 +342,7 @@ export default function AdsWarMachinePage() {
               {/* Demand Engine */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="bg-white border border-rani-navy/10 rounded-xl p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Radio className="w-4 h-4 text-rani-gold" />
+                  <Radio className="w-4 h-4 text-rani-gold-accessible" />
                   <h3 className="text-sm font-heading text-rani-navy">Demand Engine</h3>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
@@ -363,7 +363,7 @@ export default function AdsWarMachinePage() {
               {/* Creative Health */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white border border-rani-navy/10 rounded-xl p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Eye className="w-4 h-4 text-rani-gold" />
+                  <Eye className="w-4 h-4 text-rani-gold-accessible" />
                   <h3 className="text-sm font-heading text-rani-navy">Creative Health</h3>
                 </div>
                 <div className="space-y-2.5 text-xs font-body">
@@ -382,7 +382,7 @@ export default function AdsWarMachinePage() {
                     </span>
                   </div>
                 </div>
-                <a href="/dashboard/ads-war-machine/creatives" className="block mt-3 text-[10px] text-rani-gold hover:text-rani-gold/80 font-semibold">
+                <a href="/dashboard/ads-war-machine/creatives" className="block mt-3 text-[10px] text-rani-gold-accessible hover:text-rani-gold/80 font-semibold">
                   Manage Creatives &rarr;
                 </a>
               </motion.div>
@@ -390,7 +390,7 @@ export default function AdsWarMachinePage() {
               {/* Compliance */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="bg-white border border-rani-navy/10 rounded-xl p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Shield className="w-4 h-4 text-rani-gold" />
+                  <Shield className="w-4 h-4 text-rani-gold-accessible" />
                   <h3 className="text-sm font-heading text-rani-navy">Compliance</h3>
                 </div>
                 <div className="space-y-2.5 text-xs font-body">
@@ -420,22 +420,22 @@ export default function AdsWarMachinePage() {
               <h2 className="text-sm sm:text-base font-heading text-rani-navy mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <button className="p-3 rounded-lg bg-rani-navy/5 hover:bg-rani-navy/10 transition-colors text-left">
-                  <Zap className="w-4 h-4 text-rani-gold mb-1.5" />
+                  <Zap className="w-4 h-4 text-rani-gold-accessible mb-1.5" />
                   <p className="text-xs font-heading text-rani-navy">Launch Campaign</p>
                   <p className="text-[10px] text-rani-muted">New Meta or Google campaign</p>
                 </button>
                 <button className="p-3 rounded-lg bg-rani-navy/5 hover:bg-rani-navy/10 transition-colors text-left">
-                  <RefreshCw className="w-4 h-4 text-rani-gold mb-1.5" />
+                  <RefreshCw className="w-4 h-4 text-rani-gold-accessible mb-1.5" />
                   <p className="text-xs font-heading text-rani-navy">Refresh Creatives</p>
                   <p className="text-[10px] text-rani-muted">Generate new ad variants</p>
                 </button>
                 <button className="p-3 rounded-lg bg-rani-navy/5 hover:bg-rani-navy/10 transition-colors text-left">
-                  <BarChart3 className="w-4 h-4 text-rani-gold mb-1.5" />
+                  <BarChart3 className="w-4 h-4 text-rani-gold-accessible mb-1.5" />
                   <p className="text-xs font-heading text-rani-navy">Run Report</p>
                   <p className="text-[10px] text-rani-muted">Cross-platform analytics</p>
                 </button>
                 <button className="p-3 rounded-lg bg-rani-navy/5 hover:bg-rani-navy/10 transition-colors text-left">
-                  <Target className="w-4 h-4 text-rani-gold mb-1.5" />
+                  <Target className="w-4 h-4 text-rani-gold-accessible mb-1.5" />
                   <p className="text-xs font-heading text-rani-navy">Competitor Scan</p>
                   <p className="text-[10px] text-rani-muted">Competitive intelligence</p>
                 </button>

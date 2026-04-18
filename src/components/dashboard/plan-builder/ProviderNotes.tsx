@@ -110,7 +110,7 @@ export default function ProviderNotes({ phases, client, packages }: ProviderNote
                         &ldquo;{obj.objection}&rdquo;
                       </p>
                       <div className="flex items-start gap-1.5">
-                        <ArrowRight className="h-3 w-3 text-[#C9A96E] mt-0.5 flex-shrink-0" />
+                        <ArrowRight className="h-3 w-3 text-rani-gold-accessible mt-0.5 flex-shrink-0" />
                         <p className="text-[11px] text-gray-500 leading-relaxed">{obj.response}</p>
                       </div>
                     </div>
@@ -122,7 +122,7 @@ export default function ProviderNotes({ phases, client, packages }: ProviderNote
               <NoteSection
                 icon={<DollarSign className="h-3.5 w-3.5" />}
                 title="Package Strategy"
-                color="text-[#C9A96E]"
+                color="text-rani-gold-accessible"
                 bgColor="bg-[#C9A96E]/10"
               >
                 <p className="text-xs text-gray-600 leading-relaxed mb-2">{notes.highConvertingPackage}</p>

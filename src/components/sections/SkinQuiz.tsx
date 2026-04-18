@@ -428,7 +428,7 @@ export default function SkinQuiz() {
             className="text-center"
           >
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-rani-gold/20">
-              <Sparkles className="h-8 w-8 text-rani-gold" />
+              <Sparkles className="h-8 w-8 text-rani-gold-accessible" />
             </div>
             <h2 className="font-heading text-3xl font-bold text-rani-navy sm:text-4xl">
               Your Personalized Treatment Plan
@@ -601,7 +601,7 @@ export default function SkinQuiz() {
                           {c.label}
                         </span>
                         {isSelected && (
-                          <CheckCircle className="ml-auto h-5 w-5 flex-shrink-0 text-rani-gold" />
+                          <CheckCircle className="ml-auto h-5 w-5 flex-shrink-0 text-rani-gold-accessible" />
                         )}
                       </button>
                     );
@@ -711,7 +711,7 @@ export default function SkinQuiz() {
                           {b.subtext}
                         </span>
                         {isSelected && (
-                          <CheckCircle className="mt-2 h-5 w-5 text-rani-gold" />
+                          <CheckCircle className="mt-2 h-5 w-5 text-rani-gold-accessible" />
                         )}
                       </button>
                     );

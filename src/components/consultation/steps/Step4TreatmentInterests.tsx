@@ -164,7 +164,7 @@ export default function Step4TreatmentInterests({
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                   selected
-                    ? 'bg-[#C9A96E]/15 text-[#C9A96E]'
+                    ? 'bg-[#C9A96E]/15 text-rani-gold-accessible'
                     : 'bg-[#0F1D2C]/5 text-[#0F1D2C]/50'
                 }`}
               >
@@ -197,7 +197,7 @@ export default function Step4TreatmentInterests({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="font-body text-xs text-[#C9A96E] text-center mt-6"
+          className="font-body text-xs text-rani-gold-accessible text-center mt-6"
         >
           {selectedTreatments.length} treatment
           {selectedTreatments.length !== 1 ? 's' : ''} selected &mdash;

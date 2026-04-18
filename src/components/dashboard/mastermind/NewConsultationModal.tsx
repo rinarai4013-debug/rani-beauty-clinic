@@ -448,14 +448,14 @@ function PhotoDropZone({
             }
           `}
         >
-          <Icon className="w-6 h-6 text-[#C9A96E]/60" />
+          <Icon className="w-6 h-6 text-rani-gold-accessible/60" />
           <span className="text-xs text-[#F8F6F1]/40" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             {sublabel}
           </span>
         </div>
       ) : (
         <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#C9A96E]/20 bg-[#C9A96E]/5">
-          <span className="text-xs text-[#C9A96E]/60" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          <span className="text-xs text-rani-gold-accessible/60" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             Maximum {maxFiles} {maxFiles === 1 ? 'file' : 'files'} reached — remove one to add more
           </span>
         </div>

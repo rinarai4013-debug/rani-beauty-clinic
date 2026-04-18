@@ -27,7 +27,7 @@ export default function TrustLogosBar() {
               key={item.text}
               className="flex items-center gap-2 text-rani-navy/70"
             >
-              <item.icon size={18} className="text-rani-gold" />
+              <item.icon size={18} className="text-rani-gold-accessible" />
               <span className="font-body text-sm font-medium whitespace-nowrap">
                 {item.text}
               </span>

@@ -70,7 +70,7 @@ export default function RetentionActions({ actions, onExecute }: RetentionAction
                 {onExecute && (
                   <button
                     onClick={() => onExecute(action.id)}
-                    className="text-xs font-body font-medium text-rani-gold hover:text-rani-gold/80 whitespace-nowrap"
+                    className="text-xs font-body font-medium text-rani-gold-accessible hover:text-rani-gold/80 whitespace-nowrap"
                   >
                     Execute
                   </button>

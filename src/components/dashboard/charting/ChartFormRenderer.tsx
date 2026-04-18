@@ -179,7 +179,7 @@ export default function ChartFormRenderer({
                       }}
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                         selected
-                          ? 'border-[#C9A96E] bg-[#C9A96E]/10 text-[#C9A96E]'
+                          ? 'border-[#C9A96E] bg-[#C9A96E]/10 text-rani-gold-accessible'
                           : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
                       } ${readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
@@ -204,7 +204,7 @@ export default function ChartFormRenderer({
                       checked={(value as string) === opt.value}
                       onChange={(e) => onChange(field.id, e.target.value)}
                       disabled={readOnly}
-                      className="h-4 w-4 text-[#C9A96E] focus:ring-[#C9A96E]"
+                      className="h-4 w-4 text-rani-gold-accessible focus:ring-[#C9A96E]"
                     />
                     <span className="text-sm text-gray-700">{opt.label}</span>
                   </label>
@@ -219,7 +219,7 @@ export default function ChartFormRenderer({
                   checked={(value as boolean) || false}
                   onChange={(e) => onChange(field.id, e.target.checked)}
                   disabled={readOnly}
-                  className="h-4 w-4 rounded text-[#C9A96E] focus:ring-[#C9A96E]"
+                  className="h-4 w-4 rounded text-rani-gold-accessible focus:ring-[#C9A96E]"
                 />
                 <span className="text-sm text-gray-700">Confirmed</span>
               </label>

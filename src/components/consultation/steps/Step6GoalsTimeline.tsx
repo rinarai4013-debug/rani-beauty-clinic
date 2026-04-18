@@ -120,7 +120,7 @@ function SelectionCard({
     >
       <div
         className={`transition-colors duration-300 ${
-          isActive ? 'text-[#C9A96E]' : 'text-[#0F1D2C]/40'
+          isActive ? 'text-rani-gold-accessible' : 'text-[#0F1D2C]/40'
         }`}
       >
         {icon}

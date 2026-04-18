@@ -93,7 +93,7 @@ function RefillCalendar({ month, year, events, totalPatients, refillsDue, overdu
                 key={day}
                 className={`h-24 border rounded-lg p-1.5 ${isToday ? 'border-[#C9A96E] bg-[#C9A96E]/5' : 'border-gray-100'}`}
               >
-                <p className={`text-xs font-medium mb-1 ${isToday ? 'text-[#C9A96E]' : 'text-gray-500'}`}>{day}</p>
+                <p className={`text-xs font-medium mb-1 ${isToday ? 'text-rani-gold-accessible' : 'text-gray-500'}`}>{day}</p>
                 <div className="space-y-0.5 overflow-hidden">
                   {dayEvents.slice(0, 2).map((event) => (
                     <div

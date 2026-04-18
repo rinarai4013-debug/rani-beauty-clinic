@@ -13,8 +13,8 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ElementType; color: string }>
   lead: { icon: UserPlus, color: 'text-purple-500 bg-purple-50' },
   review: { icon: Star, color: 'text-amber-500 bg-amber-50' },
   alert: { icon: Bell, color: 'text-red-500 bg-red-50' },
-  form: { icon: FileText, color: 'text-rani-gold bg-rani-gold/10' },
-  achievement: { icon: Award, color: 'text-rani-gold bg-rani-gold/10' },
+  form: { icon: FileText, color: 'text-rani-gold-accessible bg-rani-gold/10' },
+  achievement: { icon: Award, color: 'text-rani-gold-accessible bg-rani-gold/10' },
 };
 
 export default function RecentActivity() {

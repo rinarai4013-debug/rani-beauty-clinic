@@ -74,7 +74,7 @@ export default function FunnelHealthPanel() {
       <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-rani-gold" />
+            <Activity className="w-4 h-4 text-rani-gold-accessible" />
             <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
               Funnel Health
             </h3>
@@ -100,7 +100,7 @@ export default function FunnelHealthPanel() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-rani-gold" />
+          <Activity className="w-4 h-4 text-rani-gold-accessible" />
           <h3 className="text-sm font-body font-semibold text-rani-navy uppercase tracking-wider">
             Funnel Health
           </h3>

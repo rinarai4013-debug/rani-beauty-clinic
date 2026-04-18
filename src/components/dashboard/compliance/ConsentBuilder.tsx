@@ -86,7 +86,7 @@ export default function ConsentBuilder({ templates, recentConsents }: ConsentBui
       <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-rani-border p-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-rani-gold/10 flex items-center justify-center">
-            <FileSignature className="w-5 h-5 text-rani-gold" />
+            <FileSignature className="w-5 h-5 text-rani-gold-accessible" />
           </div>
           <div>
             <h2 className="text-lg font-body font-bold text-rani-navy">Consent Builder</h2>

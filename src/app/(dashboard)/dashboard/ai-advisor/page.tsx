@@ -83,7 +83,7 @@ export default function AIAdvisorPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-playfair text-[#0F1D2C] flex items-center gap-2">
-              <Brain className="w-6 h-6 text-[#C9A96E]" />
+              <Brain className="w-6 h-6 text-rani-gold-accessible" />
               AI Treatment Advisor
             </h1>
             <p className="text-sm text-[#0F1D2C]/60 font-montserrat mt-1">
@@ -97,7 +97,7 @@ export default function AIAdvisorPage() {
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-white rounded-xl border border-[#F8F6F1] p-5 space-y-4">
               <h3 className="font-montserrat font-semibold text-[#0F1D2C] flex items-center gap-2">
-                <User className="w-4 h-4 text-[#C9A96E]" />
+                <User className="w-4 h-4 text-rani-gold-accessible" />
                 Client Profile
               </h3>
 
@@ -214,7 +214,7 @@ export default function AIAdvisorPage() {
                         type="checkbox"
                         checked={item.value}
                         onChange={e => item.set(e.target.checked)}
-                        className="rounded border-[#C9A96E] text-[#C9A96E] focus:ring-[#C9A96E]"
+                        className="rounded border-[#C9A96E] text-rani-gold-accessible focus:ring-[#C9A96E]"
                       />
                       {item.label}
                     </label>
@@ -258,7 +258,7 @@ export default function AIAdvisorPage() {
                           {data.skinAnalysis.skinHealthScore.overall}
                         </div>
                         <div className="text-sm text-[#0F1D2C]/50 font-montserrat">/ 100</div>
-                        <div className="text-sm text-[#C9A96E] font-montserrat mt-2">
+                        <div className="text-sm text-rani-gold-accessible font-montserrat mt-2">
                           {data.skinAnalysis.benchmarkComparison.percentile}th percentile
                         </div>
                         <div className="text-xs text-[#0F1D2C]/40 font-montserrat">
@@ -281,7 +281,7 @@ export default function AIAdvisorPage() {
                   <>
                     <div className="bg-white rounded-xl border border-[#F8F6F1] p-5">
                       <h3 className="font-montserrat font-semibold text-[#0F1D2C] mb-4 flex items-center gap-2">
-                        <MessageCircle className="w-4 h-4 text-[#C9A96E]" />
+                        <MessageCircle className="w-4 h-4 text-rani-gold-accessible" />
                         Consultation Copilot
                       </h3>
                       <CopilotSuggestion suggestions={data.copilot.suggestions} />
@@ -298,7 +298,7 @@ export default function AIAdvisorPage() {
 
             {!data && !isLoading && !error && (
               <div className="bg-white rounded-xl border border-[#F8F6F1] p-12 text-center">
-                <Brain className="w-12 h-12 text-[#C9A96E]/30 mx-auto mb-4" />
+                <Brain className="w-12 h-12 text-rani-gold-accessible/30 mx-auto mb-4" />
                 <h3 className="text-lg font-playfair text-[#0F1D2C] mb-2">Ready to Advise</h3>
                 <p className="text-sm text-[#0F1D2C]/50 font-montserrat">
                   Fill in the client profile and click Generate to create a personalized treatment plan.

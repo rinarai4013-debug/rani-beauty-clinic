@@ -107,7 +107,7 @@ export default function LeadScoreCard({ leadName, leadSource, score, onAction }:
         {onAction && (
           <button
             onClick={onAction}
-            className="flex items-center gap-1 text-xs font-body text-rani-gold hover:text-rani-navy transition-colors"
+            className="flex items-center gap-1 text-xs font-body text-rani-gold-accessible hover:text-rani-navy transition-colors"
           >
             <Zap className="w-3.5 h-3.5" />
             Act

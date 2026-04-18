@@ -35,12 +35,12 @@ export default function CopilotSuggestion({ suggestions, onSelect }: CopilotSugg
           >
             <div className="flex items-start gap-3">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Icon className="w-4 h-4 text-[#C9A96E]" />
+                <Icon className="w-4 h-4 text-rani-gold-accessible" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <h4 className="font-montserrat font-semibold text-sm text-[#0F1D2C] truncate">{sug.title}</h4>
-                  <span className="text-xs font-montserrat text-[#C9A96E] font-semibold flex-shrink-0">
+                  <span className="text-xs font-montserrat text-rani-gold-accessible font-semibold flex-shrink-0">
                     {sug.relevanceScore}%
                   </span>
                 </div>

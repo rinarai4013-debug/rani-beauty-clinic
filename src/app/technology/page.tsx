@@ -164,12 +164,12 @@ export default function TechnologyPage() {
                   <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
                     <div className="lg:flex-1">
                       <div className="mb-4 flex items-center gap-3">
-                        <device.icon size={28} className="text-rani-gold" />
+                        <device.icon size={28} className="text-rani-gold-accessible" />
                         <div>
                           <h3 className="font-body text-xl font-bold text-rani-navy">
                             {device.name}
                           </h3>
-                          <p className="font-body text-xs font-semibold uppercase tracking-wider text-rani-gold">
+                          <p className="font-body text-xs font-semibold uppercase tracking-wider text-rani-gold-accessible">
                             {device.category}
                           </p>
                         </div>
@@ -189,7 +189,7 @@ export default function TechnologyPage() {
                           >
                             <ChevronRight
                               size={14}
-                              className="mt-0.5 shrink-0 text-rani-gold"
+                              className="mt-0.5 shrink-0 text-rani-gold-accessible"
                             />
                             <span>{spec}</span>
                           </li>

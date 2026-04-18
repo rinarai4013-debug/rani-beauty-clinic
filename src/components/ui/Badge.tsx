@@ -30,7 +30,7 @@ export default function Badge({
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-body text-xs font-semibold ${styles} ${className}`}
     >
-      <span className="text-rani-gold">{iconMap[icon]}</span>
+      <span className="text-rani-gold-accessible">{iconMap[icon]}</span>
       {children}
     </span>
   );

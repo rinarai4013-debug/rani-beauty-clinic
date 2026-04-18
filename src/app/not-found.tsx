@@ -33,7 +33,7 @@ export default function NotFound() {
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-16 text-center">
       <div className="w-full max-w-lg">
         {/* 404 number */}
-        <p className="font-heading text-7xl font-bold text-rani-gold sm:text-8xl">
+        <p className="font-heading text-7xl font-bold text-rani-gold-accessible sm:text-8xl">
           404
         </p>
 
@@ -80,7 +80,7 @@ export default function NotFound() {
                 href={service.href}
                 className="group flex items-center gap-2 rounded-lg px-3 py-2 font-body text-sm text-rani-text transition-colors hover:bg-rani-cream"
               >
-                <span className="text-rani-gold transition-transform group-hover:translate-x-1">
+                <span className="text-rani-gold-accessible transition-transform group-hover:translate-x-1">
                   &rarr;
                 </span>
                 {service.name}
@@ -93,7 +93,7 @@ export default function NotFound() {
           Need help?{" "}
           <a
             href="tel:+14255394440"
-            className="text-rani-gold hover:underline font-medium"
+            className="text-rani-gold-accessible hover:underline font-medium"
           >
             Call (425) 539-4440
           </a>

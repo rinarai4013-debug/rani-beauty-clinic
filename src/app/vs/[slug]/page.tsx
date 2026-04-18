@@ -163,13 +163,13 @@ export default function VsComparisonPage({ params }: PageProps) {
                 Home
               </Link>
             </li>
-            <li aria-hidden="true" className="text-[#C9A96E]">/</li>
+            <li aria-hidden="true" className="text-rani-gold-accessible">/</li>
             <li>
               <Link href="/vs" className="hover:text-[#C9A96E] transition-colors">
                 Compare
               </Link>
             </li>
-            <li aria-hidden="true" className="text-[#C9A96E]">/</li>
+            <li aria-hidden="true" className="text-rani-gold-accessible">/</li>
             <li className="text-[#0F1D2C] font-medium">
               {page.treatmentA} vs {page.treatmentB}
             </li>
@@ -198,7 +198,7 @@ export default function VsComparisonPage({ params }: PageProps) {
       <section className="py-16 md:py-24 px-6 bg-white">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-3xl md:text-4xl font-light text-[#0F1D2C] text-center mb-12">
-            Side-by-Side <span className="text-[#C9A96E]">Comparison</span>
+            Side-by-Side <span className="text-rani-gold-accessible">Comparison</span>
           </h2>
           <div className="overflow-x-auto rounded-lg border border-[#C9A96E]/20">
             <table className="w-full text-left">
@@ -260,7 +260,7 @@ export default function VsComparisonPage({ params }: PageProps) {
       <section className="py-16 md:py-24 px-6 bg-white">
         <div className="mx-auto max-w-3xl">
           <div className="border-l-4 border-[#C9A96E] bg-[#F8F6F1] p-8 md:p-12 rounded-r-lg">
-            <p className="uppercase tracking-[0.2em] text-[#C9A96E] text-sm font-medium mb-4">
+            <p className="uppercase tracking-[0.2em] text-rani-gold-accessible text-sm font-medium mb-4">
               Expert Recommendation
             </p>
             <h2 className="text-2xl md:text-3xl font-light text-[#0F1D2C] mb-6">
@@ -277,7 +277,7 @@ export default function VsComparisonPage({ params }: PageProps) {
       <section className="py-16 md:py-24 px-6 bg-[#F8F6F1]">
         <div className="mx-auto max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-light text-[#0F1D2C] text-center mb-12">
-            Frequently Asked <span className="text-[#C9A96E]">Questions</span>
+            Frequently Asked <span className="text-rani-gold-accessible">Questions</span>
           </h2>
           <div className="space-y-6">
             {page.faqs.map((faq) => (

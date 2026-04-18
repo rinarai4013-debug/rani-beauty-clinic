@@ -16,7 +16,7 @@ const CATEGORY_CONFIG: Record<OpportunityCategory, { icon: React.ElementType; co
   'rebook-overdue': { icon: RefreshCw, color: 'text-amber-600 bg-amber-50', label: 'Rebook' },
   'reactivate-dormant': { icon: Users, color: 'text-purple-600 bg-purple-50', label: 'Reactivate' },
   'win-back-lapsed': { icon: Users, color: 'text-rose-600 bg-rose-50', label: 'Win Back' },
-  'vip-retention': { icon: Target, color: 'text-rani-gold bg-amber-50', label: 'VIP' },
+  'vip-retention': { icon: Target, color: 'text-rani-gold-accessible bg-amber-50', label: 'VIP' },
   'new-client-acquisition': { icon: Users, color: 'text-teal-600 bg-teal-50', label: 'New Client' },
   'price-optimization': { icon: CreditCard, color: 'text-indigo-600 bg-indigo-50', label: 'Pricing' },
   'package-conversion': { icon: CreditCard, color: 'text-cyan-600 bg-cyan-50', label: 'Package' },
@@ -84,7 +84,7 @@ export default function OpportunityScoreCard({ opportunity, rank, compact = fals
           <p className="text-xs font-body text-rani-muted mt-1">{opportunity.description}</p>
 
           {opportunity.targetClient && (
-            <p className="text-xs font-body text-rani-gold mt-1">Client: {opportunity.targetClient}</p>
+            <p className="text-xs font-body text-rani-gold-accessible mt-1">Client: {opportunity.targetClient}</p>
           )}
 
           {/* Score breakdown bar */}

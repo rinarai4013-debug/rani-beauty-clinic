@@ -45,7 +45,7 @@ export default function ProtocolsPage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-playfair text-[#0F1D2C] flex items-center gap-2">
-            <FileText className="w-6 h-6 text-[#C9A96E]" />
+            <FileText className="w-6 h-6 text-rani-gold-accessible" />
             Clinical Protocol Library
           </h1>
           <p className="text-sm text-[#0F1D2C]/60 font-montserrat mt-1">
@@ -130,7 +130,7 @@ export default function ProtocolsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-montserrat text-[#C9A96E] uppercase tracking-wide">
+                        <span className="text-xs font-montserrat text-rani-gold-accessible uppercase tracking-wide">
                           {CATEGORY_LABELS[protocol.category] || protocol.category}
                         </span>
                         <span className="text-xs text-[#0F1D2C]/30">v{protocol.version}</span>

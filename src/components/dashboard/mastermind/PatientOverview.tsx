@@ -34,7 +34,7 @@ export default function PatientOverview({ session }: PatientOverviewProps) {
             </span>
           )}
           {scan && (
-            <span className="px-2 py-0.5 rounded-full bg-[#C9A96E]/10 font-body text-xs font-medium text-[#C9A96E]">
+            <span className="px-2 py-0.5 rounded-full bg-[#C9A96E]/10 font-body text-xs font-medium text-rani-gold-accessible">
               Fitzpatrick {scan.skinAnalysis.fitzpatrickType}
             </span>
           )}

@@ -60,7 +60,7 @@ export default function SkinAnalysisGrid({
               className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A96E]/10 border border-[#C9A96E]/20"
             >
               <span className="font-body text-xs text-[#0F1D2C]/60">Skin Score</span>
-              <span className="font-body text-sm font-bold text-[#C9A96E]">
+              <span className="font-body text-sm font-bold text-rani-gold-accessible">
                 {analysis.compositeSkinScore.toFixed(1)}
               </span>
             </motion.div>

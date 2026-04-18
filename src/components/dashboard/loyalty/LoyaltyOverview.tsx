@@ -23,7 +23,7 @@ export default function LoyaltyOverview({ analytics }: LoyaltyOverviewProps) {
       value: formatNumber(analytics.totalPointsIssued, true),
       sub: `${formatNumber(analytics.pointsInCirculation, true)} in circulation`,
       icon: Award,
-      color: 'text-rani-gold',
+      color: 'text-rani-gold-accessible',
     },
     {
       label: 'Points Redeemed',

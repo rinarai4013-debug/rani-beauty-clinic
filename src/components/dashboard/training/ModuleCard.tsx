@@ -96,7 +96,7 @@ export default function ModuleCard({ module, progress, locked = false }: ModuleC
           {completedSections}/{totalSections} sections
         </span>
         {!locked && !isComplete && (
-          <span className="text-xs text-[#C9A96E] font-medium flex items-center gap-0.5">
+          <span className="text-xs text-rani-gold-accessible font-medium flex items-center gap-0.5">
             {completedSections > 0 ? 'Continue' : 'Start'} <ChevronRight className="w-3 h-3" />
           </span>
         )}

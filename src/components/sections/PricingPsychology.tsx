@@ -106,7 +106,7 @@ export function FinancingStrip({
     >
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-rani-gold/20">
-          <CreditCard className="h-4 w-4 text-rani-gold" />
+          <CreditCard className="h-4 w-4 text-rani-gold-accessible" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="font-body text-sm font-semibold text-rani-navy">
@@ -189,7 +189,7 @@ export function CompareAndSave({
           <span className="text-right font-body text-xs font-semibold uppercase tracking-wider text-rani-muted">
             Individual
           </span>
-          <span className="text-right font-body text-xs font-semibold uppercase tracking-wider text-rani-gold">
+          <span className="text-right font-body text-xs font-semibold uppercase tracking-wider text-rani-gold-accessible">
             {packageLabel}
           </span>
         </div>

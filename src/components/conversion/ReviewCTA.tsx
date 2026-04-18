@@ -33,7 +33,7 @@ export default function ReviewCTA({
           <Star
             key={i}
             size={22}
-            className="fill-rani-gold text-rani-gold"
+            className="fill-rani-gold text-rani-gold-accessible"
           />
         ))}
       </div>

@@ -111,7 +111,7 @@ export default function GoalsPage() {
           {achievements && achievements.length > 0 && (
             <div className="bg-white rounded-xl border border-gray-100 p-5">
               <h3 className="font-display font-semibold text-rani-navy mb-3 flex items-center gap-2">
-                <Award className="w-4 h-4 text-rani-gold" /> Achievements
+                <Award className="w-4 h-4 text-rani-gold-accessible" /> Achievements
               </h3>
               <div className="flex flex-wrap gap-4 justify-center">
                 {achievements.map(a => (
@@ -132,7 +132,7 @@ export default function GoalsPage() {
       {goals?.coachingRecommendations && goals.coachingRecommendations.length > 0 && (
         <div>
           <h2 className="font-display font-semibold text-rani-navy mb-3 flex items-center gap-2">
-            <Lightbulb className="w-5 h-5 text-rani-gold" /> Coaching Recommendations
+            <Lightbulb className="w-5 h-5 text-rani-gold-accessible" /> Coaching Recommendations
           </h2>
           <CoachingCard recommendations={goals.coachingRecommendations} />
         </div>

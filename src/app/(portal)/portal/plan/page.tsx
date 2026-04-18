@@ -92,7 +92,7 @@ export default function PlanPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-8 h-8 text-rani-gold animate-spin" />
+        <Loader2 className="w-8 h-8 text-rani-gold-accessible animate-spin" />
         <p className="font-body text-rani-muted text-sm">Loading your treatment plan...</p>
       </div>
     );
@@ -113,7 +113,7 @@ export default function PlanPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 px-6 text-center">
         <div className="w-16 h-16 rounded-full bg-rani-cream flex items-center justify-center">
-          <Sparkles className="w-7 h-7 text-rani-gold" />
+          <Sparkles className="w-7 h-7 text-rani-gold-accessible" />
         </div>
         <div>
           <h2 className="font-heading text-2xl text-rani-navy mb-2">
@@ -156,7 +156,7 @@ export default function PlanPage() {
         {data.planDetails && (
           <div className="flex flex-wrap items-center gap-3 font-body text-sm text-rani-muted">
             <span className="inline-flex items-center gap-1.5 bg-rani-cream text-rani-navy px-3 py-1 rounded-full text-xs font-medium">
-              <Crown className="w-3.5 h-3.5 text-rani-gold" />
+              <Crown className="w-3.5 h-3.5 text-rani-gold-accessible" />
               {data.planDetails.planTier}
             </span>
             <span className="flex items-center gap-1">
@@ -189,7 +189,7 @@ export default function PlanPage() {
           </div>
           <button
             onClick={() => setShowSimulation(!showSimulation)}
-            className="font-body text-sm font-medium text-rani-gold hover:text-rani-gold/80 transition-colors flex items-center gap-1"
+            className="font-body text-sm font-medium text-rani-gold-accessible hover:text-rani-gold/80 transition-colors flex items-center gap-1"
           >
             {showSimulation ? 'Hide' : 'View Simulation'}
             {showSimulation ? (
@@ -249,7 +249,7 @@ export default function PlanPage() {
                           key={sIdx}
                           className="flex items-center gap-2 font-body text-sm text-rani-navy"
                         >
-                          <CheckCircle2 className="w-4 h-4 text-rani-gold flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-rani-gold-accessible flex-shrink-0" />
                           {service}
                         </li>
                       ))}
@@ -295,12 +295,12 @@ export default function PlanPage() {
                   </div>
                   <ul className="space-y-2 mb-6 flex-1">
                     <li className="flex items-center gap-2 font-body text-sm text-rani-navy">
-                      <CheckCircle2 className="w-4 h-4 text-rani-gold flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-rani-gold-accessible flex-shrink-0" />
                       {pkg.sessions} sessions included
                     </li>
                     {pkg.discount && (
                       <li className="flex items-center gap-2 font-body text-sm text-rani-navy">
-                        <CheckCircle2 className="w-4 h-4 text-rani-gold flex-shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-rani-gold-accessible flex-shrink-0" />
                         {pkg.discount} savings
                       </li>
                     )}
@@ -328,7 +328,7 @@ export default function PlanPage() {
       <section className="bg-white rounded-xl border border-rani-border p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-rani-cream flex items-center justify-center">
-            <CreditCard className="w-5 h-5 text-rani-gold" />
+            <CreditCard className="w-5 h-5 text-rani-gold-accessible" />
           </div>
           <div>
             <h2 className="font-heading text-xl text-rani-navy">Flexible Financing</h2>

@@ -191,7 +191,7 @@ export default function LifecycleJourney({ client, metrics }: LifecycleJourneyPr
         {client.milestones.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <h4 className="text-[10px] font-semibold text-rani-navy uppercase tracking-wider mb-2 flex items-center gap-1">
-              <Gift className="w-3 h-3 text-rani-gold" />
+              <Gift className="w-3 h-3 text-rani-gold-accessible" />
               Milestones
             </h4>
             <div className="space-y-1.5">

@@ -106,14 +106,14 @@ export default function ReferralShare({
           onClick={handleSMS}
           className="flex items-center justify-center gap-2 rounded-xl border border-rani-border bg-white px-4 py-3 text-sm font-medium text-rani-navy hover:border-rani-gold/40 hover:bg-rani-cream/30 transition-all"
         >
-          <MessageSquare className="h-4 w-4 text-rani-gold" />
+          <MessageSquare className="h-4 w-4 text-rani-gold-accessible" />
           Share via SMS
         </button>
         <button
           onClick={handleEmail}
           className="flex items-center justify-center gap-2 rounded-xl border border-rani-border bg-white px-4 py-3 text-sm font-medium text-rani-navy hover:border-rani-gold/40 hover:bg-rani-cream/30 transition-all"
         >
-          <Mail className="h-4 w-4 text-rani-gold" />
+          <Mail className="h-4 w-4 text-rani-gold-accessible" />
           Share via Email
         </button>
       </div>

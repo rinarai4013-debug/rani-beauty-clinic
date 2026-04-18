@@ -175,7 +175,7 @@ export default function PortalNav({ patientName }: PortalNavProps) {
                   isActive ? 'text-rani-navy' : 'text-rani-muted'
                 }`}
               >
-                <Icon className={`h-5 w-5 ${isActive ? 'text-rani-gold' : ''}`} />
+                <Icon className={`h-5 w-5 ${isActive ? 'text-rani-gold-accessible' : ''}`} />
                 <span className="text-[10px]">{item.label}</span>
               </a>
             );

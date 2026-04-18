@@ -93,7 +93,7 @@ export default function DashboardBookingPage() {
                   <p className="text-xs text-[#6B7280]">{pv.appointmentCount} appointments</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-[#C9A96E]">${pv.totalRevenue}</p>
+                  <p className="text-sm font-bold text-rani-gold-accessible">${pv.totalRevenue}</p>
                   <p className="text-xs text-[#6B7280]">{pv.totalMinutesBooked} min</p>
                 </div>
               </div>

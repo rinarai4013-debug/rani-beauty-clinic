@@ -37,7 +37,7 @@ export function generateMetadata({
 const priorityStyles: Record<string, { bg: string; text: string; label: string }> = {
   essential: {
     bg: "bg-[#C9A96E]/20",
-    text: "text-[#C9A96E]",
+    text: "text-rani-gold-accessible",
     label: "Essential",
   },
   recommended: {
@@ -174,7 +174,7 @@ export default function AgeSlugPage({
                   <p className="text-gray-600 text-sm leading-relaxed flex-1">
                     {treatment.whyNow}
                   </p>
-                  <span className="inline-block mt-4 text-[#C9A96E] text-sm font-medium group-hover:underline">
+                  <span className="inline-block mt-4 text-rani-gold-accessible text-sm font-medium group-hover:underline">
                     Learn more &rarr;
                   </span>
                 </Link>

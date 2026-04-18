@@ -100,7 +100,7 @@ export default function AnimatedCounter({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, hasStarted, animate]);
 
-  const defaultColor = 'text-[#C9A96E]';
+  const defaultColor = 'text-rani-gold-accessible';
   const colorClass = color || defaultColor;
 
   return (

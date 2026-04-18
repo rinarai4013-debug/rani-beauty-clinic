@@ -61,7 +61,7 @@ function KeywordManager({ keywords, totalTracked, avgPosition, top10Count }: Key
             <p className="text-[10px] text-gray-400">Tracked</p>
           </div>
           <div className="text-center">
-            <p className="text-lg font-bold text-[#C9A96E]">{avgPosition.toFixed(1)}</p>
+            <p className="text-lg font-bold text-rani-gold-accessible">{avgPosition.toFixed(1)}</p>
             <p className="text-[10px] text-gray-400">Avg. Pos</p>
           </div>
           <div className="text-center">
@@ -119,7 +119,7 @@ function KeywordManager({ keywords, totalTracked, avgPosition, top10Count }: Key
       {/* Footer */}
       <div className="px-5 py-3 bg-gray-50 flex items-center justify-between">
         <button className="text-xs bg-white border border-gray-200 px-3 py-1.5 rounded-lg text-gray-600">+ Add Keyword</button>
-        <button className="text-xs text-[#C9A96E] font-medium">Export Report</button>
+        <button className="text-xs text-rani-gold-accessible font-medium">Export Report</button>
       </div>
     </div>
   );

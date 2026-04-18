@@ -186,7 +186,7 @@ export default function AftercarePage({ params }: PageProps) {
             <ul className="space-y-4 ml-16">
               {section.items.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-[#C9A96E] mt-1 flex-shrink-0">&#10003;</span>
+                  <span className="text-rani-gold-accessible mt-1 flex-shrink-0">&#10003;</span>
                   <span className="text-gray-700 text-lg leading-relaxed">{item}</span>
                 </li>
               ))}
@@ -278,7 +278,7 @@ export default function AftercarePage({ params }: PageProps) {
           </p>
           <Link
             href={parentPath}
-            className="text-[#C9A96E] font-semibold hover:underline text-lg"
+            className="text-rani-gold-accessible font-semibold hover:underline text-lg"
           >
             Learn more about {page.treatment} at Rani Beauty Clinic &rarr;
           </Link>

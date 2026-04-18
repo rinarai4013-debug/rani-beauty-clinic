@@ -70,7 +70,7 @@ export default function MeetTheTeam() {
                     key={stat.label}
                     className="rounded-lg bg-white p-4 text-center shadow-sm"
                   >
-                    <p className="font-heading text-2xl font-bold text-rani-gold">
+                    <p className="font-heading text-2xl font-bold text-rani-gold-accessible">
                       {stat.value}
                     </p>
                     <p className="mt-1 font-body text-xs text-rani-muted">

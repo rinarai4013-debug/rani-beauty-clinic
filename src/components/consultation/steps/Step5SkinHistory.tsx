@@ -115,7 +115,7 @@ export default function Step5SkinHistory({
               >
                 <div
                   className={`transition-colors duration-300 ${
-                    isActive ? 'text-[#C9A96E]' : 'text-[#0F1D2C]/40'
+                    isActive ? 'text-rani-gold-accessible' : 'text-[#0F1D2C]/40'
                   }`}
                 >
                   {type.icon}
@@ -359,7 +359,7 @@ export default function Step5SkinHistory({
       >
         <div className="flex items-center gap-2 mb-3">
           <div className="w-8 h-8 rounded-full bg-[#C9A96E]/10 flex items-center justify-center">
-            <svg className="w-4 h-4 text-[#C9A96E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 text-rani-gold-accessible" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>

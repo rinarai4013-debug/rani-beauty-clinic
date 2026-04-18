@@ -226,7 +226,7 @@ export default function PhotoUploadZone({
               `}
             >
               {isDragging ? (
-                <Upload className="h-8 w-8 text-[#C9A96E]" />
+                <Upload className="h-8 w-8 text-rani-gold-accessible" />
               ) : (
                 <Camera className="h-8 w-8 text-[#0F1D2C]/40" />
               )}
