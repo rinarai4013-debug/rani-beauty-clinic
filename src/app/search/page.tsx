@@ -110,8 +110,8 @@ export default function SearchPage({
             {results.length === 0 ? (
               <div className="rounded-lg border border-rani-border bg-rani-cream p-5">
                 <p className="font-body text-sm text-rani-navy">
-                  No matches found. Try a treatment name like "cosmelan", "botox", or
-                  "glp-1".
+                  No matches found. Try a treatment name like &quot;cosmelan&quot;,
+                  &quot;botox&quot;, or &quot;glp-1&quot;.
                 </p>
               </div>
             ) : (
