@@ -530,6 +530,53 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
+  /api/consultation/offer-selection:
+    post:
+      operationId: selectConsultationOffer
+      summary: Capture consult offer selection and return checkout route
+      tags: [Public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                intakeId: { type: string }
+                selectedProductId: { type: string }
+                selectedProductLabel: { type: string }
+                category: { type: string }
+                requestedTrack: { type: string }
+                fulfillmentMode: { type: string, enum: [clinic, home] }
+                quotedRetail: { type: number }
+                quotedGrossProfit: { type: number }
+                quotedMarginPercent: { type: number }
+              required:
+                [selectedProductId, selectedProductLabel, category, requestedTrack, fulfillmentMode, quotedRetail, quotedGrossProfit, quotedMarginPercent]
+      responses:
+        "200":
+          description: Offer selection accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  providerReviewRequired: { type: boolean }
+                  prescriptionHandoffLocked: { type: boolean }
+                  checkoutAllowed: { type: boolean }
+                  checkoutUrl: { type: string }
+                  message: { type: string }
+                required: [success, providerReviewRequired, prescriptionHandoffLocked, checkoutAllowed]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Request body too large
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
   /api/booking/book:
     get:
       operationId: checkBookingAvailability
@@ -2442,6 +2489,17 @@ components:
       properties:
         success:
           type: boolean
+        sessionId:
+          type: string
+        patientName:
+          type: string
+        hasPhoto:
+          type: boolean
+        phase:
+          type: string
+        intakeId:
+          type: string
+          nullable: true
         data:
           type: object
           properties:
@@ -2453,6 +2511,41 @@ components:
               type: boolean
             phase:
               type: string
+        medicalOffers:
+          type: object
+          properties:
+            providerReviewRequired: { type: boolean }
+            requestedTrack: { type: string }
+            recommendationCount: { type: integer }
+            projectedMonthlyRetail: { type: number }
+            projectedMonthlyCOGS: { type: number }
+            projectedMonthlyGrossProfit: { type: number }
+            averageMarginPercent: { type: number }
+            checkoutPaths:
+              type: object
+              properties:
+                clinic: { type: string }
+                home: { type: string }
+            normalizedSymptoms:
+              type: array
+              items: { type: string }
+            recommendedProducts:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: string }
+                  product: { type: string }
+                  label: { type: string }
+                  category: { type: string }
+                  score: { type: number }
+                  monthlyCostEstimate: { type: number }
+                  suggestedRetail: { type: number }
+                  suggestedGrossProfit: { type: number }
+                  suggestedMarginPercent: { type: number }
+                  rationale:
+                    type: array
+                    items: { type: string }
       required: [success]
 
     SubscribeRequest:

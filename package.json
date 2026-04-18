@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "smoke:consult-offers": "node scripts/smoke-consult-offers.mjs",
     "typecheck": "tsc --noEmit",
     "seo:generate-llms": "node scripts/seo/generate-llms-files.mjs",
     "seo:check-llms": "node scripts/seo/generate-llms-files.mjs --check",

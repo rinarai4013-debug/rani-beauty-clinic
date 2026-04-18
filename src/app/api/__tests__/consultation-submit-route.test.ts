@@ -159,6 +159,10 @@ describe('POST /api/consultation/submit', () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.data.sessionId).toBe('ms_test_1');
+    expect(body.sessionId).toBe('ms_test_1');
+    expect(body.medicalOffers?.providerReviewRequired).toBe(true);
+    expect(body.medicalOffers?.recommendedProducts?.length ?? 0).toBeGreaterThan(0);
+    expect(body.medicalOffers?.projectedMonthlyGrossProfit ?? 0).toBeGreaterThan(0);
     expect(intakeCreateMock).toHaveBeenCalledTimes(1);
   });
 });
