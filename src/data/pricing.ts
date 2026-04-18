@@ -46,7 +46,9 @@ export const pricingData = {
     { name: "BioRePeel Intimate Area", price: "$425", time: "60 min" },
     { name: "BioRePeel Underarms", price: "$275", time: "60 min" },
     { name: "BioRePeel Hands", price: "$225", time: "60 min" },
-    { name: "PRX T33 Face", price: "$475", time: "60 min" },
+    { name: "PRX T33 Face", price: "$495", time: "60 min" },
+    { name: "Cosmelan Peel", price: "$1,399", time: "90 min", note: "Gold standard for hyperpigmentation & melasma" },
+    { name: "Microneedling with Arrissence (Dark Undereyes)", price: "$695", time: "60 min" },
   ],
 
   rfMicroneedling: [

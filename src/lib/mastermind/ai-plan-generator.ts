@@ -198,6 +198,8 @@ AFTERCARE MUST BE TREATMENT-SPECIFIC (not generic):
 - Chemical Peels (VI Peel): Don't wash face for 4 hours after, no picking peeling skin, no retinoids for 10 days, no sun for 7 days, peeling days 3-7.
 - BioRePeel: Zero downtime, no retinoids for 3 days, SPF 30+ daily.
 - PRX-T33: No retinoids for 3-5 days, keep hydrated, SPF daily.
+- Cosmelan Peel: Apply Cosmelan 2 cream at home as directed (critical for results), strict SPF 50+ daily, avoid sun exposure for 4 weeks, expect peeling days 3-7, no retinoids or AHAs for 2 weeks, redness/darkening before lightening is normal.
+- Microneedling with Arrissence (Dark Undereyes): No makeup for 24 hours, avoid rubbing eye area for 48 hours, use recommended eye serum as directed, mild bruising/swelling normal for 2-3 days, results visible from 4-6 weeks.
 - Sofwave: Mild redness a few hours, no excessive heat for 24 hours, results develop over 3-6 months.
 - Laser treatments: Avoid sun 2 weeks, no retinoids for 7 days, redness 3-5 days.
 - HydraFacial: No makeup for 6 hours, no harsh products for 48 hours.
