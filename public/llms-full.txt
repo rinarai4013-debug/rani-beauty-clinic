@@ -1,6 +1,6 @@
 # Rani Beauty Clinic — Complete Knowledge Base
 
-> Physician-supervised medspa in Renton, WA offering advanced aesthetic treatments and medical wellness programs under the supervision of Dr. Alexander Landfield, Board-Certified Neurologist. Woman-owned. Open 7 days a week. Serving all of King County, Washington.
+> Auto-generated from canonical pricing and clinic identity sources. Last reviewed: April 18, 2026.
 
 ## Business Identity
 
@@ -13,231 +13,43 @@
 - **Email:** info@ranibeautyclinic.com
 - **Website:** https://www.ranibeautyclinic.com
 - **Booking:** https://booking.mangomint.com/ranibeautyclinic1
-- **Hours:** Monday–Sunday, 10:00 AM – 7:00 PM (Open 7 days a week)
+- **Hours:** Monday - Sunday, 10:00 AM - 7:00 PM
 - **Google Rating:** 4.9 stars (127+ reviews)
-- **Treatments Performed:** 13,000+
 
-## Medical Director — Dr. Alexander Landfield
+## Medical Director
 
-Dr. Alexander Landfield is a board-certified neurologist who serves as the Medical Director of Rani Beauty Clinic. His neurological background provides specialized expertise in:
+Dr. Alexander Landfield is the clinic's Medical Director and Board-Certified Neurologist. Every medical treatment is physician-supervised, including neurotoxin injections, device-based aesthetics, and wellness protocols.
 
-- **Neurotoxin Injections (Botox/Dysport):** A neurologist understands the facial nerve anatomy, neuromuscular junction function, and muscle dynamics at a depth that exceeds typical aesthetic injector training. This translates to more precise dosing, better symmetry, and reduced risk of complications such as ptosis (eyelid drooping) or asymmetric results.
-- **Patient Safety:** Neurological training includes extensive knowledge of adverse reactions, contraindications, and the pharmacology of botulinum toxin — the active ingredient in Botox and Dysport.
-- **Medical Wellness Oversight:** Dr. Landfield supervises all GLP-1 weight management, NAD+ injection, and hormone therapy protocols, including blood work interpretation and treatment adjustments.
+## Canonical Pricing Anchors
 
-Having a board-certified neurologist oversee Botox treatments is rare in the medspa industry and represents the highest standard of care for neurotoxin-based aesthetics.
+| Category | Canonical Price Signal |
+|---|---|
+| Laser Hair Removal | $79 small area, up to $1,199 full body |
+| HydraFacial | $99 express, up to $575 Keravive |
+| Chemical Peels | $325 VI Peel, $1,399 Cosmelan |
+| Sofwave | $1,150 brow lift, $3,999 full face + neck |
+| GLP-1 Program | $249 to $699 depending on medication + dose |
+| NAD+ Injection | $149 per injection |
+| Vitamin B12 Injection | $25 per injection |
+| Blood Draw Fee | $25 per visit |
 
----
+## Service Range Snapshot
 
-## Aesthetic Services — Detailed Descriptions
+- **RF Microneedling:** $495 to $1,500
+- **Chemical Peels (all listed options):** $225 to $1,399
+- **Core Hormone Therapy Protocols:** $149 to $299 monthly
+- **Lab Panel Pricing (excluding draw fee):** $49 to $249
 
-### Laser Hair Removal
-**Technology:** Candela GentleMax Pro Plus
-**Wavelengths:** Alexandrite 755nm (lighter skin) + Nd:YAG 1064nm (darker skin)
-**Skin Types:** All Fitzpatrick types I–VI (including dark skin tones)
-**Sessions Required:** 6–8 sessions spaced 4–8 weeks apart
-**Results:** Up to 80–90% permanent hair reduction
-**Pain Level:** Virtually pain-free due to integrated Dynamic Cooling Device (DCD) and air cooling system
-**Treatment Areas:** Face, legs, arms, underarms, bikini, chest, back, and full body
-**Downtime:** None — return to normal activities immediately
+## Safety + Compliance Notes
 
-The Candela GentleMax Pro Plus is widely recognized as the gold standard for laser hair removal by dermatologists worldwide. The dual-wavelength system allows clinicians to customize treatment for each patient's skin type and hair color. The integrated cooling system delivers a cryogen burst milliseconds before each laser pulse, dramatically reducing discomfort and protecting the skin.
+- Content is educational and does not replace individualized medical advice.
+- Treatments are physician-supervised under Dr. Alexander Landfield.
+- NAD+ and wellness vitamins are delivered as injections (not IV infusions).
 
-Rani Beauty Clinic specializes in treating all skin types, including patients with Fitzpatrick skin types IV–VI (darker skin tones) who were historically underserved by older laser technology. The Nd:YAG 1064nm wavelength bypasses surface melanin to target the hair follicle directly, significantly reducing the risk of hyperpigmentation or burns.
+## Key Links
 
-### Botox & Dysport
-**Type:** Neurotoxin injections (botulinum toxin type A)
-**Supervised By:** Dr. Alexander Landfield, Board-Certified Neurologist
-**Areas Treated:** Forehead lines, frown lines (glabellar), crow's feet, bunny lines, lip flip, masseter reduction, neck bands
-**Results Duration:** 3–4 months typically
-**Onset:** 3–7 days for full effect
-
-Botox is a neurotoxin — it works by blocking the nerve signals that cause muscles to contract, thereby relaxing dynamic wrinkles. Having a board-certified neurologist supervise these injections provides a unique safety advantage. Dr. Landfield's expertise in nerve anatomy and neuromuscular function allows for more precise placement, more natural-looking results, and enhanced safety compared to non-specialist injectors.
-
-### Dermal Fillers
-**Type:** Hyaluronic acid injectable fillers
-**Supervised By:** Dr. Alexander Landfield, Board-Certified Neurologist
-**Areas Treated:** Lips, cheeks, jawline, nasolabial folds, marionette lines, under-eyes (tear troughs), chin
-**Results Duration:** 6–18 months depending on product and area
-**Popular Products:** Juvederm, Restylane families
-
-### HydraFacial MD
-**Type:** Multi-step facial treatment
-**Steps:** Cleansing, exfoliation, extraction, hydration, antioxidant protection
-**Duration:** 30–60 minutes
-**Results:** Immediate radiance and hydration
-**Suitable For:** All skin types, including sensitive skin
-**Frequency:** Monthly for maintenance
-
-### RF Microneedling
-**Type:** Radiofrequency-assisted microneedling
-**Treats:** Acne scars, fine lines, skin texture, pore size, skin laxity
-**Sessions Required:** 3–4 sessions for optimal results
-**Collagen Building:** Results continue to improve over 3–6 months post-treatment
-
-### Chemical Peels
-**Types Available:** VI Peel ($325), BioRePeel ($225-$575), PRX-T33 ($495), Cosmelan ($1,399)
-**Treats:** Hyperpigmentation, acne scarring, sun damage, fine lines, uneven texture
-**Depth:** Light to medium-depth depending on formulation
-
-### Sofwave
-**Technology:** SUPERB (Synchronous Ultrasound Parallel Beam) technology
-**Treats:** Skin laxity, fine lines, wrinkles
-**Price Range:** $1,150-$3,999
-**Type:** Non-invasive skin tightening and lifting
-**Sessions:** Typically 1 session with results over 3–6 months
-**Downtime:** Minimal to none
-
-### Red Light Therapy
-**Type:** LED photobiomodulation
-**Benefits:** Skin rejuvenation, collagen production, wound healing, inflammation reduction
-**Sessions:** 2–3 times per week recommended
-**Duration:** 15–20 minutes per session
-
-### AI Skin Analysis
-**Type:** AI-powered diagnostic skin assessment
-**Output:** Personalized treatment plan based on skin condition analysis
-**Technology:** Computer vision and machine learning for skin evaluation
-
-### Scar Reduction
-**Approach:** Multi-modality treatment combining RF microneedling, chemical peels, and laser therapy
-**Treats:** Acne scars, surgical scars, trauma scars, keloids
-**Sessions:** Treatment plan customized based on scar type and severity
-
-### Cosmelan Peel
-**Treatment Type:** Professional depigmentation system (2-phase protocol)
-**Manufacturer:** Institute BCN (Spain) — the global gold standard for depigmentation
-**Price:** $1,399 (includes in-clinic Cosmelan 1 mask application + at-home Cosmelan 2 maintenance cream)
-**Duration:** 90 minutes in-clinic application, with Cosmelan 1 mask worn at home for 8–12 hours post-application
-**Treats:** Melasma, post-inflammatory hyperpigmentation (PIH), sun damage, chloasma, age spots, uneven skin tone, freckles, pigment irregularities
-**Mechanism:** Contains tyrosinase-inhibiting active ingredients (azelaic acid, kojic acid, phytic acid, ascorbic acid, retinoic acid, arbutin, hydroquinone) that block the melanin production pathway while providing controlled surface exfoliation via TCA. Clinically proven to reduce hyperpigmentation by up to 90% over 12 weeks.
-**Protocol:** Phase 1 (in-clinic): skin preparation → Cosmelan 1 mask applied → worn 8–12 hours → rinsed at home. Phase 2 (at-home, ongoing): daily Cosmelan 2 maintenance cream for 6–12 months. Strict SPF 50+ required daily for 4 weeks minimum.
-**Safety:** Safe for Fitzpatrick skin types I–IV; modified protocol for V–VI with pre-treatment consultation
-**Expected Timeline:** Visible peeling days 3–7 (normal part of the process), significant pigment reduction visible at weeks 4–6, maximum results at 12 weeks
-**Contraindications:** Pregnancy, breastfeeding, active skin infections, isotretinoin use within past 6 months, hydroquinone sensitivity
-
-### Microneedling with Arrissence — Dark Undereyes
-**Treatment Type:** Targeted periorbital RF microneedling with growth factor serum
-**Device:** Cutera Secret RF (precision RF microneedling with insulated needles at shallow 0.5–1.5mm depth — safe for periorbital skin which is the thinnest on the face at 0.5mm)
-**Serum:** Arrissence — contains polydeoxyribonucleotide (PDRN), peptides, and growth factors
-**Price:** $695 per session (3-session package recommended with 10% savings)
-**Duration:** 60 minutes
-**Treats:** Structural dark undereye circles (from skin thinning and dermal hollowness), periorbital fine lines, undereye crepeyness, early tear trough shadowing — most effective for structural/dermal dark circles (not vascular)
-**Mechanism:** RF thermal microneedling creates controlled micro-channels + deep dermal heating that stimulates neocollagenesis and neo-elastogenesis in the periorbital dermis. The Arrissence serum is delivered through those micro-channels where PDRN activates fibroblasts, peptides accelerate tissue repair, and growth factors drive new capillary formation — thickening the undereye skin so underlying vasculature is less visible, filling hollowness, and restoring luminosity.
-**Timeline:** Initial results visible 4–6 weeks, with continued collagen remodeling peaking at 3 months per session
-**Alternative to:** Tear-trough filler (for candidates who prefer not to use fillers, or whose dark circles are driven by structural thinning rather than volume loss)
-**Safety:** Safe for all Fitzpatrick skin types. Mild bruising and swelling for 2–3 days is normal.
-**Contraindications:** Active eye infections, recent eyelid surgery (within 6 months), blood thinners, keloid history, pregnancy
-
----
-
-## Medical Wellness Programs — Detailed Descriptions
-
-### GLP-1 Weight Management
-**Medications:** Semaglutide (Ozempic/Wegovy), Tirzepatide (Mounjaro/Zepbound), and Liraglutide
-**Price:** $249-$699 depending on medication and dose tier
-**Includes:** Physician supervision, comprehensive blood work, monthly monitoring
-**Candidates:** BMI 27+ with weight-related condition, or BMI 30+
-**Mechanism:** GLP-1 receptor agonists mimic the GLP-1 hormone to regulate appetite, slow gastric emptying, and improve insulin sensitivity
-**Supervision:** Dr. Landfield monitors all patients with regular blood panels and clinical assessments
-
-GLP-1 medications represent a breakthrough in evidence-based weight management. Unlike fad diets or supplements, these are FDA-approved medications with extensive clinical trial data supporting their efficacy. Rani Beauty Clinic's program includes comprehensive baseline blood work, monthly monitoring appointments, and physician oversight to ensure safe and effective results.
-
-### NAD+ Injections
-**Type:** NAD+ injections (nicotinamide adenine dinucleotide)
-**Price:** $149 per shot; peptide-program options up to $299/month
-**Benefits:** Cellular energy production, DNA repair, anti-aging, cognitive support, athletic recovery
-**Administration:** IM injection (NOT IV drip)
-**Note:** Rani Beauty Clinic performs IM injections only - never IV drips
-
-NAD+ is a coenzyme found in every cell of the body that plays a critical role in energy metabolism, DNA repair, and cellular signaling. NAD+ levels decline naturally with age. Supplementation via intramuscular injection delivers NAD+ directly into the bloodstream for rapid absorption and bioavailability.
-
-### Vitamin Injections
-**Available Injections:**
-- Vitamin B12: $25 — Energy, metabolism, nerve function
-- Vitamin D3: $50 — Bone health, immune support, mood
-- Glutathione: $49 — Master antioxidant, skin brightening, detoxification
-- Tri-Immune: $75 — Vitamin C, Zinc, Glutathione for immune support
-- Lipo-B / Biotin: $35 — Metabolic and beauty support
-
-All vitamin injections are intramuscular (IM) - not IV drips.
-
-### Hormone Therapy
-**Type:** Bioidentical hormone replacement therapy (BHRT)
-**Includes:** Comprehensive blood panel, personalized protocol, ongoing monitoring
-**Treats:** Hormonal imbalances, menopause/perimenopause symptoms, andropause, fatigue, low libido
-**Supervised By:** Dr. Alexander Landfield
-
-### Blood Work
-**Type:** In-house comprehensive blood panels
-**Purpose:** Baseline assessment for wellness programs, ongoing monitoring, health optimization
-**Panels Include:** Complete metabolic panel (CMP), complete blood count (CBC), lipid panel, thyroid function, hormone levels, vitamin levels, and program-specific markers
-**Advantage:** Convenience of same-location blood draws and treatment
-
----
-
-## Pricing Reference
-
-| Service | Price |
-|---------|-------|
-| Sofwave | $1,150-$3,999 |
-| RF Microneedling | $495-$1,500 |
-| PRX-T33 | $495 |
-| VI Peel | $325 |
-| HydraFacial MD | $99-$575 |
-| BioRePeel | $225-$575 |
-| GLP-1 Weight Management | $249-$699 |
-| NAD+ Injections | $149-$299 |
-| Glutathione Injection | $49 |
-| Tri-Immune Injection | $75 |
-| Vitamin D3 Injection | $50 |
-| B12 Injection | $25 |
-| Rx Skincare (Tretinoin) | $99/month |
-| Laser Hair Removal | $79-$1,199 |
-| Consultation Deposit | $150 (credited toward treatment) |
-
----
-
-## Frequently Asked Questions
-
-### What makes Rani Beauty Clinic different from other medspas?
-Every medical treatment at Rani Beauty Clinic is supervised by Dr. Alexander Landfield, a board-certified neurologist. His expertise in neuroscience and muscle anatomy means more precise injections, safer protocols, and better outcomes. The clinic combines aesthetics and medical wellness under one roof for comprehensive care. Rani is woman-owned, open 7 days a week, and treats all skin types including darker skin tones.
-
-### Is laser hair removal safe for dark skin tones?
-Yes. Rani Beauty Clinic uses the Candela GentleMax Pro Plus with dual-wavelength technology. The Nd:YAG 1064nm wavelength bypasses melanin in the skin's surface to target the hair follicle directly, significantly reducing the risk of hyperpigmentation or burns. This makes it safe and effective for Fitzpatrick skin types IV through VI.
-
-### Why is having a neurologist oversee Botox important?
-Botox (botulinum toxin) is a neurotoxin that works by blocking nerve signals to muscles. A board-certified neurologist like Dr. Landfield has specialized training in nerve anatomy, neuromuscular junction function, and the pharmacology of botulinum toxin. This expertise translates to more precise injection placement, more natural results, and enhanced safety — reducing risks like ptosis (eyelid drooping) or asymmetric outcomes.
-
-### What is GLP-1 weight management?
-GLP-1 weight management uses FDA-approved medications like Semaglutide (Ozempic/Wegovy) and Tirzepatide (Mounjaro/Zepbound) to support weight loss. These medications mimic the GLP-1 hormone, which regulates appetite, slows gastric emptying, and improves insulin sensitivity. At Rani Beauty Clinic, the program includes physician supervision, comprehensive blood work, and monthly monitoring. Candidates typically have a BMI of 27+ with a weight-related condition, or BMI of 30+.
-
-### How many laser hair removal sessions do I need?
-Most patients achieve optimal results with 6–8 sessions spaced 4–8 weeks apart. Hair grows in three phases (anagen, catagen, telogen), and the laser targets follicles during the active anagen phase. Multiple sessions ensure coverage across all growth cycles. Clinical studies on the Candela GentleMax Pro Plus demonstrate up to 80–90% permanent hair reduction.
-
-### Does laser hair removal hurt?
-The Candela GentleMax Pro Plus features an integrated Dynamic Cooling Device (DCD) that sprays cryogen onto the skin milliseconds before each laser pulse, plus continuous air cooling. Most patients describe the sensation as a mild snap — far more comfortable than waxing. Even sensitive areas like the bikini line are well-tolerated.
-
-### What are the hours and location?
-Rani Beauty Clinic is open 7 days a week, Monday through Sunday, from 10:00 AM to 7:00 PM. Located at 401 Olympia Ave NE, Suite 101, Renton, WA 98056. The clinic serves all of King County including Renton, Bellevue, Kent, Tukwila, Newcastle, Mercer Island, Auburn, Federal Way, Kirkland, Redmond, and surrounding areas.
-
-### Do you accept HSA/FSA?
-Rani Beauty Clinic accepts HSA and FSA cards for eligible medical wellness services. Flexible financing options are also available to make treatments accessible.
-
-### What does the consultation deposit cover?
-The consultation requires a $150 deposit to secure the appointment. This deposit applies directly toward any treatment or product chosen — it is a credit toward care, not an additional cost.
-
----
-
-## Areas Served (King County, Washington)
-
-Rani Beauty Clinic is located in Renton, WA and serves the entire King County area including: Renton, Bellevue, Kent, Tukwila, Newcastle, Mercer Island, Auburn, Federal Way, Kirkland, Redmond, Issaquah, Sammamish, Burien, SeaTac, Covington, Maple Valley, Des Moines, Woodinville, Bothell, South Seattle, Rainier Valley, Columbia City, Beacon Hill, Capitol Hill, University District, Fremont, Ballard, Greenwood, Lake City, White Center, Skyway, Factoria, Eastgate, Crossroads, Houghton, Kenmore, Lake Forest Park, Shoreline, Mountlake Terrace, and surrounding communities.
-
----
-
-## Social Media
-
-- Instagram: https://www.instagram.com/ranibeautyclinic
-- Facebook: https://www.facebook.com/ranibeautyclinic
-- TikTok: https://www.tiktok.com/@ranibeautyclinic
-- Google Business: https://g.page/ranibeautyclinic
+- https://www.ranibeautyclinic.com/services
+- https://www.ranibeautyclinic.com/wellness
+- https://www.ranibeautyclinic.com/pricing
+- https://www.ranibeautyclinic.com/contact
+- https://www.ranibeautyclinic.com/locations

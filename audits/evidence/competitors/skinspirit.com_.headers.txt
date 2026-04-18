@@ -1,0 +1,30 @@
+HTTP/2 301 
+date: Sat, 18 Apr 2026 05:32:45 GMT
+content-type: text/html
+content-length: 166
+location: https://www.skinspirit.com/
+set-cookie: _cfuvid=ne0LnU2RgBGyp6_UWU_aPv.MO5isIpcuS_jgjcQTyE8-1776490365.488757-1.0.1.1-ddCXZfy2LVJXFp1qgg5a7KcbG4NQFLzk9B7qBmDmbho; HttpOnly; SameSite=None; Secure; Path=/; Domain=skinspirit.com
+cf-ray: 9ee14a704b055195-SEA
+cf-cache-status: BYPASS
+cache-control: private
+server: cloudflare
+vary: Accept-Encoding
+x-wf-region: us-east-1
+alt-svc: h3=":443"; ma=86400
+
+HTTP/2 200 
+date: Sat, 18 Apr 2026 05:32:45 GMT
+content-type: text/html; charset=utf-8
+set-cookie: _cfuvid=Gs1rYmUcfUb98c4DVXWTzhYhAU3FwT.Mv.BHNIiENwI-1776490365.8574646-1.0.1.1-cBIfUgY0kkFsoqjAn6aMS7J2vKfum4hmlcsIjUs0e28; HttpOnly; SameSite=None; Secure; Path=/; Domain=www.skinspirit.com
+cf-ray: 9ee14a7298046e12-SEA
+cf-cache-status: HIT
+age: 4351
+last-modified: Sat, 18 Apr 2026 04:20:14 GMT
+server: cloudflare
+vary: accept-encoding
+surrogate-control: max-age=432000
+surrogate-key: www.skinspirit.com 6764496e34ff7106c11cc5cf pageId:6764496e34ff7106c11cc5d5 69b07bb4210c99cf7e8a022b
+x-lambda-id: aee002bd-ed9c-445f-8b35-97634d632512
+x-wf-region: us-east-1
+alt-svc: h3=":443"; ma=86400
+

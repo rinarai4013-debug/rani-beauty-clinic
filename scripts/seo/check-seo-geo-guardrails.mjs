@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..", "..");
 
@@ -123,6 +124,33 @@ results.push(
 
 const llms = read("public/llms.txt");
 const llmsFull = read("public/llms-full.txt");
+let llmsGeneratorPass = true;
+let llmsGeneratorDetails = "llms artifacts are in sync with canonical generators.";
+
+try {
+  execSync("node scripts/seo/generate-llms-files.mjs --check", {
+    cwd: repoRoot,
+    stdio: "pipe",
+  });
+} catch (error) {
+  llmsGeneratorPass = false;
+  const stderr =
+    error && typeof error === "object" && "stderr" in error
+      ? String(error.stderr || "").trim()
+      : "";
+  llmsGeneratorDetails =
+    stderr.length > 0
+      ? stderr
+      : "Run `npm run seo:generate-llms` to sync public/llms.txt and public/llms-full.txt.";
+}
+
+results.push(
+  runCheck(
+    "llms files are generated from canonical data",
+    llmsGeneratorPass,
+    llmsGeneratorDetails
+  )
+);
 const llmsRequiredPatterns = [
   /\$79/,
   /\$1,199/,

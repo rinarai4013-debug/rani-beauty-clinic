@@ -165,6 +165,7 @@ export default function ServicePageTemplate({
     ? `https://www.ranibeautyclinic.com${serviceImageData.image}`
     : "https://www.ranibeautyclinic.com/images/logo/logo-dark.png";
   const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
+  const medicalReviewDate = clinicInfo.contentReviewDate ?? "April 18, 2026";
 
   // Catalog lookup — pulls pricing, concerns, duration, sessions, and body areas
   // so we can emit a rich MedicalProcedure + Offer pair that LLMs cite.
@@ -509,6 +510,28 @@ export default function ServicePageTemplate({
             <p className="mt-8 font-body text-base text-rani-text leading-relaxed">
               {service.resultsAndRecovery}
             </p>
+          </FadeInOnScroll>
+        </div>
+      </section>
+
+      {/* Medical Disclaimer + Review Stamp */}
+      <section className="bg-rani-navy py-12 md:py-16">
+        <div className="mx-auto max-w-4xl px-6">
+          <FadeInOnScroll>
+            <div className="rounded-xl border border-rani-gold/30 bg-white/5 p-6 md:p-8">
+              <p className="font-body text-xs font-semibold uppercase tracking-[0.08em] text-rani-gold">
+                Medical Review &amp; Disclosure
+              </p>
+              <p className="mt-3 font-body text-sm leading-relaxed text-gray-100">
+                This page is educational and does not replace individualized medical diagnosis, treatment, or
+                emergency care. Every injectable, device, and wellness protocol at Rani Beauty Clinic is delivered
+                under physician supervision and requires clinical screening for candidacy and safety.
+              </p>
+              <p className="mt-4 font-body text-xs text-gray-300">
+                Last medically reviewed: {medicalReviewDate} by {clinicInfo.medicalDirector.name},{" "}
+                {clinicInfo.medicalDirector.specialty}.
+              </p>
+            </div>
           </FadeInOnScroll>
         </div>
       </section>

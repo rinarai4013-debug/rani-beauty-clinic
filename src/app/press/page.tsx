@@ -19,6 +19,8 @@ import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { clinicInfo } from "@/data/clinic-info";
 import CopyButton from "./CopyButton";
 
+const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
+
 export const metadata: Metadata = {
   title: "Press & Media Kit | Rani Beauty Clinic",
   description:
@@ -130,7 +132,7 @@ const organizationSchema = {
     postalCode: clinicInfo.address.zip,
     addressCountry: "US",
   },
-  telephone: clinicInfo.phone,
+  telephone: schemaPhone,
   email: clinicInfo.email,
   sameAs: [
     clinicInfo.social.instagram,

@@ -1,0 +1,40 @@
+HTTP/2 301 
+date: Sat, 18 Apr 2026 05:32:48 GMT
+content-type: text/html; charset=UTF-8
+location: https://www.anushkaspa.com/
+cf-ray: 9ee14a818dc875b4-SEA
+status: 301 Moved Permanently
+x-powered-by: WP Engine
+x-redirect-by: WordPress
+x-cacheable: non200
+cache-control: max-age=600, must-revalidate
+x-cache: HIT: 3
+x-cache-group: normal
+strict-transport-security: max-age=63072000
+cf-cache-status: DYNAMIC
+set-cookie: __cf_bm=EjUNDYHnPznZ6XFk_mSYMWYTyYmwEruaMRyvZhcyUTw-1776490368-1.0.1.1-B0VzCJ4_w44X01ekfPS0yXU4NiDfvF1XtUqI8ZGlKuVsy0.GG7d7BYV.dJKdJohTnR82Rm.LuM9lP40OWz9Zp07RibmJj1cFTmgf3AuHwOo; path=/; expires=Sat, 18-Apr-26 06:02:48 GMT; domain=.anushkaspa.com; HttpOnly; Secure; SameSite=None
+server: cloudflare
+alt-svc: h3=":443"; ma=86400
+
+HTTP/2 200 
+date: Sat, 18 Apr 2026 05:32:49 GMT
+content-type: text/html; charset=UTF-8
+cf-ray: 9ee14a8628887657-SEA
+vary: Accept-Encoding
+vary: Accept-Encoding
+vary: Accept-Encoding
+vary: Accept-Encoding,Cookie
+link: <https://www.anushkaspa.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.anushkaspa.com/wp-json/wp/v2/pages/9>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://www.anushkaspa.com/>; rel=shortlink
+x-powered-by: WP Engine
+x-cacheable: SHORT
+cache-control: max-age=600, must-revalidate
+x-cache: HIT: 5
+x-cache-group: normal
+strict-transport-security: max-age=63072000
+cf-cache-status: DYNAMIC
+set-cookie: __cf_bm=xd6HHK69JUkbrMljSq1UEL6pQgzKwid9G.Rvd51EgcA-1776490369-1.0.1.1-moTwkhv_GWmvN6sU2nVmTIvPiCKxJBOYbX.wvHT75m_NKcb8ff1_4D7ru.p.UvdnY9cQVLpNXw67wipl1d.jEFK1vbgV9wLNyAT_PQwpmeI; path=/; expires=Sat, 18-Apr-26 06:02:49 GMT; domain=.www.anushkaspa.com; HttpOnly; Secure; SameSite=None
+server: cloudflare
+alt-svc: h3=":443"; ma=86400
+

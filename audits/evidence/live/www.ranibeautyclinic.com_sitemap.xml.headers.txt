@@ -1,0 +1,24 @@
+HTTP/2 404 
+accept-ranges: bytes
+access-control-allow-origin: *
+age: 0
+cache-control: public, max-age=0, must-revalidate
+content-disposition: inline; filename="404"
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://booking.mangomint.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.airtable.com https://www.google-analytics.com https://stats.g.doubleclick.net https://www.clarity.ms https://connect.facebook.net https://www.facebook.com https://booking.mangomint.com https://*.ingest.us.sentry.io; frame-src 'self' https://www.googletagmanager.com https://booking.mangomint.com https://app.mangomint.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+content-type: text/html; charset=utf-8
+date: Sat, 18 Apr 2026 05:25:50 GMT
+etag: "e9d4be0d0b95e7dc24a89bc9a7c86869"
+last-modified: Sat, 18 Apr 2026 05:25:50 GMT
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Vercel
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-matched-path: /404
+x-next-error-status: 404
+x-vercel-cache: HIT
+x-vercel-id: pdx1::89r5t-1776489950299-505efc98a543
+x-xss-protection: 1; mode=block
+content-length: 163846
+

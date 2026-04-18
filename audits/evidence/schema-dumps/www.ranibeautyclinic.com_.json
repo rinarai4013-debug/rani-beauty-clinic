@@ -1,0 +1,1173 @@
+{
+  "url": "https://www.ranibeautyclinic.com/",
+  "scriptCount": 8,
+  "scripts": [
+    {
+      "index": 0,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "Organization",
+              "MedicalBusiness",
+              "MedicalClinic",
+              "LocalBusiness"
+            ],
+            "@id": "https://www.ranibeautyclinic.com#organization",
+            "name": "Rani Beauty Clinic",
+            "alternateName": "Rani Medspa",
+            "url": "https://www.ranibeautyclinic.com",
+            "logo": {
+              "@type": "ImageObject",
+              "@id": "https://www.ranibeautyclinic.com#logo",
+              "url": "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
+              "width": 600,
+              "height": 200,
+              "caption": "Rani Beauty Clinic"
+            },
+            "image": {
+              "@id": "https://www.ranibeautyclinic.com#logo"
+            },
+            "description": "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
+            "slogan": "Your Skin. Your Wellness. Our Expertise.",
+            "foundingDate": "2022",
+            "telephone": "(425) 539-4440",
+            "email": "info@ranibeautyclinic.com",
+            "priceRange": "$$$",
+            "currenciesAccepted": "USD",
+            "paymentAccepted": [
+              "Cash",
+              "Credit Card",
+              "HSA",
+              "FSA",
+              "Financing"
+            ],
+            "medicalSpecialty": [
+              "Dermatology",
+              "CosmeticSurgery",
+              "Medical-aesthetics",
+              "PlasticSurgery"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "401 Olympia Ave NE, Suite 101",
+              "addressLocality": "Renton",
+              "addressRegion": "WA",
+              "postalCode": "98056",
+              "addressCountry": "US"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 47.4856,
+              "longitude": -122.2031
+            },
+            "hasMap": "https://g.page/ranibeautyclinic",
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "opens": "10:00",
+                "closes": "19:00"
+              }
+            ],
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": 4.9,
+              "reviewCount": 127,
+              "bestRating": 5,
+              "worstRating": 1
+            },
+            "sameAs": [
+              "https://www.instagram.com/ranibeautyclinic",
+              "https://www.facebook.com/ranibeautyclinic",
+              "https://www.tiktok.com/@ranibeautyclinic",
+              "https://g.page/ranibeautyclinic"
+            ],
+            "employee": {
+              "@id": "https://www.ranibeautyclinic.com#medical-director"
+            },
+            "areaServed": [
+              {
+                "@type": "State",
+                "name": "Washington"
+              },
+              {
+                "@type": "AdministrativeArea",
+                "name": "King County"
+              },
+              {
+                "@type": "City",
+                "name": "Renton"
+              },
+              {
+                "@type": "City",
+                "name": "Bellevue"
+              },
+              {
+                "@type": "City",
+                "name": "Seattle"
+              },
+              {
+                "@type": "City",
+                "name": "Kent"
+              },
+              {
+                "@type": "City",
+                "name": "Tukwila"
+              },
+              {
+                "@type": "City",
+                "name": "Newcastle"
+              },
+              {
+                "@type": "City",
+                "name": "Mercer Island"
+              },
+              {
+                "@type": "City",
+                "name": "Kirkland"
+              },
+              {
+                "@type": "City",
+                "name": "Redmond"
+              },
+              {
+                "@type": "City",
+                "name": "Issaquah"
+              },
+              {
+                "@type": "City",
+                "name": "Sammamish"
+              },
+              {
+                "@type": "City",
+                "name": "Auburn"
+              },
+              {
+                "@type": "City",
+                "name": "Federal Way"
+              }
+            ],
+            "knowsAbout": [
+              "Laser Hair Removal",
+              "Botox",
+              "Dysport",
+              "Dermal Fillers",
+              "HydraFacial",
+              "RF Microneedling",
+              "Chemical Peels",
+              "Cosmelan Peel",
+              "BioRePeel",
+              "VI Peel",
+              "PRX-T33",
+              "Sofwave",
+              "Red Light Therapy",
+              "Melasma Treatment",
+              "Hyperpigmentation",
+              "Acne Scars",
+              "Skin Tightening",
+              "Dark Circles",
+              "Undereye Rejuvenation",
+              "Scar Reduction",
+              "GLP-1 Weight Management",
+              "Semaglutide",
+              "Tirzepatide",
+              "Hormone Replacement Therapy",
+              "NAD+ Injections",
+              "Vitamin B12 Injections",
+              "Glutathione Injections",
+              "Peptide Therapy",
+              "Testosterone Replacement Therapy"
+            ],
+            "potentialAction": {
+              "@type": "ReserveAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://booking.mangomint.com/ranibeautyclinic1",
+                "actionPlatform": [
+                  "https://schema.org/DesktopWebPlatform",
+                  "https://schema.org/MobileWebPlatform"
+                ]
+              },
+              "result": {
+                "@type": "Reservation",
+                "name": "Medspa Appointment"
+              }
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.ranibeautyclinic.com#medical-director",
+            "name": "Dr. Alexander Landfield",
+            "jobTitle": "Medical Director",
+            "description": "Every medical treatment at Rani Beauty Clinic is performed under the supervision of Dr. Alexander Landfield, a board-certified neurologist.",
+            "hasCredential": {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Board Certification",
+              "name": "Board-Certified Neurologist"
+            },
+            "worksFor": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "knowsAbout": [
+              "Neurology",
+              "Botox",
+              "Dysport",
+              "Neurotoxin Injections",
+              "Facial Nerve Anatomy",
+              "Medical Aesthetics"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.ranibeautyclinic.com#website",
+            "url": "https://www.ranibeautyclinic.com",
+            "name": "Rani Beauty Clinic",
+            "description": "Premier physician-supervised medspa in Renton, WA — laser, injectables, skin rejuvenation, and medical wellness.",
+            "publisher": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "inLanguage": "en-US",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.ranibeautyclinic.com/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": "https://www.ranibeautyclinic.com/#organization",
+        "name": "Rani Beauty Clinic",
+        "alternateName": "Rani Beauty Clinic Renton",
+        "url": "https://www.ranibeautyclinic.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
+          "width": 600,
+          "height": 200
+        },
+        "description": "Physician-supervised medspa in Renton, WA offering laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections, hormone therapy and more. Every medical treatment supervised by Dr. Alexander Landfield, Board-Certified Neurologist.",
+        "foundingDate": "2022",
+        "founder": {
+          "@type": "Person",
+          "name": "Rani",
+          "jobTitle": "Founder & CEO"
+        },
+        "numberOfEmployees": {
+          "@type": "QuantitativeValue",
+          "minValue": 5,
+          "maxValue": 15
+        },
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "(425) 539-4440",
+            "contactType": "customer service",
+            "areaServed": "US",
+            "availableLanguage": [
+              "English"
+            ],
+            "hoursAvailable": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "opens": "10:00",
+              "closes": "19:00"
+            }
+          },
+          {
+            "@type": "ContactPoint",
+            "telephone": "(425) 539-4440",
+            "contactType": "reservations",
+            "areaServed": "US",
+            "availableLanguage": [
+              "English"
+            ]
+          }
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "401 Olympia Ave NE, Suite 101",
+          "addressLocality": "Renton",
+          "addressRegion": "WA",
+          "postalCode": "98056",
+          "addressCountry": "US"
+        },
+        "sameAs": [
+          "https://www.instagram.com/ranibeautyclinic",
+          "https://www.facebook.com/ranibeautyclinic",
+          "https://www.tiktok.com/@ranibeautyclinic",
+          "https://g.page/ranibeautyclinic"
+        ],
+        "knowsAbout": [
+          "Laser Hair Removal",
+          "Botox Injections",
+          "Dermal Fillers",
+          "HydraFacial",
+          "RF Microneedling",
+          "Chemical Peels",
+          "Sofwave Skin Tightening",
+          "GLP-1 Weight Management",
+          "Semaglutide",
+          "Tirzepatide",
+          "NAD+ Injections",
+          "Hormone Therapy",
+          "Medical Aesthetics",
+          "Medspa Treatments",
+          "Skin Rejuvenation",
+          "Anti-Aging Treatments",
+          "Neurotoxin Injections",
+          "Red Light Therapy",
+          "AI Skin Analysis",
+          "Candela GentleMax Pro Plus"
+        ],
+        "award": "Woman-Owned Business",
+        "slogan": "Your Skin. Your Wellness. Our Expertise."
+      }
+    },
+    {
+      "index": 2,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": [
+          "LocalBusiness",
+          "MedicalBusiness"
+        ],
+        "name": "Rani Beauty Clinic",
+        "image": "https://www.ranibeautyclinic.com/opengraph-image",
+        "url": "https://www.ranibeautyclinic.com",
+        "telephone": "(425) 539-4440",
+        "email": "info@ranibeautyclinic.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "401 Olympia Ave NE, Suite 101",
+          "addressLocality": "Renton",
+          "addressRegion": "WA",
+          "postalCode": "98056",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 47.4856,
+          "longitude": -122.2031
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "opens": "10:00",
+            "closes": "19:00"
+          }
+        ],
+        "priceRange": "$$",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": 4.9,
+          "reviewCount": 127,
+          "bestRating": 5,
+          "worstRating": 1
+        },
+        "sameAs": [
+          "https://www.instagram.com/ranibeautyclinic",
+          "https://www.facebook.com/ranibeautyclinic",
+          "https://www.tiktok.com/@ranibeautyclinic",
+          "https://g.page/ranibeautyclinic"
+        ],
+        "@id": "https://www.ranibeautyclinic.com/#localbusiness",
+        "alternateName": "Rani Medspa Renton WA",
+        "description": "Rani Beauty Clinic is a physician-supervised medspa in Renton, WA. Every medical treatment is performed under the supervision of Dr. Alexander Landfield, a board-certified neurologist. The clinic offers laser hair removal (Candela GentleMax Pro Plus), Botox & Dysport, dermal fillers, HydraFacial MD, RF microneedling, Sofwave skin tightening, GLP-1 weight management (Semaglutide/Tirzepatide), NAD+ injections, hormone therapy, and more. Woman-owned. Open 7 days a week. Safe for all skin types. Rated 4.9 stars on Google.",
+        "medicalSpecialty": "Dermatology",
+        "currenciesAccepted": "USD",
+        "paymentAccepted": "Cash, Credit Card, Debit Card, HSA, FSA",
+        "employee": {
+          "@type": "Physician",
+          "@id": "https://www.ranibeautyclinic.com/#physician",
+          "name": "Dr. Alexander Landfield",
+          "jobTitle": "Medical Director",
+          "description": "Board-Certified Neurologist serving as Medical Director. Provides neurological expertise for neurotoxin injections (Botox, Dysport) and oversees all medical treatments and wellness programs.",
+          "medicalSpecialty": "Neurology",
+          "worksFor": {
+            "@id": "https://www.ranibeautyclinic.com/#organization"
+          }
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Aesthetic & Wellness Services",
+          "itemListElement": [
+            {
+              "@type": "OfferCatalog",
+              "name": "Aesthetic Treatments",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Laser Hair Removal",
+                    "url": "https://www.ranibeautyclinic.com/services/laser-hair-removal"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Botox & Dysport",
+                    "url": "https://www.ranibeautyclinic.com/services/botox-dysport"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Dermal Fillers",
+                    "url": "https://www.ranibeautyclinic.com/services/dermal-fillers"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "HydraFacial MD",
+                    "url": "https://www.ranibeautyclinic.com/services/hydrafacial"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "RF Microneedling",
+                    "url": "https://www.ranibeautyclinic.com/services/rf-microneedling"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Chemical Peels",
+                    "url": "https://www.ranibeautyclinic.com/services/chemical-peels"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Sofwave",
+                    "url": "https://www.ranibeautyclinic.com/services/sofwave"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Red Light Therapy",
+                    "url": "https://www.ranibeautyclinic.com/services/red-light-therapy"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "OfferCatalog",
+              "name": "Medical Wellness Programs",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "GLP-1 Weight Management",
+                    "url": "https://www.ranibeautyclinic.com/wellness/glp1-weight-management"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "NAD+ Injections",
+                    "url": "https://www.ranibeautyclinic.com/wellness/nad-injections"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Vitamin Injections",
+                    "url": "https://www.ranibeautyclinic.com/wellness/vitamin-injections"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Hormone Therapy",
+                    "url": "https://www.ranibeautyclinic.com/wellness/hormone-therapy"
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Blood Work",
+                    "url": "https://www.ranibeautyclinic.com/wellness/blood-work"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "areaServed": [
+          {
+            "@type": "City",
+            "name": "Renton",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Bellevue",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Kent",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Tukwila",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Newcastle",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Mercer Island",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Auburn",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Federal Way",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Kirkland",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Redmond",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Issaquah",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Sammamish",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "City",
+            "name": "Seattle",
+            "containedInPlace": {
+              "@type": "State",
+              "name": "Washington"
+            }
+          },
+          {
+            "@type": "AdministrativeArea",
+            "name": "King County"
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://www.ranibeautyclinic.com/#website",
+        "name": "Rani Beauty Clinic",
+        "url": "https://www.ranibeautyclinic.com",
+        "description": "Official website of Rani Beauty Clinic - physician-supervised medspa in Renton, WA.",
+        "publisher": {
+          "@id": "https://www.ranibeautyclinic.com/#organization"
+        },
+        "inLanguage": "en-US",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://www.ranibeautyclinic.com/search?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    },
+    {
+      "index": 4,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": "https://www.ranibeautyclinic.com/#webpage",
+        "name": "Rani Beauty Clinic | Premier Medspa & Wellness in Renton, WA",
+        "url": "https://www.ranibeautyclinic.com",
+        "description": "Physician-supervised medspa in Renton, WA. Every treatment supervised by Dr. Alexander Landfield, Board-Certified Neurologist. Laser hair removal, Botox, HydraFacial, GLP-1 weight management, NAD+ injections. Woman-owned. Open 7 days a week. 4.9-star Google rating.",
+        "speakable": {
+          "@type": "SpeakableSpecification",
+          "cssSelector": [
+            "h1",
+            ".hero-subtitle",
+            ".trust-bar",
+            ".faq-answer",
+            "[data-speakable]"
+          ]
+        },
+        "isPartOf": {
+          "@id": "https://www.ranibeautyclinic.com/#website"
+        },
+        "about": {
+          "@id": "https://www.ranibeautyclinic.com/#organization"
+        },
+        "mainEntity": {
+          "@id": "https://www.ranibeautyclinic.com/#localbusiness"
+        }
+      }
+    },
+    {
+      "index": 5,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://www.ranibeautyclinic.com/#localbusiness",
+        "name": "Rani Beauty Clinic",
+        "review": [
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Sarah M."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "I was so nervous about laser hair removal, but the Candela GentleMax Pro Plus made it completely pain-free. I actually fell asleep during my session! After just three treatments, I already see a dramatic reduction and my skin feels so smooth.",
+            "datePublished": "2025-11-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Laser Hair Removal"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Jennifer L."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "Having a board-certified neurologist administer my Botox makes all the difference. Dr. Landfield's understanding of facial anatomy is unmatched - my results look completely natural. Friends keep telling me I look refreshed, but nobody can pinpoint why.",
+            "datePublished": "2025-12-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Botox"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Priya K."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "I got a HydraFacial before my sister's wedding and the immediate glow was unreal. My makeup artist even asked what I had done because my skin looked so radiant. I'm now on a monthly plan and my complexion has never been better.",
+            "datePublished": "2025-10-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "HydraFacial"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Marcus T."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "Years of acne left me with deep scarring that really affected my confidence. After my RF microneedling series at Rani Beauty Clinic, the texture of my skin has improved dramatically. I finally feel comfortable without trying to hide behind a beard.",
+            "datePublished": "2026-01-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "RF Microneedling"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Angela R."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "The GLP-1 weight management program has been truly life-changing. The medical team monitored me closely every step of the way, and I never felt like just a number. I've lost 40 pounds and gained a whole new outlook on my health.",
+            "datePublished": "2026-02-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "GLP-1 Weight Management"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Diana W."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "From the moment you walk in, the staff at Rani Beauty Clinic makes you feel like family. The clinic is gorgeous, everything is so clean and modern, and the team personally follows up after every visit. This is hands down the best medspa experience I've ever had.",
+            "datePublished": "2025-12-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "General Experience"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Robert H."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "Started the NAD+ injection program at Rani and the difference in my energy and mental clarity is remarkable. Dr. Landfield reviewed my labs and tailored the protocol to my specific needs. I'm sleeping better and recovering faster from workouts than I have in years.",
+            "datePublished": "2026-01-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "NAD+ Injections"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Lisa K."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "Open seven days a week makes all the difference for my schedule. I come in for my chemical peel on Sundays and it fits perfectly into my routine. After four sessions, my hyperpigmentation has faded significantly and my skin tone is so much more even.",
+            "datePublished": "2026-03-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Chemical Peels"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Carmen D."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "The hormone therapy program has been transformative. Dr. Landfield took the time to review my comprehensive blood panel and created a protocol that addressed my specific symptoms. I finally feel like myself again after struggling with fatigue and brain fog for years.",
+            "datePublished": "2025-12-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Hormone Therapy"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Michael P."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "I chose Rani for Dysport because I wanted a provider who truly understands the neuroscience behind it. Dr. Landfield explained exactly how the treatment works at the neuromuscular level, and the precision of his technique shows in the results. Subtle, natural, and exactly what I wanted.",
+            "datePublished": "2026-02-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Dysport"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Vanessa G."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "I was hesitant about dermal fillers but the team walked me through every step and showed me exactly what to expect. The fact that a neurologist oversees the process made me feel completely safe. My cheeks look lifted and natural, and the results lasted beautifully.",
+            "datePublished": "2026-01-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Dermal Fillers"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "James C."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "The Sofwave treatment at Rani was a game-changer for my jawline. No downtime, no needles, and I could see the tightening effect within weeks. The staff made the whole experience comfortable, and I'm already planning my next session.",
+            "datePublished": "2026-03-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "Sofwave"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Natasha B."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "I've been doing IV therapy at Rani for the past three months and the boost to my immune system has been incredible. The lounge is private and relaxing, and the nursing staff is so attentive. It's become my favorite part of my wellness routine.",
+            "datePublished": "2026-02-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "IV Therapy"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "David K."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "The GLP-1 program at Rani changed my life. Dr. Landfield monitors everything closely, and having blood work done right in the clinic makes it so convenient. I've lost over 30 pounds and I feel healthier and more energetic than I have in a decade.",
+            "datePublished": "2025-11-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "GLP-1 Weight Management"
+            }
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Michelle T."
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5,
+              "bestRating": 5
+            },
+            "reviewBody": "I tried RF microneedling at another clinic with mediocre results, so I was skeptical. But the team at Rani used a completely different approach, and after three sessions my acne scars have faded more than I thought possible. Worth every penny.",
+            "datePublished": "2026-03-01",
+            "itemReviewed": {
+              "@type": "Service",
+              "name": "RF Microneedling"
+            }
+          }
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": 4.9,
+          "reviewCount": 127,
+          "bestRating": 5,
+          "worstRating": 1
+        }
+      }
+    },
+    {
+      "index": 6,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What makes Rani Beauty Clinic different from other medspas?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every medical treatment at Rani is supervised by Dr. Alexander Landfield, a board-certified neurologist. His expertise in neuroscience and muscle anatomy means more precise injections, safer protocols, and better outcomes. We also combine aesthetics and medical wellness under one roof, so your care is truly comprehensive."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the consultation deposit work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Your consultation requires a $150 deposit to secure your appointment. This deposit applies directly toward any treatment or product you choose - so it's not an extra cost, it's a credit toward your care. During your visit, our team will assess your skin, discuss your goals, and create a personalized treatment roadmap."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I know which treatment is right for me?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "That's exactly what your consultation is for. We evaluate your skin type, concerns, medical history, and goals to recommend the most effective plan. You can also take our Treatment Quiz for a quick preliminary recommendation."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is laser hair removal painful?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our Candela GentleMax Pro Plus uses an integrated cooling system that makes treatments virtually pain-free. Most patients describe it as a light snapping sensation. The dual-wavelength technology is safe for all skin types, including darker skin tones."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How soon will I see results?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "It depends on the treatment. HydraFacial gives an immediate glow. Botox takes 3-7 days to show full effect. RF microneedling results build over 3-6 months as collagen regenerates. During your consultation, we'll set realistic expectations for your specific treatment plan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Rani Beauty Clinic Services",
+        "description": "Complete list of aesthetic treatments and medical wellness programs offered at Rani Beauty Clinic in Renton, WA.",
+        "numberOfItems": 17,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Laser Hair Removal",
+            "url": "https://www.ranibeautyclinic.com/services/laser-hair-removal"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Botox & Dysport",
+            "url": "https://www.ranibeautyclinic.com/services/botox-dysport"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Dermal Fillers",
+            "url": "https://www.ranibeautyclinic.com/services/dermal-fillers"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "HydraFacial MD",
+            "url": "https://www.ranibeautyclinic.com/services/hydrafacial"
+          },
+          {
+            "@type": "ListItem",
+            "position": 5,
+            "name": "RF Microneedling",
+            "url": "https://www.ranibeautyclinic.com/services/rf-microneedling"
+          },
+          {
+            "@type": "ListItem",
+            "position": 6,
+            "name": "Chemical Peels",
+            "url": "https://www.ranibeautyclinic.com/services/chemical-peels"
+          },
+          {
+            "@type": "ListItem",
+            "position": 7,
+            "name": "Sofwave",
+            "url": "https://www.ranibeautyclinic.com/services/sofwave"
+          },
+          {
+            "@type": "ListItem",
+            "position": 8,
+            "name": "BioRePeel",
+            "url": "https://www.ranibeautyclinic.com/services/biorepeel"
+          },
+          {
+            "@type": "ListItem",
+            "position": 9,
+            "name": "Red Light Therapy",
+            "url": "https://www.ranibeautyclinic.com/services/red-light-therapy"
+          },
+          {
+            "@type": "ListItem",
+            "position": 10,
+            "name": "AI Skin Analysis",
+            "url": "https://www.ranibeautyclinic.com/services/ai-skin-analysis"
+          },
+          {
+            "@type": "ListItem",
+            "position": 11,
+            "name": "Scar Reduction",
+            "url": "https://www.ranibeautyclinic.com/services/scar-reduction"
+          },
+          {
+            "@type": "ListItem",
+            "position": 12,
+            "name": "Laser Acne Facial",
+            "url": "https://www.ranibeautyclinic.com/services/laser-acne-facial"
+          },
+          {
+            "@type": "ListItem",
+            "position": 13,
+            "name": "GLP-1 Weight Management",
+            "url": "https://www.ranibeautyclinic.com/wellness/glp1-weight-management"
+          },
+          {
+            "@type": "ListItem",
+            "position": 14,
+            "name": "NAD+ Injections",
+            "url": "https://www.ranibeautyclinic.com/wellness/nad-injections"
+          },
+          {
+            "@type": "ListItem",
+            "position": 15,
+            "name": "Vitamin Injections",
+            "url": "https://www.ranibeautyclinic.com/wellness/vitamin-injections"
+          },
+          {
+            "@type": "ListItem",
+            "position": 16,
+            "name": "Hormone Therapy",
+            "url": "https://www.ranibeautyclinic.com/wellness/hormone-therapy"
+          },
+          {
+            "@type": "ListItem",
+            "position": 17,
+            "name": "Blood Work",
+            "url": "https://www.ranibeautyclinic.com/wellness/blood-work"
+          }
+        ]
+      }
+    }
+  ]
+}

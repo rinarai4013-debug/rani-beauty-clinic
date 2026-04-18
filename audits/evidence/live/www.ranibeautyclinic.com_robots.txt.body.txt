@@ -1,0 +1,105 @@
+User-Agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: anthropic-ai
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: cohere-ai
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: Bytespider
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: CCBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /provider/
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /onboarding/
+Disallow: /docs/
+Disallow: /plan/
+Disallow: /tv/
+Disallow: /offline/
+Disallow: /_next/
+Disallow: /wp-admin/
+Disallow: /wp-content/
+Disallow: /wp-includes/
+Disallow: /wp-json/
+Disallow: /wp-login.php
+Disallow: /xmlrpc.php
+Disallow: /wp-cron.php
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /my-account/
+Disallow: /product/
+Disallow: /product-category/
+Disallow: /product-tag/
+Disallow: /shop/
+Disallow: /*?s=*
+Disallow: /*?replytocom=*
+Disallow: /*?remove_item=*
+Disallow: /*?add-to-cart=*
+Disallow: /feed/
+Disallow: /comments/feed/
+Disallow: /author/
+Disallow: /tag/
+Disallow: /category/
+Disallow: /service_category/
+Disallow: /cmsms_doctor/
+Disallow: /*?templately_library=*
+Disallow: /*?wc-ajax=*
+Disallow: /*?post_type=*
+Disallow: /*?p=*
+
+Sitemap: https://www.ranibeautyclinic.com/sitemap.xml

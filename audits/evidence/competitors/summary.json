@@ -1,0 +1,67 @@
+[
+  {
+    "domain": "skinspirit.com",
+    "homeStatus": 200,
+    "llmsStatus": 404,
+    "schema": {
+      "scripts": 0,
+      "invalid": 0,
+      "types": []
+    }
+  },
+  {
+    "domain": "idealimage.com",
+    "homeStatus": 530,
+    "llmsStatus": 530,
+    "schema": {
+      "scripts": 0,
+      "invalid": 0,
+      "types": []
+    }
+  },
+  {
+    "domain": "anushkaspa.com",
+    "homeStatus": 200,
+    "llmsStatus": 404,
+    "schema": {
+      "scripts": 5,
+      "invalid": 0,
+      "types": [
+        "BreadcrumbList",
+        "HairSalon",
+        "ImageObject",
+        "LocalBusiness",
+        "MedicalBusiness",
+        "WebPage",
+        "WebSite"
+      ]
+    }
+  },
+  {
+    "domain": "seattleplasticsurgery.com",
+    "homeStatus": 200,
+    "llmsStatus": 200,
+    "schema": {
+      "scripts": 2,
+      "invalid": 0,
+      "types": [
+        "BreadcrumbList",
+        "ImageObject",
+        "Organization",
+        "Physician",
+        "WebPage",
+        "WebSite"
+      ]
+    }
+  },
+  {
+    "domain": "kusumotoaesthetic.com",
+    "homeStatus": null,
+    "llmsStatus": null,
+    "schema": {
+      "scripts": 0,
+      "invalid": 0,
+      "types": []
+    }
+  }
+]

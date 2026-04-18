@@ -1,0 +1,519 @@
+{
+  "url": "https://www.ranibeautyclinic.com/services/cosmelan-peel",
+  "scriptCount": 6,
+  "scripts": [
+    {
+      "index": 0,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "Organization",
+              "MedicalBusiness",
+              "MedicalClinic",
+              "LocalBusiness"
+            ],
+            "@id": "https://www.ranibeautyclinic.com#organization",
+            "name": "Rani Beauty Clinic",
+            "alternateName": "Rani Medspa",
+            "url": "https://www.ranibeautyclinic.com",
+            "logo": {
+              "@type": "ImageObject",
+              "@id": "https://www.ranibeautyclinic.com#logo",
+              "url": "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
+              "width": 600,
+              "height": 200,
+              "caption": "Rani Beauty Clinic"
+            },
+            "image": {
+              "@id": "https://www.ranibeautyclinic.com#logo"
+            },
+            "description": "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
+            "slogan": "Your Skin. Your Wellness. Our Expertise.",
+            "foundingDate": "2022",
+            "telephone": "(425) 539-4440",
+            "email": "info@ranibeautyclinic.com",
+            "priceRange": "$$$",
+            "currenciesAccepted": "USD",
+            "paymentAccepted": [
+              "Cash",
+              "Credit Card",
+              "HSA",
+              "FSA",
+              "Financing"
+            ],
+            "medicalSpecialty": [
+              "Dermatology",
+              "CosmeticSurgery",
+              "Medical-aesthetics",
+              "PlasticSurgery"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "401 Olympia Ave NE, Suite 101",
+              "addressLocality": "Renton",
+              "addressRegion": "WA",
+              "postalCode": "98056",
+              "addressCountry": "US"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 47.4856,
+              "longitude": -122.2031
+            },
+            "hasMap": "https://g.page/ranibeautyclinic",
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "opens": "10:00",
+                "closes": "19:00"
+              }
+            ],
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": 4.9,
+              "reviewCount": 127,
+              "bestRating": 5,
+              "worstRating": 1
+            },
+            "sameAs": [
+              "https://www.instagram.com/ranibeautyclinic",
+              "https://www.facebook.com/ranibeautyclinic",
+              "https://www.tiktok.com/@ranibeautyclinic",
+              "https://g.page/ranibeautyclinic"
+            ],
+            "employee": {
+              "@id": "https://www.ranibeautyclinic.com#medical-director"
+            },
+            "areaServed": [
+              {
+                "@type": "State",
+                "name": "Washington"
+              },
+              {
+                "@type": "AdministrativeArea",
+                "name": "King County"
+              },
+              {
+                "@type": "City",
+                "name": "Renton"
+              },
+              {
+                "@type": "City",
+                "name": "Bellevue"
+              },
+              {
+                "@type": "City",
+                "name": "Seattle"
+              },
+              {
+                "@type": "City",
+                "name": "Kent"
+              },
+              {
+                "@type": "City",
+                "name": "Tukwila"
+              },
+              {
+                "@type": "City",
+                "name": "Newcastle"
+              },
+              {
+                "@type": "City",
+                "name": "Mercer Island"
+              },
+              {
+                "@type": "City",
+                "name": "Kirkland"
+              },
+              {
+                "@type": "City",
+                "name": "Redmond"
+              },
+              {
+                "@type": "City",
+                "name": "Issaquah"
+              },
+              {
+                "@type": "City",
+                "name": "Sammamish"
+              },
+              {
+                "@type": "City",
+                "name": "Auburn"
+              },
+              {
+                "@type": "City",
+                "name": "Federal Way"
+              }
+            ],
+            "knowsAbout": [
+              "Laser Hair Removal",
+              "Botox",
+              "Dysport",
+              "Dermal Fillers",
+              "HydraFacial",
+              "RF Microneedling",
+              "Chemical Peels",
+              "Cosmelan Peel",
+              "BioRePeel",
+              "VI Peel",
+              "PRX-T33",
+              "Sofwave",
+              "Red Light Therapy",
+              "Melasma Treatment",
+              "Hyperpigmentation",
+              "Acne Scars",
+              "Skin Tightening",
+              "Dark Circles",
+              "Undereye Rejuvenation",
+              "Scar Reduction",
+              "GLP-1 Weight Management",
+              "Semaglutide",
+              "Tirzepatide",
+              "Hormone Replacement Therapy",
+              "NAD+ Injections",
+              "Vitamin B12 Injections",
+              "Glutathione Injections",
+              "Peptide Therapy",
+              "Testosterone Replacement Therapy"
+            ],
+            "potentialAction": {
+              "@type": "ReserveAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://booking.mangomint.com/ranibeautyclinic1",
+                "actionPlatform": [
+                  "https://schema.org/DesktopWebPlatform",
+                  "https://schema.org/MobileWebPlatform"
+                ]
+              },
+              "result": {
+                "@type": "Reservation",
+                "name": "Medspa Appointment"
+              }
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.ranibeautyclinic.com#medical-director",
+            "name": "Dr. Alexander Landfield",
+            "jobTitle": "Medical Director",
+            "description": "Every medical treatment at Rani Beauty Clinic is performed under the supervision of Dr. Alexander Landfield, a board-certified neurologist.",
+            "hasCredential": {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Board Certification",
+              "name": "Board-Certified Neurologist"
+            },
+            "worksFor": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "knowsAbout": [
+              "Neurology",
+              "Botox",
+              "Dysport",
+              "Neurotoxin Injections",
+              "Facial Nerve Anatomy",
+              "Medical Aesthetics"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.ranibeautyclinic.com#website",
+            "url": "https://www.ranibeautyclinic.com",
+            "name": "Rani Beauty Clinic",
+            "description": "Premier physician-supervised medspa in Renton, WA — laser, injectables, skin rejuvenation, and medical wellness.",
+            "publisher": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "inLanguage": "en-US",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.ranibeautyclinic.com/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What exactly is the Cosmelan Peel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cosmelan is a two-phase professional depigmentation system — not a traditional peel. Phase one is an in-clinic application of the Cosmelan 1 mask, which you wear for 8 to 12 hours and remove at home. Phase two is a months-long at-home protocol using Cosmelan 2 maintenance cream. Together, they inhibit the tyrosinase enzyme responsible for melanin overproduction, exfoliate pigmented surface cells, and prevent hyperpigmentation from returning. It is ranked the #1 professional depigmentation treatment globally by Institute BCN and used in over 80 countries."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who is the ideal candidate for Cosmelan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cosmelan is ideal for clients with melasma, post-inflammatory hyperpigmentation (PIH from acne or injury), sun spots, chloasma, or persistent uneven skin tone. It is clinically validated for Fitzpatrick skin types I through IV, with a modified protocol available for types V and VI. Cosmelan is not suitable for clients who are pregnant, breastfeeding, have active skin infections, or have used isotretinoin (Accutane) in the past 6 months. A thorough consultation with your clinician will confirm your candidacy before any treatment is planned."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is the peeling normal? How bad does it get?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes — the peeling between days 3 and 7 is an expected and necessary part of the Cosmelan protocol. The TCA and exfoliating acids in the Cosmelan 1 mask shed the melanin-loaded surface cells, creating space for fresher, less pigmented skin beneath. The intensity of peeling varies by skin type and mask wear time but is typically described as moderate: visible flaking and tightness, not raw or weeping skin. Most clients plan their social commitments around this window and work from home during peak peeling days. Using only the approved gentle kit products during this phase protects the barrier and supports a smooth recovery."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many Cosmelan sessions are needed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The standard protocol includes one in-clinic Cosmelan 1 mask application followed by 3 to 4 months of at-home Cosmelan 2 maintenance cream. Clinical data shows 90% reduction in hyperpigmentation at 12 weeks. For clients with deep or recalcitrant melasma, a second in-clinic session may be recommended at 3 to 6 months. Annual maintenance sessions or ongoing at-home Cosmelan 2 use are commonly recommended to maintain results long-term, particularly for hormonal melasma where the trigger (sun, hormones) is ongoing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Cosmelan safe for darker skin tones?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cosmelan is clinically validated for Fitzpatrick types I through IV. For types V and VI, a modified protocol is available and must be discussed thoroughly during your consultation. The risk with darker skin types is post-inflammatory hyperpigmentation from the treatment itself if the protocol is too aggressive — which is why wear time customization and a conservative introduction to Cosmelan 2 are essential. At Rani, we take Fitzpatrick typing seriously and will not proceed with treatment on any skin tone without a full consultation and an individualized plan that prioritizes your safety and your outcome."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much does the Cosmelan Peel cost?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Cosmelan Peel is $1,399 per session (90 min in-clinic application), which includes the Cosmelan 1 mask treatment, your aftercare kit, and your follow-up progress appointment. The at-home Cosmelan 2 maintenance cream is included in your protocol plan. Financing is available through Cherry and PatientFi with no credit impact pre-qualification. Call us at (425) 539-4440 to schedule your consultation and confirm your candidacy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "MedicalProcedure",
+        "name": "Cosmelan Peel",
+        "description": "The world's #1 professional depigmentation system. Cosmelan's two-phase clinical protocol delivers a 90% reduction in hyperpigmentation in 12 weeks — targeting melasma, sun spots, PIH, and uneven skin tone at the enzymatic root cause.",
+        "url": "https://www.ranibeautyclinic.com/services/cosmelan-peel",
+        "image": "https://www.ranibeautyclinic.com/images/services/cosmelan/1.png",
+        "procedureType": "https://health-lifesci.schema.org/NoninvasiveProcedure",
+        "howPerformed": "Before your Cosmelan treatment, your clinician performs a thorough skin assessment to confirm your Fitzpatrick type, evaluate the distribution and depth of your hyperpigmentation, and review your full history including medications, recent sun exposure, and any contraindications. This consultation shapes your mask wear time (8 to 12 hours) and your customized Cosmelan 2 maintenance schedule. Your clinician will also take clinical photographs to track your progress over the 12-week protocol. In the treatment room, your skin is thoroughly cleansed and degreased to ensure even absorption. The Cosmelan 1 mask — a caramel-colored paste containing azelaic acid, kojic acid, phytic acid, TCA, and ascorbic acid — is applied in an even layer across the treatment area. You leave our clinic with the mask on your skin. Your clinician will confirm your personal wear time (typically 8 to 12 hours) based on your skin type and sensitivity profile. You remove the mask at home as instructed, then apply the soothing aftercare cream provided in your kit. Over the days following the in-clinic application, you will experience controlled peeling and flaking — this is an expected and necessary part of the process. The TCA and exfoliating acids are shedding the melanin-loaded epidermal cells, making way for fresher, less pigmented skin beneath. During this phase, your skin may appear red or feel tight. You will use only the Rani-approved gentle cleanser, healing moisturizer, and SPF 50+ provided in your post-treatment protocol. This phase is temporary; most peeling resolves within 7 to 10 days. Once peeling subsides, you begin applying the Cosmelan 2 maintenance cream daily. This phase — which runs for several months — is where the long-term results are built. The Cosmelan 2 cream continues to inhibit tyrosinase activity, prevent melanin rebound, and refine skin tone as cell turnover completes. Your clinician schedules a check-in appointment at 4 to 6 weeks to assess your progress, adjust application frequency if needed, and confirm you are on track. Strict daily SPF 50+ use is non-negotiable throughout this phase and beyond.",
+        "indication": [
+          {
+            "@type": "MedicalIndication",
+            "name": "hyperpigmentation"
+          },
+          {
+            "@type": "MedicalIndication",
+            "name": "sun damage"
+          },
+          {
+            "@type": "MedicalIndication",
+            "name": "dull skin"
+          }
+        ],
+        "bodyLocation": [
+          "face"
+        ],
+        "preparation": "Discontinue retinoids, tretinoin, and all exfoliating acids for 7 days before your appointment. Avoid sun exposure and tanning for 2 weeks prior — even a mild tan will affect the treatment outcome. Arrive with clean, makeup-free skin. Notify your clinician if you are pregnant, breastfeeding, or have recently used isotretinoin (Accutane) within the past 6 months, as Cosmelan is contraindicated in these cases. Do not use blood-thinning supplements (vitamin E, fish oil) for 5 days before your appointment. Plan to be at the clinic for approximately 90 minutes for the full consultation and mask application, and arrange to have your schedule clear for the 8 to 12 hours the mask is worn at home.",
+        "followup": "Expect visible peeling and flaking between days 3 and 7 — this is not a side effect, it is the treatment working. Your skin will shed the melanin-loaded surface cells to reveal the cleaner, more even skin beneath. During this phase, use only the gentle products provided in your kit: a mild cleanser, a barrier-repair moisturizer, and SPF 50+. Do not pick or forcibly remove peeling skin. After peeling resolves, begin the Cosmelan 2 maintenance cream as directed. Avoid sun exposure diligently for a minimum of 4 weeks post-treatment and continue SPF 50+ daily throughout the protocol — UV exposure is the primary trigger for melanin rebound. A follow-up appointment is scheduled at 4 to 6 weeks to assess your progress and adjust your protocol as needed.",
+        "medicalSpecialty": {
+          "@type": "MedicalSpecialty",
+          "name": "Dermatology"
+        },
+        "provider": {
+          "@type": "MedicalBusiness",
+          "@id": "https://www.ranibeautyclinic.com#organization",
+          "name": "Rani Beauty Clinic",
+          "telephone": "(425) 539-4440",
+          "url": "https://www.ranibeautyclinic.com",
+          "priceRange": "$$$",
+          "medicalSpecialty": [
+            "Dermatology",
+            "CosmeticSurgery",
+            "Medical-aesthetics"
+          ],
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "401 Olympia Ave NE, Suite 101",
+            "addressLocality": "Renton",
+            "addressRegion": "WA",
+            "postalCode": "98056",
+            "addressCountry": "US"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 47.4856,
+            "longitude": -122.2031
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": 4.9,
+            "reviewCount": 127,
+            "bestRating": 5
+          }
+        },
+        "areaServed": [
+          {
+            "@type": "State",
+            "name": "Washington"
+          },
+          {
+            "@type": "City",
+            "name": "Renton"
+          },
+          {
+            "@type": "City",
+            "name": "Bellevue"
+          },
+          {
+            "@type": "City",
+            "name": "Seattle"
+          },
+          {
+            "@type": "City",
+            "name": "Kent"
+          },
+          {
+            "@type": "City",
+            "name": "Tukwila"
+          },
+          {
+            "@type": "City",
+            "name": "Newcastle"
+          },
+          {
+            "@type": "City",
+            "name": "Mercer Island"
+          },
+          {
+            "@type": "AdministrativeArea",
+            "name": "King County"
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Cosmelan Peel",
+        "name": "Cosmelan Peel",
+        "description": "The world's #1 professional depigmentation system. Cosmelan's two-phase clinical protocol delivers a 90% reduction in hyperpigmentation in 12 weeks — targeting melasma, sun spots, PIH, and uneven skin tone at the enzymatic root cause.",
+        "url": "https://www.ranibeautyclinic.com/services/cosmelan-peel",
+        "image": "https://www.ranibeautyclinic.com/images/services/cosmelan/1.png",
+        "provider": {
+          "@type": "MedicalBusiness",
+          "@id": "https://www.ranibeautyclinic.com#organization",
+          "name": "Rani Beauty Clinic"
+        },
+        "areaServed": {
+          "@type": "AdministrativeArea",
+          "name": "King County, Washington"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": 1399,
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://booking.mangomint.com/ranibeautyclinic1",
+          "priceValidUntil": "2027-12-31",
+          "validFrom": "2026-04-17",
+          "seller": {
+            "@type": "MedicalBusiness",
+            "@id": "https://www.ranibeautyclinic.com#organization",
+            "name": "Rani Beauty Clinic"
+          }
+        }
+      }
+    },
+    {
+      "index": 4,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ranibeautyclinic.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Services",
+            "item": "https://www.ranibeautyclinic.com/services"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Cosmelan Peel",
+            "item": "https://www.ranibeautyclinic.com/services/cosmelan-peel"
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How Cosmelan Peel Works at Rani Beauty Clinic",
+        "description": "The world's #1 professional depigmentation system. Cosmelan's two-phase clinical protocol delivers a 90% reduction in hyperpigmentation in 12 weeks — targeting melasma, sun spots, PIH, and uneven skin tone at the enzymatic root cause.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "In-Depth Consultation & Skin Assessment",
+            "text": "Before your Cosmelan treatment, your clinician performs a thorough skin assessment to confirm your Fitzpatrick type, evaluate the distribution and depth of your hyperpigmentation, and review your full history including medications, recent sun exposure, and any contraindications. This consultation shapes your mask wear time (8 to 12 hours) and your customized Cosmelan 2 maintenance schedule. Your clinician will also take clinical photographs to track your progress over the 12-week protocol."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Cosmelan 1 Mask Application",
+            "text": "In the treatment room, your skin is thoroughly cleansed and degreased to ensure even absorption. The Cosmelan 1 mask — a caramel-colored paste containing azelaic acid, kojic acid, phytic acid, TCA, and ascorbic acid — is applied in an even layer across the treatment area. You leave our clinic with the mask on your skin. Your clinician will confirm your personal wear time (typically 8 to 12 hours) based on your skin type and sensitivity profile. You remove the mask at home as instructed, then apply the soothing aftercare cream provided in your kit."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Controlled Exfoliation Phase (Days 3–7)",
+            "text": "Over the days following the in-clinic application, you will experience controlled peeling and flaking — this is an expected and necessary part of the process. The TCA and exfoliating acids are shedding the melanin-loaded epidermal cells, making way for fresher, less pigmented skin beneath. During this phase, your skin may appear red or feel tight. You will use only the Rani-approved gentle cleanser, healing moisturizer, and SPF 50+ provided in your post-treatment protocol. This phase is temporary; most peeling resolves within 7 to 10 days."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 4,
+            "name": "Cosmelan 2 At-Home Maintenance Protocol",
+            "text": "Once peeling subsides, you begin applying the Cosmelan 2 maintenance cream daily. This phase — which runs for several months — is where the long-term results are built. The Cosmelan 2 cream continues to inhibit tyrosinase activity, prevent melanin rebound, and refine skin tone as cell turnover completes. Your clinician schedules a check-in appointment at 4 to 6 weeks to assess your progress, adjust application frequency if needed, and confirm you are on track. Strict daily SPF 50+ use is non-negotiable throughout this phase and beyond."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -13,12 +13,14 @@ import Badge from "@/components/ui/Badge";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
 
+const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
+
 const contactStructuredData = {
   "@context": "https://schema.org",
   "@type": "MedicalBusiness",
   name: clinicInfo.name,
   url: clinicInfo.website,
-  telephone: clinicInfo.phone,
+  telephone: schemaPhone,
   email: clinicInfo.email,
   address: {
     "@type": "PostalAddress",
@@ -41,7 +43,7 @@ const contactStructuredData = {
   },
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: clinicInfo.phone,
+    telephone: schemaPhone,
     contactType: "customer service",
     availableLanguage: ["English"],
   },

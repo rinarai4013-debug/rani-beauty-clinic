@@ -1,0 +1,162 @@
+{
+  "file": "seattleplasticsurgery.com_.body.txt",
+  "scriptCount": 2,
+  "scripts": [
+    {
+      "index": 0,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": "https://www.seattleplasticsurgery.com/",
+            "url": "https://www.seattleplasticsurgery.com/",
+            "name": "Seattle Plastic Surgery | Best Plastic Surgeon Seattle",
+            "isPartOf": {
+              "@id": "https://www.seattleplasticsurgery.com/#website"
+            },
+            "about": {
+              "@id": "https://www.seattleplasticsurgery.com/#organization"
+            },
+            "primaryImageOfPage": {
+              "@id": "https://www.seattleplasticsurgery.com/#primaryimage"
+            },
+            "image": {
+              "@id": "https://www.seattleplasticsurgery.com/#primaryimage"
+            },
+            "thumbnailUrl": "https://www.seattleplasticsurgery.com/wp-content/uploads/2019/10/instagramFeed-static-drj.jpg",
+            "datePublished": "2015-06-24T17:02:14+00:00",
+            "dateModified": "2026-03-12T00:55:49+00:00",
+            "description": "Seattle Plastic Surgery, home to the best plastic surgeon in Seattle, offers premier plastic surgery improving the shape and appearance of your face & body.",
+            "breadcrumb": {
+              "@id": "https://www.seattleplasticsurgery.com/#breadcrumb"
+            },
+            "inLanguage": "en-US",
+            "potentialAction": [
+              {
+                "@type": "ReadAction",
+                "target": [
+                  "https://www.seattleplasticsurgery.com/"
+                ]
+              }
+            ]
+          },
+          {
+            "@type": "ImageObject",
+            "inLanguage": "en-US",
+            "@id": "https://www.seattleplasticsurgery.com/#primaryimage",
+            "url": "https://www.seattleplasticsurgery.com/wp-content/uploads/2019/10/instagramFeed-static-drj.jpg",
+            "contentUrl": "https://www.seattleplasticsurgery.com/wp-content/uploads/2019/10/instagramFeed-static-drj.jpg",
+            "width": 640,
+            "height": 640,
+            "caption": "Image of Instagram feed"
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://www.seattleplasticsurgery.com/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home"
+              }
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.seattleplasticsurgery.com/#website",
+            "url": "https://www.seattleplasticsurgery.com/",
+            "name": "Seattle Plastic Surgery | Best Seattle Cosmetic Surgeon",
+            "description": "",
+            "publisher": {
+              "@id": "https://www.seattleplasticsurgery.com/#organization"
+            },
+            "potentialAction": [
+              {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://www.seattleplasticsurgery.com/?s={search_term_string}"
+                },
+                "query-input": {
+                  "@type": "PropertyValueSpecification",
+                  "valueRequired": true,
+                  "valueName": "search_term_string"
+                }
+              }
+            ],
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://www.seattleplasticsurgery.com/#organization",
+            "name": "Seattle Plastic Surgery",
+            "url": "https://www.seattleplasticsurgery.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "inLanguage": "en-US",
+              "@id": "https://www.seattleplasticsurgery.com/#/schema/logo/image/",
+              "url": "https://www.seattleplasticsurgery.com/wp-content/uploads/2018/10/sps-square-logo.png",
+              "contentUrl": "https://www.seattleplasticsurgery.com/wp-content/uploads/2018/10/sps-square-logo.png",
+              "width": 199,
+              "height": 199,
+              "caption": "Seattle Plastic Surgery"
+            },
+            "image": {
+              "@id": "https://www.seattleplasticsurgery.com/#/schema/logo/image/"
+            },
+            "sameAs": [
+              "https://www.facebook.com/Seattle-Plastic-Surgery-Center-170735812939723/",
+              "https://x.com/seattleplastic",
+              "https://www.instagram.com/realdrj/",
+              "https://www.youtube.com/channel/UCVd8kWyWLWZI7x4LCLVFATA"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "json": {
+        "@context": "http://schema.org",
+        "@type": "Physician",
+        "name": "Seattle Plastic Surgery Center",
+        "image": "https://www.seattleplasticsurgery.com/wp-content/uploads/2018/09/jonov-craig-md-1.png",
+        "openingHours": "Mo-Fr 09:00-21:00",
+        "url": "https://www.seattleplasticsurgery.com/",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.7",
+          "reviewCount": "14"
+        },
+        "address": [
+          {
+            "@type": "PostalAddress",
+            "addressLocality": "Seattle",
+            "addressRegion": "Washington",
+            "postalCode": "98122",
+            "streetAddress": "600 Broadway #320",
+            "telephone": "206-324-1120"
+          },
+          {
+            "@type": "PostalAddress",
+            "addressLocality": "Lynnwood",
+            "addressRegion": "Washington",
+            "postalCode": "98037",
+            "streetAddress": "3500 188th St SW #670",
+            "telephone": "206-209-0988",
+            "sameAs": [
+              "https://www.facebook.com/Seattle-Plastic-Surgery-Center-170735812939723/",
+              "https://www.instagram.com/realdrj/",
+              "https://www.youtube.com/channel/UCVd8kWyWLWZI7x4LCLVFATA",
+              "https://www.yelp.com/biz/seattle-plastic-surgery-center-seattle-2",
+              "https://www.realself.com/find/Washington/Lynnwood/Physician/Craig-Jonov"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

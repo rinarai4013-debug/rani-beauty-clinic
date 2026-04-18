@@ -1,0 +1,466 @@
+{
+  "url": "https://www.ranibeautyclinic.com/services/botox-dysport",
+  "scriptCount": 5,
+  "scripts": [
+    {
+      "index": 0,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "Organization",
+              "MedicalBusiness",
+              "MedicalClinic",
+              "LocalBusiness"
+            ],
+            "@id": "https://www.ranibeautyclinic.com#organization",
+            "name": "Rani Beauty Clinic",
+            "alternateName": "Rani Medspa",
+            "url": "https://www.ranibeautyclinic.com",
+            "logo": {
+              "@type": "ImageObject",
+              "@id": "https://www.ranibeautyclinic.com#logo",
+              "url": "https://www.ranibeautyclinic.com/images/logo/logo-dark.png",
+              "width": 600,
+              "height": 200,
+              "caption": "Rani Beauty Clinic"
+            },
+            "image": {
+              "@id": "https://www.ranibeautyclinic.com#logo"
+            },
+            "description": "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
+            "slogan": "Your Skin. Your Wellness. Our Expertise.",
+            "foundingDate": "2022",
+            "telephone": "(425) 539-4440",
+            "email": "info@ranibeautyclinic.com",
+            "priceRange": "$$$",
+            "currenciesAccepted": "USD",
+            "paymentAccepted": [
+              "Cash",
+              "Credit Card",
+              "HSA",
+              "FSA",
+              "Financing"
+            ],
+            "medicalSpecialty": [
+              "Dermatology",
+              "CosmeticSurgery",
+              "Medical-aesthetics",
+              "PlasticSurgery"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "401 Olympia Ave NE, Suite 101",
+              "addressLocality": "Renton",
+              "addressRegion": "WA",
+              "postalCode": "98056",
+              "addressCountry": "US"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 47.4856,
+              "longitude": -122.2031
+            },
+            "hasMap": "https://g.page/ranibeautyclinic",
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "opens": "10:00",
+                "closes": "19:00"
+              }
+            ],
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": 4.9,
+              "reviewCount": 127,
+              "bestRating": 5,
+              "worstRating": 1
+            },
+            "sameAs": [
+              "https://www.instagram.com/ranibeautyclinic",
+              "https://www.facebook.com/ranibeautyclinic",
+              "https://www.tiktok.com/@ranibeautyclinic",
+              "https://g.page/ranibeautyclinic"
+            ],
+            "employee": {
+              "@id": "https://www.ranibeautyclinic.com#medical-director"
+            },
+            "areaServed": [
+              {
+                "@type": "State",
+                "name": "Washington"
+              },
+              {
+                "@type": "AdministrativeArea",
+                "name": "King County"
+              },
+              {
+                "@type": "City",
+                "name": "Renton"
+              },
+              {
+                "@type": "City",
+                "name": "Bellevue"
+              },
+              {
+                "@type": "City",
+                "name": "Seattle"
+              },
+              {
+                "@type": "City",
+                "name": "Kent"
+              },
+              {
+                "@type": "City",
+                "name": "Tukwila"
+              },
+              {
+                "@type": "City",
+                "name": "Newcastle"
+              },
+              {
+                "@type": "City",
+                "name": "Mercer Island"
+              },
+              {
+                "@type": "City",
+                "name": "Kirkland"
+              },
+              {
+                "@type": "City",
+                "name": "Redmond"
+              },
+              {
+                "@type": "City",
+                "name": "Issaquah"
+              },
+              {
+                "@type": "City",
+                "name": "Sammamish"
+              },
+              {
+                "@type": "City",
+                "name": "Auburn"
+              },
+              {
+                "@type": "City",
+                "name": "Federal Way"
+              }
+            ],
+            "knowsAbout": [
+              "Laser Hair Removal",
+              "Botox",
+              "Dysport",
+              "Dermal Fillers",
+              "HydraFacial",
+              "RF Microneedling",
+              "Chemical Peels",
+              "Cosmelan Peel",
+              "BioRePeel",
+              "VI Peel",
+              "PRX-T33",
+              "Sofwave",
+              "Red Light Therapy",
+              "Melasma Treatment",
+              "Hyperpigmentation",
+              "Acne Scars",
+              "Skin Tightening",
+              "Dark Circles",
+              "Undereye Rejuvenation",
+              "Scar Reduction",
+              "GLP-1 Weight Management",
+              "Semaglutide",
+              "Tirzepatide",
+              "Hormone Replacement Therapy",
+              "NAD+ Injections",
+              "Vitamin B12 Injections",
+              "Glutathione Injections",
+              "Peptide Therapy",
+              "Testosterone Replacement Therapy"
+            ],
+            "potentialAction": {
+              "@type": "ReserveAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://booking.mangomint.com/ranibeautyclinic1",
+                "actionPlatform": [
+                  "https://schema.org/DesktopWebPlatform",
+                  "https://schema.org/MobileWebPlatform"
+                ]
+              },
+              "result": {
+                "@type": "Reservation",
+                "name": "Medspa Appointment"
+              }
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.ranibeautyclinic.com#medical-director",
+            "name": "Dr. Alexander Landfield",
+            "jobTitle": "Medical Director",
+            "description": "Every medical treatment at Rani Beauty Clinic is performed under the supervision of Dr. Alexander Landfield, a board-certified neurologist.",
+            "hasCredential": {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Board Certification",
+              "name": "Board-Certified Neurologist"
+            },
+            "worksFor": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "knowsAbout": [
+              "Neurology",
+              "Botox",
+              "Dysport",
+              "Neurotoxin Injections",
+              "Facial Nerve Anatomy",
+              "Medical Aesthetics"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.ranibeautyclinic.com#website",
+            "url": "https://www.ranibeautyclinic.com",
+            "name": "Rani Beauty Clinic",
+            "description": "Premier physician-supervised medspa in Renton, WA — laser, injectables, skin rejuvenation, and medical wellness.",
+            "publisher": {
+              "@id": "https://www.ranibeautyclinic.com#organization"
+            },
+            "inLanguage": "en-US",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.ranibeautyclinic.com/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between Botox and Dysport?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Botox (onabotulinumtoxinA) and Dysport (abobotulinumtoxinA) are both FDA-approved botulinum toxin type A products that work by the same mechanism - temporarily blocking nerve signals to targeted muscles. The key differences are molecular: Dysport has smaller protein molecules that tend to diffuse slightly more, making it well-suited for larger treatment areas like the forehead. Dysport also tends to have a slightly faster onset (3-5 days vs. 5-7 days for Botox). Some clients prefer the feel or longevity of one product over the other. During your consultation, our team will discuss which product may be best suited for your specific treatment areas and preferences. Many of our clients alternate between the two or use different products for different areas."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does it matter that your Medical Director is a neurologist?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Botulinum toxin is a neurotoxin - it works by blocking nerve signals at the neuromuscular junction. A neurologist's entire career is built on understanding nerve function, neuromuscular physiology, and the behavior of these types of agents. Dr. Landfield's board-certified neurological expertise means he has a deep, clinical understanding of facial nerve anatomy, muscle interaction patterns, and the pharmacology of neuromodulators that goes far beyond standard aesthetic injector training. This translates to more precise dosing, better anticipation of how the product will behave in each patient, and a significantly lower risk of complications like ptosis (eyelid drooping) or asymmetry. When a neurologist oversees your neurotoxin treatment, you are receiving care from the type of specialist who understands these products at the deepest level."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Will I look frozen or unnatural?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Not at our clinic. The 'frozen' look is the result of over-treatment - too many units injected into too many muscle groups, eliminating all natural facial movement. Our philosophy, guided by Dr. Landfield's neurological expertise, is strategic precision: we target specific muscles at carefully calibrated doses to soften wrinkles while preserving your natural range of facial expression. The goal is for people to notice that you look refreshed and well-rested - not that you have had a cosmetic procedure. We always err on the side of conservative treatment and offer a complimentary 2-week follow-up to make adjustments if needed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does Botox/Dysport last?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Results typically last 3-4 months for most clients. Individual longevity varies based on factors including metabolism, muscle strength, the area treated, and dosage. Some clients find their results last longer with repeated treatments, as the targeted muscles become conditioned to remain relaxed. We recommend scheduling your maintenance appointment before your previous treatment has fully worn off - typically every 3-4 months - to maintain consistent results and prevent wrinkles from re-establishing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What areas can be treated with Botox and Dysport?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The most common treatment areas are the horizontal forehead lines, the vertical frown lines between the eyebrows (glabella or 'elevens'), and the crow's feet around the eyes. However, neurotoxins are versatile and can also address bunny lines on the nose, a gummy smile, lip lines (smoker's lines), downturned mouth corners, chin dimpling (mentalis strain), neck bands (platysmal bands), and masseter reduction for jawline slimming or TMJ relief. Advanced techniques can even achieve a subtle brow lift. Our team will discuss all applicable treatment areas during your consultation."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much do Botox and Dysport cost at Rani Beauty Clinic?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Botox and Dysport are priced per unit, and the total cost depends on the number of units needed for your treatment areas and muscle strength. Common treatment areas like crow's feet typically require 12–24 units, frown lines 20–30 units, and forehead lines 10–30 units. During your consultation, Dr. Landfield or our trained injectors will assess your facial anatomy and provide an exact quote. Angel Glow Up members receive a sign-up bonus of 20% off Toxin. Call us at (425) 539-4440 to schedule your consultation."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "MedicalProcedure",
+        "name": "Botox & Dysport",
+        "description": "Expert neurotoxin injections by a team led by Dr. Alexander Landfield, a board-certified neurologist, for natural-looking wrinkle reduction and preventative aging treatment.",
+        "url": "https://www.ranibeautyclinic.com/services/botox-dysport",
+        "image": "https://www.ranibeautyclinic.com/images/services/botox/1.png",
+        "procedureType": "https://health-lifesci.schema.org/NoninvasiveProcedure",
+        "howPerformed": "Your treatment begins with a comprehensive consultation where your injector evaluates your facial anatomy, muscle movement patterns, skin quality, and aesthetic goals. Under Dr. Landfield's protocols, we assess not just where wrinkles are visible at rest, but how the entire network of facial muscles interacts during expression. This neurological approach to facial analysis ensures that treatment is strategic and holistic, not just reactive. Based on your facial assessment, a personalized injection plan is developed specifying the product (Botox or Dysport), the precise injection sites, and the exact dosing for each area. Whether you are seeking subtle prevention (sometimes called 'baby Botox') or more comprehensive smoothing, the plan is tailored to achieve your desired level of correction while maintaining natural expression and movement. Using ultra-fine needles, the neurotoxin is injected into the targeted muscles with precision. The entire injection process typically takes 10-15 minutes. Most clients describe the sensation as a brief pinch - no numbing is usually needed, although ice or a topical numbing agent can be applied upon request. The number of injection points varies based on your treatment plan, but common areas include the forehead, glabella (between the brows), and crow's feet. After the injections, you receive aftercare instructions and are free to return to your normal activities immediately. A follow-up appointment is scheduled for 2 weeks post-treatment so your injector can assess the results, ensure symmetry, and make any minor adjustments if needed. This complimentary touch-up appointment is a standard part of our commitment to optimal results.",
+        "preparation": "Avoid blood-thinning medications and supplements - including aspirin, ibuprofen, fish oil, vitamin E, and alcohol - for at least 48 hours before your appointment to minimize bruising. Arrive with a clean face free of makeup in the treatment area. If this is your first neurotoxin treatment, come prepared to discuss your medical history, any medications you take, and your aesthetic goals. There is no need for numbing cream, but you may request it if you are sensitive to needles.",
+        "followup": "You can resume all normal activities immediately. Avoid lying flat, vigorous exercise, and rubbing or massaging the treated areas for 4 hours after treatment. Do not schedule any facials, laser treatments, or dental procedures for 2 weeks to allow the neurotoxin to fully settle. Initial effects become visible within 3-5 days for Dysport and 5-7 days for Botox, with full results apparent at 10-14 days. Results typically last 3-4 months, and your follow-up appointment at 2 weeks allows us to assess results and make any needed adjustments.",
+        "medicalSpecialty": {
+          "@type": "MedicalSpecialty",
+          "name": "Dermatology"
+        },
+        "provider": {
+          "@type": "MedicalBusiness",
+          "@id": "https://www.ranibeautyclinic.com#organization",
+          "name": "Rani Beauty Clinic",
+          "telephone": "(425) 539-4440",
+          "url": "https://www.ranibeautyclinic.com",
+          "priceRange": "$$$",
+          "medicalSpecialty": [
+            "Dermatology",
+            "CosmeticSurgery",
+            "Medical-aesthetics"
+          ],
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "401 Olympia Ave NE, Suite 101",
+            "addressLocality": "Renton",
+            "addressRegion": "WA",
+            "postalCode": "98056",
+            "addressCountry": "US"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 47.4856,
+            "longitude": -122.2031
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": 4.9,
+            "reviewCount": 127,
+            "bestRating": 5
+          }
+        },
+        "areaServed": [
+          {
+            "@type": "State",
+            "name": "Washington"
+          },
+          {
+            "@type": "City",
+            "name": "Renton"
+          },
+          {
+            "@type": "City",
+            "name": "Bellevue"
+          },
+          {
+            "@type": "City",
+            "name": "Seattle"
+          },
+          {
+            "@type": "City",
+            "name": "Kent"
+          },
+          {
+            "@type": "City",
+            "name": "Tukwila"
+          },
+          {
+            "@type": "City",
+            "name": "Newcastle"
+          },
+          {
+            "@type": "City",
+            "name": "Mercer Island"
+          },
+          {
+            "@type": "AdministrativeArea",
+            "name": "King County"
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ranibeautyclinic.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Services",
+            "item": "https://www.ranibeautyclinic.com/services"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Botox & Dysport",
+            "item": "https://www.ranibeautyclinic.com/services/botox-dysport"
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "valid": true,
+      "json": {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How Botox & Dysport Works at Rani Beauty Clinic",
+        "description": "Expert neurotoxin injections by a team led by Dr. Alexander Landfield, a board-certified neurologist, for natural-looking wrinkle reduction and preventative aging treatment.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Expert Consultation & Facial Analysis",
+            "text": "Your treatment begins with a comprehensive consultation where your injector evaluates your facial anatomy, muscle movement patterns, skin quality, and aesthetic goals. Under Dr. Landfield's protocols, we assess not just where wrinkles are visible at rest, but how the entire network of facial muscles interacts during expression. This neurological approach to facial analysis ensures that treatment is strategic and holistic, not just reactive."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Customized Treatment Plan",
+            "text": "Based on your facial assessment, a personalized injection plan is developed specifying the product (Botox or Dysport), the precise injection sites, and the exact dosing for each area. Whether you are seeking subtle prevention (sometimes called 'baby Botox') or more comprehensive smoothing, the plan is tailored to achieve your desired level of correction while maintaining natural expression and movement."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Precision Injection",
+            "text": "Using ultra-fine needles, the neurotoxin is injected into the targeted muscles with precision. The entire injection process typically takes 10-15 minutes. Most clients describe the sensation as a brief pinch - no numbing is usually needed, although ice or a topical numbing agent can be applied upon request. The number of injection points varies based on your treatment plan, but common areas include the forehead, glabella (between the brows), and crow's feet."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 4,
+            "name": "Immediate Aftercare & Follow-Up",
+            "text": "After the injections, you receive aftercare instructions and are free to return to your normal activities immediately. A follow-up appointment is scheduled for 2 weeks post-treatment so your injector can assess the results, ensure symmetry, and make any minor adjustments if needed. This complimentary touch-up appointment is a standard part of our commitment to optimal results."
+          }
+        ]
+      }
+    }
+  ]
+}
