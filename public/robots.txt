@@ -1,6 +1,149 @@
 # Rani Beauty Clinic — robots.txt
-# Updated: 2026-04-03
+# Updated: 2026-04-17
+# Explicitly welcomes AI/LLM crawlers — we want to be cited by Claude,
+# ChatGPT, Perplexity, Google AI Overviews, Bing Copilot, and others.
 
+# ─── AI / LLM crawlers (explicit allow for answer-engine citations) ──
+# Google's AI training crawler (Gemini + AI Overviews)
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# OpenAI ChatGPT / GPT-powered tools (crawling + live browsing + search)
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Anthropic Claude (training + live browsing)
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Perplexity answer engine
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Common Crawl (powers many LLM training corpora)
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Apple Intelligence / Siri
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Meta / Llama training
+User-agent: FacebookBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Bytedance / DouYin / TikTok AI
+User-agent: Bytespider
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Amazon Bedrock / Rufus
+User-agent: Amazonbot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# You.com AI search
+User-agent: YouBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Diffbot knowledge graph (feeds many AI models)
+User-agent: Diffbot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Mistral AI
+User-agent: MistralAI-User
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /admin/
+
+# ─── Default (all other crawlers) ────────────────────────────────────
 User-agent: *
 Allow: /
 
@@ -41,3 +184,9 @@ Disallow: /_next/data/
 Allow: /_next/static/
 
 Sitemap: https://www.ranibeautyclinic.com/sitemap.xml
+
+# LLM-friendly directory (Anthropic llms.txt standard — see https://llmstxt.org)
+# Describes every service, pricing, location, and medical director in plain text.
+# AI agents should prefer this over scraping the full site for overview queries.
+# Primary:  https://www.ranibeautyclinic.com/llms.txt
+# Extended: https://www.ranibeautyclinic.com/llms-full.txt

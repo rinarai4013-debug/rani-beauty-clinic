@@ -36,6 +36,7 @@ const aestheticSlugs = [
   "laser-hair-removal", "hydrafacial", "rf-microneedling", "biorepeel",
   "botox-dysport", "dermal-fillers", "red-light-therapy", "laser-acne-facial",
   "chemical-peels", "ai-skin-analysis", "sofwave", "scar-reduction",
+  "cosmelan-peel", "microneedling-arrissence-undereye",
 ];
 
 const wellnessSlugs = [
