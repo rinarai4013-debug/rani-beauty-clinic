@@ -41,11 +41,15 @@ vi.mock('@/lib/security/public-intent-guard', () => ({
   normalizeEmailForLimit: (...args: unknown[]) => normalizeEmailForLimitMock(...args),
 }));
 
-vi.mock('@/lib/consultation/schema', () => ({
-  submitIntakeSchema: {
-    safeParse: (...args: unknown[]) => safeParseMock(...args),
-  },
-}));
+vi.mock('@/lib/consultation/schema', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/consultation/schema')>();
+  return {
+    ...actual,
+    submitIntakeSchema: {
+      safeParse: (...args: unknown[]) => safeParseMock(...args),
+    },
+  };
+});
 
 vi.mock('@/lib/mastermind/session', () => ({
   createSession: (...args: unknown[]) => createSessionMock(...args),

@@ -141,7 +141,6 @@ const BUDGET_OPTIONS = [
   { value: '3000-5000', label: '$3,000 - $5,000' },
   { value: '5000-plus', label: '$5,000+' },
 ];
-const ALL_TREATMENT_VALUES = ALL_TREATMENTS.map((t) => t.value);
 
 const CONCERN_TO_SCHEMA_CONCERNS: Record<string, string[]> = {
   acne: ['acne'],
@@ -823,9 +822,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const [preferredDays, setPreferredDays] = useState<string[]>([]);
   const [preferredTime, setPreferredTime] = useState<string[]>([]);
   const [budget, setBudget] = useState<string[]>([]);
-  const [excludedTreatmentInterests, setExcludedTreatmentInterests] = useState<string[]>([]);
-  const [includeProductRecommendations, setIncludeProductRecommendations] = useState(true);
-  const [includeMedicalOffers, setIncludeMedicalOffers] = useState(true);
 
   // ── Step 3: Clinical Notes (provider observations) ──
   const [clinicalNotes, setClinicalNotes] = useState('');
@@ -874,9 +870,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       if (d.preferredDays) setPreferredDays(d.preferredDays);
       if (d.preferredTime) setPreferredTime(d.preferredTime);
       if (d.budget) setBudget(d.budget);
-      if (d.excludedTreatmentInterests) setExcludedTreatmentInterests(d.excludedTreatmentInterests);
-      if (typeof d.includeProductRecommendations === 'boolean') setIncludeProductRecommendations(d.includeProductRecommendations);
-      if (typeof d.includeMedicalOffers === 'boolean') setIncludeMedicalOffers(d.includeMedicalOffers);
       if (d.currentStep && d.currentStep > 1) setCurrentStep(d.currentStep);
     } catch { /* ignore corrupt drafts */ }
   }, [open]);
@@ -893,7 +886,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         hasAllergies, allergies, hasMedications, medications, smokingAlcohol, waterIntake,
         clinicalNotes,
         skincareRoutine, amRoutine, pmRoutine, preferredDays, preferredTime, budget,
-        excludedTreatmentInterests, includeProductRecommendations, includeMedicalOffers,
       }));
     } catch { /* ignore storage errors */ }
   }, [
@@ -904,7 +896,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     hasAllergies, allergies, hasMedications, medications, smokingAlcohol, waterIntake,
     clinicalNotes,
     skincareRoutine, amRoutine, pmRoutine, preferredDays, preferredTime, budget,
-    excludedTreatmentInterests, includeProductRecommendations, includeMedicalOffers,
   ]);
 
   // ── Derived ──
@@ -913,12 +904,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     () => treatmentInterests.some((t) => LAB_REQUIRED_TREATMENTS.includes(t)),
     [treatmentInterests]
   );
-
-  useEffect(() => {
-    setExcludedTreatmentInterests((prev) =>
-      prev.filter((value) => !treatmentInterests.includes(value))
-    );
-  }, [treatmentInterests]);
 
   // ── Togglers ──
   const toggleMulti = useCallback(
@@ -935,33 +920,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     []
   );
 
-  const toggleIncludeTreatment = useCallback((value: string) => {
-    setTreatmentInterests((prev) =>
-      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
-    );
-    setExcludedTreatmentInterests((prev) => prev.filter((item) => item !== value));
-  }, []);
-
-  const toggleExcludeTreatment = useCallback((value: string) => {
-    setExcludedTreatmentInterests((prev) =>
-      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
-    );
-    setTreatmentInterests((prev) => prev.filter((item) => item !== value));
-  }, []);
-
-  const includeAllTreatments = useCallback(() => {
-    setTreatmentInterests([...ALL_TREATMENT_VALUES]);
-    setExcludedTreatmentInterests([]);
-  }, []);
-
-  const clearIncludedTreatments = useCallback(() => {
-    setTreatmentInterests([]);
-  }, []);
-
-  const clearExcludedTreatments = useCallback(() => {
-    setExcludedTreatmentInterests([]);
-  }, []);
-
   // ── Validation per step ──
   const validateStep = (step: number): boolean => {
     const errors: Record<string, boolean> = {};
@@ -972,14 +930,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     }
     if (step === 2) {
       if (concerns.length === 0) errors.concerns = true;
-    }
-    if (step === 5) {
-      if (
-        treatmentInterests.length === 0 &&
-        excludedTreatmentInterests.length >= ALL_TREATMENT_VALUES.length
-      ) {
-        errors.planControls = true;
-      }
     }
 
     setValidationErrors(errors);
@@ -1069,12 +1019,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           concerns,
           goals: goalsText || undefined,
           timeline: normalizedTimeline,
-          includeMedicalOffers,
-          planPreferences: {
-            includeServiceHints: treatmentInterests,
-            excludeServiceHints: excludedTreatmentInterests,
-            includeProductRecommendations,
-          },
 
           hasUpcomingEvent: hasEvent === 'yes',
           eventDetails: hasEvent === 'yes' ? `${eventType} - ${eventDate}` : undefined,
@@ -1387,7 +1331,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
                     key={t.value}
                     label={t.label}
                     selected={treatmentInterests.includes(t.value)}
-                    onClick={() => toggleIncludeTreatment(t.value)}
+                    onClick={() => toggleMulti(setTreatmentInterests)(t.value)}
                     showCheck
                   />
                 ))}
@@ -1686,126 +1630,10 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         icon={Upload}
       />
 
-      {/* Provider Plan Controls */}
-      <div className="space-y-4 rounded-xl bg-white/5 border border-[#C9A96E]/20 p-4">
-        <div>
-          <FieldLabel>Plan Controls (Provider)</FieldLabel>
-          <p className="text-[11px] text-[#F8F6F1]/55" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            Final curation before AI generation. Include what you want emphasized and exclude what should not be proposed.
-          </p>
-        </div>
-
-        <div>
-          <p
-            className="text-[11px] font-semibold text-[#C9A96E]/75 uppercase tracking-wider mb-2"
-            style={{ fontFamily: 'Montserrat, sans-serif' }}
-          >
-            Include Services ({treatmentInterests.length})
-          </p>
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              type="button"
-              onClick={includeAllTreatments}
-              className="px-2.5 py-1 rounded-full border border-[#C9A96E]/35 text-[10px] uppercase tracking-wider text-[#F8F6F1]/80 hover:border-[#C9A96E]/70 transition-colors"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
-            >
-              Select all
-            </button>
-            <button
-              type="button"
-              onClick={clearIncludedTreatments}
-              className="px-2.5 py-1 rounded-full border border-white/20 text-[10px] uppercase tracking-wider text-[#F8F6F1]/65 hover:border-white/35 transition-colors"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
-            >
-              Clear
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {ALL_TREATMENTS.map((treatment) => (
-              <GoldPill
-                key={`include-${treatment.value}`}
-                label={treatment.label}
-                selected={treatmentInterests.includes(treatment.value)}
-                onClick={() => toggleIncludeTreatment(treatment.value)}
-                showCheck
-              />
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p
-            className="text-[11px] font-semibold text-[#C9A96E]/75 uppercase tracking-wider mb-2"
-            style={{ fontFamily: 'Montserrat, sans-serif' }}
-          >
-            Exclude Services ({excludedTreatmentInterests.length})
-          </p>
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              type="button"
-              onClick={clearExcludedTreatments}
-              className="px-2.5 py-1 rounded-full border border-white/20 text-[10px] uppercase tracking-wider text-[#F8F6F1]/65 hover:border-white/35 transition-colors"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
-            >
-              Clear exclusions
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {ALL_TREATMENTS.map((treatment) => (
-              <GoldPill
-                key={`exclude-${treatment.value}`}
-                label={treatment.label}
-                selected={excludedTreatmentInterests.includes(treatment.value)}
-                onClick={() => toggleExcludeTreatment(treatment.value)}
-                showCheck
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setIncludeProductRecommendations((prev) => !prev)}
-            className={`
-              px-4 py-3 rounded-xl border text-left transition-all duration-200
-              ${includeProductRecommendations
-                ? 'border-[#C9A96E]/70 bg-[#C9A96E]/15 text-[#F8F6F1]'
-                : 'border-white/15 bg-white/5 text-[#F8F6F1]/65'}
-            `}
-          >
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-              Skincare Products
-            </p>
-            <p className="text-[11px] mt-1" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-              {includeProductRecommendations ? 'Included in plan and aftercare' : 'Excluded from plan output'}
-            </p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIncludeMedicalOffers((prev) => !prev)}
-            className={`
-              px-4 py-3 rounded-xl border text-left transition-all duration-200
-              ${includeMedicalOffers
-                ? 'border-[#C9A96E]/70 bg-[#C9A96E]/15 text-[#F8F6F1]'
-                : 'border-white/15 bg-white/5 text-[#F8F6F1]/65'}
-            `}
-          >
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-              Product Offers
-            </p>
-            <p className="text-[11px] mt-1" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-              {includeMedicalOffers ? 'Medical product offers enabled' : 'Medical product offers disabled'}
-            </p>
-          </button>
-        </div>
-
-        {validationErrors.planControls && (
-          <p className="text-xs text-red-400" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            At least one service must remain available for AI recommendations.
-          </p>
-        )}
+      <div className="rounded-xl bg-white/5 border border-[#C9A96E]/20 p-4">
+        <p className="text-[11px] text-[#F8F6F1]/65" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          AI will generate the complete treatment plan first. You can then add or remove services in the Treatment Plan tab during provider review.
+        </p>
       </div>
 
       {/* Quick Summary */}
@@ -1840,22 +1668,6 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
                 .join(', ')}
             />
           )}
-          {excludedTreatmentInterests.length > 0 && (
-            <SummaryRow
-              label="Excluded"
-              value={excludedTreatmentInterests
-                .map((t) => ALL_TREATMENTS.find((o) => o.value === t)?.label || t)
-                .join(', ')}
-            />
-          )}
-          <SummaryRow
-            label="Skincare Products"
-            value={includeProductRecommendations ? 'Included' : 'Excluded'}
-          />
-          <SummaryRow
-            label="Medical Offers"
-            value={includeMedicalOffers ? 'Enabled' : 'Disabled'}
-          />
 
           {hadTreatments === 'yes' && previousTreatments && (
             <SummaryRow label="Previous Treatments" value={previousTreatments} />
