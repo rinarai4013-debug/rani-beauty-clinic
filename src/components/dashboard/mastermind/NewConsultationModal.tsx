@@ -181,6 +181,7 @@ const MAX_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
 const MAX_AURA_DATA_URL_BYTES = 900_000;
 const AURA_QUALITY_STEPS = [0.82, 0.74, 0.66, 0.58, 0.5];
 const AURA_SCALE_STEPS = [1, 0.88, 0.76, 0.64, 0.52];
+const SESSION_READY_RETRY_DELAYS_MS = [250, 450, 800, 1200, 1800];
 
 // ══════════════════════════════════════════════════════════════
 // HELPERS
@@ -324,6 +325,34 @@ function getApiErrorMessage(
 
   if (parsed.text) return normalizeSubmissionError(parsed.text.slice(0, 220));
   return normalizeSubmissionError(fallback);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function waitForSessionReady(sessionId: string): Promise<void> {
+  let lastMessage = 'Session is still initializing. Please retry.';
+
+  for (let index = 0; index < SESSION_READY_RETRY_DELAYS_MS.length; index += 1) {
+    const response = await fetch(`/api/mastermind/sessions/${sessionId}`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (response.ok) return;
+
+    const parsed = await parseJsonResponse(response);
+    lastMessage = getApiErrorMessage(response, parsed, lastMessage);
+    const retryable =
+      response.status === 404 || /session not found|session is still initializing/i.test(lastMessage);
+
+    if (!retryable || index === SESSION_READY_RETRY_DELAYS_MS.length - 1) {
+      throw new Error(lastMessage);
+    }
+    await sleep(SESSION_READY_RETRY_DELAYS_MS[index]);
+  }
+
+  throw new Error(lastMessage);
 }
 
 async function loadPdfJs() {
@@ -1075,6 +1104,10 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       if (!sessionId) {
         throw new Error('Submission succeeded but no session ID was returned. Please retry.');
       }
+
+      // Newly created sessions can take a brief moment to become readable
+      // across API invocations. Gate follow-up calls on session readiness.
+      await waitForSessionReady(sessionId);
 
       // Aura scans are processed outside the multipart submit payload to avoid
       // body-size limits that can return non-JSON proxy errors.
