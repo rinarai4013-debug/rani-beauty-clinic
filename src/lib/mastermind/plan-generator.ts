@@ -19,6 +19,297 @@ import { validatePlan } from '@/lib/plan-builder/constraints';
 import { generatePackages } from '@/lib/plan-builder/package-generator';
 import { PHASE_LABELS } from '@/lib/plan-builder/types';
 
+const SERVICE_HINT_KEYWORDS: Record<string, string[]> = {
+  hydrafacial: ['hydrafacial', 'facial'],
+  'laser-facials': ['laser facial', 'laser'],
+  'rf-microneedling': ['rf micro', 'microneedling'],
+  'microneedling-arrissence-undereye': ['arrissence', 'undereye', 'microneedling'],
+  peels: ['peel', 'vi peel', 'biorepeel', 'prx'],
+  'cosmelan-peel': ['cosmelan'],
+  'skin-boosters': ['skin booster', 'booster'],
+  sofwave: ['sofwave'],
+  botox: ['botox'],
+  'dermal-fillers': ['filler'],
+  sculptra: ['sculptra'],
+  'laser-hair': ['laser hair'],
+  hormones: ['hormone', 'trt', 'testosterone', 'thyroid'],
+  glp1: ['glp', 'semaglutide', 'tirzepatide', 'weight'],
+};
+const PACKAGE_FINANCING_APR = 0.1499;
+
+type PlanPreferences = {
+  includeServiceHints: string[];
+  excludeServiceHints: string[];
+  includeProductRecommendations: boolean;
+};
+
+function normalizeHint(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function normalizeSearchText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function toUniqueStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+
+  const unique = new Set<string>();
+  for (const item of value) {
+    if (typeof item !== 'string') continue;
+    const normalized = normalizeHint(item);
+    if (normalized) unique.add(normalized);
+  }
+
+  return Array.from(unique);
+}
+
+function getPlanPreferences(intakeData: Partial<ConsultationFormData>): PlanPreferences | null {
+  const intakeRecord = intakeData as Record<string, unknown>;
+  const rawPreferences = intakeRecord.planPreferences;
+  const preferenceRecord =
+    rawPreferences && typeof rawPreferences === 'object'
+      ? (rawPreferences as Record<string, unknown>)
+      : null;
+
+  const includeServiceHints = toUniqueStringArray(preferenceRecord?.includeServiceHints);
+  const excludeServiceHints = toUniqueStringArray(preferenceRecord?.excludeServiceHints);
+  const includeProductRecommendations = preferenceRecord?.includeProductRecommendations !== false;
+
+  const hasServiceControls =
+    includeServiceHints.length > 0 || excludeServiceHints.length > 0;
+  const hasProductControl = includeProductRecommendations === false;
+
+  if (!hasServiceControls && !hasProductControl) {
+    return null;
+  }
+
+  return {
+    includeServiceHints,
+    excludeServiceHints,
+    includeProductRecommendations,
+  };
+}
+
+function buildHintTokens(hints: string[]): string[] {
+  const tokens = new Set<string>();
+
+  for (const hint of hints) {
+    const normalizedHint = normalizeHint(hint);
+    if (!normalizedHint) continue;
+
+    const mappedKeywords = SERVICE_HINT_KEYWORDS[normalizedHint] ?? [];
+    const implicitKeywords = normalizedHint.split('-').filter(Boolean);
+    const phrases = [normalizedHint.replace(/-/g, ' '), ...mappedKeywords, ...implicitKeywords];
+
+    for (const phrase of phrases) {
+      const normalizedPhrase = normalizeSearchText(phrase);
+      if (normalizedPhrase.length >= 2) {
+        tokens.add(normalizedPhrase);
+      }
+    }
+  }
+
+  return Array.from(tokens);
+}
+
+function matchesTokens(text: string, tokens: string[]): boolean {
+  if (tokens.length === 0) return false;
+
+  const normalizedText = normalizeSearchText(text);
+  if (!normalizedText) return false;
+
+  return tokens.some((token) => normalizedText.includes(token));
+}
+
+function treatmentSearchText(treatment: MastermindTreatment): string {
+  return [
+    treatment.id,
+    treatment.treatmentName,
+    treatment.category,
+    ...treatment.targetConcerns,
+    ...treatment.targetZones,
+  ].join(' ');
+}
+
+function applyTreatmentFilters(
+  treatments: MastermindTreatment[],
+  includeTokens: string[],
+  excludeTokens: string[],
+): MastermindTreatment[] {
+  if (treatments.length === 0) return treatments;
+
+  return treatments.filter((treatment) => {
+    const haystack = treatmentSearchText(treatment);
+    const isExcluded = matchesTokens(haystack, excludeTokens);
+    if (isExcluded) return false;
+
+    if (includeTokens.length === 0) return true;
+    return matchesTokens(haystack, includeTokens);
+  });
+}
+
+function roundMoney(value: number): number {
+  return Math.round(value);
+}
+
+function calculateMonthlyPayment(principal: number, apr: number, months: number): number {
+  if (!Number.isFinite(principal) || principal <= 0 || months <= 0) return 0;
+  if (apr <= 0) return Math.round(principal / months);
+
+  const monthlyRate = apr / 12;
+  const compoundFactor = Math.pow(1 + monthlyRate, months);
+  const payment = principal * (monthlyRate * compoundFactor) / (compoundFactor - 1);
+  return Math.round(payment);
+}
+
+function recalculatePackage(pkg: GeneratedPackage): GeneratedPackage {
+  if (!pkg.lineItems || pkg.lineItems.length === 0) {
+    return pkg;
+  }
+
+  const originalPrice = roundMoney(
+    pkg.lineItems.reduce((sum, lineItem) => {
+      const qty = Number.isFinite(lineItem.qty) ? lineItem.qty : 0;
+      const unitPrice = Number.isFinite(lineItem.unitPrice) ? lineItem.unitPrice : 0;
+      const lineTotal = Number.isFinite(lineItem.total) && lineItem.total > 0
+        ? lineItem.total
+        : qty * unitPrice;
+      return sum + lineTotal;
+    }, 0),
+  );
+
+  const discount = Number.isFinite(pkg.discount) ? Math.min(90, Math.max(0, pkg.discount)) : 0;
+  const price = roundMoney(originalPrice * (1 - discount / 100));
+  const sessions = pkg.lineItems.reduce((sum, lineItem) => {
+    const qty = Number.isFinite(lineItem.qty) ? lineItem.qty : 0;
+    return sum + qty;
+  }, 0);
+
+  return {
+    ...pkg,
+    originalPrice,
+    price,
+    totalPrice: price,
+    sessions,
+    monthlyPayment12: calculateMonthlyPayment(price, PACKAGE_FINANCING_APR, 12),
+    monthlyPayment24: calculateMonthlyPayment(price, PACKAGE_FINANCING_APR, 24),
+    savingsVsStandalone: Math.max(0, roundMoney(originalPrice - price)),
+  };
+}
+
+export function applyPlanPreferencesToPlan(
+  plan: MastermindPlan,
+  intakeData: Partial<ConsultationFormData>,
+): MastermindPlan {
+  const preferences = getPlanPreferences(intakeData);
+  if (!preferences) return plan;
+
+  const includeTokens = buildHintTokens(preferences.includeServiceHints);
+  const excludeTokens = buildHintTokens(preferences.excludeServiceHints);
+  const hasServiceFilters = includeTokens.length > 0 || excludeTokens.length > 0;
+
+  let recommendations = plan.recommendations;
+
+  if (hasServiceFilters) {
+    const filteredRecommendations = {
+      primary: applyTreatmentFilters(plan.recommendations.primary, includeTokens, excludeTokens),
+      complementary: applyTreatmentFilters(plan.recommendations.complementary, includeTokens, excludeTokens),
+      maintenance: applyTreatmentFilters(plan.recommendations.maintenance, includeTokens, excludeTokens),
+    };
+
+    const filteredTotal =
+      filteredRecommendations.primary.length +
+      filteredRecommendations.complementary.length +
+      filteredRecommendations.maintenance.length;
+
+    if (filteredTotal > 0) {
+      if (filteredRecommendations.primary.length === 0) {
+        if (filteredRecommendations.complementary.length > 0) {
+          filteredRecommendations.primary.push(filteredRecommendations.complementary.shift()!);
+        } else if (filteredRecommendations.maintenance.length > 0) {
+          filteredRecommendations.primary.push(filteredRecommendations.maintenance.shift()!);
+        }
+      }
+      recommendations = filteredRecommendations;
+    }
+  }
+
+  const selectedTreatments = [
+    ...recommendations.primary,
+    ...recommendations.complementary,
+    ...recommendations.maintenance,
+  ];
+  const selectedTreatmentIds = new Set(selectedTreatments.map((treatment) => treatment.id));
+  const selectedTreatmentNames = selectedTreatments.map((treatment) =>
+    normalizeSearchText(treatment.treatmentName),
+  );
+
+  const sequencing = hasServiceFilters
+    ? plan.sequencing
+      .map((sequenceItem) => ({
+        ...sequenceItem,
+        treatments: sequenceItem.treatments.filter((treatment) =>
+          selectedTreatmentIds.has(treatment.treatmentId),
+        ),
+      }))
+      .filter((sequenceItem) => sequenceItem.treatments.length > 0)
+    : plan.sequencing;
+
+  const filteredAftercare = hasServiceFilters
+    ? plan.aftercarePreview.filter((aftercareItem) =>
+      selectedTreatmentIds.has(aftercareItem.treatmentId),
+    )
+    : plan.aftercarePreview;
+  const aftercarePreview = preferences.includeProductRecommendations
+    ? filteredAftercare
+    : filteredAftercare.map((aftercareItem) => ({
+      ...aftercareItem,
+      productsRecommended: [],
+    }));
+
+  const packages = hasServiceFilters
+    ? plan.packages.map((pkg) => {
+      const filteredLineItems = pkg.lineItems.filter((lineItem) => {
+        const serviceText = normalizeSearchText(lineItem.service);
+        if (!serviceText) return false;
+
+        if (matchesTokens(serviceText, excludeTokens)) return false;
+
+        const matchesSelectedTreatment = selectedTreatmentNames.some(
+          (name) => name && (serviceText.includes(name) || name.includes(serviceText)),
+        );
+
+        if (includeTokens.length > 0) {
+          return matchesTokens(serviceText, includeTokens) || matchesSelectedTreatment;
+        }
+        return matchesSelectedTreatment;
+      });
+
+      if (filteredLineItems.length === 0 || filteredLineItems.length === pkg.lineItems.length) {
+        return pkg;
+      }
+
+      return recalculatePackage({
+        ...pkg,
+        lineItems: filteredLineItems,
+      });
+    })
+    : plan.packages;
+
+  return {
+    ...plan,
+    recommendations,
+    sequencing: sequencing.length > 0 ? sequencing : plan.sequencing,
+    packages,
+    aftercarePreview,
+  };
+}
+
 // ── MAIN GENERATOR ──
 
 export function generateMastermindPlan(

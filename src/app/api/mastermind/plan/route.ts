@@ -8,7 +8,7 @@
 
 import { NextRequest } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { generateMastermindPlan } from '@/lib/mastermind/plan-generator';
+import { generateMastermindPlan, applyPlanPreferencesToPlan } from '@/lib/mastermind/plan-generator';
 import { generateAIPlan } from '@/lib/mastermind/ai-plan-generator';
 import { mockMastermindPlan } from '@/lib/mastermind/mock-data';
 import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
@@ -86,6 +86,8 @@ export async function POST(request: NextRequest) {
         plan = generateMastermindPlan(scanResult, intakeData);
         source = 'engine';
       }
+
+      plan = applyPlanPreferencesToPlan(plan, intakeData);
 
       // Save plan back to session if we loaded one
       if (session) {

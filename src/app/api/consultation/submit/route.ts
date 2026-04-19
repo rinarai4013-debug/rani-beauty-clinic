@@ -340,6 +340,12 @@ function coerceLegacySubmitPayload(rawPayload: unknown): Record<string, unknown>
   payload.phone = normalizePhone(payload.phone);
   payload.dob = normalizeDob(payload.dob);
   payload.skinConcerns = normalizeSkinConcerns(payload);
+  const normalizedTargetAreas = coerceStringArray(payload.targetAreas);
+  payload.targetAreas = normalizedTargetAreas.length > 0 ? normalizedTargetAreas : undefined;
+  const normalizedTreatmentInterests = coerceStringArray(payload.treatmentInterests);
+  payload.treatmentInterests = normalizedTreatmentInterests.length > 0
+    ? normalizedTreatmentInterests
+    : undefined;
   payload.goals = normalizeGoals(payload);
   payload.budget = normalizeBudget(payload.budget);
   payload.timeline = normalizeTimeline(payload);
@@ -711,7 +717,11 @@ export async function POST(request: NextRequest) {
         await scanPromise;
       }
 
-      const medicalOffers = buildMedicalOffers(intakeData);
+      const includeMedicalOffers =
+        (intakeData as Record<string, unknown>).includeMedicalOffers !== false;
+      const medicalOffers = includeMedicalOffers
+        ? buildMedicalOffers(intakeData)
+        : null;
 
       return NextResponse.json({
         success: true,
