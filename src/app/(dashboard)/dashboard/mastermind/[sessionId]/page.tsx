@@ -331,6 +331,34 @@ export default function MastermindSessionPage() {
     session?.phase === 'generating_plan' ||
     session?.phase === 'simulating';
   const loadingMsg = session ? LOADING_MESSAGES[session.phase] : null;
+  const medicalOffers = session?.medicalOffers ?? null;
+  const selectedMedicalOffers = medicalOffers?.recommendedProducts.filter(
+    (product) => product.selected !== false,
+  ) ?? [];
+
+  const handleToggleMedicalOffer = useCallback(
+    async (productId: string) => {
+      if (!medicalOffers) return;
+
+      const nextProducts = medicalOffers.recommendedProducts.map((product) =>
+        product.id === productId
+          ? { ...product, selected: product.selected === false }
+          : product,
+      );
+
+      const nextOffers = {
+        ...medicalOffers,
+        recommendedProducts: nextProducts,
+        recommendationCount: nextProducts.length,
+      };
+
+      await dispatch({
+        type: 'SET_MEDICAL_OFFERS',
+        offers: nextOffers,
+      });
+    },
+    [dispatch, medicalOffers],
+  );
 
   const timeSinceCreation = useMemo(() => {
     if (!session) return '';
@@ -1030,6 +1058,45 @@ export default function MastermindSessionPage() {
                   </div>
                 )}
 
+                {/* BoomRx Offer Snapshot */}
+                {medicalOffers?.recommendedProducts?.length ? (
+                  <div className="col-span-2">
+                    <p className="font-body text-xs text-white/30 mb-1.5">BoomRx Recommendations</p>
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className="px-2 py-0.5 rounded-full font-body text-xs text-[#C9A96E]"
+                          style={{ background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.2)' }}
+                        >
+                          Track: {medicalOffers.requestedTrack}
+                        </span>
+                        <span className="font-body text-xs text-white/45">
+                          {selectedMedicalOffers.length}/{medicalOffers.recommendedProducts.length} selected
+                        </span>
+                        <span className="font-body text-xs text-emerald-300">
+                          ${medicalOffers.projectedMonthlyGrossProfit.toLocaleString()} projected gross profit
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {medicalOffers.recommendedProducts.slice(0, 5).map((offer) => (
+                          <span
+                            key={offer.id}
+                            className="px-2 py-0.5 rounded-full font-body text-xs"
+                            style={{
+                              background: offer.selected === false ? 'rgba(255,255,255,0.04)' : 'rgba(16,185,129,0.16)',
+                              border: offer.selected === false ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(16,185,129,0.35)',
+                              color: offer.selected === false ? 'rgba(255,255,255,0.5)' : 'rgb(110,231,183)',
+                              textDecoration: offer.selected === false ? 'line-through' : 'none',
+                            }}
+                          >
+                            {offer.product}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
                 {/* Skincare Routine */}
                 {(intake?.skincareAM || intake?.skincarePM) && (
                   <div className="col-span-2">
@@ -1375,6 +1442,83 @@ export default function MastermindSessionPage() {
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
               />
             </div>
+
+            {/* BoomRx Offer Curation */}
+            {medicalOffers?.recommendedProducts?.length ? (
+              <div>
+                <h3 className="font-body text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+                  BoomRx Offer Curation
+                </h3>
+                <div
+                  className="rounded-xl p-3 space-y-3"
+                  style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}
+                >
+                  <p className="font-body text-[11px] text-white/60">
+                    AI preselected products for <span className="text-[#C9A96E]">{medicalOffers.requestedTrack}</span>. Toggle any item off before provider handoff.
+                  </p>
+                  <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                    {medicalOffers.recommendedProducts.map((product) => (
+                      <label
+                        key={product.id}
+                        className="flex items-start gap-2 rounded-lg px-2 py-1.5 cursor-pointer"
+                        style={{
+                          background: product.selected === false ? 'rgba(255,255,255,0.03)' : 'rgba(16,185,129,0.08)',
+                          border: product.selected === false ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(16,185,129,0.25)',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={product.selected !== false}
+                          onChange={() => void handleToggleMedicalOffer(product.id)}
+                          className="mt-0.5 accent-[#C9A96E]"
+                        />
+                        <div className="min-w-0">
+                          <p
+                            className="font-body text-xs font-medium"
+                            style={{
+                              color: product.selected === false ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.9)',
+                              textDecoration: product.selected === false ? 'line-through' : 'none',
+                            }}
+                          >
+                            {product.label}
+                          </p>
+                          <p className="font-body text-[10px] text-white/45">
+                            ${product.suggestedRetail.toFixed(2)} retail · {product.suggestedMarginPercent.toFixed(1)}% margin
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-body text-[11px] text-white/55">
+                      Projected monthly gross profit: <span className="text-emerald-300">${medicalOffers.projectedMonthlyGrossProfit.toLocaleString()}</span>
+                    </p>
+                    <div className="flex gap-2">
+                      <a
+                        href={medicalOffers.checkoutPaths.clinic}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg font-body text-[11px] font-medium text-white/80 hover:text-white transition-colors"
+                        style={{ background: 'rgba(15,29,44,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+                      >
+                        Clinic
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <a
+                        href={medicalOffers.checkoutPaths.home}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg font-body text-[11px] font-medium text-white/80 hover:text-white transition-colors"
+                        style={{ background: 'rgba(15,29,44,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+                      >
+                        Home
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             {/* Quick Actions */}
             <div className="space-y-2">
@@ -2081,4 +2225,3 @@ function generateCopilotClosing(session: NonNullable<ReturnType<typeof useMaster
 
   return techniques;
 }
-

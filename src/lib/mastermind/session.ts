@@ -51,6 +51,13 @@ export function sessionReducer(
         patientEmail: (action.data.email as string) || state.patientEmail,
       };
 
+    case 'SET_MEDICAL_OFFERS':
+      return {
+        ...state,
+        updatedAt: now,
+        medicalOffers: action.offers,
+      };
+
     case 'SET_SOURCE_PHOTO':
       return { ...state, updatedAt: now, sourcePhotoUrl: action.url };
 
@@ -235,6 +242,7 @@ export function createSession(
     intakeData: null,
     patientName: '',
     patientEmail: '',
+    medicalOffers: null,
     sourcePhotoUrl: null,
     auraScanResult: null,
     mastermindPlan: null,
@@ -331,6 +339,7 @@ function hydrateSession(parsed: Record<string, unknown>): MastermindSession {
     intakeData: parsed.intakeData as MastermindSession['intakeData'] ?? null,
     patientName: typeof parsed.patientName === 'string' ? parsed.patientName : '',
     patientEmail: typeof parsed.patientEmail === 'string' ? parsed.patientEmail : '',
+    medicalOffers: parsed.medicalOffers as MastermindSession['medicalOffers'] ?? null,
     sourcePhotoUrl: typeof parsed.sourcePhotoUrl === 'string' ? parsed.sourcePhotoUrl : null,
     auraScanResult: parsed.auraScanResult as MastermindSession['auraScanResult'] ?? null,
     mastermindPlan: parsed.mastermindPlan as MastermindSession['mastermindPlan'] ?? null,
@@ -496,4 +505,3 @@ function generateSessionId(): string {
   const random = Math.random().toString(36).slice(2, 8);
   return `ms_${timestamp}_${random}`;
 }
-

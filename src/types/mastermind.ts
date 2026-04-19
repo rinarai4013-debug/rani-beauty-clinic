@@ -307,6 +307,35 @@ export interface ProtocolPacketMeta {
   packetVersion: number;
 }
 
+// ── MEDICAL OFFERS ──
+
+export interface MedicalOfferProduct {
+  id: string;
+  product: string;
+  label: string;
+  category: string;
+  score: number;
+  monthlyCostEstimate: number;
+  suggestedRetail: number;
+  suggestedGrossProfit: number;
+  suggestedMarginPercent: number;
+  rationale: string[];
+  selected?: boolean;
+}
+
+export interface MedicalOffersPayload {
+  providerReviewRequired: true;
+  checkoutPaths: { clinic: string; home: string };
+  requestedTrack: string;
+  normalizedSymptoms: string[];
+  recommendationCount: number;
+  projectedMonthlyRetail: number;
+  projectedMonthlyCOGS: number;
+  projectedMonthlyGrossProfit: number;
+  averageMarginPercent: number;
+  recommendedProducts: MedicalOfferProduct[];
+}
+
 // ── MASTERMIND SESSION ──
 
 export type MastermindPhase =
@@ -332,6 +361,7 @@ export interface MastermindSession {
   intakeData: Partial<ConsultationFormData> | null;
   patientName: string;
   patientEmail: string;
+  medicalOffers: MedicalOffersPayload | null;
 
   // Phase 1b: Source Photo (for simulation)
   sourcePhotoUrl: string | null; // base64 data URL or persistent URL
@@ -367,6 +397,7 @@ export interface MastermindSession {
 
 export type MastermindSessionAction =
   | { type: 'SET_INTAKE'; data: Partial<ConsultationFormData> }
+  | { type: 'SET_MEDICAL_OFFERS'; offers: MedicalOffersPayload | null }
   | { type: 'SET_SOURCE_PHOTO'; url: string }
   | { type: 'SET_PHASE'; phase: MastermindPhase }
   | { type: 'SET_SCAN_RESULT'; result: AuraScanResult }
@@ -383,5 +414,4 @@ export type MastermindSessionAction =
   | { type: 'SET_CLINIC_NOTES'; notes: string; actor?: string }
   | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string }
   | { type: 'SET_PROTOCOL_PACKET'; packetUrl: string; generatedAt: string; generatorActor: string; packetVersion: number };
-
 
