@@ -105,13 +105,13 @@ const nextConfig = {
     const csp = [
       "default-src 'self'",
       // Next.js hydration + analytics inline scripts require 'unsafe-inline'
-      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://booking.mangomint.com https://connect.facebook.net",
+      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://booking.mangomint.com https://connect.facebook.net",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       // Allow all HTTPS images (Airtable CDN, GA, Meta, etc.)
       "img-src 'self' data: blob: https:",
       // Restrict fetch/XHR to known API endpoints
-      "connect-src 'self' https://api.airtable.com https://www.google-analytics.com https://stats.g.doubleclick.net https://www.clarity.ms https://connect.facebook.net https://www.facebook.com https://booking.mangomint.com https://*.ingest.us.sentry.io",
+      "connect-src 'self' https://api.airtable.com https://www.google-analytics.com https://stats.g.doubleclick.net https://connect.facebook.net https://www.facebook.com https://booking.mangomint.com https://*.ingest.us.sentry.io",
       // Mangomint overlay + GTM noscript iframe
       "frame-src 'self' https://www.googletagmanager.com https://booking.mangomint.com https://app.mangomint.com",
       // Block framing of this site (redundant with X-Frame-Options but belt+suspenders)

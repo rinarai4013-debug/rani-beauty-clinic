@@ -12,7 +12,13 @@ import { createSession, saveSessionAsync, sessionReducer } from '@/lib/mastermin
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
-import { submitIntakeSchema } from '@/lib/consultation/schema';
+import {
+  BUDGET_OPTIONS,
+  SKIN_CONCERN_OPTIONS,
+  SKIN_TYPES,
+  TIMELINE_OPTIONS,
+  submitIntakeSchema,
+} from '@/lib/consultation/schema';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import {
@@ -157,6 +163,248 @@ function toMoney(value: number): number {
   return Number(value.toFixed(2));
 }
 
+const ALLOWED_SKIN_CONCERNS = new Set<string>(SKIN_CONCERN_OPTIONS as readonly string[]);
+const ALLOWED_SKIN_TYPES = new Set<string>(SKIN_TYPES as readonly string[]);
+const ALLOWED_TIMELINES = new Set<string>(TIMELINE_OPTIONS as readonly string[]);
+const ALLOWED_BUDGETS = new Set<string>(BUDGET_OPTIONS as readonly string[]);
+
+const LEGACY_CONCERN_MAP: Record<string, string[]> = {
+  acne: ['acne'],
+  'acne-scars': ['acne', 'dull-skin'],
+  hyperpigmentation: ['hyperpigmentation'],
+  'fine-lines': ['aging-skin'],
+  texture: ['dull-skin', 'large-pores'],
+  laxity: ['skin-laxity'],
+  dryness: ['dull-skin'],
+  'hair-removal': ['unwanted-hair'],
+  scars: ['dull-skin'],
+  undereye: ['aging-skin', 'hyperpigmentation'],
+  rosacea: ['sun-damage'],
+  'large-pores': ['large-pores'],
+};
+
+const LEGACY_BUDGET_MAP: Record<string, ConsultationFormData['budget']> = {
+  'under-500': 'starter',
+  '500-1500': 'moderate',
+  '1500-3000': 'premium',
+  '3000-5000': 'investment',
+  '5000-plus': 'investment',
+};
+
+const LEGACY_SKIN_TYPE_MAP: Record<string, ConsultationFormData['skinType']> = {
+  normal: 'normal',
+  dry: 'dry',
+  oily: 'oily',
+  oil: 'oily',
+  combination: 'combination',
+  combo: 'combination',
+  sensitive: 'sensitive',
+};
+
+function coerceString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function coerceStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : ''))
+      .filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+    if (trimmed.includes(',')) {
+      return trimmed
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+    return [trimmed];
+  }
+  return [];
+}
+
+function normalizePhone(value: unknown): string | undefined {
+  const raw = coerceString(value);
+  if (!raw) return undefined;
+  const digits = raw.replace(/\D/g, '');
+
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits.startsWith('1')) {
+    const local = digits.slice(1);
+    return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
+  }
+
+  return undefined;
+}
+
+function normalizeDob(value: unknown): string | undefined {
+  const raw = coerceString(value);
+  if (!raw) return undefined;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  const now = new Date();
+  let age = now.getFullYear() - parsed.getFullYear();
+  const monthDelta = now.getMonth() - parsed.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && now.getDate() < parsed.getDate())) {
+    age -= 1;
+  }
+  return age >= 18 ? raw : undefined;
+}
+
+function normalizeSkinConcerns(payload: Record<string, unknown>): string[] | undefined {
+  const rawConcerns = [
+    ...coerceStringArray(payload.skinConcerns),
+    ...coerceStringArray(payload.concerns),
+  ];
+  if (rawConcerns.length === 0) return undefined;
+
+  const normalized = new Set<string>();
+  for (const concern of rawConcerns) {
+    const key = concern.toLowerCase();
+    const mapped = LEGACY_CONCERN_MAP[key] ?? [key];
+    for (const mappedValue of mapped) {
+      if (ALLOWED_SKIN_CONCERNS.has(mappedValue)) {
+        normalized.add(mappedValue);
+      }
+    }
+  }
+
+  return normalized.size > 0 ? Array.from(normalized) : undefined;
+}
+
+function normalizeBudget(value: unknown): ConsultationFormData['budget'] | undefined {
+  const raw = coerceString(value);
+  if (!raw) return undefined;
+  const key = raw.toLowerCase();
+
+  if (ALLOWED_BUDGETS.has(key)) return key as ConsultationFormData['budget'];
+  return LEGACY_BUDGET_MAP[key];
+}
+
+function normalizeTimeline(payload: Record<string, unknown>): ConsultationFormData['timeline'] | undefined {
+  const explicitTimeline = coerceString(payload.timeline)?.toLowerCase();
+  if (explicitTimeline) {
+    if (ALLOWED_TIMELINES.has(explicitTimeline)) return explicitTimeline as ConsultationFormData['timeline'];
+    if (explicitTimeline.includes('event')) return 'event';
+    if (explicitTimeline.includes('soon') || explicitTimeline.includes('asap') || explicitTimeline.includes('urgent')) {
+      return 'asap';
+    }
+    if (explicitTimeline.includes('maint')) return 'ongoing';
+    if (explicitTimeline.includes('gradual')) return 'gradual';
+  }
+
+  const hasUpcomingEvent =
+    payload.hasUpcomingEvent === true ||
+    coerceString(payload.hasUpcomingEvent)?.toLowerCase() === 'yes';
+  return hasUpcomingEvent ? 'event' : undefined;
+}
+
+function normalizeGoals(payload: Record<string, unknown>): string | undefined {
+  const rawGoals = payload.goals;
+  if (typeof rawGoals === 'string') {
+    const trimmed = rawGoals.trim();
+    return trimmed || undefined;
+  }
+  const asArray = coerceStringArray(rawGoals);
+  if (asArray.length > 0) return asArray.join(', ').slice(0, 2000);
+
+  const concernFallback = coerceStringArray(payload.concerns);
+  if (concernFallback.length > 0) {
+    return concernFallback.join(', ').slice(0, 2000);
+  }
+  return undefined;
+}
+
+function normalizeSkinType(value: unknown): ConsultationFormData['skinType'] | undefined {
+  const raw = coerceString(value)?.toLowerCase();
+  if (!raw) return undefined;
+  if (ALLOWED_SKIN_TYPES.has(raw)) return raw as ConsultationFormData['skinType'];
+  return LEGACY_SKIN_TYPE_MAP[raw];
+}
+
+function coerceLegacySubmitPayload(rawPayload: unknown): Record<string, unknown> {
+  if (!rawPayload || typeof rawPayload !== 'object') return {};
+
+  const payload = { ...(rawPayload as Record<string, unknown>) };
+
+  payload.firstName = coerceString(payload.firstName);
+  payload.lastName = coerceString(payload.lastName);
+  payload.email = coerceString(payload.email)?.toLowerCase();
+  payload.phone = normalizePhone(payload.phone);
+  payload.dob = normalizeDob(payload.dob);
+  payload.skinConcerns = normalizeSkinConcerns(payload);
+  payload.goals = normalizeGoals(payload);
+  payload.budget = normalizeBudget(payload.budget);
+  payload.timeline = normalizeTimeline(payload);
+  payload.skinType = normalizeSkinType(payload.skinType);
+
+  return payload;
+}
+
+async function parseMultipartIntakePayload(formData: FormData): Promise<unknown> {
+  const parseCandidate = async (value: FormDataEntryValue | null): Promise<unknown | null> => {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) return null;
+      try {
+        return JSON.parse(trimmed);
+      } catch {
+        return null;
+      }
+    }
+    if (value instanceof File) {
+      const text = (await value.text()).trim();
+      if (!text) return null;
+      try {
+        return JSON.parse(text);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const dataLikeFields: Array<FormDataEntryValue | null> = [
+    formData.get('data'),
+    formData.get('payload'),
+    formData.get('intake'),
+  ];
+
+  for (const candidate of dataLikeFields) {
+    const parsed = await parseCandidate(candidate);
+    if (parsed && typeof parsed === 'object') {
+      return parsed;
+    }
+  }
+
+  const fallback: Record<string, unknown> = {};
+  for (const [key, value] of formData.entries()) {
+    if (key === 'photos') continue;
+    if (typeof value !== 'string') continue;
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+    if (key in fallback) {
+      const current = fallback[key];
+      if (Array.isArray(current)) {
+        current.push(trimmed);
+      } else {
+        fallback[key] = [current, trimmed];
+      }
+    } else {
+      fallback[key] = trimmed;
+    }
+  }
+
+  return fallback;
+}
+
 function inferRequestedTrack(intakeData: Partial<ConsultationFormData>): RequestedTrack {
   const interests = Array.isArray(intakeData.treatmentInterests)
     ? intakeData.treatmentInterests.join(' ').toLowerCase()
@@ -297,26 +545,17 @@ export async function POST(request: NextRequest) {
 
       const formData = await request.formData();
 
-      const dataField = formData.get('data');
-      if (!dataField || typeof dataField !== 'string') {
+      let intakeData: Partial<ConsultationFormData>;
+      const rawIntakeJson = await parseMultipartIntakePayload(formData);
+      if (!rawIntakeJson || typeof rawIntakeJson !== 'object') {
         return NextResponse.json(
           { success: false, error: 'Missing form data' },
           { status: 400 }
         );
       }
 
-      let intakeData: Partial<ConsultationFormData>;
-      let rawIntakeJson: unknown;
-      try {
-        rawIntakeJson = JSON.parse(dataField);
-      } catch {
-        return NextResponse.json(
-          { success: false, error: 'Invalid form data JSON' },
-          { status: 400 }
-        );
-      }
-
-      const parsed = submitIntakeSchema.safeParse(rawIntakeJson);
+      const normalizedIntakeCandidate = coerceLegacySubmitPayload(rawIntakeJson);
+      const parsed = submitIntakeSchema.safeParse(normalizedIntakeCandidate);
       if (!parsed.success) {
         return NextResponse.json(
           {

@@ -115,7 +115,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://booking.mangomint.com" />
         {/* DNS-prefetch for analytics origins (loaded afterInteractive, not blocking) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <Analytics />
         {/* Mangomint booking scripts are loaded via Analytics component */}
