@@ -51,6 +51,13 @@ export function sessionReducer(
         patientEmail: (action.data.email as string) || state.patientEmail,
       };
 
+    case 'SET_MEDICAL_OFFERS':
+      return {
+        ...state,
+        updatedAt: now,
+        medicalOffers: action.offers,
+      };
+
     case 'SET_SOURCE_PHOTO':
       return { ...state, updatedAt: now, sourcePhotoUrl: action.url };
 
@@ -235,6 +242,7 @@ export function createSession(
     intakeData: null,
     patientName: '',
     patientEmail: '',
+    medicalOffers: null,
     sourcePhotoUrl: null,
     auraScanResult: null,
     mastermindPlan: null,
@@ -253,6 +261,7 @@ export function createSession(
 // In-memory Map used as read cache within a single invocation.
 
 const sessions = new Map<string, MastermindSession>();
+const AIRTABLE_READ_RETRY_DELAYS_MS = [120, 280, 520];
 
 /**
  * Get session by ID.
@@ -292,16 +301,24 @@ export async function getSessionByIdAsync(id: string): Promise<MastermindSession
 
   // Server-side: try Airtable
   if (typeof window === 'undefined') {
-    try {
-      const { getSessionFromAirtable } = await import('./session-store');
-      const atSession = await getSessionFromAirtable(id);
-      if (atSession) {
-        const hydrated = hydrateSession(atSession as unknown as Record<string, unknown>);
-        sessions.set(id, hydrated);
-        return hydrated;
+    const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+    for (let index = 0; index <= AIRTABLE_READ_RETRY_DELAYS_MS.length; index += 1) {
+      try {
+        const { getSessionFromAirtable } = await import('./session-store');
+        const atSession = await getSessionFromAirtable(id);
+        if (atSession) {
+          const hydrated = hydrateSession(atSession as unknown as Record<string, unknown>);
+          sessions.set(id, hydrated);
+          return hydrated;
+        }
+      } catch (err) {
+        console.warn('[Session] Airtable read failed:', err);
       }
-    } catch (err) {
-      console.warn('[Session] Airtable read failed:', err);
+
+      const delay = AIRTABLE_READ_RETRY_DELAYS_MS[index];
+      if (delay) {
+        await sleep(delay);
+      }
     }
   }
 
@@ -322,6 +339,7 @@ function hydrateSession(parsed: Record<string, unknown>): MastermindSession {
     intakeData: parsed.intakeData as MastermindSession['intakeData'] ?? null,
     patientName: typeof parsed.patientName === 'string' ? parsed.patientName : '',
     patientEmail: typeof parsed.patientEmail === 'string' ? parsed.patientEmail : '',
+    medicalOffers: parsed.medicalOffers as MastermindSession['medicalOffers'] ?? null,
     sourcePhotoUrl: typeof parsed.sourcePhotoUrl === 'string' ? parsed.sourcePhotoUrl : null,
     auraScanResult: parsed.auraScanResult as MastermindSession['auraScanResult'] ?? null,
     mastermindPlan: parsed.mastermindPlan as MastermindSession['mastermindPlan'] ?? null,
@@ -487,5 +505,3 @@ function generateSessionId(): string {
   const random = Math.random().toString(36).slice(2, 8);
   return `ms_${timestamp}_${random}`;
 }
-
-

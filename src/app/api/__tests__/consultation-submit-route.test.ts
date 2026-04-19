@@ -41,11 +41,15 @@ vi.mock('@/lib/security/public-intent-guard', () => ({
   normalizeEmailForLimit: (...args: unknown[]) => normalizeEmailForLimitMock(...args),
 }));
 
-vi.mock('@/lib/consultation/schema', () => ({
-  submitIntakeSchema: {
-    safeParse: (...args: unknown[]) => safeParseMock(...args),
-  },
-}));
+vi.mock('@/lib/consultation/schema', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/consultation/schema')>();
+  return {
+    ...actual,
+    submitIntakeSchema: {
+      safeParse: (...args: unknown[]) => safeParseMock(...args),
+    },
+  };
+});
 
 vi.mock('@/lib/mastermind/session', () => ({
   createSession: (...args: unknown[]) => createSessionMock(...args),
@@ -164,5 +168,36 @@ describe('POST /api/consultation/submit', () => {
     expect(body.medicalOffers?.recommendedProducts?.length ?? 0).toBeGreaterThan(0);
     expect(body.medicalOffers?.projectedMonthlyGrossProfit ?? 0).toBeGreaterThan(0);
     expect(intakeCreateMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('accepts legacy aura PDF multipart uploads without failing submission', async () => {
+    const formData = new FormData();
+    formData.set(
+      'data',
+      JSON.stringify({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+        phone: '425-555-0100',
+      }),
+    );
+    formData.append(
+      'aura',
+      new File([Buffer.from('%PDF-1.7 mock')], 'skin-scan.pdf', { type: 'application/pdf' }),
+    );
+
+    const { POST } = await import('@/app/api/consultation/submit/route');
+    const request = new Request('http://localhost:3000/api/consultation/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const response = await POST(request as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.hasPhoto).toBe(false);
+    expect(body.auraUploadStatus).toContain('Aura PDF received');
   });
 });

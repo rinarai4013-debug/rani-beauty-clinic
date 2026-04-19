@@ -71,7 +71,7 @@ export const clinicInfo = {
     ga4: "G-4YXJ90MXGG",
     gtm: "GTM-MPS3MPNG",
     metaPixel: "769852657929598",
-    clarity: "vnjnfo8pn5",
-    // hotjar removed — Clarity provides equivalent session replay + heatmaps
+    clarity: "",
+    // session replay disabled per privacy preference
   },
 };

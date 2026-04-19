@@ -142,6 +142,29 @@ const BUDGET_OPTIONS = [
   { value: '5000-plus', label: '$5,000+' },
 ];
 
+const CONCERN_TO_SCHEMA_CONCERNS: Record<string, string[]> = {
+  acne: ['acne'],
+  'acne-scars': ['acne', 'dull-skin'],
+  hyperpigmentation: ['hyperpigmentation'],
+  'fine-lines': ['aging-skin'],
+  texture: ['dull-skin', 'large-pores'],
+  laxity: ['skin-laxity'],
+  dryness: ['dull-skin'],
+  'hair-removal': ['unwanted-hair'],
+  scars: ['dull-skin'],
+  undereye: ['aging-skin', 'hyperpigmentation'],
+  rosacea: ['sun-damage'],
+  'large-pores': ['large-pores'],
+};
+
+const BUDGET_TO_SCHEMA_BUDGET: Record<string, 'starter' | 'moderate' | 'premium' | 'investment'> = {
+  'under-500': 'starter',
+  '500-1500': 'moderate',
+  '1500-3000': 'premium',
+  '3000-5000': 'investment',
+  '5000-plus': 'investment',
+};
+
 // ══════════════════════════════════════════════════════════════
 // STEP DEFINITIONS
 // ══════════════════════════════════════════════════════════════
@@ -154,6 +177,12 @@ const STEPS = [
   { number: 5, label: 'Photos', icon: ImageIcon },
 ];
 
+const MAX_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_DATA_URL_BYTES = 900_000;
+const AURA_QUALITY_STEPS = [0.82, 0.74, 0.66, 0.58, 0.5];
+const AURA_SCALE_STEPS = [1, 0.88, 0.76, 0.64, 0.52];
+const SESSION_READY_RETRY_DELAYS_MS = [300, 600, 1000, 1500, 2200, 3200, 4500, 6000];
+
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
@@ -162,6 +191,282 @@ function calculateAge(dob: string): number | null {
   if (!dob) return null;
   const age = Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000);
   return age >= 0 && age < 150 ? age : null;
+}
+
+function normalizeConcernSelections(rawConcerns: string[]): string[] {
+  const normalized = new Set<string>();
+  for (const concern of rawConcerns) {
+    const mapped = CONCERN_TO_SCHEMA_CONCERNS[concern] ?? [];
+    for (const value of mapped) normalized.add(value);
+  }
+  return Array.from(normalized);
+}
+
+function normalizePhoneForSubmit(rawPhone: string): string | undefined {
+  const trimmed = rawPhone.trim();
+  if (!trimmed) return undefined;
+
+  const digits = trimmed.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits.startsWith('1')) {
+    const local = digits.slice(1);
+    return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
+  }
+
+  return undefined;
+}
+
+function normalizeDobForSubmit(rawDob: string): string | undefined {
+  if (!rawDob) return undefined;
+  const parsed = new Date(rawDob);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  const now = new Date();
+  let age = now.getFullYear() - parsed.getFullYear();
+  const monthDelta = now.getMonth() - parsed.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && now.getDate() < parsed.getDate())) {
+    age -= 1;
+  }
+
+  return age >= 18 ? rawDob : undefined;
+}
+
+function estimateDataUrlBytes(dataUrl: string): number {
+  const comma = dataUrl.indexOf(',');
+  const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+  return Math.ceil((base64.length * 3) / 4);
+}
+
+function toOptimizedDataUrl(sourceCanvas: HTMLCanvasElement): string {
+  for (const scale of AURA_SCALE_STEPS) {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(sourceCanvas.width * scale));
+    canvas.height = Math.max(1, Math.round(sourceCanvas.height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) continue;
+
+    context.drawImage(sourceCanvas, 0, 0, canvas.width, canvas.height);
+    for (const quality of AURA_QUALITY_STEPS) {
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      if (estimateDataUrlBytes(dataUrl) <= MAX_AURA_DATA_URL_BYTES) {
+        return dataUrl;
+      }
+    }
+  }
+
+  return sourceCanvas.toDataURL('image/jpeg', 0.45);
+}
+
+async function parseJsonResponse(response: Response): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+  } catch {
+    // non-JSON response body
+  }
+
+  return { json: null, text };
+}
+
+function normalizeSubmissionError(message: string): string {
+  const normalized = message.trim();
+  if (!normalized) return 'Submission failed. Please try again.';
+
+  if (
+    /request entity too large|payload too large|body exceeded|unexpected token.*request en/i.test(
+      normalized
+    )
+  ) {
+    return 'Your upload is too large. Please use fewer or smaller files, then retry.';
+  }
+
+  if (
+    /unexpected token.*internal s|internal server error|unexpected token.*not valid json|not valid json/i.test(
+      normalized
+    )
+  ) {
+    return 'The server returned an invalid response. Please retry in a moment.';
+  }
+
+  if (/invalid form data payload|invalid consultation payload|invalid form data json/i.test(normalized)) {
+    return 'Some form fields were formatted unexpectedly. Please retry; we adjusted the submission format.';
+  }
+
+  return normalized;
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string
+): string {
+  const payload = parsed.json;
+  const payloadError =
+    payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+  const payloadMessage =
+    payload && typeof payload.message === 'string' ? payload.message.trim() : '';
+
+  if (payloadError) return normalizeSubmissionError(payloadError);
+  if (payloadMessage) return normalizeSubmissionError(payloadMessage);
+
+  if (response.status === 413) {
+    return 'Your upload is too large. Please use fewer or smaller files, then retry.';
+  }
+  if (response.status >= 500) {
+    return 'Server is temporarily unavailable. Please try again shortly.';
+  }
+
+  if (parsed.text) return normalizeSubmissionError(parsed.text.slice(0, 220));
+  return normalizeSubmissionError(fallback);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function waitForSessionReady(sessionId: string): Promise<void> {
+  let lastMessage = 'Session is still initializing. Please retry.';
+
+  for (let index = 0; index < SESSION_READY_RETRY_DELAYS_MS.length; index += 1) {
+    const response = await fetch(`/api/mastermind/sessions/${sessionId}`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (response.ok) return;
+
+    const parsed = await parseJsonResponse(response);
+    lastMessage = getApiErrorMessage(response, parsed, lastMessage);
+    const retryable =
+      response.status === 404 || /session not found|session is still initializing/i.test(lastMessage);
+
+    if (!retryable || index === SESSION_READY_RETRY_DELAYS_MS.length - 1) {
+      throw new Error(lastMessage);
+    }
+    await sleep(SESSION_READY_RETRY_DELAYS_MS[index]);
+  }
+
+  throw new Error(lastMessage);
+}
+
+async function loadPdfJs() {
+  const win = window as unknown as { pdfjsLib?: any };
+  if (win.pdfjsLib) return win.pdfjsLib;
+
+  const PDFJS_VERSION = '3.11.174';
+  const CDN_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.min.js`;
+  const WORKER_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.js`;
+
+  await new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${CDN_URL}"]`);
+    if (existing) {
+      let attempts = 0;
+      const check = window.setInterval(() => {
+        attempts += 1;
+        if (win.pdfjsLib) {
+          clearInterval(check);
+          resolve();
+          return;
+        }
+        if (attempts > 50) {
+          clearInterval(check);
+          reject(new Error('PDF.js load timeout'));
+        }
+      }, 100);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = CDN_URL;
+    script.onload = () => {
+      let attempts = 0;
+      const check = window.setInterval(() => {
+        attempts += 1;
+        if (win.pdfjsLib) {
+          clearInterval(check);
+          resolve();
+          return;
+        }
+        if (attempts > 30) {
+          clearInterval(check);
+          reject(new Error('PDF.js init timeout'));
+        }
+      }, 100);
+    };
+    script.onerror = () => reject(new Error('Failed to load PDF renderer'));
+    document.head.appendChild(script);
+  });
+
+  if (!win.pdfjsLib) throw new Error('PDF renderer unavailable');
+  win.pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_URL;
+  return win.pdfjsLib;
+}
+
+async function auraFileToDataUrl(file: File): Promise<string> {
+  const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+
+  if (isPdf) {
+    const pdfjsLib = await loadPdfJs();
+    const buffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1.35 });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Unable to process PDF upload.');
+    await page.render({ canvasContext: context, viewport }).promise;
+
+    const dataUrl = toOptimizedDataUrl(canvas);
+    if (estimateDataUrlBytes(dataUrl) > MAX_AURA_DATA_URL_BYTES) {
+      throw new Error('Aura PDF is still too large after processing. Export page 1 only and retry.');
+    }
+    return dataUrl;
+  }
+
+  return new Promise<string>((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const MAX = 1200;
+      let width = image.width;
+      let height = image.height;
+      if (width > MAX) {
+        height = Math.round((height * MAX) / width);
+        width = MAX;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d');
+      if (!context) {
+        reject(new Error('Unable to process image upload.'));
+        return;
+      }
+      context.drawImage(image, 0, 0, width, height);
+
+      const dataUrl = toOptimizedDataUrl(canvas);
+      if (estimateDataUrlBytes(dataUrl) > MAX_AURA_DATA_URL_BYTES) {
+        reject(new Error('Aura image is too large after processing. Please use a smaller file.'));
+        return;
+      }
+      resolve(dataUrl);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Failed to load image upload.'));
+    };
+    image.src = objectUrl;
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -670,16 +975,29 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
     try {
       const goalMap: Record<string, string> = {
-        'fine-lines': 'anti-aging',
-        'hyperpigmentation': 'pigment-correction',
-        'dryness': 'brightening',
-        'acne': 'acne-treatment',
-        'laxity': 'skin-tightening',
-        'acne-scars': 'scar-treatment',
-        'scars': 'scar-treatment',
-        'undereye': 'undereye-treatment',
-        'rosacea': 'redness-reduction',
+        'fine-lines': 'reduce fine lines and build collagen',
+        'hyperpigmentation': 'improve pigmentation and even skin tone',
+        'dryness': 'improve hydration and skin barrier strength',
+        'acne': 'clear active breakouts and reduce inflammation',
+        'laxity': 'tighten skin and improve firmness',
+        'acne-scars': 'soften acne scarring and refine texture',
+        'scars': 'improve scar appearance and smoothness',
+        'undereye': 'brighten and refresh the under-eye area',
+        'rosacea': 'reduce redness and sensitivity',
+        'texture': 'smooth texture and refine pore appearance',
+        'hair-removal': 'reduce unwanted hair growth',
+        'large-pores': 'minimize pore visibility',
       };
+
+      const normalizedSkinConcerns = normalizeConcernSelections(concerns);
+      const normalizedPhone = normalizePhoneForSubmit(phone);
+      const normalizedDob = normalizeDobForSubmit(dob);
+      const normalizedBudget = BUDGET_TO_SCHEMA_BUDGET[budget[0] || ''];
+      const normalizedTimeline = hasEvent === 'yes' ? 'event' : undefined;
+      const goalsText = concerns
+        .map((concern) => goalMap[concern] || concern)
+        .filter((value) => value.trim().length > 0)
+        .join(', ');
 
       const formData = new FormData();
 
@@ -688,18 +1006,19 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          dob: dob || undefined,
+          dob: normalizedDob,
           email: email.trim() || undefined,
-          phone: phone.trim() || undefined,
+          phone: normalizedPhone,
           age: calculatedAge ?? undefined,
           contactPreference: contactPref[0] || undefined,
           referralSource: referralSource[0] || undefined,
 
-          skinConcerns: concerns,
+          skinConcerns: normalizedSkinConcerns.length > 0 ? normalizedSkinConcerns : undefined,
           targetAreas,
           treatmentInterests,
           concerns,
-          goals: concerns.map((c) => goalMap[c] || c),
+          goals: goalsText || undefined,
+          timeline: normalizedTimeline,
 
           hasUpcomingEvent: hasEvent === 'yes',
           eventDetails: hasEvent === 'yes' ? `${eventType} - ${eventDate}` : undefined,
@@ -729,7 +1048,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           preferredDays: preferredDays.length > 0 ? preferredDays : undefined,
           preferredTime: preferredTime[0] || undefined,
 
-          budget: budget[0] || undefined,
+          budget: normalizedBudget,
 
           clinicalNotes: clinicalNotes.trim() || undefined,
         })
@@ -738,22 +1057,90 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       for (const file of skinPhotos) {
         formData.append('photos', file);
       }
-      for (const file of auraPhotos) {
-        formData.append('aura', file);
+
+      const totalSubmitBytes = skinPhotos.reduce((sum, file) => sum + file.size, 0);
+      if (totalSubmitBytes > MAX_SUBMIT_UPLOAD_BYTES) {
+        throw new Error('Uploaded photos are too large. Keep total upload under 4 MB and retry.');
       }
 
       const res = await fetch('/api/consultation/submit', {
         method: 'POST',
         body: formData,
       });
+      const parsedSubmit = await parseJsonResponse(res);
+      if (!res.ok) {
+        throw new Error(
+          getApiErrorMessage(res, parsedSubmit, 'Submission failed. Please retry.')
+        );
+      }
+      if (!parsedSubmit.json) {
+        throw new Error('Server returned an invalid response. Please retry.');
+      }
 
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'Submission failed');
+      const submitPayload = parsedSubmit.json as {
+        success?: boolean;
+        error?: string;
+        message?: string;
+        sessionId?: string;
+        data?: { sessionId?: string };
+      };
+
+      if (!submitPayload.success) {
+        throw new Error(
+          normalizeSubmissionError(
+            (typeof submitPayload.error === 'string' && submitPayload.error) ||
+              (typeof submitPayload.message === 'string' && submitPayload.message) ||
+              'Submission failed'
+          )
+        );
+      }
 
       // Clear saved draft on successful submit
       try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
 
-      const sessionId = json.data.sessionId;
+      const sessionId =
+        submitPayload.data?.sessionId ||
+        (typeof submitPayload.sessionId === 'string' ? submitPayload.sessionId : '');
+      if (!sessionId) {
+        throw new Error('Submission succeeded but no session ID was returned. Please retry.');
+      }
+
+      // Newly created sessions can take a brief moment to become readable
+      // across API invocations. Gate follow-up calls on session readiness.
+      await waitForSessionReady(sessionId);
+
+      // Aura scans are processed outside the multipart submit payload to avoid
+      // body-size limits that can return non-JSON proxy errors.
+      if (auraPhotos.length > 0) {
+        try {
+          const auraDataUrl = await auraFileToDataUrl(auraPhotos[0]);
+          const saveRes = await fetch(`/api/mastermind/sessions/${sessionId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: { type: 'SET_SOURCE_PHOTO', url: auraDataUrl } }),
+          });
+          const parsedSave = await parseJsonResponse(saveRes);
+          if (!saveRes.ok) {
+            throw new Error(
+              getApiErrorMessage(saveRes, parsedSave, 'Failed to attach Aura scan photo.')
+            );
+          }
+
+          const scanRes = await fetch('/api/mastermind/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId }),
+          });
+          const parsedScan = await parseJsonResponse(scanRes);
+          if (!scanRes.ok) {
+            throw new Error(
+              getApiErrorMessage(scanRes, parsedScan, 'Aura scan processing failed.')
+            );
+          }
+        } catch (auraError) {
+          console.warn('[NewConsultationModal] Aura upload post-processing failed:', auraError);
+        }
+      }
 
       await fetch('/api/mastermind/plan', {
         method: 'POST',
@@ -769,7 +1156,11 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
       onCreated(sessionId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError(
+        err instanceof Error
+          ? normalizeSubmissionError(err.message)
+          : 'Something went wrong'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -1238,6 +1629,12 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         maxFiles={3}
         icon={Upload}
       />
+
+      <div className="rounded-xl bg-white/5 border border-[#C9A96E]/20 p-4">
+        <p className="text-[11px] text-[#F8F6F1]/65" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          AI will generate the complete treatment plan first. You can then add or remove services in the Treatment Plan tab during provider review.
+        </p>
+      </div>
 
       {/* Quick Summary */}
       <div>

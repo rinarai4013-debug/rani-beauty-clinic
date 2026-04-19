@@ -521,6 +521,7 @@ export function mockMastermindSession(overrides?: Partial<MastermindSession>): M
     },
     patientName: 'Sarah Johnson',
     patientEmail: 'sarah.j@example.com',
+    medicalOffers: null,
     sourcePhotoUrl: null,
     auraScanResult: mockAuraScanResult(),
     mastermindPlan: null,

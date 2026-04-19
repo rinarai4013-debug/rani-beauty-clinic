@@ -57,6 +57,104 @@ interface AuraImportPanelProps {
   onImportComplete?: (result: ImportResult) => void;
 }
 
+const MAX_UPLOAD_DATA_URL_BYTES = 900_000;
+const QUALITY_STEPS = [0.82, 0.74, 0.66, 0.58, 0.5];
+const SCALE_STEPS = [1, 0.88, 0.76, 0.64, 0.52];
+
+function estimateDataUrlBytes(dataUrl: string): number {
+  const comma = dataUrl.indexOf(',');
+  const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+  return Math.ceil((base64.length * 3) / 4);
+}
+
+async function parseJsonResponse(
+  response: Response
+): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+    return { json: null, text };
+  } catch {
+    return { json: null, text };
+  }
+}
+
+function normalizeImportErrorMessage(message: string): string {
+  const normalized = message.trim();
+  if (!normalized) return 'Import failed. Please try again.';
+
+  if (
+    /request entity too large|payload too large|body exceeded|unexpected token.*request en/i.test(
+      normalized
+    )
+  ) {
+    return 'The upload is too large. Please crop to face only or use a smaller image/PDF.';
+  }
+
+  if (
+    /unexpected token.*internal s|internal server error|unexpected token.*not valid json|not valid json/i.test(
+      normalized
+    )
+  ) {
+    return 'The scanner service returned an invalid response. Please try again in a few moments.';
+  }
+
+  return normalized;
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string
+): string {
+  const payload = parsed.json;
+  const payloadError =
+    payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+  const payloadMessage =
+    payload && typeof payload.message === 'string' ? payload.message.trim() : '';
+
+  if (payloadError) return normalizeImportErrorMessage(payloadError);
+  if (payloadMessage) return normalizeImportErrorMessage(payloadMessage);
+
+  if (response.status === 413) {
+    return 'The upload is too large. Please crop to face only or use a smaller image/PDF.';
+  }
+  if (response.status >= 500) {
+    return 'Server is temporarily unavailable. Please try again shortly.';
+  }
+
+  if (parsed.text) {
+    return normalizeImportErrorMessage(parsed.text.slice(0, 220));
+  }
+
+  return normalizeImportErrorMessage(fallback);
+}
+
+function toOptimizedDataUrl(sourceCanvas: HTMLCanvasElement): string {
+  for (const scale of SCALE_STEPS) {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(sourceCanvas.width * scale));
+    canvas.height = Math.max(1, Math.round(sourceCanvas.height * scale));
+    const ctx = canvas.getContext('2d');
+    if (!ctx) continue;
+    ctx.drawImage(sourceCanvas, 0, 0, canvas.width, canvas.height);
+
+    for (const quality of QUALITY_STEPS) {
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      if (estimateDataUrlBytes(dataUrl) <= MAX_UPLOAD_DATA_URL_BYTES) {
+        return dataUrl;
+      }
+    }
+  }
+
+  return sourceCanvas.toDataURL('image/jpeg', 0.45);
+}
+
 // ── COMPONENT ──
 
 export default function AuraImportPanel({ session, onImportComplete }: AuraImportPanelProps) {
@@ -129,7 +227,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       console.log('[AuraImport] PDF loaded into buffer, rendering first page...');
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 2.0 });
+      const viewport = page.getViewport({ scale: 1.35 });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
       canvas.height = viewport.height;
@@ -138,8 +236,12 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       await page.render({ canvasContext: ctx, viewport }).promise;
       console.log('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
 
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      console.log('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
+      const dataUrl = toOptimizedDataUrl(canvas);
+      const estimatedBytes = estimateDataUrlBytes(dataUrl);
+      if (estimatedBytes > MAX_UPLOAD_DATA_URL_BYTES) {
+        throw new Error('Processed PDF is still too large. Please export page 1 only or use a smaller file.');
+      }
+      console.log('[AuraImport] Converted to JPEG:', `${Math.round(estimatedBytes / 1024)}KB`);
       return dataUrl;
     }
 
@@ -157,7 +259,13 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         const ctx = canvas.getContext('2d');
         if (!ctx) { reject(new Error('Canvas context unavailable')); return; }
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.85));
+        const dataUrl = toOptimizedDataUrl(canvas);
+        const estimatedBytes = estimateDataUrlBytes(dataUrl);
+        if (estimatedBytes > MAX_UPLOAD_DATA_URL_BYTES) {
+          reject(new Error('Processed image is too large. Please use a smaller file.'));
+          return;
+        }
+        resolve(dataUrl);
       };
       img.onerror = () => reject(new Error('Failed to load image'));
       img.src = URL.createObjectURL(file);
@@ -184,20 +292,41 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: { type: 'SET_SOURCE_PHOTO', url: dataUrl } }),
         });
-        if (!saveRes.ok) throw new Error('Failed to save photo to session');
+        if (!saveRes.ok) {
+          const parsedSave = await parseJsonResponse(saveRes);
+          throw new Error(
+            getApiErrorMessage(
+              saveRes,
+              parsedSave,
+              'Failed to save uploaded photo to session.'
+            )
+          );
+        }
 
         // Step 3: Run the AI scan with the uploaded photo
         console.log('[AuraImport] Running AI scan...');
         const scanRes = await fetch('/api/mastermind/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: session.id, sourcePhotoUrl: dataUrl }),
+          // Session already contains sourcePhotoUrl from step 2.
+          // Sending only sessionId keeps request payload tiny and avoids 413s.
+          body: JSON.stringify({ sessionId: session.id }),
         });
+        const parsedScan = await parseJsonResponse(scanRes);
         if (!scanRes.ok) {
-          const errText = await scanRes.text().catch(() => '');
-          throw new Error(`AI scan failed (${scanRes.status}): ${errText.slice(0, 200)}`);
+          throw new Error(
+            getApiErrorMessage(
+              scanRes,
+              parsedScan,
+              `AI scan failed (${scanRes.status}).`
+            )
+          );
         }
-        const scanJson = await scanRes.json();
+
+        const scanJson = parsedScan.json;
+        if (!scanJson) {
+          throw new Error('AI scan returned an invalid response. Please try again.');
+        }
         console.log('[AuraImport] AI scan complete:', scanJson.success);
 
         // Step 4: Auto-trigger simulation so projections populate
@@ -222,11 +351,20 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
             session: { id: session.id, phase: 'scan_complete', updatedAt: new Date().toISOString() },
           });
         } else {
-          setImportError(scanJson.error || 'AI scan failed after photo upload');
+          const scanError =
+            typeof scanJson.error === 'string' && scanJson.error.trim()
+              ? scanJson.error
+              : 'AI scan failed after photo upload';
+          setImportError(normalizeImportErrorMessage(scanError));
         }
       } catch (err) {
         console.error('File upload scan failed:', err);
-        setImportError(err instanceof Error ? err.message : 'Failed to upload and analyze. Please try again.');
+        const fallback = 'Failed to upload and analyze. Please try again.';
+        setImportError(
+          err instanceof Error
+            ? normalizeImportErrorMessage(err.message) || fallback
+            : fallback
+        );
       } finally {
         setFileUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -263,11 +401,21 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
     setScanError(null);
     try {
       const res = await fetch('/api/mastermind/aura-import');
-      const json = await res.json();
-      if (json.success) {
-        setAvailableScans(json.data || []);
+      const parsed = await parseJsonResponse(res);
+      if (!res.ok) {
+        setScanError(getApiErrorMessage(res, parsed, 'Failed to list Aura scans.'));
+        return;
+      }
+
+      const json = parsed.json;
+      if (json?.success) {
+        setAvailableScans((json.data as AvailableScan[]) || []);
       } else {
-        setScanError(json.error || 'Failed to list scans');
+        setScanError(
+          normalizeImportErrorMessage(
+            (typeof json?.error === 'string' && json.error) || 'Failed to list scans'
+          )
+        );
       }
     } catch (err) {
       setScanError('Could not connect to Aura scanner');
@@ -294,14 +442,21 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           }),
         });
 
-        const json = await res.json();
+        const parsed = await parseJsonResponse(res);
+        if (!res.ok) {
+          setImportError(getApiErrorMessage(res, parsed, 'Import failed.'));
+          return;
+        }
 
-        if (json.success) {
-          setImportResult(json.data);
+        const json = parsed.json;
+
+        if (json?.success) {
+          setImportResult(json.data as ImportResult);
 
           // Store imported images from the session's source photo
           // The API stores images in the scan result; the front is the sourcePhotoUrl
-          const imageKeys = json.data.scan.imageKeys as string[];
+          const data = json.data as ImportResult;
+          const imageKeys = data.scan.imageKeys as string[];
           const images: ImportedScanImages = {};
 
           // The images are stored in the session — we need to fetch the session
@@ -312,9 +467,13 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           }
 
           setImportedImages(images);
-          onImportComplete?.(json.data);
+          onImportComplete?.(data);
         } else {
-          setImportError(json.error || 'Import failed');
+          setImportError(
+            normalizeImportErrorMessage(
+              (typeof json?.error === 'string' && json.error) || 'Import failed'
+            )
+          );
         }
       } catch (err) {
         setImportError('Import request failed — check server logs');
@@ -340,13 +499,23 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         }),
       });
 
-      const json = await res.json();
+      const parsed = await parseJsonResponse(res);
+      if (!res.ok) {
+        setImportError(getApiErrorMessage(res, parsed, 'Import failed.'));
+        return;
+      }
 
-      if (json.success) {
-        setImportResult(json.data);
-        onImportComplete?.(json.data);
+      const json = parsed.json;
+
+      if (json?.success) {
+        setImportResult(json.data as ImportResult);
+        onImportComplete?.(json.data as ImportResult);
       } else {
-        setImportError(json.error || 'Import failed');
+        setImportError(
+          normalizeImportErrorMessage(
+            (typeof json?.error === 'string' && json.error) || 'Import failed'
+          )
+        );
       }
     } catch (err) {
       setImportError('Import request failed');

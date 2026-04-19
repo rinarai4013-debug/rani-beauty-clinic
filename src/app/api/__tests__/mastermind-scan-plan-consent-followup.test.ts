@@ -13,6 +13,7 @@ const findLatestScanMock = vi.fn();
 const runAIAuraScanWithDeviceMock = vi.fn();
 const mockAuraScanResultMock = vi.fn();
 const generateMastermindPlanMock = vi.fn();
+const applyPlanPreferencesToPlanMock = vi.fn();
 const generateAIPlanMock = vi.fn();
 const mockMastermindPlanMock = vi.fn();
 const renderTemplateMock = vi.fn();
@@ -59,6 +60,7 @@ vi.mock('@/lib/mastermind/mock-data', () => ({
 
 vi.mock('@/lib/mastermind/plan-generator', () => ({
   generateMastermindPlan: (...args: unknown[]) => generateMastermindPlanMock(...args),
+  applyPlanPreferencesToPlan: (...args: unknown[]) => applyPlanPreferencesToPlanMock(...args),
 }));
 
 vi.mock('@/lib/mastermind/ai-plan-generator', () => ({
@@ -144,6 +146,7 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
       packages: [{ name: 'Transform', price: 2900 }],
       recommendations: { primary: [] },
     });
+    applyPlanPreferencesToPlanMock.mockImplementation((plan: unknown) => plan);
     generateAIPlanMock.mockResolvedValue({
       packages: [{ name: 'AI Transform', price: 3100 }],
       recommendations: { primary: [] },
@@ -356,6 +359,7 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     expect(response.status).toBe(200);
     expect(body.meta.source).toBe('engine');
     expect(generateMastermindPlanMock).toHaveBeenCalledTimes(1);
+    expect(applyPlanPreferencesToPlanMock).toHaveBeenCalledTimes(1);
   });
 
   it('POST /api/mastermind/plan uses mock mode when USE_MOCK_AI=true', async () => {
@@ -571,4 +575,3 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     );
   });
 });
-

@@ -112,6 +112,8 @@ function applyOptimisticUpdate(
       return { ...session, selectedPackageTier: action.tier, updatedAt: new Date().toISOString() };
     case 'SET_SOURCE_PHOTO':
       return { ...session, sourcePhotoUrl: action.url, updatedAt: new Date().toISOString() };
+    case 'SET_MEDICAL_OFFERS':
+      return { ...session, medicalOffers: action.offers, updatedAt: new Date().toISOString() };
     case 'SET_CLINIC_STATUS':
       return { ...session, clinicStatus: action.status, updatedAt: new Date().toISOString() };
     case 'SET_CLINIC_NOTES':

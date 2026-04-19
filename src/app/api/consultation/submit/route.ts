@@ -12,7 +12,13 @@ import { createSession, saveSessionAsync, sessionReducer } from '@/lib/mastermin
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
-import { submitIntakeSchema } from '@/lib/consultation/schema';
+import {
+  BUDGET_OPTIONS,
+  SKIN_CONCERN_OPTIONS,
+  SKIN_TYPES,
+  TIMELINE_OPTIONS,
+  submitIntakeSchema,
+} from '@/lib/consultation/schema';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import { getClientIP, rateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import {
@@ -21,6 +27,17 @@ import {
   normalizeEmailForLimit,
 } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
+import type { MedicalOfferProduct, MedicalOffersPayload } from '@/types/mastermind';
+import {
+  BOOMRX_FORMULARY_ITEMS,
+  type BoomRxCategory,
+  type BoomRxFormularyItem,
+} from '@/lib/medical/boomrx-formulary';
+import {
+  recommendBoomRxBySymptoms,
+  type SymptomMatchedRecommendation,
+  type SymptomRecommendationBundle,
+} from '@/lib/medical/symptom-product-matrix';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB each
@@ -29,132 +46,260 @@ const MAX_TOTAL_PHOTO_SIZE = 30 * 1024 * 1024; // 30MB total
 const MAX_JSON_REQUEST_BYTES = 512 * 1024;
 const MAX_MULTIPART_REQUEST_BYTES = 35 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const BOOMRX_RECOMMENDATION_LIMIT = 8;
 
 type RequestedTrack = 'glp1' | 'hormones' | 'peptides' | 'hybrid';
-type MedicalOfferCategory = 'glp1' | 'hormones' | 'peptides' | 'wellness';
-
-type MedicalOfferProduct = {
-  id: string;
-  product: string;
-  label: string;
-  category: MedicalOfferCategory;
-  score: number;
-  monthlyCostEstimate: number;
-  suggestedRetail: number;
-  suggestedGrossProfit: number;
-  suggestedMarginPercent: number;
-  rationale: string[];
-};
-
-type MedicalOffersPayload = {
-  providerReviewRequired: true;
-  checkoutPaths: { clinic: string; home: string };
-  requestedTrack: RequestedTrack;
-  normalizedSymptoms: string[];
-  recommendationCount: number;
-  projectedMonthlyRetail: number;
-  projectedMonthlyCOGS: number;
-  projectedMonthlyGrossProfit: number;
-  averageMarginPercent: number;
-  recommendedProducts: MedicalOfferProduct[];
-};
-
-type BaseOfferProduct = {
-  id: string;
-  product: string;
-  label: string;
-  category: MedicalOfferCategory;
-  defaultTrack: RequestedTrack;
-  monthlyCostEstimate: number;
-  suggestedRetail: number;
-  keywords: string[];
-};
-
-const BASE_MEDICAL_OFFER_PRODUCTS: BaseOfferProduct[] = [
-  {
-    id: 'glp1-semaglutide',
-    product: 'Semaglutide',
-    label: 'Semaglutide Weekly Program',
-    category: 'glp1',
-    defaultTrack: 'glp1',
-    monthlyCostEstimate: 220,
-    suggestedRetail: 549,
-    keywords: ['weight', 'appetite', 'glp', 'metabolic', 'fatigue'],
-  },
-  {
-    id: 'glp1-tirzepatide',
-    product: 'Tirzepatide',
-    label: 'Tirzepatide Advanced Program',
-    category: 'glp1',
-    defaultTrack: 'glp1',
-    monthlyCostEstimate: 300,
-    suggestedRetail: 749,
-    keywords: ['weight', 'insulin', 'glp', 'metabolic', 'resistance'],
-  },
-  {
-    id: 'hormone-trt',
-    product: 'TRT Protocol',
-    label: 'Hormone Optimization (TRT)',
-    category: 'hormones',
-    defaultTrack: 'hormones',
-    monthlyCostEstimate: 180,
-    suggestedRetail: 499,
-    keywords: ['hormone', 'trt', 'energy', 'muscle', 'libido'],
-  },
-  {
-    id: 'hormone-thyroid',
-    product: 'Thyroid Support',
-    label: 'Thyroid + Hormone Balance Program',
-    category: 'hormones',
-    defaultTrack: 'hormones',
-    monthlyCostEstimate: 150,
-    suggestedRetail: 429,
-    keywords: ['thyroid', 'fatigue', 'hormone', 'weight', 'hair'],
-  },
-  {
-    id: 'peptide-bpc157',
-    product: 'BPC-157',
-    label: 'BPC-157 Recovery Program',
-    category: 'peptides',
-    defaultTrack: 'peptides',
-    monthlyCostEstimate: 130,
-    suggestedRetail: 349,
-    keywords: ['recovery', 'inflammation', 'joint', 'injury', 'healing'],
-  },
-  {
-    id: 'peptide-cjc-ipamorelin',
-    product: 'CJC-1295 + Ipamorelin',
-    label: 'CJC-1295 / Ipamorelin Performance Stack',
-    category: 'peptides',
-    defaultTrack: 'peptides',
-    monthlyCostEstimate: 240,
-    suggestedRetail: 599,
-    keywords: ['sleep', 'performance', 'longevity', 'muscle', 'recomposition'],
-  },
-  {
-    id: 'wellness-nad',
-    product: 'NAD+',
-    label: 'NAD+ Cellular Energy Program',
-    category: 'wellness',
-    defaultTrack: 'hybrid',
-    monthlyCostEstimate: 180,
-    suggestedRetail: 429,
-    keywords: ['energy', 'wellness', 'brain', 'focus', 'fatigue'],
-  },
-  {
-    id: 'wellness-glutathione',
-    product: 'Glutathione',
-    label: 'Glutathione Antioxidant Program',
-    category: 'wellness',
-    defaultTrack: 'hybrid',
-    monthlyCostEstimate: 80,
-    suggestedRetail: 229,
-    keywords: ['detox', 'skin', 'glow', 'pigmentation', 'wellness'],
-  },
-];
 
 function toMoney(value: number): number {
   return Number(value.toFixed(2));
+}
+
+const ALLOWED_SKIN_CONCERNS = new Set<string>(SKIN_CONCERN_OPTIONS as readonly string[]);
+const ALLOWED_SKIN_TYPES = new Set<string>(SKIN_TYPES as readonly string[]);
+const ALLOWED_TIMELINES = new Set<string>(TIMELINE_OPTIONS as readonly string[]);
+const ALLOWED_BUDGETS = new Set<string>(BUDGET_OPTIONS as readonly string[]);
+
+const LEGACY_CONCERN_MAP: Record<string, string[]> = {
+  acne: ['acne'],
+  'acne-scars': ['acne', 'dull-skin'],
+  hyperpigmentation: ['hyperpigmentation'],
+  'fine-lines': ['aging-skin'],
+  texture: ['dull-skin', 'large-pores'],
+  laxity: ['skin-laxity'],
+  dryness: ['dull-skin'],
+  'hair-removal': ['unwanted-hair'],
+  scars: ['dull-skin'],
+  undereye: ['aging-skin', 'hyperpigmentation'],
+  rosacea: ['sun-damage'],
+  'large-pores': ['large-pores'],
+};
+
+const LEGACY_BUDGET_MAP: Record<string, ConsultationFormData['budget']> = {
+  'under-500': 'starter',
+  '500-1500': 'moderate',
+  '1500-3000': 'premium',
+  '3000-5000': 'investment',
+  '5000-plus': 'investment',
+};
+
+const LEGACY_SKIN_TYPE_MAP: Record<string, ConsultationFormData['skinType']> = {
+  normal: 'normal',
+  dry: 'dry',
+  oily: 'oily',
+  oil: 'oily',
+  combination: 'combination',
+  combo: 'combination',
+  sensitive: 'sensitive',
+};
+
+function coerceString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function coerceStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : ''))
+      .filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+    if (trimmed.includes(',')) {
+      return trimmed
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+    return [trimmed];
+  }
+  return [];
+}
+
+function normalizePhone(value: unknown): string | undefined {
+  const raw = coerceString(value);
+  if (!raw) return undefined;
+  const digits = raw.replace(/\D/g, '');
+
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits.startsWith('1')) {
+    const local = digits.slice(1);
+    return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
+  }
+
+  return undefined;
+}
+
+function normalizeDob(value: unknown): string | undefined {
+  const raw = coerceString(value);
+  if (!raw) return undefined;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  const now = new Date();
+  let age = now.getFullYear() - parsed.getFullYear();
+  const monthDelta = now.getMonth() - parsed.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && now.getDate() < parsed.getDate())) {
+    age -= 1;
+  }
+  return age >= 18 ? raw : undefined;
+}
+
+function normalizeSkinConcerns(payload: Record<string, unknown>): string[] | undefined {
+  const rawConcerns = [
+    ...coerceStringArray(payload.skinConcerns),
+    ...coerceStringArray(payload.concerns),
+  ];
+  if (rawConcerns.length === 0) return undefined;
+
+  const normalized = new Set<string>();
+  for (const concern of rawConcerns) {
+    const key = concern.toLowerCase();
+    const mapped = LEGACY_CONCERN_MAP[key] ?? [key];
+    for (const mappedValue of mapped) {
+      if (ALLOWED_SKIN_CONCERNS.has(mappedValue)) {
+        normalized.add(mappedValue);
+      }
+    }
+  }
+
+  return normalized.size > 0 ? Array.from(normalized) : undefined;
+}
+
+function normalizeBudget(value: unknown): ConsultationFormData['budget'] | undefined {
+  const raw = coerceString(value);
+  if (!raw) return undefined;
+  const key = raw.toLowerCase();
+
+  if (ALLOWED_BUDGETS.has(key)) return key as ConsultationFormData['budget'];
+  return LEGACY_BUDGET_MAP[key];
+}
+
+function normalizeTimeline(payload: Record<string, unknown>): ConsultationFormData['timeline'] | undefined {
+  const explicitTimeline = coerceString(payload.timeline)?.toLowerCase();
+  if (explicitTimeline) {
+    if (ALLOWED_TIMELINES.has(explicitTimeline)) return explicitTimeline as ConsultationFormData['timeline'];
+    if (explicitTimeline.includes('event')) return 'event';
+    if (explicitTimeline.includes('soon') || explicitTimeline.includes('asap') || explicitTimeline.includes('urgent')) {
+      return 'asap';
+    }
+    if (explicitTimeline.includes('maint')) return 'ongoing';
+    if (explicitTimeline.includes('gradual')) return 'gradual';
+  }
+
+  const hasUpcomingEvent =
+    payload.hasUpcomingEvent === true ||
+    coerceString(payload.hasUpcomingEvent)?.toLowerCase() === 'yes';
+  return hasUpcomingEvent ? 'event' : undefined;
+}
+
+function normalizeGoals(payload: Record<string, unknown>): string | undefined {
+  const rawGoals = payload.goals;
+  if (typeof rawGoals === 'string') {
+    const trimmed = rawGoals.trim();
+    return trimmed || undefined;
+  }
+  const asArray = coerceStringArray(rawGoals);
+  if (asArray.length > 0) return asArray.join(', ').slice(0, 2000);
+
+  const concernFallback = coerceStringArray(payload.concerns);
+  if (concernFallback.length > 0) {
+    return concernFallback.join(', ').slice(0, 2000);
+  }
+  return undefined;
+}
+
+function normalizeSkinType(value: unknown): ConsultationFormData['skinType'] | undefined {
+  const raw = coerceString(value)?.toLowerCase();
+  if (!raw) return undefined;
+  if (ALLOWED_SKIN_TYPES.has(raw)) return raw as ConsultationFormData['skinType'];
+  return LEGACY_SKIN_TYPE_MAP[raw];
+}
+
+function coerceLegacySubmitPayload(rawPayload: unknown): Record<string, unknown> {
+  if (!rawPayload || typeof rawPayload !== 'object') return {};
+
+  const payload = { ...(rawPayload as Record<string, unknown>) };
+
+  payload.firstName = coerceString(payload.firstName);
+  payload.lastName = coerceString(payload.lastName);
+  payload.email = coerceString(payload.email)?.toLowerCase();
+  payload.phone = normalizePhone(payload.phone);
+  payload.dob = normalizeDob(payload.dob);
+  payload.skinConcerns = normalizeSkinConcerns(payload);
+  const normalizedTargetAreas = coerceStringArray(payload.targetAreas);
+  payload.targetAreas = normalizedTargetAreas.length > 0 ? normalizedTargetAreas : undefined;
+  const normalizedTreatmentInterests = coerceStringArray(payload.treatmentInterests);
+  payload.treatmentInterests = normalizedTreatmentInterests.length > 0
+    ? normalizedTreatmentInterests
+    : undefined;
+  payload.goals = normalizeGoals(payload);
+  payload.budget = normalizeBudget(payload.budget);
+  payload.timeline = normalizeTimeline(payload);
+  payload.skinType = normalizeSkinType(payload.skinType);
+
+  return payload;
+}
+
+async function parseMultipartIntakePayload(formData: FormData): Promise<unknown> {
+  const parseCandidate = async (value: FormDataEntryValue | null): Promise<unknown | null> => {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) return null;
+      try {
+        return JSON.parse(trimmed);
+      } catch {
+        return null;
+      }
+    }
+    if (value instanceof File) {
+      const text = (await value.text()).trim();
+      if (!text) return null;
+      try {
+        return JSON.parse(text);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const dataLikeFields: Array<FormDataEntryValue | null> = [
+    formData.get('data'),
+    formData.get('payload'),
+    formData.get('intake'),
+  ];
+
+  for (const candidate of dataLikeFields) {
+    const parsed = await parseCandidate(candidate);
+    if (parsed && typeof parsed === 'object') {
+      return parsed;
+    }
+  }
+
+  const fallback: Record<string, unknown> = {};
+  for (const [key, value] of formData.entries()) {
+    if (key === 'photos') continue;
+    if (typeof value !== 'string') continue;
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+    if (key in fallback) {
+      const current = fallback[key];
+      if (Array.isArray(current)) {
+        current.push(trimmed);
+      } else {
+        fallback[key] = [current, trimmed];
+      }
+    } else {
+      fallback[key] = trimmed;
+    }
+  }
+
+  return fallback;
 }
 
 function inferRequestedTrack(intakeData: Partial<ConsultationFormData>): RequestedTrack {
@@ -196,65 +341,182 @@ function inferRequestedTrack(intakeData: Partial<ConsultationFormData>): Request
   return 'hybrid';
 }
 
-function buildMedicalOffers(intakeData: Partial<ConsultationFormData>): MedicalOffersPayload {
-  const requestedTrack = inferRequestedTrack(intakeData);
-  const symptomTerms = [
-    ...(Array.isArray(intakeData.skinConcerns) ? intakeData.skinConcerns : []),
-    ...(Array.isArray(intakeData.targetAreas) ? intakeData.targetAreas : []),
-  ]
-    .map((value) => String(value).trim().toLowerCase())
-    .filter(Boolean);
+function toStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean)
+    : [];
+}
 
-  const freeText = [
-    ...(Array.isArray(intakeData.treatmentInterests) ? intakeData.treatmentInterests : []),
-    typeof intakeData.goals === 'string' ? intakeData.goals : '',
-    typeof intakeData.treatmentHistory === 'string' ? intakeData.treatmentHistory : '',
-  ]
-    .join(' ')
-    .toLowerCase();
+function deriveConsultSymptoms(intakeData: Partial<ConsultationFormData>): string[] {
+  const concerns = toStringArray(intakeData.skinConcerns);
+  const areas = toStringArray(intakeData.targetAreas);
+  const interests = toStringArray(intakeData.treatmentInterests);
+  const goalTokens = typeof intakeData.goals === 'string'
+    ? intakeData.goals
+      .toLowerCase()
+      .split(/[^a-z0-9]+/g)
+      .filter((token) => token.length >= 3)
+    : [];
 
-  const ranked = BASE_MEDICAL_OFFER_PRODUCTS
-    .filter((item) => requestedTrack === 'hybrid' || item.defaultTrack === requestedTrack || item.defaultTrack === 'hybrid')
+  return Array.from(new Set([
+    ...concerns,
+    ...areas,
+    ...interests,
+    ...goalTokens,
+  ]));
+}
+
+function trackBoostCategories(requestedTrack: RequestedTrack): BoomRxCategory[] {
+  if (requestedTrack === 'glp1') return ['glp1', 'wellness'];
+  if (requestedTrack === 'hormones') return ['hormone', 'sexual-health', 'wellness'];
+  if (requestedTrack === 'peptides') return ['peptide', 'wellness'];
+  return ['glp1', 'hormone', 'peptide', 'sexual-health', 'wellness', 'hair-skin'];
+}
+
+function buildFallbackBoomRxBundle(input: {
+  symptoms: string[];
+  requestedTrack: RequestedTrack;
+}): SymptomRecommendationBundle {
+  const normalizedSymptoms = input.symptoms.map((symptom) => symptom.toLowerCase());
+  const boostedCategories = new Set(trackBoostCategories(input.requestedTrack));
+
+  const recommendations = BOOMRX_FORMULARY_ITEMS
+    .filter((item): item is BoomRxFormularyItem => Boolean(item))
     .map((item) => {
-      const keywordHits = item.keywords.filter((keyword) => freeText.includes(keyword));
-      const symptomHits = symptomTerms.filter((symptom) => item.label.toLowerCase().includes(symptom));
-      const score = (item.defaultTrack === requestedTrack ? 4 : 2) + keywordHits.length + symptomHits.length;
-      const suggestedGrossProfit = toMoney(item.suggestedRetail - item.monthlyCostEstimate);
-      const suggestedMarginPercent =
-        item.suggestedRetail > 0 ? toMoney((suggestedGrossProfit / item.suggestedRetail) * 100) : 0;
-      const rationale = [
-        item.defaultTrack === requestedTrack ? 'track-match' : 'cross-track',
-        ...keywordHits.map((hit) => `keyword:${hit}`),
-        ...symptomHits.map((hit) => `symptom:${hit}`),
-      ].slice(0, 4);
-
-      const product: MedicalOfferProduct = {
-        id: item.id,
-        product: item.product,
-        label: item.label,
-        category: item.category,
-        score,
-        monthlyCostEstimate: toMoney(item.monthlyCostEstimate),
-        suggestedRetail: toMoney(item.suggestedRetail),
-        suggestedGrossProfit,
-        suggestedMarginPercent,
-        rationale,
+      const trackScore = boostedCategories.has(item.category) ? 3 : 1;
+      const keywordHits = item.keywords.filter((keyword) =>
+        normalizedSymptoms.some((symptom) => symptom.includes(keyword) || keyword.includes(symptom)),
+      );
+      return {
+        item,
+        score: trackScore + keywordHits.length,
+        rationale: keywordHits.length > 0
+          ? ['catalog-fallback', ...keywordHits.slice(0, 3).map((hit) => `keyword:${hit}`)]
+          : ['catalog-fallback'],
       };
-      return product;
     })
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
-      return b.suggestedGrossProfit - a.suggestedGrossProfit;
+      return b.item.suggestedGrossProfit - a.item.suggestedGrossProfit;
     })
-    .slice(0, 4);
+    .slice(0, BOOMRX_RECOMMENDATION_LIMIT);
 
-  const projectedMonthlyRetail = toMoney(ranked.reduce((sum, offer) => sum + offer.suggestedRetail, 0));
-  const projectedMonthlyCOGS = toMoney(ranked.reduce((sum, offer) => sum + offer.monthlyCostEstimate, 0));
+  const projectedMonthlyRetail = toMoney(
+    recommendations.reduce((sum, entry) => sum + toMoney(entry.item.suggestedRetail), 0),
+  );
+  const projectedMonthlyCOGS = toMoney(
+    recommendations.reduce((sum, entry) => sum + toMoney(entry.item.monthlyCostEstimate), 0),
+  );
   const projectedMonthlyGrossProfit = toMoney(projectedMonthlyRetail - projectedMonthlyCOGS);
   const averageMarginPercent =
-    ranked.length > 0
-      ? toMoney(ranked.reduce((sum, offer) => sum + offer.suggestedMarginPercent, 0) / ranked.length)
+    recommendations.length > 0
+      ? toMoney(
+        recommendations.reduce((sum, entry) => sum + toMoney(entry.item.suggestedMarginPercent), 0)
+          / recommendations.length,
+      )
       : 0;
+
+  return {
+    normalizedSymptoms,
+    recommendations,
+    projectedMonthlyRetail,
+    projectedMonthlyCOGS,
+    projectedMonthlyGrossProfit,
+    averageMarginPercent,
+  };
+}
+
+function normalizeBoomRxBundle(bundle: SymptomRecommendationBundle): SymptomRecommendationBundle {
+  const recommendations = bundle.recommendations
+    .filter((entry): entry is SymptomMatchedRecommendation => Boolean(entry?.item))
+    .slice(0, BOOMRX_RECOMMENDATION_LIMIT)
+    .map((entry) => ({
+      ...entry,
+      item: {
+        ...entry.item,
+        monthlyCostEstimate: toMoney(entry.item.monthlyCostEstimate),
+        suggestedRetail: toMoney(entry.item.suggestedRetail),
+        suggestedGrossProfit: toMoney(entry.item.suggestedGrossProfit),
+        suggestedMarginPercent: toMoney(entry.item.suggestedMarginPercent),
+      },
+    }));
+
+  const projectedMonthlyRetail = toMoney(
+    recommendations.reduce((sum, entry) => sum + entry.item.suggestedRetail, 0),
+  );
+  const projectedMonthlyCOGS = toMoney(
+    recommendations.reduce((sum, entry) => sum + entry.item.monthlyCostEstimate, 0),
+  );
+
+  return {
+    normalizedSymptoms: toStringArray(bundle.normalizedSymptoms),
+    recommendations,
+    projectedMonthlyRetail,
+    projectedMonthlyCOGS,
+    projectedMonthlyGrossProfit: toMoney(projectedMonthlyRetail - projectedMonthlyCOGS),
+    averageMarginPercent:
+      recommendations.length > 0
+        ? toMoney(
+          recommendations.reduce((sum, entry) => sum + entry.item.suggestedMarginPercent, 0)
+            / recommendations.length,
+        )
+        : 0,
+  };
+}
+
+function buildBoomRxBundle(input: {
+  symptoms: string[];
+  goals?: string[];
+  requestedTrack: RequestedTrack;
+}): SymptomRecommendationBundle {
+  const normalizedSymptoms = input.symptoms.map((symptom) => symptom.toLowerCase());
+
+  try {
+    const bundle = recommendBoomRxBySymptoms({
+      symptoms: normalizedSymptoms,
+      goals: input.goals,
+      requestedTrack: input.requestedTrack,
+      limit: BOOMRX_RECOMMENDATION_LIMIT,
+    });
+    const normalizedBundle = normalizeBoomRxBundle(bundle);
+    if (normalizedBundle.recommendations.length === 0) {
+      throw new Error('BoomRx engine returned zero recommendations');
+    }
+    return normalizedBundle;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn('[Consultation Submit] BoomRx recommender failed, using fallback:', reason);
+    return buildFallbackBoomRxBundle({
+      symptoms: normalizedSymptoms,
+      requestedTrack: input.requestedTrack,
+    });
+  }
+}
+
+function buildMedicalOffers(intakeData: Partial<ConsultationFormData>): MedicalOffersPayload {
+  const requestedTrack = inferRequestedTrack(intakeData);
+  const symptomTerms = deriveConsultSymptoms(intakeData);
+  const boomRxBundle = buildBoomRxBundle({
+    symptoms: symptomTerms,
+    goals: typeof intakeData.goals === 'string' && intakeData.goals.trim()
+      ? [intakeData.goals]
+      : [],
+    requestedTrack,
+  });
+
+  const ranked: MedicalOfferProduct[] = boomRxBundle.recommendations.map((entry) => ({
+    id: entry.item.id,
+    product: entry.item.baseProduct,
+    label: entry.item.label,
+    category: entry.item.category,
+    score: entry.score,
+    monthlyCostEstimate: toMoney(entry.item.monthlyCostEstimate),
+    suggestedRetail: toMoney(entry.item.suggestedRetail),
+    suggestedGrossProfit: toMoney(entry.item.suggestedGrossProfit),
+    suggestedMarginPercent: toMoney(entry.item.suggestedMarginPercent),
+    rationale: entry.rationale,
+    selected: true,
+  }));
 
   const checkoutPaths =
     requestedTrack === 'peptides'
@@ -268,14 +530,20 @@ function buildMedicalOffers(intakeData: Partial<ConsultationFormData>): MedicalO
     providerReviewRequired: true,
     checkoutPaths,
     requestedTrack,
-    normalizedSymptoms: symptomTerms,
+    normalizedSymptoms: boomRxBundle.normalizedSymptoms,
     recommendationCount: ranked.length,
-    projectedMonthlyRetail,
-    projectedMonthlyCOGS,
-    projectedMonthlyGrossProfit,
-    averageMarginPercent,
+    projectedMonthlyRetail: boomRxBundle.projectedMonthlyRetail,
+    projectedMonthlyCOGS: boomRxBundle.projectedMonthlyCOGS,
+    projectedMonthlyGrossProfit: boomRxBundle.projectedMonthlyGrossProfit,
+    averageMarginPercent: boomRxBundle.averageMarginPercent,
     recommendedProducts: ranked,
   };
+}
+
+function isPdfUpload(file: File): boolean {
+  const type = (file.type || '').toLowerCase();
+  const name = (file.name || '').toLowerCase();
+  return type === 'application/pdf' || name.endsWith('.pdf');
 }
 
 export async function POST(request: NextRequest) {
@@ -297,26 +565,17 @@ export async function POST(request: NextRequest) {
 
       const formData = await request.formData();
 
-      const dataField = formData.get('data');
-      if (!dataField || typeof dataField !== 'string') {
+      let intakeData: Partial<ConsultationFormData>;
+      const rawIntakeJson = await parseMultipartIntakePayload(formData);
+      if (!rawIntakeJson || typeof rawIntakeJson !== 'object') {
         return NextResponse.json(
           { success: false, error: 'Missing form data' },
           { status: 400 }
         );
       }
 
-      let intakeData: Partial<ConsultationFormData>;
-      let rawIntakeJson: unknown;
-      try {
-        rawIntakeJson = JSON.parse(dataField);
-      } catch {
-        return NextResponse.json(
-          { success: false, error: 'Invalid form data JSON' },
-          { status: 400 }
-        );
-      }
-
-      const parsed = submitIntakeSchema.safeParse(rawIntakeJson);
+      const normalizedIntakeCandidate = coerceLegacySubmitPayload(rawIntakeJson);
+      const parsed = submitIntakeSchema.safeParse(normalizedIntakeCandidate);
       if (!parsed.success) {
         return NextResponse.json(
           {
@@ -331,6 +590,8 @@ export async function POST(request: NextRequest) {
 
       let sourcePhotoUrl: string | null = null;
       const photoFiles = formData.getAll('photos').filter((value): value is File => value instanceof File);
+      const auraFiles = formData.getAll('aura').filter((value): value is File => value instanceof File);
+      let auraUploadStatus: string | null = null;
       if (photoFiles.length > MAX_PHOTOS) {
         return NextResponse.json(
           { success: false, error: `Only ${MAX_PHOTOS} photos are allowed` },
@@ -366,6 +627,32 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // Backward compatibility: older clients may upload Aura file directly as multipart "aura".
+      // Keep the intake successful and attach what we can.
+      if (!sourcePhotoUrl && auraFiles.length > 0) {
+        const auraFile = auraFiles[0];
+        if (isPdfUpload(auraFile)) {
+          auraUploadStatus = `Aura PDF received (${auraFile.name || 'document.pdf'})`;
+        } else if (ALLOWED_TYPES.includes(auraFile.type) && auraFile.size <= MAX_PHOTO_SIZE) {
+          try {
+            const auraBuffer = Buffer.from(await auraFile.arrayBuffer());
+            let auraImage = sharp(auraBuffer);
+            const auraMeta = await auraImage.metadata();
+            if (auraMeta.width && auraMeta.width > MAX_PHOTO_WIDTH) {
+              auraImage = auraImage.resize({ width: MAX_PHOTO_WIDTH, withoutEnlargement: true });
+            }
+            const processedAura = await auraImage.jpeg({ quality: 85 }).toBuffer();
+            sourcePhotoUrl = `data:image/jpeg;base64,${processedAura.toString('base64')}`;
+            auraUploadStatus = `Aura image received (${auraFile.name || 'upload'})`;
+          } catch (err) {
+            console.warn('[Consultation Submit] Aura upload processing failed:', err);
+            auraUploadStatus = 'Aura upload received (processing failed)';
+          }
+        } else {
+          auraUploadStatus = 'Aura upload received (unsupported format or size)';
+        }
+      }
+
       const patientName = `${intakeData.firstName || ''} ${intakeData.lastName || ''}`.trim();
       const patientEmail = (intakeData.email as string) || '';
 
@@ -383,11 +670,18 @@ export async function POST(request: NextRequest) {
       );
       if (!scopedLimit.allowed) return rateLimitResponse(scopedLimit.resetIn);
 
+      const includeMedicalOffers =
+        (intakeData as Record<string, unknown>).includeMedicalOffers !== false;
+      const medicalOffers = includeMedicalOffers
+        ? buildMedicalOffers(intakeData)
+        : null;
+
       const session = createSession({
         intakeData,
         patientName,
         patientEmail,
         sourcePhotoUrl,
+        medicalOffers,
       });
       await saveSessionAsync(session);
 
@@ -422,6 +716,7 @@ export async function POST(request: NextRequest) {
           budget ? `Budget: ${budget}` : '',
           `Medical Flags: ${activeFlags.length > 0 ? activeFlags.join(', ') : 'None reported'}`,
           sourcePhotoUrl ? 'Photo: Uploaded' : 'Photo: None',
+          auraUploadStatus ? `Aura Upload: ${auraUploadStatus}` : '',
           `Session ID: ${session.id}`,
         ].filter(Boolean).join('\n');
 
@@ -472,8 +767,6 @@ export async function POST(request: NextRequest) {
         await scanPromise;
       }
 
-      const medicalOffers = buildMedicalOffers(intakeData);
-
       return NextResponse.json({
         success: true,
         data: {
@@ -488,6 +781,7 @@ export async function POST(request: NextRequest) {
         phase: session.phase,
         intakeId,
         medicalOffers,
+        auraUploadStatus,
       });
     } catch (error) {
       console.error('[Consultation Submit] Error:', error);
