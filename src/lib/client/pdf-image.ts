@@ -1,8 +1,7 @@
 'use client';
 
-const PDFJS_CDN_VERSION = '4.10.38';
-const PDFJS_MODULE_URL = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_CDN_VERSION}/build/pdf.min.mjs`;
-const PDFJS_WORKER_URL = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_CDN_VERSION}/build/pdf.worker.min.mjs`;
+const PDFJS_MODULE_PATH = '/vendor/pdfjs/pdf.min.mjs';
+const PDFJS_WORKER_PATH = '/vendor/pdfjs/pdf.worker.min.mjs';
 
 type PdfJsModule = {
   version?: string;
@@ -32,14 +31,13 @@ let pdfJsPromise: Promise<PdfJsModule> | null = null;
 async function loadPdfJs(): Promise<PdfJsModule> {
   if (!pdfJsPromise) {
     pdfJsPromise = (async () => {
-      const runtimeImport = new Function('moduleUrl', 'return import(moduleUrl)') as (
-        moduleUrl: string
-      ) => Promise<{ default?: PdfJsModule } & Record<string, unknown>>;
-      const imported = await runtimeImport(PDFJS_MODULE_URL);
+      const moduleUrl = new URL(PDFJS_MODULE_PATH, window.location.origin).toString();
+      const workerUrl = new URL(PDFJS_WORKER_PATH, window.location.origin).toString();
+      const imported = await import(/* webpackIgnore: true */ moduleUrl);
       const pdfjs = (imported.default ?? imported) as unknown as PdfJsModule;
 
       if (pdfjs.GlobalWorkerOptions) {
-        pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+        pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
       }
 
       return pdfjs;
