@@ -12,6 +12,7 @@ export const TABLE_NAMES = {
   REVIEWS: 'Reviews',
   KPI_SNAPSHOTS: 'KPI Snapshots',
   ALERTS: 'Alerts',
+  INCIDENTS: 'Incidents',
   COMPETITOR_INTELLIGENCE: 'Competitor Intelligence',
   TREATMENT_PLANS: 'Treatment Plans',
 } as const;
@@ -25,6 +26,28 @@ export const FIELDS = {
     phone: 'Phone',
     preferredContact: 'Preferred Contact',
     status: 'Status',         // Single select
+    mangomintClientId: 'MangoMint Client ID',
+    leadSource: 'Lead Source',
+    leadMedium: 'Lead Medium',
+    leadCampaign: 'Lead Campaign',
+    leadAdSet: 'Lead Ad Set',
+    leadAd: 'Lead Ad',
+    leadOffer: 'Lead Offer',
+    leadLandingPage: 'Lead Landing Page',
+    leadKeyword: 'Lead Keyword',
+    leadReferrer: 'Lead Referrer',
+    firstTouchAt: 'First Touch At',
+    lastTouchAt: 'Last Touch At',
+    attributionId: 'Attribution ID',
+    utmSource: 'UTM Source',
+    utmMedium: 'UTM Medium',
+    utmCampaign: 'UTM Campaign',
+    utmContent: 'UTM Content',
+    utmTerm: 'UTM Term',
+    firstBookingSource: 'First Booking Source',
+    firstBookingOffer: 'First Booking Offer',
+    attributedRevenue: 'Attributed Revenue',
+    attributionModel: 'Attribution Model',
     // Linked record fields (read-only, populated via linked tables)
     intakes: 'Client Intakes',
     intakeIntelligence: 'Intake Intelligence',
@@ -100,6 +123,22 @@ export const FIELDS = {
     createdDate: 'Created Date',
     notes: 'Notes', // Long Text - used for System Config storage (e.g. encrypted Plaid connection)
   },
+  incidents: {
+    clientName: 'Client Name',
+    servicesInvolved: 'Services Involved',
+    incidentDateTime: 'Incident Date/Time',
+    providerOnDuty: 'Provider on Duty',
+    incidentType: 'Incident Type',
+    severity: 'Severity',
+    narrativeDescription: 'Narrative Description',
+    immediateActionTaken: 'Immediate Action Taken',
+    followUpRequired: 'Follow-Up Required',
+    followUpNotes: 'Follow-Up Notes',
+    photoAttachments: 'Photo Attachments',
+    reportedBy: 'Reported By',
+    medicalDirectorReviewStatus: 'Medical Director Review Status',
+    medicalDirectorNotes: 'Medical Director Notes',
+  },
   reviews: {
     platform: 'Platform',
     starRating: 'Star Rating',
@@ -125,14 +164,15 @@ export const FIELDS = {
     planUrl: 'Plan URL',           // URL
     status: 'Status',              // Single select: Sent, Viewed, Selected, Booked, Expired
     createdDate: 'Created Date',   // Date
-    sentAt: 'Sent At',
     intakeRecordId: 'Intake Record ID', // Single-line text (for linking back)
     clientName: 'Client Name',     // Single-line text (denormalized for easy access)
-    clientEmail: 'Client Email',
-    clientPhone: 'Client Phone',
-    lastViewedAt: 'Last Viewed At',
-    viewCount: 'View Count',
-    financingClickedAt: 'Financing Clicked At',
+    lastViewedAt: 'Last Viewed At', // Date/time
+    viewCount: 'View Count',       // Number
+    financingClickedAt: 'Financing Clicked At', // Date/time
+    sentAt: 'Sent At',             // Date/time
+    clientEmail: 'Client Email',   // Email
+    clientPhone: 'Client Phone',   // Phone
+    followUpsSent: 'Follow Ups Sent', // Long text (JSON)
   },
   packages: {
     name: 'Package Name',

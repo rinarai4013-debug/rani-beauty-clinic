@@ -14,6 +14,8 @@
  * CRITICAL: Rani does IM INJECTIONS only. Never say "infusion."
  */
 
+import { MEMBERSHIP_PLAN_COPY } from '@/data/membership-copy';
+
 // ── Types ────────────────────────────────────────────────────────────────
 
 export type MembershipTier = 'halo' | 'glow' | 'elite';
@@ -162,12 +164,12 @@ const ELITE_BENEFITS: MembershipBenefit[] = [
 export const PLANS: Record<MembershipTier, MembershipPlan> = {
   halo: {
     tier: 'halo',
-    name: 'Halo',
-    tagline: 'Your glow-up starts here',
-    monthlyPrice: 149,
-    annualPrice: 149 * 10, // $1,490 (save 2 months = $298)
-    annualMonthlyEquivalent: Math.round((149 * 10) / 12 * 100) / 100,
-    annualSavings: 149 * 2,
+    name: MEMBERSHIP_PLAN_COPY.halo.name,
+    tagline: MEMBERSHIP_PLAN_COPY.halo.tagline,
+    monthlyPrice: MEMBERSHIP_PLAN_COPY.halo.monthlyPrice,
+    annualPrice: MEMBERSHIP_PLAN_COPY.halo.monthlyPrice * 10, // $1,490 (save 2 months = $298)
+    annualMonthlyEquivalent: Math.round((MEMBERSHIP_PLAN_COPY.halo.monthlyPrice * 10) / 12 * 100) / 100,
+    annualSavings: MEMBERSHIP_PLAN_COPY.halo.monthlyPrice * 2,
     benefits: HALO_BENEFITS,
     monthlyCredits: 100,
     creditRolloverMonths: 1,
@@ -183,12 +185,12 @@ export const PLANS: Record<MembershipTier, MembershipPlan> = {
   },
   glow: {
     tier: 'glow',
-    name: 'Glow',
-    tagline: 'Elevate your transformation journey',
-    monthlyPrice: 249,
-    annualPrice: 249 * 10, // $2,490 (save 2 months = $498)
-    annualMonthlyEquivalent: Math.round((249 * 10) / 12 * 100) / 100,
-    annualSavings: 249 * 2,
+    name: MEMBERSHIP_PLAN_COPY.glow.name,
+    tagline: MEMBERSHIP_PLAN_COPY.glow.tagline,
+    monthlyPrice: MEMBERSHIP_PLAN_COPY.glow.monthlyPrice,
+    annualPrice: MEMBERSHIP_PLAN_COPY.glow.monthlyPrice * 10, // $2,490 (save 2 months = $498)
+    annualMonthlyEquivalent: Math.round((MEMBERSHIP_PLAN_COPY.glow.monthlyPrice * 10) / 12 * 100) / 100,
+    annualSavings: MEMBERSHIP_PLAN_COPY.glow.monthlyPrice * 2,
     benefits: GLOW_BENEFITS,
     monthlyCredits: 200,
     creditRolloverMonths: 1,
@@ -204,12 +206,12 @@ export const PLANS: Record<MembershipTier, MembershipPlan> = {
   },
   elite: {
     tier: 'elite',
-    name: 'Elite',
-    tagline: 'The ultimate Rani experience',
-    monthlyPrice: 449,
-    annualPrice: 449 * 10, // $4,490 (save 2 months = $898)
-    annualMonthlyEquivalent: Math.round((449 * 10) / 12 * 100) / 100,
-    annualSavings: 449 * 2,
+    name: MEMBERSHIP_PLAN_COPY.elite.name,
+    tagline: MEMBERSHIP_PLAN_COPY.elite.tagline,
+    monthlyPrice: MEMBERSHIP_PLAN_COPY.elite.monthlyPrice,
+    annualPrice: MEMBERSHIP_PLAN_COPY.elite.monthlyPrice * 10, // $4,490 (save 2 months = $898)
+    annualMonthlyEquivalent: Math.round((MEMBERSHIP_PLAN_COPY.elite.monthlyPrice * 10) / 12 * 100) / 100,
+    annualSavings: MEMBERSHIP_PLAN_COPY.elite.monthlyPrice * 2,
     benefits: ELITE_BENEFITS,
     monthlyCredits: 400,
     creditRolloverMonths: 1,
@@ -358,27 +360,27 @@ export function applyDiscount(
 export const FOUNDING_MEMBER_RATES: FoundingMemberRate[] = [
   {
     tier: 'halo',
-    originalMonthlyPrice: 149,
+    originalMonthlyPrice: MEMBERSHIP_PLAN_COPY.halo.monthlyPrice,
     foundingMonthlyPrice: 119,
-    savings: 30,
+    savings: MEMBERSHIP_PLAN_COPY.halo.monthlyPrice - 119,
     lockedUntil: 'lifetime',
     maxFoundingMembers: 50,
     currentFoundingMembers: 0,
   },
   {
     tier: 'glow',
-    originalMonthlyPrice: 249,
+    originalMonthlyPrice: MEMBERSHIP_PLAN_COPY.glow.monthlyPrice,
     foundingMonthlyPrice: 199,
-    savings: 50,
+    savings: MEMBERSHIP_PLAN_COPY.glow.monthlyPrice - 199,
     lockedUntil: 'lifetime',
     maxFoundingMembers: 50,
     currentFoundingMembers: 0,
   },
   {
     tier: 'elite',
-    originalMonthlyPrice: 449,
+    originalMonthlyPrice: MEMBERSHIP_PLAN_COPY.elite.monthlyPrice,
     foundingMonthlyPrice: 359,
-    savings: 90,
+    savings: MEMBERSHIP_PLAN_COPY.elite.monthlyPrice - 359,
     lockedUntil: 'lifetime',
     maxFoundingMembers: 50,
     currentFoundingMembers: 0,

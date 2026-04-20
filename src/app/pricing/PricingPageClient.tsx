@@ -11,9 +11,11 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { pricingData } from "@/data/pricing";
+import { PRICING_MEMBERSHIP_COPY } from "@/data/membership-copy";
 import { clinicInfo } from "@/data/clinic-info";
 import { trackCTAClick, trackAnalyticsEvent } from "@/lib/analytics/events";
 import ConsultationUrgency from "@/components/conversion/ConsultationUrgency";
+import QuickConsult from "@/components/conversion/QuickConsult";
 
 type PriceItem = { name: string; price: string; note?: string; time?: string };
 
@@ -301,7 +303,7 @@ export default function PricingPageClient() {
           <FadeInOnScroll delay={0.1}>
             <div className="mt-4 rounded-lg border border-rani-gold/30 bg-rani-gold/5 px-4 py-3 flex items-center justify-between flex-wrap gap-3">
               <p className="font-body text-sm text-rani-navy">
-                <span className="font-bold">Financing available</span> — Sofwave from <span className="font-bold text-rani-gold">~$230/mo</span> with Cherry or PatientFi
+                <span className="font-bold">Financing available</span> — Ask about flexible payment options for Sofwave treatments
               </p>
               <Button
                 href="/contact"
@@ -431,16 +433,16 @@ export default function PricingPageClient() {
           <FadeInOnScroll>
             <SectionLabel label="MEMBERSHIP" />
             <h2 className="mt-4 text-center font-body text-2xl font-bold text-rani-navy md:text-3xl">
-              {pricingData.membership.name}
+              {PRICING_MEMBERSHIP_COPY.name}
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-center font-body text-sm text-rani-muted">
-              Join today and get {pricingData.membership.signupBonus}. Exclusive monthly
+              Join today and get {PRICING_MEMBERSHIP_COPY.signupBonus}. Exclusive monthly
               memberships with VIP perks and the best value on your aesthetic journey.
             </p>
           </FadeInOnScroll>
 
           <StaggerChildren className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-            {pricingData.membership.tiers.map((tier) => (
+            {PRICING_MEMBERSHIP_COPY.tiers.map((tier) => (
               <Card
                 key={tier.name}
                 goldTop={tier.popular}
@@ -494,7 +496,7 @@ export default function PricingPageClient() {
                   </ul>
 
                   <div className="mt-8 w-full">
-                    {pricingData.membership.comingSoon ? (
+                    {PRICING_MEMBERSHIP_COPY.comingSoon ? (
                       <Button
                         href="/contact"
                         className="!w-full"
@@ -532,12 +534,7 @@ export default function PricingPageClient() {
                 Membership FAQ
               </h3>
               <div className="space-y-4">
-                {[
-                  { q: "Can I upgrade my tier?", a: "Yes, anytime. Billing is prorated to your new tier." },
-                  { q: "Is there a contract?", a: "No contracts. Cancel anytime with 30 days notice." },
-                  { q: "When do my monthly services reset?", a: "On your billing date each month. Unused services roll over for up to 2 months (3 months for Elite Aura)." },
-                  { q: "Can I share my membership?", a: "Memberships are non-transferable and tied to your account." },
-                ].map((faq) => (
+                {PRICING_MEMBERSHIP_COPY.faqs.map((faq) => (
                   <div key={faq.q} className="rounded-lg border border-rani-border bg-rani-cream p-4">
                     <p className="font-body text-sm font-bold text-rani-navy">{faq.q}</p>
                     <p className="mt-1 font-body text-sm text-rani-muted">{faq.a}</p>
@@ -640,6 +637,13 @@ export default function PricingPageClient() {
               </div>
             </FadeInOnScroll>
           </div>
+        </div>
+      </section>
+
+      {/* Quick Consult Lead Capture */}
+      <section className="bg-rani-cream py-16 md:py-20">
+        <div className="mx-auto max-w-3xl px-6">
+          <QuickConsult />
         </div>
       </section>
 

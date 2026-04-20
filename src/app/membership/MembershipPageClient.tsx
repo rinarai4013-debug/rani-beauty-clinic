@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { clinicInfo } from "@/data/clinic-info";
 import {
   Check,
   Star,
@@ -16,111 +15,26 @@ import {
 } from "lucide-react";
 import CountUp from "@/components/animations/CountUp";
 import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
+import { MEMBERSHIP_PAGE_COPY } from "@/data/membership-copy";
 
 /* ────────────────────────────────────────────────────────
    Types & Data
    ──────────────────────────────────────────────────────── */
 
-interface Tier {
-  name: string;
-  price: number;
-  badge?: string;
-  features: string[];
-  highlight: boolean;
-}
-
-const tiers: Tier[] = [
-  {
-    name: "Glow Starter",
-    price: 149,
-    features: [
-      "1 HydraFacial per month",
-      "10% off all services",
-      "Priority booking",
-      "Free AI skin analysis",
-    ],
-    highlight: false,
-  },
-  {
-    name: "Glow Plus",
-    price: 299,
-    badge: "Most Popular",
-    features: [
-      "1 HydraFacial + 1 Chemical Peel per month",
-      "15% off all services",
-      "Priority booking",
-      "Free AI skin analysis",
-      "Complimentary birthday treatment",
-      "VIP event access",
-    ],
-    highlight: true,
-  },
-  {
-    name: "Glow VIP",
-    price: 499,
-    features: [
-      "2 treatments per month (HydraFacial, Peel, or RF Micro)",
-      "20% off all services",
-      "Same-day booking",
-      "Free AI skin analysis",
-      "Complimentary birthday treatment",
-      "VIP event access",
-      "Dedicated treatment coordinator",
-      "Complimentary Rx skincare consultation",
-    ],
-    highlight: false,
-  },
-];
-
-interface FAQItem {
-  question: string;
-  answer: string;
-}
-
-const faqs: FAQItem[] = [
-  {
-    question: "Can I cancel my membership at any time?",
-    answer:
-      "Yes. Our memberships are month-to-month with no long-term contracts. We ask for 30 days written notice to cancel, and any unused benefits from the current billing cycle remain available until the end of that period.",
-  },
-  {
-    question: "Can I share my membership with family members?",
-    answer:
-      "Membership benefits are tied to the individual member. However, your discount on services can be used when purchasing gift cards for loved ones.",
-  },
-  {
-    question: "What happens if I miss my monthly treatment?",
-    answer:
-      "Unused treatments roll over for one month. So if you miss December, you can use two treatments in January. After that, unused sessions expire.",
-  },
-  {
-    question: "Can I upgrade or downgrade my tier?",
-    answer:
-      "Absolutely. Tier changes take effect at the start of your next billing cycle. Just let our front desk know or send us an email.",
-  },
-  {
-    question: "Do I pay the consultation deposit as a member?",
-    answer:
-      "No. Members skip the $150 consultation deposit entirely. This is one of the many perks of being part of The Glow Membership.",
-  },
-  {
-    question: "Is there a sign-up fee?",
-    answer:
-      "There is no sign-up fee. Your first monthly payment is all you need to get started.",
-  },
-];
+const tiers = MEMBERSHIP_PAGE_COPY.tiers;
+const faqs = MEMBERSHIP_PAGE_COPY.faqs;
 
 /* ────────────────────────────────────────────────────────
    ROI Calculator
    ──────────────────────────────────────────────────────── */
 
-const AVG_TREATMENT_COST = 250; // average per-treatment retail cost
+const AVG_TREATMENT_COST = MEMBERSHIP_PAGE_COPY.roi.averageTreatmentCost;
 
 function ROICalculator() {
   const [frequency, setFrequency] = useState(2);
 
   const yearlyWithout = frequency * AVG_TREATMENT_COST * 12;
-  const yearlyWith = 299 * 12; // Glow Plus annual
+  const yearlyWith = MEMBERSHIP_PAGE_COPY.roi.featuredTierMonthlyPrice * 12;
   const savings = yearlyWithout - yearlyWith;
 
   return (
@@ -186,7 +100,7 @@ function ROICalculator() {
               </div>
               <div className="rounded-xl border border-rani-gold/30 bg-rani-gold/10 p-5 text-center">
                 <p className="font-body text-sm text-rani-gold">
-                  With Glow Plus
+                  With {MEMBERSHIP_PAGE_COPY.roi.featuredTierName}
                 </p>
                 <p className="mt-2 font-heading text-3xl font-bold text-white">
                   $
@@ -427,7 +341,7 @@ export default function MembershipPageClient() {
                   </ul>
 
                   <a
-                    href={clinicInfo.booking.url}
+                    href="https://booking.mangomint.com/ranibeautyclinic1"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-lg py-3.5 font-body text-sm font-semibold uppercase tracking-wider transition-all duration-300 ${
@@ -506,7 +420,7 @@ export default function MembershipPageClient() {
               month.
             </p>
             <a
-              href={clinicInfo.booking.url}
+              href="https://booking.mangomint.com/ranibeautyclinic1"
               target="_blank"
               rel="noopener noreferrer"
               className="group mt-8 inline-flex items-center gap-2 rounded-lg bg-rani-gold px-10 py-4 font-body text-sm font-semibold uppercase tracking-wider text-rani-navy shadow-lg shadow-rani-gold/20 transition-all duration-300 hover:bg-white hover:shadow-xl"
