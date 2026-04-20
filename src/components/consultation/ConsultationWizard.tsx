@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -227,6 +227,41 @@ const slideVariants = {
   }),
 };
 
+async function parseJsonResponse(
+  response: Response
+): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+  } catch {
+    // non-JSON response
+  }
+
+  return { json: null, text };
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string
+): string {
+  const payload = parsed.json;
+  const payloadError = payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+  const payloadMessage = payload && typeof payload.message === 'string' ? payload.message.trim() : '';
+
+  if (payloadError) return payloadError;
+  if (payloadMessage) return payloadMessage;
+  if (response.status === 413) return 'Upload is too large. Please use smaller images and retry.';
+  if (response.status >= 500) return 'Server is temporarily unavailable. Please try again shortly.';
+  if (parsed.text) return parsed.text.slice(0, 220);
+  return fallback;
+}
+
 // ── Component ──
 
 export default function ConsultationWizard() {
@@ -291,12 +326,23 @@ export default function ConsultationWizard() {
         method: 'POST',
         body,
       });
-
+      const parsed = await parseJsonResponse(res);
       if (!res.ok) {
-        throw new Error('Submission failed');
+        throw new Error(getApiErrorMessage(res, parsed, 'Submission failed'));
+      }
+      if (!parsed.json) {
+        throw new Error('Server returned an invalid response. Please retry.');
       }
 
-      const result = await res.json();
+      const result = parsed.json as {
+        success?: boolean;
+        data?: { sessionId?: string };
+        error?: string;
+        message?: string;
+      };
+      if (!result.success) {
+        throw new Error(result.error || result.message || 'Submission failed');
+      }
 
       dispatch({ type: 'SUBMIT_END', success: true });
 
@@ -306,11 +352,16 @@ export default function ConsultationWizard() {
           sessionStorage.setItem('mastermind_last_session', result.data.sessionId);
         } catch { /* sessionStorage unavailable */ }
       }
-    } catch {
+    } catch (err) {
       dispatch({ type: 'SUBMIT_END', success: false });
       dispatch({
         type: 'SET_ERRORS',
-        errors: { submit: 'Something went wrong. Please try again.' },
+        errors: {
+          submit:
+            err instanceof Error && err.message.trim()
+              ? err.message
+              : 'Something went wrong. Please try again.',
+        },
       });
     }
   }, [currentStep, formData]);
@@ -527,7 +578,7 @@ export default function ConsultationWizard() {
               key={currentStep}
               custom={direction}
               variants={slideVariants}
-              initial="enter"
+              initial={currentStep === 0 ? false : 'enter'}
               animate="center"
               exit="exit"
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -1113,24 +1164,12 @@ function StepPhotos({
       <div className="mt-6">
         <div className="grid grid-cols-3 gap-3">
           {photos.map((file, index) => (
-            <div
+            <PhotoPreviewTile
               key={`${file.name}-${index}`}
-              className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={URL.createObjectURL(file)}
-                alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => removePhoto(index)}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#0F1D2C]/70 text-white flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                aria-label="Remove photo"
-              >
-                &times;
-              </button>
-            </div>
+              file={file}
+              index={index}
+              onRemove={() => removePhoto(index)}
+            />
           ))}
 
           {photos.length < 3 && (
@@ -1160,6 +1199,38 @@ function StepPhotos({
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PhotoPreviewTile({ file, index, onRemove }: {
+  file: File;
+  index: number;
+  onRemove: () => void;
+}) {
+  const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
+
+  useEffect(() => {
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  return (
+    <div className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={previewUrl}
+        alt={`Upload ${index + 1}`}
+        className="w-full h-full object-cover"
+      />
+      <button
+        onClick={onRemove}
+        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#0F1D2C]/70 text-white flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+        aria-label="Remove photo"
+      >
+        &times;
+      </button>
     </div>
   );
 }
