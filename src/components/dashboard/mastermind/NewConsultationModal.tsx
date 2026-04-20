@@ -6,6 +6,7 @@ import {
   User, Heart, Stethoscope, Clock, ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { convertPdfFirstPageToJpeg } from '@/lib/client/pdf-image';
 
 // ══════════════════════════════════════════════════════════════
 // OPTION CONSTANTS — matching all 25 Typeform questions
@@ -581,7 +582,7 @@ function PhotoDropZone({
   label: string;
   sublabel: string;
   files: File[];
-  onFiles: (files: File[]) => void;
+  onFiles: (files: File[]) => void | Promise<void>;
   onRemove: (index: number) => void;
   maxFiles?: number;
   allowPdf?: boolean;
@@ -596,12 +597,12 @@ function PhotoDropZone({
     const dropped = Array.from(e.dataTransfer.files).filter(
       (f) => f.type.startsWith('image/') || (allowPdf && isPdfFile(f))
     );
-    onFiles(dropped.slice(0, maxFiles - files.length));
+    void onFiles(dropped.slice(0, maxFiles - files.length));
   };
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
-    onFiles(selected.slice(0, maxFiles - files.length));
+    void onFiles(selected.slice(0, maxFiles - files.length));
     e.target.value = '';
   };
 
@@ -753,6 +754,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   // ── Step 5: Photos ──
   const [skinPhotos, setSkinPhotos] = useState<File[]>([]);
   const [auraPhotos, setAuraPhotos] = useState<File[]>([]);
+  const [isConvertingAuraPdf, setIsConvertingAuraPdf] = useState(false);
 
   // ── Draft auto-save / restore (localStorage) ──
   const DRAFT_KEY = 'rani_consult_draft';
@@ -889,11 +891,36 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const addSkinPhotos = (files: File[]) =>
     setSkinPhotos((prev) => [...prev, ...files].slice(0, MAX_SKIN_UPLOAD_FILES));
   const removeSkinPhoto = (i: number) => setSkinPhotos((prev) => prev.filter((_, idx) => idx !== i));
-  const addAuraPhotos = (files: File[]) => {
-    const oversizeAuraImages = files.filter(
-      (file) => !isPdfFile(file) && file.type.startsWith('image/') && file.size > MAX_AURA_INLINE_UPLOAD_BYTES
+  const addAuraPhotos = async (files: File[]) => {
+    const pdfFiles = files.filter((file) => isPdfFile(file));
+    const nonPdfFiles = files.filter((file) => !isPdfFile(file));
+
+    let convertedPdfImages: File[] = [];
+    let failedPdfCount = 0;
+    if (pdfFiles.length > 0) {
+      setIsConvertingAuraPdf(true);
+      const converted = await Promise.all(
+        pdfFiles.map(async (pdfFile) => {
+          try {
+            return await convertPdfFirstPageToJpeg(pdfFile, { maxDimension: 1700, quality: 0.82 });
+          } catch {
+            failedPdfCount += 1;
+            return null;
+          }
+        })
+      );
+      convertedPdfImages = converted.filter((file): file is File => file instanceof File);
+      setIsConvertingAuraPdf(false);
+    }
+
+    const oversizeAuraImages = [...nonPdfFiles, ...convertedPdfImages].filter(
+      (file) => file.type.startsWith('image/') && file.size > MAX_AURA_INLINE_UPLOAD_BYTES
     );
-    if (oversizeAuraImages.length > 0) {
+    if (failedPdfCount > 0) {
+      setError(
+        `${failedPdfCount} Aura PDF file${failedPdfCount > 1 ? 's could not' : ' could not'} be converted. Please retry with a different PDF export.`
+      );
+    } else if (oversizeAuraImages.length > 0) {
       setError(
         `Skipped ${oversizeAuraImages.length} Aura image${oversizeAuraImages.length > 1 ? 's' : ''} over ${formatMb(MAX_AURA_INLINE_UPLOAD_BYTES)} MB.`
       );
@@ -901,8 +928,8 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       setError(null);
     }
 
-    const acceptedFiles = files.filter(
-      (file) => isPdfFile(file) || (file.type.startsWith('image/') && file.size <= MAX_AURA_INLINE_UPLOAD_BYTES)
+    const acceptedFiles = [...nonPdfFiles, ...convertedPdfImages].filter(
+      (file) => file.type.startsWith('image/') && file.size <= MAX_AURA_INLINE_UPLOAD_BYTES
     );
     setAuraPhotos((prev) => [...prev, ...acceptedFiles].slice(0, MAX_AURA_UPLOAD_FILES));
   };
@@ -1597,7 +1624,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       {/* Aura Scan */}
       <PhotoDropZone
         label="Upload Aura Skin Scan"
-        sublabel="Upload screenshots for AI scan (Aura PDFs are excluded from initial submit)"
+        sublabel="Upload Aura PDF or screenshots (PDF auto-converts to image for scan)"
         files={auraPhotos}
         onFiles={addAuraPhotos}
         onRemove={removeAuraPhoto}
@@ -1605,6 +1632,11 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         allowPdf={true}
         icon={Upload}
       />
+      {isConvertingAuraPdf && (
+        <p className="text-xs text-[#C9A96E]/80" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          Converting Aura PDF to image for secure upload...
+        </p>
+      )}
 
       {/* Quick Summary */}
       <div>

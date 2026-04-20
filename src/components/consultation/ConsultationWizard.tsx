@@ -16,6 +16,7 @@ import {
   Camera,
   CheckCircle2,
 } from 'lucide-react';
+import { convertPdfFirstPageToJpeg } from '@/lib/client/pdf-image';
 
 import WizardProgressBar from './WizardProgressBar';
 import WizardTrustBar from './WizardTrustBar';
@@ -262,6 +263,12 @@ function getApiErrorMessage(
   return fallback;
 }
 
+function isPdfFile(file: File): boolean {
+  const type = (file.type || '').toLowerCase();
+  const name = (file.name || '').toLowerCase();
+  return type === 'application/pdf' || name.endsWith('.pdf');
+}
+
 // ── Component ──
 
 export default function ConsultationWizard() {
@@ -367,13 +374,52 @@ export default function ConsultationWizard() {
   }, [currentStep, formData]);
 
   const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || []);
+      e.target.value = '';
+      if (files.length === 0) return;
+
+      const pdfFiles = files.filter((file) => isPdfFile(file));
+      const imageFiles = files.filter((file) => !isPdfFile(file));
+
+      let convertedPdfImages: File[] = [];
+      let failedPdfCount = 0;
+      if (pdfFiles.length > 0) {
+        const converted = await Promise.all(
+          pdfFiles.map(async (pdfFile) => {
+            try {
+              return await convertPdfFirstPageToJpeg(pdfFile, { maxDimension: 1700, quality: 0.82 });
+            } catch {
+              failedPdfCount += 1;
+              return null;
+            }
+          })
+        );
+        convertedPdfImages = converted.filter((file): file is File => file instanceof File);
+      }
+
       const existing = (formData.photos as File[]) || [];
-      const combined = [...existing, ...files].slice(0, 3);
+      const normalized = [...imageFiles, ...convertedPdfImages];
+      const combined = [...existing, ...normalized].slice(0, 3);
       setField('photos', combined);
+
+      if (failedPdfCount > 0) {
+        dispatch({
+          type: 'SET_ERRORS',
+          errors: {
+            ...errors,
+            photos:
+              `${failedPdfCount} PDF file${failedPdfCount > 1 ? 's' : ''} could not be converted. ` +
+              'Please retry with a different PDF export.',
+          },
+        });
+      } else if (errors.photos) {
+        const nextErrors = { ...errors };
+        delete nextErrors.photos;
+        dispatch({ type: 'SET_ERRORS', errors: nextErrors });
+      }
     },
-    [formData.photos, setField]
+    [errors, formData.photos, setField]
   );
 
   const removePhoto = useCallback(
@@ -1178,7 +1224,7 @@ function StepPhotos({
               <span className="text-xs font-body text-[#0F1D2C]/40">Add Photo</span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/heic"
+                accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
                 onChange={handleFileChange}
                 className="hidden"
                 multiple
@@ -1193,9 +1239,9 @@ function StepPhotos({
 
         <div className="mt-4 p-3 rounded-lg bg-[#F8F6F1]/80 border border-[#0F1D2C]/5">
           <p className="text-xs font-body text-[#0F1D2C]/50 leading-relaxed">
-            Upload up to 3 photos (JPEG, PNG, WebP, or HEIC, max 10 MB each). Good
-            lighting and a clean background produce the best results. All photos are
-            stored securely and kept strictly confidential.
+            Upload up to 3 files (JPEG, PNG, WebP, HEIC, or Aura PDF). PDFs are
+            automatically converted to a secure image preview before upload. Good lighting
+            and a clean background produce the best results.
           </p>
         </div>
       </div>
