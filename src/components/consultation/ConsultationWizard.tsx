@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback, useState } from 'react';
+import { useReducer, useCallback, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -52,7 +52,6 @@ const STEP_LABELS = [
 ] as const;
 
 const TOTAL_STEPS = STEP_LABELS.length;
-const CONSULTATION_SUBMIT_TIMEOUT_MS = 45_000;
 
 const STEP_ICONS = [
   Sparkles,
@@ -122,46 +121,6 @@ interface WizardState {
   auraScanResult: AuraScanResult | null;
   isScanning: boolean;
 }
-
-type ConsultationOfferProduct = {
-  id: string;
-  product: string;
-  label: string;
-  category: string;
-  score: number;
-  monthlyCostEstimate: number;
-  suggestedRetail: number;
-  suggestedGrossProfit: number;
-  suggestedMarginPercent: number;
-  rationale: string[];
-};
-
-type ConsultationMedicalOffers = {
-  providerReviewRequired: boolean;
-  checkoutPaths: { clinic: string; home: string };
-  requestedTrack: string;
-  normalizedSymptoms: string[];
-  recommendationCount: number;
-  projectedMonthlyRetail: number;
-  projectedMonthlyCOGS: number;
-  projectedMonthlyGrossProfit: number;
-  averageMarginPercent: number;
-  recommendedProducts: ConsultationOfferProduct[];
-};
-
-type ConsultationSubmitResponse = {
-  success?: boolean;
-  error?: string;
-  message?: string;
-  sessionId?: string;
-  data?: {
-    sessionId?: string;
-    patientName?: string;
-    hasPhoto?: boolean;
-    phase?: string;
-  };
-  medicalOffers?: ConsultationMedicalOffers;
-};
 
 type WizardAction =
   | { type: 'SET_FIELD'; field: string; value: unknown }
@@ -268,13 +227,46 @@ const slideVariants = {
   }),
 };
 
+async function parseJsonResponse(
+  response: Response
+): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+  } catch {
+    // non-JSON response
+  }
+
+  return { json: null, text };
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string
+): string {
+  const payload = parsed.json;
+  const payloadError = payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+  const payloadMessage = payload && typeof payload.message === 'string' ? payload.message.trim() : '';
+
+  if (payloadError) return payloadError;
+  if (payloadMessage) return payloadMessage;
+  if (response.status === 413) return 'Upload is too large. Please use smaller images and retry.';
+  if (response.status >= 500) return 'Server is temporarily unavailable. Please try again shortly.';
+  if (parsed.text) return parsed.text.slice(0, 220);
+  return fallback;
+}
+
 // ── Component ──
 
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
   const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
-  const [submittedMedicalOffers, setSubmittedMedicalOffers] = useState<ConsultationMedicalOffers | null>(null);
-  const [submitSuccessMessage, setSubmitSuccessMessage] = useState('');
 
   // ── Handlers ──
 
@@ -317,13 +309,8 @@ export default function ConsultationWizard() {
     }
 
     dispatch({ type: 'SUBMIT_START' });
-    setSubmittedMedicalOffers(null);
-    setSubmitSuccessMessage('');
 
     try {
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), CONSULTATION_SUBMIT_TIMEOUT_MS);
-
       // Build multipart form data for file uploads
       const body = new FormData();
       const { photos, ...jsonData } = formData;
@@ -338,65 +325,43 @@ export default function ConsultationWizard() {
       const res = await fetch('/api/consultation/submit', {
         method: 'POST',
         body,
-        signal: controller.signal,
       });
-
-      window.clearTimeout(timeoutId);
-
+      const parsed = await parseJsonResponse(res);
       if (!res.ok) {
-        let errorMessage = 'Submission failed';
-        try {
-          const errorBody = await res.json();
-          if (typeof errorBody?.error === 'string' && errorBody.error.trim()) {
-            errorMessage = errorBody.error.trim();
-          }
-        } catch {
-          if (res.status === 413) {
-            errorMessage = 'Upload is too large. Keep each photo under 10MB and total uploads under 30MB.';
-          } else if (res.status >= 500) {
-            errorMessage = 'Server is temporarily unavailable. Please retry in a moment.';
-          }
-        }
-        throw new Error(errorMessage);
+        throw new Error(getApiErrorMessage(res, parsed, 'Submission failed'));
+      }
+      if (!parsed.json) {
+        throw new Error('Server returned an invalid response. Please retry.');
       }
 
-      const result = (await res.json()) as ConsultationSubmitResponse;
-      const sessionId = result.data?.sessionId || result.sessionId;
-      if (!sessionId) {
-        throw new Error('Submission succeeded but no session ID was returned. Please retry.');
+      const result = parsed.json as {
+        success?: boolean;
+        data?: { sessionId?: string };
+        error?: string;
+        message?: string;
+      };
+      if (!result.success) {
+        throw new Error(result.error || result.message || 'Submission failed');
       }
 
       dispatch({ type: 'SUBMIT_END', success: true });
 
       // Store session ID for post-submit reference (e.g., dashboard redirect)
-      try {
-        sessionStorage.setItem('mastermind_last_session', sessionId);
-      } catch {
-        // sessionStorage unavailable
+      if (result.data?.sessionId) {
+        try {
+          sessionStorage.setItem('mastermind_last_session', result.data.sessionId);
+        } catch { /* sessionStorage unavailable */ }
       }
-
-      if (result.medicalOffers) {
-        setSubmittedMedicalOffers(result.medicalOffers);
-        setSubmitSuccessMessage(
-          `We found ${result.medicalOffers.recommendationCount} medically supervised options matched to your intake.`
-        );
-      } else {
-        setSubmitSuccessMessage(
-          'Our team will review your consultation and reach out within 24 hours with a personalized treatment plan.'
-        );
-      }
-    } catch (error) {
-      const message =
-        error instanceof DOMException && error.name === 'AbortError'
-          ? 'Upload timed out. Please retry with fewer or smaller photos.'
-          : error instanceof Error && error.message
-            ? error.message
-            : 'Something went wrong. Please try again.';
-
+    } catch (err) {
       dispatch({ type: 'SUBMIT_END', success: false });
       dispatch({
         type: 'SET_ERRORS',
-        errors: { submit: message },
+        errors: {
+          submit:
+            err instanceof Error && err.message.trim()
+              ? err.message
+              : 'Something went wrong. Please try again.',
+        },
       });
     }
   }, [currentStep, formData]);
@@ -499,45 +464,9 @@ export default function ConsultationWizard() {
             You&apos;re All Set
           </h2>
           <p className="font-body text-[#0F1D2C]/60 max-w-md mx-auto mb-8">
-            Thank you, {formData.firstName}! {submitSuccessMessage || 'Our team will review your consultation and follow up soon.'}
+            Thank you, {formData.firstName}! Our team will review your consultation
+            and reach out within 24 hours with a personalized treatment plan.
           </p>
-          {submittedMedicalOffers?.recommendedProducts?.length ? (
-            <div className="rounded-xl border border-[#C9A96E]/30 bg-[#F8F6F1] p-4 mb-6 text-left">
-              <p className="font-body text-sm text-[#0F1D2C]/70 mb-3">
-                Recommended track: <strong className="text-[#0F1D2C]">{submittedMedicalOffers.requestedTrack}</strong>
-                {' '}• Projected monthly gross profit:{' '}
-                <strong className="text-[#0F1D2C]">${submittedMedicalOffers.projectedMonthlyGrossProfit.toFixed(2)}</strong>
-              </p>
-              <div className="space-y-2 mb-4">
-                {submittedMedicalOffers.recommendedProducts.slice(0, 3).map((product) => (
-                  <div key={product.id} className="rounded-lg bg-white border border-[#0F1D2C]/10 p-3">
-                    <p className="font-body font-semibold text-[#0F1D2C]">{product.label}</p>
-                    <p className="font-body text-xs text-[#0F1D2C]/60">
-                      Retail ${product.suggestedRetail.toFixed(2)} • Margin {product.suggestedMarginPercent.toFixed(1)}%
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <a
-                  href={submittedMedicalOffers.checkoutPaths.clinic}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F1D2C] text-white font-body text-sm font-medium hover:bg-[#1A2D3E] transition-colors"
-                >
-                  Continue in Clinic
-                </a>
-                <a
-                  href={submittedMedicalOffers.checkoutPaths.home}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#0F1D2C]/20 text-[#0F1D2C] bg-white font-body text-sm font-medium hover:border-[#C9A96E]/60 transition-colors"
-                >
-                  Continue at Home
-                </a>
-              </div>
-            </div>
-          ) : null}
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F1D2C] text-white font-body font-medium rounded-xl hover:bg-[#0F1D2C]/90 transition-colors"
@@ -649,7 +578,7 @@ export default function ConsultationWizard() {
               key={currentStep}
               custom={direction}
               variants={slideVariants}
-              initial="enter"
+              initial={currentStep === 0 ? false : 'enter'}
               animate="center"
               exit="exit"
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -1235,24 +1164,12 @@ function StepPhotos({
       <div className="mt-6">
         <div className="grid grid-cols-3 gap-3">
           {photos.map((file, index) => (
-            <div
+            <PhotoPreviewTile
               key={`${file.name}-${index}`}
-              className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={URL.createObjectURL(file)}
-                alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => removePhoto(index)}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#0F1D2C]/70 text-white flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                aria-label="Remove photo"
-              >
-                &times;
-              </button>
-            </div>
+              file={file}
+              index={index}
+              onRemove={() => removePhoto(index)}
+            />
           ))}
 
           {photos.length < 3 && (
@@ -1282,6 +1199,38 @@ function StepPhotos({
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PhotoPreviewTile({ file, index, onRemove }: {
+  file: File;
+  index: number;
+  onRemove: () => void;
+}) {
+  const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
+
+  useEffect(() => {
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  return (
+    <div className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={previewUrl}
+        alt={`Upload ${index + 1}`}
+        className="w-full h-full object-cover"
+      />
+      <button
+        onClick={onRemove}
+        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#0F1D2C]/70 text-white flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+        aria-label="Remove photo"
+      >
+        &times;
+      </button>
     </div>
   );
 }
