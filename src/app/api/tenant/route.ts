@@ -231,9 +231,9 @@ export async function DELETE(request: NextRequest) {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function sanitizeTenantForResponse(tenant: Record<string, unknown> | { id: string; name: string; slug: string; airtable: { baseId: string; pat: string }; [key: string]: unknown }) {
+function sanitizeTenantForResponse<T extends object>(tenant: T) {
   // Remove sensitive fields from API responses
-  const safe = { ...tenant } as Record<string, unknown>;
+  const safe = { ...(tenant as Record<string, unknown>) };
 
   // Mask Airtable PAT
   if (safe.airtable && typeof safe.airtable === 'object') {

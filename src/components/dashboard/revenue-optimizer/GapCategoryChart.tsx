@@ -54,7 +54,10 @@ export default function GapCategoryChart({ summary }: GapCategoryChartProps) {
               ))}
             </Pie>
             <Tooltip
-              formatter={(val: number) => `$${val.toLocaleString()}`}
+              formatter={(val) => {
+                const amount = typeof val === 'number' ? val : Number(val ?? 0);
+                return `$${amount.toLocaleString()}`;
+              }}
               contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
             />
           </PieChart>

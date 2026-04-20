@@ -11,9 +11,13 @@ export default function MRRChart({ data, height = 300 }: MRRChartProps) {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
-  const formatMonth = (month: string) => {
-    const [y, m] = month.split('-');
-    const date = new Date(parseInt(y), parseInt(m) - 1);
+  const formatMonth = (month: unknown) => {
+    const value = typeof month === 'string' ? month : '';
+    const [y, m] = value.split('-');
+    const year = Number(y);
+    const monthIndex = Number(m) - 1;
+    if (!year || monthIndex < 0) return value;
+    const date = new Date(year, monthIndex);
     return date.toLocaleDateString('en-US', { month: 'short' });
   };
 

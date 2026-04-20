@@ -74,7 +74,7 @@ function getPageType(): string {
 
 let cachedUtm: Record<string, string> | null = null;
 
-function getUtmParams(): Record<string, string> {
+export function getUtmParams(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   if (cachedUtm) return cachedUtm;
 

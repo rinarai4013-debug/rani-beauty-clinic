@@ -85,4 +85,5 @@ export const TTL = {
   MODERATE: 120_000,    // 2min - lead funnel, aggregations
   RELAXED: 300_000,     // 5min - client lists, provider cards
   SLOW: 600_000,        // 10min - finance, inventory
+  HOURLY: 3_600_000,    // 60min - strategic snapshots
 } as const;

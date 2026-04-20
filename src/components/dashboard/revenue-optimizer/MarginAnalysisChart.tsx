@@ -34,7 +34,10 @@ export default function MarginAnalysisChart({ margins }: MarginAnalysisChartProp
             <XAxis dataKey="service" tick={{ fontSize: 10, fill: '#94a3b8' }} angle={-20} textAnchor="end" height={60} />
             <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickFormatter={(v) => `${v}%`} />
             <Tooltip
-              formatter={(val: number) => [`${val}%`, 'Net Margin']}
+              formatter={(val) => {
+                const percent = typeof val === 'number' ? val : Number(val ?? 0);
+                return [`${percent}%`, 'Net Margin'];
+              }}
               contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
             />
             <Bar dataKey="margin" radius={[4, 4, 0, 0]}>

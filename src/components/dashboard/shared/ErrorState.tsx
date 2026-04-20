@@ -159,7 +159,7 @@ export function ErrorState({
       {onRetry && <RetryButton onRetry={onRetry} />}
 
       {/* Dev-only error details */}
-      {process.env.NODE_ENV === 'development' && error && (
+      {process.env.NODE_ENV === 'development' && Boolean(error) && (
         <div className="mt-6 w-full max-w-lg">
           <button
             onClick={() => setShowDetails(!showDetails)}
