@@ -16,7 +16,13 @@ import {
   Camera,
   CheckCircle2,
 } from 'lucide-react';
-import { convertPdfFirstPageToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
+import {
+  AURA_PDF_EXTRACT_MARKER,
+  convertPdfFirstPageToJpeg,
+  extractAuraPdfInsightsFromText,
+  extractPdfTextSummary,
+  encodeAuraPdfExtractMarker,
+} from '@/lib/client/pdf-image';
 
 import WizardProgressBar from './WizardProgressBar';
 import WizardTrustBar from './WizardTrustBar';
@@ -274,6 +280,10 @@ function isPdfFile(file: File): boolean {
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
   const [pdfFallbackNotes, setPdfFallbackNotes] = useState<string[]>([]);
+  const visiblePdfFallbackNotes = useMemo(
+    () => pdfFallbackNotes.filter((note) => !note.startsWith(AURA_PDF_EXTRACT_MARKER)),
+    [pdfFallbackNotes]
+  );
   const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
 
   // ── Handlers ──
@@ -325,11 +335,11 @@ export default function ConsultationWizard() {
       const jsonData = { ...rest };
       if (pdfFallbackNotes.length > 0) {
         const existingNotes = typeof jsonData.clinicalNotes === 'string' ? jsonData.clinicalNotes.trim() : '';
-        const fallbackHeader =
-          `${pdfFallbackNotes.length} Aura PDF fallback note${pdfFallbackNotes.length > 1 ? 's were' : ' was'} extracted from PDF upload.`;
-        jsonData.clinicalNotes = [existingNotes, fallbackHeader, ...pdfFallbackNotes]
-          .filter(Boolean)
-          .join('\n');
+        const visibleCount = visiblePdfFallbackNotes.length;
+        const fallbackHeader = visibleCount
+          ? `${visibleCount} Aura PDF fallback note${visibleCount > 1 ? 's were' : ' was'} extracted from PDF upload.`
+          : '';
+        jsonData.clinicalNotes = [existingNotes, fallbackHeader, ...pdfFallbackNotes].filter(Boolean).join('\n');
       }
       body.append('data', JSON.stringify(jsonData));
 
@@ -381,7 +391,7 @@ export default function ConsultationWizard() {
         },
       });
     }
-  }, [currentStep, formData, pdfFallbackNotes]);
+  }, [currentStep, formData, pdfFallbackNotes, visiblePdfFallbackNotes]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -404,8 +414,13 @@ export default function ConsultationWizard() {
             failedPdfCount += 1;
             try {
               const extracted = await extractPdfTextSummary(pdfFile, { maxPages: 3, maxChars: 1500 });
-              if (extracted.trim()) {
-                fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}:\n${extracted.trim()}`);
+              const normalizedExtracted = extracted.trim();
+              if (normalizedExtracted) {
+                fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}:\n${normalizedExtracted}`);
+                const parsedInsights = extractAuraPdfInsightsFromText(normalizedExtracted, pdfFile.name);
+                if (parsedInsights) {
+                  fallbackNotes.push(encodeAuraPdfExtractMarker(parsedInsights));
+                }
               } else {
                 fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}.`);
               }
@@ -601,7 +616,7 @@ export default function ConsultationWizard() {
             errors={errors}
             handleFileChange={handleFileChange}
             removePhoto={removePhoto}
-            pdfFallbackCount={pdfFallbackNotes.length}
+            pdfFallbackCount={visiblePdfFallbackNotes.length}
           />
         );
       case 7:
@@ -1269,8 +1284,8 @@ function StepPhotos({
         <div className="mt-4 p-3 rounded-lg bg-[#F8F6F1]/80 border border-[#0F1D2C]/5">
           <p className="text-xs font-body text-[#0F1D2C]/50 leading-relaxed">
             Upload up to 3 files (JPEG, PNG, WebP, HEIC, or Aura PDF). PDFs are
-            converted to secure image preview when possible; otherwise we ingest the PDF
-            directly for fallback analysis. Good lighting and a clean background produce the best results.
+            converted to secure image preview when possible; otherwise extracted report text
+            is used as fallback analysis input. Good lighting and a clean background produce the best results.
           </p>
         </div>
       </div>

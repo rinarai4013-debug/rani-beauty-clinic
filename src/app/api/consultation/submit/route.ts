@@ -33,6 +33,8 @@ const MAX_TOTAL_UPLOAD_SIZE = 30 * 1024 * 1024; // 30MB total
 const MAX_JSON_REQUEST_BYTES = 512 * 1024;
 const MAX_MULTIPART_REQUEST_BYTES = 35 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const AURA_PDF_EXTRACT_MARKER = 'AURA_PDF_EXTRACT::';
+const AURA_PDF_CATEGORIES = ['wrinkles', 'texture', 'brownSpots', 'redAreas', 'pores'] as const;
 
 const LEGACY_CONCERN_MAP: Record<string, string[]> = {
   acne: ['acne'],
@@ -302,6 +304,82 @@ function buildAuraPdfClinicalNote(insights: AuraPdfInsights): string {
     .join('\n');
 }
 
+function stripAuraPdfExtractMarkers(notes: string): string {
+  return notes
+    .split('\n')
+    .filter((line) => !line.trim().startsWith(AURA_PDF_EXTRACT_MARKER))
+    .join('\n')
+    .trim();
+}
+
+function parseAuraPdfInsightsFromClinicalNotes(notes: string): AuraPdfInsights | null {
+  const lines = notes.split('\n');
+  const absoluteScores: AuraPdfInsights['absoluteScores'] = {};
+  const peerScores: AuraPdfInsights['peerScores'] = {};
+  let peerSkinScore: number | null = null;
+  let provenance = 'aura-pdf-fallback-notes';
+  let found = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith(AURA_PDF_EXTRACT_MARKER)) continue;
+
+    const payloadText = trimmed.slice(AURA_PDF_EXTRACT_MARKER.length).trim();
+    if (!payloadText) continue;
+
+    try {
+      const parsed = JSON.parse(payloadText) as Record<string, unknown>;
+      found = true;
+      if (typeof parsed.provenance === 'string' && parsed.provenance.trim()) {
+        provenance = parsed.provenance.trim();
+      }
+
+      const parsedAbsolute = parsed.absoluteScores;
+      if (parsedAbsolute && typeof parsedAbsolute === 'object') {
+        for (const category of AURA_PDF_CATEGORIES) {
+          const value = (parsedAbsolute as Record<string, unknown>)[category];
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            absoluteScores[category] = value;
+          }
+        }
+      }
+
+      const parsedPeer = parsed.peerScores;
+      if (parsedPeer && typeof parsedPeer === 'object') {
+        for (const category of AURA_PDF_CATEGORIES) {
+          const value = (parsedPeer as Record<string, unknown>)[category];
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            peerScores[category] = value;
+          }
+        }
+      }
+
+      if (typeof parsed.peerSkinScore === 'number' && Number.isFinite(parsed.peerSkinScore)) {
+        peerSkinScore = parsed.peerSkinScore;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  const hasMetrics = Object.keys(absoluteScores).length > 0 || Object.keys(peerScores).length > 0;
+  if (!found || (!hasMetrics && peerSkinScore === null)) return null;
+
+  const cleanSummary = stripAuraPdfExtractMarkers(notes)
+    .split('\n')
+    .filter((line) => line.trim().length > 0)
+    .slice(0, 24)
+    .join('\n');
+
+  return {
+    provenance,
+    absoluteScores,
+    peerScores,
+    peerSkinScore,
+    textSummary: cleanSummary,
+  };
+}
+
 export async function POST(request: NextRequest) {
   return withSentry('consultation/submit', async () => {
     try {
@@ -340,6 +418,14 @@ export async function POST(request: NextRequest) {
         );
       }
       intakeData = parsed.data as Partial<ConsultationFormData>;
+      const rawClinicalNotes =
+        typeof intakeData.clinicalNotes === 'string' ? intakeData.clinicalNotes : '';
+      const auraPdfInsightsFromNotes = rawClinicalNotes
+        ? parseAuraPdfInsightsFromClinicalNotes(rawClinicalNotes)
+        : null;
+      if (rawClinicalNotes) {
+        intakeData.clinicalNotes = stripAuraPdfExtractMarkers(rawClinicalNotes) || undefined;
+      }
 
       let sourcePhotoUrl: string | null = null;
       const photoFiles = formData.getAll('photos').filter((value): value is File => value instanceof File);
@@ -362,6 +448,14 @@ export async function POST(request: NextRequest) {
         } else {
           auraUploadStatus = `Aura PDF received (${auraPdfFile.name || 'document.pdf'})`;
         }
+      }
+
+      if (!auraPdfInsights && auraPdfInsightsFromNotes) {
+        auraPdfInsights = auraPdfInsightsFromNotes;
+        const parsedMetrics = buildAuraPdfMetricsSummary(auraPdfInsightsFromNotes);
+        auraUploadStatus = parsedMetrics
+          ? `Aura PDF metrics recovered from fallback notes (${parsedMetrics})`
+          : 'Aura PDF metrics recovered from fallback notes';
       }
 
       if (photoFiles.length > MAX_PHOTOS) {

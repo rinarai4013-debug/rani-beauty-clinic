@@ -6,7 +6,13 @@ import {
   User, Heart, Stethoscope, Clock, ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { convertPdfFirstPageToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
+import {
+  AURA_PDF_EXTRACT_MARKER,
+  convertPdfFirstPageToJpeg,
+  extractAuraPdfInsightsFromText,
+  extractPdfTextSummary,
+  encodeAuraPdfExtractMarker,
+} from '@/lib/client/pdf-image';
 
 // ══════════════════════════════════════════════════════════════
 // OPTION CONSTANTS — matching all 25 Typeform questions
@@ -915,10 +921,15 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           failedPdfCount += 1;
           try {
             const extracted = await extractPdfTextSummary(pdfFile, { maxPages: 3, maxChars: 2000 });
-            if (extracted.trim()) {
+            const normalizedExtracted = extracted.trim();
+            if (normalizedExtracted) {
               fallbackNotes.push(
-                `Aura PDF fallback extracted from ${pdfFile.name}:\n${extracted.trim()}`
+                `Aura PDF fallback extracted from ${pdfFile.name}:\n${normalizedExtracted}`
               );
+              const parsedInsights = extractAuraPdfInsightsFromText(normalizedExtracted, pdfFile.name);
+              if (parsedInsights) {
+                fallbackNotes.push(encodeAuraPdfExtractMarker(parsedInsights));
+              }
             } else {
               fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}.`);
             }
@@ -956,6 +967,10 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const removeAuraPhoto = (i: number) => setAuraPhotos((prev) => prev.filter((_, idx) => idx !== i));
 
   const auraInlineUploadPreview = useMemo(() => buildAuraInlineUploadSet(auraPhotos), [auraPhotos]);
+  const auraPdfFallbackVisibleNotes = useMemo(
+    () => auraPdfFallbackNotes.filter((note) => !note.startsWith(AURA_PDF_EXTRACT_MARKER)),
+    [auraPdfFallbackNotes]
+  );
 
   // ── Submit ──
   const handleSubmit = async () => {
@@ -999,9 +1014,12 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         );
       }
       if (auraPdfFallbackNotes.length > 0) {
-        auraNotes.push(
-          `${auraPdfFallbackNotes.length} Aura PDF fallback note${auraPdfFallbackNotes.length > 1 ? 's' : ''} extracted for scan context.`
-        );
+        const visibleNoteCount = auraPdfFallbackVisibleNotes.length;
+        if (visibleNoteCount > 0) {
+          auraNotes.push(
+            `${visibleNoteCount} Aura PDF fallback note${visibleNoteCount > 1 ? 's' : ''} extracted for scan context.`
+          );
+        }
         auraNotes.push(...auraPdfFallbackNotes);
       }
       if (auraInline.skippedOversizeCount > 0) {
@@ -1727,7 +1745,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           <SummaryRow label="Skin Photos" value={`${skinPhotos.length} uploaded`} />
           <SummaryRow
             label="Aura Scan"
-            value={`${auraPhotos.length} attached (${auraInlineUploadPreview.inlineFiles.length} images sent${auraPdfFallbackNotes.length > 0 ? `, ${auraPdfFallbackNotes.length} PDF fallback note${auraPdfFallbackNotes.length > 1 ? 's' : ''}` : ''})`}
+            value={`${auraPhotos.length} attached (${auraInlineUploadPreview.inlineFiles.length} images sent${auraPdfFallbackVisibleNotes.length > 0 ? `, ${auraPdfFallbackVisibleNotes.length} PDF fallback note${auraPdfFallbackVisibleNotes.length > 1 ? 's' : ''}` : ''})`}
           />
         </div>
       </div>

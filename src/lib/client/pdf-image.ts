@@ -31,6 +31,25 @@ type PdfTextExtractOptions = {
   maxChars?: number;
 };
 
+type AuraPdfCategory = 'wrinkles' | 'texture' | 'brownSpots' | 'redAreas' | 'pores';
+
+export type AuraPdfClientInsights = {
+  provenance: string;
+  absoluteScores: Partial<Record<AuraPdfCategory, number>>;
+  peerScores: Partial<Record<AuraPdfCategory, number>>;
+  peerSkinScore: number | null;
+};
+
+export const AURA_PDF_EXTRACT_MARKER = 'AURA_PDF_EXTRACT::';
+
+const AURA_CATEGORY_LABELS: Record<AuraPdfCategory, string> = {
+  wrinkles: 'Wrinkles',
+  texture: 'Texture',
+  brownSpots: 'Brown Spots',
+  redAreas: 'Red Areas',
+  pores: 'Pores',
+};
+
 let pdfJsPromise: Promise<PdfJsModule> | null = null;
 
 async function loadPdfJs(): Promise<PdfJsModule> {
@@ -162,4 +181,88 @@ export async function extractPdfTextSummary(
   } finally {
     await pdf.destroy?.();
   }
+}
+
+function parseFloatSafe(raw: string): number | null {
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function roundToOneDecimal(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+function parseCategoryValues(text: string, label: string): number[] {
+  const values: number[] = [];
+  const regex = new RegExp(`${label}[\\s\\S]{0,40}?Score\\s*:\\s*(-?\\d+(?:\\.\\d+)?)`, 'gi');
+  let match = regex.exec(text);
+  while (match) {
+    const value = parseFloatSafe(match[1]);
+    if (value !== null) values.push(value);
+    match = regex.exec(text);
+  }
+  return values;
+}
+
+function pickAbsolute(values: number[]): number | null {
+  for (const value of values) {
+    if (value >= 0.5 && value <= 5.0) return value;
+  }
+  return null;
+}
+
+function pickPeer(values: number[]): number | null {
+  if (values.length >= 2) {
+    const second = values[1];
+    if (second >= -3 && second <= 3) return second;
+  }
+  for (const value of values) {
+    if (value >= -3 && value <= 3 && value < 0.5) return value;
+  }
+  return null;
+}
+
+function parsePeerSkinScore(text: string): number | null {
+  const regex = /Skin Score[\s\S]{0,140}?(-?\d+(?:\.\d+)?)/i;
+  const match = regex.exec(text);
+  if (!match) return null;
+  const value = parseFloatSafe(match[1]);
+  if (value === null) return null;
+  return value >= -3 && value <= 3 ? roundToOneDecimal(value) : null;
+}
+
+export function extractAuraPdfInsightsFromText(
+  text: string,
+  provenance: string
+): AuraPdfClientInsights | null {
+  const normalized = text.trim();
+  if (!normalized) return null;
+
+  const absoluteScores: Partial<Record<AuraPdfCategory, number>> = {};
+  const peerScores: Partial<Record<AuraPdfCategory, number>> = {};
+
+  for (const [category, label] of Object.entries(AURA_CATEGORY_LABELS) as Array<
+    [AuraPdfCategory, string]
+  >) {
+    const values = parseCategoryValues(normalized, label);
+    const absolute = pickAbsolute(values);
+    const peer = pickPeer(values);
+    if (absolute !== null) absoluteScores[category] = roundToOneDecimal(absolute);
+    if (peer !== null) peerScores[category] = roundToOneDecimal(peer);
+  }
+
+  const hasAnyMetrics = Object.keys(absoluteScores).length > 0 || Object.keys(peerScores).length > 0;
+  const peerSkinScore = parsePeerSkinScore(normalized);
+  if (!hasAnyMetrics && peerSkinScore === null) return null;
+
+  return {
+    provenance,
+    absoluteScores,
+    peerScores,
+    peerSkinScore,
+  };
+}
+
+export function encodeAuraPdfExtractMarker(insights: AuraPdfClientInsights): string {
+  return `${AURA_PDF_EXTRACT_MARKER}${JSON.stringify(insights)}`;
 }
