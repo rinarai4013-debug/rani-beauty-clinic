@@ -236,8 +236,8 @@ function analyzeZones(
     const facialZone = ZONE_DISPLAY_NAMES[area];
     if (!facialZone) continue;
 
-    // Base zone score from overall, with some variance
-    const variance = (Math.random() * 20 - 10); // ±10 from overall
+    // Deterministic variance keeps results stable between runs for the same intake.
+    const variance = zoneVarianceSeed(facialZone, age, concerns);
     const zoneScore = Math.round(
       Math.max(20, Math.min(95, skinHealth.overall + variance))
     );
@@ -281,6 +281,16 @@ function analyzeZones(
   }
 
   return zones;
+}
+
+function zoneVarianceSeed(zone: FacialZone, age: number, concerns: SkinConcern[]): number {
+  const signature = `${zone}|${age}|${concerns.slice().sort().join(',')}`;
+  let hash = 0;
+  for (let index = 0; index < signature.length; index += 1) {
+    hash = ((hash << 5) - hash + signature.charCodeAt(index)) | 0;
+  }
+
+  return (Math.abs(hash) % 21) - 10;
 }
 
 function getZoneRecommendations(

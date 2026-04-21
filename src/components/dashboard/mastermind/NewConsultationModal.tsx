@@ -6,7 +6,7 @@ import {
   User, Heart, Stethoscope, Clock, ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { convertPdfFirstPageToJpeg } from '@/lib/client/pdf-image';
+import { convertPdfFirstPageToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
 
 // ══════════════════════════════════════════════════════════════
 // OPTION CONSTANTS — matching all 25 Typeform questions
@@ -249,16 +249,19 @@ function formatMb(bytes: number): string {
 
 function buildAuraInlineUploadSet(files: File[]): {
   inlineFiles: File[];
+  rawPdfFiles: File[];
   skippedPdfCount: number;
   skippedOversizeCount: number;
 } {
   let skippedPdfCount = 0;
   let skippedOversizeCount = 0;
   const inlineFiles: File[] = [];
+  const rawPdfFiles: File[] = [];
 
   for (const file of files) {
     if (isPdfFile(file)) {
       skippedPdfCount += 1;
+      rawPdfFiles.push(file);
       continue;
     }
 
@@ -272,7 +275,7 @@ function buildAuraInlineUploadSet(files: File[]): {
     inlineFiles.push(file);
   }
 
-  return { inlineFiles, skippedPdfCount, skippedOversizeCount };
+  return { inlineFiles, rawPdfFiles, skippedPdfCount, skippedOversizeCount };
 }
 
 async function parseJsonResponse(
@@ -608,7 +611,7 @@ function PhotoDropZone({
 
   const previewUrls = useMemo(
     () =>
-      files.map((file) => (file.type === 'application/pdf' ? null : URL.createObjectURL(file))),
+      files.map((file) => (isPdfFile(file) ? null : URL.createObjectURL(file))),
     [files]
   );
 
@@ -638,7 +641,7 @@ function PhotoDropZone({
           {files.map((f, i) => (
             <div key={i} className="relative group">
               <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-[#C9A96E]/30 flex items-center justify-center bg-[#0F1D2C]">
-                {f.type === 'application/pdf' ? (
+                {isPdfFile(f) ? (
                   <div className="text-center">
                     <div className="text-[#C9A96E] text-lg">📄</div>
                     <div className="text-[8px] text-[#F8F6F1]/50 mt-0.5 px-1 truncate max-w-[76px]">{f.name}</div>
@@ -755,6 +758,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const [skinPhotos, setSkinPhotos] = useState<File[]>([]);
   const [auraPhotos, setAuraPhotos] = useState<File[]>([]);
   const [isConvertingAuraPdf, setIsConvertingAuraPdf] = useState(false);
+  const [auraPdfFallbackNotes, setAuraPdfFallbackNotes] = useState<string[]>([]);
 
   // ── Draft auto-save / restore (localStorage) ──
   const DRAFT_KEY = 'rani_consult_draft';
@@ -896,21 +900,37 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     const nonPdfFiles = files.filter((file) => !isPdfFile(file));
 
     let convertedPdfImages: File[] = [];
+    const fallbackNotes: string[] = [];
     let failedPdfCount = 0;
     if (pdfFiles.length > 0) {
       setIsConvertingAuraPdf(true);
-      const converted = await Promise.all(
-        pdfFiles.map(async (pdfFile) => {
+      for (const pdfFile of pdfFiles) {
+        try {
+          const converted = await convertPdfFirstPageToJpeg(pdfFile, {
+            maxDimension: 1700,
+            quality: 0.82,
+          });
+          convertedPdfImages.push(converted);
+        } catch {
+          failedPdfCount += 1;
           try {
-            return await convertPdfFirstPageToJpeg(pdfFile, { maxDimension: 1700, quality: 0.82 });
+            const extracted = await extractPdfTextSummary(pdfFile, { maxPages: 3, maxChars: 2000 });
+            if (extracted.trim()) {
+              fallbackNotes.push(
+                `Aura PDF fallback extracted from ${pdfFile.name}:\n${extracted.trim()}`
+              );
+            } else {
+              fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}.`);
+            }
           } catch {
-            failedPdfCount += 1;
-            return null;
+            fallbackNotes.push(`Aura PDF attached (${pdfFile.name}) but image conversion failed.`);
           }
-        })
-      );
-      convertedPdfImages = converted.filter((file): file is File => file instanceof File);
+        }
+      }
       setIsConvertingAuraPdf(false);
+    }
+    if (fallbackNotes.length > 0) {
+      setAuraPdfFallbackNotes((prev) => [...prev, ...fallbackNotes].slice(0, 5));
     }
 
     const oversizeAuraImages = [...nonPdfFiles, ...convertedPdfImages].filter(
@@ -918,7 +938,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     );
     if (failedPdfCount > 0) {
       setError(
-        `${failedPdfCount} Aura PDF file${failedPdfCount > 1 ? 's could not' : ' could not'} be converted. Please retry with a different PDF export.`
+        `${failedPdfCount} Aura PDF file${failedPdfCount > 1 ? 's could not' : ' could not'} be converted to image. Extracted report text will be used as fallback analysis input.`
       );
     } else if (oversizeAuraImages.length > 0) {
       setError(
@@ -975,8 +995,14 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       const auraNotes: string[] = [];
       if (auraInline.skippedPdfCount > 0) {
         auraNotes.push(
-          `${auraInline.skippedPdfCount} Aura PDF file${auraInline.skippedPdfCount > 1 ? 's were' : ' was'} attached in dashboard but excluded from initial submit.`
+          `${auraInline.skippedPdfCount} Aura PDF file${auraInline.skippedPdfCount > 1 ? 's were' : ' was'} attached but not uploaded as raw file due payload limits.`
         );
+      }
+      if (auraPdfFallbackNotes.length > 0) {
+        auraNotes.push(
+          `${auraPdfFallbackNotes.length} Aura PDF fallback note${auraPdfFallbackNotes.length > 1 ? 's' : ''} extracted for scan context.`
+        );
+        auraNotes.push(...auraPdfFallbackNotes);
       }
       if (auraInline.skippedOversizeCount > 0) {
         auraNotes.push(
@@ -984,7 +1010,8 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         );
       }
       const combinedClinicalNotes = [clinicalNotes.trim(), ...auraNotes].filter(Boolean).join('\n');
-      const initialUploadBytes = [...skinPhotos, ...auraInline.inlineFiles].reduce((sum, file) => sum + file.size, 0);
+      const initialUploadBytes = [...skinPhotos, ...auraInline.inlineFiles]
+        .reduce((sum, file) => sum + file.size, 0);
       if (initialUploadBytes > MAX_INITIAL_SUBMIT_UPLOAD_BYTES) {
         throw new Error(
           `Initial upload exceeds ${formatMb(MAX_INITIAL_SUBMIT_UPLOAD_BYTES)} MB. Remove some files and retry.`
@@ -1083,6 +1110,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
       // Clear saved draft on successful submit
       try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
+      setAuraPdfFallbackNotes([]);
 
       const sessionId =
         submitPayload.data?.sessionId ||
@@ -1699,7 +1727,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           <SummaryRow label="Skin Photos" value={`${skinPhotos.length} uploaded`} />
           <SummaryRow
             label="Aura Scan"
-            value={`${auraPhotos.length} attached (${auraInlineUploadPreview.inlineFiles.length} sent in initial submit)`}
+            value={`${auraPhotos.length} attached (${auraInlineUploadPreview.inlineFiles.length} images sent${auraPdfFallbackNotes.length > 0 ? `, ${auraPdfFallbackNotes.length} PDF fallback note${auraPdfFallbackNotes.length > 1 ? 's' : ''}` : ''})`}
           />
         </div>
       </div>

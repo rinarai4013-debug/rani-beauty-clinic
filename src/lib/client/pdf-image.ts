@@ -26,6 +26,11 @@ type PdfConvertOptions = {
   quality?: number;
 };
 
+type PdfTextExtractOptions = {
+  maxPages?: number;
+  maxChars?: number;
+};
+
 let pdfJsPromise: Promise<PdfJsModule> | null = null;
 
 async function loadPdfJs(): Promise<PdfJsModule> {
@@ -45,6 +50,17 @@ async function loadPdfJs(): Promise<PdfJsModule> {
   }
 
   return pdfJsPromise;
+}
+
+async function loadPdfDocument(pdfFile: File): Promise<PdfDocument> {
+  const pdfjs = await loadPdfJs();
+  const bytes = new Uint8Array(await pdfFile.arrayBuffer());
+  const loadingTask = pdfjs.getDocument({
+    data: bytes,
+    useWorkerFetch: false,
+    isEvalSupported: false,
+  });
+  return loadingTask.promise;
 }
 
 function baseName(fileName: string): string {
@@ -71,36 +87,78 @@ export async function convertPdfFirstPageToJpeg(
   const maxDimension = options.maxDimension ?? 1800;
   const quality = options.quality ?? 0.82;
 
-  const pdfjs = await loadPdfJs();
-  const bytes = new Uint8Array(await pdfFile.arrayBuffer());
-  const loadingTask = pdfjs.getDocument({ data: bytes });
-  const pdf = await loadingTask.promise;
+  const pdf = await loadPdfDocument(pdfFile);
 
   try {
     const page = await pdf.getPage(1);
-    let viewport = page.getViewport({ scale: 1.8 });
-    const largerSide = Math.max(viewport.width, viewport.height);
-    if (largerSide > maxDimension) {
-      const downScale = maxDimension / largerSide;
-      viewport = page.getViewport({ scale: 1.8 * downScale });
+    const candidateScales = [1.8, 1.25, 1.0, 0.8];
+    let lastError: unknown = null;
+
+    for (const baseScale of candidateScales) {
+      try {
+        let viewport = page.getViewport({ scale: baseScale });
+        const largerSide = Math.max(viewport.width, viewport.height);
+        if (largerSide > maxDimension) {
+          const downScale = maxDimension / largerSide;
+          viewport = page.getViewport({ scale: baseScale * downScale });
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.floor(viewport.width));
+        canvas.height = Math.max(1, Math.floor(viewport.height));
+
+        const context = canvas.getContext('2d', { alpha: false });
+        if (!context) {
+          throw new Error('Failed to create canvas context for PDF conversion');
+        }
+
+        await page.render({ canvasContext: context, viewport }).promise;
+        const blob = await toBlob(canvas, quality);
+
+        return new File([blob], `${baseName(pdfFile.name)}-page1.jpg`, {
+          type: 'image/jpeg',
+          lastModified: Date.now(),
+        });
+      } catch (error) {
+        lastError = error;
+      }
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.floor(viewport.width));
-    canvas.height = Math.max(1, Math.floor(viewport.height));
+    throw lastError instanceof Error
+      ? lastError
+      : new Error('Failed to render Aura PDF page to image');
+  } finally {
+    await pdf.destroy?.();
+  }
+}
 
-    const context = canvas.getContext('2d', { alpha: false });
-    if (!context) {
-      throw new Error('Failed to create canvas context for PDF conversion');
+export async function extractPdfTextSummary(
+  pdfFile: File,
+  options: PdfTextExtractOptions = {}
+): Promise<string> {
+  const maxPages = Math.max(1, options.maxPages ?? 3);
+  const maxChars = Math.max(500, options.maxChars ?? 4000);
+  const pdf = await loadPdfDocument(pdfFile);
+
+  try {
+    const fragments: string[] = [];
+    const pageCount = (pdf as unknown as { numPages?: number }).numPages ?? maxPages;
+    const pagesToRead = Math.min(maxPages, pageCount);
+
+    for (let pageNumber = 1; pageNumber <= pagesToRead; pageNumber += 1) {
+      const page = await pdf.getPage(pageNumber);
+      const textContent = await (
+        page as unknown as { getTextContent: () => Promise<{ items?: Array<{ str?: string }> }> }
+      ).getTextContent();
+      for (const item of textContent.items || []) {
+        const text = typeof item?.str === 'string' ? item.str.trim() : '';
+        if (text) fragments.push(text);
+      }
+
+      if (fragments.join('\n').length >= maxChars) break;
     }
 
-    await page.render({ canvasContext: context, viewport }).promise;
-    const blob = await toBlob(canvas, quality);
-
-    return new File([blob], `${baseName(pdfFile.name)}-page1.jpg`, {
-      type: 'image/jpeg',
-      lastModified: Date.now(),
-    });
+    return fragments.join('\n').slice(0, maxChars);
   } finally {
     await pdf.destroy?.();
   }

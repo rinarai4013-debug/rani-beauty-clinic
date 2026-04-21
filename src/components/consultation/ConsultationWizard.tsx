@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback, useEffect, useMemo } from 'react';
+import { useReducer, useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -16,7 +16,7 @@ import {
   Camera,
   CheckCircle2,
 } from 'lucide-react';
-import { convertPdfFirstPageToJpeg } from '@/lib/client/pdf-image';
+import { convertPdfFirstPageToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
 
 import WizardProgressBar from './WizardProgressBar';
 import WizardTrustBar from './WizardTrustBar';
@@ -273,6 +273,7 @@ function isPdfFile(file: File): boolean {
 
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
+  const [pdfFallbackNotes, setPdfFallbackNotes] = useState<string[]>([]);
   const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
 
   // ── Handlers ──
@@ -320,7 +321,16 @@ export default function ConsultationWizard() {
     try {
       // Build multipart form data for file uploads
       const body = new FormData();
-      const { photos, ...jsonData } = formData;
+      const { photos, ...rest } = formData;
+      const jsonData = { ...rest };
+      if (pdfFallbackNotes.length > 0) {
+        const existingNotes = typeof jsonData.clinicalNotes === 'string' ? jsonData.clinicalNotes.trim() : '';
+        const fallbackHeader =
+          `${pdfFallbackNotes.length} Aura PDF fallback note${pdfFallbackNotes.length > 1 ? 's were' : ' was'} extracted from PDF upload.`;
+        jsonData.clinicalNotes = [existingNotes, fallbackHeader, ...pdfFallbackNotes]
+          .filter(Boolean)
+          .join('\n');
+      }
       body.append('data', JSON.stringify(jsonData));
 
       if (photos && photos.length > 0) {
@@ -328,7 +338,6 @@ export default function ConsultationWizard() {
           body.append('photos', photo);
         }
       }
-
       const res = await fetch('/api/consultation/submit', {
         method: 'POST',
         body,
@@ -352,6 +361,7 @@ export default function ConsultationWizard() {
       }
 
       dispatch({ type: 'SUBMIT_END', success: true });
+      setPdfFallbackNotes([]);
 
       // Store session ID for post-submit reference (e.g., dashboard redirect)
       if (result.data?.sessionId) {
@@ -371,7 +381,7 @@ export default function ConsultationWizard() {
         },
       });
     }
-  }, [currentStep, formData]);
+  }, [currentStep, formData, pdfFallbackNotes]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -383,19 +393,30 @@ export default function ConsultationWizard() {
       const imageFiles = files.filter((file) => !isPdfFile(file));
 
       let convertedPdfImages: File[] = [];
+      const fallbackNotes: string[] = [];
       let failedPdfCount = 0;
       if (pdfFiles.length > 0) {
-        const converted = await Promise.all(
-          pdfFiles.map(async (pdfFile) => {
+        for (const pdfFile of pdfFiles) {
+          try {
+            const converted = await convertPdfFirstPageToJpeg(pdfFile, { maxDimension: 1700, quality: 0.82 });
+            convertedPdfImages.push(converted);
+          } catch {
+            failedPdfCount += 1;
             try {
-              return await convertPdfFirstPageToJpeg(pdfFile, { maxDimension: 1700, quality: 0.82 });
+              const extracted = await extractPdfTextSummary(pdfFile, { maxPages: 3, maxChars: 1500 });
+              if (extracted.trim()) {
+                fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}:\n${extracted.trim()}`);
+              } else {
+                fallbackNotes.push(`Aura PDF fallback extracted from ${pdfFile.name}.`);
+              }
             } catch {
-              failedPdfCount += 1;
-              return null;
+              fallbackNotes.push(`Aura PDF attached (${pdfFile.name}) but image conversion failed.`);
             }
-          })
-        );
-        convertedPdfImages = converted.filter((file): file is File => file instanceof File);
+          }
+        }
+      }
+      if (fallbackNotes.length > 0) {
+        setPdfFallbackNotes((prev) => [...prev, ...fallbackNotes].slice(0, 5));
       }
 
       const existing = (formData.photos as File[]) || [];
@@ -409,8 +430,8 @@ export default function ConsultationWizard() {
           errors: {
             ...errors,
             photos:
-              `${failedPdfCount} PDF file${failedPdfCount > 1 ? 's' : ''} could not be converted. ` +
-              'Please retry with a different PDF export.',
+              `${failedPdfCount} PDF file${failedPdfCount > 1 ? 's' : ''} could not be converted to image. ` +
+              'Extracted report text will be used as fallback analysis input.',
           },
         });
       } else if (errors.photos) {
@@ -580,6 +601,7 @@ export default function ConsultationWizard() {
             errors={errors}
             handleFileChange={handleFileChange}
             removePhoto={removePhoto}
+            pdfFallbackCount={pdfFallbackNotes.length}
           />
         );
       case 7:
@@ -1191,11 +1213,13 @@ function StepPhotos({
   errors,
   handleFileChange,
   removePhoto,
+  pdfFallbackCount,
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removePhoto: (index: number) => void;
+  pdfFallbackCount: number;
 }) {
   const photos = (formData.photos as File[]) || [];
 
@@ -1236,12 +1260,17 @@ function StepPhotos({
         {errors.photos && (
           <p className="mt-2 text-sm font-body text-red-600">{errors.photos}</p>
         )}
+        {pdfFallbackCount > 0 && (
+          <p className="mt-2 text-sm font-body text-[#0F1D2C]/70">
+            {pdfFallbackCount} Aura PDF file{pdfFallbackCount > 1 ? 's are' : ' is'} queued as fallback upload.
+          </p>
+        )}
 
         <div className="mt-4 p-3 rounded-lg bg-[#F8F6F1]/80 border border-[#0F1D2C]/5">
           <p className="text-xs font-body text-[#0F1D2C]/50 leading-relaxed">
             Upload up to 3 files (JPEG, PNG, WebP, HEIC, or Aura PDF). PDFs are
-            automatically converted to a secure image preview before upload. Good lighting
-            and a clean background produce the best results.
+            converted to secure image preview when possible; otherwise we ingest the PDF
+            directly for fallback analysis. Good lighting and a clean background produce the best results.
           </p>
         </div>
       </div>
