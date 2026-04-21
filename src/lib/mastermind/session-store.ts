@@ -22,6 +22,10 @@ const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
 const TABLE_NAME = 'Automation%20Log';
 const WORKFLOW_KEY = 'mastermind_session';
 
+function shouldFailHard(): boolean {
+  return process.env.NODE_ENV === 'production' || process.env.REQUIRE_PERSISTENT_SESSIONS === 'true';
+}
+
 function getAirtablePat(): string | null {
   return process.env.AIRTABLE_PAT || null;
 }
@@ -49,6 +53,8 @@ const cache = new Map<string, { session: MastermindSession; recordId: string }>(
 export async function saveSessionToAirtable(session: MastermindSession): Promise<void> {
   const pat = getAirtablePat();
   if (!pat) {
+    const error = new Error('AIRTABLE_PAT not set — session not persisted');
+    if (shouldFailHard()) throw error;
     console.warn('[SessionStore] AIRTABLE_PAT not set — session not persisted');
     return;
   }
@@ -103,7 +109,7 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
       });
       if (!res.ok) {
         const errBody = await res.text().catch(() => '');
-        console.error(`[SessionStore] PATCH failed (${res.status}):`, errBody);
+        throw new Error(`[SessionStore] PATCH failed (${res.status}): ${errBody.slice(0, 500)}`);
       }
     } else {
       // Check if record exists (from a previous cold start)
@@ -125,7 +131,7 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
         });
         if (!res.ok) {
           const errBody = await res.text().catch(() => '');
-          console.error(`[SessionStore] PATCH (found) failed (${res.status}):`, errBody);
+          throw new Error(`[SessionStore] PATCH (found) failed (${res.status}): ${errBody.slice(0, 500)}`);
         }
         cache.set(session.id, { session, recordId: existing.recordId });
       } else {
@@ -149,21 +155,21 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
         });
         if (!res.ok) {
           const errBody = await res.text().catch(() => '');
-          console.error(`[SessionStore] CREATE failed (${res.status}):`, errBody);
+          throw new Error(`[SessionStore] CREATE failed (${res.status}): ${errBody.slice(0, 500)}`);
         } else {
           const data = await res.json();
           const recordId = data?.records?.[0]?.id;
           if (recordId) {
             cache.set(session.id, { session, recordId });
           } else {
-            console.warn('[SessionStore] CREATE succeeded but no recordId in response');
+            throw new Error('[SessionStore] CREATE succeeded but no recordId in response');
           }
         }
       }
     }
   } catch (err) {
     console.error('[SessionStore] Airtable save failed:', err);
-    // Cache still has the session for this invocation
+    if (shouldFailHard()) throw err;
   }
 
   // Always update in-memory cache

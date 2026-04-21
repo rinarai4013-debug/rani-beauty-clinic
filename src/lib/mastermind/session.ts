@@ -292,16 +292,30 @@ export async function getSessionByIdAsync(id: string): Promise<MastermindSession
 
   // Server-side: try Airtable
   if (typeof window === 'undefined') {
-    try {
-      const { getSessionFromAirtable } = await import('./session-store');
-      const atSession = await getSessionFromAirtable(id);
-      if (atSession) {
-        const hydrated = hydrateSession(atSession as unknown as Record<string, unknown>);
-        sessions.set(id, hydrated);
-        return hydrated;
+    const retryDelaysMs = [0, 120, 260, 500, 900];
+    const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+    let lastError: unknown = null;
+
+    for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+      if (attempt > 0) {
+        await wait(retryDelaysMs[attempt]);
       }
-    } catch (err) {
-      console.warn('[Session] Airtable read failed:', err);
+
+      try {
+        const { getSessionFromAirtable } = await import('./session-store');
+        const atSession = await getSessionFromAirtable(id);
+        if (atSession) {
+          const hydrated = hydrateSession(atSession as unknown as Record<string, unknown>);
+          sessions.set(id, hydrated);
+          return hydrated;
+        }
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (lastError) {
+      console.warn('[Session] Airtable read failed after retries:', lastError);
     }
   }
 
@@ -397,17 +411,8 @@ export async function saveSessionAsync(session: MastermindSession): Promise<void
   sessions.set(session.id, session);
 
   if (typeof window === 'undefined') {
-    try {
-      const { saveSessionToAirtable } = await import('./session-store');
-      await saveSessionToAirtable(session);
-    } catch (err) {
-      // Log as error — if this fails, session only exists in memory
-      // and will be lost on Vercel cold start
-      console.error(
-        `[Session] CRITICAL: Airtable save failed for session ${session.id} (phase: ${session.phase}, patient: ${session.patientName || 'unknown'})`,
-        err
-      );
-    }
+    const { saveSessionToAirtable } = await import('./session-store');
+    await saveSessionToAirtable(session);
   }
 }
 
@@ -487,5 +492,4 @@ function generateSessionId(): string {
   const random = Math.random().toString(36).slice(2, 8);
   return `ms_${timestamp}_${random}`;
 }
-
 
