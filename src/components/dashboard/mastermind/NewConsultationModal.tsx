@@ -172,7 +172,7 @@ const BUDGET_TO_SCHEMA: Record<string, string> = {
   '5000-plus': 'investment',
 };
 
-const SESSION_READY_RETRY_DELAYS_MS = [120, 300, 700];
+const SESSION_READY_RETRY_DELAYS_MS = [150, 300, 600, 1000, 1600, 2400, 3600, 5200];
 const MAX_INITIAL_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
 const MAX_AURA_INLINE_UPLOAD_BYTES = 3 * 1024 * 1024;
 const MAX_SKIN_UPLOAD_FILES = 5;
@@ -371,8 +371,7 @@ async function waitForSessionReady(sessionId: string): Promise<void> {
 
     const parsed = await parseJsonResponse(response);
     if (response.status === 401 || response.status === 403) {
-      // Session exists, but auth middleware blocked verification. Continue best-effort.
-      return;
+      throw new Error('Your dashboard session expired. Please sign in again and retry.');
     }
     lastMessage = getApiErrorMessage(response, parsed, lastMessage);
     const retryable = response.status === 404 || /session not found|still initializing/i.test(lastMessage);
@@ -1137,10 +1136,11 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         throw new Error('Submission succeeded but no session ID was returned. Please retry.');
       }
 
-      // Cross-function persistence can lag briefly; poll before downstream calls.
-      try {
-        await waitForSessionReady(sessionId);
+      // Mandatory: do not navigate until session is truly readable.
+      await waitForSessionReady(sessionId);
 
+      // Best-effort downstream generation; non-blocking for navigation.
+      try {
         let planRes = await fetch('/api/mastermind/plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
