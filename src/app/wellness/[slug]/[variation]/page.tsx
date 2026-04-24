@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import StructuredData from "@/components/seo/StructuredData";
 import { clinicInfo } from "@/data/clinic-info";
+import { getRxProgramFromVariation, getRxProgramEnrollmentHref } from "@/lib/rx-programs";
 import {
   serviceVariations,
   ServiceVariation,
@@ -124,6 +125,10 @@ export default function WellnessVariationPage({
   }
 
   const { faqSchema, breadcrumbSchema } = buildStructuredData(variation);
+  const mappedRxProgram = getRxProgramFromVariation(variation.parentSlug, variation.slug);
+  const rxProgramHref = mappedRxProgram
+    ? getRxProgramEnrollmentHref(mappedRxProgram)
+    : null;
 
   return (
     <>
@@ -259,12 +264,21 @@ export default function WellnessVariationPage({
             >
               View All {variation.parentTitle} Options
             </Link>
-            <a
-              href={clinicInfo.phoneTel}
-              className="inline-block px-8 py-3 bg-[#C9A96E] text-[#0F1D2C] rounded-lg hover:bg-[#C9A96E]/90 transition-colors font-bold"
-            >
-              Schedule Your Consultation
-            </a>
+            {rxProgramHref ? (
+              <Link
+                href={rxProgramHref}
+                className="inline-block px-8 py-3 bg-[#C9A96E] text-[#0F1D2C] rounded-lg hover:bg-[#C9A96E]/90 transition-colors font-bold"
+              >
+                Start Program Enrollment
+              </Link>
+            ) : (
+              <a
+                href={clinicInfo.phoneTel}
+                className="inline-block px-8 py-3 bg-[#C9A96E] text-[#0F1D2C] rounded-lg hover:bg-[#C9A96E]/90 transition-colors font-bold"
+              >
+                Schedule Your Consultation
+              </a>
+            )}
           </div>
         </div>
       </section>

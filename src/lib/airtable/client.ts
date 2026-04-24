@@ -122,6 +122,7 @@ export const Tables = {
   intakeIntelligence: () => getAirtableBase()('Intake Intelligence'),
   treatmentPlans: () => getAirtableBase()('Treatment Plans'),
   chartNotes: () => getAirtableBase()('Chart Notes'),
+  rxProgramEnrollments: () => getAirtableBase()('Rx Program Enrollments'),
 } as const;
 
 // Resolve a table accessor key to its Airtable table name
@@ -140,6 +141,7 @@ const TABLE_KEY_TO_NAME: Record<string, string> = {
   intakeIntelligence: 'Intake Intelligence',
   treatmentPlans: 'Treatment Plans',
   chartNotes: 'Chart Notes',
+  rxProgramEnrollments: 'Rx Program Enrollments',
 };
 
 /**
