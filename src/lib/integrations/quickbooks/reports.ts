@@ -611,7 +611,7 @@ const DEFAULT_MONTHLY_BUDGETS: Record<ClinicExpenseCategory, number> = {
 
 const DEFAULT_REVENUE_TARGET = 80000;
 
-let budgetOverrides: Record<string, ClinicBudget> = {};
+const budgetOverrides: Record<string, ClinicBudget> = {};
 
 export function setBudget(month: string, budget: Partial<ClinicBudget>): void {
   budgetOverrides[month] = {

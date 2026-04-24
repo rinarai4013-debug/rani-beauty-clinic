@@ -87,7 +87,7 @@ function boxBlurH(
 
   for (let y = 0; y < height; y++) {
     let ri = y * width * 4;
-    let li = ri;
+    const li = ri;
     let sumR = 0,
       sumG = 0,
       sumB = 0;

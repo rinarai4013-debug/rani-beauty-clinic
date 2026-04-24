@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
     // targetAreas/etc. to their declared types when present. Still
     // .partial() + .passthrough() so wizards that bail out mid-way
     // don't get rejected, and unknown keys flow through for logging.
-    let intakeData: Partial<ConsultationFormData>;
     let rawIntakeJson: unknown;
     try {
       rawIntakeJson = JSON.parse(dataField);
@@ -89,7 +88,7 @@ export async function POST(request: NextRequest) {
         { status: 422 }
       );
     }
-    intakeData = parsed.data as Partial<ConsultationFormData>;
+    const intakeData = parsed.data as Partial<ConsultationFormData>;
 
     // 2. Process photos — extract first valid photo as source
     let sourcePhotoUrl: string | null = null;

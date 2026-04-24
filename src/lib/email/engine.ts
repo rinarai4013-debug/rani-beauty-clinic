@@ -279,7 +279,7 @@ export function render(
   const processedPreheader = interpolate(template.preheader, vars);
 
   // Auto-generate plain text if not provided or if it contains variables
-  let processedText = template.text
+  const processedText = template.text
     ? interpolate(processConditionals(template.text, vars), vars)
     : htmlToPlainText(processedHtml);
 

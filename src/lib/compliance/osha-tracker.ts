@@ -241,7 +241,7 @@ export function calculateOSHAScore(): {
   areas.push({ area: 'PPE Inventory', score: Math.max(0, ppeScore), maxScore: 20, issues: ppeIssues });
 
   // General compliance (20 points) - workplace safety
-  let generalScore = 20;
+  const generalScore = 20;
   const generalIssues: string[] = [];
   // Check for recent inspections, fire safety, etc.
   areas.push({ area: 'General Safety', score: generalScore, maxScore: 20, issues: generalIssues });

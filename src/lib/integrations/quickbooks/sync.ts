@@ -97,7 +97,7 @@ export function mapToExpenseCategory(
 
 /* ─── Sync State (in-memory — use DB in production) ─────────── */
 
-let syncState: SyncStatus = {
+const syncState: SyncStatus = {
   lastSyncAt: null,
   lastFullSyncAt: null,
   syncInProgress: false,
