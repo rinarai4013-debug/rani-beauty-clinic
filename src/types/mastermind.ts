@@ -6,26 +6,14 @@
  */
 
 import type {
-  ClientProfile,
-  MedicalHistory,
   SkinAnalysis,
-  SkinHealthScore,
   SkinDimensions,
-  FitzpatrickType,
-  GlogauScale,
   SkinConcern,
-  TreatmentRecommendation,
-  TreatmentPlan,
   Contraindication,
   MedicalFlag,
-  OutcomePrediction,
-  PaymentOption,
-  LifestyleFactors,
-  AgingPattern,
-  TreatmentPriority,
 } from '@/types/ai-treatment';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
-import type { GeneratedPackage, PlanPhase, SelectedService } from '@/lib/plan-builder/types';
+import type { GeneratedPackage } from '@/lib/plan-builder/types';
 
 // ── AURA SCORE ──
 
@@ -383,5 +371,4 @@ export type MastermindSessionAction =
   | { type: 'SET_CLINIC_NOTES'; notes: string; actor?: string }
   | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string }
   | { type: 'SET_PROTOCOL_PACKET'; packetUrl: string; generatedAt: string; generatorActor: string; packetVersion: number };
-
 
