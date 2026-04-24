@@ -5,10 +5,10 @@ import { Tables, fetchAll, createRecord, updateRecord } from '@/lib/airtable/cli
 import { FIELDS } from '@/lib/airtable/tables';
 import { cache, TTL } from '@/lib/cache';
 
+import { withSentry } from '@/lib/sentry-utils';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-import { withSentry } from '@/lib/sentry-utils';
 
 const AirtableRecordIdSchema = z
   .string()

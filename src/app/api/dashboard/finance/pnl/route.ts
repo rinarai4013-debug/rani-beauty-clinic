@@ -5,15 +5,15 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import {
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
   generateFinancialIntelligence,
   type FinanceInput,
   type RevenueEntry,
   type ExpenseEntry,
 } from '@/lib/finance/pnl-engine';
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 /**
  * GET /api/dashboard/finance/pnl

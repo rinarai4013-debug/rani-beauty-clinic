@@ -6,10 +6,10 @@ import { Resend } from 'resend';
 import crypto from 'crypto';
 import { z } from 'zod';
 
+import { withSentry } from '@/lib/sentry-utils';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-import { withSentry } from '@/lib/sentry-utils';
 
 // ─── Input Validation ─────────────────────────────────────────────
 const SendPlanSchema = z.object({

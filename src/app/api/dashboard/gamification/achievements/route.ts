@@ -7,9 +7,9 @@ import { ACHIEVEMENTS, checkAchievements } from '@/data/dashboard/achievement-de
 import { getCurrentLevel } from '@/lib/gamification/levels';
 import type { DailyMetrics } from '@/types/gamification';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 export async function GET() {
   return withSentry('dashboard/gamification/achievements', async () => {

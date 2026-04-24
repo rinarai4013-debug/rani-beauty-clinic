@@ -3,9 +3,9 @@ import { getSession } from '@/lib/auth/session';
 import { hasPermission } from '@/lib/auth/roles';
 import { Tables, fetchAll } from '@/lib/airtable/client';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 interface TransactionFields {
   Date?: string;

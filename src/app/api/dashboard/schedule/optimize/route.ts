@@ -6,9 +6,9 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { optimizeSchedule, type ScheduleInput, type AppointmentData } from '@/lib/schedule/optimizer';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 /**
  * GET /api/dashboard/schedule/optimize

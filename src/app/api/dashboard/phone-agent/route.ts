@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 export async function GET() {
   return withSentry('dashboard/phone-agent', async () => {

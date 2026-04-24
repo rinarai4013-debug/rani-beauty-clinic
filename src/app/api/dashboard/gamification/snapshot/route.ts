@@ -8,9 +8,9 @@ import { getCurrentLevel, getNextLevel, getLevelProgress } from '@/lib/gamificat
 import { TARGETS } from '@/data/dashboard/score-weights';
 import type { DailyMetrics } from '@/types/gamification';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 interface TransactionFields {
   'Date': string;

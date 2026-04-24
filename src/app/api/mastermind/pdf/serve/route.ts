@@ -1,6 +1,3 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 /**
  * GET /api/mastermind/pdf/serve?file={filename}
  *
@@ -15,6 +12,9 @@ import { getSession } from '@/lib/auth/session';
 
 import { withSentry } from '@/lib/sentry-utils';
 import { logEvent } from '@/lib/logging/structured-logger';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 export async function GET(request: NextRequest) {
   return withSentry('mastermind/pdf/serve', async () => {

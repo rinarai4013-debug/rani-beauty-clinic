@@ -6,9 +6,9 @@ import type { AgentId, AgentReport } from '@/types/agent';
 import { AGENT_REGISTRY } from '@/lib/agents/registry';
 import { buildOfflineReport, buildComplianceReport, buildFinanceReport, buildScoredReport } from '@/lib/agents/report-builder';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 /**
  * GET /api/dashboard/agents/[agentId]

@@ -6,9 +6,9 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { recommendNextTreatment } from '@/lib/recommendations/engine';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 export async function GET(
   request: NextRequest,

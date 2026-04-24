@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 // Tier 1 zod (2026-04-11): the copilot engine declares a ConsultInput
 // interface. Lock the POST body to that shape so random payloads

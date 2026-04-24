@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { spawnSync } = require('child_process');
 const { readdirSync, readFileSync } = require('fs');
 const { join } = require('path');
 
@@ -47,6 +48,17 @@ function main() {
       console.error(` - ${file}`);
     }
     process.exit(1);
+  }
+
+  const typecheck = spawnSync('npx', ['tsc', '--noEmit', '--skipLibCheck'], {
+    encoding: 'utf8',
+    stdio: 'pipe',
+  });
+  if (typecheck.status !== 0) {
+    console.error('[check:dynamic] TypeScript validation failed (npx tsc --noEmit --skipLibCheck).');
+    if (typecheck.stdout) process.stdout.write(typecheck.stdout);
+    if (typecheck.stderr) process.stderr.write(typecheck.stderr);
+    process.exit(typecheck.status || 1);
   }
 
   console.log(`[check:dynamic] OK: ${routeFiles.length} route files checked, ${missing.length} missing exports`);

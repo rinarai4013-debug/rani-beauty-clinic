@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import {
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
   fetchRevenue,
   fetchSchedule,
   fetchAlerts,
@@ -25,6 +22,9 @@ import { fetchFillIntelligence } from '@/lib/briefing/fill-intelligence';
 import { buildGrowthIntelligence } from '@/lib/briefing/growth-intelligence';
 import { buildExecutiveBriefing } from '@/lib/briefing/executive-os';
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 export async function GET() {
   return withSentry('dashboard/briefing', async () => {

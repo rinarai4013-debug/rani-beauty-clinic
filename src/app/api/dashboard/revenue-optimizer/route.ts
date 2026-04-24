@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSession } from "@/lib/auth/session";
 import { withSentry } from '@/lib/sentry-utils';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
 
 /**
  * GET /api/dashboard/revenue-optimizer
