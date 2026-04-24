@@ -11,7 +11,7 @@ describe('booking/services', () => {
 
   it('returns specific services by id', () => {
     expect(getServiceById('sofwave-full-face-neck')).toMatchObject({
-      name: 'Sofwave - Full Face + Neck',
+      name: 'Sofwave · Full Face + Neck',
       price: 3999,
       depositRequired: 400,
     });
@@ -29,7 +29,7 @@ describe('booking/services', () => {
   it('includes generated laser hair removal services with expected rules', () => {
     const lhr = getServicesByCategory('laser-hair-removal');
 
-    expect(lhr).toHaveLength(10);
+    expect(lhr).toHaveLength(22);
     expect(lhr.every(service => service.requiredRooms.includes('glow'))).toBe(true);
     expect(lhr.find(service => service.id === 'lhr-full-body')?.depositRequired).toBe(50);
   });
