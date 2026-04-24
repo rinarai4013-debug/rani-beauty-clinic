@@ -6,6 +6,9 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface AppointmentFields {
   'Provider': string;
   'Date': string;

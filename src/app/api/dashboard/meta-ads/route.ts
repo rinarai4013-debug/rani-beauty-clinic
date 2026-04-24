@@ -4,6 +4,9 @@ import { hasPermission } from '@/lib/auth/roles';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface MetaCampaign {
   id: string;
   name: string;

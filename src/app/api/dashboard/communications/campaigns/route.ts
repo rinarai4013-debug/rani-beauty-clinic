@@ -7,6 +7,9 @@ import { getAllCampaigns, createCampaign, getCampaignTypeDefaults } from '@/lib/
 import { withSentry } from '@/lib/sentry-utils';
 import type { MessageChannel } from '@/types/communications';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const CampaignCreateSchema = z.object({
   name: z.string().min(1, 'name is required'),
   type: z.enum(['promotional', 'educational', 'reactivation', 'event', 'seasonal', 'birthday', 'direct']),

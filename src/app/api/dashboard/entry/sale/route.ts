@@ -6,6 +6,9 @@ import { Tables, createRecord } from '@/lib/airtable/client';
 import { cache } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const SaleSchema = z.object({
   amount: z.number().positive(),
   serviceName: z.string().min(1),

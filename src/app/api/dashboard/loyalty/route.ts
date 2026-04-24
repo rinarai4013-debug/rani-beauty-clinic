@@ -5,6 +5,9 @@ import { cache, TTL } from '@/lib/cache';
 import { z } from 'zod';
 import { withSentry } from '@/lib/sentry-utils';
 import {
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
   buildAnalytics,
   determineTier,
   calculateTierProgress,

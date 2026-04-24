@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import {
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
   fetchRevenue,
   fetchSchedule,
   fetchAlerts,

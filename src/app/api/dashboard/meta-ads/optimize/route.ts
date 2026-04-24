@@ -5,6 +5,9 @@ import { cache, TTL } from '@/lib/cache';
 import { analyzeMetaAds, type MetaAdsInput } from '@/lib/ads/meta-ads-manager';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/dashboard/meta-ads/optimize
  *

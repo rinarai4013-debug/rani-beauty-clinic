@@ -6,6 +6,9 @@ import type { AgentFeed, AgentStatusSummary, AgentAlert, AgentRecommendation } f
 import { AGENT_IDS, AGENT_REGISTRY } from '@/lib/agents/registry';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/dashboard/agents/feed
  *

@@ -6,6 +6,9 @@ import { cache, TTL } from '@/lib/cache';
 import { analyzeInventory, type InventoryInput, type InventoryItem, type InventoryCategory } from '@/lib/inventory/auto-manager';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Fields stored in the Alerts table by the entry/inventory form
 interface InventoryAlertFields {
   'Type': string;

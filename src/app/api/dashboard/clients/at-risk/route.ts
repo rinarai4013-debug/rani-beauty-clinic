@@ -6,6 +6,9 @@ import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const urgencyMap: Record<string, 'critical' | 'medium' | 'low'> = {
   Churned: 'critical',
   'Lapsed 90': 'medium',

@@ -4,6 +4,9 @@ import { TRAINING_MODULES, ROLE_LABELS, ROLE_COLORS } from '@/data/training/modu
 import type { TrainingRole } from '@/data/training/modules';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const TRAINING_ROLES: TrainingRole[] = ['front-desk', 'provider', 'all-staff', 'management'];
 
 export async function GET(req: NextRequest) {

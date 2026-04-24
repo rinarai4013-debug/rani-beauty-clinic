@@ -7,6 +7,9 @@ import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
 import type { AppointmentItem } from '@/types/dashboard';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface AppointmentFields {
   'Service Name': string;
   'Service Category': string;

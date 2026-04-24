@@ -7,6 +7,9 @@ import { cache } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const LeadSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
