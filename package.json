@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "npm run check:dynamic",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "build:with-audit": "npm run compliance:audit && NODE_OPTIONS='--max-old-space-size=8192' next build",
     "start": "next start",
     "lint": "next lint",
     "check:dynamic": "node scripts/check-dynamic-routes.js",
