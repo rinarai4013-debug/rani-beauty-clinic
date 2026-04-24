@@ -258,8 +258,8 @@ export async function runAIAuraScanWithDevice(
   }
 
   try {
-    console.info(`${LOG_PREFIX} Starting device-image AI analysis (scan ${scanId})`);
-    console.info(`${LOG_PREFIX} Patient: ${deviceScan.patientName}, Date: ${deviceScan.scanDate}`);
+    console.warn(`${LOG_PREFIX} Starting device-image AI analysis (scan ${scanId})`);
+    console.warn(`${LOG_PREFIX} Patient: ${deviceScan.patientName}, Date: ${deviceScan.scanDate}`);
 
     const anthropic = getAnthropicClient();
 
@@ -312,7 +312,7 @@ export async function runAIAuraScanWithDevice(
     }
 
     const imageCount = contentBlocks.filter((b) => b.type === 'image').length;
-    console.info(`${LOG_PREFIX} Sending ${imageCount} scanner images to Claude`);
+    console.warn(`${LOG_PREFIX} Sending ${imageCount} scanner images to Claude`);
 
     // Add the analysis prompt as the final text block
     contentBlocks.push({
@@ -337,7 +337,7 @@ export async function runAIAuraScanWithDevice(
     ]);
 
     const latency = Date.now() - startTime;
-    console.info(`${LOG_PREFIX} Claude response received in ${latency}ms (${imageCount} images analyzed)`);
+    console.warn(`${LOG_PREFIX} Claude response received in ${latency}ms (${imageCount} images analyzed)`);
 
     // Extract text content
     const textBlock = response.content.find((block) => block.type === 'text');
@@ -352,7 +352,7 @@ export async function runAIAuraScanWithDevice(
     // Assemble validated result
     const result = assembleResult(parsed, scanId);
 
-    console.info(
+    console.warn(
       `${LOG_PREFIX} Device scan analysis complete: score=${result.auraScore.overall}/100 ` +
       `(${result.auraScore.grade}), skinAge=${result.auraScore.skinAge}, ` +
       `concerns=${result.detectedConcerns.length}, images=${imageCount}, latency=${latency}ms`

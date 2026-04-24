@@ -208,7 +208,7 @@ export async function getAllSessionsFromAirtable(): Promise<MastermindSession[]>
       return Array.from(cache.values()).map(c => c.session);
     }
     const data = await res.json();
-    console.log(`[SessionStore] Loaded ${data?.records?.length || 0} sessions from Airtable`);
+    console.warn(`[SessionStore] Loaded ${data?.records?.length || 0} sessions from Airtable`);
     const sessions: MastermindSession[] = [];
 
     for (const record of data?.records || []) {

@@ -73,7 +73,7 @@ export function logEvent(
     message,
     ...sanitizedMetadata,
   };
-  console.log(JSON.stringify(entry));
+  console.warn(JSON.stringify(entry));
 }
 
 export function logAuthFailure(ip: string, username: string, reason: string): void {

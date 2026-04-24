@@ -158,7 +158,7 @@ export function trackAnalyticsEvent(
 
   // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
-    console.debug(`[Analytics] ${name}`, enriched);
+    console.warn(`[Analytics] ${name}`, enriched);
   }
 }
 

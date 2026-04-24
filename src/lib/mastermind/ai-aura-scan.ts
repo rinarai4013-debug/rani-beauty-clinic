@@ -467,12 +467,12 @@ export async function runAIAuraScan(
 
   // Guard: no photo — fall back to rule-based
   if (!sourcePhotoUrl || !sourcePhotoUrl.startsWith('data:image/')) {
-    console.info(`${LOG_PREFIX} No valid photo provided — falling back to rule-based scan`);
+    console.warn(`${LOG_PREFIX} No valid photo provided — falling back to rule-based scan`);
     return toAIResult(await runAuraScan(intakeData, medicalData), false, scanId);
   }
 
   try {
-    console.info(`${LOG_PREFIX} Starting AI analysis for scan ${scanId}`);
+    console.warn(`${LOG_PREFIX} Starting AI analysis for scan ${scanId}`);
 
     // Extract base64 and media type from data URL
     const { base64, mediaType } = parseDataUrl(sourcePhotoUrl);
@@ -510,7 +510,7 @@ export async function runAIAuraScan(
     ]);
 
     const latency = Date.now() - startTime;
-    console.info(`${LOG_PREFIX} Claude response received in ${latency}ms for scan ${scanId}`);
+    console.warn(`${LOG_PREFIX} Claude response received in ${latency}ms for scan ${scanId}`);
 
     // Extract text content from response
     const textBlock = response.content.find((block) => block.type === 'text');
@@ -525,7 +525,7 @@ export async function runAIAuraScan(
     // Validate and assemble the result
     const result = assembleResult(parsed, scanId, latency);
 
-    console.info(
+    console.warn(
       `${LOG_PREFIX} AI scan complete: score=${result.auraScore.overall}, ` +
       `grade=${result.auraScore.grade}, skinAge=${result.auraScore.skinAge}, ` +
       `concerns=${result.detectedConcerns.length}, latency=${latency}ms`

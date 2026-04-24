@@ -122,11 +122,11 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
     const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
 
     if (isPdf) {
-      console.log('[AuraImport] Processing PDF client-side...', file.name, `${(file.size / 1024 / 1024).toFixed(1)}MB`);
+      console.warn('[AuraImport] Processing PDF client-side...', file.name, `${(file.size / 1024 / 1024).toFixed(1)}MB`);
       const pdfjsLib = await loadPdfJs();
 
       const arrayBuffer = await file.arrayBuffer();
-      console.log('[AuraImport] PDF loaded into buffer, rendering first page...');
+      console.warn('[AuraImport] PDF loaded into buffer, rendering first page...');
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 2.0 });
@@ -136,10 +136,10 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas context unavailable');
       await page.render({ canvasContext: ctx, viewport }).promise;
-      console.log('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
+      console.warn('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
 
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      console.log('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
+      console.warn('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
       return dataUrl;
     }
 
@@ -187,7 +187,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         if (!saveRes.ok) throw new Error('Failed to save photo to session');
 
         // Step 3: Run the AI scan with the uploaded photo
-        console.log('[AuraImport] Running AI scan...');
+        console.warn('[AuraImport] Running AI scan...');
         const scanRes = await fetch('/api/mastermind/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -198,10 +198,10 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           throw new Error(`AI scan failed (${scanRes.status}): ${errText.slice(0, 200)}`);
         }
         const scanJson = await scanRes.json();
-        console.log('[AuraImport] AI scan complete:', scanJson.success);
+        console.warn('[AuraImport] AI scan complete:', scanJson.success);
 
         // Step 4: Auto-trigger simulation so projections populate
-        console.log('[AuraImport] Triggering simulation...');
+        console.warn('[AuraImport] Triggering simulation...');
         const simRes = await fetch('/api/mastermind/simulate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

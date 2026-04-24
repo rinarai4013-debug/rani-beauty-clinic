@@ -41,7 +41,7 @@ function log(level: LogLevel, message: string, meta?: Record<string, unknown>) {
   } else if (level === 'warn') {
     console.warn(prefix, message, meta ? JSON.stringify(meta) : '');
   } else {
-    console.log(prefix, message, meta ? JSON.stringify(meta) : '');
+    console.warn(prefix, message, meta ? JSON.stringify(meta) : '');
   }
 }
 

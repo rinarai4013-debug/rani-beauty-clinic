@@ -95,7 +95,7 @@ class WriteQueue {
     this.draining = false;
 
     if (successCount > 0) {
-      console.info(
+      console.warn(
         `[Airtable:WriteQueue] Drained ${successCount}/${batch.length} queued writes.`
       );
     }

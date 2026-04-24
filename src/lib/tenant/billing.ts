@@ -384,7 +384,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<WebhookRe
         if (!customerId) return { handled: false, error: 'No customer ID on invoice' };
 
         // We log this but don't block - invoice.paid is informational
-        console.log(`[Billing] Invoice paid for customer ${customerId} (no tenantId in metadata)`);
+        console.warn(`[Billing] Invoice paid for customer ${customerId} (no tenantId in metadata)`);
         return { handled: true, action: 'invoice_paid_no_tenant' };
       }
 

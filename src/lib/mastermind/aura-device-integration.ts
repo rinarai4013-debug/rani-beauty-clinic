@@ -312,7 +312,7 @@ export async function importAuraScan(
     matchingFiles.push(...prefixMatches);
   }
 
-  console.log(
+  console.warn(
     `${LOG_PREFIX} Found ${matchingFiles.length} images for "${patientName}" on ${scanDate}`
   );
 
@@ -422,7 +422,7 @@ export async function findLatestScan(patientName: string): Promise<AuraDeviceSca
   }
 
   const best = matches[0];
-  console.log(
+  console.warn(
     `${LOG_PREFIX} Best match for "${patientName}": "${best.name}" on ${best.date} (score: ${best.score})`
   );
 

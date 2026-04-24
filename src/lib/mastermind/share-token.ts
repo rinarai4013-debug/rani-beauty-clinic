@@ -74,7 +74,7 @@ export async function saveTokenToAirtable(record: ShareTokenRecord): Promise<voi
       const errBody = await res.text().catch(() => '');
       console.error(`[Share] Airtable token save failed (${res.status}):`, errBody);
     } else {
-      console.log(`[Share] Token persisted to Airtable: ${record.token.substring(0, 12)}...`);
+      console.warn(`[Share] Token persisted to Airtable: ${record.token.substring(0, 12)}...`);
     }
   } catch (err) {
     console.error('[Share] Airtable token save error:', err);
@@ -96,7 +96,7 @@ async function loadTokenFromAirtable(token: string): Promise<ShareTokenRecord | 
     const data = await res.json();
     const row = data?.records?.[0];
     if (row?.fields?.Details) {
-      console.log(`[Share] Token loaded from Airtable: ${token.substring(0, 12)}...`);
+      console.warn(`[Share] Token loaded from Airtable: ${token.substring(0, 12)}...`);
       return JSON.parse(row.fields.Details) as ShareTokenRecord;
     }
     console.warn(`[Share] Token not found in Airtable: ${token.substring(0, 12)}... (${data?.records?.length || 0} records)`);
