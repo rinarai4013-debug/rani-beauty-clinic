@@ -1582,14 +1582,16 @@ export default function PatientPlanPage() {
                         {data.simulation.withTreatment.frames[
                           data.simulation.withTreatment.frames.length - 1
                         ].imageDataUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={
                               data.simulation.withTreatment.frames[
                                 data.simulation.withTreatment.frames.length - 1
                               ].imageDataUrl
                             }
                             alt="Projected result with treatment"
+                            fill
+                            unoptimized
+                            sizes="(max-width: 768px) 100vw, 50vw"
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -1664,14 +1666,16 @@ export default function PatientPlanPage() {
                         {data.simulation.withoutTreatment.frames[
                           data.simulation.withoutTreatment.frames.length - 1
                         ].imageDataUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={
                               data.simulation.withoutTreatment.frames[
                                 data.simulation.withoutTreatment.frames.length - 1
                               ].imageDataUrl
                             }
                             alt="Projected result without treatment"
+                            fill
+                            unoptimized
+                            sizes="(max-width: 768px) 100vw, 50vw"
                             className="w-full h-full object-cover"
                           />
                         ) : (

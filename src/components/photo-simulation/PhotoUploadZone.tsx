@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
+import NextImage from 'next/image';
 import { Camera, X, Upload } from 'lucide-react';
 
 interface PhotoUploadZoneProps {
@@ -261,9 +262,12 @@ export default function PhotoUploadZone({
               key={index}
               className="relative group rounded-lg overflow-hidden border border-[#0F1D2C]/10 shadow-sm"
             >
-              <img
+              <NextImage
                 src={preview}
                 alt={`Upload ${index + 1}`}
+                width={96}
+                height={96}
+                unoptimized
                 className="h-24 w-24 object-cover"
               />
               <button

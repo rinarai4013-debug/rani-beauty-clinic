@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import Image from 'next/image';
 import PhotoUploadZone from './PhotoUploadZone';
 import FaceFrameGuide from './FaceFrameGuide';
 import SimulationCanvas from './SimulationCanvas';
@@ -180,5 +181,14 @@ function PhotoThumb({ file }: { file: File }) {
   }, [file]);
 
   if (!src) return <div className="h-full w-full bg-[#F8F6F1]" />;
-  return <img src={src} alt="Uploaded photo thumbnail preview" className="h-full w-full object-cover" />;
+  return (
+    <Image
+      src={src}
+      alt="Uploaded photo thumbnail preview"
+      width={48}
+      height={48}
+      unoptimized
+      className="h-full w-full object-cover"
+    />
+  );
 }
