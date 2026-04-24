@@ -6,6 +6,9 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 import { cache, TTL } from '@/lib/cache';
 import { logPhiAccessFromRequest } from '@/lib/compliance/phi-logger';
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 function splitName(name: string) {
   const [firstName = '', ...rest] = name.trim().split(/\s+/);

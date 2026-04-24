@@ -5,6 +5,9 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 import type { LeadFunnelData } from '@/types/dashboard';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 interface IntakeFields {
   'Processing Status'?: string;

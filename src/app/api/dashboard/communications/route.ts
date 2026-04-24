@@ -7,6 +7,9 @@ import {
   getAllCampaigns,
 } from '@/lib/communications';
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 // GET /api/dashboard/communications - Overview data
 export async function GET(request: Request) {

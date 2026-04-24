@@ -15,6 +15,9 @@ import {
   type LoyaltyAnalytics,
 } from '@/lib/loyalty/engine';
 import { getAvailableRewards } from '@/lib/loyalty/rewards';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 const LoyaltyTierSchema = z.enum(['Silver', 'Gold', 'Platinum']);
 const AwardBonusSchema = z.object({

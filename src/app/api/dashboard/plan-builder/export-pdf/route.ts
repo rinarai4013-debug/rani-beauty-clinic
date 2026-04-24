@@ -4,6 +4,9 @@ import { getSession } from '@/lib/auth/session';
 import { Tables } from '@/lib/airtable/client';
 
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 const LineItemSchema = z.object({
   service: z.string(),
