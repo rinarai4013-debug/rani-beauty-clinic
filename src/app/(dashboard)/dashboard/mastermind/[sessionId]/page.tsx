@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -20,7 +21,7 @@ import {
   Scan,
   ClipboardCheck,
   Eye,
-  Image,
+  Image as ImageIcon,
   CheckCircle2,
   AlertTriangle,
   Mail,
@@ -59,7 +60,7 @@ const WORKFLOW_PHASES: PhaseDefinition[] = [
   { key: 'scan_complete', label: 'Scan', icon: Scan, stepIndex: 1 },
   { key: 'plan_ready', label: 'Plan', icon: FileText, stepIndex: 2 },
   { key: 'provider_review', label: 'Review', icon: Eye, stepIndex: 3 },
-  { key: 'simulation_ready', label: 'Simulation', icon: Image, stepIndex: 4 },
+  { key: 'simulation_ready', label: 'Simulation', icon: ImageIcon, stepIndex: 4 },
   { key: 'presenting', label: 'Present', icon: Presentation, stepIndex: 5 },
   { key: 'completed', label: 'Complete', icon: CheckCircle2, stepIndex: 6 },
 ];
@@ -878,9 +879,12 @@ export default function MastermindSessionPage() {
                       style={{ border: '2px solid rgba(201,169,110,0.4)', boxShadow: '0 0 15px rgba(201,169,110,0.15)' }}
                       title="Click to change photo"
                     >
-                      <img
+                      <NextImage
                         src={session.sourcePhotoUrl}
                         alt={session.patientName}
+                        fill
+                        unoptimized
+                        sizes="64px"
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -1551,7 +1555,7 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="w-16 h-16 rounded-full bg-[#F8F6F1] flex items-center justify-center mb-4">
-          <Image className="w-8 h-8 text-[#0F1D2C]/20" />
+          <ImageIcon className="w-8 h-8 text-[#0F1D2C]/20" />
         </div>
         <h3 className="font-body text-sm font-medium text-[#0F1D2C]/60">
           No Simulation Yet
@@ -1604,14 +1608,17 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
         >
           <div className="aspect-[4/3] bg-[#0F1D2C]/5 relative">
             {frame.imageDataUrl ? (
-              <img
+              <NextImage
                 src={frame.imageDataUrl}
                 alt={frame.description}
+                fill
+                unoptimized
+                sizes="(max-width: 768px) 100vw, 66vw"
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Image className="w-12 h-12 text-[#0F1D2C]/10" />
+                <ImageIcon className="w-12 h-12 text-[#0F1D2C]/10" />
               </div>
             )}
             <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
@@ -2081,4 +2088,3 @@ function generateCopilotClosing(session: NonNullable<ReturnType<typeof useMaster
 
   return techniques;
 }
-
