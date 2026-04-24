@@ -1,6 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -1218,10 +1219,12 @@ function PhotoPreviewTile({ file, index, onRemove }: {
 
   return (
     <div className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={previewUrl}
         alt={`Upload ${index + 1}`}
+        width={512}
+        height={512}
+        unoptimized
         className="w-full h-full object-cover"
       />
       <button

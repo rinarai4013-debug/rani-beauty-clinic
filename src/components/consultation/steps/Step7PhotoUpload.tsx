@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, X, Upload, User, Sun, Lightbulb, Lock, Sparkles, Loader2 } from 'lucide-react';
 import type { AuraScanResult } from '@/types/mastermind';
@@ -285,10 +286,12 @@ export default function Step7PhotoUpload({
                 transition={{ duration: 0.3 }}
                 className="relative aspect-square rounded-2xl overflow-hidden group"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <NextImage
                   src={url}
                   alt={`Uploaded photo ${i + 1}`}
+                  width={512}
+                  height={512}
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />

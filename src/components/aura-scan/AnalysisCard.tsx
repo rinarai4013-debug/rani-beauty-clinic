@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import type { CategoryScore, ScoringMode } from '@/types/mastermind';
 
 interface AnalysisCardProps {
@@ -67,11 +68,13 @@ export default function AnalysisCard({
       {/* Face Image Placeholder */}
       <div className="relative w-full aspect-square rounded-xl bg-[#F8F6F1] overflow-hidden flex items-center justify-center">
         {photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={photoUrl}
             alt={`${category.label} analysis`}
-            className="w-full h-full object-cover"
+            fill
+            unoptimized
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
           />
         ) : (
           <div className="flex flex-col items-center gap-1">

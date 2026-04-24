@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Star, Clock, ChevronRight } from 'lucide-react';
 import type { ProviderInfo } from '@/types/mobile';
 
@@ -24,9 +25,12 @@ export default function ProviderCard({ provider, selected, onSelect }: ProviderC
       {/* Avatar */}
       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#C9A96E]/20 to-rani-cream flex items-center justify-center flex-shrink-0">
         {provider.avatar ? (
-          <img
+          <Image
             src={provider.avatar}
             alt={provider.name}
+            width={48}
+            height={48}
+            unoptimized
             className="w-full h-full rounded-full object-cover"
           />
         ) : (

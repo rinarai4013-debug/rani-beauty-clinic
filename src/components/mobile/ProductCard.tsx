@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Heart, ShoppingBag, RefreshCw, Star, Sparkles } from 'lucide-react';
 import type { ShopProduct } from '@/types/mobile';
 
@@ -16,7 +17,14 @@ export default function ProductCard({ product, onAddToCart, onToggleFavorite }: 
       {/* Image */}
       <div className="relative aspect-square bg-gradient-to-br from-rani-cream to-white">
         {product.image ? (
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+          <Image
+            src={product.image}
+            alt={product.name}
+            width={600}
+            height={600}
+            unoptimized
+            className="w-full h-full object-cover"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ShoppingBag size={40} className="text-rani-gold-accessible/20" />
