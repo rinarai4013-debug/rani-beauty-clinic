@@ -8,13 +8,11 @@ import type {
   BookingResult,
   CalendarColorMode,
   CalendarDayData,
-  CalendarView,
   IntakeForm,
   WaitlistEntry,
 } from '@/lib/booking/types';
 import type { WaitlistStats } from '@/lib/booking/waitlist';
 import type { ProviderDayView, RoomDayView, HourlyRevenue, PrintSchedule } from '@/lib/booking/calendar';
-import type { ProviderLoad, ScheduleGap, OptimalSlotSuggestion } from '@/lib/booking/scheduler';
 import type { FormProgress } from '@/lib/booking/intake';
 import type { ProcessedReminder, RebookingNudge } from '@/lib/booking/reminders';
 

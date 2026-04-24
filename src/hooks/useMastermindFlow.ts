@@ -23,11 +23,8 @@ import {
   calculateFinancingOptions,
   getPlanTotalCost,
   getAllTreatments,
-  type SlideId,
   type FinancingOption,
 } from '@/lib/mastermind/index';
-import type { MastermindSession } from '@/types/mastermind';
-import type { GeneratedPackage } from '@/lib/plan-builder/types';
 
 interface PresentationState {
   currentSlideIndex: number;

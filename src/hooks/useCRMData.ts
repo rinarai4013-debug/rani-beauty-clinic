@@ -19,7 +19,6 @@ import type {
   ClientLifecycle,
   SegmentMetrics,
   ClientSegment,
-  RFMMatrixCell,
   CustomSegment,
   AutomationRecipe,
   AutomationMetrics,

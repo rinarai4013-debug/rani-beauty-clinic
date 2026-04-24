@@ -19,7 +19,6 @@ import type {
   CECreditSummary,
   CareerPath,
   PerformanceReview,
-  TrainingProgress,
   SkillCertification,
   TrainingBudget,
 } from '@/types/providers';

@@ -2,7 +2,7 @@ import {
   runTechnicalSEOChecks, evaluateCoreWebVitals, calculateLocalSEOScore,
   analyzeKeywordRankings, identifyContentGaps, analyzeCompetitorOverlap,
   getTargetKeywords, getGMBChecklist,
-  type KeywordRanking, type LocalRanking,
+  type KeywordRanking,
 } from '@/lib/marketing/seo-monitor';
 
 // ── Helper ──────────────────────────────────────────────────────────────

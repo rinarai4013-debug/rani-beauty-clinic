@@ -19,7 +19,6 @@ import type {
   ChatMessage,
   SkincareTip,
   TreatmentPlanProgress,
-  MobileAPIResponse,
   PaginatedResponse,
 } from '@/types/mobile';
 

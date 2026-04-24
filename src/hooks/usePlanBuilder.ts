@@ -6,7 +6,6 @@ import type {
   BuilderAction,
   SelectedService,
   PlanPhase,
-  GeneratedPackage,
 } from '@/lib/plan-builder/types';
 import { PHASE_LABELS } from '@/lib/plan-builder/types';
 import { generatePackages } from '@/lib/plan-builder/package-generator';

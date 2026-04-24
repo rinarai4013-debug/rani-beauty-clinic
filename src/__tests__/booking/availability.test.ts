@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   AvailabilityEngine,
   DEFAULT_PROVIDERS,
-  DEFAULT_ROOMS,
   DEFAULT_SCHEDULING_CONFIG,
   parseTime,
   formatTime,
@@ -13,7 +12,6 @@ import {
   minutesBetween,
 } from '@/lib/booking/availability';
 import { BOOKABLE_SERVICES } from '@/lib/booking/services';
-import type { Appointment, BookableService, Holiday } from '@/lib/booking/types';
 
 // ── HELPER FUNCTION TESTS ──
 

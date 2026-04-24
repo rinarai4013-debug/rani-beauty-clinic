@@ -1,7 +1,7 @@
 import {
   parseUTMParams, classifyChannel, runAttribution, compareModels,
   mapCustomerJourney, calculateChannelPerformance, getJourneyStats,
-  type CustomerJourney, type MarketingChannel, type AttributionModel,
+  type CustomerJourney, type MarketingChannel,
 } from '@/lib/marketing/attribution';
 
 // ── Helper: sample journeys ─────────────────────────────────────────────

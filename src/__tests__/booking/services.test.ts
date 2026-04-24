@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { BOOKABLE_SERVICES, getServiceById, getServicesByCategory, getBookableCategories } from '@/lib/booking/services';
-import type { BookableService, RoomId } from '@/lib/booking/types';
 
 describe('BOOKABLE_SERVICES', () => {
   it('has all expected service categories', () => {

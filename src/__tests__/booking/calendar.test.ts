@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { CalendarManager, formatRevenueChartData, formatRoomUtilizationChart, formatWeeklyRevenueChart } from '@/lib/booking/calendar';
 import { AvailabilityEngine, DEFAULT_PROVIDERS, DEFAULT_SCHEDULING_CONFIG } from '@/lib/booking/availability';
 import { BOOKABLE_SERVICES } from '@/lib/booking/services';
-import type { CalendarColorMode } from '@/lib/booking/types';
 
 describe('CalendarManager', () => {
   let engine: AvailabilityEngine;

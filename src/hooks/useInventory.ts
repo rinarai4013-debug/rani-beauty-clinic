@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react';
 import { useDashboardData } from './useDashboardData';
-import type { SWRConfiguration } from 'swr';
 
 /* ─── Inventory SWR Hooks ─────────────────────────────────────────────
  *  All inventory-related data fetching hooks.
