@@ -13,15 +13,15 @@ interface PipelineKanbanProps {
     count: number;
     totalValue: number;
   }[];
-  onLeadClick?: (lead: PipelineLead) => void;
-  onStageDrop?: (leadId: string, toStage: PipelineStage) => void;
+  onLeadClick?: (_lead: PipelineLead) => void;
+  onStageDrop?: (_leadId: string, _toStage: PipelineStage) => void;
 }
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
 }
 
-function LeadCard({ lead, onClick }: { lead: PipelineLead; onClick?: (lead: PipelineLead) => void }) {
+function LeadCard({ lead, onClick }: { lead: PipelineLead; onClick?: (_lead: PipelineLead) => void }) {
   return (
     <motion.div
       layout

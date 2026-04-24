@@ -63,7 +63,7 @@ const SCENARIOS: ScenarioConfig[] = [
 ];
 
 interface ScenarioSliderProps {
-  onScenarioChange: (type: ScenarioType, params: Record<string, number>) => void;
+  onScenarioChange: (_type: ScenarioType, _params: Record<string, number>) => void;
   activeScenario?: ScenarioType;
 }
 

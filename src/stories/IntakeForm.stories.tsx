@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 interface IntakeFormProps {
   variant: 'glp1' | 'peptide' | 'hormone';
-  onSubmit?: (data: Record<string, string>) => void;
+  onSubmit?: (_data: Record<string, string>) => void;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────

@@ -7,11 +7,11 @@ import DraggableServiceItem from './DraggableServiceItem';
 
 interface PhaseDropZoneProps {
   phase: PlanPhase;
-  onRemove: (id: string) => void;
-  onSetQty: (id: string, qty: number) => void;
-  onSetNotes: (id: string, notes: string) => void;
-  onMoveToPhase: (id: string, phase: 1 | 2 | 3) => void;
-  onReorder: (phase: 1 | 2 | 3, fromIndex: number, toIndex: number) => void;
+  onRemove: (_id: string) => void;
+  onSetQty: (_id: string, _qty: number) => void;
+  onSetNotes: (_id: string, _notes: string) => void;
+  onMoveToPhase: (_id: string, _phase: 1 | 2 | 3) => void;
+  onReorder: (_phase: 1 | 2 | 3, _fromIndex: number, _toIndex: number) => void;
 }
 
 export default function PhaseDropZone({

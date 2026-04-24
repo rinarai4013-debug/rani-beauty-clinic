@@ -6,7 +6,7 @@ import type { WaitlistEntry } from '@/lib/booking/types';
 interface WaitlistFormProps {
   serviceId: string;
   serviceName: string;
-  onSubmit: (data: Partial<WaitlistEntry>) => Promise<void>;
+  onSubmit: (_data: Partial<WaitlistEntry>) => Promise<void>;
   onClose: () => void;
 }
 

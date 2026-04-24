@@ -12,7 +12,7 @@ import type { Conversation, Message, SmartReply } from '@/types/communications';
 interface ConversationThreadProps {
   conversation: Conversation;
   smartReplies?: SmartReply[];
-  onSendMessage: (body: string) => void;
+  onSendMessage: (_body: string) => void;
   onBack?: () => void;
   onMarkRead?: () => void;
 }

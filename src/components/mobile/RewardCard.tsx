@@ -7,7 +7,7 @@ import type { RewardItem } from '@/types/mobile';
 interface RewardCardProps {
   reward: RewardItem;
   userPoints: number;
-  onRedeem?: (rewardId: string) => void;
+  onRedeem?: (_rewardId: string) => void;
 }
 
 export default function RewardCard({ reward, userPoints, onRedeem }: RewardCardProps) {

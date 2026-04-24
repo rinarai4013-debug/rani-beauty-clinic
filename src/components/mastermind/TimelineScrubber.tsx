@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 interface TimelineScrubberProps {
   timepoints: string[];
   activeIndex: number;
-  onChange: (index: number) => void;
+  onChange: (_index: number) => void;
   color?: string;
 }
 

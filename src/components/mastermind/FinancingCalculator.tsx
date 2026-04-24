@@ -16,7 +16,7 @@ interface FinancingCalculatorProps {
   amount: number;
   options: FinancingOption[];
   selectedOption: FinancingOption | null;
-  onSelect: (months: number | null) => void;
+  onSelect: (_months: number | null) => void;
   variant?: 'light' | 'dark';
 }
 

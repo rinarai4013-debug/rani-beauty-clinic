@@ -106,7 +106,7 @@ describe('mastermind simulate + complete + copilot routes', () => {
       phase: 'scan_review',
     });
 
-    sessionReducerMock.mockImplementation((_session: unknown, _action: unknown) => ({
+    sessionReducerMock.mockImplementation((__session: unknown, __action: unknown) => ({
       id: 'ms_1',
       phase: 'completed',
     }));

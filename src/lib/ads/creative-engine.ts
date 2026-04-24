@@ -315,7 +315,7 @@ export interface DescriptionVariant {
   text: string;
 }
 
-const FRAMEWORK_GENERATORS: Record<CopyFramework, (service: ServiceProfile) => Omit<GeneratedCopy, 'framework' | 'service' | 'keywords'>> = {
+const FRAMEWORK_GENERATORS: Record<CopyFramework, (_service: ServiceProfile) => Omit<GeneratedCopy, 'framework' | 'service' | 'keywords'>> = {
   pas: (s) => ({
     headline: `Tired of ${s.painPoints[0].toLowerCase()}?`,
     primaryText: `${s.painPoints[0]}. It affects how you feel every time you look in the mirror. But it doesn't have to be this way.\n\n${s.topBenefit} at Rani Beauty Clinic — where science meets luxury.\n\n${s.results[0]}. ${s.timeframe}.\n\n${s.socialProofStat}.`,
@@ -609,7 +609,7 @@ function svgTextLines(lines: string[], x: number, startY: number, lineHeight: nu
   ).join('\n');
 }
 
-const TEMPLATE_GENERATORS: Record<VisualTemplate, (service: ServiceProfile, w: number, h: number) => string> = {
+const TEMPLATE_GENERATORS: Record<VisualTemplate, (_service: ServiceProfile, _w: number, _h: number) => string> = {
   before_after: (s, w, h) => {
     const midX = w / 2;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">

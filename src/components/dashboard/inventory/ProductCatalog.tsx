@@ -24,7 +24,7 @@ import {
 
 interface ProductCatalogProps {
   products?: Product[];
-  onProductClick?: (product: Product) => void;
+  onProductClick?: (_product: Product) => void;
   loading?: boolean;
 }
 

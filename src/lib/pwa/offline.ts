@@ -74,7 +74,7 @@ export function queueRequest(
   // Also try registering a background sync
   if ("serviceWorker" in navigator && "SyncManager" in window) {
     navigator.serviceWorker.ready.then((reg) => {
-      (reg as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync
+      (reg as ServiceWorkerRegistration & { sync: { register: (_tag: string) => Promise<void> } }).sync
         .register("rani-form-sync")
         .catch(() => {
           // Background sync not available, will use online listener

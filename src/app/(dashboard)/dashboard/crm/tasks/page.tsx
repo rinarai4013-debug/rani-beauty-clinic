@@ -12,11 +12,11 @@ export default function TasksPage() {
   const tasks = (data?.tasks || []) as CRMTask[];
   const metrics = data?.metrics as TaskMetrics | undefined;
 
-  const handleComplete = (taskId: string) => {
+  const handleComplete = (_taskId: string) => {
     // TODO: API call to complete task
   };
 
-  const handleStart = (taskId: string) => {
+  const handleStart = (_taskId: string) => {
     // TODO: API call to start task
   };
 

@@ -5,8 +5,8 @@ import type { MemberRetentionProfile } from '@/lib/membership/retention';
 
 interface AtRiskMemberListProps {
   members: MemberRetentionProfile[];
-  onViewMember?: (memberId: string) => void;
-  onTakeAction?: (memberId: string, actionType: string) => void;
+  onViewMember?: (_memberId: string) => void;
+  onTakeAction?: (_memberId: string, _actionType: string) => void;
   limit?: number;
 }
 

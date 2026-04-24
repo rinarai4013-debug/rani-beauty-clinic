@@ -6,7 +6,7 @@ import type { RealTimeSuggestion } from '@/types/ai-treatment';
 
 interface CopilotSuggestionProps {
   suggestions: RealTimeSuggestion[];
-  onSelect?: (suggestion: RealTimeSuggestion) => void;
+  onSelect?: (_suggestion: RealTimeSuggestion) => void;
 }
 
 const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string }> = {

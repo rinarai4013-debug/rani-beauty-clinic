@@ -6,7 +6,7 @@ import type { EmptySlotGap } from '@/lib/revenue/gap-finder';
 
 interface EmptySlotsListProps {
   slots: EmptySlotGap[];
-  onFillSlot?: (slot: EmptySlotGap) => void;
+  onFillSlot?: (_slot: EmptySlotGap) => void;
 }
 
 export default function EmptySlotsList({ slots, onFillSlot }: EmptySlotsListProps) {

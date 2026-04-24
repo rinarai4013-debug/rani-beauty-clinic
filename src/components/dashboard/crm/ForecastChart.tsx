@@ -24,7 +24,7 @@ export default function ForecastChart({ forecasts }: ForecastChartProps) {
       </h3>
 
       <div className="space-y-4">
-        {forecasts.map((forecast, i) => {
+        {forecasts.map((forecast, _i) => {
           const expectedPct = (forecast.expectedRevenue / maxValue) * 100;
           const bestPct = (forecast.bestCase / maxValue) * 100;
           const worstPct = (forecast.worstCase / maxValue) * 100;

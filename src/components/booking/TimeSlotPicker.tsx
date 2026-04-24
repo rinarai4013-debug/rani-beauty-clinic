@@ -6,7 +6,7 @@ import type { TimeSlot } from '@/lib/booking/types';
 interface TimeSlotPickerProps {
   slots: TimeSlot[];
   selectedSlot: TimeSlot | null;
-  onSelect: (slot: TimeSlot) => void;
+  onSelect: (_slot: TimeSlot) => void;
   isLoading?: boolean;
 }
 

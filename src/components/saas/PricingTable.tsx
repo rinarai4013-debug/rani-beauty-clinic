@@ -20,7 +20,7 @@ interface PricingTier {
 }
 
 interface PricingTableProps {
-  onSelect?: (tier: string) => void;
+  onSelect?: (_tier: string) => void;
   annual?: boolean;
 }
 

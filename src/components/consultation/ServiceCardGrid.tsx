@@ -13,7 +13,7 @@ import {
 
 interface ServiceCardGridProps {
   selectedIds: string[];
-  onToggle: (id: string) => void;
+  onToggle: (_id: string) => void;
   filter?: ServiceCategory;
 }
 

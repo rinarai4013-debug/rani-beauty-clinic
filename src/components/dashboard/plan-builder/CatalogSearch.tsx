@@ -8,8 +8,8 @@ import { SERVICE_CATEGORIES } from '@/data/services/unified-catalog';
 interface CatalogSearchProps {
   query: string;
   category: ServiceCategory | 'all';
-  onSearch: (q: string) => void;
-  onCategoryChange: (cat: ServiceCategory | 'all') => void;
+  onSearch: (_q: string) => void;
+  onCategoryChange: (_cat: ServiceCategory | 'all') => void;
 }
 
 export default function CatalogSearch({

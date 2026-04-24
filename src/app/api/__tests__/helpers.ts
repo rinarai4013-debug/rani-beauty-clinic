@@ -109,9 +109,9 @@ export function airtableRecords<T extends Record<string, unknown>>(
  * `fetchFirst`, `createRecord`, and `rateLimitedQuery` implementations.
  */
 export function createAirtableMock(overrides: {
-  fetchAll?: (...args: unknown[]) => Promise<AirtableRecord[]>;
-  fetchFirst?: (...args: unknown[]) => Promise<AirtableRecord[]>;
-  createRecord?: (...args: unknown[]) => Promise<string>;
+  fetchAll?: (..._args: unknown[]) => Promise<AirtableRecord[]>;
+  fetchFirst?: (..._args: unknown[]) => Promise<AirtableRecord[]>;
+  createRecord?: (..._args: unknown[]) => Promise<string>;
   rateLimitedQuery?: <T>(fn: () => Promise<T>) => Promise<T>;
 } = {}) {
   const mockTable = () => ({

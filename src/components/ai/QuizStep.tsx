@@ -6,7 +6,7 @@ import type { QuizQuestion, QuizOption } from '@/types/ai-treatment';
 interface QuizStepProps {
   question: QuizQuestion;
   currentAnswer: string | string[];
-  onAnswer: (value: string | string[]) => void;
+  onAnswer: (_value: string | string[]) => void;
   onNext: () => void;
   onBack: () => void;
   currentStep: number;

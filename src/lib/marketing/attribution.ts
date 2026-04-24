@@ -340,7 +340,7 @@ function attributePositionBased(journey: CustomerJourney): TouchpointCredit[] {
 
 // ── Model Router ──────────────────────────────────────────────────────────
 
-const MODEL_FN: Record<AttributionModel, (j: CustomerJourney) => TouchpointCredit[]> = {
+const MODEL_FN: Record<AttributionModel, (_j: CustomerJourney) => TouchpointCredit[]> = {
   first_touch: attributeFirstTouch,
   last_touch: attributeLastTouch,
   linear: attributeLinear,

@@ -8,7 +8,7 @@ import type { MastermindSession, MastermindTreatment, PlanModification } from '@
 interface PlanEditorProps {
   session: MastermindSession;
   onValidate: () => Promise<ValidationResult | null>;
-  onDispatch: (action: any) => Promise<void>;
+  onDispatch: (_action: any) => Promise<void>;
 }
 
 interface ValidationResult {

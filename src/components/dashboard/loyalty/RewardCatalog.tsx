@@ -8,7 +8,7 @@ import { getRewardsByCategory, getCategoryLabel, type LoyaltyReward, type Reward
 interface RewardCatalogProps {
   tier: 'Silver' | 'Gold' | 'Platinum';
   balance: number;
-  onRedeem?: (rewardId: string) => void;
+  onRedeem?: (_rewardId: string) => void;
 }
 
 const CATEGORY_ICONS: Record<RewardCategory, React.ElementType> = {

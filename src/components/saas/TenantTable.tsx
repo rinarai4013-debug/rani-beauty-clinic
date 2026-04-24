@@ -19,7 +19,7 @@ export interface Tenant {
 
 interface TenantTableProps {
   tenants: Tenant[];
-  onStatusChange?: (id: string, status: Tenant['status']) => void;
+  onStatusChange?: (_id: string, _status: Tenant['status']) => void;
 }
 
 const statusConfig: Record<Tenant['status'], { label: string; bg: string; text: string; dot: string }> = {

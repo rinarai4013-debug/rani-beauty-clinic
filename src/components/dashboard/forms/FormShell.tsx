@@ -9,7 +9,7 @@ interface FormShellProps {
   subtitle?: string;
   icon: ReactNode;
   children: ReactNode;
-  onSubmit: (e: FormEvent) => void;
+  onSubmit: (_e: FormEvent) => void;
   isSubmitting?: boolean;
   submitLabel?: string;
   backHref?: string;

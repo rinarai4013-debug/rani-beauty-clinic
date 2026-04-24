@@ -5,7 +5,7 @@ import type { RetentionAction, RetentionActionType } from '@/lib/membership/rete
 
 interface RetentionActionsProps {
   actions: RetentionAction[];
-  onExecute?: (actionId: string) => void;
+  onExecute?: (_actionId: string) => void;
 }
 
 const ACTION_ICONS: Record<RetentionActionType, typeof Phone> = {

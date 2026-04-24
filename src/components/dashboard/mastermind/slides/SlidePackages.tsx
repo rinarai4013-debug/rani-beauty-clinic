@@ -168,7 +168,7 @@ function PackageCard({
 
 interface SlidePackagesProps {
   packages: GeneratedPackage[];
-  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
+  onSelectPackage: (_tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
 }
 
 export default function SlidePackages({ packages, onSelectPackage }: SlidePackagesProps) {

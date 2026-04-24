@@ -6,9 +6,9 @@ import { Check } from 'lucide-react';
 
 interface TreatmentEffectSelectorProps {
   selectedPresets: string[];
-  onToggle: (preset: string) => void;
+  onToggle: (_preset: string) => void;
   intensity: number; // 0-1
-  onIntensityChange: (v: number) => void;
+  onIntensityChange: (_v: number) => void;
 }
 
 export default function TreatmentEffectSelector({

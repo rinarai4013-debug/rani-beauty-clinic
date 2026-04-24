@@ -1,7 +1,7 @@
 "use client";
 
-type UpdateCallback = (registration: ServiceWorkerRegistration) => void;
-type InstallCallback = (event: BeforeInstallPromptEvent) => void;
+type UpdateCallback = (_registration: ServiceWorkerRegistration) => void;
+type InstallCallback = (_event: BeforeInstallPromptEvent) => void;
 
 export interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];

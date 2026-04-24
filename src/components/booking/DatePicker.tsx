@@ -5,7 +5,7 @@ import { format, addDays, addMonths, startOfMonth, endOfMonth, eachDayOfInterval
 
 interface DatePickerProps {
   selectedDate: string | null;
-  onSelect: (date: string) => void;
+  onSelect: (_date: string) => void;
   minDate?: Date;
   maxDate?: Date;
   disabledDates?: string[];

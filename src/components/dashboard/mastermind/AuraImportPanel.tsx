@@ -54,7 +54,7 @@ interface ImportResult {
 
 interface AuraImportPanelProps {
   session: MastermindSession;
-  onImportComplete?: (result: ImportResult) => void;
+  onImportComplete?: (_result: ImportResult) => void;
 }
 
 // ── COMPONENT ──

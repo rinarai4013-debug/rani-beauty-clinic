@@ -46,7 +46,7 @@ interface ChartWrapperProps {
   /** Date range selector tabs */
   dateRanges?: DateRangeOption[];
   activeRange?: string;
-  onRangeChange?: (range: string) => void;
+  onRangeChange?: (_range: string) => void;
   /** Whether chart can be expanded fullscreen */
   expandable?: boolean;
   /** Optional header actions (legend, download button, etc.) */

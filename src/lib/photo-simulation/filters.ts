@@ -383,7 +383,7 @@ export function applyFilterChain(
 ): void {
   const filterMap: Record<
     FilterStep['filter'],
-    (ctx: CanvasRenderingContext2D, w: number, h: number, i: number) => void
+    (_ctx: CanvasRenderingContext2D, _w: number, _h: number, _i: number) => void
   > = {
     skinSmoothing: applySkinSmoothing,
     toneEvening: applyToneEvening,
@@ -437,7 +437,7 @@ export async function applyUnifiedFilterChain(
 
     const degradationMap: Record<
       DegradationFilterStep['filter'],
-      (ctx: CanvasRenderingContext2D, w: number, h: number, i: number) => void
+      (_ctx: CanvasRenderingContext2D, _w: number, _h: number, _i: number) => void
     > = {
       agingProgression: applyAgingProgression,
       textureDegradation: applyTextureDegradation,

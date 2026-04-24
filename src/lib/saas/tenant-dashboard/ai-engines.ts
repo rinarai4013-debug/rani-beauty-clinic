@@ -323,7 +323,7 @@ export async function getDynamicPricing(
   }
 
   const suggestions: PricingSuggestion[] = Array.from(serviceMap.entries())
-    .filter(([_, data]) => data.amounts.length >= 3)
+    .filter(([__, data]) => data.amounts.length >= 3)
     .map(([service, data]) => {
       const avgPrice = data.amounts.reduce((s, a) => s + a, 0) / data.amounts.length;
       const recentAmounts = data.amounts.slice(-10);
@@ -360,7 +360,7 @@ export function generateContent(
   _tenant: TenantConfig,
   request: ContentRequest
 ): GeneratedContent {
-  const templates: Record<ContentType, (req: ContentRequest, clinic: string) => string> = {
+  const templates: Record<ContentType, (_req: ContentRequest, _clinic: string) => string> = {
     social_post: (req, clinic) =>
       `Ready to transform your look? At ${clinic}, we're passionate about helping you feel your absolute best. ${req.topic} #MedSpa #Beauty #SelfCare`,
     email_campaign: (req, clinic) =>
@@ -371,7 +371,7 @@ export function generateContent(
       `# ${req.topic}\n\nAt ${clinic}, we stay at the forefront of aesthetic innovation. ${req.topic}\n\nSchedule your consultation to learn more.`,
     ad_copy: (req, clinic) =>
       `${req.topic} | ${clinic}\nExpert care. Stunning results. Book your free consultation today.\nLimited spots available this month.`,
-    review_response: (req, _clinic) =>
+    review_response: (req, __clinic) =>
       `Thank you for your wonderful review! We're thrilled to hear about your experience with ${req.topic}. Our team is dedicated to delivering exceptional results.`,
   };
 

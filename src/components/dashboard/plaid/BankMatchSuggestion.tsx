@@ -10,7 +10,7 @@ interface BankMatchSuggestionProps {
   vendor: string;
   date: string;
   matchType: 'expense' | 'sale';
-  onMatch: (transactionId: string) => void;
+  onMatch: (_transactionId: string) => void;
 }
 
 export default function BankMatchSuggestion({

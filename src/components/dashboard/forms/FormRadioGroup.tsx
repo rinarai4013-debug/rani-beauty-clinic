@@ -2,7 +2,7 @@
 
 interface FormRadioGroupProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (_value: string) => void;
   options: { value: string; label: string; emoji?: string }[];
   columns?: 2 | 3 | 4;
 }

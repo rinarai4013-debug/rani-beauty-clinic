@@ -13,7 +13,7 @@ import type {
 
 interface AudienceBuilderProps {
   filter: AudienceFilter;
-  onChange: (filter: AudienceFilter) => void;
+  onChange: (_filter: AudienceFilter) => void;
   audienceSize?: number;
   totalClients?: number;
 }

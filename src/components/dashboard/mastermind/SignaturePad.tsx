@@ -11,7 +11,7 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 
 interface SignaturePadProps {
-  onSign: (dataUrl: string) => void;
+  onSign: (_dataUrl: string) => void;
   onClear?: () => void;
   width?: number;
   height?: number;

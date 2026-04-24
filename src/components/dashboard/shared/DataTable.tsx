@@ -23,9 +23,9 @@ export interface DataTableColumn<T> {
   key: string;
   header: string;
   /** Render function - receives the row data */
-  render?: (row: T, index: number) => ReactNode;
+  render?: (_row: T, _index: number) => ReactNode;
   /** Simple accessor for sorting - if not provided, uses key as object path */
-  accessor?: (row: T) => string | number;
+  accessor?: (_row: T) => string | number;
   sortable?: boolean;
   /** Alignment */
   align?: 'left' | 'center' | 'right';
@@ -43,7 +43,7 @@ interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
   data: T[];
   /** Unique key extractor */
-  rowKey: (row: T) => string;
+  rowKey: (_row: T) => string;
 
   // ── Data states ─────────────────────────────────────────────────
   loading?: boolean;
@@ -58,7 +58,7 @@ interface DataTableProps<T> {
   paginate?: boolean;
   pageSize?: number;
   /** Custom row click handler */
-  onRowClick?: (row: T) => void;
+  onRowClick?: (_row: T) => void;
   /** Custom empty state */
   emptyTitle?: string;
   emptyDescription?: string;

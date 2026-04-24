@@ -6,7 +6,7 @@ import { DEFAULT_PROVIDERS } from '@/lib/booking/availability';
 interface ProviderSelectorProps {
   providers?: ProviderSchedule[];
   selectedProviderId: string | null;
-  onSelect: (providerId: string | null) => void;
+  onSelect: (_providerId: string | null) => void;
   serviceId?: string;
 }
 

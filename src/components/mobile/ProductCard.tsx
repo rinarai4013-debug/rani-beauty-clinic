@@ -6,8 +6,8 @@ import type { ShopProduct } from '@/types/mobile';
 
 interface ProductCardProps {
   product: ShopProduct;
-  onAddToCart?: (productId: string) => void;
-  onToggleFavorite?: (productId: string) => void;
+  onAddToCart?: (_productId: string) => void;
+  onToggleFavorite?: (_productId: string) => void;
 }
 
 export default function ProductCard({ product, onAddToCart, onToggleFavorite }: ProductCardProps) {

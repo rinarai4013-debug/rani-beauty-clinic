@@ -8,7 +8,7 @@ import type { QuizQuestion } from '@/data/training/modules';
 interface QuizSectionProps {
   questions: QuizQuestion[];
   sectionTitle: string;
-  onComplete: (score: number) => void;
+  onComplete: (_score: number) => void;
   onBack: () => void;
 }
 

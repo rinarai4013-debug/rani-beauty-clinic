@@ -12,8 +12,8 @@ import type { Conversation, MessageChannel, SmartReply } from '@/types/communica
 interface InboxViewProps {
   conversations: Conversation[];
   smartRepliesMap?: Map<string, SmartReply[]>;
-  onSendMessage: (conversationId: string, body: string) => void;
-  onMarkRead?: (conversationId: string) => void;
+  onSendMessage: (_conversationId: string, _body: string) => void;
+  onMarkRead?: (_conversationId: string) => void;
   isLoading?: boolean;
 }
 

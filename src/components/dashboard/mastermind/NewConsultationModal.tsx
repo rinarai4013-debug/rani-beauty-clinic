@@ -241,7 +241,7 @@ function GoldInput({
   type?: string;
   placeholder?: string;
   value: string;
-  onChange: (v: string) => void;
+  onChange: (_v: string) => void;
   error?: boolean;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
   return (
@@ -271,7 +271,7 @@ function GoldTextArea({
 }: {
   placeholder?: string;
   value: string;
-  onChange: (v: string) => void;
+  onChange: (_v: string) => void;
   rows?: number;
 }) {
   return (
@@ -296,7 +296,7 @@ function YesNoToggle({
   onChange,
 }: {
   value: 'yes' | 'no' | '';
-  onChange: (v: 'yes' | 'no') => void;
+  onChange: (_v: 'yes' | 'no') => void;
 }) {
   return (
     <div className="flex gap-2">
@@ -368,8 +368,8 @@ function PhotoDropZone({
   label: string;
   sublabel: string;
   files: File[];
-  onFiles: (files: File[]) => void;
-  onRemove: (index: number) => void;
+  onFiles: (_files: File[]) => void;
+  onRemove: (_index: number) => void;
   maxFiles?: number;
   icon?: React.ComponentType<{ className?: string }>;
 }) {
@@ -471,7 +471,7 @@ function PhotoDropZone({
 interface Props {
   open: boolean;
   onClose: () => void;
-  onCreated: (sessionId: string) => void;
+  onCreated: (_sessionId: string) => void;
 }
 
 export default function NewConsultationModal({ open, onClose, onCreated }: Props) {

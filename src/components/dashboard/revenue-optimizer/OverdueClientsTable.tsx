@@ -5,7 +5,7 @@ import type { OverdueClientGap } from '@/lib/revenue/gap-finder';
 
 interface OverdueClientsTableProps {
   clients: OverdueClientGap[];
-  onContact?: (client: OverdueClientGap) => void;
+  onContact?: (_client: OverdueClientGap) => void;
 }
 
 export default function OverdueClientsTable({ clients, onContact }: OverdueClientsTableProps) {

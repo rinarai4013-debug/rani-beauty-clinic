@@ -5,7 +5,7 @@ import { ROOM_COLORS } from '@/lib/booking/types';
 
 interface CalendarDayViewProps {
   data: CalendarDayData;
-  onEventClick?: (event: CalendarEvent) => void;
+  onEventClick?: (_event: CalendarEvent) => void;
   startHour?: number;
   endHour?: number;
 }

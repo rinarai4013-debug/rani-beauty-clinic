@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 interface BodyMapPickerProps {
   selectedAreas: string[];
-  onToggle: (area: string) => void;
+  onToggle: (_area: string) => void;
 }
 
 interface BodyZone {

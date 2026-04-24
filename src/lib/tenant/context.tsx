@@ -32,9 +32,9 @@ export interface TenantContextValue {
   /** Current subscription tier */
   tier: SubscriptionTier;
   /** Check if a specific feature is enabled for this tenant */
-  isFeatureEnabled: (feature: keyof FeatureFlags) => boolean;
+  isFeatureEnabled: (_feature: keyof FeatureFlags) => boolean;
   /** Get the minimum tier needed to access a feature (for upsell UI) */
-  requiredTier: (feature: keyof FeatureFlags) => SubscriptionTier;
+  requiredTier: (_feature: keyof FeatureFlags) => SubscriptionTier;
   /** Whether tenant is on the free trial */
   isTrial: boolean;
   /** Whether white-label is active (remove RaniOS branding) */

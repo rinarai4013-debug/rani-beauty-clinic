@@ -7,10 +7,10 @@ import { TASK_TYPE_LABELS, TASK_PRIORITY_COLORS } from '@/types/crm';
 
 interface TaskBoardProps {
   tasks: CRMTask[];
-  onComplete?: (taskId: string) => void;
-  onStart?: (taskId: string) => void;
-  onReassign?: (taskId: string, assignee: string) => void;
-  onClick?: (task: CRMTask) => void;
+  onComplete?: (_taskId: string) => void;
+  onStart?: (_taskId: string) => void;
+  onReassign?: (_taskId: string, _assignee: string) => void;
+  onClick?: (_task: CRMTask) => void;
 }
 
 const TASK_ICONS: Record<TaskType, typeof Phone> = {
@@ -40,9 +40,9 @@ function TaskCard({
   onClick,
 }: {
   task: CRMTask;
-  onComplete?: (id: string) => void;
-  onStart?: (id: string) => void;
-  onClick?: (task: CRMTask) => void;
+  onComplete?: (_id: string) => void;
+  onStart?: (_id: string) => void;
+  onClick?: (_task: CRMTask) => void;
 }) {
   const Icon = TASK_ICONS[task.type] || FileText;
 

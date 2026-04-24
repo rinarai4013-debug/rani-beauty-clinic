@@ -19,7 +19,7 @@ interface ServiceTemplate {
   technology?: string;
   category: "aesthetic" | "wellness";
   faqs: { question: string; answer: string }[];
-  generateContent: (cityName: string, county: string, drivingTime: string, distance: string) => string;
+  generateContent: (_cityName: string, _county: string, _drivingTime: string, _distance: string) => string;
 }
 
 const serviceTemplates: ServiceTemplate[] = [

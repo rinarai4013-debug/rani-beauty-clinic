@@ -321,7 +321,7 @@ describe('GET /api/dashboard/clients/[id]', () => {
     (Tables.clients as any).mockReturnValue({ find: mockFind });
 
     // Mock linked record fetches
-    mockFetchAll.mockImplementation((_table: unknown, opts?: { filterByFormula?: string }) => {
+    mockFetchAll.mockImplementation((__table: unknown, _opts?: { filterByFormula?: string }) => {
       return Promise.resolve([
         airtableRecord('apt_001', { 'Service Name': 'HydraFacial', Date: '2024-01-15', Status: 'completed', 'Amount Paid': 275, 'Service Category': 'Facial', Provider: 'Mom', Time: '10:00', Duration: 60, 'Is Consult': false }),
       ]);

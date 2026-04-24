@@ -45,7 +45,7 @@ export default function PredictiveMetrics({
               { label: '3 months', data: withTx.threeMonths },
               { label: '6 months', data: withTx.sixMonths },
               { label: '1 year', data: withTx.oneYear },
-            ].map((point, i) => (
+            ].map((point, _i) => (
               <div key={point.label} className="flex items-center justify-between">
                 <span className="font-body text-xs text-[#0F1D2C]/60">{point.label}</span>
                 <div className="flex items-center gap-3">

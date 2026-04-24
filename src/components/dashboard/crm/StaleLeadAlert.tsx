@@ -6,7 +6,7 @@ import { PIPELINE_STAGE_LABELS } from '@/types/crm';
 
 interface StaleLeadAlertProps {
   leads: PipelineLead[];
-  onAction?: (leadId: string, action: 'call' | 'email' | 'mark_lost') => void;
+  onAction?: (_leadId: string, _action: 'call' | 'email' | 'mark_lost') => void;
 }
 
 export default function StaleLeadAlert({ leads, onAction }: StaleLeadAlertProps) {

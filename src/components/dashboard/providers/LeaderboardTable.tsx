@@ -7,7 +7,7 @@ import type { LeaderboardEntry } from '@/types/providers';
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
   metric: string;
-  formatValue?: (value: number) => string;
+  formatValue?: (_value: number) => string;
 }
 
 export default function LeaderboardTable({ entries, metric, formatValue }: LeaderboardTableProps) {

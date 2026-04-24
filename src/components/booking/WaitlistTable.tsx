@@ -5,9 +5,9 @@ import type { WaitlistEntry } from '@/lib/booking/types';
 
 interface WaitlistTableProps {
   entries: WaitlistEntry[];
-  onNotify?: (entryId: string) => void;
-  onRemove?: (entryId: string) => void;
-  onConvert?: (entryId: string) => void;
+  onNotify?: (_entryId: string) => void;
+  onRemove?: (_entryId: string) => void;
+  onConvert?: (_entryId: string) => void;
 }
 
 export default function WaitlistTable({ entries, onNotify, onRemove, onConvert }: WaitlistTableProps) {

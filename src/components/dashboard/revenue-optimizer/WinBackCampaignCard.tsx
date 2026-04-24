@@ -6,7 +6,7 @@ import type { WinBackCampaign } from '@/lib/revenue/retention-machine';
 
 interface WinBackCampaignCardProps {
   campaign: WinBackCampaign;
-  onLaunch?: (campaign: WinBackCampaign) => void;
+  onLaunch?: (_campaign: WinBackCampaign) => void;
 }
 
 export default function WinBackCampaignCard({ campaign, onLaunch }: WinBackCampaignCardProps) {

@@ -44,10 +44,10 @@ vi.mock('@/lib/airtable/client', () => {
   const mockTable = () => ({
     find: vi.fn(),
     select: vi.fn().mockReturnValue({
-      firstPage: vi.fn((cb: (err: Error | null, records?: unknown[]) => void) => cb(null, [])),
+      firstPage: vi.fn((cb: (_err: Error | null, _records?: unknown[]) => void) => cb(null, [])),
     }),
-    create: vi.fn((records: unknown[], opts: unknown, cb: (err: Error | null) => void) => cb(null)),
-    update: vi.fn((records: unknown[], opts: unknown, cb: (err: Error | null) => void) => cb(null)),
+    create: vi.fn((records: unknown[], opts: unknown, cb: (_err: Error | null) => void) => cb(null)),
+    update: vi.fn((records: unknown[], opts: unknown, cb: (_err: Error | null) => void) => cb(null)),
   });
   return {
     Tables: {

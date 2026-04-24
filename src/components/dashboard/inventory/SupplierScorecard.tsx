@@ -16,7 +16,7 @@ import { products, getProductsBySupplier } from '@/data/inventory/products';
 interface SupplierScorecardProps {
   supplierList?: Supplier[];
   selectedSupplierId?: string;
-  onSupplierSelect?: (id: string) => void;
+  onSupplierSelect?: (_id: string) => void;
   loading?: boolean;
 }
 

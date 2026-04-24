@@ -14,7 +14,7 @@ import type {
 
 interface ComposeMessageProps {
   templates?: MessageTemplate[];
-  onSend: (request: SendMessageRequest) => void;
+  onSend: (_request: SendMessageRequest) => void;
   onCancel?: () => void;
   defaultChannel?: MessageChannel;
   defaultClientId?: string;

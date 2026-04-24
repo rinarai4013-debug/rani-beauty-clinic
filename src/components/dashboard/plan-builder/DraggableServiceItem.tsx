@@ -7,10 +7,10 @@ import type { SelectedService } from '@/lib/plan-builder/types';
 interface DraggableServiceItemProps {
   service: SelectedService;
   index: number;
-  onRemove: (id: string) => void;
-  onSetQty: (id: string, qty: number) => void;
-  onSetNotes: (id: string, notes: string) => void;
-  onMoveToPhase: (id: string, phase: 1 | 2 | 3) => void;
+  onRemove: (_id: string) => void;
+  onSetQty: (_id: string, _qty: number) => void;
+  onSetNotes: (_id: string, _notes: string) => void;
+  onMoveToPhase: (_id: string, _phase: 1 | 2 | 3) => void;
 }
 
 export default function DraggableServiceItem({

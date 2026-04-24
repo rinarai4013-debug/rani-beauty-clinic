@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type confetti from 'canvas-confetti';
 
-type ConfettiFn = (options?: confetti.Options) => Promise<undefined> | null;
+type ConfettiFn = (_options?: confetti.Options) => Promise<undefined> | null;
 
 // Dynamic import canvas-confetti to avoid SSR issues
 export function useConfetti() {

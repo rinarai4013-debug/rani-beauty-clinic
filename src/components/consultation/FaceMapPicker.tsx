@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 interface FaceMapPickerProps {
   selectedAreas: string[];
-  onToggle: (area: string) => void;
+  onToggle: (_area: string) => void;
 }
 
 interface FaceZone {

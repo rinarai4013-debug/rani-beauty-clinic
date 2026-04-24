@@ -6,8 +6,8 @@ import type { TimeOffRequest, TimeOffStatus } from '@/types/providers';
 
 interface TimeOffCalendarProps {
   requests: TimeOffRequest[];
-  onApprove?: (id: string) => void;
-  onDeny?: (id: string) => void;
+  onApprove?: (_id: string) => void;
+  onDeny?: (_id: string) => void;
   isManager?: boolean;
 }
 

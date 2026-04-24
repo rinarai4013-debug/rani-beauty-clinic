@@ -8,7 +8,7 @@ import { draftReviewResponse } from '@/lib/marketing/review-engine';
 
 interface ReviewResponseDrafterProps {
   review: Review;
-  onApprove?: (reviewId: string, response: string) => void;
+  onApprove?: (_reviewId: string, _response: string) => void;
   onClose?: () => void;
 }
 

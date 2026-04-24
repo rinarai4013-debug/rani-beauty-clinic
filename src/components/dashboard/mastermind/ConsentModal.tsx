@@ -17,7 +17,7 @@ import { sanitizeHtml } from '@/lib/security/sanitize-html';
 interface ConsentModalProps {
   open: boolean;
   onClose: () => void;
-  onConsent: (record: ConsentRecord) => void;
+  onConsent: (_record: ConsentRecord) => void;
   template: ConsentTemplate;
   patientName: string;
   patientEmail: string;

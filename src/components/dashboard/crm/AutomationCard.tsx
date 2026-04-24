@@ -5,7 +5,7 @@ import type { AutomationRecipe } from '@/types/crm';
 
 interface AutomationCardProps {
   automation: AutomationRecipe;
-  onToggle: (id: string, enabled: boolean) => void;
+  onToggle: (_id: string, _enabled: boolean) => void;
 }
 
 const CATEGORY_LABELS: Record<AutomationRecipe['category'], string> = {

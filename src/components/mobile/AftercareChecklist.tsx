@@ -7,7 +7,7 @@ import type { AftercareItem } from '@/types/mobile';
 
 interface AftercareChecklistProps {
   items: AftercareItem[];
-  onToggle?: (itemId: string, completed: boolean) => void;
+  onToggle?: (_itemId: string, _completed: boolean) => void;
 }
 
 const categoryIcons: Record<string, typeof Check> = {

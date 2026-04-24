@@ -176,7 +176,7 @@ function SlideCounter({ current, total }: { current: number; total: number }) {
 
 interface PresentationModeProps {
   session: MastermindSession;
-  onSelectPackage?: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
+  onSelectPackage?: (_tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   onBookSession?: () => void;
   onShareLink?: () => void;
   onClose?: () => void;

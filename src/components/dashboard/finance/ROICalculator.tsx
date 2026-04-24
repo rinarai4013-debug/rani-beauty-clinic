@@ -91,7 +91,7 @@ export default function ROICalculator({ defaults }: ROICalculatorProps) {
   );
 }
 
-function InputField({ label, value, onChange, prefix }: { label: string; value: number; onChange: (v: number) => void; prefix?: string }) {
+function InputField({ label, value, onChange, prefix }: { label: string; value: number; onChange: (_v: number) => void; prefix?: string }) {
   return (
     <div>
       <label className="block text-xs font-body text-rani-muted mb-1">{label}</label>

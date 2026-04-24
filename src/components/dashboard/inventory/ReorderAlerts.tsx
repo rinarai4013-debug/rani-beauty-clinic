@@ -30,7 +30,7 @@ interface ReorderAlert {
 interface ReorderAlertsProps {
   products?: Product[];
   loading?: boolean;
-  onCreatePO?: (productIds: string[]) => void;
+  onCreatePO?: (_productIds: string[]) => void;
 }
 
 const URGENCY_CONFIG = {

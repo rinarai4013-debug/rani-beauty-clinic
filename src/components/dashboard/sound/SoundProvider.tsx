@@ -13,11 +13,11 @@ type SoundName =
   | 'click';     // Subtle UI click
 
 interface SoundContextType {
-  play: (sound: SoundName) => void;
+  play: (_sound: SoundName) => void;
   muted: boolean;
-  setMuted: (muted: boolean) => void;
+  setMuted: (_muted: boolean) => void;
   volume: number;
-  setVolume: (volume: number) => void;
+  setVolume: (_volume: number) => void;
 }
 
 const SoundContext = createContext<SoundContextType>({
@@ -54,7 +54,7 @@ function createOscillatorSound(
   osc.stop(audioCtx.currentTime + duration);
 }
 
-const SOUND_DEFINITIONS: Record<SoundName, (ctx: AudioContext, vol: number) => void> = {
+const SOUND_DEFINITIONS: Record<SoundName, (_ctx: AudioContext, _vol: number) => void> = {
   booking: (ctx, vol) => {
     createOscillatorSound(ctx, 523.25, 0.15, 'sine', vol); // C5
     setTimeout(() => createOscillatorSound(ctx, 659.25, 0.15, 'sine', vol), 100); // E5

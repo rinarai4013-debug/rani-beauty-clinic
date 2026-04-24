@@ -15,7 +15,7 @@ const STATUS_CONFIG: Record<ResponseStatus, { label: string; color: string; icon
 interface ReviewFeedProps {
   reviews: Review[];
   loading?: boolean;
-  onRespond?: (review: Review) => void;
+  onRespond?: (_review: Review) => void;
 }
 
 export default function ReviewFeed({ reviews, loading, onRespond }: ReviewFeedProps) {

@@ -6,7 +6,7 @@ import type { BuilderClient } from '@/lib/plan-builder/types';
 
 interface ClientSelectorProps {
   selected: BuilderClient | null;
-  onSelect: (client: BuilderClient | null) => void;
+  onSelect: (_client: BuilderClient | null) => void;
 }
 
 interface ClientSearchResult {

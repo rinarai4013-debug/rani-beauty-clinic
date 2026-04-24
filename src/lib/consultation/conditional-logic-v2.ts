@@ -22,7 +22,7 @@ export interface MedicalFollowUp {
   field: string;
   type: 'text' | 'date' | 'select';
   options?: { value: string; label: string }[];
-  condition: (data: Partial<MedicalHistoryFormData>) => boolean;
+  condition: (_data: Partial<MedicalHistoryFormData>) => boolean;
 }
 
 export function getMedicalFollowUps(

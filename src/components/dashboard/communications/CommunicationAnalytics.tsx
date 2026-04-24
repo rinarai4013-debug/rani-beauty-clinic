@@ -116,7 +116,7 @@ export default function CommunicationAnalytics({
                   paddingAngle={4}
                   dataKey="value"
                 >
-                  {channelData.map((entry, index) => (
+                  {channelData.map((entry, _index) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>

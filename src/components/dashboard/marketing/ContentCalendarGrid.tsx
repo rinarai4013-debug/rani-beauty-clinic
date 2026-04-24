@@ -40,7 +40,7 @@ const PRIORITY_DOT: Record<string, string> = {
 interface ContentCalendarGridProps {
   weeks: WeeklyContent[];
   loading?: boolean;
-  onPieceClick?: (piece: ContentPiece) => void;
+  onPieceClick?: (_piece: ContentPiece) => void;
 }
 
 export default function ContentCalendarGrid({ weeks, loading, onPieceClick }: ContentCalendarGridProps) {

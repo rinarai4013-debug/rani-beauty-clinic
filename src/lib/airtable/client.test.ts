@@ -6,7 +6,7 @@ vi.mock('airtable', () => {
   const mockTable = {
     select: vi.fn().mockReturnValue({
       firstPage: vi.fn().mockResolvedValue([]),
-      eachPage: vi.fn((_pageFn: unknown, doneFn: (err?: Error) => void) => doneFn()),
+      eachPage: vi.fn((_pageFn: unknown, doneFn: (_err?: Error) => void) => doneFn()),
     }),
     create: vi.fn().mockResolvedValue({ id: 'recNew123' }),
     update: vi.fn().mockResolvedValue({}),

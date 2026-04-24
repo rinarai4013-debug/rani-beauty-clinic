@@ -5,7 +5,7 @@ import { Camera, X, Upload } from 'lucide-react';
 
 interface PhotoUploadZoneProps {
   photos: File[];
-  onPhotosChange: (photos: File[]) => void;
+  onPhotosChange: (_photos: File[]) => void;
   maxPhotos?: number;
 }
 

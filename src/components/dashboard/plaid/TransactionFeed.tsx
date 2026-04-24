@@ -155,7 +155,7 @@ function TransactionRow({
   expanded: boolean;
   onToggle: () => void;
   onExclude: () => void;
-  onCategorize: (cat: RaniExpenseCategory) => void;
+  onCategorize: (_cat: RaniExpenseCategory) => void;
 }) {
   const isCredit = tx.amount < 0;
   const displayAmount = Math.abs(tx.amount);

@@ -20,7 +20,7 @@ export default function AccountsStrip({ accounts }: AccountsStripProps) {
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
-      {accounts.map((account, i) => {
+      {accounts.map((account, _i) => {
         const Icon = ACCOUNT_ICONS[account.type] || ACCOUNT_ICONS.default;
         return (
           <div

@@ -10,11 +10,11 @@ import type { MessageTemplate, TemplateCategory } from '@/types/communications';
 
 interface TemplateLibraryProps {
   templates: MessageTemplate[];
-  onEdit: (id: string) => void;
-  onPreview: (template: MessageTemplate) => void;
+  onEdit: (_id: string) => void;
+  onPreview: (_template: MessageTemplate) => void;
   onCreateNew: () => void;
-  onDuplicate: (id: string) => void;
-  onSelect?: (template: MessageTemplate) => void;
+  onDuplicate: (_id: string) => void;
+  onSelect?: (_template: MessageTemplate) => void;
   selectable?: boolean;
 }
 

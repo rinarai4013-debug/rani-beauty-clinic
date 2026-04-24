@@ -12,10 +12,10 @@ import type { Campaign, CampaignStatus, CampaignType } from '@/types/communicati
 interface CampaignListProps {
   campaigns: Campaign[];
   onCreateNew: () => void;
-  onEdit: (id: string) => void;
-  onDuplicate: (id: string) => void;
-  onDelete: (id: string) => void;
-  onViewDetails: (id: string) => void;
+  onEdit: (_id: string) => void;
+  onDuplicate: (_id: string) => void;
+  onDelete: (_id: string) => void;
+  onViewDetails: (_id: string) => void;
 }
 
 const STATUS_BADGE: Record<CampaignStatus, { label: string; bg: string; text: string }> = {

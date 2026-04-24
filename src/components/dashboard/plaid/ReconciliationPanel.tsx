@@ -6,8 +6,8 @@ import type { PlaidTransaction, ReconciliationMatch } from '@/types/plaid';
 interface ReconciliationPanelProps {
   transaction: PlaidTransaction | null;
   matches: ReconciliationMatch[];
-  onConfirm: (match: ReconciliationMatch) => void;
-  onExclude: (txId: string) => void;
+  onConfirm: (_match: ReconciliationMatch) => void;
+  onExclude: (_txId: string) => void;
   onClose: () => void;
 }
 

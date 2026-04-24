@@ -17,8 +17,8 @@ interface SaveOfferModalProps {
     description: string;
     value: number;
   }[];
-  onAcceptOffer: (memberId: string, offerType: SaveOfferType) => void;
-  onProceedCancel: (memberId: string) => void;
+  onAcceptOffer: (_memberId: string, _offerType: SaveOfferType) => void;
+  onProceedCancel: (_memberId: string) => void;
 }
 
 const OFFER_ICONS: Record<SaveOfferType, typeof Gift> = {

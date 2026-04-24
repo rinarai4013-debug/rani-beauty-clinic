@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 interface StepProps {
   formData: Record<string, any>;
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (_field: string, _value: any) => void;
   errors: Record<string, string>;
 }
 
@@ -16,7 +16,7 @@ interface FormFieldProps {
   hint?: string;
   value: string;
   error?: string;
-  onChange: (value: string) => void;
+  onChange: (_value: string) => void;
   delay?: number;
 }
 

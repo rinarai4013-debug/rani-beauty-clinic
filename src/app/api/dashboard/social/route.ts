@@ -20,7 +20,7 @@ export async function GET() {
         'generateWeeklyPlan' in socialEngine && typeof socialEngine.generateWeeklyPlan === 'function'
           ? socialEngine.generateWeeklyPlan
           : socialEngine.generateSocialPlan
-      ) as (input: unknown) => unknown;
+      ) as (_input: unknown) => unknown;
 
     const payload = generator({
       services: [],

@@ -263,7 +263,7 @@ export default function ShareableResult({
             Recommended Treatments
           </p>
           <div className="space-y-2.5">
-            {topRecommendations.map((rec, i) => (
+            {topRecommendations.map((rec, _i) => (
               <div
                 key={rec.name}
                 className="flex items-center justify-between"

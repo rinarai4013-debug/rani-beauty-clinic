@@ -8,8 +8,8 @@ interface IntakeFormRendererProps {
   form: IntakeForm;
   progress: FormProgress;
   requiredConsents: ConsentFormTemplate[];
-  onUpdateField: (sectionId: string, fieldId: string, value: unknown) => void;
-  onSignConsent: (consentType: string, signatureData?: string) => void;
+  onUpdateField: (_sectionId: string, _fieldId: string, _value: unknown) => void;
+  onSignConsent: (_consentType: string, _signatureData?: string) => void;
   onSubmit: () => void;
 }
 
@@ -185,7 +185,7 @@ function FieldRenderer({
   field: IntakeField;
   sectionId: string;
   allFields: IntakeField[];
-  onUpdate: (sectionId: string, fieldId: string, value: unknown) => void;
+  onUpdate: (_sectionId: string, _fieldId: string, _value: unknown) => void;
 }) {
   // Check conditional visibility
   if (field.conditionalOn) {

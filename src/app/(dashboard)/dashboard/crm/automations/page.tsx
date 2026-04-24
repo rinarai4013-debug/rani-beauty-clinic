@@ -38,7 +38,7 @@ export default function AutomationsPage() {
     return true;
   });
 
-  const handleToggle = (id: string, enabled: boolean) => {
+  const handleToggle = (_id: string, _enabled: boolean) => {
     // TODO: API call to toggle automation
   };
 

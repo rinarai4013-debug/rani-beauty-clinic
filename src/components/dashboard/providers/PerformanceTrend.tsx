@@ -6,7 +6,7 @@ import type { TrendAnalysis } from '@/types/providers';
 
 interface PerformanceTrendProps {
   trend: TrendAnalysis;
-  formatValue?: (v: number) => string;
+  formatValue?: (_v: number) => string;
   height?: number;
 }
 

@@ -641,7 +641,7 @@ function StepAboutYou({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  setField: (field: string, value: unknown) => void;
+  setField: (_field: string, _value: unknown) => void;
 }) {
   return (
     <div>
@@ -704,7 +704,7 @@ function StepConcerns({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  toggleArrayField: (field: string, value: string) => void;
+  toggleArrayField: (_field: string, _value: string) => void;
   showBodyMap: boolean;
 }) {
   const selectedConcerns = (formData.skinConcerns as string[]) || [];
@@ -795,7 +795,7 @@ function StepInterests({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  toggleArrayField: (field: string, value: string) => void;
+  toggleArrayField: (_field: string, _value: string) => void;
   servicesByCategory: {
     label: string;
     categories: ServiceCategory[];
@@ -862,7 +862,7 @@ function StepHistory({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  setField: (field: string, value: unknown) => void;
+  setField: (_field: string, _value: unknown) => void;
 }) {
   const followUps = getFollowUpQuestions(
     (formData.skinConcerns as string[]) || [],
@@ -1016,7 +1016,7 @@ function StepGoals({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  setField: (field: string, value: unknown) => void;
+  setField: (_field: string, _value: unknown) => void;
 }) {
   return (
     <div>
@@ -1097,8 +1097,8 @@ function StepPhotos({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  removePhoto: (index: number) => void;
+  handleFileChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
+  removePhoto: (_index: number) => void;
 }) {
   const photos = (formData.photos as File[]) || [];
 
@@ -1172,7 +1172,7 @@ function StepSummary({
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
-  setField: (field: string, value: unknown) => void;
+  setField: (_field: string, _value: unknown) => void;
 }) {
   const concerns = (formData.skinConcerns as string[]) || [];
   const interests = (formData.treatmentInterests as string[]) || [];
@@ -1285,7 +1285,7 @@ function InputField({
   label: string;
   type?: string;
   value: string;
-  onChange: (value: string) => void;
+  onChange: (_value: string) => void;
   error?: string;
   placeholder?: string;
 }) {

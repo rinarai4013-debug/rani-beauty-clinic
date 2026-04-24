@@ -15,7 +15,7 @@ import type { GeneratedPackage } from '@/lib/plan-builder/types';
 interface PackageSelectorProps {
   packages: GeneratedPackage[];
   selectedTier: 'Start' | 'Transform' | 'Elite' | 'Essential' | null;
-  onSelect: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
+  onSelect: (_tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   variant?: 'light' | 'dark';
 }
 

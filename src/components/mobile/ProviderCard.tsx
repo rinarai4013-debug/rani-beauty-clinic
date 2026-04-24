@@ -7,7 +7,7 @@ import type { ProviderInfo } from '@/types/mobile';
 interface ProviderCardProps {
   provider: ProviderInfo;
   selected?: boolean;
-  onSelect?: (providerId: string) => void;
+  onSelect?: (_providerId: string) => void;
 }
 
 export default function ProviderCard({ provider, selected, onSelect }: ProviderCardProps) {

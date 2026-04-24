@@ -16,11 +16,11 @@ export default function PipelinePage() {
   const forecastData = (forecasts || []) as PipelineForecast[];
   const [view, setView] = useState<'kanban' | 'funnel'>('kanban');
 
-  const handleLeadClick = (lead: PipelineLead) => {
+  const handleLeadClick = (_lead: PipelineLead) => {
     // Navigate to lead detail
   };
 
-  const handleStageDrop = (leadId: string, toStage: PipelineStage) => {
+  const handleStageDrop = (_leadId: string, _toStage: PipelineStage) => {
     // Handle drag-and-drop stage transition via API
   };
 

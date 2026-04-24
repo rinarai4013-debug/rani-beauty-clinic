@@ -7,7 +7,7 @@ interface ServiceCardProps {
   service: BookableService;
   showPrice?: boolean;
   isSelected?: boolean;
-  onSelect?: (serviceId: string) => void;
+  onSelect?: (_serviceId: string) => void;
 }
 
 export default function ServiceCard({ service, showPrice = true, isSelected = false, onSelect }: ServiceCardProps) {

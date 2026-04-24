@@ -8,7 +8,7 @@ import type { RevenueActionItem } from '@/lib/revenue/gap-finder';
 interface ActionItemCardProps {
   action: RevenueActionItem;
   rank: number;
-  onExecute?: (action: RevenueActionItem) => void;
+  onExecute?: (_action: RevenueActionItem) => void;
 }
 
 export default function ActionItemCard({ action, rank, onExecute }: ActionItemCardProps) {

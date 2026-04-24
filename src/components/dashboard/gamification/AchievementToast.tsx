@@ -11,7 +11,7 @@ const RARITY_COLORS = {
 
 export function showAchievementToast(
   achievement: { name: string; icon: string; description: string; rarity: string; xpReward: number },
-  fireConfetti?: (type: 'achievement' | 'levelup' | 'boss' | 'streak') => void
+  fireConfetti?: (_type: 'achievement' | 'levelup' | 'boss' | 'streak') => void
 ) {
   if (fireConfetti) fireConfetti('achievement');
 
@@ -51,7 +51,7 @@ export function showBossLevelToast(
   bossIcon: string,
   revenue: number,
   xpReward: number,
-  fireConfetti?: (type: 'achievement' | 'levelup' | 'boss' | 'streak') => void
+  fireConfetti?: (_type: 'achievement' | 'levelup' | 'boss' | 'streak') => void
 ) {
   if (fireConfetti) fireConfetti('boss');
 

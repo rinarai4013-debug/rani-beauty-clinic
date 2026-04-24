@@ -9,7 +9,7 @@ export interface Achievement {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   xpReward: number;
   soundEffect: SoundEvent;
-  condition: (metrics: DailyMetrics) => boolean;
+  condition: (_metrics: DailyMetrics) => boolean;
 }
 
 export interface EarnedAchievement {

@@ -6,7 +6,7 @@ import type { ChatMessage, ChatAction } from '@/types/mobile';
 
 interface ChatBubbleProps {
   message: ChatMessage;
-  onAction?: (action: ChatAction) => void;
+  onAction?: (_action: ChatAction) => void;
 }
 
 const actionIcons: Record<string, typeof CalendarPlus> = {

@@ -5,10 +5,10 @@
 
 declare global {
   interface Window {
-    gtag?: (...args: unknown[]) => void;
+    gtag?: (..._args: unknown[]) => void;
     dataLayer?: Record<string, unknown>[];
-    fbq?: (...args: unknown[]) => void;
-    clarity?: (...args: unknown[]) => void;
+    fbq?: (..._args: unknown[]) => void;
+    clarity?: (..._args: unknown[]) => void;
   }
 }
 
@@ -156,4 +156,3 @@ export interface AnalyticsEventParams {
   // Generic catch-all
   [key: string]: string | number | boolean | undefined;
 }
-

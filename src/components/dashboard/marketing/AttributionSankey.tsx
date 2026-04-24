@@ -29,7 +29,7 @@ const CHANNEL_LABELS: Record<MarketingChannel, string> = {
 interface AttributionSankeyProps {
   comparisons: AttributionComparison[];
   selectedModel?: AttributionModel;
-  onModelChange?: (model: AttributionModel) => void;
+  onModelChange?: (_model: AttributionModel) => void;
   loading?: boolean;
 }
 

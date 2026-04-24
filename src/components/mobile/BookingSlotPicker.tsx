@@ -10,8 +10,8 @@ interface BookingSlotPickerProps {
   slots: TimeSlot[];
   selectedDate: Date;
   selectedTime: string | null;
-  onDateChange: (date: Date) => void;
-  onTimeSelect: (time: string, provider: string) => void;
+  onDateChange: (_date: Date) => void;
+  onTimeSelect: (_time: string, _provider: string) => void;
 }
 
 const demandColors = {

@@ -62,7 +62,7 @@ class WriteQueue {
    * Returns the number of successfully retried entries.
    */
   async drain(
-    executor: (entry: QueuedWrite) => Promise<void>
+    executor: (_entry: QueuedWrite) => Promise<void>
   ): Promise<number> {
     if (this.draining || this.queue.length === 0) return 0;
     this.draining = true;

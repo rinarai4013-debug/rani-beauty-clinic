@@ -17,7 +17,7 @@ type AirtableTable = Airtable.Table<Airtable.FieldSet>;
 export interface TenantDatabaseClient {
   tenantId: string;
   base: AirtableBase;
-  table: (name: string) => AirtableTable;
+  table: (_name: string) => AirtableTable;
   fetchAll: <T = Record<string, unknown>>(
     tableName: string,
     options?: Airtable.SelectOptions<Airtable.FieldSet>,
@@ -38,7 +38,7 @@ export interface TenantDatabaseClient {
     recordId: string,
     fields: Partial<T>
   ) => Promise<void>;
-  deleteRecord: (tableName: string, recordId: string) => Promise<void>;
+  deleteRecord: (_tableName: string, _recordId: string) => Promise<void>;
   Tables: TenantTables;
 }
 

@@ -27,8 +27,8 @@ import {
 // Mock hoist — must be declared before importing the route under test
 // ---------------------------------------------------------------------------
 
-const mockCreateRecord = vi.fn<(...args: unknown[]) => Promise<string>>();
-const mockUpsertAttribution = vi.fn<(...args: unknown[]) => Promise<void>>();
+const mockCreateRecord = vi.fn<(..._args: unknown[]) => Promise<string>>();
+const mockUpsertAttribution = vi.fn<(..._args: unknown[]) => Promise<void>>();
 const mockRateLimit = vi.fn().mockReturnValue({ allowed: true, resetIn: 0 });
 const mockGetClientIP = vi.fn().mockReturnValue('127.0.0.1');
 const mockRateLimitResponse = vi.fn().mockImplementation((resetIn: number) =>

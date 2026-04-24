@@ -5,7 +5,7 @@ import type { ScoringMode } from '@/types/mastermind';
 
 interface ScoringToggleProps {
   mode: ScoringMode;
-  onChange: (mode: ScoringMode) => void;
+  onChange: (_mode: ScoringMode) => void;
 }
 
 export default function ScoringToggle({ mode, onChange }: ScoringToggleProps) {

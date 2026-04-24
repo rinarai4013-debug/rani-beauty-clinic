@@ -434,7 +434,7 @@ export function recommendNextTreatment(input: RecommendationInput): Recommendati
     }
   }
   const deduped: Recommendation[] = Array.from(bySvc.values())
-    .map(({ _src: _source, ...rec }) => rec)
+    .map(({ _src: __source, ...rec }) => rec)
     .sort((a, b) => b.confidence - a.confidence);
 
   const primary = deduped[0] || {

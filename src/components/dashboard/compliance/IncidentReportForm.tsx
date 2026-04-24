@@ -7,7 +7,7 @@ import type { IncidentReport } from '@/types/compliance';
 
 interface IncidentReportFormProps {
   incidents: IncidentReport[];
-  onSubmit?: (data: Omit<IncidentReport, 'id' | 'status'>) => void;
+  onSubmit?: (_data: Omit<IncidentReport, 'id' | 'status'>) => void;
 }
 
 const INCIDENT_TYPES: { value: IncidentReport['type']; label: string }[] = [

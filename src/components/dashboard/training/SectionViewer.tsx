@@ -9,7 +9,7 @@ import QuizSection from './QuizSection';
 interface SectionViewerProps {
   sections: TrainingSection[];
   moduleTitle: string;
-  onComplete?: (sectionIndex: number, quizScore: number) => void;
+  onComplete?: (_sectionIndex: number, _quizScore: number) => void;
   completedSections?: number[];
 }
 

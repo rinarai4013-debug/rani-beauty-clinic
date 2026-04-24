@@ -45,9 +45,9 @@ export interface EmailTemplate {
 }
 
 export interface ServiceEmailSet {
-  pretreatment: (vars?: TemplateVariables) => EmailTemplate;
-  dayOf: (vars?: TemplateVariables) => EmailTemplate;
-  aftercare: (vars?: TemplateVariables) => EmailTemplate;
+  pretreatment: (_vars?: TemplateVariables) => EmailTemplate;
+  dayOf: (_vars?: TemplateVariables) => EmailTemplate;
+  aftercare: (_vars?: TemplateVariables) => EmailTemplate;
 }
 
 export interface RenderedEmail {

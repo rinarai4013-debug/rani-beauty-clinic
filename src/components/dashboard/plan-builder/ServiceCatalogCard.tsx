@@ -6,7 +6,7 @@ import { CATEGORY_LABELS } from '@/data/services/unified-catalog';
 
 interface ServiceCatalogCardProps {
   service: UnifiedService;
-  onAdd: (service: UnifiedService) => void;
+  onAdd: (_service: UnifiedService) => void;
 }
 
 export default function ServiceCatalogCard({ service, onAdd }: ServiceCatalogCardProps) {

@@ -95,7 +95,7 @@ export default function PlanProgress({ plan, compact = false }: PlanProgressProp
           <div className="absolute left-[15px] top-0 bottom-0 w-px bg-rani-border" />
 
           <div className="space-y-5">
-            {plan.steps.map((step, i) => (
+            {plan.steps.map((step, _i) => (
               <div key={step.id} className="relative flex items-start gap-4">
                 {/* Status icon */}
                 <div className="relative z-10 flex-shrink-0">

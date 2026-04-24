@@ -80,7 +80,7 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
               transition={{ duration: 0.4 }}
               className="grid gap-8 md:grid-cols-3"
             >
-              {desktopReviews.map((review, i) => (
+              {desktopReviews.map((review, _i) => (
                 <TestimonialCard
                   key={review.id}
                   name={review.name}

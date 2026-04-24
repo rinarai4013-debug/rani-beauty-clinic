@@ -10,7 +10,7 @@ interface ForecastChartProps {
 }
 
 export default function ForecastChart({ projections, confidence, monthlyTarget }: ForecastChartProps) {
-  const chartData = projections.map((p, i) => ({
+  const chartData = projections.map((p, _i) => ({
     month: new Date(p.month + '-01').toLocaleDateString('en-US', { month: 'short' }),
     revenue: p.projectedRevenue,
     expenses: p.estimatedExpenses,

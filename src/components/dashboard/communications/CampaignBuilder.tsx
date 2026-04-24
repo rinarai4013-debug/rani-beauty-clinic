@@ -16,7 +16,7 @@ import type {
 } from '@/types/communications';
 
 interface CampaignBuilderProps {
-  onSubmit: (campaign: Partial<Campaign>) => void;
+  onSubmit: (_campaign: Partial<Campaign>) => void;
   onCancel: () => void;
   initialData?: Partial<Campaign>;
 }

@@ -37,7 +37,7 @@ async function getConsultGenerator() {
   return (
     ('generateConsultBriefing' in consultEngine && typeof consultEngine.generateConsultBriefing === 'function'
       ? consultEngine.generateConsultBriefing
-      : consultEngine.generateConsultCopilot) as (input: unknown) => unknown
+      : consultEngine.generateConsultCopilot) as (_input: unknown) => unknown
   );
 }
 

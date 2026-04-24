@@ -33,8 +33,8 @@ type TenantConfigLike = {
 };
 
 type TenantDbLike = {
-  createRecord: (tableName: string, fields: Record<string, unknown>) => Promise<string>;
-  fetchAll: (tableName: string) => Promise<Array<{ id: string; fields: Record<string, unknown> }>>;
+  createRecord: (_tableName: string, _fields: Record<string, unknown>) => Promise<string>;
+  fetchAll: (_tableName: string) => Promise<Array<{ id: string; fields: Record<string, unknown> }>>;
 };
 
 const SYSTEM_TEMPLATES = [

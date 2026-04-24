@@ -224,7 +224,7 @@ export function getCommunicationAnalytics(
 
   for (const type of campaignTypes) {
     if (type === 'direct') {
-      const directLogs = logs.filter(l => {
+      const directLogs = logs.filter(_l=> {
         // Messages not associated with any campaign
         return !campaigns.some(c =>
           c.metrics.totalSent > 0 && c.type === type

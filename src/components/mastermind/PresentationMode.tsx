@@ -43,17 +43,17 @@ interface PresentationModeProps {
   session: MastermindSession;
   slides: SlideConfig[];
   currentSlideIndex: number;
-  onGoToSlide: (index: number) => void;
+  onGoToSlide: (_index: number) => void;
   onNext: () => void;
   onPrev: () => void;
   onExit: () => void;
-  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
+  onSelectPackage: (_tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
   onGeneratePdf: () => Promise<string | null>;
   onComplete: () => Promise<unknown>;
   selectedPackage: GeneratedPackage | null;
   financingOptions: FinancingOption[];
   selectedFinancing: FinancingOption | null;
-  onSelectFinancing: (months: number | null) => void;
+  onSelectFinancing: (_months: number | null) => void;
   pdfLoading: boolean;
   completing: boolean;
   /** Optional metabolic status for status-aware checkout CTA */
@@ -318,8 +318,8 @@ interface SlideProps {
   selectedPackage: GeneratedPackage | null;
   financingOptions: FinancingOption[];
   selectedFinancing: FinancingOption | null;
-  onSelectPackage: (tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
-  onSelectFinancing: (months: number | null) => void;
+  onSelectPackage: (_tier: 'Start' | 'Transform' | 'Elite' | 'Essential') => void;
+  onSelectFinancing: (_months: number | null) => void;
   onGeneratePdf: () => Promise<string | null>;
   onComplete: () => Promise<unknown>;
   pdfLoading: boolean;

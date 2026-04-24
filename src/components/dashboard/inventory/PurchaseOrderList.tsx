@@ -14,7 +14,7 @@ import {
 
 interface PurchaseOrderListProps {
   orders?: PurchaseOrder[];
-  onOrderClick?: (order: PurchaseOrder) => void;
+  onOrderClick?: (_order: PurchaseOrder) => void;
   onCreateNew?: () => void;
   loading?: boolean;
 }

@@ -145,7 +145,7 @@ export interface SlideConfig {
   title: string;
   subtitle: string;
   icon: string; // Lucide icon name
-  requiresData: (session: MastermindSession) => boolean;
+  requiresData: (_session: MastermindSession) => boolean;
 }
 
 export const PRESENTATION_SLIDES: readonly SlideConfig[] = [

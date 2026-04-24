@@ -313,7 +313,7 @@ function PackageCard({
   onSelect,
 }: {
   pkg: PatientPlanData['packages'][0];
-  onSelect: (tier: string) => void;
+  onSelect: (_tier: string) => void;
 }) {
   const isHighlighted = pkg.highlighted;
 

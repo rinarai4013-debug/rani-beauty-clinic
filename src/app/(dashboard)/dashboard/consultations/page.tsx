@@ -1584,7 +1584,7 @@ function ProviderReviewActions({
   loading,
 }: {
   clinicalNote: string;
-  onNoteChange: (v: string) => void;
+  onNoteChange: (_v: string) => void;
   showForm: boolean;
   onToggleForm: () => void;
   onApprove: () => void;

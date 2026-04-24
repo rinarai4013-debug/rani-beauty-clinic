@@ -8,7 +8,7 @@ import { NOTE_TYPE_LABELS } from '@/types/crm';
 interface NoteComposerProps {
   clientId: string;
   clientName: string;
-  onSubmit?: (data: { type: NoteType; subject: string; content: string; isPinned: boolean }) => void;
+  onSubmit?: (_data: { type: NoteType; subject: string; content: string; isPinned: boolean }) => void;
 }
 
 const NOTE_TYPE_OPTIONS: { type: NoteType; icon: typeof Phone; label: string }[] = [

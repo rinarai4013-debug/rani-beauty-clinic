@@ -9,7 +9,7 @@ import ScoringToggle from './ScoringToggle';
 interface SkinAnalysisGridProps {
   analysis: AuraDeviceAnalysis;
   patientPhotos?: string[]; // Photo URLs for each analysis view
-  onCategoryClick?: (category: SkinAnalysisCategory) => void;
+  onCategoryClick?: (_category: SkinAnalysisCategory) => void;
 }
 
 /**

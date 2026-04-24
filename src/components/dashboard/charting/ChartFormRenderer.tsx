@@ -8,7 +8,7 @@ interface ChartFormRendererProps {
   section: string;
   data: Record<string, unknown>;
   errors: ValidationError[];
-  onChange: (fieldId: string, value: unknown) => void;
+  onChange: (_fieldId: string, _value: unknown) => void;
   readOnly?: boolean;
 }
 
