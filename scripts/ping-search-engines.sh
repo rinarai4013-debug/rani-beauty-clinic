@@ -2,7 +2,7 @@
 # Ping all search engines to accelerate indexing
 # Run after every deployment: bash scripts/ping-search-engines.sh
 
-BASE_URL="https://ranibeautyclinic.com"
+BASE_URL="https://www.ranibeautyclinic.com"
 
 echo "=== Pinging Search Engines ==="
 

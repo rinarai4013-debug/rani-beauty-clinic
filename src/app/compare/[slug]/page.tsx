@@ -27,13 +27,13 @@ export function generateMetadata({ params }: PageProps): Metadata {
     title: { absolute: page.metaTitle },
     description: page.metaDescription,
     alternates: {
-      canonical: `${clinicInfo.website}/compare/${page.slug}`,
+      canonical: `${clinicInfo.website}/vs/${page.slug}`,
     },
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
       type: "article",
-      url: `${clinicInfo.website}/compare/${page.slug}`,
+      url: `${clinicInfo.website}/vs/${page.slug}`,
       images: [
         {
           url: "/opengraph-image",
@@ -83,7 +83,7 @@ export default function ComparePage({ params }: PageProps) {
     "@type": "Article",
     headline: page.metaTitle,
     description: page.metaDescription,
-    url: `${clinicInfo.website}/compare/${page.slug}`,
+    url: `${clinicInfo.website}/vs/${page.slug}`,
     author: {
       "@type": "Organization",
       name: clinicInfo.name,
@@ -94,7 +94,7 @@ export default function ComparePage({ params }: PageProps) {
       name: clinicInfo.name,
       url: clinicInfo.website,
     },
-    mainEntityOfPage: `${clinicInfo.website}/compare/${page.slug}`,
+    mainEntityOfPage: `${clinicInfo.website}/vs/${page.slug}`,
   };
 
   return (
@@ -105,7 +105,7 @@ export default function ComparePage({ params }: PageProps) {
         items={[
           { name: "Home", url: clinicInfo.website },
           { name: "Compare Treatments", url: `${clinicInfo.website}/compare` },
-          { name: `${page.treatmentA} vs ${page.treatmentB}`, url: `${clinicInfo.website}/compare/${page.slug}` },
+          { name: `${page.treatmentA} vs ${page.treatmentB}`, url: `${clinicInfo.website}/vs/${page.slug}` },
         ]}
       />
 
@@ -363,7 +363,7 @@ export default function ComparePage({ params }: PageProps) {
             {relatedComparisons.map((related) => (
               <Link
                 key={related.slug}
-                href={`/compare/${related.slug}`}
+                href={`/vs/${related.slug}`}
                 className="group flex items-center justify-between rounded-xl border border-gray-100 bg-white px-5 py-4 transition hover:border-[#C9A96E]/30 hover:shadow-md"
               >
                 <div>

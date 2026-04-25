@@ -381,7 +381,7 @@ export default function ConcernPageClient({
                 {uniqueComps.slice(0, 4).map((comp) => (
                   <Link
                     key={comp.slug}
-                    href={`/compare/${comp.slug}`}
+                    href={`/vs/${comp.slug}`}
                     className="rounded-full border border-rani-gold/20 bg-rani-cream px-4 py-2 font-body text-xs font-semibold text-rani-navy transition-all hover:border-rani-gold hover:shadow-sm"
                   >
                     {comp.treatmentA} vs {comp.treatmentB} →
