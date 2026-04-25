@@ -3,11 +3,70 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import type { SimulationComparison, AuraScanResult, MastermindPlan } from '@/types/mastermind';
+import type { SimulationComparison, SimulationFrame, AuraScanResult, MastermindPlan } from '@/types/mastermind';
 import { generateSimulationComparison } from '@/lib/mastermind/simulation-engine';
 import TimelineScrubber from './TimelineScrubber';
 import SimulationMetrics from './SimulationMetrics';
 import SimulationDisclaimer from '@/components/photo-simulation/SimulationDisclaimer';
+
+/**
+ * Renders a frame as a clearly-labeled data card when a real face simulation
+ * is unavailable (no photo on file, or photo stripped from Airtable persistence).
+ * Replaces the misleading "SVG image inside a face panel" rendering that was
+ * audited as F-11 — viewers were reading projection cards as face transformations.
+ */
+function ProjectionCard({
+  frame,
+  accent,
+  accentMuted,
+}: {
+  frame: SimulationFrame;
+  accent: string;
+  accentMuted: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="absolute inset-0 flex flex-col items-center justify-center px-6 py-8"
+      style={{ background: `linear-gradient(135deg, ${accentMuted} 0%, #FFFFFF 100%)` }}
+    >
+      <p
+        className="text-[10px] font-bold tracking-[0.22em] uppercase mb-3"
+        style={{ color: accent }}
+      >
+        Projected outcome
+      </p>
+      <div className="flex items-center gap-6 mb-4">
+        <div className="text-center">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-1.5"
+            style={{ backgroundColor: `${accent}15`, border: `2px solid ${accent}` }}
+          >
+            <span className="text-2xl font-bold" style={{ color: accent }}>
+              {frame.auraScoreProjection}
+            </span>
+          </div>
+          <p className="text-[9px] font-bold tracking-wider uppercase text-[#0F1D2C]/60">Aura Score</p>
+        </div>
+        <div className="text-center">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-1.5"
+            style={{ backgroundColor: '#0F1D2C08', border: '2px solid #0F1D2C30' }}
+          >
+            <span className="text-2xl font-bold text-[#0F1D2C]">{frame.skinAgeProjection}</span>
+          </div>
+          <p className="text-[9px] font-bold tracking-wider uppercase text-[#0F1D2C]/60">Skin Age</p>
+        </div>
+      </div>
+      <p className="text-[11px] text-center text-[#0F1D2C]/55 leading-snug max-w-[88%]">
+        {frame.description}
+      </p>
+    </motion.div>
+  );
+}
 
 interface PredictiveSimulationProps {
   scanResult: AuraScanResult;
@@ -137,6 +196,16 @@ export default function PredictiveSimulation({
       <h2 className="font-[family-name:var(--font-heading)] text-xl text-[#0F1D2C] text-center">
         Your Skin&apos;s Two Futures
       </h2>
+      {(() => {
+        const isProjectionMode =
+          (currentWithFrame?.kind === 'data-projection') ||
+          (currentWithoutFrame?.kind === 'data-projection');
+        return isProjectionMode ? (
+          <p className="font-body text-xs text-[#0F1D2C]/50 text-center max-w-2xl mx-auto -mt-3">
+            Data-driven projections from consultation findings. Not a face simulation — upload a clinical photo to view a true visual progression.
+          </p>
+        ) : null;
+      })()}
 
       {/* Dual Image Panels */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -152,24 +221,40 @@ export default function PredictiveSimulation({
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F8F6F1] border border-[#059669]/20">
             <AnimatePresence mode="wait">
               {currentWithFrame && (
-                <motion.img
-                  key={currentWithFrame.timepoint}
-                  src={currentWithFrame.imageDataUrl}
-                  alt={`With treatment — ${currentWithFrame.timepoint}`}
-                  className="w-full h-full object-cover"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
+                currentWithFrame.kind === 'photo-simulation' ? (
+                  <motion.img
+                    key={currentWithFrame.timepoint}
+                    src={currentWithFrame.imageDataUrl}
+                    alt={`With treatment — ${currentWithFrame.timepoint}`}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                ) : (
+                  <ProjectionCard
+                    key={currentWithFrame.timepoint}
+                    frame={currentWithFrame}
+                    accent="#059669"
+                    accentMuted="#D1FAE5"
+                  />
+                )
               )}
             </AnimatePresence>
 
-            {/* Timepoint badge */}
+            {/* Timepoint + projection-mode badge */}
             {currentWithFrame && (
-              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#059669] text-white font-body text-xs font-medium">
-                {currentWithFrame.timepoint}
-              </div>
+              <>
+                <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#059669] text-white font-body text-xs font-medium">
+                  {currentWithFrame.timepoint}
+                </div>
+                {currentWithFrame.kind === 'data-projection' && (
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-[#0F1D2C]/85 text-white/95 font-body text-[10px] font-bold tracking-[0.18em] uppercase">
+                    Data projection
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -201,24 +286,40 @@ export default function PredictiveSimulation({
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F8F6F1] border border-[#DC2626]/20">
             <AnimatePresence mode="wait">
               {currentWithoutFrame && (
-                <motion.img
-                  key={currentWithoutFrame.timepoint}
-                  src={currentWithoutFrame.imageDataUrl}
-                  alt={`Without treatment — ${currentWithoutFrame.timepoint}`}
-                  className="w-full h-full object-cover"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
+                currentWithoutFrame.kind === 'photo-simulation' ? (
+                  <motion.img
+                    key={currentWithoutFrame.timepoint}
+                    src={currentWithoutFrame.imageDataUrl}
+                    alt={`Without treatment — ${currentWithoutFrame.timepoint}`}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                ) : (
+                  <ProjectionCard
+                    key={currentWithoutFrame.timepoint}
+                    frame={currentWithoutFrame}
+                    accent="#DC2626"
+                    accentMuted="#FEE2E2"
+                  />
+                )
               )}
             </AnimatePresence>
 
-            {/* Timepoint badge */}
+            {/* Timepoint + projection-mode badge */}
             {currentWithoutFrame && (
-              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#DC2626] text-white font-body text-xs font-medium">
-                {currentWithoutFrame.timepoint}
-              </div>
+              <>
+                <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#DC2626] text-white font-body text-xs font-medium">
+                  {currentWithoutFrame.timepoint}
+                </div>
+                {currentWithoutFrame.kind === 'data-projection' && (
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-[#0F1D2C]/85 text-white/95 font-body text-[10px] font-bold tracking-[0.18em] uppercase">
+                    Data projection
+                  </div>
+                )}
+              </>
             )}
           </div>
 

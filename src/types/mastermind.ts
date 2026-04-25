@@ -24,7 +24,7 @@ import type {
   AgingPattern,
   TreatmentPriority,
 } from '@/types/ai-treatment';
-import type { ConsultationFormData } from '@/lib/consultation/schema';
+import type { ConsultationSubmitData, ConsultationFormData } from '@/lib/consultation/schema';
 import type { GeneratedPackage, PlanPhase, SelectedService } from '@/lib/plan-builder/types';
 
 // ── AURA SCORE ──
@@ -236,6 +236,7 @@ export interface ProviderReviewState {
 
 export interface SimulationFrame {
   imageDataUrl: string; // base64 data URL from canvas
+  kind: 'photo-simulation' | 'data-projection';
   timepoint: string; // "1M", "3M", "6M", "1Y", "3Y", "5Y"
   monthNumber: number;
   description: string;
@@ -329,7 +330,7 @@ export interface MastermindSession {
   phase: MastermindPhase;
 
   // Phase 1: Intake
-  intakeData: Partial<ConsultationFormData> | null;
+  intakeData: Partial<ConsultationSubmitData> | null;
   patientName: string;
   patientEmail: string;
 
@@ -338,6 +339,7 @@ export interface MastermindSession {
 
   // Phase 2: Aura Scan
   auraScanResult: AuraScanResult | null;
+  auraScanError?: { at: string; message: string; source: string } | null;
 
   // Phase 3: Plan
   mastermindPlan: MastermindPlan | null;
@@ -370,6 +372,7 @@ export type MastermindSessionAction =
   | { type: 'SET_SOURCE_PHOTO'; url: string }
   | { type: 'SET_PHASE'; phase: MastermindPhase }
   | { type: 'SET_SCAN_RESULT'; result: AuraScanResult }
+  | { type: 'SET_SCAN_ERROR'; error: { at: string; message: string; source: string } | null }
   | { type: 'SET_PLAN'; plan: MastermindPlan }
   | { type: 'SET_PROVIDER_REVIEW'; review: ProviderReviewState }
   | { type: 'ADD_MODIFICATION'; modification: PlanModification }
@@ -383,5 +386,3 @@ export type MastermindSessionAction =
   | { type: 'SET_CLINIC_NOTES'; notes: string; actor?: string }
   | { type: 'SET_SHARE_TOKEN'; token: string; actor?: string }
   | { type: 'SET_PROTOCOL_PACKET'; packetUrl: string; generatedAt: string; generatorActor: string; packetVersion: number };
-
-

@@ -1,0 +1,39 @@
+
+> rani-beauty-clinic@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+  - Experiments (use with caution):
+    · instrumentationHook
+
+ ✓ Starting...
+ ○ Compiling /instrumentation ...
+ ✓ Compiled /instrumentation in 2.3s (1163 modules)
+ ✓ Ready in 5.5s
+ ✓ Compiled /src/middleware in 270ms (729 modules)
+ ○ Compiling /api/mastermind/sessions ...
+ ✓ Compiled /api/mastermind/sessions in 1335ms (1810 modules)
+ GET /api/mastermind/sessions 401 in 1642ms
+ ✓ Compiled /api/mastermind/aura-import in 369ms (1875 modules)
+ GET /api/mastermind/aura-import 200 in 746ms
+ ✓ Compiled /api/mastermind/complete in 291ms (1891 modules)
+ POST /api/mastermind/complete 400 in 331ms
+ POST /api/mastermind/aura-import 400 in 21ms
+ ✓ Compiled /api/dashboard/auth/login in 345ms (1893 modules)
+ POST /api/dashboard/auth/login 401 in 714ms
+ ○ Compiling /api/consultation/submit ...
+ ✓ Compiled /api/consultation/submit in 1035ms (1905 modules)
+(node:11562) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[Consultation Submit] Auto-scan completed for session ms_moef8d7i_yrv4ay (source: engine)
+ POST /api/consultation/submit 200 in 7712ms
+[Consultation Submit] Auto-scan completed for session ms_moef8lfh_p7qgh3 (source: engine)
+ POST /api/consultation/submit 200 in 2083ms
+ POST /api/consultation/submit 413 in 16ms
+[Aura PDF] pdf.js extraction failed, using raw fallback: Error: Setting up fake worker failed: "Cannot find module '/private/tmp/rani-hotfix/.next/server/vendor-chunks/pdf.worker.mjs' imported from /private/tmp/rani-hotfix/.next/server/vendor-chunks/pdfjs-dist.js".
+    at eval (webpack-internal:///(rsc)/./node_modules/pdfjs-dist/legacy/build/pdf.mjs:17516:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[Consultation Submit] Auto-scan completed for session ms_moef8un5_xanzan (source: aura-pdf-fallback)
+ POST /api/consultation/submit 200 in 3581ms

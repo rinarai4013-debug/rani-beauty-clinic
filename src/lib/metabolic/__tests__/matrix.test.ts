@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   metabolicIntakeSchema,
+  generateFullMetabolicRecommendation,
   generateMetabolicRecommendation,
   type MetabolicIntake,
 } from '@/lib/metabolic/matrix';
@@ -31,6 +32,8 @@ describe('metabolicIntakeSchema', () => {
       expect(result.data.medicalFlags.pregnant).toBe(false);
       expect(result.data.labs.baselineLabsCompleted).toBe(false);
       expect(result.data.fulfillmentPreference).toBe('clinic');
+      expect(result.data.biometrics.weightLbs).toBeUndefined();
+      expect(result.data.peptideHistory.tolerance).toBe('unknown');
     }
   });
 
@@ -94,6 +97,30 @@ describe('generateMetabolicRecommendation', () => {
     expect(rec.blockedTracks).toContain('glp1');
     expect(rec.status).toBe('provider-review-required');
     expect(rec.riskFlags.length).toBeGreaterThan(0);
+  });
+
+  it('blocks glp1 for gallbladder disease and sets provider-review-required', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, gallbladderDisease: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    expect(rec.blockedTracks).toContain('glp1');
+    expect(rec.status).toBe('provider-review-required');
+    expect(rec.riskFlags.some((flag) => /gallbladder/i.test(flag))).toBe(true);
+  });
+
+  it('blocks glp1 for severe depression and sets provider-review-required', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, severeDepression: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    expect(rec.blockedTracks).toContain('glp1');
+    expect(rec.status).toBe('provider-review-required');
+    expect(rec.riskFlags.some((flag) => /depression/i.test(flag))).toBe(true);
   });
 
   it('sets ineligible when all 3 tracks are blocked', () => {
@@ -214,5 +241,18 @@ describe('generateMetabolicRecommendation', () => {
     const recB = generateMetabolicRecommendation(breastfeedingOnly);
     const recBP = generateMetabolicRecommendation(bothFlags);
     expect([...recB.blockedTracks].sort()).toEqual([...recBP.blockedTracks].sort());
+  });
+
+  it('builds peptide personalized dosing plan in full recommendation mode', () => {
+    const intake = makeIntake({
+      goals: ['recovery', 'performance'],
+      symptoms: ['slow-recovery', 'inflammation', 'fatigue'],
+      labs: { baselineLabsCompleted: true, latestA1c: undefined, fastingGlucose: undefined, tsh: undefined },
+      biometrics: { weightLbs: 205, bmi: 30.5, heightInches: 68 },
+      peptideHistory: { priorPeptideExposure: false, tolerance: 'standard', preferredRoute: 'subcutaneous' },
+    });
+    const rec = generateFullMetabolicRecommendation(intake, { forceTrack: 'peptides' });
+    expect(rec.dosageFramework.personalizedPeptidePlan).not.toBeNull();
+    expect(rec.dosageFramework.personalizedPeptidePlan?.candidates.length).toBeGreaterThan(0);
   });
 });

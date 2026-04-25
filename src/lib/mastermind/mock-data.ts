@@ -450,6 +450,7 @@ export function mockMastermindPlan(): MastermindPlan {
 
 export function mockSimulationComparison(): SimulationComparison {
   const emptyFrame = (timepoint: string, monthNumber: number, score: number, skinAge: number, desc: string): SimulationFrame => ({
+    kind: 'data-projection',
     imageDataUrl: '',
     timepoint,
     monthNumber,

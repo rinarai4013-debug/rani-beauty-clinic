@@ -1578,10 +1578,14 @@ export default function PatientPlanPage() {
                   <div className="p-5">
                     {data.simulation.withTreatment.frames.length > 0 && (
                       <div className="aspect-square relative rounded-xl overflow-hidden mb-4 bg-gray-100">
-                        {/* Show last frame (most dramatic result) */}
+                        {/* F-11: only render the image as a "photo" when it's a real face simulation.
+                            For data-projection frames, fall through to the score-card UI below. */}
                         {data.simulation.withTreatment.frames[
                           data.simulation.withTreatment.frames.length - 1
-                        ].imageDataUrl ? (
+                        ].imageDataUrl &&
+                        data.simulation.withTreatment.frames[
+                          data.simulation.withTreatment.frames.length - 1
+                        ].kind === 'photo-simulation' ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={
@@ -1663,7 +1667,10 @@ export default function PatientPlanPage() {
                       <div className="aspect-square relative rounded-xl overflow-hidden mb-4 bg-gray-100">
                         {data.simulation.withoutTreatment.frames[
                           data.simulation.withoutTreatment.frames.length - 1
-                        ].imageDataUrl ? (
+                        ].imageDataUrl &&
+                        data.simulation.withoutTreatment.frames[
+                          data.simulation.withoutTreatment.frames.length - 1
+                        ].kind === 'photo-simulation' ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={

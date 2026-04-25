@@ -16,6 +16,7 @@ const REQUIRED_FIELDS: (keyof DosageFramework)[] = [
   'monitoringCadence',
   'providerAuthorizationNote',
   'constrainedByStatus',
+  'personalizedPeptidePlan',
 ];
 
 describe('generateDosageFramework', () => {
@@ -113,5 +114,38 @@ describe('generateDosageFramework', () => {
         expect(fw.cadence.length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('returns peptide personalized plan for peptide track when intake context is provided', async () => {
+    const { metabolicIntakeSchema } = await import('@/lib/metabolic/matrix');
+    const intake = metabolicIntakeSchema.parse({
+      firstName: 'Alex',
+      lastName: 'Stone',
+      email: 'alex@example.com',
+      goals: ['recovery', 'performance'],
+      symptoms: ['slow-recovery', 'inflammation', 'fatigue'],
+      labs: { baselineLabsCompleted: true },
+      biometrics: { weightLbs: 210 },
+      peptideHistory: { tolerance: 'standard', priorPeptideExposure: false },
+    });
+    const fw = generateDosageFramework('peptides', 'performance', 'eligible', intake);
+    expect(fw.personalizedPeptidePlan).not.toBeNull();
+    expect(fw.personalizedPeptidePlan?.candidates.length).toBeGreaterThan(0);
+    expect(
+      fw.personalizedPeptidePlan?.candidates.some((candidate) => /Provider-start reference/i.test(candidate.startDose)),
+    ).toBe(true);
+  });
+
+  it('returns null personalizedPeptidePlan for non-peptide tracks', async () => {
+    const { metabolicIntakeSchema } = await import('@/lib/metabolic/matrix');
+    const intake = metabolicIntakeSchema.parse({
+      firstName: 'Alex',
+      lastName: 'Stone',
+      email: 'alex@example.com',
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+    });
+    const fw = generateDosageFramework('glp1', 'foundation', 'eligible', intake);
+    expect(fw.personalizedPeptidePlan).toBeNull();
   });
 });

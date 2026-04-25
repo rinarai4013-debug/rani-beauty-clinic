@@ -46,6 +46,12 @@ export const METABOLIC_SYMPTOM_OPTIONS = [
 export type MetabolicGoal = (typeof METABOLIC_GOAL_OPTIONS)[number];
 export type MetabolicSymptom = (typeof METABOLIC_SYMPTOM_OPTIONS)[number];
 
+export const PEPTIDE_TOLERANCE_OPTIONS = ['unknown', 'sensitive', 'standard', 'high'] as const;
+export type PeptideTolerance = (typeof PEPTIDE_TOLERANCE_OPTIONS)[number];
+
+export const PEPTIDE_ROUTE_OPTIONS = ['subcutaneous', 'intramuscular', 'oral', 'no-preference'] as const;
+export type PeptideRoutePreference = (typeof PEPTIDE_ROUTE_OPTIONS)[number];
+
 // ── Zod Intake Schema ──
 
 const baseIntakeSchema = z.object({
@@ -77,6 +83,16 @@ const baseIntakeSchema = z.object({
     fastingGlucose: z.number().min(50).max(400).optional(),
     tsh: z.number().min(0).max(30).optional(),
   }).default({}),
+  biometrics: z.object({
+    heightInches: z.number().min(48).max(90).optional(),
+    weightLbs: z.number().min(80).max(700).optional(),
+    bmi: z.number().min(10).max(90).optional(),
+  }).default({}),
+  peptideHistory: z.object({
+    priorPeptideExposure: z.boolean().default(false),
+    tolerance: z.enum(PEPTIDE_TOLERANCE_OPTIONS).default('unknown'),
+    preferredRoute: z.enum(PEPTIDE_ROUTE_OPTIONS).default('no-preference'),
+  }).default({}),
 });
 
 export const metabolicIntakeSchema = baseIntakeSchema.transform((data) => ({
@@ -96,6 +112,16 @@ export const metabolicIntakeSchema = baseIntakeSchema.transform((data) => ({
     latestA1c: data.labs?.latestA1c,
     fastingGlucose: data.labs?.fastingGlucose,
     tsh: data.labs?.tsh,
+  },
+  biometrics: {
+    heightInches: data.biometrics?.heightInches,
+    weightLbs: data.biometrics?.weightLbs,
+    bmi: data.biometrics?.bmi,
+  },
+  peptideHistory: {
+    priorPeptideExposure: data.peptideHistory?.priorPeptideExposure ?? false,
+    tolerance: data.peptideHistory?.tolerance ?? 'unknown',
+    preferredRoute: data.peptideHistory?.preferredRoute ?? 'no-preference',
   },
 }));
 
@@ -141,6 +167,12 @@ interface TrackProfile {
   blockReason?: string;
 }
 
+function appendBlockReason(existing: string | undefined, next: string): string {
+  if (!existing) return next;
+  if (existing.includes(next)) return existing;
+  return `${existing} ${next}`;
+}
+
 function buildTrackProfiles(intake: MetabolicIntake): Record<MetabolicTrack, TrackProfile> {
   const symptoms = new Set(intake.symptoms);
   const goals = new Set(intake.goals);
@@ -182,11 +214,38 @@ function buildTrackProfiles(intake: MetabolicIntake): Record<MetabolicTrack, Tra
   }
 
   if (flags.thyroidCancerHistory || flags.pancreatitisHistory) {
-    profile.glp1.blockReason = 'Thyroid cancer/pancreatitis history blocks automatic GLP-1 protocol assignment.';
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Thyroid cancer/pancreatitis history blocks automatic GLP-1 protocol assignment.',
+    );
+  }
+
+  if (flags.gallbladderDisease) {
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Gallbladder disease history requires physician clearance before GLP-1 assignment.',
+    );
+  }
+
+  if (flags.uncontrolledHypertension) {
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Uncontrolled hypertension requires physician clearance before GLP-1 assignment.',
+    );
+  }
+
+  if (flags.severeDepression) {
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Severe depression history requires physician clearance before GLP-1 assignment.',
+    );
   }
 
   if (flags.eatingDisorderHistory) {
-    profile.glp1.blockReason = 'Eating disorder history requires physician clearance before appetite-suppressing protocols.';
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Eating disorder history requires physician clearance before appetite-suppressing protocols.',
+    );
   }
 
   return profile;
@@ -391,6 +450,7 @@ export function generateFullMetabolicRecommendation(
     recommendation.recommendedTrack,
     tierRecommendation.tier,
     recommendation.status,
+    intake,
   );
 
   return {

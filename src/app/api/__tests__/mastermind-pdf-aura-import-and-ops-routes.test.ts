@@ -18,6 +18,7 @@ const getSessionMock = vi.fn();
 const fetchProviderIntelligenceMock = vi.fn();
 const readStorageMock = vi.fn();
 const hasPermissionMock = vi.fn();
+const getSessionFromRequestMock = vi.fn();
 
 vi.mock('@/lib/mastermind/aura-device-integration', () => ({
   listAvailableScans: (...args: unknown[]) => listAvailableScansMock(...args),
@@ -51,6 +52,7 @@ vi.mock('@/lib/mastermind/pdf-storage', () => ({
 
 vi.mock('@/lib/auth/session', () => ({
   getSession: (...args: unknown[]) => getSessionMock(...args),
+  getSessionFromRequest: (...args: unknown[]) => getSessionFromRequestMock(...args),
 }));
 
 vi.mock('@/lib/briefing/provider-intelligence', () => ({
@@ -109,6 +111,12 @@ describe('mastermind aura/pdf + ops routes', () => {
       auraScanResult: { auraScore: { overall: 82 } },
       mastermindPlan: { recommendations: { primary: [] } },
     });
+
+    getSessionFromRequestMock.mockResolvedValue({
+      username: 'dashboard-provider',
+      role: 'provider',
+      displayName: 'Dashboard Provider',
+    });
     sessionReducerMock.mockImplementation((session: unknown) => session);
     saveSessionAsyncMock.mockResolvedValue(undefined);
 
@@ -164,7 +172,22 @@ describe('mastermind aura/pdf + ops routes', () => {
     expect(body.meta.count).toBe(2);
   });
 
+  it('GET /api/mastermind/aura-import requires authentication', async () => {
+    getSessionFromRequestMock.mockResolvedValueOnce(null);
+    const { GET } = await import('@/app/api/mastermind/aura-import/route');
+    const response = await GET(
+      new Request('http://localhost:3000/api/mastermind/aura-import') as never,
+    );
+
+    expect(response.status).toBe(401);
+  });
+
   it('POST /api/mastermind/aura-import requires sessionId', async () => {
+    getSessionFromRequestMock.mockResolvedValueOnce({
+      username: 'dashboard-provider',
+      role: 'provider',
+      displayName: 'Dashboard Provider',
+    });
     const { POST } = await import('@/app/api/mastermind/aura-import/route');
     const response = await POST(
       new Request('http://localhost:3000/api/mastermind/aura-import', {
@@ -178,6 +201,11 @@ describe('mastermind aura/pdf + ops routes', () => {
   });
 
   it('POST /api/mastermind/aura-import requires patientName', async () => {
+    getSessionFromRequestMock.mockResolvedValueOnce({
+      username: 'dashboard-provider',
+      role: 'provider',
+      displayName: 'Dashboard Provider',
+    });
     const { POST } = await import('@/app/api/mastermind/aura-import/route');
     const response = await POST(
       new Request('http://localhost:3000/api/mastermind/aura-import', {
@@ -219,6 +247,11 @@ describe('mastermind aura/pdf + ops routes', () => {
   });
 
   it('POST /api/mastermind/aura-import imports scan and stores analysis', async () => {
+    getSessionFromRequestMock.mockResolvedValue({
+      username: 'dashboard-provider',
+      role: 'provider',
+      displayName: 'Dashboard Provider',
+    });
     const { POST } = await import('@/app/api/mastermind/aura-import/route');
     const response = await POST(
       new Request('http://localhost:3000/api/mastermind/aura-import', {
@@ -234,6 +267,20 @@ describe('mastermind aura/pdf + ops routes', () => {
     expect(body.meta.source).toBe('aura-device-ai');
     expect(saveSessionToAirtableMock).toHaveBeenCalledTimes(2);
     expect(runAIAuraScanWithDeviceMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('POST /api/mastermind/aura-import requires authentication', async () => {
+    getSessionFromRequestMock.mockResolvedValueOnce(null);
+    const { POST } = await import('@/app/api/mastermind/aura-import/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/aura-import', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sessionId: 'ms_1', patientName: 'Jane Doe' }),
+      }) as never,
+    );
+
+    expect(response.status).toBe(401);
   });
 
   it('POST /api/mastermind/pdf rejects invalid body', async () => {

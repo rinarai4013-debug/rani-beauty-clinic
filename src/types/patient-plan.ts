@@ -89,6 +89,7 @@ export interface PatientSimulation {
       auraScoreProjection: number;
       skinAgeProjection: number;
       imageDataUrl: string;
+      kind?: 'photo-simulation' | 'data-projection';
     }[];
     narrative: string;
   };
@@ -100,6 +101,7 @@ export interface PatientSimulation {
       auraScoreProjection: number;
       skinAgeProjection: number;
       imageDataUrl: string;
+      kind?: 'photo-simulation' | 'data-projection';
     }[];
     narrative: string;
   };

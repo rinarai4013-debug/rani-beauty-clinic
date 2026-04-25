@@ -13,6 +13,8 @@ import {
   importAuraScan,
   findLatestScan,
 } from '@/lib/mastermind/aura-device-integration';
+import { getSessionFromRequest } from '@/lib/auth/session';
+import { unauthorized, forbidden } from '@/lib/auth/middleware';
 import { runAIAuraScanWithDevice } from '@/lib/mastermind/ai-aura-scan-with-device';
 import { getSessionFromAirtable, saveSessionToAirtable } from '@/lib/mastermind/session-store';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
@@ -24,9 +26,12 @@ import { logEvent } from '@/lib/logging/structured-logger';
  * GET — List available scans from the Aura device.
  * Returns array of { name, date, imageCount }.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   return withSentry('mastermind/aura-import', async () => {
     try {
+      const auth = await getSessionFromRequest(request).catch(() => null);
+      if (!auth) return unauthorized();
+      if (auth.role !== 'ceo' && auth.role !== 'provider') return forbidden();
       const scans = listAvailableScans();
       return apiSuccess(scans, { source: 'aura-device', count: scans.length });
     } catch (error) {
@@ -51,6 +56,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   return withSentry('mastermind/aura-import', async () => {
     try {
+      const auth = await getSessionFromRequest(request).catch(() => null);
+      if (!auth) return unauthorized();
+      if (auth.role !== 'ceo' && auth.role !== 'provider') return forbidden();
+
       const parsed = await parseJsonBody(request);
       if ('error' in parsed) return parsed.error;
       const { body } = parsed;
