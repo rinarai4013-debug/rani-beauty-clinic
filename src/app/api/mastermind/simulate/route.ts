@@ -77,16 +77,19 @@ function buildSimulationPlaceholderImage(
   </defs>
   <rect width="1200" height="900" fill="url(#bg)" />
   <rect x="72" y="72" width="1056" height="756" rx="36" fill="#ffffff" opacity="0.9" />
-  <text x="120" y="180" fill="${palette.accent}" font-size="56" font-family="Inter, Arial, sans-serif" font-weight="700">${escapeSvgText(palette.title)}</text>
-  <text x="120" y="238" fill="#0F1D2C" font-size="34" font-family="Inter, Arial, sans-serif" font-weight="600">${escapeSvgText(heading)}</text>
-  <rect x="120" y="288" width="430" height="170" rx="20" fill="${palette.accentMuted}" />
-  <text x="152" y="352" fill="#0F1D2C" font-size="28" font-family="Inter, Arial, sans-serif" font-weight="600">Projected Aura Score</text>
-  <text x="152" y="424" fill="${palette.accent}" font-size="66" font-family="Inter, Arial, sans-serif" font-weight="800">${escapeSvgText(String(frame.auraScoreProjection))}</text>
-  <rect x="580" y="288" width="500" height="170" rx="20" fill="${palette.accentMuted}" />
-  <text x="612" y="352" fill="#0F1D2C" font-size="28" font-family="Inter, Arial, sans-serif" font-weight="600">Projected Skin Age</text>
-  <text x="612" y="424" fill="${palette.accent}" font-size="66" font-family="Inter, Arial, sans-serif" font-weight="800">${escapeSvgText(String(frame.skinAgeProjection))}</text>
-  <text x="120" y="540" fill="#425466" font-size="29" font-family="Inter, Arial, sans-serif">${escapeSvgText(frame.description.slice(0, 140))}</text>
-  <text x="120" y="778" fill="#6B7280" font-size="22" font-family="Inter, Arial, sans-serif">AI projection preview generated from consultation data.</text>
+  <!-- F-11 defense-in-depth: explicit projection badge baked into the SVG -->
+  <rect x="120" y="116" width="270" height="44" rx="22" fill="#0F1D2C" />
+  <text x="255" y="145" fill="#ffffff" font-size="18" font-family="Inter, Arial, sans-serif" font-weight="700" text-anchor="middle" letter-spacing="3">DATA PROJECTION</text>
+  <text x="120" y="220" fill="${palette.accent}" font-size="56" font-family="Inter, Arial, sans-serif" font-weight="700">${escapeSvgText(palette.title)}</text>
+  <text x="120" y="278" fill="#0F1D2C" font-size="34" font-family="Inter, Arial, sans-serif" font-weight="600">${escapeSvgText(heading)}</text>
+  <rect x="120" y="320" width="430" height="170" rx="20" fill="${palette.accentMuted}" />
+  <text x="152" y="384" fill="#0F1D2C" font-size="28" font-family="Inter, Arial, sans-serif" font-weight="600">Projected Aura Score</text>
+  <text x="152" y="456" fill="${palette.accent}" font-size="66" font-family="Inter, Arial, sans-serif" font-weight="800">${escapeSvgText(String(frame.auraScoreProjection))}</text>
+  <rect x="580" y="320" width="500" height="170" rx="20" fill="${palette.accentMuted}" />
+  <text x="612" y="384" fill="#0F1D2C" font-size="28" font-family="Inter, Arial, sans-serif" font-weight="600">Projected Skin Age</text>
+  <text x="612" y="456" fill="${palette.accent}" font-size="66" font-family="Inter, Arial, sans-serif" font-weight="800">${escapeSvgText(String(frame.skinAgeProjection))}</text>
+  <text x="120" y="572" fill="#425466" font-size="29" font-family="Inter, Arial, sans-serif">${escapeSvgText(frame.description.slice(0, 140))}</text>
+  <text x="120" y="778" fill="#6B7280" font-size="22" font-family="Inter, Arial, sans-serif">Data-driven projection from consultation findings — not a face simulation.</text>
 </svg>`;
 
   return {
