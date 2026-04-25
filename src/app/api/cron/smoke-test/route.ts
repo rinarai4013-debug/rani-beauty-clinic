@@ -26,7 +26,7 @@ type SmokeRunResult = {
 
 async function runSmokeTest() {
   const scriptPath = path.resolve(process.cwd(), 'scripts', 'live-smoke-test.js');
-  const { runSmokeChecks } = requireFromRoot(scriptPath) as { runSmokeChecks: () => Promise<SmokeRunResult> };
+  const { runSmokeChecks } = requireFromRoot(scriptPath) as { runSmokeChecks: (opts?: { writeToAirtable?: boolean; triggeredBy?: string }) => Promise<SmokeRunResult> };
 
   const result = await runSmokeChecks({ writeToAirtable: true, triggeredBy: 'cron' });
   return result;
@@ -39,12 +39,16 @@ async function postSlackFailure(result: SmokeRunResult) {
   const failedChecks = result.checks
     .filter((check) => !check.ok)
     .map((check) => `• ${check.name}: ${check.detail ?? 'failed'}`)
-    .join('\n');
+    .join('
+');
 
   const payload = {
-    text: `🚨 Smoke test failed (${result.timestamp})\n` +
-      `Route: /api/cron/smoke-test\n` +
-      `Status: ${result.status}\n` +
+    text: `🚨 Smoke test failed (${result.timestamp})
+` +
+      `Route: /api/cron/smoke-test
+` +
+      `Status: ${result.status}
+` +
       `Checks: ${failedChecks || 'unknown'}`,
   };
 
