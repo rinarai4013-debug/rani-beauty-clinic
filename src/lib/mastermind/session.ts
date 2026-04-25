@@ -14,6 +14,8 @@ import type {
   ProtocolPacketMeta,
 } from '@/types/mastermind';
 
+const TERMINAL_PHASES: MastermindPhase[] = ['provider_review', 'approved', 'completed'];
+
 // ── Activity Log Helper ──
 
 function appendLog(
@@ -58,6 +60,12 @@ export function sessionReducer(
       return { ...state, updatedAt: now, phase: action.phase };
 
     case 'SET_SCAN_RESULT':
+      if (TERMINAL_PHASES.includes(state.phase)) {
+        console.warn(
+          `[Session] Refusing scan overwrite on session ${state.id} (phase=${state.phase})`,
+        );
+        return state;
+      }
       return {
         ...state,
         updatedAt: now,
@@ -65,8 +73,25 @@ export function sessionReducer(
         auraScanResult: action.result,
         activityLog: appendLog(state.activityLog, 'scan_completed', `Aura scan completed (score: ${action.result?.auraScore?.overall ?? '?'})`),
       };
+    case 'SET_SCAN_ERROR':
+      return {
+        ...state,
+        updatedAt: now,
+        auraScanError: action.error,
+        activityLog: appendLog(
+          state.activityLog,
+          'scan_failed',
+          `Auto-scan failed: ${action.error?.message ?? 'unknown'}`,
+        ),
+      };
 
     case 'SET_PLAN':
+      if (TERMINAL_PHASES.includes(state.phase)) {
+        console.warn(
+          `[Session] Refusing plan overwrite on session ${state.id} (phase=${state.phase})`,
+        );
+        return state;
+      }
       return {
         ...state,
         updatedAt: now,
@@ -148,6 +173,12 @@ export function sessionReducer(
     }
 
     case 'SET_SIMULATION':
+      if (state.phase === 'completed') {
+        console.warn(
+          `[Session] Refusing simulation overwrite on session ${state.id} (phase=${state.phase})`,
+        );
+        return state;
+      }
       return {
         ...state,
         updatedAt: now,
@@ -237,6 +268,7 @@ export function createSession(
     patientEmail: '',
     sourcePhotoUrl: null,
     auraScanResult: null,
+    auraScanError: null,
     mastermindPlan: null,
     providerReview: null,
     simulationComparison: null,
@@ -351,6 +383,7 @@ function hydrateSession(parsed: Record<string, unknown>): MastermindSession {
     patientEmail: typeof parsed.patientEmail === 'string' ? parsed.patientEmail : '',
     sourcePhotoUrl: typeof parsed.sourcePhotoUrl === 'string' ? parsed.sourcePhotoUrl : null,
     auraScanResult: parsed.auraScanResult as MastermindSession['auraScanResult'] ?? null,
+    auraScanError: parsed.auraScanError as MastermindSession['auraScanError'] ?? null,
     mastermindPlan: parsed.mastermindPlan as MastermindSession['mastermindPlan'] ?? null,
     providerReview: parsed.providerReview as MastermindSession['providerReview'] ?? null,
     simulationComparison: parsed.simulationComparison as MastermindSession['simulationComparison'] ?? null,

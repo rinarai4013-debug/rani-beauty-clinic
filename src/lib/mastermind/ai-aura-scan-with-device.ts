@@ -23,7 +23,7 @@ import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
 import type { AuraDeviceScan } from '@/lib/mastermind/aura-device-integration';
 import type { AuraScanResult, FacialZone, ConcernSeverity, ConcernUrgency, TreatmentReadiness } from '@/types/mastermind';
 import type { FitzpatrickType, GlogauScale } from '@/types/ai-treatment';
-import type { ConsultationFormData } from '@/lib/consultation/schema';
+import type { ConsultationSubmitData } from '@/lib/consultation/schema';
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 
 // ── CONSTANTS ──
@@ -99,7 +99,7 @@ You MUST respond with ONLY a valid JSON object. No markdown, no code fences, no 
 // ── USER PROMPT ──
 
 function buildDeviceAnalysisPrompt(
-  intakeData: Partial<ConsultationFormData>
+  intakeData: Partial<ConsultationSubmitData>
 ): string {
   const age = calculateAge(intakeData.dob);
   const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
@@ -246,7 +246,7 @@ Return ONLY the JSON object. No markdown, no code fences.`;
  */
 export async function runAIAuraScanWithDevice(
   deviceScan: AuraDeviceScan,
-  intakeData: Partial<ConsultationFormData>
+  intakeData: Partial<ConsultationSubmitData>
 ): Promise<AuraScanResult> {
   const scanId = `aura_device_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   const startTime = Date.now();
@@ -719,7 +719,7 @@ function createTimeout(ms: number): Promise<never> {
 }
 
 async function fallbackScan(
-  intakeData: Partial<ConsultationFormData>,
+  intakeData: Partial<ConsultationSubmitData>,
   scanId: string
 ): Promise<AuraScanResult> {
   const result = await runAuraScan(intakeData);

@@ -293,6 +293,7 @@ const submitCore = z
   .passthrough();
 
 export const submitIntakeSchema = submitCore;
+export type ConsultationSubmitData = z.infer<typeof submitIntakeSchema>;
 
 /** Validate a single step's data. Returns { success, errors } */
 export function validateStep(

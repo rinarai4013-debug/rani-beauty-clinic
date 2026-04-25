@@ -18,8 +18,11 @@ import {
 } from '@/lib/mastermind/aura-pdf';
 import { parseAuraPdfTextFallbackMarkers } from '@/lib/mastermind/aura-pdf-fallback';
 import { Tables, rateLimitedQuery } from '@/lib/airtable/client';
-import { submitIntakeSchema } from '@/lib/consultation/schema';
-import type { ConsultationFormData } from '@/lib/consultation/schema';
+import {
+  submitIntakeSchema,
+  type ConsultationFormData,
+  type ConsultationSubmitData,
+} from '@/lib/consultation/schema';
 import { recommendBoomRxBySymptoms } from '@/lib/medical/symptom-product-matrix';
 import {
   BOOMRX_FORMULARY_ITEMS,
@@ -255,7 +258,7 @@ function coerceLegacySubmitPayload(rawPayload: unknown): Record<string, unknown>
   return payload;
 }
 
-function deriveRequestedTrack(intakeData: Partial<ConsultationFormData>): MetabolicIntake['preferredTrack'] {
+function deriveRequestedTrack(intakeData: Partial<ConsultationSubmitData>): MetabolicIntake['preferredTrack'] {
   const interests = Array.isArray(intakeData.treatmentInterests)
     ? intakeData.treatmentInterests.map((item) => String(item).toLowerCase())
     : [];
@@ -266,7 +269,7 @@ function deriveRequestedTrack(intakeData: Partial<ConsultationFormData>): Metabo
   return undefined;
 }
 
-function normalizeClinicalSymptoms(intakeData: Partial<ConsultationFormData>): string[] {
+function normalizeClinicalSymptoms(intakeData: Partial<ConsultationSubmitData>): string[] {
   const mapped = new Set<string>();
   const concerns = Array.isArray(intakeData.skinConcerns)
     ? intakeData.skinConcerns.map((item) => String(item).toLowerCase())
@@ -390,7 +393,7 @@ function buildCatalogFallbackOffers(
   };
 }
 
-function buildMedicalOffers(intakeData: Partial<ConsultationFormData>): MedicalOfferSummary | null {
+function buildMedicalOffers(intakeData: Partial<ConsultationSubmitData>): MedicalOfferSummary | null {
   const requestedTrack = deriveRequestedTrack(intakeData) ?? 'glp1';
   const goalsText = typeof intakeData.goals === 'string' ? intakeData.goals : '';
   const normalizedSymptoms = normalizeClinicalSymptoms(intakeData);
@@ -429,7 +432,7 @@ function buildMedicalOffers(intakeData: Partial<ConsultationFormData>): MedicalO
 }
 
 function buildMetabolicRecommendation(
-  intakeData: Partial<ConsultationFormData>,
+  intakeData: Partial<ConsultationSubmitData>,
 ): ReturnType<typeof generateFullMetabolicRecommendation> | null {
   const requestedTrack = deriveRequestedTrack(intakeData);
   if (!requestedTrack) return null;
@@ -647,7 +650,7 @@ export async function POST(request: NextRequest) {
 
       rawIntakePayload = getPayloadCandidate(rawIntakePayload);
 
-      let intakeData: Partial<ConsultationFormData>;
+      let intakeData: Partial<ConsultationSubmitData>;
       if (!rawIntakePayload || typeof rawIntakePayload !== 'object') {
         return NextResponse.json({ success: false, error: 'Missing form data' }, { status: 400 });
       }
@@ -667,7 +670,7 @@ export async function POST(request: NextRequest) {
           { status: 422 },
         );
       }
-      intakeData = parsed.data as Partial<ConsultationFormData>;
+      intakeData = parsed.data as Partial<ConsultationSubmitData>;
       const markerParse = parseAuraPdfTextFallbackMarkers(
         typeof intakeData.clinicalNotes === 'string' ? intakeData.clinicalNotes : undefined
       );
