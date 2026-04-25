@@ -9,7 +9,7 @@
  * - All protocol initiation requires explicit provider authorization
  */
 
-import type { MetabolicTrack } from './matrix';
+import type { MetabolicIntake, MetabolicTrack } from './matrix';
 import type { TierLevel, SafetyStatus } from './tier-matrix';
 
 // ── Output Type ──
@@ -24,6 +24,27 @@ export interface DosageFramework {
   monitoringCadence: string[];
   providerAuthorizationNote: string;
   constrainedByStatus: boolean;
+  personalizedPeptidePlan: PersonalizedPeptidePlan | null;
+}
+
+export interface PersonalizedPeptideDoseCandidate {
+  compound: string;
+  targetIntent: string;
+  startDose: string;
+  escalationWindow: string;
+  route: 'subcutaneous' | 'intramuscular' | 'topical';
+  cadence: string;
+  cycleLength: string;
+  confidence: 'moderate' | 'high';
+  rationale: string[];
+}
+
+export interface PersonalizedPeptidePlan {
+  strategy: 'recovery-first' | 'performance-stack' | 'metabolic-repair' | 'longevity-stack';
+  dataCompleteness: 'low' | 'medium' | 'high';
+  computedFrom: string[];
+  warnings: string[];
+  candidates: PersonalizedPeptideDoseCandidate[];
 }
 
 // ── Internal Table ──
@@ -302,6 +323,193 @@ const DOSING_TABLE: Record<MetabolicTrack, Record<TierLevel, DosingEntry>> = {
   },
 };
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function roundToNearest(value: number, step: number): number {
+  return Math.round(value / step) * step;
+}
+
+function calculatePeptideDoseMultiplier(intake: MetabolicIntake, status: SafetyStatus): number {
+  const weight = intake.biometrics.weightLbs;
+  const tolerance = intake.peptideHistory.tolerance;
+
+  let multiplier = 1;
+  if (typeof weight === 'number') {
+    if (weight >= 240) multiplier += 0.2;
+    else if (weight >= 200) multiplier += 0.1;
+    else if (weight <= 120) multiplier -= 0.15;
+    else if (weight <= 150) multiplier -= 0.05;
+  }
+
+  if (tolerance === 'sensitive') multiplier -= 0.2;
+  if (tolerance === 'high') multiplier += 0.15;
+
+  if (!intake.labs.baselineLabsCompleted) multiplier -= 0.1;
+  if (intake.medicalFlags.uncontrolledHypertension || intake.medicalFlags.severeDepression) {
+    multiplier -= 0.1;
+  }
+  if (status !== 'eligible') multiplier -= 0.15;
+
+  return clamp(multiplier, 0.65, 1.35);
+}
+
+function resolveDataCompleteness(intake: MetabolicIntake): 'low' | 'medium' | 'high' {
+  let score = 0;
+  if (typeof intake.biometrics.weightLbs === 'number') score += 1;
+  if (typeof intake.biometrics.bmi === 'number') score += 1;
+  if (intake.labs.baselineLabsCompleted) score += 1;
+  if (intake.peptideHistory.tolerance !== 'unknown') score += 1;
+  if (intake.peptideHistory.priorPeptideExposure) score += 1;
+
+  if (score >= 4) return 'high';
+  if (score >= 2) return 'medium';
+  return 'low';
+}
+
+function buildPeptideWarnings(intake: MetabolicIntake, status: SafetyStatus): string[] {
+  const warnings: string[] = [];
+  if (!intake.labs.baselineLabsCompleted) {
+    warnings.push('Baseline labs are incomplete; provider should use conservative initiation and confirm safety markers first.');
+  }
+  if (status !== 'eligible') {
+    warnings.push('Safety status is constrained; provider review is required before any peptide start-range authorization.');
+  }
+  if (intake.medicalFlags.pregnant || intake.medicalFlags.breastfeeding) {
+    warnings.push('Pregnancy or breastfeeding flag present; peptide protocol requires explicit provider-only review.');
+  }
+  if (intake.medicalFlags.uncontrolledHypertension) {
+    warnings.push('Uncontrolled hypertension flag present; defer escalation until blood-pressure control is documented.');
+  }
+  return warnings;
+}
+
+function buildPeptidePersonalizedPlan(
+  intake: MetabolicIntake,
+  track: MetabolicTrack,
+  tier: TierLevel,
+  status: SafetyStatus,
+): PersonalizedPeptidePlan | null {
+  if (track !== 'peptides' && track !== 'hybrid') {
+    return null;
+  }
+
+  const symptoms = new Set(intake.symptoms);
+  const goals = new Set(intake.goals);
+  const multiplier = calculatePeptideDoseMultiplier(intake, status);
+
+  const recoveryLead =
+    symptoms.has('slow-recovery') ||
+    symptoms.has('inflammation') ||
+    symptoms.has('gut-bloating') ||
+    goals.has('recovery');
+  const performanceLead = goals.has('performance') || symptoms.has('muscle-loss');
+  const metabolicLead =
+    goals.has('energy') ||
+    goals.has('longevity') ||
+    symptoms.has('fatigue') ||
+    symptoms.has('brain-fog');
+
+  const strategy: PersonalizedPeptidePlan['strategy'] = recoveryLead
+    ? 'recovery-first'
+    : performanceLead
+      ? 'performance-stack'
+      : metabolicLead
+        ? 'metabolic-repair'
+        : 'longevity-stack';
+
+  const candidates: PersonalizedPeptideDoseCandidate[] = [];
+  const computedFrom = ['goals', 'symptoms', 'medicalFlags', 'labs.baselineLabsCompleted'];
+  if (typeof intake.biometrics.weightLbs === 'number') computedFrom.push('biometrics.weightLbs');
+  if (typeof intake.biometrics.bmi === 'number') computedFrom.push('biometrics.bmi');
+  if (intake.peptideHistory.tolerance !== 'unknown') computedFrom.push('peptideHistory.tolerance');
+  if (intake.peptideHistory.priorPeptideExposure) computedFrom.push('peptideHistory.priorPeptideExposure');
+
+  const bpcBaseByTier: Record<TierLevel, number> = {
+    foundation: 250,
+    performance: 350,
+    elite: 500,
+  };
+  const bpcStart = clamp(roundToNearest(bpcBaseByTier[tier] * multiplier, 25), 200, 700);
+  const bpcUpper = clamp(roundToNearest(bpcStart * 1.8, 25), 350, 1000);
+
+  if (recoveryLead || strategy === 'recovery-first') {
+    candidates.push({
+      compound: 'BPC-157',
+      targetIntent: 'Recovery + inflammation modulation',
+      startDose: `Provider-start reference: ${bpcStart} mcg per dose`,
+      escalationWindow: `Provider-reviewed range: ${bpcStart}-${bpcUpper} mcg per dose`,
+      route: intake.peptideHistory.preferredRoute === 'intramuscular' ? 'intramuscular' : 'subcutaneous',
+      cadence: 'Once daily for foundational recovery; may split to twice-daily based on provider review.',
+      cycleLength: '8-12 week cycle, then deload reassessment.',
+      confidence: intake.labs.baselineLabsCompleted ? 'high' : 'moderate',
+      rationale: [
+        'Recovery/inflammation signal detected in goals or symptoms.',
+        'Dose scaled by weight + tolerance profile with conservative safety clamp.',
+      ],
+    });
+  }
+
+  const cjcBaseByTier: Record<TierLevel, number> = {
+    foundation: 100,
+    performance: 150,
+    elite: 200,
+  };
+  const cjcStart = clamp(roundToNearest(cjcBaseByTier[tier] * multiplier, 10), 80, 250);
+  const cjcUpper = clamp(roundToNearest(cjcStart * 1.7, 10), 150, 350);
+
+  if (performanceLead || strategy === 'performance-stack') {
+    candidates.push({
+      compound: 'CJC-1295 / Ipamorelin',
+      targetIntent: 'Lean-mass retention + sleep-linked recovery',
+      startDose: `Provider-start reference: CJC-1295 ${cjcStart} mcg + Ipamorelin ${cjcStart} mcg at bedtime`,
+      escalationWindow: `Provider-reviewed range: ${cjcStart}-${cjcUpper} mcg each bedtime dose`,
+      route: 'subcutaneous',
+      cadence: 'Bedtime pulse, 5 days on / 2 days off.',
+      cycleLength: '8-12 week cycle with midpoint review.',
+      confidence: intake.labs.baselineLabsCompleted ? 'high' : 'moderate',
+      rationale: [
+        'Performance or muscle-loss signal detected.',
+        'Bedtime secretagogue pattern aligns with existing protocol cadence.',
+      ],
+    });
+  }
+
+  const nadBaseByTier: Record<TierLevel, number> = {
+    foundation: 100,
+    performance: 200,
+    elite: 250,
+  };
+  const nadStart = clamp(roundToNearest(nadBaseByTier[tier] * multiplier, 25), 75, 300);
+  const nadUpper = clamp(roundToNearest(nadStart * 1.5, 25), 150, 450);
+
+  if (metabolicLead || candidates.length === 0) {
+    candidates.push({
+      compound: 'NAD+',
+      targetIntent: 'Energy + cognitive resilience',
+      startDose: `Provider-start reference: ${nadStart} mg per dose`,
+      escalationWindow: `Provider-reviewed range: ${nadStart}-${nadUpper} mg per dose`,
+      route: 'intramuscular',
+      cadence: '2-3 doses/week during loading phase; then weekly maintenance.',
+      cycleLength: '4-week loading + maintenance protocol.',
+      confidence: intake.labs.baselineLabsCompleted ? 'high' : 'moderate',
+      rationale: [
+        'Energy/longevity or fatigue/cognitive signals detected.',
+        'Dose aligned to tier intensity and adjusted by tolerance profile.',
+      ],
+    });
+  }
+
+  return {
+    strategy,
+    dataCompleteness: resolveDataCompleteness(intake),
+    computedFrom,
+    warnings: buildPeptideWarnings(intake, status),
+    candidates,
+  };
+}
+
 const PROVIDER_AUTHORIZATION_NOTE =
   'PROVIDER AUTHORIZATION REQUIRED: This dosage framework is a clinical reference only. ' +
   'No protocol may be initiated, modified, or continued without explicit provider review and authorization. ' +
@@ -313,8 +521,12 @@ export function generateDosageFramework(
   track: MetabolicTrack,
   tier: TierLevel,
   status: SafetyStatus,
+  intake?: MetabolicIntake,
 ): DosageFramework {
   const entry = DOSING_TABLE[track][tier];
+  const personalizedPeptidePlan = intake
+    ? buildPeptidePersonalizedPlan(intake, track, tier, status)
+    : null;
 
   return {
     track,
@@ -326,5 +538,6 @@ export function generateDosageFramework(
     monitoringCadence: entry.monitoringCadence,
     providerAuthorizationNote: PROVIDER_AUTHORIZATION_NOTE,
     constrainedByStatus: status !== 'eligible',
+    personalizedPeptidePlan,
   };
 }

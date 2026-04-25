@@ -47,7 +47,7 @@ function escapeSvgText(value: string): string {
 function buildSimulationPlaceholderImage(
   trajectory: 'with' | 'without',
   frame: SimulationFrame,
-): string {
+): { imageDataUrl: string; kind: SimulationFrame['kind'] } {
   const palette =
     trajectory === 'with'
       ? {
@@ -55,18 +55,20 @@ function buildSimulationPlaceholderImage(
           backgroundEnd: '#DEF8EA',
           accent: '#059669',
           accentMuted: '#D1FAE5',
-          title: 'With Treatment',
+          title: 'Projected Outcome',
         }
       : {
           backgroundStart: '#FFF5F5',
           backgroundEnd: '#FFE4E6',
           accent: '#E11D48',
           accentMuted: '#FFD5DD',
-          title: 'Without Treatment',
+          title: 'Projected Outcome',
         };
 
+  const heading = `Projected outcome — Month ${frame.timepoint}`;
+
   const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="${escapeSvgText(`${palette.title} ${frame.timepoint} projection`)}}">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="${escapeSvgText(`${palette.title} projection ${frame.timepoint}`)}">
   <defs>
     <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0%" stop-color="${palette.backgroundStart}" />
@@ -76,7 +78,7 @@ function buildSimulationPlaceholderImage(
   <rect width="1200" height="900" fill="url(#bg)" />
   <rect x="72" y="72" width="1056" height="756" rx="36" fill="#ffffff" opacity="0.9" />
   <text x="120" y="180" fill="${palette.accent}" font-size="56" font-family="Inter, Arial, sans-serif" font-weight="700">${escapeSvgText(palette.title)}</text>
-  <text x="120" y="238" fill="#0F1D2C" font-size="34" font-family="Inter, Arial, sans-serif" font-weight="600">${escapeSvgText(`Timepoint: ${frame.timepoint}`)}</text>
+  <text x="120" y="238" fill="#0F1D2C" font-size="34" font-family="Inter, Arial, sans-serif" font-weight="600">${escapeSvgText(heading)}</text>
   <rect x="120" y="288" width="430" height="170" rx="20" fill="${palette.accentMuted}" />
   <text x="152" y="352" fill="#0F1D2C" font-size="28" font-family="Inter, Arial, sans-serif" font-weight="600">Projected Aura Score</text>
   <text x="152" y="424" fill="${palette.accent}" font-size="66" font-family="Inter, Arial, sans-serif" font-weight="800">${escapeSvgText(String(frame.auraScoreProjection))}</text>
@@ -87,19 +89,22 @@ function buildSimulationPlaceholderImage(
   <text x="120" y="778" fill="#6B7280" font-size="22" font-family="Inter, Arial, sans-serif">AI projection preview generated from consultation data.</text>
 </svg>`;
 
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  return {
+    imageDataUrl: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
+    kind: 'data-projection',
+  };
 }
 
 function resolveFrameImage(
   sourcePhotoUrl: string | null | undefined,
   trajectory: 'with' | 'without',
   frame: SimulationFrame,
-): string {
+): { imageDataUrl: string; kind: SimulationFrame['kind'] } {
   if (isPersistableSourcePhoto(sourcePhotoUrl)) {
-    return sourcePhotoUrl;
+    return { imageDataUrl: sourcePhotoUrl, kind: 'photo-simulation' };
   }
 
-  return buildSimulationPlaceholderImage(trajectory, frame);
+  return { ...buildSimulationPlaceholderImage(trajectory, frame), kind: 'data-projection' };
 }
 
 function ensureFrameImages(
@@ -107,16 +112,17 @@ function ensureFrameImages(
   sourcePhotoUrl: string | null | undefined,
 ): SimulationComparison {
   const mapFrames = (
-    frames: SimulationFrame[],
-    trajectory: 'with' | 'without',
-  ): SimulationFrame[] =>
+  frames: SimulationFrame[],
+  trajectory: 'with' | 'without',
+): SimulationFrame[] =>
     frames.map((frame) => {
       const existingImage = typeof frame.imageDataUrl === 'string' ? frame.imageDataUrl : '';
+      const existingKind = frame.kind;
       return {
         ...frame,
-        imageDataUrl: isRenderableImageValue(existingImage)
-          ? existingImage
-          : resolveFrameImage(sourcePhotoUrl, trajectory, frame),
+        ...(isRenderableImageValue(existingImage)
+          ? { imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' }
+          : resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
       };
     });
 
@@ -147,6 +153,7 @@ function buildDataDrivenSimulation(
     age: number,
     desc: string,
   ): SimulationFrame => ({
+    kind: 'data-projection',
     imageDataUrl: '',
     timepoint,
     monthNumber,

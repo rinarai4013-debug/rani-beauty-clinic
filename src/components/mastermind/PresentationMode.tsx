@@ -644,6 +644,10 @@ function SimulationSlide({ session, comparisonMetrics, costOfDelay, trajectorySc
 
   const withFrame = sim.withTreatment.frames[sim.withTreatment.frames.length - 1];
   const withoutFrame = sim.withoutTreatment.frames[sim.withoutTreatment.frames.length - 1];
+  const projectionMode =
+    withFrame?.kind === 'data-projection' || withoutFrame?.kind === 'data-projection';
+  const withBadge = projectionMode ? 'Projected outcome with treatment (1Y)' : 'With Treatment (1Y)';
+  const withoutBadge = projectionMode ? 'Projected outcome without treatment (1Y)' : 'Without Treatment (1Y)';
 
   return (
     <div className="flex flex-col items-center min-h-full px-6 py-12">
@@ -653,7 +657,7 @@ function SimulationSlide({ session, comparisonMetrics, costOfDelay, trajectorySc
             Your Future Self
           </h2>
           <p className="font-body text-white/40 mt-2">
-            Two paths — one choice
+            {projectionMode ? 'Projected outcomes (data-driven scenario simulation)' : 'Two paths — one choice'}
           </p>
         </div>
 
@@ -663,7 +667,7 @@ function SimulationSlide({ session, comparisonMetrics, costOfDelay, trajectorySc
             <div className="text-3xl font-bold text-green-400 font-[family-name:var(--font-heading)]">
               {withFrame?.auraScoreProjection || '—'}
             </div>
-            <div className="text-xs text-green-400/60 font-body mt-1">With Treatment (1Y)</div>
+            <div className="text-xs text-green-400/60 font-body mt-1">{withBadge}</div>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-center">
@@ -677,9 +681,16 @@ function SimulationSlide({ session, comparisonMetrics, costOfDelay, trajectorySc
             <div className="text-3xl font-bold text-red-400 font-[family-name:var(--font-heading)]">
               {withoutFrame?.auraScoreProjection || '—'}
             </div>
-            <div className="text-xs text-red-400/60 font-body mt-1">Without Treatment (1Y)</div>
+            <div className="text-xs text-red-400/60 font-body mt-1">{withoutBadge}</div>
           </div>
         </div>
+
+        {projectionMode && (
+          <p className="font-body text-xs text-white/45 text-center max-w-2xl mx-auto">
+            These cards are clinical projections, not guaranteed face photographs. They compare expected
+            score trajectories for treatment and non-treatment paths.
+          </p>
+        )}
 
         {/* Key Differentiators */}
         {comparisonMetrics && (

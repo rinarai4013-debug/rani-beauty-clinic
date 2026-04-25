@@ -236,6 +236,7 @@ export interface ProviderReviewState {
 
 export interface SimulationFrame {
   imageDataUrl: string; // base64 data URL from canvas
+  kind: 'photo-simulation' | 'data-projection';
   timepoint: string; // "1M", "3M", "6M", "1Y", "3Y", "5Y"
   monthNumber: number;
   description: string;

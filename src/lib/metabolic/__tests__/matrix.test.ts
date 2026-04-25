@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   metabolicIntakeSchema,
+  generateFullMetabolicRecommendation,
   generateMetabolicRecommendation,
   type MetabolicIntake,
 } from '@/lib/metabolic/matrix';
@@ -31,6 +32,8 @@ describe('metabolicIntakeSchema', () => {
       expect(result.data.medicalFlags.pregnant).toBe(false);
       expect(result.data.labs.baselineLabsCompleted).toBe(false);
       expect(result.data.fulfillmentPreference).toBe('clinic');
+      expect(result.data.biometrics.weightLbs).toBeUndefined();
+      expect(result.data.peptideHistory.tolerance).toBe('unknown');
     }
   });
 
@@ -214,5 +217,18 @@ describe('generateMetabolicRecommendation', () => {
     const recB = generateMetabolicRecommendation(breastfeedingOnly);
     const recBP = generateMetabolicRecommendation(bothFlags);
     expect([...recB.blockedTracks].sort()).toEqual([...recBP.blockedTracks].sort());
+  });
+
+  it('builds peptide personalized dosing plan in full recommendation mode', () => {
+    const intake = makeIntake({
+      goals: ['recovery', 'performance'],
+      symptoms: ['slow-recovery', 'inflammation', 'fatigue'],
+      labs: { baselineLabsCompleted: true, latestA1c: undefined, fastingGlucose: undefined, tsh: undefined },
+      biometrics: { weightLbs: 205, bmi: 30.5, heightInches: 68 },
+      peptideHistory: { priorPeptideExposure: false, tolerance: 'standard', preferredRoute: 'subcutaneous' },
+    });
+    const rec = generateFullMetabolicRecommendation(intake, { forceTrack: 'peptides' });
+    expect(rec.dosageFramework.personalizedPeptidePlan).not.toBeNull();
+    expect(rec.dosageFramework.personalizedPeptidePlan?.candidates.length).toBeGreaterThan(0);
   });
 });
