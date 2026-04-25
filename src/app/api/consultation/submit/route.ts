@@ -37,6 +37,7 @@ import {
 } from '@/lib/security/public-intent-guard';
 import { withSentry } from '@/lib/sentry-utils';
 import { SessionStoreError } from '@/lib/mastermind/session-store';
+import { logEvent } from '@/lib/logging/structured-logger';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB each
@@ -651,7 +652,6 @@ export async function POST(request: NextRequest) {
 
       rawIntakePayload = getPayloadCandidate(rawIntakePayload);
 
-      let intakeData: Partial<ConsultationSubmitData>;
       if (!rawIntakePayload || typeof rawIntakePayload !== 'object') {
         return NextResponse.json({ success: false, error: 'Missing form data' }, { status: 400 });
       }
@@ -671,7 +671,7 @@ export async function POST(request: NextRequest) {
           { status: 422 },
         );
       }
-      intakeData = parsed.data as Partial<ConsultationSubmitData>;
+      const intakeData = parsed.data as Partial<ConsultationSubmitData>;
       const markerParse = parseAuraPdfTextFallbackMarkers(
         typeof intakeData.clinicalNotes === 'string' ? intakeData.clinicalNotes : undefined
       );
@@ -946,7 +946,7 @@ export async function POST(request: NextRequest) {
 
           const scanned = sessionReducer(session, { type: 'SET_SCAN_RESULT', result: scanResult });
           await saveSessionAsync(scanned);
-          console.log(JSON.stringify({ event: 'mastermind.auto_scan.completed', sessionId: session.id, source }));
+          logEvent('api', 'info', 'mastermind.auto_scan.completed', { source, sessionId: session.id });
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           console.error(JSON.stringify({ event: 'mastermind.auto_scan.failed', sessionId: session.id, error: message }));

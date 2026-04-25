@@ -15,7 +15,7 @@ import {
 } from '@/lib/mastermind/session';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
-import type { MastermindSessionAction, PlanModification } from '@/types/mastermind';
+import type { MastermindSessionAction } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
 
