@@ -24,6 +24,7 @@ import { pnwCities } from "@/data/locations/pnw-cities";
 import { waCitiesExtended } from "@/data/locations/wa-cities-extended";
 import { serviceGeoEntries } from "@/data/locations/service-geo";
 import { extendedServiceGeoEntries } from "@/data/locations/service-geo-extended";
+import { publishedCityServicePages } from "@/data/programmatic-seo/city-service-pages";
 
 const baseUrl = "https://www.ranibeautyclinic.com";
 
@@ -249,7 +250,16 @@ function buildGeoHubSitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
   }));
 
-  return [...locationPages, ...nearCityPages];
+  const programmaticCityServicePages: MetadataRoute.Sitemap = publishedCityServicePages.map(
+    (page) => ({
+      url: page.canonicalUrl,
+      lastModified: page.lastReviewed,
+      priority: 0.7,
+      changeFrequency: "monthly",
+    })
+  );
+
+  return [...locationPages, ...nearCityPages, ...programmaticCityServicePages];
 }
 
 // ── Sub-sitemaps 4-5: Near service pages (~2,250 URLs split A-K / L-Z) ─
