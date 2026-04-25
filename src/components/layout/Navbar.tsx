@@ -22,10 +22,15 @@ const megaMenuColumns = [
     ],
   },
   {
-    title: "Injectables",
+    title: "Peptides Rx",
     links: [
-      { name: "Botox & Dysport", href: "/services/botox-dysport" },
-      { name: "Dermal Fillers", href: "/services/dermal-fillers" },
+      { name: "Peptide Quiz", href: "/peptides/quiz" },
+      { name: "GLP-1 Accelerator", href: "/peptides/protocol/glp1-accelerator" },
+      { name: "Men's TRT", href: "/peptides/protocol/mens-trt-foundation" },
+      { name: "Women's HRT", href: "/peptides/protocol/womens-hrt-reset" },
+      { name: "BPC-157 Recovery", href: "/peptides/bpc-157" },
+      { name: "NAD+ Longevity", href: "/peptides/nad-injection" },
+      { name: "Full Formulary", href: "/peptides" },
     ],
   },
   {
@@ -34,6 +39,8 @@ const megaMenuColumns = [
       { name: "Laser Hair Removal", href: "/services/laser-hair-removal" },
       { name: "Sofwave", href: "/services/sofwave" },
       { name: "Red Light Therapy", href: "/services/red-light-therapy" },
+      { name: "Botox & Dysport", href: "/services/botox-dysport" },
+      { name: "Dermal Fillers", href: "/services/dermal-fillers" },
     ],
   },
   {
@@ -48,10 +55,12 @@ const megaMenuColumns = [
   },
 ];
 
-// ── Nav Links (5 items, title case) ──────────────────────────────────────────
+// ── Nav Links (6 items, Peptides Rx promoted to top-level) ──────────────────
 
 const navLinks = [
   { name: "Services", href: "/services", megaMenu: true },
+  { name: "Peptides Rx", href: "/peptides", highlight: true },
+  { name: "Gifts", href: "/gifts" },
   { name: "Results", href: "/results" },
   { name: "About", href: "/about" },
   { name: "Pricing", href: "/pricing" },
@@ -61,7 +70,11 @@ const navLinks = [
 // Mobile nav gets a few more items
 const mobileNavLinks = [
   { name: "Services", href: "/services" },
+  { name: "Peptides Rx", href: "/peptides" },
   { name: "Wellness", href: "/wellness" },
+  { name: "Gifts", href: "/gifts" },
+  { name: "Neurotoxin", href: "/neurotoxin" },
+  { name: "Corporate", href: "/corporate" },
   { name: "Results", href: "/results" },
   { name: "About", href: "/about" },
   { name: "Pricing", href: "/pricing" },
@@ -93,23 +106,30 @@ export default function Navbar() {
   return (
     <>
       {/* ── Announcement Bar (Navy, minimal) ─────────────────────────────── */}
+      {/* Audit 2026-04-19 P0 NAV-01: cap at 100vw so fixed positioning
+          doesn't stretch to the full scrollable area when any descendant
+          overflows. This prevents the dismiss button from rendering
+          off-screen on mobile viewports. */}
       <div
-        className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-200 ${
+        className={`fixed top-0 left-0 right-0 z-[60] w-screen max-w-[100vw] transition-all duration-200 ${
           showAnnouncement
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
-        <div className="bg-rani-navy border-b border-white/5 px-4 py-2 text-center">
-          <span className="font-body text-[13px] text-white/70">
+        <div className="relative bg-rani-navy border-b border-white/5 px-10 py-2 text-center">
+          <span className="font-body text-[12px] sm:text-[13px] text-white/70">
             Complimentary phone consultations available
           </span>
+          {/* Audit 2026-04-19 P2 NAV-02: raise hit area to WCAG touch-target
+              minimum (24x24 AAA, 44x44 AA) and ensure it's above the absolute
+              parent's padding so it doesn't overlap the text. */}
           <button
             onClick={() => setAnnouncementVisible(false)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white/70"
+            className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded text-white/50 transition-colors hover:bg-white/10 hover:text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rani-gold"
             aria-label="Dismiss announcement"
           >
-            <X size={12} />
+            <X size={14} />
           </button>
         </div>
       </div>
@@ -117,7 +137,7 @@ export default function Navbar() {
       {/* ── Main Nav ─────────────────────────────────────────────────────── */}
       <nav
         aria-label="Main navigation"
-        className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed left-0 right-0 z-50 w-screen max-w-[100vw] transition-all duration-300 ${
           showAnnouncement ? "top-[36px]" : "top-0"
         } ${
           scrolled
@@ -125,18 +145,21 @@ export default function Navbar() {
             : "bg-transparent h-20"
         }`}
       >
-        <div className="mx-auto flex h-full items-center justify-between px-6 2xl:max-w-[1400px]">
-          {/* Logo */}
+        <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6 2xl:max-w-[1400px]">
+          {/* Logo — right-margin is lg-only; on mobile the hamburger + Book pill
+              were getting pushed off the 390–414px viewport edge (Audit 2026-04-19
+              P0: NAV-01, horizontal overflow). Also cap logo width on narrow
+              screens so the right-side controls always fit. */}
           <Link
             href="/"
-            className="flex items-center gap-3 shrink-0 mr-12"
+            className="flex items-center gap-3 shrink min-w-0 lg:mr-12 lg:shrink-0"
           >
             <Image
               src="/images/logo/logo-light.png"
               alt="Rani Beauty Clinic"
               width={260}
               height={32}
-              className="h-7 w-auto md:h-8"
+              className="h-6 w-auto max-w-[180px] sm:h-7 sm:max-w-none md:h-8"
               priority
             />
           </Link>
@@ -202,14 +225,19 @@ export default function Navbar() {
                             ))}
                           </div>
 
-                          {/* Quiz link */}
-                          <div className="mt-6 border-t border-white/10 pt-4">
+                          {/* Quiz links */}
+                          <div className="mt-6 flex flex-col gap-2 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
                             <Link
                               href="/quiz"
                               className="flex items-center gap-2 font-body text-sm font-semibold text-rani-gold transition-colors hover:text-rani-gold-light"
                             >
-                              Not sure where to start? Take our 60-second quiz
-                              &rarr;
+                              Treatment quiz (60s) &rarr;
+                            </Link>
+                            <Link
+                              href="/peptides/quiz"
+                              className="flex items-center gap-2 font-body text-sm font-semibold text-rani-gold transition-colors hover:text-rani-gold-light"
+                            >
+                              Peptide & Rx quiz (2 min) &rarr;
                             </Link>
                           </div>
                         </div>
@@ -242,21 +270,26 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile: Book pill + hamburger */}
-          <div className="flex items-center gap-3 lg:hidden">
+          {/* Mobile: Book pill + hamburger
+              Audit 2026-04-19 P0 NAV-01 fix: tighten padding + reduce gap so
+              controls fit inside 390–414px viewports. shrink-0 prevents the
+              logo from squashing them out. */}
+          <div className="flex items-center gap-2 lg:hidden shrink-0">
             <a
               href={clinicInfo.booking.url}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => { trackCTAClick('Book', 'navbar_mobile', clinicInfo.booking.url); trackBookingOpen('navbar_mobile'); }}
-              className="rounded-full bg-rani-gold px-5 py-2 min-h-[44px] flex items-center font-body text-xs font-bold text-rani-navy transition-colors hover:bg-rani-gold-light"
+              className="rounded-full bg-rani-gold px-4 py-2 min-h-[44px] flex items-center font-body text-xs font-bold text-rani-navy transition-colors hover:bg-rani-gold-light"
             >
               Book
             </a>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="text-white p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rani-gold"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav-panel"
             >
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -268,6 +301,10 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
+            id="mobile-nav-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
