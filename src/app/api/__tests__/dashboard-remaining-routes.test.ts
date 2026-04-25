@@ -8,6 +8,7 @@ const cacheSetMock = vi.fn();
 const generateWeeklyBriefMock = vi.fn();
 const calculateComplianceScoreMock = vi.fn();
 const fetchAllMock = vi.fn();
+const fetchFirstMock = vi.fn();
 const tablesAppointmentsMock = vi.fn();
 const tablesTransactionsMock = vi.fn();
 const tablesClientsMock = vi.fn();
@@ -56,8 +57,10 @@ vi.mock('@/lib/airtable/client', () => ({
     transactions: (...args: unknown[]) => tablesTransactionsMock(...args),
     clients: (...args: unknown[]) => tablesClientsMock(...args),
     reviews: (...args: unknown[]) => tablesReviewsMock(...args),
+    kpis: vi.fn().mockReturnValue('kpis'),
   },
   fetchAll: (...args: unknown[]) => fetchAllMock(...args),
+  fetchFirst: (...args: unknown[]) => fetchFirstMock(...args),
 }));
 
 vi.mock('@/lib/predictions/no-show', () => ({
@@ -109,6 +112,7 @@ function nextReq(url: string, cookie = 'session=test') {
 describe('remaining dashboard routes coverage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    const todayIsoDate = new Date().toISOString().slice(0, 10);
     getSessionMock.mockResolvedValue({ username: 'rina', role: 'ceo' });
     hasPermissionMock.mockReturnValue(true);
     cacheGetMock.mockReturnValue(null);
@@ -160,6 +164,7 @@ describe('remaining dashboard routes coverage', () => {
     tablesTransactionsMock.mockReturnValue('transactions');
     tablesClientsMock.mockReturnValue('clients');
     tablesReviewsMock.mockReturnValue('reviews');
+    fetchFirstMock.mockResolvedValue([]);
 
     fetchAllMock.mockImplementation(async (table: string) => {
       if (table === 'appointments') {
@@ -167,7 +172,7 @@ describe('remaining dashboard routes coverage', () => {
           {
             id: 'appt1',
             fields: {
-              Date: '2026-04-12',
+              Date: todayIsoDate,
               Time: '10:00',
               Duration: 60,
               Status: 'scheduled',
@@ -190,7 +195,7 @@ describe('remaining dashboard routes coverage', () => {
           {
             id: 'appt2',
             fields: {
-              Date: '2026-04-12',
+              Date: todayIsoDate,
               Time: '13:00',
               Duration: 45,
               Status: 'completed',
@@ -215,8 +220,8 @@ describe('remaining dashboard routes coverage', () => {
 
       if (table === 'transactions') {
         return [
-          { id: 'txn1', fields: { Date: '2026-04-12', Amount: 3200, Type: 'Service', Status: 'Completed', Provider: 'Rina', Service: 'Sofwave' } },
-          { id: 'txn2', fields: { Date: '2026-04-12', Amount: 275, Type: 'Service', Status: 'Completed', Provider: 'Rina', Service: 'HydraFacial' } },
+          { id: 'txn1', fields: { Date: todayIsoDate, Amount: 3200, Type: 'Service', Status: 'Completed', Provider: 'Rina', Service: 'Sofwave' } },
+          { id: 'txn2', fields: { Date: todayIsoDate, Amount: 275, Type: 'Service', Status: 'Completed', Provider: 'Rina', Service: 'HydraFacial' } },
         ];
       }
 
@@ -333,8 +338,8 @@ describe('remaining dashboard routes coverage', () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.score.total).toBeDefined();
-    expect(body.topStats.totalAppointments).toBeGreaterThan(0);
+    expect(body.score).toBeDefined();
+    expect(body.metrics.appointments).toBeGreaterThan(0);
   });
 
   it('GET /api/dashboard/schedule enforces permission and logs PHI access', async () => {

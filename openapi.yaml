@@ -802,6 +802,69 @@ paths:
         "401":
           description: Invalid signature
 
+  /api/webhooks/rx-intake:
+    post:
+      operationId: handleRxIntakeWebhook
+      summary: Rx intake enrollment webhook
+      tags: [Webhooks]
+      parameters:
+        - name: x-rx-webhook-secret
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - program_slug
+              properties:
+                program_slug:
+                  type: string
+                  description: Program slug (snake_case)
+                programSlug:
+                  type: string
+                  description: Program slug (camelCase alias)
+                program_id:
+                  type: string
+                patient_id:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                intake_date:
+                  type: string
+                  format: date
+              additionalProperties: true
+      responses:
+        "200":
+          description: Enrollment processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      recordId:
+                        type: string
+                      programSlug:
+                        type: string
+        "400":
+          description: Invalid JSON body
+        "401":
+          description: Unauthorized webhook secret
+        "422":
+          description: Invalid payload
+
   # ── OpenAPI Wave 4: providers, revenue, meta-ads ─────────────────
 
   /api/dashboard/providers:

@@ -18,7 +18,10 @@ const MobileCTA = dynamic(() => import("@/components/layout/MobileCTA"), { ssr: 
 const ScrollToTop = dynamic(() => import("@/components/layout/ScrollToTop"), { ssr: false });
 const ExitIntentPopup = dynamic(() => import("@/components/sections/ExitIntentPopup"), { ssr: false });
 const AIChatWidget = dynamic(() => import("@/components/AIChatWidget"), { ssr: false });
-const SocialProofToast = dynamic(() => import("@/components/sections/SocialProofToast"), { ssr: false });
+// SocialProofToast removed 2026-04-23: fabricated notifications ("Christina from
+// Sammamish just completed her 4th HydraFacial 5 min ago") are an FTC/PR risk.
+// Re-enable only when wired to a real last-booking feed via Mangomint webhook.
+// const SocialProofToast = dynamic(() => import("@/components/sections/SocialProofToast"), { ssr: false });
 const BehavioralTracker = dynamic(() => import("@/components/analytics/BehavioralTracker"), { ssr: false });
 const AnalyticsTracker = dynamic(() => import("@/components/analytics/AnalyticsTracker"), { ssr: false });
 const CookieConsent = dynamic(() => import("@/components/analytics/CookieConsent"), { ssr: false });
@@ -101,8 +104,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
-
   return (
     <html lang="en" className={fontVariables}>
       <head>
@@ -155,7 +156,7 @@ export default function RootLayout({
                     "Luxury physician-supervised medspa in Renton, WA. Specializing in laser hair removal, Botox, HydraFacial, RF microneedling, chemical peels, Sofwave, GLP-1 weight management, hormone therapy, and medical wellness injections under board-certified neurologist supervision.",
                   slogan: clinicInfo.tagline,
                   foundingDate: String(clinicInfo.established),
-                  telephone: schemaPhone,
+                  telephone: clinicInfo.phone,
                   email: clinicInfo.email,
                   priceRange: "$$$",
                   currenciesAccepted: "USD",
@@ -318,7 +319,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-body text-rani-text antialiased">
+      {/* Audit 2026-04-19 P0 LAYOUT-01: overflow-x-hidden is a defensive
+          guard against stray wide elements that historically caused
+          horizontal scroll on 390–414px viewports (see NAV-01). Paired with
+          the per-component fixes, this ensures no element can break the
+          mobile viewport regardless of CMS content width. */}
+      <body className="font-body text-rani-text antialiased overflow-x-hidden">
         <SkipNav />
         <ConditionalPublicLayout>
           <GTMNoScript />
@@ -331,7 +337,7 @@ export default function RootLayout({
           <MobileCTA />
           <ScrollToTop />
           <ExitIntentPopup />
-          <SocialProofToast />
+          {/* <SocialProofToast /> · disabled: FTC-risk fake notifications */}
           <AIChatWidget />
           <BehavioralTracker />
           <AnalyticsTracker />
