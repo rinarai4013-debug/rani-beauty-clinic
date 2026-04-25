@@ -43,7 +43,7 @@ import ScanResultsPanel from '@/components/dashboard/mastermind/ScanResultsPanel
 import AuraImportPanel from '@/components/dashboard/mastermind/AuraImportPanel';
 import PlanEditor from '@/components/dashboard/mastermind/PlanEditor';
 import CopilotSidebar from '@/components/dashboard/mastermind/CopilotSidebar';
-import type { MastermindPhase } from '@/types/mastermind';
+import type { MastermindPhase, SimulationFrame } from '@/types/mastermind';
 
 // ── PHASE DEFINITIONS ──
 
@@ -1542,6 +1542,72 @@ function ActionButton({ onClick, loading, icon: Icon, label, variant }: ActionBu
 // SIMULATION TAB
 // ════════════════════════════════════════════════════════════
 
+function ProjectionFrameCard({
+  frame,
+  mode,
+}: {
+  frame: SimulationFrame;
+  mode: 'with' | 'without';
+}) {
+  const isWithPlan = mode === 'with';
+
+  return (
+    <div
+      className={`relative h-full w-full overflow-hidden ${
+        isWithPlan
+          ? 'bg-gradient-to-br from-[#F0FDF4] via-white to-[#ECFDF5]'
+          : 'bg-gradient-to-br from-[#FFF7ED] via-white to-[#FEF2F2]'
+      }`}
+    >
+      <div className="absolute inset-0 opacity-[0.08]" style={{
+        backgroundImage:
+          'radial-gradient(circle at 25% 20%, #0F1D2C 0 1px, transparent 1px), radial-gradient(circle at 75% 80%, #0F1D2C 0 1px, transparent 1px)',
+        backgroundSize: '28px 28px',
+      }} />
+      <div className="absolute left-4 top-4">
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+            isWithPlan
+              ? 'bg-[#059669]/10 text-[#047857] border border-[#059669]/20'
+              : 'bg-red-50 text-red-600 border border-red-200'
+          }`}
+        >
+          Data Projection
+        </span>
+      </div>
+      <div className="relative z-10 flex h-full flex-col justify-center px-8 py-10">
+        <p className="font-body text-xs font-semibold uppercase tracking-[0.22em] text-[#0F1D2C]/40">
+          {frame.timepoint}
+        </p>
+        <h3 className="mt-3 font-[family-name:var(--font-heading)] text-3xl text-[#0F1D2C]">
+          {isWithPlan ? 'Projected with plan' : 'Projected without plan'}
+        </h3>
+        <p className="mt-3 max-w-xl font-body text-sm leading-relaxed text-[#0F1D2C]/55">
+          This is a score-based clinical projection, not a generated face image.
+        </p>
+        <div className="mt-8 grid grid-cols-2 gap-4">
+          <div className="rounded-2xl border border-[#0F1D2C]/10 bg-white/75 p-4 shadow-sm">
+            <p className="font-body text-xs uppercase tracking-[0.18em] text-[#0F1D2C]/35">
+              Aura Score
+            </p>
+            <p className={`mt-2 font-[family-name:var(--font-heading)] text-4xl font-bold ${isWithPlan ? 'text-[#059669]' : 'text-red-600'}`}>
+              {frame.auraScoreProjection}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[#0F1D2C]/10 bg-white/75 p-4 shadow-sm">
+            <p className="font-body text-xs uppercase tracking-[0.18em] text-[#0F1D2C]/35">
+              Skin Age
+            </p>
+            <p className="mt-2 font-[family-name:var(--font-heading)] text-4xl font-bold text-[#0F1D2C]">
+              {frame.skinAgeProjection}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof useMastermindSession>['session']> }) {
   const sim = session.simulationComparison;
   const [activeView, setActiveView] = useState<'with' | 'without'>('with');
@@ -1565,9 +1631,18 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
 
   const currentPath = activeView === 'with' ? sim.withTreatment : sim.withoutTreatment;
   const frame = currentPath.frames[selectedFrame];
+  const projectionMode = currentPath.frames.some((candidate) => candidate.kind !== 'photo-simulation');
 
   return (
     <div className="space-y-6">
+      {projectionMode && (
+        <div className="rounded-2xl border border-[#C9A96E]/20 bg-[#C9A96E]/10 px-4 py-3">
+          <p className="font-body text-xs font-medium text-[#0F1D2C]/70">
+            These are data projections from consultation findings. They are not face transformations.
+          </p>
+        </div>
+      )}
+
       {/* View Toggle */}
       <div className="flex items-center gap-2">
         <button
@@ -1579,7 +1654,7 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
               : 'bg-[#F8F6F1] text-[#0F1D2C]/40 border border-transparent'
           }`}
         >
-          With Treatment
+          {projectionMode ? 'Projected With Plan' : 'With Treatment'}
         </button>
         <button
           type="button"
@@ -1590,7 +1665,7 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
               : 'bg-[#F8F6F1] text-[#0F1D2C]/40 border border-transparent'
           }`}
         >
-          Without Treatment
+          {projectionMode ? 'Projected Without Plan' : 'Without Treatment'}
         </button>
       </div>
 
@@ -1603,31 +1678,35 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
           className="rounded-2xl border border-[#E8E4DF] overflow-hidden bg-white"
         >
           <div className="aspect-[4/3] bg-[#0F1D2C]/5 relative">
-            {frame.imageDataUrl ? (
-              <img
-                src={frame.imageDataUrl}
-                alt={frame.description}
-                className="w-full h-full object-cover"
-              />
+            {frame.kind === 'photo-simulation' && frame.imageDataUrl ? (
+              <>
+                <img
+                  src={frame.imageDataUrl}
+                  alt={frame.description}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2">
+                    <p className="font-body text-xs text-[#0F1D2C]/50">{frame.timepoint}</p>
+                    <p className="font-[family-name:var(--font-heading)] text-lg font-bold text-[#0F1D2C]">
+                      Score: {frame.auraScoreProjection}
+                    </p>
+                  </div>
+                  <div className="bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2">
+                    <p className="font-body text-xs text-[#0F1D2C]/50">Skin Age</p>
+                    <p className="font-body text-sm font-semibold text-[#0F1D2C]">
+                      {frame.skinAgeProjection}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : frame.kind !== 'photo-simulation' ? (
+              <ProjectionFrameCard frame={frame} mode={activeView} />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Image className="w-12 h-12 text-[#0F1D2C]/10" />
               </div>
             )}
-            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2">
-                <p className="font-body text-xs text-[#0F1D2C]/50">{frame.timepoint}</p>
-                <p className="font-[family-name:var(--font-heading)] text-lg font-bold text-[#0F1D2C]">
-                  Score: {frame.auraScoreProjection}
-                </p>
-              </div>
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2">
-                <p className="font-body text-xs text-[#0F1D2C]/50">Skin Age</p>
-                <p className="font-body text-sm font-semibold text-[#0F1D2C]">
-                  {frame.skinAgeProjection}
-                </p>
-              </div>
-            </div>
           </div>
           <div className="p-4">
             <p className="font-body text-sm text-[#0F1D2C]/70">{frame.description}</p>
@@ -2081,4 +2160,3 @@ function generateCopilotClosing(session: NonNullable<ReturnType<typeof useMaster
 
   return techniques;
 }
-
