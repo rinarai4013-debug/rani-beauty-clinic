@@ -33,5 +33,10 @@
       "permanent": true
     }
   ],
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/smoke-test",
+      "schedule": "0 13 * * *"
+    }
+  ]
 }

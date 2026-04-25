@@ -1752,6 +1752,39 @@ paths:
         "500":
           $ref: "#/components/responses/InternalError"
 
+  /api/cron/smoke-test:
+    get:
+      operationId: runSmokeTestCron
+      summary: Trigger live smoke-test run and persist latest result
+      tags: [Cron]
+      responses:
+        "200":
+          description: Smoke test passed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  status:
+                    type: string
+                  checks:
+                    type: array
+                    items:
+                      type: object
+                  durationMs:
+                    type: number
+                  triggeredBy:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        "401":
+          description: Missing or invalid cron signature
+        "500":
+          description: Smoke run failed
+
   # ── Batch 2: entry forms, gamification, dashboard misc ───────────
 
   /api/dashboard/entry/ceo-note:
@@ -1984,6 +2017,55 @@ paths:
 
   /api/dashboard/metabolic-funnel:
     get: { operationId: getMetabolicFunnel, summary: Metabolic protocol funnel metrics, tags: [Dashboard], security: [{ SessionCookie: [] }], parameters: [{ name: since, in: query, required: false, schema: { type: string, format: date } }], responses: { "200": { description: Funnel aggregate metrics }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" } } }
+
+  /api/dashboard/smoke-test:
+    get:
+      operationId: getSmokeTestRun
+      summary: Latest live smoke test run payload
+      tags: [Dashboard]
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Latest run data or null when no rows exist yet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  run:
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: string
+                      runId:
+                        type: integer
+                      status:
+                        type: string
+                      timestamp:
+                        type: string
+                        format: date-time
+                      durationMs:
+                        type: number
+                      triggeredBy:
+                        type: string
+                      checks:
+                        type: array
+                        items:
+                          type: object
+                  checks:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          description: Failed to read Smoke Test Runs
 
   /api/mastermind/aura-import:
     get: { operationId: getAuraImportStatus, summary: Aura scan import status, tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Import status }, "401": { $ref: "#/components/responses/Unauthorized" } } }

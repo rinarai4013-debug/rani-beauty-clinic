@@ -19,6 +19,7 @@ import FunnelHealthPanel from '@/components/dashboard/panels/FunnelHealthPanel';
 import BossLevelMilestone from '@/components/dashboard/gamification/BossLevelMilestone';
 import MorningBriefing from '@/components/dashboard/gamification/MorningBriefing';
 import DailyChallenges from '@/components/dashboard/gamification/DailyChallenges';
+import SmokeTestStatusCard from '@/app/(dashboard)/dashboard/_components/SmokeTestStatusCard';
 import { DashboardErrorBoundary, InlineError } from '@/components/dashboard/shared';
 import { useKPIs } from '@/hooks/useDashboardData';
 import type { KPIData } from '@/types/dashboard';
@@ -153,6 +154,8 @@ export default function ExecutiveHome() {
 
         {/* Save Queue */}
         <SaveQueuePanel />
+
+        <SmokeTestStatusCard />
 
         {/* Wins + Challenges + Boss Level */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
