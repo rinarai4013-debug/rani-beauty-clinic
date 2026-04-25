@@ -309,6 +309,33 @@ export async function getSessionByIdAsync(id: string): Promise<MastermindSession
 }
 
 /**
+ * Fetch a session with bounded retry/backoff — absorbs the Airtable
+ * read-after-write lag that surfaces as "session not found" when a
+ * follow-up call (plan/simulate) lands on a different Vercel Lambda than
+ * the one that wrote the session. Total budget: ~3.5s worst case.
+ *
+ * Callers that expect the session to exist (session was just created)
+ * should use this instead of getSessionByIdAsync.
+ */
+export async function getSessionByIdAsyncRetry(
+  id: string,
+  opts: { maxAttempts?: number; baseDelayMs?: number } = {},
+): Promise<MastermindSession | null> {
+  const maxAttempts = opts.maxAttempts ?? 5;
+  const baseDelayMs = opts.baseDelayMs ?? 150;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const session = await getSessionByIdAsync(id);
+    if (session) return session;
+    if (attempt === maxAttempts - 1) break;
+    const expo = Math.min(1500, baseDelayMs * 2 ** attempt);
+    const jitter = Math.random() * 0.3 * expo;
+    await new Promise((r) => setTimeout(r, expo + jitter));
+  }
+  return null;
+}
+
+/**
  * Hydrate a parsed session with defaults for missing fields.
  * Prevents crashes when loading sessions saved by older code
  * that didn't have all fields.
@@ -397,17 +424,36 @@ export async function saveSessionAsync(session: MastermindSession): Promise<void
   sessions.set(session.id, session);
 
   if (typeof window === 'undefined') {
-    try {
-      const { saveSessionToAirtable } = await import('./session-store');
-      await saveSessionToAirtable(session);
-    } catch (err) {
-      // Log as error — if this fails, session only exists in memory
-      // and will be lost on Vercel cold start
-      console.error(
-        `[Session] CRITICAL: Airtable save failed for session ${session.id} (phase: ${session.phase}, patient: ${session.patientName || 'unknown'})`,
-        err
-      );
-    }
+    const { saveSessionToAirtable } = await import('./session-store');
+    await saveSessionToAirtable(session);
+  }
+}
+
+/**
+ * Best-effort save that never throws — returns a classification so callers
+ * can still surface limit/timeout errors in the response body without
+ * failing the whole request.
+ */
+export async function saveSessionBestEffort(
+  session: MastermindSession,
+): Promise<{ ok: true } | { ok: false; kind: string; message: string }> {
+  sessions.set(session.id, session);
+  if (typeof window !== 'undefined') return { ok: true };
+  try {
+    const { saveSessionToAirtable } = await import('./session-store');
+    await saveSessionToAirtable(session);
+    return { ok: true };
+  } catch (err: unknown) {
+    const kind =
+      err && typeof err === 'object' && 'kind' in err
+        ? String((err as { kind: unknown }).kind)
+        : 'unknown';
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(
+      `[Session] Airtable save failed (kind=${kind}) for session ${session.id} (phase: ${session.phase})`,
+      err,
+    );
+    return { ok: false, kind, message };
   }
 }
 
@@ -487,5 +533,3 @@ function generateSessionId(): string {
   const random = Math.random().toString(36).slice(2, 8);
   return `ms_${timestamp}_${random}`;
 }
-
-

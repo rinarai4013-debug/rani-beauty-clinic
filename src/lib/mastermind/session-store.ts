@@ -22,6 +22,81 @@ const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
 const TABLE_NAME = 'Automation%20Log';
 const WORKFLOW_KEY = 'mastermind_session';
 
+/**
+ * Typed error class for Airtable write failures.
+ *
+ * `kind: "limit"` — the workspace/base/table is over its record cap. This is
+ * an OPERATOR problem (upgrade the plan) that callers must surface to the
+ * user rather than silently swallow. The session is still readable in memory
+ * for this invocation but will NOT survive the next cold start.
+ *
+ * `kind: "timeout"` — Airtable did not respond in our 8s budget. Likely
+ * transient; caller should still surface rather than false-success.
+ *
+ * `kind: "http"` — any other non-2xx response.
+ *
+ * `kind: "unknown"` — exceptions we could not classify.
+ */
+export type SessionStoreErrorKind = 'limit' | 'timeout' | 'http' | 'unknown';
+
+export class SessionStoreError extends Error {
+  readonly kind: SessionStoreErrorKind;
+  readonly status?: number;
+  readonly bodySnippet?: string;
+  readonly airtableErrorType?: string;
+  readonly operation: 'create' | 'update' | 'read' | 'delete';
+  readonly sessionId: string;
+
+  constructor(opts: {
+    kind: SessionStoreErrorKind;
+    operation: 'create' | 'update' | 'read' | 'delete';
+    sessionId: string;
+    status?: number;
+    bodySnippet?: string;
+    airtableErrorType?: string;
+    message: string;
+  }) {
+    super(opts.message);
+    this.name = 'SessionStoreError';
+    this.kind = opts.kind;
+    this.operation = opts.operation;
+    this.sessionId = opts.sessionId;
+    this.status = opts.status;
+    this.bodySnippet = opts.bodySnippet;
+    this.airtableErrorType = opts.airtableErrorType;
+  }
+}
+
+const LIMIT_ERROR_TYPES = new Set([
+  'LIMIT_CHECK_TOO_MANY_RECORDS_IN_TABLE',
+  'TOO_MANY_RECORDS_IN_BASE',
+  'INVALID_RECORDS_LIMIT_REACHED',
+]);
+
+/**
+ * Classify an Airtable error response body into a typed kind.
+ * Accepts both raw JSON string and parsed object.
+ */
+export function classifyAirtableError(body: unknown): {
+  kind: SessionStoreErrorKind;
+  airtableErrorType?: string;
+} {
+  let parsed: any = body;
+  if (typeof body === 'string') {
+    try { parsed = JSON.parse(body); } catch { /* keep as string */ }
+  }
+  const errorType =
+    parsed && typeof parsed === 'object' && parsed.error && typeof parsed.error === 'object'
+      ? (parsed.error.type as string | undefined)
+      : parsed && typeof parsed === 'object' && typeof parsed.error === 'string'
+        ? (parsed.error as string)
+        : undefined;
+
+  if (errorType && LIMIT_ERROR_TYPES.has(errorType)) return { kind: 'limit', airtableErrorType: errorType };
+  if (errorType) return { kind: 'http', airtableErrorType: errorType };
+  return { kind: 'http' };
+}
+
 function getAirtablePat(): string | null {
   return process.env.AIRTABLE_PAT || null;
 }
@@ -85,6 +160,14 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
   }
   const cached = cache.get(session.id);
 
+  /**
+   * Incident 2026-04-19 hardening: previously any non-2xx response here was
+   * logged-and-swallowed, so the API route returned `{ success: true }` to
+   * the client while the session never actually landed in Airtable. Now any
+   * non-2xx (especially Airtable's `TOO_MANY_RECORDS_IN_BASE` 422) throws a
+   * typed `SessionStoreError` so the caller can decide whether to surface.
+   */
+  let persistedError: SessionStoreError | null = null;
   try {
     if (cached?.recordId) {
       // Update existing record
@@ -103,7 +186,16 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
       });
       if (!res.ok) {
         const errBody = await res.text().catch(() => '');
-        console.error(`[SessionStore] PATCH failed (${res.status}):`, errBody);
+        const { kind, airtableErrorType } = classifyAirtableError(errBody);
+        persistedError = new SessionStoreError({
+          kind,
+          operation: 'update',
+          sessionId: session.id,
+          status: res.status,
+          bodySnippet: errBody.slice(0, 300),
+          airtableErrorType,
+          message: `[SessionStore] PATCH failed (${res.status}) ${airtableErrorType ?? ''}`.trim(),
+        });
       }
     } else {
       // Check if record exists (from a previous cold start)
@@ -125,7 +217,16 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
         });
         if (!res.ok) {
           const errBody = await res.text().catch(() => '');
-          console.error(`[SessionStore] PATCH (found) failed (${res.status}):`, errBody);
+          const { kind, airtableErrorType } = classifyAirtableError(errBody);
+          persistedError = new SessionStoreError({
+            kind,
+            operation: 'update',
+            sessionId: session.id,
+            status: res.status,
+            bodySnippet: errBody.slice(0, 300),
+            airtableErrorType,
+            message: `[SessionStore] PATCH (found) failed (${res.status}) ${airtableErrorType ?? ''}`.trim(),
+          });
         }
         cache.set(session.id, { session, recordId: existing.recordId });
       } else {
@@ -149,7 +250,16 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
         });
         if (!res.ok) {
           const errBody = await res.text().catch(() => '');
-          console.error(`[SessionStore] CREATE failed (${res.status}):`, errBody);
+          const { kind, airtableErrorType } = classifyAirtableError(errBody);
+          persistedError = new SessionStoreError({
+            kind,
+            operation: 'create',
+            sessionId: session.id,
+            status: res.status,
+            bodySnippet: errBody.slice(0, 300),
+            airtableErrorType,
+            message: `[SessionStore] CREATE failed (${res.status}) ${airtableErrorType ?? ''}`.trim(),
+          });
         } else {
           const data = await res.json();
           const recordId = data?.records?.[0]?.id;
@@ -162,15 +272,47 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
       }
     }
   } catch (err) {
-    console.error('[SessionStore] Airtable save failed:', err);
-    // Cache still has the session for this invocation
+    // AbortSignal.timeout throws a DOMException with name "TimeoutError".
+    if (err instanceof DOMException && err.name === 'TimeoutError') {
+      persistedError = new SessionStoreError({
+        kind: 'timeout',
+        operation: cached?.recordId ? 'update' : 'create',
+        sessionId: session.id,
+        message: '[SessionStore] Airtable save timed out after 8s',
+      });
+    } else {
+      persistedError = new SessionStoreError({
+        kind: 'unknown',
+        operation: cached?.recordId ? 'update' : 'create',
+        sessionId: session.id,
+        message: `[SessionStore] Airtable save failed: ${err instanceof Error ? err.message : String(err)}`,
+      });
+    }
   }
 
-  // Always update in-memory cache
+  // Always update in-memory cache — the session is still usable for this
+  // invocation even if Airtable persistence failed. This preserves the old
+  // behavior that callers who swallow the error still observe.
   if (!cache.has(session.id)) {
     cache.set(session.id, { session, recordId: '' });
   } else {
     cache.get(session.id)!.session = session;
+  }
+
+  if (persistedError) {
+    // Structured log for ops — easy to grep and alert on.
+    console.error(
+      JSON.stringify({
+        event: 'session_store.save_failed',
+        kind: persistedError.kind,
+        operation: persistedError.operation,
+        sessionId: persistedError.sessionId,
+        status: persistedError.status,
+        airtableErrorType: persistedError.airtableErrorType,
+        bodySnippet: persistedError.bodySnippet,
+      }),
+    );
+    throw persistedError;
   }
 }
 

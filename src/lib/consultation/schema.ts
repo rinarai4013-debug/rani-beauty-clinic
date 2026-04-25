@@ -220,26 +220,79 @@ export type ConsultationFormData = z.infer<typeof fullSchema>;
 
 /**
  * Server-side submit schema — what `/api/consultation/submit` validates
- * against after it parses the multipart `data` field. Photos travel
- * separately as binary multipart parts, so this schema drops step 7
- * (which uses `z.instanceof(File)` and wouldn't survive JSON transit
- * anyway) and is `.partial()` so users who bail out mid-wizard don't
- * get 422'd — the route still enforces what it actually needs (name,
- * email) at the handler level.
- *
- * Tier 1 zod upgrade (2026-04-11): replaced the previous
- * `z.record(z.unknown())` payload schema, which was accepting
- * arbitrary shapes and relying on `as Partial<...>` casts downstream.
+ * against after it parses the multipart `data` field.
  */
-export const submitIntakeSchema = step1Schema
-  .merge(step2Schema)
-  .merge(step3Schema)
-  .merge(step4Schema)
-  .merge(step5Schema)
-  .merge(step6Schema)
-  .merge(step8Schema)
-  .partial()
+const submitCore = z
+  .object({
+    firstName: z.string().max(80).optional(),
+    lastName: z.string().max(80).optional(),
+    email: z.string().email().optional(),
+    phone: z.string().max(40).optional(),
+    dob: z.string().optional(),
+    age: z.number().int().min(0).max(130).optional(),
+    contactPreference: z.string().optional(),
+    referralSource: z.string().optional(),
+
+    // Free-form arrays — each site uses its own vocabulary; we store
+    // whatever the caller sent so downstream AI prompts see the raw
+    // signal, and only enforce that every entry is a reasonable string.
+    skinConcerns: z.array(z.string().max(80)).max(30).optional(),
+    targetAreas: z.array(z.string().max(80)).max(30).optional(),
+    treatmentInterests: z.array(z.string().max(80)).max(40).optional(),
+    concerns: z.array(z.string().max(80)).max(30).optional(),
+    previousTreatments: z.array(z.string().max(120)).max(30).optional(),
+
+    // `goals` can arrive as string or string[] depending on caller —
+    // accept both and coerce downstream.
+    goals: z.union([z.string().max(4000), z.array(z.string().max(200)).max(30)]).optional(),
+
+    hasUpcomingEvent: z.boolean().optional(),
+    eventDetails: z.string().max(500).optional(),
+    timeline: z.string().max(80).optional(),
+    budget: z.string().max(80).optional(),
+
+    treatmentHistory: z.string().max(4000).optional(),
+    medicalHistory: z.string().max(4000).optional(),
+    allergies: z.string().max(2000).optional(),
+    medications: z.string().max(2000).optional(),
+    hasAutoimmune: z.boolean().optional(),
+    hasAllergies: z.boolean().optional(),
+    hasMedications: z.boolean().optional(),
+    pregnant: z.boolean().optional(),
+    breastfeeding: z.boolean().optional(),
+    bloodThinners: z.boolean().optional(),
+    keloidHistory: z.boolean().optional(),
+    activeSkinInfection: z.boolean().optional(),
+    isotretinoinHistory: z.boolean().optional(),
+
+    // Clinical safety flags (NEW for F-03 — REQUIRED)
+    pancreatitisHistory: z.boolean().optional(),
+    thyroidCancerHistory: z.boolean().optional(),
+    medullaryThyroidCancerFamily: z.boolean().optional(),
+    gallbladderDisease: z.boolean().optional(),
+    severeDepression: z.boolean().optional(),
+    eatingDisorderHistory: z.boolean().optional(),
+    uncontrolledHypertension: z.boolean().optional(),
+
+    skinType: z.string().max(40).optional(),
+    skincareRoutine: z.string().max(80).optional(),
+    skincareAM: z.string().max(2000).optional(),
+    skincarePM: z.string().max(2000).optional(),
+    smokingAlcohol: z.string().max(40).optional(),
+    smokingStatus: z.string().max(40).optional(),
+    waterIntake: z.string().max(40).optional(),
+    sunProtectionHabit: z.string().max(40).optional(),
+    requiresLabWork: z.boolean().optional(),
+
+    preferredDays: z.array(z.string().max(20)).max(14).optional(),
+    preferredTime: z.string().max(40).optional(),
+
+    clinicalNotes: z.string().max(4000).optional(),
+    smsConsent: z.boolean().optional(),
+  })
   .passthrough();
+
+export const submitIntakeSchema = submitCore;
 
 /** Validate a single step's data. Returns { success, errors } */
 export function validateStep(
