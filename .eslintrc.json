@@ -1,6 +1,10 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": ["next/core-web-vitals"],
   "rules": {
-    "@next/next/no-img-element": "error"
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "prefer-const": "warn",
+    "@next/next/no-img-element": "error",
+    "@next/next/no-assign-module-variable": "warn"
   }
 }
