@@ -56,7 +56,7 @@ export default function RxProgramEnrollmentPage({
         {!intakeFormUrl && (
           <p className="mt-4 text-sm text-white/70">
             Intake form URL is not configured yet. Use the contact option above
-            or call {clinicInfo.phoneDisplay}.
+            or call {clinicInfo.phone}.
           </p>
         )}
       </section>
