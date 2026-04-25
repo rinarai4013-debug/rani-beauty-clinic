@@ -188,6 +188,16 @@ export const IntakeIntelligenceSchema = z.object({
   'Processing Date': dateString,
 }).passthrough();
 
+export const RxProgramEnrollmentSchema = z.object({
+  program_id: z.string().optional(),
+  patient_id: z.string().optional(),
+  intake_date: dateString,
+  consult_scheduled_date: z.string().optional(),
+  prescription_status: z.string().optional(),
+  pharmacy: z.string().optional(),
+  monthly_billing_status: z.string().optional(),
+}).passthrough();
+
 // ─── Schema registry ──────────────────────────────────────────────────────────
 
 const SCHEMA_MAP: Record<string, z.ZodType> = {
@@ -203,6 +213,7 @@ const SCHEMA_MAP: Record<string, z.ZodType> = {
   'Alerts': AlertSchema,
   'Competitor Intelligence': CompetitorIntelligenceSchema,
   'Intake Intelligence': IntakeIntelligenceSchema,
+  'Rx Program Enrollments': RxProgramEnrollmentSchema,
 };
 
 export type TableName = keyof typeof SCHEMA_MAP;

@@ -19,6 +19,7 @@ import { staggerItem } from "@/components/animations/StaggerChildren";
 import { getServiceImage } from "@/data/service-images";
 import { galleryPages } from "@/data/results/gallery";
 import { testimonials } from "@/data/testimonials";
+import { getRxProgramPrimaryCta } from "@/lib/rx-programs";
 import { getConcernsForService, getComparisonsForService } from "@/data/internal-links";
 import { UNIFIED_CATALOG, type UnifiedService } from "@/data/services/unified-catalog";
 
@@ -166,6 +167,11 @@ export default function ServicePageTemplate({
     : "https://www.ranibeautyclinic.com/images/logo/logo-dark.png";
   const schemaPhone = clinicInfo.phoneTel.replace("tel:", "");
   const medicalReviewDate = clinicInfo.contentReviewDate ?? "April 18, 2026";
+  const primaryCta =
+    getRxProgramPrimaryCta(service.slug, Boolean(service.isWellness)) ?? {
+      text: "Book This Treatment",
+      href: clinicInfo.booking.url,
+    };
 
   // Catalog lookup — pulls pricing, concerns, duration, sessions, and body areas
   // so we can emit a rich MedicalProcedure + Offer pair that LLMs cite.
@@ -358,7 +364,7 @@ export default function ServicePageTemplate({
       <Hero
         title={service.title}
         subtitle={service.heroDescription}
-        primaryCTA={{ text: "Book This Treatment", href: clinicInfo.booking.url }}
+        primaryCTA={primaryCta}
         badge={`Supervised by ${clinicInfo.medicalDirector.name}, ${clinicInfo.medicalDirector.specialty}`}
         backgroundImage={serviceImageData?.image || undefined}
         backgroundOverlay={65}
