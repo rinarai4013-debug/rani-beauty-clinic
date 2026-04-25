@@ -17,10 +17,12 @@
     "typecheck": "tsc --noEmit",
     "compliance:audit": "node scripts/compliance-audit.js",
     "openapi:lint": "redocly lint openapi.yaml",
+    "openapi:parity": "node scripts/openapi/check-route-parity.mjs",
     "remotion:studio": "npx remotion studio remotion/index.ts",
     "remotion:render": "npx remotion render remotion/index.ts",
     "remotion:render:all": "npx remotion render remotion/index.ts --all",
-    "test:route-parity": "node scripts/tests/check-api-route-test-parity.mjs"
+    "seo:guardrails": "node scripts/seo/check-seo-geo-guardrails.mjs",
+    "test:route-parity": "node scripts/openapi/check-route-parity.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
