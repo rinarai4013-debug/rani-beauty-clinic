@@ -1989,6 +1989,9 @@ paths:
     get: { operationId: getAuraImportStatus, summary: Aura scan import status, tags: [Mastermind], security: [{ SessionCookie: [] }], responses: { "200": { description: Import status }, "401": { $ref: "#/components/responses/Unauthorized" } } }
     post: { operationId: importAuraScan, summary: Import Aura 3D scan, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object } } } }, responses: { "200": { description: Import result }, "401": { $ref: "#/components/responses/Unauthorized" } } }
 
+  /api/mastermind/aura-import/pdf:
+    post: { operationId: importAuraPdf, summary: Import Aura scan PDF handout, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } } } } }, responses: { "200": { description: Aura PDF parsed }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "413": { description: PDF exceeds size limit }, "422": { description: PDF parsed but no Aura metrics found } } }
+
   /api/mastermind/complete:
     post: { operationId: completeMastermind, summary: Complete mastermind session, tags: [Mastermind], security: [{ SessionCookie: [] }], requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { sessionId: { type: string } }, required: [sessionId] } } } }, responses: { "200": { description: Session completed }, "401": { $ref: "#/components/responses/Unauthorized" }, "500": { $ref: "#/components/responses/InternalError" } } }
 
