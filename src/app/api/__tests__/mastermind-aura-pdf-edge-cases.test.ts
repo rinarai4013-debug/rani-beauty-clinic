@@ -33,6 +33,7 @@ vi.mock('@/lib/mastermind/pdf-storage', () => ({
 }));
 
 vi.mock('@/lib/auth/session', () => ({
+  getSessionFromRequest: (...args: unknown[]) => getSessionMock(...args),
   getSession: (...args: unknown[]) => getSessionMock(...args),
 }));
 
