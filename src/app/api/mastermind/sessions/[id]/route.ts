@@ -8,7 +8,11 @@
 
 import { NextRequest } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import {
+  getSessionByIdAsyncRetry,
+  saveSessionAsync,
+  sessionReducer,
+} from '@/lib/mastermind/session';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { MastermindSessionAction, PlanModification } from '@/types/mastermind';
@@ -23,12 +27,16 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       if (!authSession) {
         return unauthorized();
       }
-      if (authSession.role !== 'ceo' && authSession.role !== 'provider') {
+      if (
+        authSession.role !== 'ceo' &&
+        authSession.role !== 'provider' &&
+        authSession.role !== 'operations'
+      ) {
         return forbidden();
       }
 
       const { id } = await params;
-      const session = await getSessionByIdAsync(id);
+      const session = await getSessionByIdAsyncRetry(id);
 
       if (!session) {
         return apiError('Session not found', 404);
@@ -50,12 +58,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (!authSession) {
         return unauthorized();
       }
-      if (authSession.role !== 'ceo' && authSession.role !== 'provider') {
+      if (
+        authSession.role !== 'ceo' &&
+        authSession.role !== 'provider' &&
+        authSession.role !== 'operations'
+      ) {
         return forbidden();
       }
 
       const { id } = await params;
-      const session = await getSessionByIdAsync(id);
+      const session = await getSessionByIdAsyncRetry(id);
 
       if (!session) {
         return apiError('Session not found', 404);

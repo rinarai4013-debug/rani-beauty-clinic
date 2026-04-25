@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getSessionFromRequestMock = vi.fn();
 const getSessionByIdAsyncMock = vi.fn();
+const getSessionByIdAsyncRetryMock = vi.fn();
 const saveSessionAsyncMock = vi.fn();
 const sessionReducerMock = vi.fn();
 const unauthorizedMock = vi.fn(
@@ -28,6 +29,7 @@ vi.mock('@/lib/auth/session', () => ({
 
 vi.mock('@/lib/mastermind/session', () => ({
   getSessionByIdAsync: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
+  getSessionByIdAsyncRetry: (...args: unknown[]) => getSessionByIdAsyncRetryMock(...args),
   saveSessionAsync: (...args: unknown[]) => saveSessionAsyncMock(...args),
   sessionReducer: (...args: unknown[]) => sessionReducerMock(...args),
 }));
@@ -105,7 +107,7 @@ function post(url: string, body: unknown): Request {
   });
 }
 
-describe('mastermind scan + plan + consent + follow-up routes', () => {
+  describe('mastermind scan + plan + consent + follow-up routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -131,6 +133,7 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
       activityLog: [],
       clinicNotes: '',
     });
+    getSessionByIdAsyncRetryMock.mockImplementation((...args: unknown[]) => getSessionByIdAsyncMock(...args));
 
     sessionReducerMock.mockImplementation((session: unknown) => session);
     saveSessionAsyncMock.mockResolvedValue(undefined);
@@ -571,4 +574,3 @@ describe('mastermind scan + plan + consent + follow-up routes', () => {
     );
   });
 });
-

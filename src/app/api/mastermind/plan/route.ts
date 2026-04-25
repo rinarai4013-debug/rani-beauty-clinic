@@ -11,7 +11,7 @@ import { getSessionFromRequest } from '@/lib/auth/session';
 import { generateMastermindPlan } from '@/lib/mastermind/plan-generator';
 import { generateAIPlan } from '@/lib/mastermind/ai-plan-generator';
 import { mockMastermindPlan } from '@/lib/mastermind/mock-data';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { AuraScanResult } from '@/types/mastermind';
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       // If sessionId provided, load scan + intake from persisted session
       let session = null;
       if (sessionId) {
-        session = await getSessionByIdAsync(sessionId);
+        session = await getSessionByIdAsyncRetry(sessionId);
         if (!session) {
           return apiError('Session not found', 404);
         }
