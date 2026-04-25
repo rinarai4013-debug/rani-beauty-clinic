@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import {
   Loader2,
   CalendarDays,
@@ -348,9 +349,12 @@ export default function TreatmentsPage() {
                     {beforeEntries.length > 0 ? (
                       beforeEntries.map((photo) => (
                         <div key={photo.id} className="relative group rounded-lg overflow-hidden border border-rani-navy/10">
-                          <img
+                          <Image
                             src={photo.dataUrl}
                             alt="Before"
+                            width={768}
+                            height={1024}
+                            unoptimized
                             className="w-full aspect-[3/4] object-cover"
                           />
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2">
@@ -380,9 +384,12 @@ export default function TreatmentsPage() {
                     {afterEntries.length > 0 ? (
                       afterEntries.map((photo) => (
                         <div key={photo.id} className="relative group rounded-lg overflow-hidden border border-rani-navy/10">
-                          <img
+                          <Image
                             src={photo.dataUrl}
                             alt="After"
+                            width={768}
+                            height={1024}
+                            unoptimized
                             className="w-full aspect-[3/4] object-cover"
                           />
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2">

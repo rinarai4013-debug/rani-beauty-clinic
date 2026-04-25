@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   Download,
@@ -198,10 +199,12 @@ export default function ShareableResult({
               Before
             </div>
             {originalUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={originalUrl}
                 alt="Original photo"
+                width={900}
+                height={900}
+                unoptimized
                 className="w-full aspect-square object-cover"
               />
             ) : (
@@ -212,10 +215,12 @@ export default function ShareableResult({
             <div className="absolute top-3 left-3 bg-[#C9A96E] text-white text-xs font-semibold px-3 py-1 rounded-full z-10">
               After
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={simulatedPhoto}
               alt="Simulated result"
+              width={900}
+              height={900}
+              unoptimized
               className="w-full aspect-square object-cover"
             />
           </div>

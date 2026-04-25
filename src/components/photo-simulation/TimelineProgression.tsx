@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Sparkles, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 import { applyClientSideFilters } from '@/lib/photo-simulation/ai-simulation';
@@ -360,13 +361,15 @@ export default function TimelineProgression({
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4 }}
-                      className="absolute inset-0"
+                      className="absolute inset-0 relative"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <NextImage
                         src={sim.imageUrl}
                         alt={`Projected results at ${panel.label}`}
-                        className="w-full h-full object-cover"
+                        fill
+                        unoptimized
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover"
                       />
                     </motion.div>
                   ) : null}

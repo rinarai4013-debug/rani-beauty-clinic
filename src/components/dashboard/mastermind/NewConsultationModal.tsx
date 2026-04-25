@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import Image from 'next/image';
 import {
   X, Loader2, Sparkles, Upload, Camera, Check, ChevronLeft, ChevronRight,
   User, Heart, Stethoscope, Clock, ImageIcon,
@@ -599,9 +600,12 @@ function PhotoDropZone({
                     <div className="text-[8px] text-[#F8F6F1]/50 mt-0.5 px-1 truncate max-w-[76px]">{f.name}</div>
                   </div>
                 ) : (
-                  <img
+                  <Image
                     src={previewUrls[i] || ''}
                     alt={`Upload ${i + 1}`}
+                    width={80}
+                    height={80}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 )}

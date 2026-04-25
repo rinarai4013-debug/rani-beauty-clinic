@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 interface ResultsSliderProps {
@@ -68,16 +69,30 @@ export default function ResultsSlider({
       onTouchEnd={handleTouchEnd}
     >
       {/* After image (full background) */}
-      <div className="absolute inset-0">
-        <img src={afterImage} alt={afterLabel} className="w-full h-full object-cover" />
+      <div className="absolute inset-0 relative">
+        <Image
+          src={afterImage}
+          alt={afterLabel}
+          fill
+          unoptimized
+          sizes="100vw"
+          className="object-cover"
+        />
       </div>
 
       {/* Before image (clipped) */}
       <div
-        className="absolute inset-0 overflow-hidden"
+        className="absolute inset-0 overflow-hidden relative"
         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
       >
-        <img src={beforeImage} alt={beforeLabel} className="w-full h-full object-cover" />
+        <Image
+          src={beforeImage}
+          alt={beforeLabel}
+          fill
+          unoptimized
+          sizes="100vw"
+          className="object-cover"
+        />
       </div>
 
       {/* Slider line */}

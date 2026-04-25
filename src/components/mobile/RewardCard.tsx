@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Gift, Lock, Coins } from 'lucide-react';
 import type { RewardItem } from '@/types/mobile';
 
@@ -24,9 +25,12 @@ export default function RewardCard({ reward, userPoints, onRedeem }: RewardCardP
       {/* Image or placeholder */}
       <div className="w-full h-24 rounded-xl bg-gradient-to-br from-[#C9A96E]/10 to-rani-cream flex items-center justify-center mb-3">
         {reward.image ? (
-          <img
+          <Image
             src={reward.image}
             alt={reward.name}
+            width={384}
+            height={96}
+            unoptimized
             className="w-full h-full object-cover rounded-xl"
           />
         ) : (
