@@ -19,7 +19,8 @@
     "openapi:lint": "redocly lint openapi.yaml",
     "remotion:studio": "npx remotion studio remotion/index.ts",
     "remotion:render": "npx remotion render remotion/index.ts",
-    "remotion:render:all": "npx remotion render remotion/index.ts --all"
+    "remotion:render:all": "npx remotion render remotion/index.ts --all",
+    "test:route-parity": "node scripts/tests/check-api-route-test-parity.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
