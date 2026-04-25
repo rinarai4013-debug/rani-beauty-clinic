@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { GET, dynamic, revalidate } from './route';
 
 describe('/api/dashboard/smoke-test route module', () => {
-  it('exports a GET handler with force-dynamic config', async () => {
-    const mod = await import('../route');
-    expect(typeof mod.GET).toBe('function');
-    expect(mod.dynamic).toBe('force-dynamic');
-    expect(mod.revalidate).toBe(0);
+  it('exports handler and dynamic directives', () => {
+    expect(typeof GET).toBe('function');
+    expect(dynamic).toBe('force-dynamic');
+    expect(revalidate).toBe(0);
   });
 });
