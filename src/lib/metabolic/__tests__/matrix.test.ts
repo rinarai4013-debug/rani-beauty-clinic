@@ -99,6 +99,30 @@ describe('generateMetabolicRecommendation', () => {
     expect(rec.riskFlags.length).toBeGreaterThan(0);
   });
 
+  it('blocks glp1 for gallbladder disease and sets provider-review-required', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, gallbladderDisease: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    expect(rec.blockedTracks).toContain('glp1');
+    expect(rec.status).toBe('provider-review-required');
+    expect(rec.riskFlags.some((flag) => /gallbladder/i.test(flag))).toBe(true);
+  });
+
+  it('blocks glp1 for severe depression and sets provider-review-required', () => {
+    const intake = makeIntake({
+      goals: ['weight-loss'],
+      symptoms: ['appetite-dysregulation'],
+      medicalFlags: { ...makeIntake().medicalFlags, severeDepression: true },
+    });
+    const rec = generateMetabolicRecommendation(intake);
+    expect(rec.blockedTracks).toContain('glp1');
+    expect(rec.status).toBe('provider-review-required');
+    expect(rec.riskFlags.some((flag) => /depression/i.test(flag))).toBe(true);
+  });
+
   it('sets ineligible when all 3 tracks are blocked', () => {
     const intake = makeIntake({
       goals: ['weight-loss'],

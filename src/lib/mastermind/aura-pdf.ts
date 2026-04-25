@@ -91,6 +91,20 @@ function extractTextFallback(bytes: Uint8Array, maxChars: number): string {
   return normalized.replace(/\s{2,}/g, ' ').trim().slice(0, maxChars);
 }
 
+function looksLikeStructuredPdf(bytes: Uint8Array): boolean {
+  if (bytes.length < 4096) return false;
+
+  const head = Buffer.from(bytes.subarray(0, Math.min(bytes.length, 1024 * 1024))).toString('latin1');
+  const tailStart = Math.max(0, bytes.length - 256 * 1024);
+  const tail = Buffer.from(bytes.subarray(tailStart)).toString('latin1');
+  const sample = `${head}\n${tail}`;
+
+  const hasPdfHeader = /^%PDF-\d\.\d/.test(head);
+  const hasEofMarker = /%%EOF/.test(tail) || /%%EOF/.test(sample);
+  const hasStructuralHints = /\/Type\s*\/Page|\/Catalog|\/Pages|stream|endobj/i.test(sample);
+  return hasPdfHeader && hasEofMarker && hasStructuralHints;
+}
+
 function parseFloatSafe(raw: string): number | null {
   const parsed = Number.parseFloat(raw);
   return Number.isFinite(parsed) ? parsed : null;
@@ -201,6 +215,15 @@ export async function extractAuraPdfInsights(
   const hasAuraKeyword = AURA_KEYWORD_RE.test(text);
 
   if (!hasAnyScore && !hasAuraKeyword) {
+    if (looksLikeStructuredPdf(bytes)) {
+      return {
+        textSummary: text.slice(0, 6000),
+        absoluteScores: {},
+        peerScores: {},
+        peerSkinScore: null,
+        provenance: pdfFile.name || 'aura-handout.pdf',
+      };
+    }
     return null;
   }
 

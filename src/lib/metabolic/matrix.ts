@@ -167,6 +167,12 @@ interface TrackProfile {
   blockReason?: string;
 }
 
+function appendBlockReason(existing: string | undefined, next: string): string {
+  if (!existing) return next;
+  if (existing.includes(next)) return existing;
+  return `${existing} ${next}`;
+}
+
 function buildTrackProfiles(intake: MetabolicIntake): Record<MetabolicTrack, TrackProfile> {
   const symptoms = new Set(intake.symptoms);
   const goals = new Set(intake.goals);
@@ -208,11 +214,38 @@ function buildTrackProfiles(intake: MetabolicIntake): Record<MetabolicTrack, Tra
   }
 
   if (flags.thyroidCancerHistory || flags.pancreatitisHistory) {
-    profile.glp1.blockReason = 'Thyroid cancer/pancreatitis history blocks automatic GLP-1 protocol assignment.';
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Thyroid cancer/pancreatitis history blocks automatic GLP-1 protocol assignment.',
+    );
+  }
+
+  if (flags.gallbladderDisease) {
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Gallbladder disease history requires physician clearance before GLP-1 assignment.',
+    );
+  }
+
+  if (flags.uncontrolledHypertension) {
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Uncontrolled hypertension requires physician clearance before GLP-1 assignment.',
+    );
+  }
+
+  if (flags.severeDepression) {
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Severe depression history requires physician clearance before GLP-1 assignment.',
+    );
   }
 
   if (flags.eatingDisorderHistory) {
-    profile.glp1.blockReason = 'Eating disorder history requires physician clearance before appetite-suppressing protocols.';
+    profile.glp1.blockReason = appendBlockReason(
+      profile.glp1.blockReason,
+      'Eating disorder history requires physician clearance before appetite-suppressing protocols.',
+    );
   }
 
   return profile;

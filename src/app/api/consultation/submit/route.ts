@@ -40,6 +40,7 @@ import { SessionStoreError } from '@/lib/mastermind/session-store';
 
 const MAX_PHOTO_WIDTH = 1200;
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB each
+const MAX_AURA_PDF_SIZE = 10 * 1024 * 1024; // 10MB per Aura PDF
 const MAX_PHOTOS = 5;
 const MAX_TOTAL_UPLOAD_SIZE = 30 * 1024 * 1024; // 30MB total
 const MAX_JSON_REQUEST_BYTES = 512 * 1024;
@@ -689,6 +690,16 @@ export async function POST(request: NextRequest) {
             error: 'Aura uploads must be PDF only. Upload images as skin photos.',
           },
           { status: 400 },
+        );
+      }
+      const oversizedAuraFile = auraFiles.find((file) => isPdfUpload(file) && file.size > MAX_AURA_PDF_SIZE);
+      if (oversizedAuraFile) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Aura PDF exceeds ${Math.round(MAX_AURA_PDF_SIZE / (1024 * 1024))}MB upload limit`,
+          },
+          { status: 413 },
         );
       }
       let auraUploadStatus: string | null = null;
