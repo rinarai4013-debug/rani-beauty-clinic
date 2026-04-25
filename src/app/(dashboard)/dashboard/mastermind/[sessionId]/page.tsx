@@ -695,7 +695,7 @@ export default function MastermindSessionPage() {
               <ActionButton
                 onClick={handleGenerateSimulation}
                 loading={actionLoading}
-                icon={Image}
+                  icon={ImageIcon}
                 label="Generate Simulation"
                 variant="primary"
               />
@@ -1129,7 +1129,7 @@ export default function MastermindSessionPage() {
                   {
                     id: 'simulation' as const,
                     label: 'Simulation',
-                    icon: Image,
+                  icon: ImageIcon,
                     available: hasSimulation,
                   },
                   { id: 'copilot' as const, label: 'Copilot', icon: Sparkles, available: true },
