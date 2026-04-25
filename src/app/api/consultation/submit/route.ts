@@ -729,9 +729,14 @@ export async function POST(request: NextRequest) {
       }
       if (auraPdfFiles.length > 0) {
         const name = auraPdfFiles[0]?.name || 'document.pdf';
-        auraUploadStatus = auraPdfInsights
-          ? `Aura PDF received + parsed (${buildAuraPdfMetricsSummary(auraPdfInsights) || name})`
-          : `Aura PDF received (${name})`;
+        if (auraPdfInsights) {
+          auraUploadStatus = `Aura PDF received + parsed (${buildAuraPdfMetricsSummary(auraPdfInsights) || name})`;
+        } else {
+          auraUploadStatus = `Aura PDF received but not parsed (${name})`;
+          auraUploadWarnings.push(
+            `Aura PDF "${name}" did not contain recognizable Aura device scores. Continuing with intake-only fallback.`,
+          );
+        }
       }
 
       if (!auraPdfInsights && markerParse.markers.length > 0) {

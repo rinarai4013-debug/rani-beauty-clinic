@@ -91,20 +91,6 @@ function extractTextFallback(bytes: Uint8Array, maxChars: number): string {
   return normalized.replace(/\s{2,}/g, ' ').trim().slice(0, maxChars);
 }
 
-function looksLikeStructuredPdf(bytes: Uint8Array): boolean {
-  if (bytes.length < 4096) return false;
-
-  const head = Buffer.from(bytes.subarray(0, Math.min(bytes.length, 1024 * 1024))).toString('latin1');
-  const tailStart = Math.max(0, bytes.length - 256 * 1024);
-  const tail = Buffer.from(bytes.subarray(tailStart)).toString('latin1');
-  const sample = `${head}\n${tail}`;
-
-  const hasPdfHeader = /^%PDF-\d\.\d/.test(head);
-  const hasEofMarker = /%%EOF/.test(tail) || /%%EOF/.test(sample);
-  const hasStructuralHints = /\/Type\s*\/Page|\/Catalog|\/Pages|stream|endobj/i.test(sample);
-  return hasPdfHeader && hasEofMarker && hasStructuralHints;
-}
-
 function parseFloatSafe(raw: string): number | null {
   const parsed = Number.parseFloat(raw);
   return Number.isFinite(parsed) ? parsed : null;
@@ -205,29 +191,11 @@ export async function extractAuraPdfInsights(
   if (!text) return null;
 
   const insights = extractAuraPdfInsightsFromText(text, pdfFile.name || 'aura-handout.pdf');
-  if (!insights) return null;
+  if (insights) return insights;
 
-  const hasAnyScore =
-    Object.keys(insights.absoluteScores).length > 0 ||
-    Object.keys(insights.peerScores).length > 0 ||
-    insights.peerSkinScore !== null;
-  const AURA_KEYWORD_RE = /\b(Wrinkles|Texture|Brown Spots|Red Areas|Pores|Skin Score|Aura)\b/i;
-  const hasAuraKeyword = AURA_KEYWORD_RE.test(text);
-
-  if (!hasAnyScore && !hasAuraKeyword) {
-    if (looksLikeStructuredPdf(bytes)) {
-      return {
-        textSummary: text.slice(0, 6000),
-        absoluteScores: {},
-        peerScores: {},
-        peerSkinScore: null,
-        provenance: pdfFile.name || 'aura-handout.pdf',
-      };
-    }
-    return null;
-  }
-
-  return insights;
+  // A syntactically valid PDF is still not a parsed Aura handout unless we can
+  // extract at least one score. Callers can continue with intake fallback.
+  return null;
 }
 
 export function extractAuraPdfInsightsFromText(
@@ -248,6 +216,13 @@ export function extractAuraPdfInsightsFromText(
   }
 
   const peerSkinScore = parsePeerSkinScore(text);
+  const hasAnyScore =
+    Object.keys(absoluteScores).length > 0 ||
+    Object.keys(peerScores).length > 0 ||
+    peerSkinScore !== null;
+
+  if (!hasAnyScore) return null;
+
   return {
     textSummary: text.slice(0, 6000),
     absoluteScores,
