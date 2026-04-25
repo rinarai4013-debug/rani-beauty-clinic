@@ -1,0 +1,59 @@
+{
+  "description": "Smoke test run history for the live smoke-test cron.",
+  "tables": [
+    {
+      "name": "Smoke Test Runs",
+      "description": "Stores harness execution status for daily health monitoring.",
+      "fields": [
+        {
+          "name": "Run ID",
+          "type": "autoNumber",
+          "options": {
+            "isUnique": true
+          }
+        },
+        {
+          "name": "Timestamp",
+          "type": "date",
+          "options": {
+            "isDateTime": true,
+            "dateFormat": "YYYY-MM-DD",
+            "timeZone": "client"
+          }
+        },
+        {
+          "name": "Status",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              { "name": "Pass" },
+              { "name": "Fail" },
+              { "name": "Partial" }
+            ]
+          }
+        },
+        {
+          "name": "Checks JSON",
+          "type": "multilineText"
+        },
+        {
+          "name": "Duration ms",
+          "type": "number",
+          "options": {
+            "precision": 0
+          }
+        },
+        {
+          "name": "Triggered By",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              { "name": "manual" },
+              { "name": "cron" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
