@@ -75,7 +75,7 @@ export async function GET() {
 
   // Comparison pages — RESTORED: template built 2026-03-31
   for (const page of comparisonPages) {
-    entries.push(entry(`${baseUrl}/compare/${page.slug}`, `${page.treatmentA} vs ${page.treatmentB}`));
+    entries.push(entry(`${baseUrl}/vs/${page.slug}`, `${page.treatmentA} vs ${page.treatmentB}`));
   }
 
   // Skin concerns

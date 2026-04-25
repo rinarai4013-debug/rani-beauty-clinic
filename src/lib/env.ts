@@ -80,7 +80,7 @@ const envSchema = z.object({
 
   // Public runtime URLs / request policy
   NEXT_PUBLIC_BASE_URL: z.string().optional().default('https://www.ranibeautyclinic.com'),
-  NEXT_PUBLIC_SITE_URL: z.string().optional().default('https://ranibeautyclinic.com'),
+  NEXT_PUBLIC_SITE_URL: z.string().optional().default('https://www.ranibeautyclinic.com'),
   CORS_ALLOWED_ORIGINS: z.string().optional().default(''),
 
   // External services

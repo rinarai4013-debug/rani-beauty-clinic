@@ -163,7 +163,6 @@ export default function RootLayout({
                   medicalSpecialty: [
                     "Dermatology",
                     "CosmeticSurgery",
-                    "Medical-aesthetics",
                     "PlasticSurgery",
                   ],
                   address: {

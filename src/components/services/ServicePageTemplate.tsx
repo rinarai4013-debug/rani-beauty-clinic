@@ -222,7 +222,7 @@ export default function ServicePageTemplate({
       telephone: schemaPhone,
       url: clinicInfo.website,
       priceRange: "$$$",
-      medicalSpecialty: ["Dermatology", "CosmeticSurgery", "Medical-aesthetics"],
+      medicalSpecialty: ["Dermatology", "CosmeticSurgery"],
       address: {
         "@type": "PostalAddress",
         streetAddress: clinicInfo.address.street,

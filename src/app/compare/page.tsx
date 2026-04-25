@@ -47,7 +47,7 @@ export default function ComparePage() {
           <StaggerChildren className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {comparisonPages.map((page) => (
               <Card key={page.slug} className="!p-0">
-                <Link href={`/compare/${page.slug}`} className="group block p-6">
+                <Link href={`/vs/${page.slug}`} className="group block p-6">
                   <h3 className="font-body text-base font-bold text-rani-navy group-hover:text-rani-gold transition-colors">
                     {page.treatmentA} vs {page.treatmentB}
                   </h3>
