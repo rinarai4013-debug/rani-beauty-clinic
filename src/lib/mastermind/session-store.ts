@@ -21,6 +21,7 @@ import { sanitizeFormulaValue } from '@/lib/airtable/sanitize';
 const AIRTABLE_BASE = 'app1SwhSfwe8GKUg4';
 const TABLE_NAME = 'Automation%20Log';
 const WORKFLOW_KEY = 'mastermind_session';
+const MAX_PERSISTED_SOURCE_PHOTO_CHARS = 45_000;
 
 /**
  * Typed error class for Airtable write failures.
@@ -131,7 +132,7 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
   // Strip large base64 data before persisting to Airtable (100KB field limit)
   // Keep a placeholder so we know an image exists
   const stripped = { ...session };
-  if (stripped.sourcePhotoUrl && stripped.sourcePhotoUrl.length > 5000) {
+  if (stripped.sourcePhotoUrl && stripped.sourcePhotoUrl.length > MAX_PERSISTED_SOURCE_PHOTO_CHARS) {
     stripped.sourcePhotoUrl = '[base64_stripped]';
   }
   if (stripped.simulationComparison) {

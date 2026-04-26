@@ -84,6 +84,40 @@ function scaleCanvas(source: HTMLCanvasElement, factor: number): HTMLCanvasEleme
   return canvas;
 }
 
+function cropCanvas(
+  source: HTMLCanvasElement,
+  crop: { left: number; top: number; width: number; height: number }
+): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.floor(crop.width));
+  canvas.height = Math.max(1, Math.floor(crop.height));
+  const context = canvas.getContext('2d', { alpha: false });
+  if (!context) {
+    throw new Error('Failed to create canvas context for PDF crop');
+  }
+  context.drawImage(
+    source,
+    crop.left,
+    crop.top,
+    crop.width,
+    crop.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+  return canvas;
+}
+
+function resizeCanvasToFit(
+  source: HTMLCanvasElement,
+  maxDimension: number
+): HTMLCanvasElement {
+  const largerSide = Math.max(source.width, source.height);
+  if (largerSide <= maxDimension) return source;
+  return scaleCanvas(source, maxDimension / largerSide);
+}
+
 async function encodeCanvasToBudget(
   canvas: HTMLCanvasElement,
   maxBytes: number,
@@ -108,6 +142,15 @@ async function encodeCanvasToBudget(
 
   if (smallestBlob) return smallestBlob;
   return toBlob(canvas, Math.min(baseQuality, 0.72));
+}
+
+export function fileToDataUrl(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('Failed to read file as data URL'));
+    reader.readAsDataURL(file);
+  });
 }
 
 export async function convertPdfFirstPageToJpeg(
@@ -161,6 +204,50 @@ export async function convertPdfFirstPageToJpeg(
     throw lastError instanceof Error
       ? lastError
       : new Error('Failed to render Aura PDF page to image');
+  } finally {
+    await pdf.destroy?.();
+  }
+}
+
+export async function convertAuraPdfFaceToJpeg(
+  pdfFile: File,
+  options: PdfConvertOptions = {}
+): Promise<File> {
+  const maxDimension = options.maxDimension ?? 420;
+  const quality = options.quality ?? 0.66;
+  const maxBytes = options.maxBytes ?? 28 * 1024;
+  const pdf = await loadPdfDocument(pdfFile);
+
+  try {
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1.55 });
+    const pageCanvas = document.createElement('canvas');
+    pageCanvas.width = Math.max(1, Math.floor(viewport.width));
+    pageCanvas.height = Math.max(1, Math.floor(viewport.height));
+
+    const context = pageCanvas.getContext('2d', { alpha: false });
+    if (!context) {
+      throw new Error('Failed to create canvas context for Aura PDF face extraction');
+    }
+
+    await page.render({ canvasContext: context, viewport }).promise;
+
+    // Aura handouts place the neutral front-face image in a stable position on
+    // page 1. Cropping this region gives the simulator an actual face source
+    // while keeping the persisted data URL small enough for Airtable.
+    const crop = {
+      left: pageCanvas.width * 0.079,
+      top: pageCanvas.height * 0.323,
+      width: pageCanvas.width * 0.252,
+      height: pageCanvas.height * 0.186,
+    };
+    const faceCanvas = resizeCanvasToFit(cropCanvas(pageCanvas, crop), maxDimension);
+    const blob = await encodeCanvasToBudget(faceCanvas, maxBytes, quality);
+
+    return new File([blob], `${baseName(pdfFile.name)}-aura-face.jpg`, {
+      type: 'image/jpeg',
+      lastModified: Date.now(),
+    });
   } finally {
     await pdf.destroy?.();
   }

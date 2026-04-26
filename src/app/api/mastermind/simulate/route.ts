@@ -13,6 +13,10 @@ import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/li
 import { unauthorized } from '@/lib/auth/middleware';
 import { z } from 'zod';
 import { NON_RENDERABLE_IMAGE_MARKERS, isRenderableImageValue } from '@/lib/mastermind/image-markers';
+import {
+  isRenderableSourcePhoto,
+  renderPhotoSimulationFrameImage,
+} from '@/lib/mastermind/photo-simulation-renderer';
 import type { SimulationComparison, SimulationFrame } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -27,12 +31,7 @@ function isPersistableSourcePhoto(value: string | null | undefined): value is st
   const trimmed = value.trim();
   if (!trimmed) return false;
   if (NON_RENDERABLE_IMAGE_MARKERS.has(trimmed.toLowerCase())) return false;
-  // Large data URLs are stripped from Airtable persistence; keep frame image stable.
-  return (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('/')
-  );
+  return isRenderableSourcePhoto(trimmed);
 }
 
 function escapeSvgText(value: string): string {
@@ -98,11 +97,14 @@ function buildSimulationPlaceholderImage(
   };
 }
 
-function resolveFrameImage(
+async function resolveFrameImage(
   sourcePhotoUrl: string | null | undefined,
   trajectory: 'with' | 'without',
   frame: SimulationFrame,
-): { imageDataUrl: string; kind: SimulationFrame['kind'] } {
+): Promise<{ imageDataUrl: string; kind: SimulationFrame['kind'] }> {
+  const rendered = await renderPhotoSimulationFrameImage(sourcePhotoUrl, trajectory, frame);
+  if (rendered) return rendered;
+
   if (isPersistableSourcePhoto(sourcePhotoUrl)) {
     return { imageDataUrl: sourcePhotoUrl, kind: 'photo-simulation' };
   }
@@ -110,34 +112,34 @@ function resolveFrameImage(
   return { ...buildSimulationPlaceholderImage(trajectory, frame), kind: 'data-projection' };
 }
 
-function ensureFrameImages(
+async function ensureFrameImages(
   comparison: SimulationComparison,
   sourcePhotoUrl: string | null | undefined,
-): SimulationComparison {
+): Promise<SimulationComparison> {
   const mapFrames = (
   frames: SimulationFrame[],
   trajectory: 'with' | 'without',
-): SimulationFrame[] =>
-    frames.map((frame) => {
+): Promise<SimulationFrame[]> =>
+    Promise.all(frames.map(async (frame) => {
       const existingImage = typeof frame.imageDataUrl === 'string' ? frame.imageDataUrl : '';
       const existingKind = frame.kind;
       return {
         ...frame,
         ...(isRenderableImageValue(existingImage)
           ? { imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' }
-          : resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
+          : await resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
       };
-    });
+    }));
 
   return {
     ...comparison,
     withTreatment: {
       ...comparison.withTreatment,
-      frames: mapFrames(comparison.withTreatment.frames, 'with'),
+      frames: await mapFrames(comparison.withTreatment.frames, 'with'),
     },
     withoutTreatment: {
       ...comparison.withoutTreatment,
-      frames: mapFrames(comparison.withoutTreatment.frames, 'without'),
+      frames: await mapFrames(comparison.withoutTreatment.frames, 'without'),
     },
   };
 }
@@ -336,18 +338,18 @@ export async function POST(request: NextRequest) {
             concerns,
             planCost,
           );
-          result = ensureFrameImages(result, sessionPhoto);
+          result = await ensureFrameImages(result, sessionPhoto);
           renderMode = 'data-driven';
         } else {
           result = mockSimulationComparison();
-          result = ensureFrameImages(result, sessionPhoto);
+          result = await ensureFrameImages(result, sessionPhoto);
         }
 
         const updated = sessionReducer(session, { type: 'SET_SIMULATION', comparison: result });
         await saveSessionAsync(updated);
       } else {
         result = mockSimulationComparison();
-        result = ensureFrameImages(result, null);
+        result = await ensureFrameImages(result, null);
       }
 
       return NextResponse.json({

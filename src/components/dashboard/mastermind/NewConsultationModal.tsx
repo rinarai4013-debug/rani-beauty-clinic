@@ -7,7 +7,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { extractPdfTextSummary } from '@/lib/client/pdf-image';
+import {
+  convertAuraPdfFaceToJpeg,
+  extractPdfTextSummary,
+  fileToDataUrl,
+} from '@/lib/client/pdf-image';
 import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 
 // ══════════════════════════════════════════════════════════════
@@ -173,6 +177,7 @@ const SESSION_READY_RETRY_PATTERNS = /session not found|not found yet|not yet av
 // Keep multipart payload below common serverless body limits (Vercel hard-fails oversized bodies).
 const MAX_INITIAL_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
 const MAX_AURA_PDF_SUBMIT_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_PREVIEW_BYTES = 28 * 1024;
 const MAX_SKIN_UPLOAD_FILES = 5;
 const MAX_AURA_UPLOAD_FILES = 3;
 const AUTH_REDIRECT_SENTINEL = '__AUTH_REDIRECT__';
@@ -1077,8 +1082,8 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           `${oversizeAuraPdfs.length} Aura PDF file${oversizeAuraPdfs.length > 1 ? 's are' : ' is'} above direct upload limits and will be parsed client-side.`
         );
       }
-      let selectedSkinPhotos = [...skinPhotos];
-      let auraPayloadFiles = auraQueuedPdfs.filter(
+      const selectedSkinPhotos = [...skinPhotos];
+      const auraPayloadFiles = auraQueuedPdfs.filter(
         (file) => file.size <= MAX_AURA_PDF_SUBMIT_BYTES
       );
       const dropLargest = (files: File[]): File | null => {
@@ -1132,6 +1137,25 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       ]);
       const auraFallbackMarkers: string[] = [];
       const auraFallbackWarnings: string[] = [];
+      let auraPdfPreviewImage: string | undefined;
+
+      for (const previewPdf of buildUniqueFileSet(auraQueuedPdfs)) {
+        try {
+          const previewFile = await convertAuraPdfFaceToJpeg(previewPdf, {
+            maxDimension: 420,
+            quality: 0.66,
+            maxBytes: MAX_AURA_PREVIEW_BYTES,
+          });
+          const dataUrl = await fileToDataUrl(previewFile);
+          if (dataUrl.length <= 45_000) {
+            auraPdfPreviewImage = dataUrl;
+            auraNotes.push('Captured compact Aura face preview for photo projections.');
+            break;
+          }
+        } catch {
+          // Text metrics still carry the consult if the PDF image region cannot render.
+        }
+      }
 
       for (const fallbackPdf of fallbackPdfFiles) {
         try {
@@ -1221,6 +1245,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           budget: normalizedBudget,
 
           clinicalNotes: combinedClinicalNotes || undefined,
+          auraPdfPreviewImage,
         })
       );
 

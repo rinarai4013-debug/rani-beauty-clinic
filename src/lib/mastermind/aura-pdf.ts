@@ -4,6 +4,7 @@ import type {
   ConcernSeverity,
   ConcernUrgency,
   CategoryScore,
+  FacialZone,
 } from '@/types/mastermind';
 
 type PdfJsModule = {
@@ -232,15 +233,47 @@ export function extractAuraPdfInsightsFromText(
   };
 }
 
-function categoryKeyToConcern(category: AuraPdfCategory): string {
-  const mapping: Record<AuraPdfCategory, string> = {
+function categoryKeyToConcern(category: AuraPdfCategory): AuraScanResult['detectedConcerns'][number]['concern'] {
+  const mapping: Record<AuraPdfCategory, AuraScanResult['detectedConcerns'][number]['concern']> = {
     wrinkles: 'wrinkles',
     texture: 'texture',
     brownSpots: 'pigmentation',
     redAreas: 'redness',
-    pores: 'large-pores',
+    pores: 'pores',
   };
   return mapping[category];
+}
+
+function categoryKeyToZones(category: AuraPdfCategory): FacialZone[] {
+  const mapping: Record<AuraPdfCategory, FacialZone[]> = {
+    wrinkles: ['forehead', 'glabella', 'periorbital_left', 'periorbital_right'],
+    texture: ['cheeks_left', 'cheeks_right', 'forehead'],
+    brownSpots: ['cheeks_left', 'cheeks_right', 'forehead'],
+    redAreas: ['cheeks_left', 'cheeks_right'],
+    pores: ['cheeks_left', 'cheeks_right', 'chin'],
+  };
+  return mapping[category];
+}
+
+function auraPdfConcernDescription(
+  category: AuraPdfCategory,
+  severity: ConcernSeverity,
+  absolute: number,
+  provenance: string,
+): string {
+  const label = CATEGORY_LABELS[category];
+  return `${label} measured ${absolute}/5 (${severity}) on the Aura handout PDF (${provenance}).`;
+}
+
+function auraPdfClinicalNote(
+  category: AuraPdfCategory,
+  severity: ConcernSeverity,
+  absolute: number,
+  peer: number | undefined,
+): string {
+  const label = CATEGORY_LABELS[category];
+  const peerText = typeof peer === 'number' ? ` Peer comparison score: ${peer}.` : '';
+  return `${label} — ${severity} grade from Aura PDF absolute score ${absolute}/5.${peerText} Confirm visually during provider review before final treatment selection.`;
 }
 
 export function applyAuraPdfInsightsToScan(
@@ -281,15 +314,36 @@ export function applyAuraPdfInsightsToScan(
   for (const [category, absolute] of Object.entries(insights.absoluteScores) as Array<[AuraPdfCategory, number]>) {
     const concernKey = categoryKeyToConcern(category);
     const concern = next.detectedConcerns.find((item) =>
-      item.concern.toLowerCase() === concernKey || item.concern.toLowerCase().includes(concernKey)
+      item.concern === concernKey || item.concern.toLowerCase().includes(concernKey)
     );
-    if (!concern) continue;
     const severity = severityFromAbsolute(absolute);
+    const peer = insights.peerScores[category];
+    const score = Math.round(((absolute - 1) / 4) * 100);
+    const zones = categoryKeyToZones(category);
+    const description = auraPdfConcernDescription(category, severity, absolute, insights.provenance);
+    const clinicalNote = auraPdfClinicalNote(category, severity, absolute, peer);
+
+    if (!concern) {
+      next.detectedConcerns.push({
+        id: `aura_pdf_${category}`,
+        concern: concernKey,
+        severity,
+        urgency: urgencyFromSeverity(severity),
+        score,
+        zones,
+        trending: 'stable',
+        description,
+        clinicalNote,
+      });
+      continue;
+    }
+
     concern.severity = severity;
     concern.urgency = urgencyFromSeverity(severity);
-    concern.score = Math.round(((absolute - 1) / 4) * 100);
-    concern.description = `${concern.description} (validated from Aura handout PDF)`;
-    concern.clinicalNote = `${concern.clinicalNote} PDF absolute score: ${absolute}/5.`;
+    concern.score = score;
+    concern.zones = zones;
+    concern.description = description;
+    concern.clinicalNote = clinicalNote;
   }
 
   return next;

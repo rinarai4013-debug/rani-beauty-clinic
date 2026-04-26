@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { MastermindSession } from '@/types/mastermind';
-import { convertPdfFirstPageToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
+import { convertAuraPdfFaceToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
 import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 
 // ── TYPES ──
@@ -263,10 +263,10 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
         let sourcePhotoUrl: string | null = null;
         try {
-          const jpegPreview = await convertPdfFirstPageToJpeg(file, {
-            maxDimension: 1200,
-            quality: 0.76,
-            maxBytes: 420 * 1024,
+          const jpegPreview = await convertAuraPdfFaceToJpeg(file, {
+            maxDimension: 420,
+            quality: 0.66,
+            maxBytes: 28 * 1024,
           });
           sourcePhotoUrl = await fileToDataUrl(jpegPreview);
         } catch {

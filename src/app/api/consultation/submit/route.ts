@@ -46,6 +46,7 @@ const MAX_PHOTOS = 5;
 const MAX_TOTAL_UPLOAD_SIZE = 30 * 1024 * 1024; // 30MB total
 const MAX_JSON_REQUEST_BYTES = 512 * 1024;
 const MAX_MULTIPART_REQUEST_BYTES = 35 * 1024 * 1024;
+const MAX_INLINE_AURA_PREVIEW_CHARS = 45_000;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
 const LEGACY_CONCERN_MAP: Record<string, string[]> = {
@@ -578,6 +579,16 @@ function isPdfUpload(file: File): boolean {
   return type === 'application/pdf' || name.endsWith('.pdf');
 }
 
+function extractInlineAuraPreviewImage(payload: Record<string, unknown>): string | null {
+  const value = payload.auraPdfPreviewImage ?? payload.sourcePhotoUrl;
+  delete payload.auraPdfPreviewImage;
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (trimmed.length === 0 || trimmed.length > MAX_INLINE_AURA_PREVIEW_CHARS) return null;
+  if (!/^data:image\/(?:jpeg|jpg|png|webp);base64,[a-z0-9+/=\r\n]+$/i.test(trimmed)) return null;
+  return trimmed;
+}
+
 function buildAuraPdfMetricsSummary(insights: AuraPdfInsights): string {
   const parts: string[] = [];
   if (typeof insights.absoluteScores.wrinkles === 'number') {
@@ -678,6 +689,10 @@ export async function POST(request: NextRequest) {
       intakeData.clinicalNotes = markerParse.cleanedNotes;
 
       let sourcePhotoUrl: string | null = null;
+      const inlineAuraPreview = extractInlineAuraPreviewImage(intakeData as Record<string, unknown>);
+      if (inlineAuraPreview) {
+        sourcePhotoUrl = inlineAuraPreview;
+      }
       const photoEntries = formData ? formData.getAll('photos') : [];
       const auraEntries = formData ? formData.getAll('aura') : [];
       const photoFiles = photoEntries.filter((value): value is File => value instanceof File);
@@ -933,10 +948,6 @@ export async function POST(request: NextRequest) {
           if (useMock) {
             scanResult = mockAuraScanResult();
             source = 'mock';
-          } else if (auraPdfInsights && !sourcePhotoUrl) {
-            const ruleScan = await runAuraScan(intakeData);
-            scanResult = applyAuraPdfInsightsToScan(ruleScan, auraPdfInsights);
-            source = 'aura-pdf-fallback';
           } else if (useAIScan && sourcePhotoUrl) {
             const { runAIAuraScan } = await import('@/lib/mastermind/ai-aura-scan');
             scanResult = await runAIAuraScan(intakeData, sourcePhotoUrl || undefined);
@@ -947,6 +958,11 @@ export async function POST(request: NextRequest) {
           } else {
             scanResult = await runAuraScan(intakeData);
             source = 'engine';
+          }
+
+          if (auraPdfInsights) {
+            scanResult = applyAuraPdfInsightsToScan(scanResult, auraPdfInsights);
+            source = `${source}+aura-pdf`;
           }
 
           const scanned = sessionReducer(session, { type: 'SET_SCAN_RESULT', result: scanResult });

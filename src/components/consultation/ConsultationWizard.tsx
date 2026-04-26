@@ -35,7 +35,11 @@ import {
   shouldShowBodyMap,
   getRecommendedServices,
 } from '@/lib/consultation/conditional-logic';
-import { extractPdfTextSummary } from '@/lib/client/pdf-image';
+import {
+  convertAuraPdfFaceToJpeg,
+  extractPdfTextSummary,
+  fileToDataUrl,
+} from '@/lib/client/pdf-image';
 import { UNIFIED_CATALOG, type ServiceCategory } from '@/data/services/unified-catalog';
 import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 import type { AuraScanResult } from '@/types/mastermind';
@@ -116,6 +120,7 @@ const MAX_AURA_UPLOAD_FILES = 3;
 const MAX_INITIAL_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
 const MAX_AURA_INLINE_UPLOAD_BYTES = 3 * 1024 * 1024;
 const MAX_AURA_PDF_SUBMIT_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_PREVIEW_BYTES = 28 * 1024;
 const AUTH_REDIRECT_SENTINEL = '__AUTH_REDIRECT__';
 const SIGNIN_PATH = '/dashboard/login';
 
@@ -447,6 +452,28 @@ export default function ConsultationWizard() {
 
       const auraMarkers: string[] = [];
       const auraWarnings: string[] = [];
+      let auraPdfPreviewImage: string | undefined;
+      for (const previewPdf of mergeAuraUploadSet({
+        existingAuraPhotos: [],
+        existingAuraPdfs: auraPdfFiles,
+        incomingAuraPhotos: [],
+        incomingAuraPdfs: [],
+      }).auraPdfs) {
+        try {
+          const previewFile = await convertAuraPdfFaceToJpeg(previewPdf, {
+            maxDimension: 420,
+            quality: 0.66,
+            maxBytes: MAX_AURA_PREVIEW_BYTES,
+          });
+          const dataUrl = await fileToDataUrl(previewFile);
+          if (dataUrl.length <= 45_000) {
+            auraPdfPreviewImage = dataUrl;
+            break;
+          }
+        } catch {
+          // The text fallback below still lets the intake continue.
+        }
+      }
       for (const fallbackPdf of fallbackPdfCandidates) {
         try {
           const textSummary = await extractPdfTextSummary(fallbackPdf, {
@@ -491,6 +518,9 @@ export default function ConsultationWizard() {
         jsonData.clinicalNotes = [existingNotes, ...noteLines, ...auraMarkers]
           .filter(Boolean)
           .join('\n\n');
+      }
+      if (auraPdfPreviewImage) {
+        (jsonData as Record<string, unknown>).auraPdfPreviewImage = auraPdfPreviewImage;
       }
       body.append('data', JSON.stringify(jsonData));
 
