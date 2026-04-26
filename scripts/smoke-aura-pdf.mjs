@@ -9,6 +9,8 @@ import { existsSync, writeFileSync } from 'node:fs';
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const REAL_PDF = process.env.REAL_PDF || '/Users/sukhithebanker/Desktop/Rina_Rai_handout_2026-04-04_16-50-38.pdf';
 const PACE_MS = Number(process.env.PACE_MS || '12000');
+const MAX_DIRECT_PDF_UPLOAD_BYTES = Number(process.env.MAX_DIRECT_PDF_UPLOAD_BYTES || String(4 * 1024 * 1024));
+const AURA_PDF_TEXT_FALLBACK_PREFIX = '[[AURA_PDF_TEXT_FALLBACK]]';
 
 const baselineData = {
   firstName: 'Aura',
@@ -43,6 +45,60 @@ async function appendFile(formData, filePath, fieldName, fileName) {
   formData.append(fieldName, new Blob([data], { type: 'application/pdf' }), fileName);
 }
 
+async function extractPdfTextSummary(filePath) {
+  const data = await import('node:fs/promises').then((fs) => fs.readFile(filePath));
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const doc = await pdfjs.getDocument({
+    data: new Uint8Array(data),
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    disableFontFace: true,
+  }).promise;
+  const chunks = [];
+  const maxPages = Math.min(doc.numPages, 4);
+  for (let pageNumber = 1; pageNumber <= maxPages; pageNumber += 1) {
+    const page = await doc.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    chunks.push(
+      textContent.items
+        .map((item) => ('str' in item ? item.str : ''))
+        .filter(Boolean)
+        .join(' '),
+    );
+  }
+  await doc.destroy();
+  return chunks.join('\n').replace(/\s{2,}/g, ' ').trim().slice(0, 7000);
+}
+
+async function appendRealAuraPdfAsAppWould(formData, filePath, fileName) {
+  const stats = await import('node:fs/promises').then((fs) => fs.stat(filePath));
+  if (stats.size <= MAX_DIRECT_PDF_UPLOAD_BYTES || process.env.SMOKE_DIRECT_PDF === '1') {
+    await appendFile(formData, filePath, 'aura', fileName);
+    return 'direct-upload';
+  }
+
+  const text = await extractPdfTextSummary(filePath);
+  if (!text) {
+    throw new Error(`could not extract PDF text fallback from ${filePath}`);
+  }
+  const existing = JSON.parse(formData.get('data'));
+  const marker = `${AURA_PDF_TEXT_FALLBACK_PREFIX}${JSON.stringify({ name: fileName, text })}`;
+  formData.set(
+    'data',
+    JSON.stringify({
+      ...existing,
+      clinicalNotes: [
+        existing.clinicalNotes,
+        `Aura PDF parsed client-side due Vercel upload limit (${fileName}).`,
+        marker,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    }),
+  );
+  return 'client-fallback';
+}
+
 async function submitPayload(name, buildForm) {
   const form = new FormData();
   const payload = {
@@ -52,7 +108,7 @@ async function submitPayload(name, buildForm) {
   };
 
   form.append('data', JSON.stringify(payload));
-  await buildForm(form);
+  const mode = await buildForm(form);
 
   const res = await fetch(`${BASE_URL}/api/consultation/submit`, {
     method: 'POST',
@@ -67,7 +123,7 @@ async function submitPayload(name, buildForm) {
     body = null;
   }
 
-  return { name, status: res.status, body };
+  return { name, status: res.status, body, mode };
 }
 
 (async () => {
@@ -79,11 +135,14 @@ async function submitPayload(name, buildForm) {
     {
       name: 'real',
       build: (form) =>
-        appendFile(form, REAL_PDF, 'aura', 'real.pdf'),
+        appendRealAuraPdfAsAppWould(form, REAL_PDF, 'real.pdf'),
       check: (res) =>
         res.status === 200 &&
         typeof res.body?.auraUploadStatus === 'string' &&
-        res.body.auraUploadStatus.includes('Aura PDF received') &&
+        (
+          res.body.auraUploadStatus.includes('Aura PDF received') ||
+          /fallback parsed/i.test(res.body.auraUploadStatus)
+        ) &&
         !/not parsed/i.test(res.body.auraUploadStatus) &&
         (res.body.auraUploadWarnings?.length || 0) === 0,
     },
@@ -141,7 +200,7 @@ async function submitPayload(name, buildForm) {
     const ok = c.check(result);
     if (ok) {
       pass += 1;
-      console.log(`[PASS] ${c.name} -> status=${result.status}`);
+      console.log(`[PASS] ${c.name} -> status=${result.status}${result.mode ? ` mode=${result.mode}` : ''}`);
     } else {
       console.error(`[FAIL] ${c.name} -> status=${result.status} body=${JSON.stringify(result.body)}`);
     }

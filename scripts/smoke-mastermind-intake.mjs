@@ -24,6 +24,8 @@ const PDF_PATH =
   process.env.SMOKE_PDF ||
   '/Users/sukhithebanker/Desktop/Rina_Rai_handout_2026-04-04_16-50-38.pdf';
 const ITERATIONS = Number(process.argv[2]) || Number(process.env.ITERATIONS) || 10;
+const MAX_DIRECT_PDF_UPLOAD_BYTES = Number(process.env.MAX_DIRECT_PDF_UPLOAD_BYTES || String(4 * 1024 * 1024));
+const AURA_PDF_TEXT_FALLBACK_PREFIX = '[[AURA_PDF_TEXT_FALLBACK]]';
 // Paces iterations under the public-form 5/min per-IP cap without relying
 // on the 429-retry branch. 13s * 5 = 65s, which safely crosses the 60s
 // rate-limit window boundary.
@@ -69,6 +71,30 @@ function buildIntakePayload(attempt) {
   };
 }
 
+async function extractPdfTextSummary(pdfBytes) {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const doc = await pdfjs.getDocument({
+    data: new Uint8Array(pdfBytes),
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    disableFontFace: true,
+  }).promise;
+  const chunks = [];
+  const maxPages = Math.min(doc.numPages, 4);
+  for (let pageNumber = 1; pageNumber <= maxPages; pageNumber += 1) {
+    const page = await doc.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    chunks.push(
+      textContent.items
+        .map((item) => ('str' in item ? item.str : ''))
+        .filter(Boolean)
+        .join(' '),
+    );
+  }
+  await doc.destroy();
+  return chunks.join('\n').replace(/\s{2,}/g, ' ').trim().slice(0, 7000);
+}
+
 async function safeReadJson(response) {
   const raw = await response.text();
   if (!raw) return { body: null, raw: '', parseError: null };
@@ -79,15 +105,26 @@ async function safeReadJson(response) {
   }
 }
 
-async function submitOnce(attempt, pdfBytes, pdfName) {
+async function submitOnce(attempt, pdfBytes, pdfName, pdfTextFallback) {
   const submitStart = Date.now();
   const form = new FormData();
-  form.append('data', JSON.stringify(buildIntakePayload(attempt)));
-  form.append(
-    'aura',
-    new Blob([pdfBytes], { type: 'application/pdf' }),
-    pdfName,
-  );
+  const payload = buildIntakePayload(attempt);
+  if (pdfTextFallback) {
+    const marker = `${AURA_PDF_TEXT_FALLBACK_PREFIX}${JSON.stringify({ name: pdfName, text: pdfTextFallback })}`;
+    payload.clinicalNotes = [
+      payload.clinicalNotes,
+      `Aura PDF parsed client-side due upload limits (${pdfName}).`,
+      marker,
+    ].join('\n');
+  }
+  form.append('data', JSON.stringify(payload));
+  if (!pdfTextFallback) {
+    form.append(
+      'aura',
+      new Blob([pdfBytes], { type: 'application/pdf' }),
+      pdfName,
+    );
+  }
 
   let submitRes = await fetch(`${BASE_URL}/api/consultation/submit`, {
     method: 'POST',
@@ -108,8 +145,10 @@ async function submitOnce(attempt, pdfBytes, pdfName) {
     const waitMs = Math.min(60_000, resetInMs + 500);
     console.warn(`[smoke] 429 on run ${attempt}, backing off ${waitMs}ms then retrying once`);
     await new Promise((r) => setTimeout(r, waitMs));
-    form.delete('aura');
-    form.append('aura', new Blob([pdfBytes], { type: 'application/pdf' }), pdfName);
+    if (!pdfTextFallback) {
+      form.delete('aura');
+      form.append('aura', new Blob([pdfBytes], { type: 'application/pdf' }), pdfName);
+    }
     submitRes = await fetch(`${BASE_URL}/api/consultation/submit`, {
       method: 'POST',
       body: form,
@@ -126,7 +165,7 @@ async function submitOnce(attempt, pdfBytes, pdfName) {
 
   const submitOk = submitRes.ok && Boolean(submitBody?.success);
   const sessionId = submitBody?.data?.sessionId ?? null;
-  const auraNote = submitBody?.data?.auraNote ?? null;
+  const auraNote = submitBody?.auraUploadStatus ?? submitBody?.data?.auraNote ?? null;
   const submitError = submitOk
     ? null
     : submitBody?.error ?? `HTTP ${submitRes.status}`;
@@ -195,15 +234,21 @@ async function main() {
   }
   const pdfBytes = fs.readFileSync(PDF_PATH);
   const pdfName = path.basename(PDF_PATH);
+  const usesClientFallback = pdfBytes.length > MAX_DIRECT_PDF_UPLOAD_BYTES && process.env.SMOKE_DIRECT_PDF !== '1';
+  const pdfTextFallback = usesClientFallback ? await extractPdfTextSummary(pdfBytes) : '';
+  if (usesClientFallback && !pdfTextFallback) {
+    throw new Error(`Could not extract client fallback text from ${PDF_PATH}`);
+  }
 
   console.log(`[smoke] base=${BASE_URL}`);
   console.log(`[smoke] pdf=${pdfName} (${(pdfBytes.length / 1024).toFixed(0)}KB)`);
+  console.log(`[smoke] pdfMode=${usesClientFallback ? 'client-fallback' : 'direct-upload'}`);
   console.log(`[smoke] iterations=${ITERATIONS}`);
 
   const results = [];
   for (let i = 1; i <= ITERATIONS; i++) {
     try {
-      const r = await submitOnce(i, pdfBytes, pdfName);
+      const r = await submitOnce(i, pdfBytes, pdfName, pdfTextFallback);
       results.push(r);
       const status = r.submitOk && r.readyOk ? 'PASS' : r.submitOk ? 'SUBMIT-ONLY' : 'FAIL';
       console.log(
