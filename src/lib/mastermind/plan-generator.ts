@@ -11,13 +11,20 @@
  * - generatePackages() from package-generator.ts
  */
 
-import type { AuraScanResult, MastermindPlan, MastermindTreatment, TreatmentSequenceItem } from '@/types/mastermind';
+import type {
+  AuraScanResult,
+  MastermindMedicalOptimization,
+  MastermindPlan,
+  MastermindTreatment,
+  TreatmentSequenceItem,
+} from '@/types/mastermind';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
-import type { PlanPhase, SelectedService, GeneratedPackage } from '@/lib/plan-builder/types';
+import type { PlanPhase, SelectedService } from '@/lib/plan-builder/types';
 import { recommendTreatmentPlan, type ClientProfile, type RecommendedService } from '@/lib/plan-builder/ai-recommender';
 import { validatePlan } from '@/lib/plan-builder/constraints';
 import { generatePackages } from '@/lib/plan-builder/package-generator';
 import { PHASE_LABELS } from '@/lib/plan-builder/types';
+import { buildMastermindMedicalOptimization } from './medical-optimization';
 
 // ── MAIN GENERATOR ──
 
@@ -51,10 +58,13 @@ export function generateMastermindPlan(
   // 8. Build aftercare preview
   const aftercarePreview = buildAftercarePreview(categorized.primary);
 
-  // 9. Generate AI summary narratives
-  const aiSummary = buildAiSummary(scanResult, categorized, intakeData);
+  // 9. Build medical optimization packet (BoomRx + metabolic/peptide guardrails)
+  const medicalOptimization = buildMastermindMedicalOptimization(intakeData);
 
-  // 10. Map warnings to contraindications
+  // 10. Generate AI summary narratives
+  const aiSummary = buildAiSummary(scanResult, categorized, intakeData, medicalOptimization);
+
+  // 11. Map warnings to contraindications
   const contraindications = warnings
     .filter((w) => w.severity === 'error')
     .map((w) => ({
@@ -74,6 +84,7 @@ export function generateMastermindPlan(
     aftercarePreview,
     aiSummary,
     contraindications,
+    medicalOptimization,
   };
 }
 
@@ -287,7 +298,8 @@ function buildAftercarePreview(
 function buildAiSummary(
   scanResult: AuraScanResult,
   categorized: { primary: MastermindTreatment[]; complementary: MastermindTreatment[]; maintenance: MastermindTreatment[] },
-  intakeData: Partial<ConsultationFormData>
+  intakeData: Partial<ConsultationFormData>,
+  medicalOptimization: MastermindMedicalOptimization | null
 ): MastermindPlan['aiSummary'] {
   const score = scanResult.auraScore;
   const totalTreatments = categorized.primary.length + categorized.complementary.length + categorized.maintenance.length;
@@ -298,13 +310,22 @@ function buildAiSummary(
   return {
     patientFacing: `Based on your Aura Score of ${score.overall} (${score.label}), we've designed a personalized ${totalTreatments}-treatment plan to address your top concerns. ${firstName}, your skin age is currently ${score.skinAge} — with this plan, we project bringing it down to ${scanResult.predictiveMetrics.withTreatment.sixMonths.skinAge} within 6 months.`,
 
-    providerFacing: `Patient presents with Aura Score ${score.overall}/100, skin age ${score.skinAge} (chronological ${score.chronologicalAge}, delta +${score.skinAgeDelta}). ${topConcerns.length} primary concerns identified: ${topConcerns.map((c) => `${c.concern} (${c.severity})`).join(', ')}. Recommended phased approach with ${categorized.primary.length} primary, ${categorized.complementary.length} complementary, and ${categorized.maintenance.length} maintenance treatments.`,
+    providerFacing:
+      `Patient presents with Aura Score ${score.overall}/100, skin age ${score.skinAge} (chronological ${score.chronologicalAge}, delta +${score.skinAgeDelta}). ${topConcerns.length} primary concerns identified: ${topConcerns.map((c) => `${c.concern} (${c.severity})`).join(', ')}. Recommended phased approach with ${categorized.primary.length} primary, ${categorized.complementary.length} complementary, and ${categorized.maintenance.length} maintenance treatments.` +
+      (medicalOptimization
+        ? ` Medical optimization: ${medicalOptimization.recommendedTrack.toUpperCase()} (${medicalOptimization.status}), tier=${medicalOptimization.tierRecommendation.tier}, provider sign-off required.`
+        : ''),
 
     keyHighlights: [
       `Aura Score improvement: ${score.overall} → ${projectedScore} projected in 6 months`,
       `Skin age reduction: ${score.skinAge} → ${scanResult.predictiveMetrics.withTreatment.sixMonths.skinAge}`,
       `${topConcerns.length} concerns addressed with synergistic treatments`,
       `${categorized.primary.length} essential treatments prioritized for maximum impact`,
+      ...(medicalOptimization
+        ? [
+            `${medicalOptimization.recommendedTrack.toUpperCase()} medical optimization packet prepared with ${medicalOptimization.recommendedProducts.length} BoomRx matches`,
+          ]
+        : []),
     ],
 
     addressedConcerns: topConcerns.map((concern) => ({

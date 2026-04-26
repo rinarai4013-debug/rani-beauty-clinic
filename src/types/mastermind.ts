@@ -183,6 +183,77 @@ export interface TreatmentSequenceItem {
   expectedMilestone: string;
 }
 
+export interface MastermindMedicalProductRecommendation {
+  id: string;
+  label: string;
+  category: string;
+  score: number;
+  suggestedRetail: number;
+  suggestedGrossProfit: number;
+  suggestedMarginPercent: number;
+  rationale: string[];
+}
+
+export interface MastermindPeptideCandidate {
+  compound: string;
+  targetIntent: string;
+  startDose: string;
+  escalationWindow: string;
+  route: 'subcutaneous' | 'intramuscular' | 'topical';
+  cadence: string;
+  cycleLength: string;
+  confidence: 'moderate' | 'high';
+  rationale: string[];
+}
+
+export interface MastermindMedicalOptimization {
+  generatedAt: string;
+  requestedTrack: 'glp1' | 'hormones' | 'peptides' | 'hybrid';
+  status: 'eligible' | 'provider-review-required' | 'ineligible';
+  recommendedTrack: 'glp1' | 'hormones' | 'peptides' | 'hybrid';
+  secondaryTracks: Array<'glp1' | 'hormones' | 'peptides' | 'hybrid'>;
+  blockedTracks: Array<'glp1' | 'hormones' | 'peptides' | 'hybrid'>;
+  providerSignoffRequired: true;
+  normalizedSymptoms: string[];
+  riskFlags: string[];
+  requiredNextSteps: string[];
+  fulfillment: {
+    allowed: string[];
+    recommended: string;
+    reason: string;
+  };
+  tierRecommendation: {
+    tier: string;
+    intensityScore: number;
+    rationale: string[];
+    constrainedByStatus: boolean;
+  };
+  dosageFramework: {
+    track: string;
+    tier: string;
+    startRange: string;
+    cadence: string;
+    escalationCriteria: string[];
+    holdRules: string[];
+    monitoringCadence: string[];
+    providerAuthorizationNote: string;
+    constrainedByStatus: boolean;
+    personalizedPeptidePlan: {
+      strategy: string;
+      dataCompleteness: string;
+      computedFrom: string[];
+      warnings: string[];
+      candidates: MastermindPeptideCandidate[];
+    } | null;
+  };
+  recommendedProducts: MastermindMedicalProductRecommendation[];
+  projectedMonthlyRetail: number;
+  projectedMonthlyCOGS: number;
+  projectedMonthlyGrossProfit: number;
+  averageMarginPercent: number;
+  providerSummary: string;
+}
+
 export interface MastermindPlan {
   planId: string;
   generatedAt: string; // ISO date
@@ -210,6 +281,7 @@ export interface MastermindPlan {
     }[];
   };
   contraindications: Contraindication[];
+  medicalOptimization?: MastermindMedicalOptimization | null;
 }
 
 // ── PROVIDER REVIEW ──

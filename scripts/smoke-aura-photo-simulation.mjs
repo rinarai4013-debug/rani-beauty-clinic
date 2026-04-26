@@ -6,6 +6,7 @@
  * - Real Aura PDF text fallback metrics parse.
  * - A compact Aura face preview is accepted and persisted as sourcePhotoUrl.
  * - The provider plan endpoint generates treatment recommendations.
+ * - The provider plan carries a medical/peptide/BoomRx optimization packet.
  * - The simulation endpoint returns distinct photo-simulation frames, not reused
  *   static images and not data-projection cards.
  *
@@ -185,6 +186,11 @@ if (!plan.res.ok) throw new Error(`plan failed ${plan.res.status}: ${JSON.string
 console.log('[plan]', {
   primary: plan.body?.data?.recommendations?.primary?.length,
   complementary: plan.body?.data?.recommendations?.complementary?.length,
+  medicalTrack: plan.body?.data?.medicalOptimization?.recommendedTrack,
+  medicalStatus: plan.body?.data?.medicalOptimization?.status,
+  peptideCandidates:
+    plan.body?.data?.medicalOptimization?.dosageFramework?.personalizedPeptidePlan?.candidates?.length || 0,
+  boomRxProducts: plan.body?.data?.medicalOptimization?.recommendedProducts?.length || 0,
 });
 
 const sim = await jsonFetch(`${BASE_URL}/api/mastermind/simulate`, {
@@ -229,6 +235,9 @@ console.log('[scan]', {
 const ok =
   submit.body?.data?.hasPhoto === true &&
   /fallback parsed|received \+ parsed|text fallback parsed/i.test(String(submit.body?.auraUploadStatus || '')) &&
+  plan.body?.data?.medicalOptimization?.providerSignoffRequired === true &&
+  (plan.body?.data?.medicalOptimization?.recommendedProducts?.length || 0) > 0 &&
+  (plan.body?.data?.medicalOptimization?.dosageFramework?.personalizedPeptidePlan?.candidates?.length || 0) > 0 &&
   frames.length >= 8 &&
   frames.every((frame) => frame.kind === 'photo-simulation') &&
   new Set(frames.map((frame) => frame.imageDataUrl)).size > 2 &&
@@ -236,4 +245,4 @@ const ok =
   !concerns.some((concern) => /Severe texture detected/.test(concern.description || '') && concern.severity === 'mild');
 
 if (!ok) throw new Error('Aura photo simulation smoke assertions failed');
-console.log('[PASS] Aura PDF metrics + compact face preview + plan + unique photo simulations all working');
+console.log('[PASS] Aura PDF metrics + compact face preview + medical plan + unique photo simulations all working');
