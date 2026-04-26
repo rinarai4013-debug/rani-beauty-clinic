@@ -111,6 +111,10 @@ const nextConfig = {
       "default-src 'self'",
       // Next.js hydration + analytics inline scripts require 'unsafe-inline'
       "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://booking.mangomint.com https://connect.facebook.net",
+      // Browser-only libraries such as pdf.js may create blob workers. Keep
+      // workers same-origin/blob-only so dashboard tools do not fall back to
+      // script-src and log noisy CSP errors.
+      "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       // Allow all HTTPS images (Airtable CDN, GA, Meta, etc.)
