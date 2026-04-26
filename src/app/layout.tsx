@@ -118,9 +118,6 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <Analytics />
-        {/* Mangomint booking scripts are loaded via Analytics component */}
-
         {/*
           ─── Global JSON-LD @graph ──────────────────────────────────────
           Emitted on every page. Creates a rich knowledge graph that LLMs
@@ -327,6 +324,7 @@ export default function RootLayout({
       <body className="font-body text-rani-text antialiased overflow-x-hidden">
         <SkipNav />
         <ConditionalPublicLayout>
+          <Analytics />
           <GTMNoScript />
           <ScrollProgress />
           <Navbar />

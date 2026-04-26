@@ -53,8 +53,6 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         />
       )}
 
-      {/* Hotjar is loaded inline in layout.tsx <head> for verification compatibility */}
-
       {/* Mangomint Online Booking Overlay */}
       <Script
         id="mangomint-booking"
