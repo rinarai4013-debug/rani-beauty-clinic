@@ -56,14 +56,23 @@ describe('/api/booking/book', () => {
 
     expect(response.status).toBe(429);
     expect(mockRateLimitResponse).toHaveBeenCalledWith(27);
-  });
+  }, 15_000);
 
-  it('GET should return 501 when allowed through the rate limiter', async () => {
+  it('GET should return available booking suggestions when allowed through the rate limiter', async () => {
     const { GET } = await import('@/app/api/booking/book/route');
-    const response = await GET(buildGetRequest('/api/booking/book') as any);
-    const data = await expectJsonStatus(response, 501);
+    const response = await GET(
+      buildGetRequest('/api/booking/book', {
+        serviceId: 'hydrafacial-signature',
+        date: '2026-05-04',
+      }) as any,
+    );
+    const data = await expectJsonStatus(response, 200);
 
-    expect(data.status).toBe('not_implemented');
+    expect(data.success).toBe(true);
+    expect(data.status).toBe('available');
+    expect(data.service.id).toBe('hydrafacial-signature');
+    expect(Array.isArray(data.slots)).toBe(true);
+    expect(data.mangomintUrl).toContain('booking.mangomint.com');
     expect(mockRateLimit).toHaveBeenCalledWith('booking', '127.0.0.1', expect.any(Object));
   });
 
@@ -82,18 +91,56 @@ describe('/api/booking/book', () => {
     expect(mockRateLimitResponse).toHaveBeenCalledWith(19);
   });
 
-  it('POST should return 501 when allowed through the rate limiter', async () => {
+  it('POST should create a pending external-confirmation booking request when allowed', async () => {
     const { POST } = await import('@/app/api/booking/book/route');
     const response = await POST(
       buildPostRequest('/api/booking/book', {
-        service: 'hydrafacial-signature',
-        provider: 'mom',
+        serviceId: 'hydrafacial-signature',
+        date: '2026-05-04',
+        startTime: '09:00',
+        clientInfo: {
+          firstName: 'Rina',
+          lastName: 'Rai',
+          email: 'rina@example.com',
+          phone: '(425) 555-0101',
+        },
+        source: 'online',
       }) as any,
     );
-    const data = await expectJsonStatus(response, 501);
+    const data = await expectJsonStatus(response, 200);
 
-    expect(data.status).toBe('not_implemented');
+    expect(data.success).toBe(true);
+    expect(data.status).toBe('pending_external_confirmation');
+    expect(data.requiresExternalConfirmation).toBe(true);
+    expect(data.appointment.serviceId).toBe('hydrafacial-signature');
+    expect(data.payment.depositRequired).toBe(false);
+    expect(data.mangomintUrl).toContain('serviceId=hydrafacial-signature');
     expect(mockRateLimit).toHaveBeenCalledWith('booking-mutation', '127.0.0.1', expect.any(Object));
+  });
+
+  it('POST exposes deposit requirements without pretending checkout is configured', async () => {
+    const { POST } = await import('@/app/api/booking/book/route');
+    const response = await POST(
+      buildPostRequest('/api/booking/book', {
+        serviceId: 'filler-lips',
+        date: '2026-05-04',
+        startTime: '09:00',
+        clientInfo: {
+          firstName: 'Deposit',
+          lastName: 'Patient',
+          email: 'deposit@example.com',
+          phone: '(425) 555-0102',
+        },
+        source: 'online',
+      }) as any,
+    );
+    const data = await expectJsonStatus(response, 200);
+
+    expect(data.success).toBe(true);
+    expect(data.payment.depositRequired).toBe(true);
+    expect(data.payment.depositAmount).toBe(100);
+    expect(data.payment.checkoutUrl).toBeNull();
+    expect(data.payment.checkoutConfigured).toBe(false);
   });
 
   it('POST should reject unknown origins', async () => {

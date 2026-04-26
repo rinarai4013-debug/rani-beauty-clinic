@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { generateConsultationPdf } from '@/lib/mastermind/pdf-generator';
 import { storePdf } from '@/lib/mastermind/pdf-storage';
 import { z } from 'zod';
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       const { sessionId } = parsed.data;
 
       // Load session
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
       }

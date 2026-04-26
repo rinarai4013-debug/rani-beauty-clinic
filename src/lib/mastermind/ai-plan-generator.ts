@@ -21,6 +21,7 @@ import type { ConsultationFormData } from '@/lib/consultation/schema';
 import type { UnifiedService } from '@/data/services/unified-catalog';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 import { generateMastermindPlan } from './plan-generator';
+import { buildMastermindMedicalOptimization } from './medical-optimization';
 
 // ── Constants ──
 
@@ -675,6 +676,7 @@ export async function generateAIPlan(
     // Parse and sanitize the response
     const rawPlan = parseAIResponse(responseText);
     const planData = buildPlanFromAIResponse(rawPlan);
+    const medicalOptimization = buildMastermindMedicalOptimization(intakeData);
 
     // Recalculate all package financing server-side for accuracy
     const packages = planData.packages.map(pkg => ({
@@ -693,6 +695,7 @@ export async function generateAIPlan(
       aftercarePreview: planData.aftercarePreview,
       aiSummary: planData.aiSummary,
       contraindications: planData.contraindications,
+      medicalOptimization,
     };
   } catch (error) {
     console.error('[AI Plan Generator] Claude AI call failed, falling back to rule-based:', error);

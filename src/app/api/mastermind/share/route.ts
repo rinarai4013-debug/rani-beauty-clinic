@@ -13,7 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry } from '@/lib/mastermind/session';
 import {
   cacheToken,
   saveTokenToAirtable,
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
           : SEVEN_DAYS_MS;
 
       // Verify session exists
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
       }

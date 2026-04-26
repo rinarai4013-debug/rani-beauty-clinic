@@ -7,7 +7,7 @@ const unauthorizedMock = vi.fn(
 const forbiddenMock = vi.fn(
   () => new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 }),
 );
-const getSessionByIdAsyncMock = vi.fn();
+const getSessionByIdAsyncRetryMock = vi.fn();
 
 vi.mock('@/lib/auth/session', () => ({
   getSessionFromRequest: (...args: unknown[]) => getSessionFromRequestMock(...args),
@@ -19,7 +19,7 @@ vi.mock('@/lib/auth/middleware', () => ({
 }));
 
 vi.mock('@/lib/mastermind/session', () => ({
-  getSessionByIdAsync: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
+  getSessionByIdAsyncRetry: (...args: unknown[]) => getSessionByIdAsyncRetryMock(...args),
 }));
 
 vi.mock('@/lib/sentry-utils', () => ({
@@ -127,14 +127,14 @@ describe('POST /api/mastermind/metabolic-handoff', () => {
     expect(body.success).toBe(false);
     expect(body.blocked).toBe(true);
     // Ineligible: session lookup should NOT have been called
-    expect(getSessionByIdAsyncMock).not.toHaveBeenCalled();
+    expect(getSessionByIdAsyncRetryMock).not.toHaveBeenCalled();
   });
 
   // ── Session lookup ──
 
   it('returns 404 when mastermind session not found', async () => {
     getSessionFromRequestMock.mockResolvedValue(PROVIDER_SESSION);
-    getSessionByIdAsyncMock.mockResolvedValue(null);
+    getSessionByIdAsyncRetryMock.mockResolvedValue(null);
     const { POST } = await import('@/app/api/mastermind/metabolic-handoff/route');
     const response = await POST(makeRequest(VALID_ELIGIBLE_PAYLOAD) as never);
     const body = await response.json();
@@ -147,7 +147,7 @@ describe('POST /api/mastermind/metabolic-handoff', () => {
   it('eligible: returns handoffSubmitted:true with checkoutUrl populated', async () => {
     process.env.METABOLIC_CHECKOUT_URL = 'https://checkout.example.com/metabolic';
     getSessionFromRequestMock.mockResolvedValue(PROVIDER_SESSION);
-    getSessionByIdAsyncMock.mockResolvedValue(MOCK_MASTERMIND_SESSION);
+    getSessionByIdAsyncRetryMock.mockResolvedValue(MOCK_MASTERMIND_SESSION);
     const { POST } = await import('@/app/api/mastermind/metabolic-handoff/route');
     const response = await POST(makeRequest(VALID_ELIGIBLE_PAYLOAD) as never);
     const body = await response.json();
@@ -166,7 +166,7 @@ describe('POST /api/mastermind/metabolic-handoff', () => {
   it('provider-review-required: handoffSubmitted:true, checkoutUrl:null, held:true', async () => {
     process.env.METABOLIC_CHECKOUT_URL = 'https://checkout.example.com/metabolic';
     getSessionFromRequestMock.mockResolvedValue(PROVIDER_SESSION);
-    getSessionByIdAsyncMock.mockResolvedValue(MOCK_MASTERMIND_SESSION);
+    getSessionByIdAsyncRetryMock.mockResolvedValue(MOCK_MASTERMIND_SESSION);
     const { POST } = await import('@/app/api/mastermind/metabolic-handoff/route');
     const response = await POST(makeRequest(VALID_HELD_PAYLOAD) as never);
     const body = await response.json();
@@ -180,17 +180,18 @@ describe('POST /api/mastermind/metabolic-handoff', () => {
     expect(body.data.providerReviewRequired).toBe(true);
   });
 
-  it('eligible without METABOLIC_CHECKOUT_URL: checkoutUrl is null', async () => {
+  it('eligible without METABOLIC_CHECKOUT_URL: returns safe internal checkout fallback', async () => {
     // Env var not set
     getSessionFromRequestMock.mockResolvedValue(PROVIDER_SESSION);
-    getSessionByIdAsyncMock.mockResolvedValue(MOCK_MASTERMIND_SESSION);
+    getSessionByIdAsyncRetryMock.mockResolvedValue(MOCK_MASTERMIND_SESSION);
     const { POST } = await import('@/app/api/mastermind/metabolic-handoff/route');
     const response = await POST(makeRequest(VALID_ELIGIBLE_PAYLOAD) as never);
     const body = await response.json();
 
     expect(response.status).toBe(200);
     expect(body.data.handoffSubmitted).toBe(true);
-    expect(body.data.checkoutUrl).toBeNull();
+    expect(body.data.checkoutUrl).toContain('/glp1/intake?checkout=clinic');
+    expect(body.data.checkoutConfigured).toBe(false);
     expect(body.data.heldForProviderReview).toBe(false);
   });
 });

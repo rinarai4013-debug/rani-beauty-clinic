@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Sparkles, Shield, Clock, CreditCard, Star, ChevronRight, Phone, CheckCircle } from 'lucide-react';
 import { clinicInfo } from '@/data/clinic-info';
+import ConsultationEmbed from '@/components/sections/ConsultationEmbed';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -23,6 +24,8 @@ const TRUST_POINTS = [
   { icon: CreditCard, label: 'Flexible Financing', desc: 'Payment plans with instant approval' },
   { icon: Star, label: 'HSA/FSA Accepted', desc: 'Use pre-tax dollars for eligible treatments' },
 ];
+
+const AI_ASSESSMENT_ANCHOR = '#consultation';
 
 export default function GetStartedPage() {
   return (
@@ -49,8 +52,7 @@ export default function GetStartedPage() {
               2-minute assessment · Results in 24 hours · Physician-supervised care
             </motion.p>
             <motion.div variants={fadeUp}>
-              <Link href={clinicInfo.consultation.url}
-                target="_blank" rel="noopener noreferrer"
+              <Link href={AI_ASSESSMENT_ANCHOR}
                 className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                 Start Your Free Assessment <ChevronRight className="w-5 h-5" />
               </Link>
@@ -64,6 +66,8 @@ export default function GetStartedPage() {
           </div>
         </div>
       </section>
+
+      <ConsultationEmbed />
 
       <section className="max-w-6xl mx-auto px-6 py-20">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-14">
@@ -148,8 +152,7 @@ export default function GetStartedPage() {
             Start your free AI-powered skin assessment and receive a personalized treatment plan within 24 hours.
           </motion.p>
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href={clinicInfo.consultation.url}
-              target="_blank" rel="noopener noreferrer"
+            <Link href={AI_ASSESSMENT_ANCHOR}
               className="inline-flex items-center gap-3 bg-rani-gold hover:bg-[#B8963D] text-rani-navy font-body font-bold text-lg px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
               Start Your Free Assessment <ChevronRight className="w-5 h-5" />
             </Link>
@@ -161,8 +164,7 @@ export default function GetStartedPage() {
       </section>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-rani-border p-3 sm:hidden z-50">
-        <Link href={clinicInfo.consultation.url}
-          target="_blank" rel="noopener noreferrer"
+        <Link href={AI_ASSESSMENT_ANCHOR}
           className="block w-full bg-rani-gold text-rani-navy font-body font-bold text-center py-3.5 rounded-full">
           Start Your Free Assessment
         </Link>

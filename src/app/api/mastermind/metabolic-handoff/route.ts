@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { unauthorized, forbidden } from '@/lib/auth/middleware';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry } from '@/lib/mastermind/session';
 import { z } from 'zod';
 import { withSentry } from '@/lib/sentry-utils';
 import type { UserRole } from '@/types/auth';
@@ -23,6 +23,14 @@ import type { UserRole } from '@/types/auth';
 // ── Auth ──
 
 const HANDOFF_ALLOWED_ROLES: UserRole[] = ['ceo', 'provider', 'operations'];
+
+function buildFallbackCheckoutUrl(payload: MetabolicHandoffPayload): string {
+  const checkout = payload.fulfillmentPreference === 'home' ? 'home' : 'clinic';
+  if (payload.recommendedTrack === 'peptides') {
+    return `/peptide/intake?checkout=${checkout}&tier=${encodeURIComponent(payload.protocolTier)}`;
+  }
+  return `/glp1/intake?checkout=${checkout}&track=${encodeURIComponent(payload.recommendedTrack)}&tier=${encodeURIComponent(payload.protocolTier)}`;
+}
 
 // ── Schema ──
 
@@ -83,7 +91,7 @@ export async function POST(request: NextRequest) {
       }
 
       // 404 — session not found
-      const session = await getSessionByIdAsync(payload.sessionId);
+      const session = await getSessionByIdAsyncRetry(payload.sessionId);
       if (!session) {
         return NextResponse.json(
           { success: false, error: 'Session not found' },
@@ -97,9 +105,10 @@ export async function POST(request: NextRequest) {
         payload.providerReviewRequired ||
         payload.approvalStatus === 'pending';
 
+      const configuredCheckoutUrl = process.env.METABOLIC_CHECKOUT_URL || '';
       const checkoutUrl = isHeld
         ? null
-        : (process.env.METABOLIC_CHECKOUT_URL ?? null);
+        : configuredCheckoutUrl || buildFallbackCheckoutUrl(payload);
 
       return NextResponse.json({
         success: true,
@@ -109,6 +118,7 @@ export async function POST(request: NextRequest) {
           protocolTier: payload.protocolTier,
           handoffSubmitted: true,
           checkoutUrl,
+          checkoutConfigured: Boolean(configuredCheckoutUrl),
           approvalStatus: isHeld ? 'pending' : payload.approvalStatus,
           providerReviewRequired: payload.providerReviewRequired,
           heldForProviderReview: isHeld,

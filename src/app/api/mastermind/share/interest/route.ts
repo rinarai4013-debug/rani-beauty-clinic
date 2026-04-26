@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveToken } from '@/lib/mastermind/share-token';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry } from '@/lib/mastermind/session';
 import { Tables } from '@/lib/airtable/client';
 import { rateLimitedQuery } from '@/lib/airtable/client';
 import { z } from 'zod';
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Load session for context
-      const session = await getSessionByIdAsync(tokenRecord.sessionId);
+      const session = await getSessionByIdAsyncRetry(tokenRecord.sessionId);
       const patientName = session?.patientName || name;
       const planPackages = session?.mastermindPlan?.packages || [];
       const selectedPackage = planPackages.find((p) => p.tier === packageTier);

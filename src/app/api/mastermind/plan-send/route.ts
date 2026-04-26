@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token';
 import crypto from 'crypto';
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });
       }
 
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
       }
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Log the send action on the session
-      const latestSession = await getSessionByIdAsync(sessionId);
+      const latestSession = await getSessionByIdAsyncRetry(sessionId);
       if (latestSession) {
         const withLog = sessionReducer(latestSession, {
           type: 'SET_CLINIC_NOTES',

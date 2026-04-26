@@ -15,6 +15,7 @@ vi.mock('@/lib/mastermind/share-token', () => ({
 
 vi.mock('@/lib/mastermind/session', () => ({
   getSessionByIdAsync: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
+  getSessionByIdAsyncRetry: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
 }));
 
 vi.mock('@/lib/airtable/client', () => ({

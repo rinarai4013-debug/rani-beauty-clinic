@@ -26,6 +26,7 @@ vi.mock('@/lib/auth/middleware', () => ({
 
 vi.mock('@/lib/mastermind/session', () => ({
   getSessionByIdAsync: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
+  getSessionByIdAsyncRetry: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
   saveSessionAsync: (...args: unknown[]) => saveSessionAsyncMock(...args),
   sessionReducer: (...args: unknown[]) => sessionReducerMock(...args),
 }));

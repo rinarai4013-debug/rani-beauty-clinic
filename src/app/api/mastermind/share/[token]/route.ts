@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry } from '@/lib/mastermind/session';
 import { resolveToken } from '@/lib/mastermind/share-token';
 import type {
   AuraScore,
@@ -251,7 +251,7 @@ export async function GET(
       }
 
       // Load session
-      const session = await getSessionByIdAsync(record.sessionId);
+      const session = await getSessionByIdAsyncRetry(record.sessionId);
       if (!session) {
         return NextResponse.json(
           { success: false, error: 'Session data is no longer available.' },

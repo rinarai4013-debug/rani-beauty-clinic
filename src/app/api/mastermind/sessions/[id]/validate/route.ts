@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry } from '@/lib/mastermind/session';
 import { validatePlan } from '@/lib/plan-builder/constraints';
 import { PHASE_LABELS, type PlanPhase, type SelectedService } from '@/lib/plan-builder/types';
 import type { ServiceCategory } from '@/data/services/unified-catalog';
@@ -28,7 +28,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       }
 
       const { id } = await params;
-      const session = await getSessionByIdAsync(id);
+      const session = await getSessionByIdAsyncRetry(id);
 
       if (!session) {
         return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });

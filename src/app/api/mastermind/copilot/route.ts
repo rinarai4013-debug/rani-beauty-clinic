@@ -10,7 +10,7 @@
 
 import { NextRequest } from 'next/server';
 import { getAnthropicClient } from '@/lib/ai/client';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry } from '@/lib/mastermind/session';
 import { parseJsonBody, apiError } from '@/lib/mastermind/api-helpers';
 import type { MastermindSession, AuraScanResult, MastermindPlan } from '@/types/mastermind';
 
@@ -537,7 +537,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Load session
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return apiError('Session not found', 404);
       }

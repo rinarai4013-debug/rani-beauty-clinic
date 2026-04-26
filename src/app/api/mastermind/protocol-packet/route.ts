@@ -16,7 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { unauthorized, forbidden } from '@/lib/auth/middleware';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { generateProtocolPacketPdf } from '@/lib/mastermind/pdf-generator';
 import { storePdf } from '@/lib/mastermind/pdf-storage';
 import { z } from 'zod';
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       const { sessionId } = parsed.data;
 
       // 404 — session not found
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return NextResponse.json({ error: 'Session not found' }, { status: 404 });
       }

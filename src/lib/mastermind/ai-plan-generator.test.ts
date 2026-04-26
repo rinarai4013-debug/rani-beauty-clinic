@@ -206,7 +206,15 @@ describe('mastermind/ai-plan-generator', () => {
       }],
     });
 
-    const plan = await generateAIPlan(scan, { firstName: 'Rina' }, catalog as any);
+    const plan = await generateAIPlan(
+      scan,
+      {
+        firstName: 'Rina',
+        treatmentInterests: ['glp1', 'peptides'],
+        goals: 'weight loss, stronger recovery, better skin quality',
+      },
+      catalog as any,
+    );
 
     expect(plan.planId).toContain('plan_ai_');
     expect(plan.packages).toHaveLength(3);
@@ -219,6 +227,11 @@ describe('mastermind/ai-plan-generator', () => {
     expect(callArgs.max_tokens).toBe(8192);
     expect(callArgs.messages[0].content).toContain('Generate a personalized Mastermind treatment plan');
     expect(plan.packages[1].savingsVsStandalone).toBeGreaterThan(0);
+    expect(plan.medicalOptimization?.providerSignoffRequired).toBe(true);
+    expect(plan.medicalOptimization?.recommendedProducts.length).toBeGreaterThan(0);
+    expect(
+      plan.medicalOptimization?.dosageFramework.personalizedPeptidePlan?.candidates.length ?? 0,
+    ).toBeGreaterThan(0);
   });
 
   it('generateAIPlan falls back to rule-based generation when Anthropic response fails', async () => {

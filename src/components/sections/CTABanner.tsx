@@ -17,6 +17,8 @@ export default function CTABanner({
   title = "Ready to Start Your Transformation?",
   subtitle,
 }: CTABannerProps) {
+  const assessmentUrl = "/get-started#consultation";
+
   return (
     <section className="relative bg-rani-navy py-16 md:py-20 overflow-hidden">
       {/* Decorative lotus watermark */}
@@ -50,12 +52,11 @@ export default function CTABanner({
         <FadeInOnScroll delay={0.6}>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
-              href={clinicInfo.consultation.url}
-              target="_blank"
+              href={assessmentUrl}
               className="!bg-rani-gold !text-rani-navy hover:!bg-rani-gold-light"
-              onClick={() => trackCTAClick('Book Your Consultation', 'cta_banner', clinicInfo.consultation.url)}
+              onClick={() => trackCTAClick('Start AI Assessment', 'cta_banner', assessmentUrl)}
             >
-              Book Your Consultation
+              Start AI Assessment
             </Button>
             <Button
               variant="secondary"
