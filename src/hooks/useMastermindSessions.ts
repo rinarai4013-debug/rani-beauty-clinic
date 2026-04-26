@@ -108,6 +108,24 @@ function applyOptimisticUpdate(
             updatedAt: new Date().toISOString(),
           }
         : undefined;
+    case 'SET_PROVIDER_REVIEW':
+      return {
+        ...session,
+        providerReview: action.review,
+        phase: 'provider_review',
+        updatedAt: new Date().toISOString(),
+      };
+    case 'ADD_MODIFICATION':
+      return session.providerReview
+        ? {
+            ...session,
+            providerReview: {
+              ...session.providerReview,
+              modifications: [...session.providerReview.modifications, action.modification],
+            },
+            updatedAt: new Date().toISOString(),
+          }
+        : undefined;
     case 'SELECT_PACKAGE':
       return { ...session, selectedPackageTier: action.tier, updatedAt: new Date().toISOString() };
     case 'SET_SOURCE_PHOTO':
