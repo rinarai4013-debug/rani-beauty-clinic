@@ -99,13 +99,20 @@ async function persistAppointmentRequest(
 
   try {
     const { Tables, createRecord } = await import('@/lib/airtable/client');
+    const serviceLabel = appointment.serviceName.toLowerCase();
+    const serviceCategory = appointment.serviceId.includes('consult') || serviceLabel.includes('consult')
+      ? 'Consult'
+      : serviceLabel.includes('filler') || serviceLabel.includes('botox') || serviceLabel.includes('dysport')
+        ? 'Injectable'
+        : serviceLabel.includes('facial')
+          ? 'Facial'
+          : serviceLabel.includes('laser')
+            ? 'Laser'
+            : 'Wellness';
+
     return await createRecord(Tables.appointments(), {
       'Service Name': appointment.serviceName,
-      'Service Category': appointment.serviceName.toLowerCase().includes('consult')
-        ? 'Consult'
-        : appointment.serviceName.toLowerCase().includes('facial')
-          ? 'Facial'
-          : 'Wellness',
+      'Service Category': serviceCategory,
       Provider: 'Rina',
       Date: appointment.date,
       Time: appointment.startTime,
@@ -117,15 +124,6 @@ async function persistAppointmentRequest(
       'Amount Quoted': appointment.estimatedRevenue,
       'Amount Paid': 0,
       'Booking Source': 'Rani Site Booking API',
-      Notes: [
-        appointment.notes,
-        `Requested provider: ${appointment.providerName}`,
-        `Requested room: ${appointment.roomId}`,
-        `Client: ${appointment.clientName} / ${appointment.clientEmail} / ${appointment.clientPhone}`,
-        'Source of truth remains Mangomint until appointment.created webhook confirms.',
-      ]
-        .filter(Boolean)
-        .join('\n'),
     });
   } catch (error) {
     console.error(
