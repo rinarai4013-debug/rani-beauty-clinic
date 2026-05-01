@@ -503,6 +503,12 @@ export default function Footer() {
               >
                 Terms
               </Link>
+              <Link
+                href="/sitemap-html"
+                className="font-body text-xs text-gray-500 transition-colors hover:text-rani-gold"
+              >
+                Site index
+              </Link>
             </div>
           </div>
         </div>
