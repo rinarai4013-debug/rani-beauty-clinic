@@ -104,6 +104,13 @@ const nextConfig = {
       { source: "/vs", destination: "/compare", permanent: false },
       { source: "/financing", destination: "/services", permanent: true },
       { source: "/treatments-for", destination: "/services", permanent: true },
+      // ── SEO recovery (Apr 30 2026) ──
+      // /peptides hub not yet shipped — 302 to /wellness so Navbar links don't 404.
+      // Revert when src/app/peptides/* lands in production.
+      { source: "/peptides", destination: "/wellness", permanent: false },
+      { source: "/peptides/:path*", destination: "/wellness", permanent: false },
+      // /combinations bare index missing — slug pages exist at /combinations/[slug].
+      { source: "/combinations", destination: "/services", permanent: false },
     ];
   },
   async headers() {
