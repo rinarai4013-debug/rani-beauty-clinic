@@ -5,6 +5,9 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { cache, TTL } from '@/lib/cache';
 import { withSentry } from '@/lib/sentry-utils';
 import type { RevenueData, ProviderRevenue, ServiceRevenue, CategoryRevenue, PaymentTypeRevenue, RevenueEntry } from '@/types/dashboard';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 interface TransactionFields {
   'Date': string;

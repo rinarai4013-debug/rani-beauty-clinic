@@ -1,0 +1,218 @@
+{
+  "name": "W23 Rx Welcome SMS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rx-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        280
+      ],
+      "id": "w23-node-001",
+      "name": "Rx Intake Webhook",
+      "webhookId": "w23-rx-intake-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "w23-set-01",
+              "name": "programLabel",
+              "value": "={{ $json.programLabel ?? $json.program_slug ?? 'Rx Program' }}",
+              "type": "string"
+            },
+            {
+              "id": "w23-set-02",
+              "name": "patientName",
+              "value": "={{ $json.patientName ?? $json.full_name ?? 'Patient' }}",
+              "type": "string"
+            },
+            {
+              "id": "w23-set-03",
+              "name": "phone",
+              "value": "={{ $json.phone ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "w23-set-04",
+              "name": "email",
+              "value": "={{ $json.email ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "w23-set-05",
+              "name": "recordId",
+              "value": "={{ $json.recordId ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "w23-set-06",
+              "name": "smsMessage",
+              "value": "={{ `Rani Beauty Clinic: Welcome to your ${$json.programLabel ?? 'Rx'} enrollment. We received your intake and our provider team will contact you within 1 business day. Reply STOP to opt out.` }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        280
+      ],
+      "id": "w23-node-002",
+      "name": "Prepare W23 Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLICKTEXT_API_URL || 'https://api.slicktext.com/v1/messages' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ `Bearer ${$env.SLICKTEXT_API_KEY}` }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"phoneNumber\":\"{{$json.phone}}\",\"message\":\"{{$json.smsMessage}}\",\"campaign\":\"W23_rx_welcome_sms\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        220
+      ],
+      "id": "w23-node-003",
+      "name": "SlickText Send Welcome SMS"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ `Bearer ${$env.RESEND_API_KEY}` }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"from\": \"Rani Beauty Clinic <noreply@ranibeautyclinic.com>\", \"to\": [\"{{$env.RX_PROVIDER_EMAIL || $env.CONTACT_EMAIL || 'info@ranibeautyclinic.com'}}\"], \"subject\": \"W23 New Rx Intake - {{$json.programLabel}}\", \"html\": \"<p><strong>Program:</strong> {{$json.programLabel}}</p><p><strong>Patient:</strong> {{$json.patientName}}</p><p><strong>Phone:</strong> {{$json.phone}}</p><p><strong>Email:</strong> {{$json.email}}</p><p><strong>Record ID:</strong> {{$json.recordId}}</p>\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        950,
+        280
+      ],
+      "id": "w23-node-004",
+      "name": "Resend Provider Notification"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, workflow: 'W23_rx_welcome_sms' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        280
+      ],
+      "id": "w23-node-005",
+      "name": "Respond OK"
+    }
+  ],
+  "connections": {
+    "Rx Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare W23 Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare W23 Payload": {
+      "main": [
+        [
+          {
+            "node": "SlickText Send Welcome SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SlickText Send Welcome SMS": {
+      "main": [
+        [
+          {
+            "node": "Resend Provider Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resend Provider Notification": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Rani Beauty Clinic",
+      "id": "rani-tag-001"
+    },
+    {
+      "name": "W23",
+      "id": "rani-tag-w23"
+    },
+    {
+      "name": "Rx Programs",
+      "id": "rani-tag-rx"
+    }
+  ],
+  "triggerCount": 1,
+  "id": "wf-rani-w23-rx-welcome-sms"
+}

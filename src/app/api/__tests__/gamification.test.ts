@@ -185,13 +185,20 @@ describe('GET /api/dashboard/gamification/score', () => {
     expect(data.bossProgress).toHaveProperty('currentRevenue');
   });
 
-  it('should return 500 on Airtable error', async () => {
+  it('should return fallback score payload on Airtable error', async () => {
     setupAuthCEO();
     mockFetchAll.mockRejectedValue(new Error('Airtable error'));
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
     const { GET } = await import('@/app/api/dashboard/gamification/score/route');
     const response = await GET();
-    await expectServerError(response);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.total).toBe(78);
+    expect(data.status).toBe('good');
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 });
 

@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, useMemo, useRef, useCallback, useEffect, DragEvent } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import {
   X, Loader2, Sparkles, Upload, Camera, Check, ChevronLeft, ChevronRight,
   User, Heart, Stethoscope, Clock, ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import {
+  convertAuraPdfFaceToJpeg,
+  extractPdfTextSummary,
+  fileToDataUrl,
+} from '@/lib/client/pdf-image';
+import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 
 // ══════════════════════════════════════════════════════════════
 // OPTION CONSTANTS — matching all 25 Typeform questions
@@ -142,6 +149,106 @@ const BUDGET_OPTIONS = [
   { value: '5000-plus', label: '$5,000+' },
 ];
 
+const CONCERN_TO_SCHEMA: Record<string, string[]> = {
+  acne: ['acne'],
+  'acne-scars': ['acne', 'dull-skin'],
+  hyperpigmentation: ['hyperpigmentation'],
+  'fine-lines': ['aging-skin'],
+  texture: ['dull-skin', 'large-pores'],
+  laxity: ['skin-laxity'],
+  dryness: ['dull-skin'],
+  'hair-removal': ['unwanted-hair'],
+  scars: ['dull-skin'],
+  undereye: ['aging-skin', 'hyperpigmentation'],
+  rosacea: ['sun-damage'],
+  'large-pores': ['large-pores'],
+};
+
+const BUDGET_TO_SCHEMA: Record<string, string> = {
+  'under-500': 'starter',
+  '500-1500': 'moderate',
+  '1500-3000': 'premium',
+  '3000-5000': 'investment',
+  '5000-plus': 'investment',
+};
+
+const SESSION_READY_RETRY_DELAYS_MS = [250, 500, 900, 1400, 2200, 3200, 5200, 8200, 12000, 16000];
+const SESSION_READY_RETRY_PATTERNS = /session not found|not found yet|not yet available|still initializing|still processing|initializing|temporary|in progress|please retry/i;
+// Keep multipart payload below common serverless body limits (Vercel hard-fails oversized bodies).
+const MAX_INITIAL_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_PDF_SUBMIT_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_PREVIEW_BYTES = 28 * 1024;
+const MAX_SKIN_UPLOAD_FILES = 5;
+const MAX_AURA_UPLOAD_FILES = 3;
+const AUTH_REDIRECT_SENTINEL = '__AUTH_REDIRECT__';
+const AUTH_SESSION_TERMS = /\b(?:unauthorized|session expired|dashboard session expired|please sign in again|sign in again)\b/i;
+const ACCESS_DENIED_TERMS = /\b(?:forbidden|access denied|insufficient permissions?|no permission|permission denied)\b/i;
+const DRAFT_KEY = 'rani_consult_draft';
+const PENDING_SESSION_KEY = 'rani_consult_pending_session';
+const SIGNIN_PATH = '/dashboard/login';
+
+function buildSignInRedirect(nextPath: string, restoreSession?: string): string {
+  const next = encodeURIComponent(nextPath || '/dashboard/mastermind');
+  try {
+    const href = new URL(SIGNIN_PATH, window.location.origin);
+    href.searchParams.set('next', next);
+    if (restoreSession) {
+      href.searchParams.set('restoreSession', encodeURIComponent(restoreSession));
+    }
+    return `${href.pathname}${href.search}`;
+  } catch {
+    const params = new URLSearchParams({ next });
+    if (restoreSession) {
+      params.set('restoreSession', encodeURIComponent(restoreSession));
+    }
+    return `${SIGNIN_PATH}?${params.toString()}`;
+  }
+}
+
+function redirectToSignIn(restoreSession?: string): never {
+  const nextPath = `${window.location.pathname}${window.location.search}`;
+  if (restoreSession) {
+    try {
+      localStorage.setItem(PENDING_SESSION_KEY, restoreSession);
+    } catch { /* ignore */ }
+  }
+  const target = buildSignInRedirect(nextPath, restoreSession);
+  window.location.assign(target);
+  throw new Error(AUTH_REDIRECT_SENTINEL);
+}
+
+function formatFileSize(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return '0 B';
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / Math.pow(1024, exponent);
+  return `${value.toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+}
+
+function buildUniqueFileSet(files: File[]): File[] {
+  const fileMap = new Map<string, File>();
+  for (const file of files) {
+    const key = `${file.name}|${file.type}|${file.size}|${file.lastModified}`;
+    if (!fileMap.has(key)) fileMap.set(key, file);
+  }
+
+  return Array.from(fileMap.values());
+}
+
+function buildAuraUploadSet(args: {
+  existingAuraPdfs: File[];
+  incomingAuraPdfs: File[];
+}): File[] {
+  const merged = [...args.existingAuraPdfs, ...args.incomingAuraPdfs];
+
+  const capped = buildUniqueFileSet(merged).slice(-MAX_AURA_UPLOAD_FILES);
+
+  return capped.filter(isPdfFile);
+}
+
 // ══════════════════════════════════════════════════════════════
 // STEP DEFINITIONS
 // ══════════════════════════════════════════════════════════════
@@ -162,6 +269,213 @@ function calculateAge(dob: string): number | null {
   if (!dob) return null;
   const age = Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000);
   return age >= 0 && age < 150 ? age : null;
+}
+
+function normalizePhoneForSubmit(rawPhone: string): string | undefined {
+  const trimmed = rawPhone.trim();
+  if (!trimmed) return undefined;
+
+  const digits = trimmed.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits.startsWith('1')) {
+    const local = digits.slice(1);
+    return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
+  }
+
+  return undefined;
+}
+
+function normalizeDobForSubmit(rawDob: string): string | undefined {
+  if (!rawDob) return undefined;
+  const parsed = new Date(rawDob);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  const now = new Date();
+  let age = now.getFullYear() - parsed.getFullYear();
+  const monthDelta = now.getMonth() - parsed.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && now.getDate() < parsed.getDate())) {
+    age -= 1;
+  }
+
+  return age >= 18 ? rawDob : undefined;
+}
+
+function normalizeConcernSelections(rawConcerns: string[]): string[] {
+  const normalized = new Set<string>();
+
+  for (const concern of rawConcerns) {
+    const key = concern.toLowerCase();
+    const mapped = CONCERN_TO_SCHEMA[key] ?? [key];
+    for (const item of mapped) normalized.add(item);
+  }
+
+  return Array.from(normalized);
+}
+
+function isPdfFile(file: File): boolean {
+  const type = (file.type || '').toLowerCase();
+  const name = (file.name || '').toLowerCase();
+  return type === 'application/pdf' || name.endsWith('.pdf');
+}
+
+function formatMb(bytes: number): string {
+  return (bytes / (1024 * 1024)).toFixed(1);
+}
+
+async function parseJsonResponse(
+  response: Response
+): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+  } catch {
+    // non-JSON response
+  }
+
+  return { json: null, text };
+}
+
+function normalizeSubmissionError(message: string): string {
+  const normalized = message.trim();
+  if (!normalized) return 'Submission failed. Please try again.';
+
+  if (
+    /request entity too large|payload too large|body exceeded|unexpected token.*request en/i.test(
+      normalized
+    )
+  ) {
+    return 'Your upload is too large. Please use fewer or smaller files, then retry.';
+  }
+
+  if (
+    /could not be converted|could not convert|failed to convert|failed conversion|unexpected token.*internal s|internal server error|unexpected token.*not valid json|not valid json/i.test(
+      normalized
+    )
+  ) {
+    return 'The server returned a temporary response. Please retry in a moment.';
+  }
+
+  if (/invalid form data payload|invalid consultation payload|invalid form data json/i.test(normalized)) {
+    return 'Some form fields were formatted unexpectedly. Please retry; we adjusted the submission format.';
+  }
+
+  if (AUTH_SESSION_TERMS.test(normalized)) {
+    return 'Your dashboard session expired. Please sign in again and retry.';
+  }
+  if (ACCESS_DENIED_TERMS.test(normalized)) {
+    return 'You do not have permission for this dashboard flow. Contact your admin to restore access.';
+  }
+
+  return normalized;
+}
+
+function isAuthExpiredError(message: string): boolean {
+  return AUTH_SESSION_TERMS.test(message);
+}
+
+function isAccessDeniedError(message: string): boolean {
+  return ACCESS_DENIED_TERMS.test(message);
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string
+): string {
+  const payload = parsed.json;
+  const payloadError = payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+  const payloadMessage = payload && typeof payload.message === 'string' ? payload.message.trim() : '';
+
+  if (payloadError) return normalizeSubmissionError(payloadError);
+  if (payloadMessage) return normalizeSubmissionError(payloadMessage);
+
+  if (response.status === 401) {
+    return 'Your dashboard session expired. Please sign in again and retry.';
+  }
+  if (response.status === 403) {
+    return 'You do not have permission for this action. Contact your admin.';
+  }
+  if (response.status === 413) return 'Your upload is too large. Please use fewer or smaller files, then retry.';
+  if (response.status >= 500) return 'Server is temporarily unavailable. Please try again shortly.';
+
+  if (parsed.text) return normalizeSubmissionError(parsed.text.slice(0, 220));
+  return normalizeSubmissionError(fallback);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function waitForSessionReady(sessionId: string): Promise<void> {
+  let lastMessage = 'Session is still initializing. Please retry.';
+  const isRetryable = (response: Response, parsedText: string) =>
+    response.status === 404 ||
+    response.status === 429 ||
+    response.status === 425 ||
+    response.status === 500 ||
+    response.status === 502 ||
+    response.status === 503 ||
+    response.status === 504 ||
+    SESSION_READY_RETRY_PATTERNS.test(parsedText);
+
+  for (let index = 0; index < SESSION_READY_RETRY_DELAYS_MS.length; index += 1) {
+    const response = await fetch(`/api/mastermind/sessions/${sessionId}`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    const parsed = await parseJsonResponse(response);
+    if (response.status === 401 || response.status === 403) {
+      redirectToSignIn(sessionId);
+    }
+    if (response.status === 403) {
+      throw new Error('You do not have permission to access this session yet.');
+    }
+    if (response.ok) {
+      const payload = parsed.json;
+      if (payload && typeof payload === 'object' && 'success' in payload) {
+        const data = (payload as { success?: unknown }).success;
+        if (data === true) {
+          const body = (payload as { data?: unknown }).data;
+          const hasSessionId =
+            body &&
+            typeof body === 'object' &&
+            typeof (body as { id?: unknown }).id === 'string' &&
+            (body as { id?: unknown }).id === sessionId;
+          if (hasSessionId) return;
+        }
+      }
+
+      // If API returned 200 but payload is not a valid session response (often auth redirect HTML),
+      // treat it as not-ready and keep polling.
+      lastMessage = parsed.text
+        ? parsed.text.slice(0, 120)
+        : 'Session data is not yet available.';
+      const retryable = isRetryable(response, lastMessage);
+      if (!retryable || index === SESSION_READY_RETRY_DELAYS_MS.length - 1) {
+        throw new Error(lastMessage);
+      }
+      await sleep(SESSION_READY_RETRY_DELAYS_MS[index]);
+      continue;
+    }
+
+    lastMessage = getApiErrorMessage(response, parsed, lastMessage);
+    const parsedText = parsed.text;
+    const retryable = isRetryable(response, parsedText);
+    if (!retryable || index === SESSION_READY_RETRY_DELAYS_MS.length - 1) {
+      throw new Error(lastMessage);
+    }
+
+    await sleep(SESSION_READY_RETRY_DELAYS_MS[index]);
+  }
+
+  throw new Error(lastMessage);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -363,14 +677,18 @@ function PhotoDropZone({
   onFiles,
   onRemove,
   maxFiles = 5,
+  allowPdf = false,
+  pdfOnly = false,
   icon: Icon = Camera,
 }: {
   label: string;
   sublabel: string;
   files: File[];
-  onFiles: (files: File[]) => void;
+  onFiles: (files: File[]) => void | Promise<void>;
   onRemove: (index: number) => void;
   maxFiles?: number;
+  allowPdf?: boolean;
+  pdfOnly?: boolean;
   icon?: React.ComponentType<{ className?: string }>;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -380,16 +698,31 @@ function PhotoDropZone({
     e.preventDefault();
     setDragOver(false);
     const dropped = Array.from(e.dataTransfer.files).filter(
-      (f) => f.type.startsWith('image/') || f.type === 'application/pdf'
+      (f) => (pdfOnly ? isPdfFile(f) : f.type.startsWith('image/') || (allowPdf && isPdfFile(f)))
     );
-    onFiles(dropped.slice(0, maxFiles - files.length));
+    void onFiles(dropped.slice(0, maxFiles - files.length));
   };
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
-    onFiles(selected.slice(0, maxFiles - files.length));
+    void onFiles(selected.slice(0, maxFiles - files.length));
     e.target.value = '';
   };
+
+  const previewUrls = useMemo(
+    () =>
+      files.map((file) => (isPdfFile(file) ? null : URL.createObjectURL(file))),
+    [files]
+  );
+
+  useEffect(
+    () => () => {
+      for (const url of previewUrls) {
+        if (url) URL.revokeObjectURL(url);
+      }
+    },
+    [previewUrls]
+  );
 
   return (
     <div className="space-y-3">
@@ -397,7 +730,13 @@ function PhotoDropZone({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
+        accept={
+          pdfOnly
+            ? 'application/pdf'
+            : allowPdf
+              ? 'image/jpeg,image/png,image/webp,image/heic,application/pdf'
+              : 'image/jpeg,image/png,image/webp,image/heic'
+        }
         multiple
         className="sr-only"
         onChange={handleSelect}
@@ -408,14 +747,14 @@ function PhotoDropZone({
           {files.map((f, i) => (
             <div key={i} className="relative group">
               <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-[#C9A96E]/30 flex items-center justify-center bg-[#0F1D2C]">
-                {f.type === 'application/pdf' ? (
+                {isPdfFile(f) ? (
                   <div className="text-center">
                     <div className="text-[#C9A96E] text-lg">📄</div>
                     <div className="text-[8px] text-[#F8F6F1]/50 mt-0.5 px-1 truncate max-w-[76px]">{f.name}</div>
                   </div>
                 ) : (
                   <img
-                    src={URL.createObjectURL(f)}
+                    src={previewUrls[i] || ''}
                     alt={`Upload ${i + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -471,7 +810,7 @@ function PhotoDropZone({
 interface Props {
   open: boolean;
   onClose: () => void;
-  onCreated: (sessionId: string) => void;
+  onCreated: (sessionId: string, isReady?: boolean) => void;
 }
 
 export default function NewConsultationModal({ open, onClose, onCreated }: Props) {
@@ -479,6 +818,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   const [direction, setDirection] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
 
   // ── Step 1: Personal Information ──
@@ -523,10 +863,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
   // ── Step 5: Photos ──
   const [skinPhotos, setSkinPhotos] = useState<File[]>([]);
-  const [auraPhotos, setAuraPhotos] = useState<File[]>([]);
-
-  // ── Draft auto-save / restore (localStorage) ──
-  const DRAFT_KEY = 'rani_consult_draft';
+  const [auraPdfFiles, setAuraPdfFiles] = useState<File[]>([]);
 
   // Restore draft on mount
   useEffect(() => {
@@ -567,6 +904,13 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       if (d.budget) setBudget(d.budget);
       if (d.currentStep && d.currentStep > 1) setCurrentStep(d.currentStep);
     } catch { /* ignore corrupt drafts */ }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      setNotice(null);
+      setError(null);
+    }
   }, [open]);
 
   // Save draft whenever any field changes
@@ -622,6 +966,7 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
     if (step === 1) {
       if (!firstName.trim()) errors.firstName = true;
       if (!lastName.trim()) errors.lastName = true;
+      if (!email.trim()) errors.email = true;
     }
     if (step === 2) {
       if (concerns.length === 0) errors.concerns = true;
@@ -656,50 +1001,218 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
   };
 
   // ── Photo handlers ──
-  const addSkinPhotos = (files: File[]) => setSkinPhotos((prev) => [...prev, ...files].slice(0, 5));
+  const addSkinPhotos = (files: File[]) =>
+    setSkinPhotos((prev) => [...prev, ...files].slice(0, MAX_SKIN_UPLOAD_FILES));
   const removeSkinPhoto = (i: number) => setSkinPhotos((prev) => prev.filter((_, idx) => idx !== i));
-  const addAuraPhotos = (files: File[]) => setAuraPhotos((prev) => [...prev, ...files].slice(0, 3));
-  const removeAuraPhoto = (i: number) => setAuraPhotos((prev) => prev.filter((_, idx) => idx !== i));
+  const addAuraPhotos = (files: File[]) => {
+    const pdfFiles = files.filter((file) => isPdfFile(file));
+    const nonPdfFiles = files.filter((file) => !isPdfFile(file));
+
+    const queueableAuraPdfs: File[] = [...pdfFiles];
+    const nextAuraPdfs = buildAuraUploadSet({
+      existingAuraPdfs: auraPdfFiles,
+      incomingAuraPdfs: queueableAuraPdfs,
+    });
+    setAuraPdfFiles(nextAuraPdfs);
+    const oversized = nextAuraPdfs.filter((file) => file.size > MAX_AURA_PDF_SUBMIT_BYTES);
+    if (oversized.length > 0) {
+      setNotice(
+        `${oversized.length} Aura PDF file${oversized.length > 1 ? 's are' : ' is'} above direct upload limits and will be parsed client-side automatically.`
+      );
+    }
+
+    if (nonPdfFiles.length > 0) {
+      setError(
+        `Skipped ${nonPdfFiles.length} non-PDF Aura file${nonPdfFiles.length > 1 ? 's' : ''}. Aura upload accepts PDF only.`
+      );
+      return;
+    }
+
+    setError(null);
+  };
+  const removeAuraPdf = (i: number) => setAuraPdfFiles((prev) => prev.filter((_, idx) => idx !== i));
 
   // ── Submit ──
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
 
     setError(null);
+    setNotice(null);
     setSubmitting(true);
 
     try {
       const goalMap: Record<string, string> = {
-        'fine-lines': 'anti-aging',
-        'hyperpigmentation': 'pigment-correction',
-        'dryness': 'brightening',
-        'acne': 'acne-treatment',
-        'laxity': 'skin-tightening',
-        'acne-scars': 'scar-treatment',
-        'scars': 'scar-treatment',
-        'undereye': 'undereye-treatment',
-        'rosacea': 'redness-reduction',
+        'fine-lines': 'reduce fine lines and support collagen',
+        'hyperpigmentation': 'improve pigmentation and even skin tone',
+        'dryness': 'improve hydration and barrier strength',
+        acne: 'clear active breakouts',
+        laxity: 'tighten skin and improve firmness',
+        'acne-scars': 'soften acne scarring and refine texture',
+        scars: 'improve scar appearance and smoothness',
+        undereye: 'brighten and refresh the under-eye area',
+        rosacea: 'reduce redness and sensitivity',
+        texture: 'smooth texture and refine pore appearance',
+        'hair-removal': 'reduce unwanted hair growth',
+        'large-pores': 'minimize pore visibility',
       };
 
+      const normalizedSkinConcerns = normalizeConcernSelections(concerns);
+      const normalizedPhone = normalizePhoneForSubmit(phone);
+      const normalizedDob = normalizeDobForSubmit(dob);
+      const normalizedBudget = BUDGET_TO_SCHEMA[budget[0] || ''];
+      const normalizedTimeline = hasEvent === 'yes' ? 'event' : undefined;
+      const goalsText = concerns
+        .map((concern) => goalMap[concern] || concern)
+        .filter((value) => value.trim().length > 0)
+        .join(', ');
+
       const formData = new FormData();
+      const auraQueuedPdfs = auraPdfFiles;
+      const auraNotes: string[] = [];
+      if (auraQueuedPdfs.length > 0) {
+        auraNotes.push(
+          `${auraQueuedPdfs.length} Aura PDF file${auraQueuedPdfs.length > 1 ? 's were' : ' was'} attached.`
+        );
+      }
+      const oversizeAuraPdfs = auraQueuedPdfs.filter(
+        (file) => file.size > MAX_AURA_PDF_SUBMIT_BYTES
+      );
+      if (oversizeAuraPdfs.length > 0) {
+        auraNotes.push(
+          `${oversizeAuraPdfs.length} Aura PDF file${oversizeAuraPdfs.length > 1 ? 's are' : ' is'} above direct upload limits and will be parsed client-side.`
+        );
+      }
+      const selectedSkinPhotos = [...skinPhotos];
+      const auraPayloadFiles = auraQueuedPdfs.filter(
+        (file) => file.size <= MAX_AURA_PDF_SUBMIT_BYTES
+      );
+      const dropLargest = (files: File[]): File | null => {
+        if (files.length === 0) return null;
+        let index = 0;
+        for (let i = 1; i < files.length; i += 1) {
+          if (files[i].size > files[index].size) index = i;
+        }
+        const [removed] = files.splice(index, 1);
+        return removed || null;
+      };
+      const totalPayloadBytes = () =>
+        [...selectedSkinPhotos, ...auraPayloadFiles].reduce((sum, file) => sum + file.size, 0);
+
+      const droppedForPayloadLimit: File[] = [];
+      while (totalPayloadBytes() > MAX_INITIAL_SUBMIT_UPLOAD_BYTES && auraPayloadFiles.length > 0) {
+        const dropped = dropLargest(auraPayloadFiles);
+        if (!dropped) break;
+        droppedForPayloadLimit.push(dropped);
+      }
+      while (totalPayloadBytes() > MAX_INITIAL_SUBMIT_UPLOAD_BYTES && selectedSkinPhotos.length > 0) {
+        const dropped = dropLargest(selectedSkinPhotos);
+        if (!dropped) break;
+        droppedForPayloadLimit.push(dropped);
+      }
+
+      const initialUploadBytes = totalPayloadBytes();
+      if (initialUploadBytes > MAX_INITIAL_SUBMIT_UPLOAD_BYTES) {
+        throw new Error(
+          `Initial upload exceeds ${formatMb(MAX_INITIAL_SUBMIT_UPLOAD_BYTES)} MB. Remove some files and retry.`
+        );
+      }
+      if (droppedForPayloadLimit.length > 0) {
+        const droppedPdfCount = droppedForPayloadLimit.filter(isPdfFile).length;
+        const droppedImageCount = droppedForPayloadLimit.length - droppedPdfCount;
+        const noteParts: string[] = [];
+        if (droppedPdfCount > 0) {
+          noteParts.push(`${droppedPdfCount} PDF`);
+        }
+        if (droppedImageCount > 0) {
+          noteParts.push(`${droppedImageCount} image${droppedImageCount > 1 ? 's' : ''}`);
+        }
+        setNotice(
+          `To keep the upload stable, we excluded ${noteParts.join(' and ')} from the initial submit. You can still continue.`
+        );
+      }
+
+      const fallbackPdfFiles = buildUniqueFileSet([
+        ...oversizeAuraPdfs,
+        ...droppedForPayloadLimit.filter((file) => isPdfFile(file)),
+      ]);
+      const auraFallbackMarkers: string[] = [];
+      const auraFallbackWarnings: string[] = [];
+      let auraPdfPreviewImage: string | undefined;
+
+      for (const previewPdf of buildUniqueFileSet(auraQueuedPdfs)) {
+        try {
+          const previewFile = await convertAuraPdfFaceToJpeg(previewPdf, {
+            maxDimension: 420,
+            quality: 0.66,
+            maxBytes: MAX_AURA_PREVIEW_BYTES,
+          });
+          const dataUrl = await fileToDataUrl(previewFile);
+          if (dataUrl.length <= 45_000) {
+            auraPdfPreviewImage = dataUrl;
+            auraNotes.push('Captured compact Aura face preview for photo projections.');
+            break;
+          }
+        } catch {
+          // Text metrics still carry the consult if the PDF image region cannot render.
+        }
+      }
+
+      for (const fallbackPdf of fallbackPdfFiles) {
+        try {
+          const textSummary = await extractPdfTextSummary(fallbackPdf, {
+            maxPages: 4,
+            maxChars: 6500,
+          });
+          const marker = serializeAuraPdfTextFallback({
+            name: fallbackPdf.name || 'aura-handout.pdf',
+            text: textSummary,
+          });
+          if (marker) {
+            auraFallbackMarkers.push(marker);
+          } else {
+            auraFallbackWarnings.push(
+              `Aura PDF "${fallbackPdf.name}" had limited readable text. Continuing with intake fallback.`
+            );
+          }
+        } catch {
+          auraFallbackWarnings.push(
+            `Aura PDF "${fallbackPdf.name}" could not be parsed automatically. Continuing with intake fallback.`
+          );
+        }
+      }
+      if (auraFallbackMarkers.length > 0) {
+        auraNotes.push(
+          `Captured ${auraFallbackMarkers.length} Aura PDF text fallback marker${auraFallbackMarkers.length > 1 ? 's' : ''} for backend scoring.`
+        );
+      }
+      if (auraFallbackWarnings.length > 0) {
+        auraNotes.push(
+          `${auraFallbackWarnings.length} Aura PDF file${auraFallbackWarnings.length > 1 ? 's were' : ' was'} only partially parsed.`
+        );
+        setNotice(auraFallbackWarnings[0]);
+      }
+      const combinedClinicalNotes = [clinicalNotes.trim(), ...auraNotes, ...auraFallbackMarkers]
+        .filter(Boolean)
+        .join('\n\n');
 
       formData.append(
         'data',
         JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          dob: dob || undefined,
+          dob: normalizedDob,
           email: email.trim() || undefined,
-          phone: phone.trim() || undefined,
+          phone: normalizedPhone,
           age: calculatedAge ?? undefined,
           contactPreference: contactPref[0] || undefined,
           referralSource: referralSource[0] || undefined,
 
-          skinConcerns: concerns,
+          skinConcerns: normalizedSkinConcerns.length > 0 ? normalizedSkinConcerns : undefined,
           targetAreas,
           treatmentInterests,
           concerns,
-          goals: concerns.map((c) => goalMap[c] || c),
+          goals: goalsText || undefined,
+          timeline: normalizedTimeline,
 
           hasUpcomingEvent: hasEvent === 'yes',
           eventDetails: hasEvent === 'yes' ? `${eventType} - ${eventDate}` : undefined,
@@ -729,16 +1242,17 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           preferredDays: preferredDays.length > 0 ? preferredDays : undefined,
           preferredTime: preferredTime[0] || undefined,
 
-          budget: budget[0] || undefined,
+          budget: normalizedBudget,
 
-          clinicalNotes: clinicalNotes.trim() || undefined,
+          clinicalNotes: combinedClinicalNotes || undefined,
+          auraPdfPreviewImage,
         })
       );
 
-      for (const file of skinPhotos) {
+      for (const file of selectedSkinPhotos) {
         formData.append('photos', file);
       }
-      for (const file of auraPhotos) {
+      for (const file of auraPayloadFiles) {
         formData.append('aura', file);
       }
 
@@ -747,29 +1261,231 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
         body: formData,
       });
 
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'Submission failed');
+      const parsedSubmit = await parseJsonResponse(res);
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          redirectToSignIn();
+        }
+        throw new Error(getApiErrorMessage(res, parsedSubmit, 'Submission failed. Please retry.'));
+      }
+      if (!parsedSubmit.json) {
+        throw new Error('Server returned an invalid response. Please retry.');
+      }
+
+      const submitPayload = parsedSubmit.json as {
+        success?: boolean;
+        error?: string;
+        message?: string;
+        data?: { sessionId?: string };
+        sessionId?: string;
+        auraUploadStatus?: string;
+        auraUploadWarnings?: string[];
+      };
+      if (!submitPayload.success) {
+        throw new Error(
+          normalizeSubmissionError(
+            (typeof submitPayload.error === 'string' && submitPayload.error) ||
+              (typeof submitPayload.message === 'string' && submitPayload.message) ||
+              'Submission failed'
+          )
+        );
+      }
 
       // Clear saved draft on successful submit
       try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
 
-      const sessionId = json.data.sessionId;
+      const sessionId =
+        submitPayload.data?.sessionId ||
+        (typeof submitPayload.sessionId === 'string' ? submitPayload.sessionId : '');
+      if (!sessionId) {
+        throw new Error('Submission succeeded but no session ID was returned. Please retry.');
+      }
+      const auraWarnings =
+        Array.isArray(submitPayload.auraUploadWarnings)
+          ? submitPayload.auraUploadWarnings.filter((item): item is string => typeof item === 'string')
+          : [];
+      const auraStatus =
+        typeof submitPayload.auraUploadStatus === 'string' ? submitPayload.auraUploadStatus : '';
 
-      await fetch('/api/mastermind/plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
-      });
+      let sessionReady = false;
+      try {
+        await waitForSessionReady(sessionId);
+        sessionReady = true;
+      } catch (readinessError) {
+        const readinessMessage =
+          readinessError instanceof Error ? readinessError.message : String(readinessError);
+        if (isAuthExpiredError(readinessMessage)) {
+          throw readinessError;
+        }
+        if (isAccessDeniedError(readinessMessage)) {
+          throw readinessError;
+        }
+        console.warn('[Mastermind] Session readiness check deferred:', readinessMessage);
+      }
+      setSkinPhotos([]);
+      setAuraPdfFiles([]);
+      const noticeMessages: string[] = [];
+      if (!sessionReady) {
+        noticeMessages.push('Session is creating. Opening the queue while processing finishes.');
+      }
+      if (auraWarnings.length > 0) {
+        noticeMessages.push(auraWarnings[0]);
+      } else if (auraStatus && /received/i.test(auraStatus)) {
+        noticeMessages.push(auraStatus);
+      }
+      if (noticeMessages.length > 0) {
+        setNotice(noticeMessages.join(' '));
+      }
+      onCreated(sessionId, sessionReady);
+      void (async () => {
+        try {
+          const downstreamRetryDelaysMs = [250, 500, 900, 1400, 2200];
+          const isRetryableDownstreamError = (status: number, message: string): boolean =>
+            status === 404 ||
+            status === 425 ||
+            status === 429 ||
+            status === 500 ||
+            status === 502 ||
+            status === 503 ||
+            status === 504 ||
+            SESSION_READY_RETRY_PATTERNS.test(message);
 
-      await fetch('/api/mastermind/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
-      });
+          const postJsonWithRetry = async (
+            url: string,
+            body: Record<string, unknown>,
+            fallbackMessage: string,
+          ): Promise<{
+            response: Response;
+            parsed: { json: Record<string, unknown> | null; text: string };
+            message: string;
+          }> => {
+            let lastResponse: Response | null = null;
+            let lastParsed: { json: Record<string, unknown> | null; text: string } = {
+              json: null,
+              text: '',
+            };
+            let lastMessage = fallbackMessage;
 
-      onCreated(sessionId);
+            for (let attempt = 0; attempt < downstreamRetryDelaysMs.length; attempt += 1) {
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(body),
+              });
+              const parsed = await parseJsonResponse(response);
+              const message = getApiErrorMessage(response, parsed, fallbackMessage);
+
+              lastResponse = response;
+              lastParsed = parsed;
+              lastMessage = message;
+
+              if (response.ok) {
+                return { response, parsed, message };
+              }
+              if (response.status === 401 || response.status === 403) {
+                return { response, parsed, message };
+              }
+
+              if (
+                !isRetryableDownstreamError(response.status, message) ||
+                attempt === downstreamRetryDelaysMs.length - 1
+              ) {
+                return { response, parsed, message };
+              }
+
+              await sleep(downstreamRetryDelaysMs[attempt]);
+            }
+
+            // Loop always returns; this is a defensive fallback.
+            return {
+              response: lastResponse || new Response('', { status: 500 }),
+              parsed: lastParsed,
+              message: lastMessage,
+            };
+          };
+
+          let {
+            response: planRes,
+            parsed: parsedPlan,
+            message: planMessage,
+          } = await postJsonWithRetry(
+            '/api/mastermind/plan',
+            { sessionId },
+            'Plan generation failed.',
+          );
+
+          // If plan runs before scan is ready, run scan explicitly once, then retry plan.
+          if (!planRes.ok && /missing scan|scan result|missing intake data/i.test(planMessage)) {
+            const {
+              response: scanRes,
+              parsed: parsedScan,
+            } = await postJsonWithRetry(
+              '/api/mastermind/scan',
+              { sessionId },
+              'Aura scan processing failed.',
+            );
+            if (!scanRes.ok && scanRes.status !== 401 && scanRes.status !== 403) {
+              throw new Error(getApiErrorMessage(scanRes, parsedScan, 'Aura scan processing failed.'));
+            }
+            if (scanRes.status === 401 || scanRes.status === 403) {
+              redirectToSignIn(sessionId);
+              throw new Error(getApiErrorMessage(scanRes, parsedScan, 'Aura scan processing failed.'));
+            }
+
+            if (scanRes.ok) {
+              ({
+                response: planRes,
+                parsed: parsedPlan,
+                message: planMessage,
+              } = await postJsonWithRetry(
+                '/api/mastermind/plan',
+                { sessionId },
+                'Plan generation failed.',
+              ));
+            }
+          }
+
+          if (!planRes.ok) {
+            if (planRes.status === 401 || planRes.status === 403) {
+              redirectToSignIn(sessionId);
+              throw new Error(planMessage);
+            }
+            throw new Error(planMessage);
+          }
+
+          if (planRes.ok) {
+            const {
+              response: simulateRes,
+              parsed: parsedSimulate,
+            } = await postJsonWithRetry(
+              '/api/mastermind/simulate',
+              { sessionId },
+              'Simulation generation failed.',
+            );
+            if (!simulateRes.ok) {
+              if (simulateRes.status === 401 || simulateRes.status === 403) {
+                redirectToSignIn(sessionId);
+                throw new Error(
+                  getApiErrorMessage(simulateRes, parsedSimulate, 'Simulation generation failed.')
+                );
+              }
+              throw new Error(
+                getApiErrorMessage(simulateRes, parsedSimulate, 'Simulation generation failed.')
+              );
+            }
+          }
+        } catch (downstreamError) {
+          console.warn('[Mastermind] Consultation saved but downstream generation deferred:', downstreamError);
+        }
+      })();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      if (err instanceof Error && err.message === AUTH_REDIRECT_SENTINEL) {
+        return;
+      }
+      setError(
+        err instanceof Error ? normalizeSubmissionError(err.message) : 'Something went wrong'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -835,8 +1551,14 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
       {/* Email */}
       <div>
-        <FieldLabel>Email</FieldLabel>
-        <GoldInput type="email" placeholder="client@email.com" value={email} onChange={setEmail} />
+        <FieldLabel>Email *</FieldLabel>
+        <GoldInput
+          type="email"
+          placeholder="client@email.com"
+          value={email}
+          onChange={setEmail}
+          error={validationErrors.email}
+        />
       </div>
 
       {/* Phone */}
@@ -1220,24 +1942,52 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
       {/* Skin Photos */}
       <PhotoDropZone
         label="Upload Skin Photos"
-        sublabel="Drag & drop or click to upload (up to 5 photos)"
+        sublabel="Drag & drop or click to upload (up to 5 photos, 4MB initial submit cap)"
         files={skinPhotos}
         onFiles={addSkinPhotos}
         onRemove={removeSkinPhoto}
-        maxFiles={5}
+        maxFiles={MAX_SKIN_UPLOAD_FILES}
+        allowPdf={false}
         icon={Camera}
       />
 
       {/* Aura Scan */}
       <PhotoDropZone
         label="Upload Aura Skin Scan"
-        sublabel="Drag & drop scan image or click to upload"
-        files={auraPhotos}
+        sublabel={`Upload Aura PDF only (large files auto-parse client-side; direct upload up to ${formatFileSize(MAX_AURA_PDF_SUBMIT_BYTES)})`}
+        files={auraPdfFiles}
         onFiles={addAuraPhotos}
-        onRemove={removeAuraPhoto}
-        maxFiles={3}
+        onRemove={removeAuraPdf}
+        maxFiles={MAX_AURA_UPLOAD_FILES}
+        allowPdf={true}
+        pdfOnly
         icon={Upload}
       />
+      {auraPdfFiles.length > 0 && (
+        <div className="space-y-2">
+          <FieldLabel>Aura PDF Attachments</FieldLabel>
+          <div className="space-y-2">
+            {auraPdfFiles.map((file, index) => (
+              <div
+                key={`${file.name}-${index}`}
+                className="flex items-center justify-between px-3 py-2 rounded-lg border border-[#C9A96E]/30 bg-[#0F1D2C]/30"
+              >
+                <div className="min-w-0">
+                  <div className="text-sm text-[#F8F6F1] truncate">{file.name}</div>
+                  <div className="text-xs text-[#F8F6F1]/50">PDF • {formatFileSize(file.size)}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeAuraPdf(index)}
+                  className="ml-3 text-xs px-2 py-1 rounded-full border border-[#C9A96E]/40 text-[#C9A96E] hover:bg-[#C9A96E]/20"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Quick Summary */}
       <div>
@@ -1298,7 +2048,18 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
           )}
 
           <SummaryRow label="Skin Photos" value={`${skinPhotos.length} uploaded`} />
-          <SummaryRow label="Aura Scan" value={`${auraPhotos.length} uploaded`} />
+          <SummaryRow
+            label="Aura Scan"
+            value={`${auraPdfFiles.length} PDF file${auraPdfFiles.length === 1 ? '' : 's'} attached`}
+          />
+          {auraPdfFiles.length > 0 && (
+            <SummaryRow
+              label="Aura PDFs"
+              value={auraPdfFiles
+                .map((file) => `${file.name} (${formatFileSize(file.size)})`)
+                .join(', ')}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -1472,15 +2233,53 @@ export default function NewConsultationModal({ open, onClose, onCreated }: Props
 
             {/* ── Footer Navigation ── */}
             <div className="px-6 py-4 border-t border-[#C9A96E]/10 space-y-3">
-              {error && (
+              {notice && (
                 <motion.p
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-xs text-red-400 text-center"
+                  className="text-xs text-emerald-300 text-center"
                   style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  {error}
+                  {notice}
                 </motion.p>
+              )}
+              {error && (
+                <div className="flex flex-col items-center gap-2">
+                  <motion.p
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-xs text-red-400 text-center"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    {error}
+                  </motion.p>
+                  {isAuthExpiredError(error) && (
+                    <Link
+                      href="/dashboard/login"
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-[#0F1D2C] text-xs font-semibold"
+                      style={{ background: 'linear-gradient(135deg, #C9A96E, #B8944F)', fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      Sign in again
+                    </Link>
+                  )}
+                  {isAccessDeniedError(error) && (
+                    <div className="flex flex-col items-center gap-2">
+                      <span
+                        className="text-xs text-white/60 font-body"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        If your role changed recently, refresh and request mastermind access from your admin.
+                      </span>
+                      <Link
+                        href="/dashboard"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-white text-xs font-semibold"
+                        style={{ background: 'linear-gradient(135deg, #1d2f45, #243e5e)' }}
+                      >
+                        Back to Dashboard
+                      </Link>
+                    </div>
+                  )}
+                </div>
               )}
 
               <div className="flex gap-3">

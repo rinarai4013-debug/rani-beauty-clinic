@@ -11,15 +11,16 @@
  * Accepts { sessionId } to load/save from session, or inline { intakeData, sourcePhotoUrl }.
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { runAuraScan } from '@/lib/mastermind/aura-scan';
 import { mockAuraScanResult } from '@/lib/mastermind/mock-data';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { ConsultationFormData } from '@/lib/consultation/schema';
 import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
+import { isUnrenderablePhoto } from '@/lib/mastermind/image-markers';
 
 import { withSentry } from '@/lib/sentry-utils';
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       // Load from session if sessionId provided
       let session = null;
       if (sessionId) {
-        session = await getSessionByIdAsync(sessionId);
+        session = await getSessionByIdAsyncRetry(sessionId);
         if (!session) return apiError('Session not found', 404);
         if (!intakeData && session.intakeData) {
           intakeData = session.intakeData as Partial<ConsultationFormData>;
@@ -60,8 +61,15 @@ export async function POST(request: NextRequest) {
       }
 
       // 424 — photo reference placeholder means the source file is not yet available
-      if (sourcePhotoUrl === '[photo_ref_unavailable]') {
-        return apiError('Source photo is temporarily unavailable — please retry after the photo reference resolves', 424);
+      if (sourcePhotoUrl && isUnrenderablePhoto(sourcePhotoUrl)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Source photo is temporarily unavailable. Please re-upload the Aura image/PDF.',
+            meta: { photoUnavailable: true },
+          },
+          { status: 424 },
+        );
       }
 
       const useMock = process.env.USE_MOCK_AI === 'true';

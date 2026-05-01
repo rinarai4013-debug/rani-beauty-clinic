@@ -23,7 +23,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMastermindSessions } from '@/hooks/useMastermindSessions';
 import NewConsultationModal from '@/components/dashboard/mastermind/NewConsultationModal';
 import type { MastermindPhase, MastermindSession } from '@/types/mastermind';
@@ -57,6 +57,15 @@ const PACKAGE_PRICES: Record<string, number> = {
   Transform: 4200,
   Elite: 7500,
 };
+const PENDING_SESSION_KEY = 'rani_consult_pending_session';
+const SESSION_RESTORE_RETRY_DELAYS_MS = [250, 500, 900, 1400, 2200, 3200, 5200, 8200];
+
+function parseMastermindSessionPayload(data: unknown): { id?: string } | null {
+  if (!data || typeof data !== 'object') return null;
+  const record = data as { id?: unknown };
+  if (typeof record.id === 'string' && record.id.trim()) return { id: record.id };
+  return null;
+}
 
 // ── ANIMATED COUNTER ──
 
@@ -222,12 +231,72 @@ export default function MastermindQueuePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const restoreSessionId = searchParams.get('restoreSession')?.trim() || '';
 
   const handleCreated = useCallback((sessionId: string) => {
     setShowNewModal(false);
     mutate();
     router.push(`/dashboard/mastermind/${sessionId}`);
   }, [mutate, router]);
+
+  useEffect(() => {
+    const restoreCandidate = restoreSessionId?.trim();
+    if (!restoreCandidate) return;
+
+    const pendingFromStorage = (() => {
+      try {
+        return localStorage.getItem(PENDING_SESSION_KEY) || '';
+      } catch {
+        return '';
+      }
+    })();
+    const sessionId = pendingFromStorage || restoreCandidate;
+    if (!sessionId) return;
+
+    let cancelled = false;
+    const restore = async () => {
+      for (let attempt = 0; attempt < SESSION_RESTORE_RETRY_DELAYS_MS.length; attempt += 1) {
+        if (cancelled) return;
+
+        const response = await fetch(`/api/mastermind/sessions/${sessionId}`, {
+          method: 'GET',
+          cache: 'no-store',
+        });
+        if (cancelled) return;
+
+        if (response.status === 404 || response.status === 425 || response.status === 429 || response.status === 500) {
+          await new Promise((resolve) => setTimeout(resolve, SESSION_RESTORE_RETRY_DELAYS_MS[attempt]));
+          continue;
+        }
+
+        if (!response.ok) {
+          try {
+            localStorage.removeItem(PENDING_SESSION_KEY);
+          } catch { /* ignore */ }
+          return;
+        }
+
+        const json = await response.json().catch(() => null);
+        const payload = json && typeof json === 'object' ? (json as { data?: unknown }).data : null;
+        const session = parseMastermindSessionPayload(payload);
+        if (session?.id === sessionId) {
+          try {
+            localStorage.removeItem(PENDING_SESSION_KEY);
+          } catch { /* ignore */ }
+          router.push(`/dashboard/mastermind/${session.id}`);
+          return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, SESSION_RESTORE_RETRY_DELAYS_MS[attempt]));
+      }
+    };
+
+    void restore();
+    return () => {
+      cancelled = true;
+    };
+  }, [restoreSessionId, router]);
 
   // ── Computed Stats ──
 

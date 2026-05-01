@@ -11,7 +11,7 @@
  */
 
 import { getAnthropicClient, hasAnthropicClient } from '@/lib/ai/client';
-import type { ConsultationFormData } from '@/lib/consultation/schema';
+import type { ConsultationSubmitData } from '@/lib/consultation/schema';
 import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
 import type {
   AuraScanResult,
@@ -162,7 +162,7 @@ You MUST respond with ONLY a valid JSON object. No markdown, no code fences, no 
 }
 
 function buildAnalysisPrompt(
-  intakeData: Partial<ConsultationFormData>,
+  intakeData: Partial<ConsultationSubmitData>,
   medicalData?: Partial<MedicalHistoryFormData>
 ): string {
   const age = calculateAge(intakeData.dob);
@@ -452,7 +452,7 @@ Return ONLY the JSON object. No markdown formatting, no code fences, no commenta
  * @returns AIAuraScanResult with optional skincareAnalysis
  */
 export async function runAIAuraScan(
-  intakeData: Partial<ConsultationFormData>,
+  intakeData: Partial<ConsultationSubmitData>,
   sourcePhotoUrl?: string,
   medicalData?: Partial<MedicalHistoryFormData>
 ): Promise<AIAuraScanResult> {

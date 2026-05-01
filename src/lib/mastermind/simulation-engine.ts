@@ -180,6 +180,7 @@ async function generateWithTreatmentPath(
 
     frames.push({
       imageDataUrl,
+      kind: 'photo-simulation',
       timepoint: timeframe.key,
       monthNumber: timeframe.monthNumber,
       description: getWithTreatmentDescription(timeframe, plan),
@@ -261,6 +262,7 @@ async function generateWithoutTreatmentPath(
 
     frames.push({
       imageDataUrl,
+      kind: 'photo-simulation',
       timepoint: timeframe.key,
       monthNumber: timeframe.monthNumber,
       description: adjusted.description,

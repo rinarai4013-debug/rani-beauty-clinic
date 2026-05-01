@@ -19,6 +19,9 @@ import { Tables, fetchAll } from '@/lib/airtable/client';
 import { withSentry } from '@/lib/sentry-utils';
 import { computeMetabolicFunnel } from '@/lib/analytics/metabolic-funnel-report';
 import type { MetabolicFunnelRecord } from '@/lib/analytics/metabolic-funnel-report';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 // ── Validation ────────────────────────────────────────────────────────────────
 

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { fetchReactivationIntelligence } from "@/lib/briefing/reactivation-intelligence";
 import { withSentry } from "@/lib/sentry-utils";
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   return withSentry("dashboard/reactivation", async () => {
     const session = await getSession();

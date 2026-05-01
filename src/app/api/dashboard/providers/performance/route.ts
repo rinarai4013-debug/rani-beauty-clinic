@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { fetchProviderIntelligence } from "@/lib/briefing/provider-intelligence";
 import { withSentry } from "@/lib/sentry-utils";
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   return withSentry("dashboard/providers/performance", async () => {
     const session = await getSession();

@@ -1,14 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+const RESTORE_SESSION_KEY = 'restoreSession';
 
 export default function DashboardLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [nextPath, setNextPath] = useState('/dashboard');
+  const [restoreSession, setRestoreSession] = useState('');
+
+  useEffect(() => {
+    const encodedNext = searchParams.get('next');
+    const encodedRestore = searchParams.get(RESTORE_SESSION_KEY);
+    if (encodedNext) {
+      try {
+        setNextPath(decodeURIComponent(encodedNext));
+      } catch {
+        setNextPath(encodedNext);
+      }
+    }
+    if (encodedRestore) {
+      try {
+        setRestoreSession(decodeURIComponent(encodedRestore));
+      } catch {
+        setRestoreSession(encodedRestore);
+      }
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +48,11 @@ export default function DashboardLoginPage() {
       });
 
       if (res.ok) {
-        router.push('/dashboard');
+        if (restoreSession) {
+          router.push(`/dashboard/mastermind/${restoreSession}`);
+        } else {
+          router.push(nextPath);
+        }
         router.refresh();
       } else {
         const data = await res.json();

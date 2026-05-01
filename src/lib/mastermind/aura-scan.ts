@@ -13,7 +13,7 @@
  * - getMedicalWarnings() from conditional-logic-v2.ts
  */
 
-import type { ConsultationFormData } from '@/lib/consultation/schema';
+import type { ConsultationSubmitData } from '@/lib/consultation/schema';
 import type { MedicalHistoryFormData } from '@/lib/consultation/medical-schema';
 import type {
   AuraScanResult,
@@ -46,7 +46,7 @@ import { getMedicalWarnings } from '@/lib/consultation/conditional-logic-v2';
 // ── MAIN ORCHESTRATOR ──
 
 export async function runAuraScan(
-  intakeData: Partial<ConsultationFormData>,
+  intakeData: Partial<ConsultationSubmitData>,
   medicalData?: Partial<MedicalHistoryFormData>
 ): Promise<AuraScanResult> {
   const scanId = `aura_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
@@ -624,7 +624,7 @@ function buildLifestyleFactors(
   };
 }
 
-function mapSkincareLevel(intakeData: Partial<ConsultationFormData>): 'none' | 'basic' | 'moderate' | 'advanced' {
+function mapSkincareLevel(intakeData: Partial<ConsultationSubmitData>): 'none' | 'basic' | 'moderate' | 'advanced' {
   // Infer from treatment history text
   const history = (intakeData.treatmentHistory as string) || '';
   if (history.toLowerCase().includes('retinol') || history.toLowerCase().includes('serum')) return 'advanced';

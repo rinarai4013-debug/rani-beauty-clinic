@@ -11,6 +11,9 @@ import {
   type ExpenseEntry,
 } from '@/lib/finance/pnl-engine';
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 /**
  * GET /api/dashboard/finance/pnl

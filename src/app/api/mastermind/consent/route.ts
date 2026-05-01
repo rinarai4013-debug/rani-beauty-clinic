@@ -8,7 +8,7 @@
 
 import { NextRequest } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { getSessionByIdAsync, saveSessionAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
 import type { ConsentRecord } from '@/types/consent';
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Load the session
-      const session = await getSessionByIdAsync(record.sessionId);
+      const session = await getSessionByIdAsyncRetry(record.sessionId);
       if (!session) {
         return apiError('Session not found', 404);
       }
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Load the session
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return apiError('Session not found', 404);
       }

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import sharp from 'sharp';
 
 const getSessionFromRequestMock = vi.fn();
 const getSessionByIdAsyncMock = vi.fn();
@@ -19,6 +20,7 @@ vi.mock('@/lib/auth/session', () => ({
 
 vi.mock('@/lib/mastermind/session', () => ({
   getSessionByIdAsync: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
+  getSessionByIdAsyncRetry: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
   saveSessionAsync: (...args: unknown[]) => saveSessionAsyncMock(...args),
   sessionReducer: (...args: unknown[]) => sessionReducerMock(...args),
 }));
@@ -72,6 +74,27 @@ function asAsyncIterable<T>(events: T[]): AsyncIterable<T> {
       }
     },
   };
+}
+
+async function makeInlineFaceSource(): Promise<string> {
+  const buffer = await sharp({
+    create: {
+      width: 140,
+      height: 160,
+      channels: 3,
+      background: { r: 221, g: 182, b: 158 },
+    },
+  })
+    .composite([
+      {
+        input: Buffer.from(
+          '<svg width="140" height="160"><ellipse cx="70" cy="82" rx="44" ry="54" fill="#d8aa91"/><circle cx="54" cy="70" r="5" fill="#33251f"/><circle cx="86" cy="70" r="5" fill="#33251f"/><path d="M52 104 Q70 117 88 104" stroke="#814439" stroke-width="5" fill="none" stroke-linecap="round"/></svg>',
+        ),
+      },
+    ])
+    .jpeg({ quality: 80 })
+    .toBuffer();
+  return `data:image/jpeg;base64,${buffer.toString('base64')}`;
 }
 
 const mockSimulationResult = {
@@ -219,6 +242,38 @@ describe('mastermind simulate + complete + copilot routes', () => {
     expect(body.meta.renderMode).toBe('data-driven');
     expect(saveSessionAsyncMock).toHaveBeenCalledTimes(1);
     expect(mockSimulationComparisonMock).not.toHaveBeenCalled();
+  });
+
+  it('POST /api/mastermind/simulate renders distinct photo-simulation frames from an inline Aura face preview', async () => {
+    getSessionByIdAsyncMock.mockResolvedValueOnce({
+      id: 'ms_1',
+      phase: 'scan_review',
+      sourcePhotoUrl: await makeInlineFaceSource(),
+      intakeData: { dob: '1990-01-01' },
+      auraScanResult: {
+        auraScore: {
+          overall: 72,
+          skinAge: 40,
+          skinAgeDelta: 4,
+        },
+        detectedConcerns: [{ concern: 'texture' }, { concern: 'pores' }],
+      },
+    });
+
+    const { POST } = await import('@/app/api/mastermind/simulate/route');
+    const response = await POST(
+      makeRequest('http://localhost:3000/api/mastermind/simulate', { sessionId: 'ms_1' }) as never,
+    );
+    const body = await response.json();
+    const frames = [
+      ...body.data.withTreatment.frames,
+      ...body.data.withoutTreatment.frames,
+    ];
+
+    expect(response.status).toBe(200);
+    expect(frames.every((frame: { kind: string }) => frame.kind === 'photo-simulation')).toBe(true);
+    expect(frames.every((frame: { imageDataUrl: string }) => frame.imageDataUrl.startsWith('data:image/jpeg;base64,'))).toBe(true);
+    expect(new Set(frames.map((frame: { imageDataUrl: string }) => frame.imageDataUrl)).size).toBeGreaterThan(2);
   });
 
   it('POST /api/mastermind/complete rejects invalid JSON body', async () => {

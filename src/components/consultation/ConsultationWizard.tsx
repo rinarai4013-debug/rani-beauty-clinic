@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback, useState } from 'react';
+import { useReducer, useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -35,7 +35,13 @@ import {
   shouldShowBodyMap,
   getRecommendedServices,
 } from '@/lib/consultation/conditional-logic';
+import {
+  convertAuraPdfFaceToJpeg,
+  extractPdfTextSummary,
+  fileToDataUrl,
+} from '@/lib/client/pdf-image';
 import { UNIFIED_CATALOG, type ServiceCategory } from '@/data/services/unified-catalog';
+import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 import type { AuraScanResult } from '@/types/mastermind';
 
 // ── Constants ──
@@ -52,7 +58,6 @@ const STEP_LABELS = [
 ] as const;
 
 const TOTAL_STEPS = STEP_LABELS.length;
-const CONSULTATION_SUBMIT_TIMEOUT_MS = 45_000;
 
 const STEP_ICONS = [
   Sparkles,
@@ -110,6 +115,23 @@ const BUDGET_LABELS: Record<string, string> = {
   investment: 'Investment ($3,500+)',
 };
 
+const MAX_AURA_UPLOAD_FILES = 3;
+// Keep multipart payload below common serverless hard limits.
+const MAX_INITIAL_SUBMIT_UPLOAD_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_INLINE_UPLOAD_BYTES = 3 * 1024 * 1024;
+const MAX_AURA_PDF_SUBMIT_BYTES = 4 * 1024 * 1024;
+const MAX_AURA_PREVIEW_BYTES = 28 * 1024;
+const AUTH_REDIRECT_SENTINEL = '__AUTH_REDIRECT__';
+const SIGNIN_PATH = '/dashboard/login';
+
+function redirectToSignIn(): never {
+  const next = `${window.location.pathname}${window.location.search}`;
+  const href = new URL(SIGNIN_PATH, window.location.origin);
+  href.searchParams.set('next', encodeURIComponent(next));
+  window.location.assign(`${href.pathname}${href.search}`);
+  throw new Error(AUTH_REDIRECT_SENTINEL);
+}
+
 // ── State ──
 
 interface WizardState {
@@ -122,46 +144,6 @@ interface WizardState {
   auraScanResult: AuraScanResult | null;
   isScanning: boolean;
 }
-
-type ConsultationOfferProduct = {
-  id: string;
-  product: string;
-  label: string;
-  category: string;
-  score: number;
-  monthlyCostEstimate: number;
-  suggestedRetail: number;
-  suggestedGrossProfit: number;
-  suggestedMarginPercent: number;
-  rationale: string[];
-};
-
-type ConsultationMedicalOffers = {
-  providerReviewRequired: boolean;
-  checkoutPaths: { clinic: string; home: string };
-  requestedTrack: string;
-  normalizedSymptoms: string[];
-  recommendationCount: number;
-  projectedMonthlyRetail: number;
-  projectedMonthlyCOGS: number;
-  projectedMonthlyGrossProfit: number;
-  averageMarginPercent: number;
-  recommendedProducts: ConsultationOfferProduct[];
-};
-
-type ConsultationSubmitResponse = {
-  success?: boolean;
-  error?: string;
-  message?: string;
-  sessionId?: string;
-  data?: {
-    sessionId?: string;
-    patientName?: string;
-    hasPhoto?: boolean;
-    phase?: string;
-  };
-  medicalOffers?: ConsultationMedicalOffers;
-};
 
 type WizardAction =
   | { type: 'SET_FIELD'; field: string; value: unknown }
@@ -268,13 +250,103 @@ const slideVariants = {
   }),
 };
 
+async function parseJsonResponse(
+  response: Response
+): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+  } catch {
+    // non-JSON response
+  }
+
+  return { json: null, text };
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string
+): string {
+  const payload = parsed.json;
+  const payloadError = payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+  const payloadMessage = payload && typeof payload.message === 'string' ? payload.message.trim() : '';
+  const parsedText = parsed.text.trim();
+
+  if (payloadError) return payloadError;
+  if (payloadMessage) return payloadMessage;
+  if (
+    /request entity too large|payload too large|body exceeded|unexpected token.*request en/i.test(parsedText)
+  ) {
+    return 'Upload is too large. Please use smaller files or fewer attachments and retry.';
+  }
+  if (
+    /could not be converted|could not convert|failed to convert|failed conversion|unexpected token.*internal s|internal server error|unexpected token.*not valid json|not valid json/i.test(parsedText)
+  ) {
+    return 'The server is temporarily returning a non-JSON response. Please retry this submission in 30-60 seconds.';
+  }
+  if (response.status === 413) return 'Upload is too large. Please use smaller images and retry.';
+  if (response.status >= 500) return 'Server is temporarily unavailable. Please try again shortly.';
+  if (parsedText) return parsedText.slice(0, 220);
+  return fallback;
+}
+
+function isPdfFile(file: File): boolean {
+  const type = (file.type || '').toLowerCase();
+  const name = (file.name || '').toLowerCase();
+  return type === 'application/pdf' || name.endsWith('.pdf');
+}
+
+function formatFileSize(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return '0 B';
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / Math.pow(1024, exponent);
+  return `${value.toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+}
+
+function mergeAuraUploadSet(args: {
+  existingAuraPhotos: File[];
+  existingAuraPdfs: File[];
+  incomingAuraPhotos: File[];
+  incomingAuraPdfs: File[];
+}): { auraPhotos: File[]; auraPdfs: File[] } {
+  const dedupe = new Map<string, File>();
+  const all: File[] = [
+    ...args.existingAuraPhotos,
+    ...args.existingAuraPdfs,
+    ...args.incomingAuraPhotos,
+    ...args.incomingAuraPdfs,
+  ];
+
+  for (const file of all) {
+    const key = `${file.name}|${file.type}|${file.size}|${file.lastModified}`;
+    if (!dedupe.has(key)) {
+      dedupe.set(key, file);
+    }
+  }
+
+  const capped = Array.from(dedupe.values()).slice(-MAX_AURA_UPLOAD_FILES);
+  return {
+    auraPhotos: capped.filter((file) => !isPdfFile(file)),
+    auraPdfs: capped.filter(isPdfFile),
+  };
+}
+
 // ── Component ──
 
 export default function ConsultationWizard() {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
+  const [auraPdfFiles, setAuraPdfFiles] = useState<File[]>([]);
   const { currentStep, direction, formData, errors, isSubmitting, isSubmitted, auraScanResult, isScanning } = state;
-  const [submittedMedicalOffers, setSubmittedMedicalOffers] = useState<ConsultationMedicalOffers | null>(null);
-  const [submitSuccessMessage, setSubmitSuccessMessage] = useState('');
 
   // ── Handlers ──
 
@@ -317,99 +389,249 @@ export default function ConsultationWizard() {
     }
 
     dispatch({ type: 'SUBMIT_START' });
-    setSubmittedMedicalOffers(null);
-    setSubmitSuccessMessage('');
 
     try {
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), CONSULTATION_SUBMIT_TIMEOUT_MS);
-
       // Build multipart form data for file uploads
       const body = new FormData();
-      const { photos, ...jsonData } = formData;
+      const { photos, ...rest } = formData;
+      const jsonData = { ...rest };
+      let uploadPhotos = [...(photos || [])];
+      const oversizeAuraPdfs = [...auraPdfFiles].filter((file) => file.size > MAX_AURA_PDF_SUBMIT_BYTES);
+      const uploadAuraPdfs = [...auraPdfFiles].filter((file) => file.size <= MAX_AURA_PDF_SUBMIT_BYTES);
+
+      const totalUploadBytes = () =>
+        [...uploadPhotos, ...uploadAuraPdfs].reduce((sum, file) => sum + file.size, 0);
+      const dropLargest = (files: File[]): File | null => {
+        if (files.length === 0) return null;
+        let maxIndex = 0;
+        for (let i = 1; i < files.length; i += 1) {
+          if (files[i].size > files[maxIndex].size) maxIndex = i;
+        }
+        const [removed] = files.splice(maxIndex, 1);
+        return removed || null;
+      };
+
+      const droppedForPayloadLimit: File[] = [];
+      while (totalUploadBytes() > MAX_INITIAL_SUBMIT_UPLOAD_BYTES && uploadAuraPdfs.length > 0) {
+        const dropped = dropLargest(uploadAuraPdfs);
+        if (!dropped) break;
+        droppedForPayloadLimit.push(dropped);
+      }
+      while (totalUploadBytes() > MAX_INITIAL_SUBMIT_UPLOAD_BYTES && uploadPhotos.length > 0) {
+        const dropped = dropLargest(uploadPhotos);
+        if (!dropped) break;
+        droppedForPayloadLimit.push(dropped);
+      }
+
+      if (totalUploadBytes() > MAX_INITIAL_SUBMIT_UPLOAD_BYTES) {
+        throw new Error(
+          `Upload too large. Keep attachments under ${formatFileSize(MAX_INITIAL_SUBMIT_UPLOAD_BYTES)} and retry.`
+        );
+      }
+
+      if (droppedForPayloadLimit.length > 0) {
+        const existingNotes = typeof jsonData.clinicalNotes === 'string' ? jsonData.clinicalNotes.trim() : '';
+        const droppedPdfCount = droppedForPayloadLimit.filter(isPdfFile).length;
+        const droppedImageCount = droppedForPayloadLimit.length - droppedPdfCount;
+        const payloadNotes: string[] = [];
+        if (droppedPdfCount > 0 || droppedImageCount > 0) {
+          const parts: string[] = [];
+          if (droppedPdfCount > 0) parts.push(`${droppedPdfCount} PDF`);
+          if (droppedImageCount > 0) parts.push(`${droppedImageCount} image${droppedImageCount > 1 ? 's' : ''}`);
+          payloadNotes.push(`Payload guard removed ${parts.join(' and ')} from initial upload.`);
+        }
+        jsonData.clinicalNotes = [existingNotes, ...payloadNotes].filter(Boolean).join('\n');
+      }
+
+      const fallbackPdfCandidates = mergeAuraUploadSet({
+        existingAuraPhotos: [],
+        existingAuraPdfs: oversizeAuraPdfs,
+        incomingAuraPhotos: [],
+        incomingAuraPdfs: droppedForPayloadLimit.filter((file): file is File => isPdfFile(file)),
+      }).auraPdfs;
+
+      const auraMarkers: string[] = [];
+      const auraWarnings: string[] = [];
+      let auraPdfPreviewImage: string | undefined;
+      for (const previewPdf of mergeAuraUploadSet({
+        existingAuraPhotos: [],
+        existingAuraPdfs: auraPdfFiles,
+        incomingAuraPhotos: [],
+        incomingAuraPdfs: [],
+      }).auraPdfs) {
+        try {
+          const previewFile = await convertAuraPdfFaceToJpeg(previewPdf, {
+            maxDimension: 420,
+            quality: 0.66,
+            maxBytes: MAX_AURA_PREVIEW_BYTES,
+          });
+          const dataUrl = await fileToDataUrl(previewFile);
+          if (dataUrl.length <= 45_000) {
+            auraPdfPreviewImage = dataUrl;
+            break;
+          }
+        } catch {
+          // The text fallback below still lets the intake continue.
+        }
+      }
+      for (const fallbackPdf of fallbackPdfCandidates) {
+        try {
+          const textSummary = await extractPdfTextSummary(fallbackPdf, {
+            maxPages: 4,
+            maxChars: 6500,
+          });
+          const marker = serializeAuraPdfTextFallback({
+            name: fallbackPdf.name || 'aura-handout.pdf',
+            text: textSummary,
+          });
+          if (marker) {
+            auraMarkers.push(marker);
+          } else {
+            auraWarnings.push(
+              `Aura PDF "${fallbackPdf.name}" had limited readable text. Continuing with intake fallback.`
+            );
+          }
+        } catch {
+          auraWarnings.push(
+            `Aura PDF "${fallbackPdf.name}" could not be parsed automatically. Continuing with intake fallback.`
+          );
+        }
+      }
+      if (oversizeAuraPdfs.length > 0 || auraMarkers.length > 0 || auraWarnings.length > 0) {
+        const existingNotes = typeof jsonData.clinicalNotes === 'string' ? jsonData.clinicalNotes.trim() : '';
+        const noteLines: string[] = [];
+        if (oversizeAuraPdfs.length > 0) {
+          noteLines.push(
+            `${oversizeAuraPdfs.length} Aura PDF file${oversizeAuraPdfs.length > 1 ? 's were' : ' was'} parsed client-side due upload limits.`
+          );
+        }
+        if (auraMarkers.length > 0) {
+          noteLines.push(
+            `Captured ${auraMarkers.length} Aura PDF text fallback marker${auraMarkers.length > 1 ? 's' : ''}.`
+          );
+        }
+        if (auraWarnings.length > 0) {
+          noteLines.push(
+            `${auraWarnings.length} Aura PDF file${auraWarnings.length > 1 ? 's were' : ' was'} only partially parsed.`
+          );
+        }
+        jsonData.clinicalNotes = [existingNotes, ...noteLines, ...auraMarkers]
+          .filter(Boolean)
+          .join('\n\n');
+      }
+      if (auraPdfPreviewImage) {
+        (jsonData as Record<string, unknown>).auraPdfPreviewImage = auraPdfPreviewImage;
+      }
       body.append('data', JSON.stringify(jsonData));
 
-      if (photos && photos.length > 0) {
-        for (const photo of photos) {
+      if (uploadPhotos.length > 0) {
+        for (const photo of uploadPhotos) {
           body.append('photos', photo);
         }
       }
-
+      if (uploadAuraPdfs.length > 0) {
+        for (const auraFile of uploadAuraPdfs) {
+          body.append('aura', auraFile);
+        }
+      }
       const res = await fetch('/api/consultation/submit', {
         method: 'POST',
         body,
-        signal: controller.signal,
       });
-
-      window.clearTimeout(timeoutId);
-
+      const parsed = await parseJsonResponse(res);
       if (!res.ok) {
-        let errorMessage = 'Submission failed';
-        try {
-          const errorBody = await res.json();
-          if (typeof errorBody?.error === 'string' && errorBody.error.trim()) {
-            errorMessage = errorBody.error.trim();
-          }
-        } catch {
-          if (res.status === 413) {
-            errorMessage = 'Upload is too large. Keep each photo under 10MB and total uploads under 30MB.';
-          } else if (res.status >= 500) {
-            errorMessage = 'Server is temporarily unavailable. Please retry in a moment.';
-          }
+        if (res.status === 401 || res.status === 403) {
+          redirectToSignIn();
         }
-        throw new Error(errorMessage);
+        throw new Error(getApiErrorMessage(res, parsed, 'Submission failed'));
+      }
+      if (!parsed.json) {
+        throw new Error('Server returned an invalid response. Please retry.');
       }
 
-      const result = (await res.json()) as ConsultationSubmitResponse;
-      const sessionId = result.data?.sessionId || result.sessionId;
-      if (!sessionId) {
-        throw new Error('Submission succeeded but no session ID was returned. Please retry.');
+      const result = parsed.json as {
+        success?: boolean;
+        data?: { sessionId?: string };
+        error?: string;
+        message?: string;
+      };
+      if (!result.success) {
+        throw new Error(result.error || result.message || 'Submission failed');
       }
 
       dispatch({ type: 'SUBMIT_END', success: true });
+      setAuraPdfFiles([]);
 
       // Store session ID for post-submit reference (e.g., dashboard redirect)
-      try {
-        sessionStorage.setItem('mastermind_last_session', sessionId);
-      } catch {
-        // sessionStorage unavailable
+      if (result.data?.sessionId) {
+        try {
+          sessionStorage.setItem('mastermind_last_session', result.data.sessionId);
+        } catch { /* sessionStorage unavailable */ }
       }
-
-      if (result.medicalOffers) {
-        setSubmittedMedicalOffers(result.medicalOffers);
-        setSubmitSuccessMessage(
-          `We found ${result.medicalOffers.recommendationCount} medically supervised options matched to your intake.`
-        );
-      } else {
-        setSubmitSuccessMessage(
-          'Our team will review your consultation and reach out within 24 hours with a personalized treatment plan.'
-        );
+    } catch (err) {
+      if (err instanceof Error && err.message === AUTH_REDIRECT_SENTINEL) {
+        return;
       }
-    } catch (error) {
-      const message =
-        error instanceof DOMException && error.name === 'AbortError'
-          ? 'Upload timed out. Please retry with fewer or smaller photos.'
-          : error instanceof Error && error.message
-            ? error.message
-            : 'Something went wrong. Please try again.';
-
       dispatch({ type: 'SUBMIT_END', success: false });
       dispatch({
         type: 'SET_ERRORS',
-        errors: { submit: message },
+        errors: {
+          submit:
+            err instanceof Error && err.message.trim()
+              ? err.message
+              : 'Something went wrong. Please try again.',
+        },
       });
     }
-  }, [currentStep, formData]);
+  }, [auraPdfFiles, currentStep, formData]);
 
   const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || []);
+      e.target.value = '';
+      if (files.length === 0) return;
+
+      const queueablePdfs: File[] = [];
+      const pdfFiles = files.filter((file) => isPdfFile(file));
+      const imageFiles = files.filter((file) => !isPdfFile(file));
+      let oversizedPdfDetected = false;
+
+      if (pdfFiles.length > 0) {
+        for (const pdfFile of pdfFiles) {
+          queueablePdfs.push(pdfFile);
+          if (pdfFile.size > MAX_AURA_PDF_SUBMIT_BYTES) {
+            oversizedPdfDetected = true;
+            console.warn('[Consultation Wizard] Aura PDF exceeds direct submit limit:', pdfFile.name);
+          }
+        }
+      }
+      const { auraPdfs } = mergeAuraUploadSet({
+        existingAuraPhotos: [],
+        existingAuraPdfs: auraPdfFiles,
+        incomingAuraPhotos: [],
+        incomingAuraPdfs: queueablePdfs,
+      });
+
       const existing = (formData.photos as File[]) || [];
-      const combined = [...existing, ...files].slice(0, 3);
+      const normalized = [...imageFiles];
+      const combined = [...existing, ...normalized].slice(0, 3);
       setField('photos', combined);
+      setAuraPdfFiles(auraPdfs);
+
+      const nextErrors = { ...errors };
+      if (oversizedPdfDetected) {
+        nextErrors.photos = `Aura PDFs above ${formatFileSize(MAX_AURA_PDF_SUBMIT_BYTES)} are parsed client-side automatically and included as fallback metrics.`;
+      } else if (nextErrors.photos) {
+        delete nextErrors.photos;
+      }
+      dispatch({ type: 'SET_ERRORS', errors: nextErrors });
     },
-    [formData.photos, setField]
+    [auraPdfFiles, errors, formData.photos, setField]
   );
+
+  const removeAuraPdf = useCallback((index: number) => {
+    setAuraPdfFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const removePhoto = useCallback(
     (index: number) => {
@@ -499,45 +721,9 @@ export default function ConsultationWizard() {
             You&apos;re All Set
           </h2>
           <p className="font-body text-[#0F1D2C]/60 max-w-md mx-auto mb-8">
-            Thank you, {formData.firstName}! {submitSuccessMessage || 'Our team will review your consultation and follow up soon.'}
+            Thank you, {formData.firstName}! Our team will review your consultation
+            and reach out within 24 hours with a personalized treatment plan.
           </p>
-          {submittedMedicalOffers?.recommendedProducts?.length ? (
-            <div className="rounded-xl border border-[#C9A96E]/30 bg-[#F8F6F1] p-4 mb-6 text-left">
-              <p className="font-body text-sm text-[#0F1D2C]/70 mb-3">
-                Recommended track: <strong className="text-[#0F1D2C]">{submittedMedicalOffers.requestedTrack}</strong>
-                {' '}• Projected monthly gross profit:{' '}
-                <strong className="text-[#0F1D2C]">${submittedMedicalOffers.projectedMonthlyGrossProfit.toFixed(2)}</strong>
-              </p>
-              <div className="space-y-2 mb-4">
-                {submittedMedicalOffers.recommendedProducts.slice(0, 3).map((product) => (
-                  <div key={product.id} className="rounded-lg bg-white border border-[#0F1D2C]/10 p-3">
-                    <p className="font-body font-semibold text-[#0F1D2C]">{product.label}</p>
-                    <p className="font-body text-xs text-[#0F1D2C]/60">
-                      Retail ${product.suggestedRetail.toFixed(2)} • Margin {product.suggestedMarginPercent.toFixed(1)}%
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <a
-                  href={submittedMedicalOffers.checkoutPaths.clinic}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F1D2C] text-white font-body text-sm font-medium hover:bg-[#1A2D3E] transition-colors"
-                >
-                  Continue in Clinic
-                </a>
-                <a
-                  href={submittedMedicalOffers.checkoutPaths.home}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#0F1D2C]/20 text-[#0F1D2C] bg-white font-body text-sm font-medium hover:border-[#C9A96E]/60 transition-colors"
-                >
-                  Continue at Home
-                </a>
-              </div>
-            </div>
-          ) : null}
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F1D2C] text-white font-body font-medium rounded-xl hover:bg-[#0F1D2C]/90 transition-colors"
@@ -605,6 +791,8 @@ export default function ConsultationWizard() {
             errors={errors}
             handleFileChange={handleFileChange}
             removePhoto={removePhoto}
+            auraPdfFiles={auraPdfFiles}
+            removeAuraPdf={removeAuraPdf}
           />
         );
       case 7:
@@ -613,6 +801,7 @@ export default function ConsultationWizard() {
             formData={formData}
             errors={errors}
             setField={setField}
+            auraPdfFiles={auraPdfFiles}
           />
         );
       default:
@@ -649,7 +838,7 @@ export default function ConsultationWizard() {
               key={currentStep}
               custom={direction}
               variants={slideVariants}
-              initial="enter"
+              initial={currentStep === 0 ? false : 'enter'}
               animate="center"
               exit="exit"
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -1216,11 +1405,15 @@ function StepPhotos({
   errors,
   handleFileChange,
   removePhoto,
+  auraPdfFiles,
+  removeAuraPdf,
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removePhoto: (index: number) => void;
+  auraPdfFiles: File[];
+  removeAuraPdf: (index: number) => void;
 }) {
   const photos = (formData.photos as File[]) || [];
 
@@ -1235,24 +1428,12 @@ function StepPhotos({
       <div className="mt-6">
         <div className="grid grid-cols-3 gap-3">
           {photos.map((file, index) => (
-            <div
+            <PhotoPreviewTile
               key={`${file.name}-${index}`}
-              className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={URL.createObjectURL(file)}
-                alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => removePhoto(index)}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#0F1D2C]/70 text-white flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                aria-label="Remove photo"
-              >
-                &times;
-              </button>
-            </div>
+              file={file}
+              index={index}
+              onRemove={() => removePhoto(index)}
+            />
           ))}
 
           {photos.length < 3 && (
@@ -1261,7 +1442,7 @@ function StepPhotos({
               <span className="text-xs font-body text-[#0F1D2C]/40">Add Photo</span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/heic"
+                accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
                 onChange={handleFileChange}
                 className="hidden"
                 multiple
@@ -1273,15 +1454,73 @@ function StepPhotos({
         {errors.photos && (
           <p className="mt-2 text-sm font-body text-red-600">{errors.photos}</p>
         )}
+        {auraPdfFiles.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm font-body font-semibold text-[#0F1D2C]">Aura PDF Attachments</p>
+            <div className="space-y-2">
+              {auraPdfFiles.map((file, index) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg border border-[#C9A96E]/30 bg-[#0F1D2C]/5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm text-[#0F1D2C] truncate">{file.name}</p>
+                    <p className="text-xs text-[#0F1D2C]/60">PDF • {formatFileSize(file.size)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeAuraPdf(index)}
+                    className="ml-3 text-xs px-2 py-1 rounded-full border border-[#C9A96E]/40 text-[#C9A96E] hover:bg-[#C9A96E]/20"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 p-3 rounded-lg bg-[#F8F6F1]/80 border border-[#0F1D2C]/5">
-          <p className="text-xs font-body text-[#0F1D2C]/50 leading-relaxed">
-            Upload up to 3 photos (JPEG, PNG, WebP, or HEIC, max 10 MB each). Good
-            lighting and a clean background produce the best results. All photos are
-            stored securely and kept strictly confidential.
+        <p className="text-xs font-body text-[#0F1D2C]/50 leading-relaxed">
+            Upload up to 3 photo files (JPEG, PNG, WebP, HEIC) and up to 3 Aura PDFs.
+            Aura PDFs above {formatFileSize(MAX_AURA_PDF_SUBMIT_BYTES)} are parsed client-side and added as fallback scan markers.
+            Non-image files must be PDFs and are processed safely without blocking your intake.
+            Good lighting and a clean background produce the best results.
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PhotoPreviewTile({ file, index, onRemove }: {
+  file: File;
+  index: number;
+  onRemove: () => void;
+}) {
+  const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
+
+  useEffect(() => {
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  return (
+    <div className="relative aspect-square rounded-xl overflow-hidden bg-[#F8F6F1] border border-[#0F1D2C]/10">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={previewUrl}
+        alt={`Upload ${index + 1}`}
+        className="w-full h-full object-cover"
+      />
+      <button
+        onClick={onRemove}
+        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#0F1D2C]/70 text-white flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+        aria-label="Remove photo"
+      >
+        &times;
+      </button>
     </div>
   );
 }
@@ -1291,10 +1530,12 @@ function StepSummary({
   formData,
   errors,
   setField,
+  auraPdfFiles,
 }: {
   formData: Partial<ConsultationFormData>;
   errors: Record<string, string>;
   setField: (field: string, value: unknown) => void;
+  auraPdfFiles: File[];
 }) {
   const concerns = (formData.skinConcerns as string[]) || [];
   const interests = (formData.treatmentInterests as string[]) || [];
@@ -1341,6 +1582,12 @@ function StepSummary({
         />
         {photos.length > 0 && (
           <SummaryRow label="Photos" value={`${photos.length} uploaded`} />
+        )}
+        {auraPdfFiles.length > 0 && (
+          <SummaryRow
+            label="Aura PDFs"
+            value={auraPdfFiles.map((file) => `${file.name} (${formatFileSize(file.size)})`).join(', ')}
+          />
         )}
       </div>
 

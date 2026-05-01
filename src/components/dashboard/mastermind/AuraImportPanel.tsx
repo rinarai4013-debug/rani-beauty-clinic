@@ -10,7 +10,10 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { MastermindSession } from '@/types/mastermind';
+import { convertAuraPdfFaceToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
+import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 
 // ── TYPES ──
 
@@ -50,6 +53,71 @@ interface ImportResult {
   };
 }
 
+async function parseJsonResponse(
+  response: Response,
+): Promise<{ json: Record<string, unknown> | null; text: string }> {
+  const text = await response.text().catch(() => '');
+  if (!text) return { json: null, text: '' };
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === 'object') {
+      return { json: parsed as Record<string, unknown>, text };
+    }
+  } catch {
+    // non-JSON response
+  }
+  return { json: null, text };
+}
+
+const AUTH_SESSION_ERROR_PATTERN =
+  /\b(?:unauthorized|not authenticated|session expired|dashboard session expired|please sign in again|sign in again)\b/i;
+const ACCESS_DENIED_ERROR_PATTERN =
+  /\b(?:forbidden|access denied|insufficient permissions?|permission denied)\b/i;
+const DOWNSTREAM_RETRY_DELAYS_MS = [250, 500, 900, 1400, 2200] as const;
+// Vercel rejects oversized multipart requests before route code executes.
+const MAX_DIRECT_PDF_UPLOAD_BYTES = 4 * 1024 * 1024;
+
+function isAuthSessionError(message: string | null | undefined): boolean {
+  if (!message) return false;
+  return AUTH_SESSION_ERROR_PATTERN.test(message);
+}
+
+function isAccessDeniedError(message: string | null | undefined): boolean {
+  if (!message) return false;
+  return ACCESS_DENIED_ERROR_PATTERN.test(message);
+}
+
+function getApiErrorMessage(
+  response: Response,
+  parsed: { json: Record<string, unknown> | null; text: string },
+  fallback: string,
+): string {
+  const payloadError = parsed.json && typeof parsed.json.error === 'string'
+    ? parsed.json.error.trim()
+    : '';
+  const payloadMessage = parsed.json && typeof parsed.json.message === 'string'
+    ? parsed.json.message.trim()
+    : '';
+
+  if (payloadError) return payloadError;
+  if (payloadMessage) return payloadMessage;
+  if (response.status === 401) return 'Your dashboard session expired. Please sign in again.';
+  if (response.status === 403) return 'You do not have permission for this action.';
+  if (response.status === 413) return 'Upload is too large. Please retry with a smaller PDF.';
+  if (response.status >= 500) return 'Server is temporarily unavailable. Please retry in a moment.';
+  if (parsed.text) return parsed.text.slice(0, 220);
+  return fallback;
+}
+
+function shouldRetryDownstream(status: number, message: string): boolean {
+  if (status === 404 || status === 425 || status === 429 || status === 500 || status === 502 || status === 503 || status === 504) {
+    return true;
+  }
+  return /session not found|not yet available|still processing|initializing|temporary|please retry/i.test(
+    message,
+  );
+}
+
 // ── PROPS ──
 
 interface AuraImportPanelProps {
@@ -73,77 +141,9 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   const [fileUploading, setFileUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load pdf.js library from CDN with retry
-  const loadPdfJs = useCallback(async (): Promise<any> => {
-    const win = window as any;
-    if (win.pdfjsLib) return win.pdfjsLib;
-
-    // Try loading the script
-    const PDFJS_VERSION = '3.11.174';
-    const CDN_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.min.js`;
-    const WORKER_URL = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.js`;
-
-    await new Promise<void>((resolve, reject) => {
-      // Check if script already exists but hasn't initialized yet
-      const existing = document.querySelector(`script[src="${CDN_URL}"]`);
-      if (existing) {
-        // Script tag exists — wait for pdfjsLib to appear
-        let attempts = 0;
-        const check = setInterval(() => {
-          attempts++;
-          if (win.pdfjsLib) { clearInterval(check); resolve(); }
-          else if (attempts > 50) { clearInterval(check); reject(new Error('PDF.js load timeout')); }
-        }, 100);
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = CDN_URL;
-      script.onload = () => {
-        // Wait for pdfjsLib to be available on window (may take a tick)
-        let attempts = 0;
-        const check = setInterval(() => {
-          attempts++;
-          if (win.pdfjsLib) { clearInterval(check); resolve(); }
-          else if (attempts > 30) { clearInterval(check); reject(new Error('PDF.js init timeout')); }
-        }, 100);
-      };
-      script.onerror = () => reject(new Error('Failed to load PDF renderer from CDN'));
-      document.head.appendChild(script);
-    });
-
-    const lib = win.pdfjsLib;
-    if (!lib) throw new Error('PDF renderer not available after load');
-    lib.GlobalWorkerOptions.workerSrc = WORKER_URL;
-    return lib;
-  }, []);
-
-  // Convert a file to a JPEG data URL client-side (handles PDFs + large images)
+  // Convert an image file to a JPEG data URL client-side
   const fileToDataUrl = useCallback(async (file: File): Promise<string> => {
-    const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
-
-    if (isPdf) {
-      console.log('[AuraImport] Processing PDF client-side...', file.name, `${(file.size / 1024 / 1024).toFixed(1)}MB`);
-      const pdfjsLib = await loadPdfJs();
-
-      const arrayBuffer = await file.arrayBuffer();
-      console.log('[AuraImport] PDF loaded into buffer, rendering first page...');
-      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-      const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 2.0 });
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Canvas context unavailable');
-      await page.render({ canvasContext: ctx, viewport }).promise;
-      console.log('[AuraImport] PDF rendered to canvas:', canvas.width, 'x', canvas.height);
-
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      console.log('[AuraImport] Converted to JPEG:', `${(dataUrl.length / 1024).toFixed(0)}KB`);
-      return dataUrl;
-    }
-
-    // For images: load into canvas, resize if needed, compress to JPEG
+    // For images: load into canvas, resize if needed, compress to JPEG.
     return new Promise((resolve, reject) => {
       const img = new window.Image();
       img.onload = () => {
@@ -162,21 +162,280 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
       img.onerror = () => reject(new Error('Failed to load image'));
       img.src = URL.createObjectURL(file);
     });
-  }, [loadPdfJs]);
+  }, []);
+
+  const handlePdfUpload = useCallback(
+    async (file: File) => {
+      const postJsonWithRetry = async (
+        url: string,
+        body: Record<string, unknown>,
+        fallbackMessage: string,
+      ): Promise<{
+        response: Response;
+        parsed: { json: Record<string, unknown> | null; text: string };
+        message: string;
+      }> => {
+        let lastResponse: Response | null = null;
+        let lastParsed: { json: Record<string, unknown> | null; text: string } = {
+          json: null,
+          text: '',
+        };
+        let lastMessage = fallbackMessage;
+
+        for (let attempt = 0; attempt < DOWNSTREAM_RETRY_DELAYS_MS.length; attempt += 1) {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(body),
+          });
+          const parsed = await parseJsonResponse(response);
+          const message = getApiErrorMessage(response, parsed, fallbackMessage);
+          lastResponse = response;
+          lastParsed = parsed;
+          lastMessage = message;
+
+          if (response.ok || response.status === 401 || response.status === 403) {
+            return { response, parsed, message };
+          }
+
+          if (!shouldRetryDownstream(response.status, message) || attempt === DOWNSTREAM_RETRY_DELAYS_MS.length - 1) {
+            return { response, parsed, message };
+          }
+
+          await new Promise((resolve) => window.setTimeout(resolve, DOWNSTREAM_RETRY_DELAYS_MS[attempt]));
+        }
+
+        return {
+          response: lastResponse || new Response('', { status: 500 }),
+          parsed: lastParsed,
+          message: lastMessage,
+        };
+      };
+
+      const runClientSidePdfFallback = async (): Promise<{
+        scanResult: unknown;
+        warning: string | null;
+      }> => {
+        const intakeData =
+          (session.intakeData && typeof session.intakeData === 'object'
+            ? (session.intakeData as Record<string, unknown>)
+            : {}) as Record<string, unknown>;
+        const existingClinicalNotes =
+          typeof intakeData.clinicalNotes === 'string' ? intakeData.clinicalNotes.trim() : '';
+
+        let pdfTextSummary = '';
+        let extractionWarning: string | null = null;
+        try {
+          pdfTextSummary = await extractPdfTextSummary(file, { maxPages: 4, maxChars: 6500 });
+        } catch {
+          extractionWarning = 'Aura PDF text extraction was limited. Using intake-based scan fallback.';
+        }
+
+        const markerLine = pdfTextSummary
+          ? serializeAuraPdfTextFallback({ name: file.name || 'aura-handout.pdf', text: pdfTextSummary })
+          : null;
+        const fallbackNotes = [
+          existingClinicalNotes,
+          `Aura PDF fallback captured client-side (${file.name}, ${(file.size / (1024 * 1024)).toFixed(1)} MB).`,
+          markerLine || '',
+          extractionWarning || '',
+        ]
+          .filter(Boolean)
+          .join('\n\n');
+
+        const intakePatchResult = await postJsonWithRetry(
+          `/api/mastermind/sessions/${session.id}`,
+          {
+            action: {
+              type: 'SET_INTAKE',
+              data: {
+                ...intakeData,
+                clinicalNotes: fallbackNotes,
+              },
+            },
+          },
+          'Failed to save Aura fallback notes to session.',
+        );
+        if (!intakePatchResult.response.ok) {
+          throw new Error(intakePatchResult.message);
+        }
+
+        let sourcePhotoUrl: string | null = null;
+        try {
+          const jpegPreview = await convertAuraPdfFaceToJpeg(file, {
+            maxDimension: 420,
+            quality: 0.66,
+            maxBytes: 28 * 1024,
+          });
+          sourcePhotoUrl = await fileToDataUrl(jpegPreview);
+        } catch {
+          sourcePhotoUrl = null;
+        }
+
+        if (sourcePhotoUrl) {
+          const photoPatchResult = await postJsonWithRetry(
+            `/api/mastermind/sessions/${session.id}`,
+            {
+              action: { type: 'SET_SOURCE_PHOTO', url: sourcePhotoUrl },
+            },
+            'Failed to save Aura preview image to session.',
+          );
+          if (!photoPatchResult.response.ok) {
+            throw new Error(photoPatchResult.message);
+          }
+        }
+
+        const scanPayload: Record<string, unknown> = { sessionId: session.id };
+        if (sourcePhotoUrl) scanPayload.sourcePhotoUrl = sourcePhotoUrl;
+        const scanResult = await postJsonWithRetry(
+          '/api/mastermind/scan',
+          scanPayload,
+          'Scan generation failed after Aura PDF fallback.',
+        );
+        if (!scanResult.response.ok) {
+          throw new Error(scanResult.message);
+        }
+
+        const scanJson = (scanResult.parsed.json || {}) as {
+          success?: boolean;
+          data?: unknown;
+          error?: string;
+          message?: string;
+        };
+        if (scanJson.success === false) {
+          throw new Error(
+            (typeof scanJson.error === 'string' && scanJson.error) ||
+              (typeof scanJson.message === 'string' && scanJson.message) ||
+              'Scan generation failed after Aura PDF fallback.',
+          );
+        }
+
+        return {
+          scanResult: scanJson.data ?? scanJson,
+          warning: extractionWarning,
+        };
+      };
+
+      let importedSessionId = session.id;
+      let importedPhase = 'scan_complete';
+      let importedScanResult: unknown = null;
+
+      const requiresClientFallback = file.size > MAX_DIRECT_PDF_UPLOAD_BYTES;
+      if (requiresClientFallback) {
+        const fallbackResult = await runClientSidePdfFallback();
+        importedScanResult = fallbackResult.scanResult;
+      } else {
+        const body = new FormData();
+        body.set('sessionId', session.id);
+        body.set('aura', file);
+
+        const pdfRes = await fetch('/api/mastermind/aura-import/pdf', {
+          method: 'POST',
+          body,
+        });
+        const parsedPdf = await parseJsonResponse(pdfRes);
+        let directFallbackUsed = false;
+        if (!pdfRes.ok) {
+          const failureMessage =
+            (parsedPdf.json && typeof parsedPdf.json.error === 'string' && parsedPdf.json.error) ||
+            parsedPdf.text ||
+            'Failed to process Aura PDF.';
+          if (
+            pdfRes.status === 413 ||
+            /request entity too large|function_payload_too_large/i.test(failureMessage)
+          ) {
+            const fallbackResult = await runClientSidePdfFallback();
+            importedScanResult = fallbackResult.scanResult;
+            directFallbackUsed = true;
+          } else {
+            const message =
+              (parsedPdf.json && typeof parsedPdf.json.error === 'string' && parsedPdf.json.error) ||
+              parsedPdf.text ||
+              'Failed to process Aura PDF.';
+            throw new Error(message);
+          }
+        }
+        if (!directFallbackUsed) {
+          const payload = (parsedPdf.json || {}) as {
+            success?: boolean;
+            data?: {
+              sessionId?: string;
+              phase?: string;
+              scanResult?: unknown;
+              warning?: string | null;
+            };
+            error?: string;
+          };
+          if (!payload.success) {
+            throw new Error(payload.error || 'Failed to process Aura PDF.');
+          }
+          importedSessionId = payload.data?.sessionId || session.id;
+          importedPhase = payload.data?.phase || 'scan_complete';
+          importedScanResult = payload.data?.scanResult ?? null;
+        }
+      }
+
+      onImportComplete?.({
+        scan: {
+          patientName: session.patientName || 'Patient',
+          scanDate: new Date().toISOString(),
+          imageKeys: [],
+          expressionKeys: [],
+          handoutPdfPath: file.name,
+        },
+        scanResult: importedScanResult,
+        session: {
+          id: importedSessionId,
+          phase: importedPhase,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+
+      // After PDF scan import, generate the treatment plan and simulation explicitly.
+      // This prevents "imported but no simulation" gaps.
+      const planResult = await postJsonWithRetry(
+        '/api/mastermind/plan',
+        { sessionId: importedSessionId },
+        'Plan generation failed after Aura import.',
+      );
+      if (!planResult.response.ok) {
+        throw new Error(planResult.message);
+      }
+
+      const simulateResult = await postJsonWithRetry(
+        '/api/mastermind/simulate',
+        { sessionId: importedSessionId },
+        'Simulation generation failed after Aura import.',
+      );
+      if (!simulateResult.response.ok) {
+        throw new Error(simulateResult.message);
+      }
+    },
+    [fileToDataUrl, onImportComplete, session.id, session.intakeData, session.patientName]
+  );
 
   // Handle file upload — process client-side then run AI scan
   const handleFileUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const isValid = file.type.startsWith('image/') || file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+      const isPdf =
+        file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+      const isValid = file.type.startsWith('image/') || isPdf;
       if (!isValid) return;
       setFileUploading(true);
       setImportError(null);
       try {
-        // Step 1: Convert file to JPEG data URL client-side (handles PDFs + large images)
+        if (isPdf) {
+          // PDF-first path: parse + score on server so the flow does not depend on client PDF renderer support.
+          await handlePdfUpload(file);
+          return;
+        }
+
+        // Image path: convert to JPEG data URL client-side.
         const dataUrl = await fileToDataUrl(file);
-        if (!dataUrl) throw new Error('Failed to process file');
+        if (!dataUrl) throw new Error('Failed to process image file');
 
         // Step 2: Save photo to session
         const saveRes = await fetch(`/api/mastermind/sessions/${session.id}`, {
@@ -232,7 +491,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [session.id, session.patientName, onImportComplete, fileToDataUrl]
+    [session.id, session.patientName, onImportComplete, fileToDataUrl, handlePdfUpload]
   );
 
   // Determine if we already have a device scan imported
@@ -263,13 +522,20 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
     setScanError(null);
     try {
       const res = await fetch('/api/mastermind/aura-import');
-      const json = await res.json();
-      if (json.success) {
-        setAvailableScans(json.data || []);
+      const parsed = await parseJsonResponse(res);
+      const json = (parsed.json || {}) as { success?: boolean; data?: AvailableScan[]; error?: string };
+      if (res.ok && json.success) {
+        setAvailableScans(Array.isArray(json.data) ? json.data : []);
       } else {
-        setScanError(json.error || 'Failed to list scans');
+        setScanError(
+          json.error ||
+            parsed.text ||
+            (res.status === 401
+              ? 'Your dashboard session expired. Please sign in again.'
+              : 'Failed to list scans'),
+        );
       }
-    } catch (err) {
+    } catch {
       setScanError('Could not connect to Aura scanner');
     } finally {
       setLoadingScans(false);
@@ -293,10 +559,14 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
             scanDate: scan.date,
           }),
         });
+        const parsed = await parseJsonResponse(res);
+        const json = (parsed.json || {}) as {
+          success?: boolean;
+          data?: ImportResult;
+          error?: string;
+        };
 
-        const json = await res.json();
-
-        if (json.success) {
+        if (res.ok && json.success && json.data) {
           setImportResult(json.data);
 
           // Store imported images from the session's source photo
@@ -314,9 +584,15 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           setImportedImages(images);
           onImportComplete?.(json.data);
         } else {
-          setImportError(json.error || 'Import failed');
+          setImportError(
+            json.error ||
+              parsed.text ||
+              (res.status === 401
+                ? 'Your dashboard session expired. Please sign in again.'
+                : 'Import failed'),
+          );
         }
-      } catch (err) {
+      } catch {
         setImportError('Import request failed — check server logs');
       } finally {
         setImporting(false);
@@ -339,16 +615,26 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           patientName: session.patientName,
         }),
       });
+      const parsed = await parseJsonResponse(res);
+      const json = (parsed.json || {}) as {
+        success?: boolean;
+        data?: ImportResult;
+        error?: string;
+      };
 
-      const json = await res.json();
-
-      if (json.success) {
+      if (res.ok && json.success && json.data) {
         setImportResult(json.data);
         onImportComplete?.(json.data);
       } else {
-        setImportError(json.error || 'Import failed');
+        setImportError(
+          json.error ||
+            parsed.text ||
+            (res.status === 401
+              ? 'Your dashboard session expired. Please sign in again.'
+              : 'Import failed'),
+        );
       }
-    } catch (err) {
+    } catch {
       setImportError('Import request failed');
     } finally {
       setImporting(false);
@@ -707,7 +993,17 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
           </svg>
-          <p className="font-body text-xs text-red-300">{importError}</p>
+          <div className="space-y-2">
+            <p className="font-body text-xs text-red-300">{importError}</p>
+            {isAuthSessionError(importError) ? (
+              <Link
+                href="/dashboard/login"
+                className="inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-3 py-1 text-xs font-semibold text-[#0F1D2C] hover:bg-[#d7bc84] transition-colors"
+              >
+                Sign in again
+              </Link>
+            ) : null}
+          </div>
         </div>
       )}
 
@@ -745,6 +1041,14 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
               {scanError && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
                   <p className="font-body text-xs text-red-300">{scanError}</p>
+                  {isAuthSessionError(scanError) ? (
+                    <Link
+                      href="/dashboard/login"
+                      className="mt-2 inline-flex items-center justify-center rounded-lg bg-[#C9A96E] px-3 py-1 text-xs font-semibold text-[#0F1D2C] hover:bg-[#d7bc84] transition-colors"
+                    >
+                      Sign in again
+                    </Link>
+                  ) : null}
                   <p className="font-body text-[10px] text-red-300/50 mt-1">
                     Ensure the Aura scanner app has been used and scan data exists on this machine.
                   </p>

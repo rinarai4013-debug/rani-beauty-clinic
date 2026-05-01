@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { getSessionByIdAsync, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
+import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/lib/mastermind/session';
 import { unauthorized } from '@/lib/auth/middleware';
 import { FOLLOW_UP_TEMPLATES, renderTemplate } from '@/lib/plan-builder/follow-up-templates';
 import { resolveToken, saveTokenToAirtable } from '@/lib/mastermind/share-token';
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const session = await getSessionByIdAsync(sessionId);
+      const session = await getSessionByIdAsyncRetry(sessionId);
       if (!session) {
         return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
       }
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Log to activity timeline via direct activity log append
-      const latestSession = await getSessionByIdAsync(sessionId);
+      const latestSession = await getSessionByIdAsyncRetry(sessionId);
       if (latestSession) {
         const channelLabel = sendChannel === 'sms' ? 'SMS' : 'email';
         const logDetail = `${template.name} sent via ${channelLabel} to ${sentTo}`;

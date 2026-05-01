@@ -6,6 +6,7 @@ import EmailCapture from "@/components/conversion/EmailCapture";
 
 const navigateLinks = [
   { name: "Services", href: "/services" },
+  { name: "Gifts", href: "/gifts" },
   { name: "Results", href: "/results" },
   { name: "About", href: "/about" },
   { name: "Pricing", href: "/pricing" },
@@ -20,6 +21,8 @@ const serviceLinks = [
   { name: "Injectables", href: "/services/botox-dysport" },
   { name: "Body & Laser", href: "/services/laser-hair-removal" },
   { name: "Medical Wellness", href: "/wellness" },
+  { name: "Neurotoxin Waitlist", href: "/neurotoxin" },
+  { name: "Corporate Memberships", href: "/corporate" },
 ];
 
 export default function Footer() {

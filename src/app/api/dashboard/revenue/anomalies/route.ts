@@ -7,6 +7,9 @@ import { cache, TTL } from '@/lib/cache';
 import { detectRevenueAnomalies, type AnomalyInput } from '@/lib/predictions/revenue-anomaly';
 import { TARGETS } from '@/data/dashboard/score-weights';
 import { withSentry } from '@/lib/sentry-utils';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 /**
  * GET /api/dashboard/revenue/anomalies
