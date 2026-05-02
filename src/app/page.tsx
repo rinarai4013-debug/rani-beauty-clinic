@@ -68,7 +68,7 @@ export default function HomePage() {
         badges={[
           "Neurologist-Directed Protocols",
           `${AGGREGATE_RATING} Stars \u00b7 Google Reviews`,
-          "Open 7 Days a Week",
+          "Tue–Sat Appointments",
         ]}
         backgroundImage="/images/hero/facility.jpg"
         backgroundOverlay={0}
