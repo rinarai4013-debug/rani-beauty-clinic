@@ -254,6 +254,35 @@ export interface MastermindMedicalOptimization {
   providerSummary: string;
 }
 
+export interface TreatmentPlanCustomizationItem {
+  id: string;
+  treatmentId?: string;
+  serviceId?: string;
+  treatmentName: string;
+  category: string;
+  selected: boolean;
+  sessions: number;
+  perSession: number;
+  totalEstimate: number;
+  recommendedWeek: number;
+  scheduledDate: string;
+  scheduledDay: number;
+  targetAreas: string[];
+  notes?: string;
+  priority: 'essential' | 'recommended' | 'optional';
+  source: 'ai' | 'staff';
+}
+
+export interface TreatmentPlanCustomization {
+  updatedAt: string;
+  updatedBy?: string;
+  submissionDate: string;
+  items: TreatmentPlanCustomizationItem[];
+  selectedTotal: number;
+  selectedSessionCount: number;
+  planNotes?: string;
+}
+
 export interface MastermindPlan {
   planId: string;
   generatedAt: string; // ISO date
@@ -415,6 +444,7 @@ export interface MastermindSession {
 
   // Phase 3: Plan
   mastermindPlan: MastermindPlan | null;
+  treatmentPlanCustomization?: TreatmentPlanCustomization;
 
   // Phase 4: Provider Review
   providerReview: ProviderReviewState | null;
@@ -446,6 +476,7 @@ export type MastermindSessionAction =
   | { type: 'SET_SCAN_RESULT'; result: AuraScanResult }
   | { type: 'SET_SCAN_ERROR'; error: { at: string; message: string; source: string } | null }
   | { type: 'SET_PLAN'; plan: MastermindPlan }
+  | { type: 'SET_TREATMENT_PLAN_CUSTOMIZATION'; customization: TreatmentPlanCustomization; actor?: string }
   | { type: 'SET_PROVIDER_REVIEW'; review: ProviderReviewState }
   | { type: 'ADD_MODIFICATION'; modification: PlanModification }
   | { type: 'SET_APPROVAL_STATUS'; status: ProviderReviewState['approvalStatus']; actor?: string }

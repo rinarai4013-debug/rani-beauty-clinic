@@ -24,6 +24,7 @@ import { withSentry } from '@/lib/sentry-utils';
 export const maxDuration = 30;
 const SimulateSessionSchema = z.object({
   sessionId: z.string().min(1).optional(),
+  sourcePhotoUrl: z.string().min(1).optional(),
 });
 
 function isPersistableSourcePhoto(value: string | null | undefined): value is string {
@@ -117,17 +118,24 @@ async function ensureFrameImages(
   sourcePhotoUrl: string | null | undefined,
 ): Promise<SimulationComparison> {
   const mapFrames = (
-  frames: SimulationFrame[],
-  trajectory: 'with' | 'without',
-): Promise<SimulationFrame[]> =>
-    Promise.all(frames.map(async (frame) => {
+    frames: SimulationFrame[],
+    trajectory: 'with' | 'without',
+  ): Promise<SimulationFrame[]> =>
+    Promise.all(frames.map(async (frame, index) => {
       const existingImage = typeof frame.imageDataUrl === 'string' ? frame.imageDataUrl : '';
       const existingKind = frame.kind;
+      if (isRenderableImageValue(existingImage)) {
+        return { ...frame, imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' };
+      }
+      if (index < frames.length - 1) {
+        return {
+          ...frame,
+          ...buildSimulationPlaceholderImage(trajectory, frame),
+        };
+      }
       return {
         ...frame,
-        ...(isRenderableImageValue(existingImage)
-          ? { imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' }
-          : await resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
+        ...(await resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
       };
     }));
 
@@ -296,7 +304,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { sessionId } = parsed.data;
+      const { sessionId, sourcePhotoUrl: requestSourcePhotoUrl } = parsed.data;
 
       let result: SimulationComparison;
       let renderMode = 'mock';
@@ -306,7 +314,9 @@ export async function POST(request: NextRequest) {
         if (!session) {
           return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
         }
-        const sessionPhoto = typeof session.sourcePhotoUrl === 'string' ? session.sourcePhotoUrl : null;
+        const sessionPhoto =
+          requestSourcePhotoUrl ||
+          (typeof session.sourcePhotoUrl === 'string' ? session.sourcePhotoUrl : null);
 
         // Use actual scan data if available
         if (session.auraScanResult?.auraScore) {
@@ -339,7 +349,9 @@ export async function POST(request: NextRequest) {
             planCost,
           );
           result = await ensureFrameImages(result, sessionPhoto);
-          renderMode = 'data-driven';
+          renderMode = sessionPhoto && isRenderableSourcePhoto(sessionPhoto)
+            ? 'photo-data-driven'
+            : 'data-driven';
         } else {
           result = mockSimulationComparison();
           result = await ensureFrameImages(result, sessionPhoto);
@@ -349,7 +361,7 @@ export async function POST(request: NextRequest) {
         await saveSessionAsync(updated);
       } else {
         result = mockSimulationComparison();
-        result = await ensureFrameImages(result, null);
+        result = await ensureFrameImages(result, requestSourcePhotoUrl);
       }
 
       return NextResponse.json({

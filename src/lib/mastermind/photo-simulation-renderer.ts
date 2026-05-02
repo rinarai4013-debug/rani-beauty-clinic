@@ -50,7 +50,7 @@ export async function renderPhotoSimulationFrameImage(
   const progress = progressForFrame(trajectory, frame);
   let pipeline = sharp(parsed.buffer, { failOn: 'none' })
     .rotate()
-    .resize({ width: 560, height: 680, fit: 'inside', withoutEnlargement: true });
+    .resize({ width: 320, height: 420, fit: 'inside', withoutEnlargement: true });
 
   if (trajectory === 'with') {
     pipeline = pipeline
@@ -75,7 +75,7 @@ export async function renderPhotoSimulationFrameImage(
     }
   }
 
-  const output = await pipeline.jpeg({ quality: 74, mozjpeg: true }).toBuffer();
+  const output = await pipeline.jpeg({ quality: 52, mozjpeg: true }).toBuffer();
   return {
     imageDataUrl: `data:image/jpeg;base64,${output.toString('base64')}`,
     kind: 'photo-simulation',

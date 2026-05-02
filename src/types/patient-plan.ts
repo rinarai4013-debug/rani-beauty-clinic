@@ -31,6 +31,7 @@ export interface PatientTreatment {
   treatmentName: string;
   category: string;
   targetConcerns: string[];
+  targetZones?: string[];
   sessionsRequired: number;
   intervalBetweenSessions: string;
   expectedImprovement: string;
@@ -49,8 +50,33 @@ export interface PatientSequenceItem {
   phase: number;
   phaseName: string;
   duration: string;
-  treatments: { treatmentName: string; week: number; sessionNumber: number }[];
+  treatments: { treatmentName: string; week: number; sessionNumber: number; scheduledDate?: string; scheduledDay?: number; targetAreas?: string[] }[];
   expectedMilestone: string;
+}
+
+export interface PatientCustomTreatmentItem {
+  id: string;
+  treatmentName: string;
+  category: string;
+  selected: boolean;
+  sessions: number;
+  perSession: number;
+  totalEstimate: number;
+  scheduledDate: string;
+  scheduledDay: number;
+  targetAreas: string[];
+  notes?: string;
+  priority: string;
+  source: 'ai' | 'staff';
+}
+
+export interface PatientTreatmentPlanCustomization {
+  updatedAt: string;
+  submissionDate: string;
+  items: PatientCustomTreatmentItem[];
+  selectedTotal: number;
+  selectedSessionCount: number;
+  planNotes?: string;
 }
 
 export interface PatientPackage {
@@ -150,6 +176,7 @@ export interface PatientPlanData {
     maintenance: PatientTreatment[];
   };
   sequencing: PatientSequenceItem[];
+  customPlan: PatientTreatmentPlanCustomization | null;
   packages: PatientPackage[];
   aftercare: PatientAftercare[];
   simulation: PatientSimulation | null;

@@ -263,13 +263,30 @@ export default function MastermindSessionPage() {
     () =>
       runAction(async () => {
         await dispatch({ type: 'SET_PHASE', phase: 'simulating' });
-        await fetch(`/api/mastermind/simulate`, {
+        const res = await fetch(`/api/mastermind/simulate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId }),
+          body: JSON.stringify({
+            sessionId,
+            sourcePhotoUrl: session?.sourcePhotoUrl || undefined,
+          }),
         });
+        const json = res.ok ? await res.json().catch(() => null) : null;
+        if (json?.data) {
+          mutate(
+            (current) => current
+              ? {
+                  ...current,
+                  phase: 'simulation_ready',
+                  simulationComparison: json.data,
+                  updatedAt: new Date().toISOString(),
+                }
+              : current,
+            false,
+          );
+        }
       }),
-    [dispatch, runAction, sessionId]
+    [dispatch, mutate, runAction, sessionId, session?.sourcePhotoUrl]
   );
 
   const handleStartPresentation = useCallback(
@@ -1183,7 +1200,33 @@ export default function MastermindSessionPage() {
                   {/* Aura Device Import — always available to (re)import */}
                   <AuraImportPanel
                     session={session}
-                    onImportComplete={() => mutate()}
+                    onImportComplete={(result) => {
+                      if (result.scanResult || result.mastermindPlan || result.simulationComparison) {
+                        mutate(
+                          (current) => current
+                            ? {
+                                ...current,
+                                auraScanResult: result.scanResult || current.auraScanResult,
+                                mastermindPlan: result.mastermindPlan || current.mastermindPlan,
+                                treatmentPlanCustomization: result.mastermindPlan
+                                  ? undefined
+                                  : current.treatmentPlanCustomization,
+                                providerReview: result.mastermindPlan
+                                  ? null
+                                  : current.providerReview,
+                                phase: result.simulationComparison
+                                  ? 'simulation_ready'
+                                  : result.session.phase as typeof current.phase,
+                                simulationComparison: result.simulationComparison || current.simulationComparison,
+                                updatedAt: result.session.updatedAt,
+                              }
+                            : current,
+                          false,
+                        );
+                        return;
+                      }
+                      mutate();
+                    }}
                   />
                   <ScanResultsPanel session={session} />
                 </motion.div>

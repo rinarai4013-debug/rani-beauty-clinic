@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
-import type {
-  MastermindSession,
-  MastermindSessionAction,
-  MastermindTreatment,
-  PlanModification,
-} from '@/types/mastermind';
+import { Plus, X, AlertTriangle, CheckCircle, Info, ChevronDown, ChevronUp, Search, CalendarDays, MapPin } from 'lucide-react';
+import type { MastermindSession, MastermindTreatment, PlanModification } from '@/types/mastermind';
+import { UNIFIED_CATALOG, SERVICE_CATEGORIES, type UnifiedService } from '@/data/services/unified-catalog';
+import {
+  buildTreatmentPlanCustomization,
+  createCustomizationItemFromService,
+  daysFromSubmission,
+  formatTreatmentCategory,
+  getTreatmentAreaOptions,
+  summarizeTreatmentCustomization,
+} from '@/lib/mastermind/treatment-customization';
 
 interface PlanEditorProps {
   session: MastermindSession;
   onValidate: () => Promise<ValidationResult | null>;
-  onDispatch: (_action: MastermindSessionAction) => Promise<void>;
+  onDispatch: (action: any) => Promise<void>;
 }
 
 interface ValidationResult {
@@ -42,10 +46,9 @@ export default function PlanEditor({
   const [validation, setValidation] = useState<ValidationResult | null>(null);
   const [expandedTreatment, setExpandedTreatment] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
-  const [customRecommendation, setCustomRecommendation] = useState('');
-  const [customRationale, setCustomRationale] = useState('');
   const [isApproving, setIsApproving] = useState(false);
-  const [isSavingModification, setIsSavingModification] = useState(false);
+  const [serviceQuery, setServiceQuery] = useState('');
+  const [showServicePicker, setShowServicePicker] = useState(false);
 
   // Run validation on mount and after edits
   useEffect(() => {
@@ -56,42 +59,120 @@ export default function PlanEditor({
     }
   }, [plan, onValidate]);
 
-  const ensureProviderReview = useCallback(async () => {
-    if (review) return;
-    await onDispatch({
-      type: 'SET_PROVIDER_REVIEW',
-      review: {
-        providerId: 'pending_auth',
-        providerName: 'Provider',
-        modifications: [],
-        clinicalNotes: [],
-        approvalStatus: 'pending',
-      },
-    });
-  }, [onDispatch, review]);
-
   const handleApprove = useCallback(async () => {
     setIsApproving(true);
     try {
-      await ensureProviderReview();
-      if (noteInput.trim()) {
+      // Set up provider review if not exists
+      // Provider identity is injected server-side by the PATCH route
+      // using the authenticated session. We send placeholder values
+      // that get overridden when auth is available.
+      if (!review) {
         await onDispatch({
-          type: 'ADD_MODIFICATION',
-          modification: {
-            id: `mod_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
-            timestamp: new Date().toISOString(),
-            type: 'note',
-            details: noteInput.trim(),
+          type: 'SET_PROVIDER_REVIEW',
+          review: {
             providerId: 'pending_auth',
+            providerName: 'Provider',
+            modifications: [],
+            clinicalNotes: noteInput ? [noteInput] : [],
+            approvalStatus: 'pending',
           },
         });
-        setNoteInput('');
       }
       await onDispatch({ type: 'SET_APPROVAL_STATUS', status: 'approved' });
     } finally {
       setIsApproving(false);
     }
-  }, [ensureProviderReview, noteInput, onDispatch]);
+  }, [onDispatch, review, noteInput]);
+
+  const allTreatments = useMemo(
+    () => plan
+      ? [
+          ...plan.recommendations.primary.map((t) => ({ ...t, tier: 'Primary' as const })),
+          ...plan.recommendations.complementary.map((t) => ({ ...t, tier: 'Complementary' as const })),
+          ...plan.recommendations.maintenance.map((t) => ({ ...t, tier: 'Maintenance' as const })),
+        ]
+      : [],
+    [plan],
+  );
+
+  const treatmentDetailById = useMemo(
+    () => new Map<string, MastermindTreatment>(allTreatments.map((t) => [t.id, t])),
+    [allTreatments],
+  );
+
+  const customization = useMemo(
+    () => session ? buildTreatmentPlanCustomization(session) : null,
+    [session],
+  );
+
+  const saveCustomization = useCallback(
+    async (items: NonNullable<typeof customization>['items'], planNotes?: string) => {
+      if (!customization) return;
+      const next = summarizeTreatmentCustomization({
+        ...customization,
+        updatedAt: new Date().toISOString(),
+        items,
+        planNotes: planNotes ?? customization.planNotes,
+      });
+      await onDispatch({ type: 'SET_TREATMENT_PLAN_CUSTOMIZATION', customization: next });
+    },
+    [customization, onDispatch],
+  );
+
+  const updateItem = useCallback(
+    async (
+      itemId: string,
+      patch: Partial<NonNullable<typeof customization>['items'][number]>,
+    ) => {
+      if (!customization) return;
+      await saveCustomization(
+        customization.items.map((item) => {
+          if (item.id !== itemId) return item;
+          const next = { ...item, ...patch };
+          if (patch.scheduledDate) {
+            next.scheduledDay = daysFromSubmission(customization.submissionDate, patch.scheduledDate);
+          }
+          if (patch.sessions || patch.perSession) {
+            next.totalEstimate = Math.max(1, next.sessions) * Math.max(0, next.perSession);
+          }
+          return next;
+        }),
+      );
+    },
+    [customization, saveCustomization],
+  );
+
+  const addService = useCallback(
+    async (service: UnifiedService) => {
+      if (!customization) return;
+      const item = createCustomizationItemFromService(
+        service,
+        session,
+        customization.items.length,
+      );
+      await saveCustomization([...customization.items, item]);
+      setServiceQuery('');
+      setShowServicePicker(false);
+      setExpandedTreatment(item.id);
+    },
+    [customization, saveCustomization, session],
+  );
+
+  const serviceOptions = useMemo(() => {
+    const q = serviceQuery.trim().toLowerCase();
+    const existingServiceIds = new Set(customization?.items.map((item) => item.serviceId).filter(Boolean));
+    return UNIFIED_CATALOG
+      .filter((service) => !existingServiceIds.has(service.id))
+      .filter((service) => {
+        if (!q) return true;
+        return (
+          service.name.toLowerCase().includes(q) ||
+          service.category.toLowerCase().includes(q) ||
+          service.description.toLowerCase().includes(q)
+        );
+      })
+      .slice(0, 12);
+  }, [customization?.items, serviceQuery]);
 
   if (!plan) {
     return (
@@ -111,78 +192,10 @@ export default function PlanEditor({
     );
   }
 
-  const allTreatments = [
-    ...plan.recommendations.primary.map((t) => ({ ...t, tier: 'Primary' as const })),
-    ...plan.recommendations.complementary.map((t) => ({ ...t, tier: 'Complementary' as const })),
-    ...plan.recommendations.maintenance.map((t) => ({ ...t, tier: 'Maintenance' as const })),
-  ];
-
-  const treatmentStatus = new Map<string, 'active' | 'excluded'>();
-  for (const modification of review?.modifications || []) {
-    if (!modification.treatmentId) continue;
-    if (modification.type === 'remove') treatmentStatus.set(modification.treatmentId, 'excluded');
-    if (modification.type === 'add') treatmentStatus.set(modification.treatmentId, 'active');
-  }
-
-  const isTreatmentExcluded = (treatmentId: string) => treatmentStatus.get(treatmentId) === 'excluded';
-  const includedTreatments = allTreatments.filter((treatment) => !isTreatmentExcluded(treatment.id));
-  const providerAdds = (review?.modifications || []).filter(
-    (modification) => modification.type === 'add' && !modification.treatmentId,
-  );
-  const providerNotes = (review?.modifications || []).filter(
-    (modification) => modification.type === 'note',
-  );
-  const totalCost = includedTreatments.reduce((sum, t) => sum + t.totalEstimate, 0);
+  const planItems = customization?.items || [];
+  const selectedItems = planItems.filter((item) => item.selected);
+  const totalCost = customization?.selectedTotal ?? allTreatments.reduce((sum, t) => sum + t.totalEstimate, 0);
   const approvalStatus = review?.approvalStatus || 'pending';
-
-  const addModification = async (
-    modification: Omit<PlanModification, 'id' | 'timestamp' | 'providerId'>,
-  ) => {
-    setIsSavingModification(true);
-    try {
-      await ensureProviderReview();
-      await onDispatch({
-        type: 'ADD_MODIFICATION',
-        modification: {
-          id: `mod_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
-          timestamp: new Date().toISOString(),
-          providerId: 'pending_auth',
-          ...modification,
-        },
-      });
-    } finally {
-      setIsSavingModification(false);
-    }
-  };
-
-  const handleToggleTreatment = async (treatment: MastermindTreatment) => {
-    const excluded = isTreatmentExcluded(treatment.id);
-    await addModification({
-      type: excluded ? 'add' : 'remove',
-      treatmentId: treatment.id,
-      details: excluded
-        ? `Restored AI recommendation: ${treatment.treatmentName}`
-        : `Excluded AI recommendation: ${treatment.treatmentName}`,
-    });
-  };
-
-  const handleAddCustomRecommendation = async () => {
-    const name = customRecommendation.trim();
-    if (!name) return;
-    await addModification({
-      type: 'add',
-      details: `${name}${customRationale.trim() ? ` — ${customRationale.trim()}` : ''}`,
-    });
-    setCustomRecommendation('');
-    setCustomRationale('');
-  };
-
-  const handleSaveNote = async () => {
-    const note = noteInput.trim();
-    if (!note) return;
-    await addModification({ type: 'note', details: note });
-    setNoteInput('');
-  };
 
   return (
     <div className="space-y-5">
@@ -200,6 +213,24 @@ export default function PlanEditor({
           )}
         </div>
       </div>
+
+      {/* Customization Summary */}
+      {customization && (
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-3 rounded-xl bg-[#0F1D2C] text-white">
+            <p className="font-body text-[10px] uppercase tracking-wide text-white/50">Selected</p>
+            <p className="font-body text-lg font-semibold">{selectedItems.length}</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#F8F6F1] border border-[#E8E4DF]">
+            <p className="font-body text-[10px] uppercase tracking-wide text-[#0F1D2C]/40">Sessions</p>
+            <p className="font-body text-lg font-semibold text-[#0F1D2C]">{customization.selectedSessionCount}</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#C9A96E]/10 border border-[#C9A96E]/20">
+            <p className="font-body text-[10px] uppercase tracking-wide text-[#C9A96E]">Plan Total</p>
+            <p className="font-body text-lg font-semibold text-[#0F1D2C]">${totalCost.toLocaleString()}</p>
+          </div>
+        </div>
+      )}
 
       {/* Validation Warnings */}
       {validation && validation.warnings.length > 0 && (
@@ -308,7 +339,7 @@ export default function PlanEditor({
                     .map((candidate) => (
                       <div key={`${candidate.compound}-${candidate.targetIntent}`} className="rounded-lg bg-white/7 p-2">
                         <p className="font-body text-xs font-semibold text-white">
-                          {candidate.compound} — {candidate.targetIntent}
+                          {candidate.compound} - {candidate.targetIntent}
                         </p>
                         <p className="font-body text-[11px] leading-relaxed text-white/60 mt-1">
                           {candidate.startDose}; {candidate.cadence}
@@ -345,11 +376,90 @@ export default function PlanEditor({
         </div>
       )}
 
+      {/* Add Treatment */}
+      <div className="rounded-xl border border-[#E8E4DF] bg-white overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setShowServicePicker((v) => !v)}
+          className="w-full flex items-center justify-between gap-3 px-3 py-3 text-left hover:bg-[#F8F6F1]/60 transition-colors"
+        >
+          <span className="flex items-center gap-2 font-body text-sm font-semibold text-[#0F1D2C]">
+            <Plus className="w-4 h-4 text-[#C9A96E]" />
+            Add catalog treatment
+          </span>
+          {showServicePicker ? (
+            <ChevronUp className="w-4 h-4 text-[#0F1D2C]/30" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-[#0F1D2C]/30" />
+          )}
+        </button>
+
+        <AnimatePresence>
+          {showServicePicker && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="border-t border-[#E8E4DF]"
+            >
+              <div className="p-3 space-y-3">
+                <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F8F6F1] border border-[#E8E4DF]">
+                  <Search className="w-4 h-4 text-[#0F1D2C]/35" />
+                  <input
+                    value={serviceQuery}
+                    onChange={(e) => setServiceQuery(e.target.value)}
+                    placeholder="Search HydraFacial, Botox, laser hair areas..."
+                    className="w-full bg-transparent outline-none font-body text-sm text-[#0F1D2C] placeholder:text-[#0F1D2C]/30"
+                  />
+                </label>
+
+                {!serviceQuery && (
+                  <div className="flex gap-1.5 overflow-x-auto hide-scrollbar">
+                    {SERVICE_CATEGORIES.slice(0, 8).map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setServiceQuery(cat.label)}
+                        className="shrink-0 px-2.5 py-1.5 rounded-full bg-[#F8F6F1] border border-[#E8E4DF] font-body text-[11px] text-[#0F1D2C]/60 hover:border-[#C9A96E]/40"
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="grid gap-2 max-h-80 overflow-y-auto pr-1">
+                  {serviceOptions.map((service) => (
+                    <button
+                      key={service.id}
+                      type="button"
+                      onClick={() => addService(service)}
+                      className="p-3 rounded-lg border border-[#E8E4DF] text-left hover:border-[#C9A96E]/50 hover:bg-[#C9A96E]/5 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-body text-sm font-semibold text-[#0F1D2C]">{service.name}</p>
+                          <p className="font-body text-xs text-[#0F1D2C]/45 mt-0.5">
+                            {formatTreatmentCategory(service.category)} &middot; {service.sessions} session{service.sessions !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                        <span className="font-body text-sm font-bold text-[#0F1D2C]">${service.price.toLocaleString()}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Treatment List */}
       <div className="space-y-2">
-        {allTreatments.map((treatment) => {
+        {planItems.map((treatment) => {
           const isExpanded = expandedTreatment === treatment.id;
-          const excluded = isTreatmentExcluded(treatment.id);
+          const detail = treatment.treatmentId ? treatmentDetailById.get(treatment.treatmentId) : undefined;
+          const areaOptions = getTreatmentAreaOptions(treatment);
           const priorityColors = {
             essential: 'bg-[#0F1D2C] text-white',
             recommended: 'bg-[#C9A96E] text-white',
@@ -363,26 +473,42 @@ export default function PlanEditor({
               className="rounded-xl border border-[#E8E4DF] bg-white overflow-hidden"
             >
               {/* Treatment Header */}
-              <div className={`flex items-center gap-2 p-3 ${excluded ? 'bg-red-50/60' : ''}`}>
+              <div
+                className={`w-full flex items-center gap-3 p-3 hover:bg-[#F8F6F1]/50 transition-colors ${!treatment.selected ? 'opacity-55' : ''}`}
+              >
                 <button
                   type="button"
-                  onClick={() => setExpandedTreatment(isExpanded ? null : treatment.id)}
-                  className="min-w-0 flex-1 flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
+                  aria-pressed={treatment.selected}
+                  aria-label={`${treatment.selected ? 'Deselect' : 'Select'} ${treatment.treatmentName}`}
+                  onClick={() => updateItem(treatment.id, { selected: !treatment.selected })}
+                  className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                    treatment.selected
+                      ? 'bg-[#059669] border-[#059669] text-white'
+                      : 'bg-white border-[#D6D0C8] text-transparent'
+                  }`}
                 >
-                  <span className={`px-2 py-0.5 rounded-md font-body text-xs font-medium ${excluded ? 'bg-red-100 text-red-700' : priorityColors[treatment.priority]}`}>
-                    {excluded ? 'OUT' : treatment.priority === 'essential' ? 'E' : treatment.priority === 'recommended' ? 'R' : 'O'}
+                  <CheckCircle className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  aria-expanded={isExpanded}
+                  onClick={() => setExpandedTreatment(isExpanded ? null : treatment.id)}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                >
+                  <span className={`px-2 py-0.5 rounded-md font-body text-xs font-medium ${priorityColors[treatment.priority]}`}>
+                    {treatment.priority === 'essential' ? 'E' : treatment.priority === 'recommended' ? 'R' : 'O'}
                   </span>
 
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-body text-sm font-medium truncate ${excluded ? 'text-[#0F1D2C]/45 line-through' : 'text-[#0F1D2C]'}`}>
+                  <span className="flex-1 min-w-0">
+                    <span className="block font-body text-sm font-medium text-[#0F1D2C] truncate">
                       {treatment.treatmentName}
-                    </p>
-                    <p className="font-body text-xs text-[#0F1D2C]/40">
-                      {treatment.tier} &middot; {treatment.sessionsRequired} session{treatment.sessionsRequired !== 1 ? 's' : ''}
-                    </p>
-                  </div>
+                    </span>
+                    <span className="block font-body text-xs text-[#0F1D2C]/40">
+                      {formatTreatmentCategory(treatment.category)} &middot; {treatment.sessions} session{treatment.sessions !== 1 ? 's' : ''} &middot; Day {treatment.scheduledDay}
+                    </span>
+                  </span>
 
-                  <span className={`font-body text-sm font-semibold shrink-0 ${excluded ? 'text-[#0F1D2C]/30 line-through' : 'text-[#0F1D2C]'}`}>
+                  <span className="font-body text-sm font-semibold text-[#0F1D2C] shrink-0">
                     ${treatment.totalEstimate.toLocaleString()}
                   </span>
 
@@ -391,20 +517,6 @@ export default function PlanEditor({
                   ) : (
                     <ChevronDown className="w-4 h-4 text-[#0F1D2C]/30 shrink-0" />
                   )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleToggleTreatment(treatment)}
-                  disabled={isSavingModification || approvalStatus === 'approved'}
-                  className={`shrink-0 inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-body text-xs font-semibold transition-colors ${
-                    excluded
-                      ? 'bg-[#059669]/10 text-[#047857] hover:bg-[#059669]/15'
-                      : 'bg-red-50 text-red-700 hover:bg-red-100'
-                  } disabled:opacity-40 disabled:cursor-not-allowed`}
-                >
-                  {excluded ? <Plus className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
-                  {excluded ? 'Restore' : 'Remove'}
                 </button>
               </div>
 
@@ -419,35 +531,111 @@ export default function PlanEditor({
                     className="border-t border-[#E8E4DF]"
                   >
                     <div className="p-3 space-y-3">
-                      <p className="font-body text-xs text-[#0F1D2C]/60">
-                        {treatment.aiReasoning}
-                      </p>
+                      {detail?.aiReasoning && (
+                        <p className="font-body text-xs text-[#0F1D2C]/60">
+                          {detail.aiReasoning}
+                        </p>
+                      )}
 
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="p-2 rounded-lg bg-[#F8F6F1]">
                           <span className="text-[#0F1D2C]/40">Per Session</span>
-                          <p className="font-medium text-[#0F1D2C]">${treatment.perSession}</p>
+                          <input
+                            type="number"
+                            min={0}
+                            value={treatment.perSession}
+                            onChange={(e) => updateItem(treatment.id, { perSession: Number(e.target.value) || 0 })}
+                            className="w-full bg-transparent font-medium text-[#0F1D2C] outline-none"
+                          />
                         </div>
                         <div className="p-2 rounded-lg bg-[#F8F6F1]">
-                          <span className="text-[#0F1D2C]/40">Downtime</span>
-                          <p className="font-medium text-[#0F1D2C]">{treatment.downtime}</p>
+                          <span className="text-[#0F1D2C]/40">Sessions</span>
+                          <input
+                            type="number"
+                            min={1}
+                            value={treatment.sessions}
+                            onChange={(e) => updateItem(treatment.id, { sessions: Math.max(1, Number(e.target.value) || 1) })}
+                            className="w-full bg-transparent font-medium text-[#0F1D2C] outline-none"
+                          />
                         </div>
                         <div className="p-2 rounded-lg bg-[#F8F6F1]">
-                          <span className="text-[#0F1D2C]/40">Results In</span>
-                          <p className="font-medium text-[#0F1D2C]">{treatment.timeToResults}</p>
+                          <span className="text-[#0F1D2C]/40 flex items-center gap-1">
+                            <CalendarDays className="w-3 h-3" />
+                            First Visit
+                          </span>
+                          <input
+                            type="date"
+                            value={treatment.scheduledDate}
+                            onChange={(e) => updateItem(treatment.id, { scheduledDate: e.target.value })}
+                            className="w-full bg-transparent font-medium text-[#0F1D2C] outline-none"
+                          />
                         </div>
                         <div className="p-2 rounded-lg bg-[#F8F6F1]">
-                          <span className="text-[#0F1D2C]/40">AI Confidence</span>
-                          <p className="font-medium text-[#0F1D2C]">{treatment.aiConfidence}%</p>
+                          <span className="text-[#0F1D2C]/40">Line Total</span>
+                          <p className="font-medium text-[#0F1D2C]">${treatment.totalEstimate.toLocaleString()}</p>
                         </div>
                       </div>
 
+                      {areaOptions.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="flex items-center gap-1.5 font-body text-xs font-semibold text-[#0F1D2C]/70 uppercase tracking-wide">
+                            <MapPin className="w-3.5 h-3.5 text-[#C9A96E]" />
+                            Treatment Areas
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {areaOptions.map((area) => {
+                              const selected = treatment.targetAreas.includes(area);
+                              return (
+                                <button
+                                  key={area}
+                                  type="button"
+                                  onClick={() => {
+                                    const areas = selected
+                                      ? treatment.targetAreas.filter((a) => a !== area)
+                                      : [...treatment.targetAreas, area];
+                                    updateItem(treatment.id, { targetAreas: areas });
+                                  }}
+                                  className={`px-2.5 py-1.5 rounded-full border font-body text-[11px] transition-colors ${
+                                    selected
+                                      ? 'border-[#C9A96E] bg-[#C9A96E]/10 text-[#0F1D2C]'
+                                      : 'border-[#E8E4DF] bg-white text-[#0F1D2C]/45 hover:border-[#C9A96E]/40'
+                                  }`}
+                                >
+                                  {area}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      <textarea
+                        defaultValue={treatment.notes || ''}
+                        onBlur={(e) => updateItem(treatment.id, { notes: e.target.value })}
+                        placeholder="Provider-visible plan note: units, syringes, areas, sequencing reason..."
+                        rows={2}
+                        className="w-full px-3 py-2 rounded-lg bg-[#F8F6F1] border border-[#E8E4DF] font-body text-xs text-[#0F1D2C] placeholder:text-[#0F1D2C]/30 outline-none focus:border-[#C9A96E] resize-none"
+                      />
+
                       {/* Clinical Rationale */}
-                      <div className="p-2.5 rounded-lg bg-[#0F1D2C]/5 border border-[#0F1D2C]/10">
-                        <p className="font-body text-xs text-[#0F1D2C]/50 italic">
-                          {treatment.clinicalRationale}
-                        </p>
-                      </div>
+                      {detail?.clinicalRationale && (
+                        <div className="p-2.5 rounded-lg bg-[#0F1D2C]/5 border border-[#0F1D2C]/10">
+                          <p className="font-body text-xs text-[#0F1D2C]/50 italic">
+                            {detail.clinicalRationale}
+                          </p>
+                        </div>
+                      )}
+
+                      {treatment.source === 'staff' && (
+                        <button
+                          type="button"
+                          onClick={() => saveCustomization(planItems.filter((item) => item.id !== treatment.id))}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 font-body text-xs font-semibold hover:bg-red-100"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Remove added treatment
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -501,61 +689,6 @@ export default function PlanEditor({
         </div>
       )}
 
-      {/* Provider Additions / Removals */}
-      <div className="space-y-3 rounded-2xl border border-[#E8E4DF] bg-white p-3">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-body text-xs font-semibold text-[#0F1D2C]/70 uppercase tracking-wide">
-            Provider edits before sign-off
-          </h3>
-          <span className="font-body text-[11px] text-[#0F1D2C]/40">
-            {includedTreatments.length}/{allTreatments.length} AI picks included
-          </span>
-        </div>
-
-        <div className="grid gap-2">
-          <input
-            value={customRecommendation}
-            onChange={(e) => setCustomRecommendation(e.target.value)}
-            placeholder="Add service, product, peptide review, lab, or follow-up..."
-            className="w-full rounded-xl border border-[#E8E4DF] bg-[#F8F6F1] px-3 py-2 font-body text-sm text-[#0F1D2C] outline-none placeholder:text-[#0F1D2C]/30 focus:border-[#C9A96E] focus:ring-2 focus:ring-[#C9A96E]/20"
-          />
-          <textarea
-            value={customRationale}
-            onChange={(e) => setCustomRationale(e.target.value)}
-            placeholder="Clinical reason, constraint, or patient preference..."
-            rows={2}
-            className="w-full rounded-xl border border-[#E8E4DF] bg-[#F8F6F1] px-3 py-2 font-body text-sm text-[#0F1D2C] outline-none placeholder:text-[#0F1D2C]/30 focus:border-[#C9A96E] focus:ring-2 focus:ring-[#C9A96E]/20 resize-none"
-          />
-          <button
-            type="button"
-            onClick={handleAddCustomRecommendation}
-            disabled={!customRecommendation.trim() || isSavingModification || approvalStatus === 'approved'}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#C9A96E] px-3 py-2 font-body text-sm font-semibold text-white transition-colors hover:bg-[#B8944F] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Plus className="h-4 w-4" />
-            Add to provider plan
-          </button>
-        </div>
-
-        {(providerAdds.length > 0 || providerNotes.length > 0) && (
-          <div className="space-y-2 border-t border-[#E8E4DF] pt-3">
-            {[...providerAdds, ...providerNotes].slice(-6).reverse().map((modification) => (
-              <div key={modification.id} className="flex items-start gap-2 rounded-xl bg-[#F8F6F1] p-2">
-                <Pencil className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#C9A96E]" />
-                <div className="min-w-0">
-                  <p className="font-body text-xs font-semibold capitalize text-[#0F1D2C]">
-                    {modification.type === 'note' ? 'Clinical note' : 'Provider addition'}
-                  </p>
-                  <p className="font-body text-xs leading-relaxed text-[#0F1D2C]/60">
-                    {modification.details}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Clinical Notes */}
       <div className="space-y-2">
         <h3 className="font-body text-xs font-semibold text-[#0F1D2C]/70 uppercase tracking-wide">
@@ -568,15 +701,6 @@ export default function PlanEditor({
           rows={3}
           className="w-full px-3 py-2 rounded-xl bg-[#F8F6F1] border border-[#E8E4DF] font-body text-sm text-[#0F1D2C] placeholder:text-[#0F1D2C]/30 outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[#C9A96E]/20 resize-none"
         />
-        <button
-          type="button"
-          onClick={handleSaveNote}
-          disabled={!noteInput.trim() || isSavingModification || approvalStatus === 'approved'}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#E8E4DF] px-3 py-2 font-body text-xs font-semibold text-[#0F1D2C]/70 transition-colors hover:bg-[#F8F6F1] disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-          Save note
-        </button>
       </div>
 
       {/* Approve Button */}

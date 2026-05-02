@@ -20,7 +20,9 @@ import type {
   SimulationComparison,
   AuraDeviceAnalysis,
   PredictiveMetrics,
+  TreatmentPlanCustomization,
 } from '@/types/mastermind';
+import { buildTreatmentPlanCustomization } from '@/lib/mastermind/treatment-customization';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 import type {
   PatientPlanData,
@@ -34,6 +36,7 @@ import type {
   PatientSimulation,
   PatientDeviceAnalysis,
   PatientPredictiveMetrics,
+  PatientTreatmentPlanCustomization,
 } from '@/types/patient-plan';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -132,6 +135,7 @@ function sanitizeTreatment(t: MastermindTreatment): PatientTreatment {
     treatmentName: t.treatmentName,
     category: t.category,
     targetConcerns: t.targetConcerns,
+    targetZones: t.targetZones?.map((zone) => zone.replace(/_/g, ' ')),
     sessionsRequired: t.sessionsRequired,
     intervalBetweenSessions: t.intervalBetweenSessions,
     expectedImprovement: t.expectedImprovement,
@@ -145,6 +149,34 @@ function sanitizeTreatment(t: MastermindTreatment): PatientTreatment {
     aiReasoning: t.aiReasoning, // patient-facing only
     synergiesWith: t.synergiesWith,
     // Strips: id, clinicalRationale, aiConfidence, contraindications, urgency, targetZones
+  };
+}
+
+function sanitizeCustomization(
+  customization: TreatmentPlanCustomization | null,
+): PatientTreatmentPlanCustomization | null {
+  if (!customization) return null;
+  return {
+    updatedAt: customization.updatedAt,
+    submissionDate: customization.submissionDate,
+    selectedTotal: customization.selectedTotal,
+    selectedSessionCount: customization.selectedSessionCount,
+    planNotes: customization.planNotes,
+    items: customization.items.map((item) => ({
+      id: item.id,
+      treatmentName: item.treatmentName,
+      category: item.category,
+      selected: item.selected,
+      sessions: item.sessions,
+      perSession: item.perSession,
+      totalEstimate: item.totalEstimate,
+      scheduledDate: item.scheduledDate,
+      scheduledDay: item.scheduledDay,
+      targetAreas: item.targetAreas,
+      notes: item.notes,
+      priority: item.priority,
+      source: item.source,
+    })),
   };
 }
 
@@ -286,6 +318,7 @@ export async function GET(
         weekOneGuidance: a.weekOneGuidance,
         productsRecommended: a.productsRecommended,
       }));
+      const customization = buildTreatmentPlanCustomization(session);
 
       const patientData: PatientPlanData = {
         patientName:
@@ -306,6 +339,7 @@ export async function GET(
           maintenance: plan.recommendations.maintenance.map(sanitizeTreatment),
         },
         sequencing: sanitizeSequencing(plan.sequencing, allTreatments),
+        customPlan: sanitizeCustomization(customization),
         packages: sanitizePackages(plan.packages),
         aftercare,
         simulation: session.simulationComparison

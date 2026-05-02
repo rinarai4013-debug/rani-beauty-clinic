@@ -667,10 +667,135 @@ function InterestModal({
 function TreatmentTimeline({
   sequencing,
   treatments,
+  customPlan,
 }: {
   sequencing: PatientPlanData['sequencing'];
   treatments: PatientPlanData['treatments'];
+  customPlan?: PatientPlanData['customPlan'];
 }) {
+  const customItems = customPlan?.items
+    .filter((item) => item.selected)
+    .sort((a, b) => a.scheduledDay - b.scheduledDay || a.treatmentName.localeCompare(b.treatmentName)) || [];
+
+  if (customItems.length > 0) {
+    return (
+      <div className="space-y-4">
+        <div
+          className="rounded-2xl p-5 luxury-card"
+          style={{
+            backgroundColor: COLORS.white,
+            border: `1px solid ${COLORS.divider}`,
+          }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold tracking-[0.2em] uppercase" style={{ color: COLORS.gold }}>
+                Exact Plan Selected
+              </p>
+              <h4 className="font-heading text-xl font-bold mt-1" style={{ color: COLORS.navy }}>
+                {customPlan?.selectedSessionCount || 0} planned sessions
+              </h4>
+            </div>
+            <div className="text-right">
+              <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                Estimated investment
+              </p>
+              <p className="font-heading text-3xl font-bold" style={{ color: COLORS.navy }}>
+                ${(customPlan?.selectedTotal || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {customItems.map((item, idx) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.06 }}
+            className="rounded-xl p-5 treatment-card-accent luxury-card"
+            style={{
+              backgroundColor: COLORS.white,
+              border: `1px solid ${COLORS.divider}`,
+            }}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold tracking-[0.18em] uppercase mb-1" style={{ color: COLORS.gold }}>
+                  Day {item.scheduledDay} &middot; {formatPatientDate(item.scheduledDate)}
+                </p>
+                <h5
+                  className="font-bold text-lg"
+                  style={{
+                    fontFamily: 'var(--font-heading), Playfair Display, serif',
+                    color: COLORS.navy,
+                  }}
+                >
+                  {item.treatmentName}
+                </h5>
+              </div>
+              <span
+                className="text-xs px-2.5 py-1 rounded-full shrink-0 font-medium"
+                style={{
+                  backgroundColor: `${COLORS.gold}15`,
+                  color: COLORS.gold,
+                }}
+              >
+                {item.sessions} {item.sessions === 1 ? 'session' : 'sessions'}
+              </span>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-3 mt-4 text-sm">
+              <div className="rounded-lg p-3" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Per session
+                </p>
+                <p className="font-bold" style={{ color: COLORS.navy }}>${item.perSession.toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg p-3" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Line estimate
+                </p>
+                <p className="font-bold" style={{ color: COLORS.navy }}>${item.totalEstimate.toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg p-3" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Priority
+                </p>
+                <p className="font-bold capitalize" style={{ color: COLORS.navy }}>{item.priority}</p>
+              </div>
+            </div>
+
+            {item.targetAreas.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {item.targetAreas.map((area) => (
+                  <span
+                    key={area}
+                    className="text-xs px-3 py-1.5 rounded-full"
+                    style={{
+                      backgroundColor: `${COLORS.navy}07`,
+                      color: `${COLORS.navy}80`,
+                      border: `1px solid ${COLORS.divider}`,
+                    }}
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {item.notes && (
+              <p className="text-sm italic mt-4" style={{ color: `${COLORS.navy}65` }}>
+                {item.notes}
+              </p>
+            )}
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
   // Create a lookup map for treatment details
   const allTreatments = [
     ...treatments.primary,
@@ -809,6 +934,16 @@ function TreatmentTimeline({
       ))}
     </div>
   );
+}
+
+function formatPatientDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Date TBD';
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 // ── Main Page Component ──
@@ -1339,10 +1474,11 @@ export default function PatientPlanPage() {
           )}
 
           {/* Visual Timeline */}
-          {data.sequencing.length > 0 && (
+          {(data.sequencing.length > 0 || (data.customPlan?.items.some((item) => item.selected) ?? false)) && (
             <TreatmentTimeline
               sequencing={data.sequencing}
               treatments={data.treatments}
+              customPlan={data.customPlan}
             />
           )}
         </div>

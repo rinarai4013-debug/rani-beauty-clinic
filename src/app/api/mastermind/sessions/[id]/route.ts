@@ -111,6 +111,7 @@ async function enrichWithProviderIdentity(
     'SET_PROVIDER_REVIEW',
     'ADD_MODIFICATION',
     'SET_APPROVAL_STATUS',
+    'SET_TREATMENT_PLAN_CUSTOMIZATION',
     'SET_CLINIC_STATUS',
     'SET_CLINIC_NOTES',
     'SET_SHARE_TOKEN',
@@ -159,6 +160,9 @@ async function enrichWithProviderIdentity(
     return { ...action, actor: providerName };
   }
   if (action.type === 'SET_SHARE_TOKEN') {
+    return { ...action, actor: providerName };
+  }
+  if (action.type === 'SET_TREATMENT_PLAN_CUSTOMIZATION') {
     return { ...action, actor: providerName };
   }
 

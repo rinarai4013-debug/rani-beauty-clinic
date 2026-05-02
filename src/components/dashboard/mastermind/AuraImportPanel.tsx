@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { MastermindSession } from '@/types/mastermind';
+import type { MastermindPlan, MastermindSession, SimulationComparison } from '@/types/mastermind';
 import { convertAuraPdfFaceToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
 import { serializeAuraPdfTextFallback } from '@/lib/mastermind/aura-pdf-fallback';
 
@@ -51,6 +51,8 @@ interface ImportResult {
     phase: string;
     updatedAt: string;
   };
+  mastermindPlan?: MastermindPlan;
+  simulationComparison?: SimulationComparison;
 }
 
 async function parseJsonResponse(
@@ -376,6 +378,32 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         }
       }
 
+      // After PDF scan import, generate the treatment plan and simulation explicitly.
+      // This prevents "imported but no simulation" gaps.
+      const planResult = await postJsonWithRetry(
+        '/api/mastermind/plan',
+        { sessionId: importedSessionId },
+        'Plan generation failed after Aura import.',
+      );
+      if (!planResult.response.ok) {
+        throw new Error(planResult.message);
+      }
+      const planJson = (planResult.parsed.json || {}) as {
+        data?: MastermindPlan;
+      };
+
+      const simulateResult = await postJsonWithRetry(
+        '/api/mastermind/simulate',
+        { sessionId: importedSessionId },
+        'Simulation generation failed after Aura import.',
+      );
+      if (!simulateResult.response.ok) {
+        throw new Error(simulateResult.message);
+      }
+      const simJson = (simulateResult.parsed.json || {}) as {
+        data?: SimulationComparison;
+      };
+
       onImportComplete?.({
         scan: {
           patientName: session.patientName || 'Patient',
@@ -387,30 +415,12 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         scanResult: importedScanResult,
         session: {
           id: importedSessionId,
-          phase: importedPhase,
+          phase: simJson.data ? 'simulation_ready' : importedPhase,
           updatedAt: new Date().toISOString(),
         },
+        mastermindPlan: planJson.data,
+        simulationComparison: simJson.data,
       });
-
-      // After PDF scan import, generate the treatment plan and simulation explicitly.
-      // This prevents "imported but no simulation" gaps.
-      const planResult = await postJsonWithRetry(
-        '/api/mastermind/plan',
-        { sessionId: importedSessionId },
-        'Plan generation failed after Aura import.',
-      );
-      if (!planResult.response.ok) {
-        throw new Error(planResult.message);
-      }
-
-      const simulateResult = await postJsonWithRetry(
-        '/api/mastermind/simulate',
-        { sessionId: importedSessionId },
-        'Simulation generation failed after Aura import.',
-      );
-      if (!simulateResult.response.ok) {
-        throw new Error(simulateResult.message);
-      }
     },
     [fileToDataUrl, onImportComplete, session.id, session.intakeData, session.patientName]
   );
@@ -459,14 +469,30 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         const scanJson = await scanRes.json();
         console.log('[AuraImport] AI scan complete:', scanJson.success);
 
-        // Step 4: Auto-trigger simulation so projections populate
-        console.log('[AuraImport] Triggering simulation...');
-        const simRes = await fetch('/api/mastermind/simulate', {
+        // Step 4: Regenerate plan from the new scan before projections populate.
+        console.log('[AuraImport] Generating treatment plan...');
+        const planRes = await fetch('/api/mastermind/plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId: session.id }),
         });
+        if (!planRes.ok) {
+          const errText = await planRes.text().catch(() => '');
+          throw new Error(`Plan generation failed (${planRes.status}): ${errText.slice(0, 200)}`);
+        }
+        const planJson = await planRes.json().catch(() => null) as { data?: MastermindPlan } | null;
+
+        // Step 5: Auto-trigger simulation so projections populate
+        console.log('[AuraImport] Triggering simulation...');
+        const simRes = await fetch('/api/mastermind/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: session.id, sourcePhotoUrl: dataUrl }),
+        });
         if (!simRes.ok) console.warn('[AuraImport] Simulation trigger failed:', simRes.status);
+        const simJson = simRes.ok
+          ? await simRes.json().catch(() => null) as { data?: SimulationComparison } | null
+          : null;
 
         if (scanJson.success !== false) {
           onImportComplete?.({
@@ -478,7 +504,9 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
               handoutPdfPath: null,
             },
             scanResult: scanJson.data || scanJson,
-            session: { id: session.id, phase: 'scan_complete', updatedAt: new Date().toISOString() },
+            session: { id: session.id, phase: simJson?.data ? 'simulation_ready' : 'scan_complete', updatedAt: new Date().toISOString() },
+            mastermindPlan: planJson?.data,
+            simulationComparison: simJson?.data,
           });
         } else {
           setImportError(scanJson.error || 'AI scan failed after photo upload');

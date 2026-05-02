@@ -14,7 +14,7 @@ import type {
   ProtocolPacketMeta,
 } from '@/types/mastermind';
 
-const TERMINAL_PHASES: MastermindPhase[] = ['provider_review', 'approved', 'completed'];
+const TERMINAL_PHASES: MastermindPhase[] = ['completed'];
 
 // ── Activity Log Helper ──
 
@@ -71,6 +71,10 @@ export function sessionReducer(
         updatedAt: now,
         phase: 'scan_complete',
         auraScanResult: action.result,
+        mastermindPlan: null,
+        treatmentPlanCustomization: undefined,
+        providerReview: null,
+        simulationComparison: null,
         activityLog: appendLog(state.activityLog, 'scan_completed', `Aura scan completed (score: ${action.result?.auraScore?.overall ?? '?'})`),
       };
     case 'SET_SCAN_ERROR':
@@ -97,7 +101,26 @@ export function sessionReducer(
         updatedAt: now,
         phase: 'plan_ready',
         mastermindPlan: action.plan,
+        treatmentPlanCustomization: undefined,
+        providerReview: null,
         activityLog: appendLog(state.activityLog, 'plan_generated', `Treatment plan generated (${action.plan?.packages?.length ?? 0} packages)`),
+      };
+
+    case 'SET_TREATMENT_PLAN_CUSTOMIZATION':
+      return {
+        ...state,
+        updatedAt: now,
+        treatmentPlanCustomization: {
+          ...action.customization,
+          updatedAt: now,
+          ...(action.actor ? { updatedBy: action.actor } : {}),
+        },
+        activityLog: appendLog(
+          state.activityLog,
+          'treatment_plan_customized',
+          `Treatment plan customized (${action.customization.items.filter((item) => item.selected).length} selected treatments)`,
+          action.actor,
+        ),
       };
 
     case 'SET_PROVIDER_REVIEW':
@@ -270,6 +293,7 @@ export function createSession(
     auraScanResult: null,
     auraScanError: null,
     mastermindPlan: null,
+    treatmentPlanCustomization: undefined,
     providerReview: null,
     simulationComparison: null,
     selectedPackageTier: null,
@@ -385,6 +409,7 @@ function hydrateSession(parsed: Record<string, unknown>): MastermindSession {
     auraScanResult: parsed.auraScanResult as MastermindSession['auraScanResult'] ?? null,
     auraScanError: parsed.auraScanError as MastermindSession['auraScanError'] ?? null,
     mastermindPlan: parsed.mastermindPlan as MastermindSession['mastermindPlan'] ?? null,
+    treatmentPlanCustomization: parsed.treatmentPlanCustomization as MastermindSession['treatmentPlanCustomization'] ?? undefined,
     providerReview: parsed.providerReview as MastermindSession['providerReview'] ?? null,
     simulationComparison: parsed.simulationComparison as MastermindSession['simulationComparison'] ?? null,
     selectedPackageTier: isValidTier(parsed.selectedPackageTier) ? parsed.selectedPackageTier : null,

@@ -99,6 +99,26 @@ function applyOptimisticUpdate(
   switch (action.type) {
     case 'SET_PHASE':
       return { ...session, phase: action.phase, updatedAt: new Date().toISOString() };
+    case 'SET_SCAN_RESULT':
+      return {
+        ...session,
+        auraScanResult: action.result,
+        mastermindPlan: null,
+        treatmentPlanCustomization: undefined,
+        providerReview: null,
+        simulationComparison: null,
+        phase: 'scan_complete',
+        updatedAt: new Date().toISOString(),
+      };
+    case 'SET_PLAN':
+      return {
+        ...session,
+        mastermindPlan: action.plan,
+        treatmentPlanCustomization: undefined,
+        providerReview: null,
+        phase: 'plan_ready',
+        updatedAt: new Date().toISOString(),
+      };
     case 'SET_APPROVAL_STATUS':
       return session.providerReview
         ? {
@@ -136,6 +156,12 @@ function applyOptimisticUpdate(
       return { ...session, clinicNotes: action.notes, updatedAt: new Date().toISOString() };
     case 'SET_SHARE_TOKEN':
       return { ...session, shareToken: action.token, updatedAt: new Date().toISOString() };
+    case 'SET_TREATMENT_PLAN_CUSTOMIZATION':
+      return {
+        ...session,
+        treatmentPlanCustomization: action.customization,
+        updatedAt: new Date().toISOString(),
+      };
     default:
       return undefined;
   }

@@ -80,12 +80,68 @@ describe('sessionReducer', () => {
     expect(result.phase).toBe('scan_complete');
   });
 
+  it('SET_SCAN_RESULT invalidates stale downstream plan data, even after approval', () => {
+    const plan = mockMastermindPlan();
+    const sim = mockSimulationComparison();
+    const session = makeSession({
+      phase: 'approved',
+      mastermindPlan: plan,
+      treatmentPlanCustomization: {
+        updatedAt: new Date().toISOString(),
+        submissionDate: new Date().toISOString(),
+        items: [],
+        selectedTotal: 0,
+        selectedSessionCount: 0,
+      },
+      providerReview: {
+        providerId: 'p1',
+        providerName: 'Dr. Smith',
+        modifications: [],
+        clinicalNotes: [],
+        approvalStatus: 'approved',
+      },
+      simulationComparison: sim,
+    });
+    const scan = mockAuraScanResult();
+    const result = sessionReducer(session, { type: 'SET_SCAN_RESULT', result: scan });
+    expect(result.auraScanResult).toBe(scan);
+    expect(result.phase).toBe('scan_complete');
+    expect(result.mastermindPlan).toBeNull();
+    expect(result.treatmentPlanCustomization).toBeUndefined();
+    expect(result.providerReview).toBeNull();
+    expect(result.simulationComparison).toBeNull();
+  });
+
   it('SET_PLAN stores plan and transitions to plan_ready', () => {
     const session = makeSession();
     const plan = mockMastermindPlan();
     const result = sessionReducer(session, { type: 'SET_PLAN', plan });
     expect(result.mastermindPlan).toBe(plan);
     expect(result.phase).toBe('plan_ready');
+  });
+
+  it('SET_PLAN clears stale customization and review state', () => {
+    const plan = mockMastermindPlan();
+    const session = makeSession({
+      treatmentPlanCustomization: {
+        updatedAt: new Date().toISOString(),
+        submissionDate: new Date().toISOString(),
+        items: [],
+        selectedTotal: 0,
+        selectedSessionCount: 0,
+      },
+      providerReview: {
+        providerId: 'p1',
+        providerName: 'Dr. Smith',
+        modifications: [],
+        clinicalNotes: [],
+        approvalStatus: 'pending',
+      },
+    });
+    const result = sessionReducer(session, { type: 'SET_PLAN', plan });
+    expect(result.mastermindPlan).toBe(plan);
+    expect(result.treatmentPlanCustomization).toBeUndefined();
+    expect(result.providerReview).toBeNull();
   });
 
   it('SET_PROVIDER_REVIEW stores review and transitions to provider_review', () => {
