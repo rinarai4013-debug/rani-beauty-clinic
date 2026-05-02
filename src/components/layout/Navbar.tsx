@@ -119,7 +119,7 @@ export default function Navbar() {
       >
         <div className="relative bg-rani-navy border-b border-white/5 px-10 py-2 text-center">
           <span className="font-body text-[12px] sm:text-[13px] text-white/70">
-            Complimentary phone consultations available
+            Physician-supervised consultations available Tuesday–Saturday
           </span>
           {/* Audit 2026-04-19 P2 NAV-02: raise hit area to WCAG touch-target
               minimum (24x24 AAA, 44x44 AA) and ensure it's above the absolute
