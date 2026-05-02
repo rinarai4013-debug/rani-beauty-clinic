@@ -646,7 +646,7 @@ export default function PlanEditor({
       </div>
 
       {/* Total */}
-      <div className="flex items-center justify-between p-3 rounded-xl bg-[#0F1D2C]/5 border border-[#0F1D2C]/10">
+      <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E8E4DF] shadow-sm">
         <span className="font-body text-sm font-medium text-[#0F1D2C]">
           Plan Total
         </span>
@@ -657,7 +657,7 @@ export default function PlanEditor({
 
       {/* Packages */}
       {plan.packages.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2 rounded-2xl border border-[#E8E4DF] bg-white p-3 shadow-sm">
           <h3 className="font-body text-xs font-semibold text-[#0F1D2C]/70 uppercase tracking-wide">
             Package Options
           </h3>
@@ -667,8 +667,8 @@ export default function PlanEditor({
                 key={pkg.tier}
                 className={`p-3 rounded-xl border text-center ${
                   pkg.highlighted
-                    ? 'border-[#C9A96E] bg-[#C9A96E]/5'
-                    : 'border-[#E8E4DF]'
+                    ? 'border-[#C9A96E] bg-[#C9A96E]/10'
+                    : 'border-[#E8E4DF] bg-[#F8F6F1]/60'
                 }`}
               >
                 <p className="font-body text-xs font-semibold text-[#0F1D2C]">{pkg.tier}</p>
@@ -690,7 +690,7 @@ export default function PlanEditor({
       )}
 
       {/* Clinical Notes */}
-      <div className="space-y-2">
+      <div className="space-y-2 rounded-2xl border border-[#E8E4DF] bg-white p-3 shadow-sm">
         <h3 className="font-body text-xs font-semibold text-[#0F1D2C]/70 uppercase tracking-wide">
           Clinical Notes
         </h3>
