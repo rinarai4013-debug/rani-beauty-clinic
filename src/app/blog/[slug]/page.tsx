@@ -13,6 +13,9 @@ import { blogPosts } from "@/data/blog/posts";
 import { clinicInfo } from "@/data/clinic-info";
 import FAQSection from "./FAQSection";
 
+export const revalidate = 86400;
+export const dynamicParams = false;
+
 interface BlogPostPageProps {
   params: { slug: string };
 }

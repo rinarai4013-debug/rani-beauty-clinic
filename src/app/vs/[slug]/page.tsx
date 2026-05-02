@@ -6,6 +6,9 @@ import { comparisonPages } from "@/data/comparisons";
 import { clinicInfo } from "@/data/clinic-info";
 import StructuredData from "@/components/seo/StructuredData";
 
+export const revalidate = 86400;
+export const dynamicParams = false;
+
 interface PageProps {
   params: { slug: string };
 }
@@ -84,22 +87,37 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
+  const cleanTitle = page.metaTitle.replace(/\s*\|\s*Rani Beauty Clinic\s*$/i, "").trim();
   const canonical = `${clinicInfo.website}/vs/${page.slug}`;
 
   return {
-    title: page.metaTitle,
+    title: { absolute: cleanTitle },
     description: page.metaDescription,
     keywords: page.keywords,
     alternates: {
       canonical,
     },
     openGraph: {
-      title: page.metaTitle,
+      title: cleanTitle,
       description: page.metaDescription,
       url: canonical,
       siteName: "Rani Beauty Clinic",
       type: "article",
       locale: "en_US",
+      images: [
+        {
+          url: "/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: `${cleanTitle} | Rani Beauty Clinic`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: cleanTitle,
+      description: page.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }
