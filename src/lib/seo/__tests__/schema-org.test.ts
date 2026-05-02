@@ -43,11 +43,11 @@ describe('schema.org JSON-LD helpers', () => {
     });
   });
 
-  it('removes non-enum medical specialties in production-safe output', () => {
+  it('removes impossible medical specialties in production-safe output', () => {
     const dirty = {
       provider: {
         '@type': 'MedicalClinic',
-        medicalSpecialty: ['Dermatology', 'UnknownSkinField', { '@type': 'MedicalSpecialty', name: 'Neurology' }],
+        medicalSpecialty: ['Dermatology', 'NotARealMedicalSpecialty', { '@type': 'MedicalSpecialty', name: 'Neurology' }],
       },
     };
 
@@ -57,6 +57,6 @@ describe('schema.org JSON-LD helpers', () => {
         medicalSpecialty: ['Dermatology', 'Neurologic'],
       },
     });
-    expect(getInvalidMedicalSpecialties(dirty)).toEqual(['UnknownSkinField']);
+    expect(getInvalidMedicalSpecialties(dirty)).toEqual(['NotARealMedicalSpecialty']);
   });
 });
