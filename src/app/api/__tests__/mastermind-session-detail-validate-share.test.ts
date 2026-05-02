@@ -367,6 +367,30 @@ describe('mastermind session detail + validate + share token routes', () => {
     });
   });
 
+  it('POST /api/mastermind/sessions/[id] updates session state (backward-compatible alias)', async () => {
+    const { POST } = await import('@/app/api/mastermind/sessions/[id]/route');
+    const response = await POST(
+      new Request('http://localhost:3000/api/mastermind/sessions/ms_1', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          action: {
+            type: 'SET_SOURCE_PHOTO',
+            url: 'https://cdn.example.com/headshot.jpg',
+          },
+        }),
+      }) as never,
+      { params: Promise.resolve({ id: 'ms_1' }) },
+    );
+
+    expect(response.status).toBe(200);
+    expect(sessionReducerMock).toHaveBeenCalledTimes(1);
+    expect(sessionReducerMock.mock.calls[0][1]).toEqual({
+      type: 'SET_SOURCE_PHOTO',
+      url: 'https://cdn.example.com/headshot.jpg',
+    });
+  });
+
   it('POST /api/mastermind/sessions/[id]/validate enforces role-gated auth', async () => {
     getSessionFromRequestMock.mockResolvedValueOnce({ username: 'front', role: 'frontdesk' });
     const { POST } = await import('@/app/api/mastermind/sessions/[id]/validate/route');

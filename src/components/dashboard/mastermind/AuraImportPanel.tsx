@@ -172,6 +172,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         url: string,
         body: Record<string, unknown>,
         fallbackMessage: string,
+        method: 'POST' | 'PATCH' = 'POST',
       ): Promise<{
         response: Response;
         parsed: { json: Record<string, unknown> | null; text: string };
@@ -186,7 +187,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
         for (let attempt = 0; attempt < DOWNSTREAM_RETRY_DELAYS_MS.length; attempt += 1) {
           const response = await fetch(url, {
-            method: 'POST',
+            method,
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
             body: JSON.stringify(body),
@@ -258,6 +259,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
             },
           },
           'Failed to save Aura fallback notes to session.',
+          'PATCH',
         );
         if (!intakePatchResult.response.ok) {
           throw new Error(intakePatchResult.message);
@@ -282,6 +284,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
               action: { type: 'SET_SOURCE_PHOTO', url: sourcePhotoUrl },
             },
             'Failed to save Aura preview image to session.',
+            'PATCH',
           );
           if (!photoPatchResult.response.ok) {
             throw new Error(photoPatchResult.message);

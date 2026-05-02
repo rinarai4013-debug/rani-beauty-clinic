@@ -1,6 +1,6 @@
 /**
  * GET /api/mastermind/sessions/[id] — Get session by ID
- * PATCH /api/mastermind/sessions/[id] — Update session fields
+ * PATCH/POST /api/mastermind/sessions/[id] — Update session fields
  *
  * PATCH uses authenticated provider identity for review attribution.
  * Falls back to anonymous if auth is unavailable (dev/testing).
@@ -51,6 +51,18 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  return patchSession(request, { params });
+}
+
+// Backward-compatible alias for older clients sending POST payloads to update sessions.
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  return patchSession(request, { params });
+}
+
+async function patchSession(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   return withSentry('mastermind/sessions/[id]', async () => {
     try {
       // Auth check — staff session required (Wave 11 P0: removed NODE_ENV dev bypass)
