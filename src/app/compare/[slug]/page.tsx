@@ -1,42 +1,75 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { ChevronRight, Phone, Shield, Star, Check, X, ArrowRight } from "lucide-react";
-import StructuredData from "@/components/seo/StructuredData";
-import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
-import { clinicInfo } from "@/data/clinic-info";
-import { comparisonPages, ComparisonPage } from "@/data/comparisons";
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { ChevronRight, Phone, Shield, Star, Check, X, ArrowRight } from 'lucide-react';
+import StructuredData from '@/components/seo/StructuredData';
+import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
+import { clinicInfo } from '@/data/clinic-info';
+import { comparisonPages, type ComparisonPage } from '@/data/comparisons';
+import { vsPages } from '@/data/seo/vs-pages';
+
+export const revalidate = 86400;
+export const dynamicParams = false;
 
 interface PageProps {
   params: { slug: string };
 }
 
+function findComparisonData(slug: string): ComparisonPage | null {
+  const comparisonPage = comparisonPages.find((page) => page.slug === slug);
+  if (comparisonPage) return comparisonPage;
+
+  const vsPage = vsPages.find((page) => page.slug === slug);
+  if (!vsPage) return null;
+
+  return {
+    slug: vsPage.slug,
+    treatmentA: vsPage.treatmentA,
+    treatmentB: vsPage.treatmentB,
+    metaTitle: vsPage.metaTitle,
+    metaDescription: vsPage.metaDescription,
+    intro: vsPage.heroDescription,
+    comparisonTable: vsPage.comparisonTable,
+    prosA: [],
+    consA: [],
+    prosB: [],
+    consB: [],
+    verdict: vsPage.expertRecommendation,
+    faqs: vsPage.faqs,
+  };
+}
+
 export function generateStaticParams() {
-  return comparisonPages.map((page) => ({
-    slug: page.slug,
-  }));
+  const slugSet = new Set<string>([
+    ...vsPages.map((page) => page.slug),
+    ...comparisonPages.map((page) => page.slug),
+  ]);
+
+  return Array.from(slugSet).map((slug) => ({ slug }));
 }
 
 export function generateMetadata({ params }: PageProps): Metadata {
-  const page = comparisonPages.find((p) => p.slug === params.slug);
+  const page = findComparisonData(params.slug);
   if (!page) {
-    return { title: "Comparison Not Found | Rani Beauty Clinic" };
+    return { title: 'Comparison Not Found | Rani Beauty Clinic' };
   }
 
   return {
     title: { absolute: page.metaTitle },
     description: page.metaDescription,
     alternates: {
-      canonical: `${clinicInfo.website}/compare/${page.slug}`,
+      canonical: `${clinicInfo.website}/vs/${page.slug}`,
     },
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
-      type: "article",
-      url: `${clinicInfo.website}/compare/${page.slug}`,
+      type: 'article',
+      url: `${clinicInfo.website}/vs/${page.slug}`,
+      siteName: 'Rani Beauty Clinic',
+      locale: 'en_US',
       images: [
         {
-          url: "/opengraph-image",
+          url: '/opengraph-image',
           width: 1200,
           height: 630,
           alt: `${page.treatmentA} vs ${page.treatmentB} - Rani Beauty Clinic`,
@@ -44,34 +77,33 @@ export function generateMetadata({ params }: PageProps): Metadata {
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: `${page.treatmentA} vs ${page.treatmentB} | Rani Beauty Clinic`,
       description: page.metaDescription,
+      images: ['/opengraph-image'],
     },
   };
 }
 
 export default function ComparePage({ params }: PageProps) {
-  const page = comparisonPages.find((p) => p.slug === params.slug);
+  const page = findComparisonData(params.slug);
 
   if (!page) {
     notFound();
   }
 
   // Related comparisons (exclude current)
-  const relatedComparisons = comparisonPages
-    .filter((p) => p.slug !== page.slug)
-    .slice(0, 6);
+  const relatedComparisons = comparisonPages.filter((p) => p.slug !== page.slug).slice(0, 6);
 
   // FAQ structured data
   const faqData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
     mainEntity: page.faqs.map((faq) => ({
-      "@type": "Question",
+      '@type': 'Question',
       name: faq.question,
       acceptedAnswer: {
-        "@type": "Answer",
+        '@type': 'Answer',
         text: faq.answer,
       },
     })),
@@ -79,22 +111,22 @@ export default function ComparePage({ params }: PageProps) {
 
   // Article structured data
   const articleData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
+    '@context': 'https://schema.org',
+    '@type': 'Article',
     headline: page.metaTitle,
     description: page.metaDescription,
-    url: `${clinicInfo.website}/compare/${page.slug}`,
+    url: `${clinicInfo.website}/vs/${page.slug}`,
     author: {
-      "@type": "Organization",
+      '@type': 'Organization',
       name: clinicInfo.name,
       url: clinicInfo.website,
     },
     publisher: {
-      "@type": "Organization",
+      '@type': 'Organization',
       name: clinicInfo.name,
       url: clinicInfo.website,
     },
-    mainEntityOfPage: `${clinicInfo.website}/compare/${page.slug}`,
+    mainEntityOfPage: `${clinicInfo.website}/vs/${page.slug}`,
   };
 
   return (
@@ -103,9 +135,12 @@ export default function ComparePage({ params }: PageProps) {
       <StructuredData data={articleData} />
       <BreadcrumbSchema
         items={[
-          { name: "Home", url: clinicInfo.website },
-          { name: "Compare Treatments", url: `${clinicInfo.website}/compare` },
-          { name: `${page.treatmentA} vs ${page.treatmentB}`, url: `${clinicInfo.website}/compare/${page.slug}` },
+          { name: 'Home', url: clinicInfo.website },
+          { name: 'Compare Treatments', url: `${clinicInfo.website}/compare` },
+          {
+            name: `${page.treatmentA} vs ${page.treatmentB}`,
+            url: `${clinicInfo.website}/vs/${page.slug}`,
+          },
         ]}
       />
 
@@ -117,23 +152,33 @@ export default function ComparePage({ params }: PageProps) {
             <nav aria-label="Breadcrumb" className="mb-4 sm:mb-6 text-sm text-gray-400">
               <ol className="flex items-center gap-2">
                 <li>
-                  <Link href="/" className="hover:text-[#C9A96E] transition-colors">Home</Link>
+                  <Link href="/" className="hover:text-[#C9A96E] transition-colors">
+                    Home
+                  </Link>
                 </li>
-                <li><ChevronRight size={14} className="text-gray-600" /></li>
                 <li>
-                  <Link href="/compare" className="hover:text-[#C9A96E] transition-colors">Compare</Link>
+                  <ChevronRight size={14} className="text-gray-600" />
                 </li>
-                <li><ChevronRight size={14} className="text-gray-600" /></li>
-                <li className="text-white font-medium">{page.treatmentA} vs {page.treatmentB}</li>
+                <li>
+                  <Link href="/compare" className="hover:text-[#C9A96E] transition-colors">
+                    Compare
+                  </Link>
+                </li>
+                <li>
+                  <ChevronRight size={14} className="text-gray-600" />
+                </li>
+                <li className="text-white font-medium">
+                  {page.treatmentA} vs {page.treatmentB}
+                </li>
               </ol>
             </nav>
             <h1 className="font-playfair text-3xl font-bold text-white sm:text-5xl lg:text-6xl">
-              <span className="text-[#C9A96E]">{page.treatmentA}</span>
-              {" "}vs{" "}
+              <span className="text-[#C9A96E]">{page.treatmentA}</span> vs{' '}
               <span className="text-[#C9A96E]">{page.treatmentB}</span>
             </h1>
             <p className="mt-4 sm:mt-6 text-base leading-relaxed text-gray-300 sm:text-xl">
-              An honest, side-by-side comparison from the physician-supervised team at Rani Beauty Clinic in Renton, WA.
+              An honest, side-by-side comparison from the physician-supervised team at Rani Beauty
+              Clinic in Renton, WA.
             </p>
             <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <a
@@ -157,9 +202,7 @@ export default function ComparePage({ params }: PageProps) {
       {/* Intro */}
       <section className="bg-white py-10 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <p className="text-base sm:text-lg leading-relaxed text-gray-700">
-            {page.intro}
-          </p>
+          <p className="text-base sm:text-lg leading-relaxed text-gray-700">{page.intro}</p>
         </div>
       </section>
 
@@ -181,7 +224,7 @@ export default function ComparePage({ params }: PageProps) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {page.comparisonTable.map((row, i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F6F1]/50"}>
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-[#F8F6F1]/50'}>
                     <td className="px-6 py-4 font-semibold text-[#0F1D2C]">{row.category}</td>
                     <td className="px-6 py-4 text-gray-700">{row.treatmentA}</td>
                     <td className="px-6 py-4 text-gray-700">{row.treatmentB}</td>
@@ -193,9 +236,14 @@ export default function ComparePage({ params }: PageProps) {
           {/* Mobile: Stacked comparison cards per category */}
           <div className="mt-8 space-y-4 sm:hidden">
             {page.comparisonTable.map((row, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+              <div
+                key={i}
+                className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm"
+              >
                 <div className="bg-[#0F1D2C] px-4 py-2.5">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-white/70">{row.category}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                    {row.category}
+                  </p>
                 </div>
                 <div className="divide-y divide-gray-100">
                   <div className="px-4 py-3">
@@ -224,7 +272,9 @@ export default function ComparePage({ params }: PageProps) {
             <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm">
               <h3 className="font-playfair text-2xl font-bold text-[#0F1D2C]">{page.treatmentA}</h3>
               <div className="mt-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Advantages</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+                  Advantages
+                </p>
                 <ul className="mt-3 space-y-2.5">
                   {page.prosA.map((pro, i) => (
                     <li key={i} className="flex items-start gap-2.5">
@@ -235,7 +285,9 @@ export default function ComparePage({ params }: PageProps) {
                 </ul>
               </div>
               <div className="mt-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-rose-500">Considerations</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-rose-500">
+                  Considerations
+                </p>
                 <ul className="mt-3 space-y-2.5">
                   {page.consA.map((con, i) => (
                     <li key={i} className="flex items-start gap-2.5">
@@ -259,7 +311,9 @@ export default function ComparePage({ params }: PageProps) {
             <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm">
               <h3 className="font-playfair text-2xl font-bold text-[#0F1D2C]">{page.treatmentB}</h3>
               <div className="mt-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Advantages</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+                  Advantages
+                </p>
                 <ul className="mt-3 space-y-2.5">
                   {page.prosB.map((pro, i) => (
                     <li key={i} className="flex items-start gap-2.5">
@@ -270,7 +324,9 @@ export default function ComparePage({ params }: PageProps) {
                 </ul>
               </div>
               <div className="mt-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-rose-500">Considerations</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-rose-500">
+                  Considerations
+                </p>
                 <ul className="mt-3 space-y-2.5">
                   {page.consB.map((con, i) => (
                     <li key={i} className="flex items-start gap-2.5">
@@ -303,9 +359,7 @@ export default function ComparePage({ params }: PageProps) {
                 Our Verdict
               </h2>
             </div>
-            <p className="text-base leading-relaxed text-gray-700">
-              {page.verdict}
-            </p>
+            <p className="text-base leading-relaxed text-gray-700">{page.verdict}</p>
             <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <a
                 href={clinicInfo.booking.url}
@@ -333,10 +387,7 @@ export default function ComparePage({ params }: PageProps) {
           </h2>
           <div className="mt-8 sm:mt-10 space-y-3 sm:space-y-4">
             {page.faqs.map((faq, i) => (
-              <details
-                key={i}
-                className="group rounded-xl border border-gray-200 bg-[#F8F6F1]"
-              >
+              <details key={i} className="group rounded-xl border border-gray-200 bg-[#F8F6F1]">
                 <summary className="flex cursor-pointer items-center justify-between px-4 sm:px-6 py-4 text-[15px] sm:text-base font-semibold text-[#0F1D2C] min-h-[48px] gap-3">
                   <span>{faq.question}</span>
                   <ChevronRight className="h-5 w-5 shrink-0 text-gray-400 transition group-open:rotate-90" />
@@ -363,7 +414,7 @@ export default function ComparePage({ params }: PageProps) {
             {relatedComparisons.map((related) => (
               <Link
                 key={related.slug}
-                href={`/compare/${related.slug}`}
+                href={`/vs/${related.slug}`}
                 className="group flex items-center justify-between rounded-xl border border-gray-100 bg-white px-5 py-4 transition hover:border-[#C9A96E]/30 hover:shadow-md"
               >
                 <div>
@@ -393,7 +444,8 @@ export default function ComparePage({ params }: PageProps) {
             Still Not Sure? Let Us Help.
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-gray-300">
-            Book a personalized consultation and our physician-supervised team will recommend the right treatment for your goals, skin type, and budget.
+            Book a personalized consultation and our physician-supervised team will recommend the
+            right treatment for your goals, skin type, and budget.
           </p>
           <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
             <a

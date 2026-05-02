@@ -1,4 +1,4 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { geoPages } from "@/data/locations/geo-pages";
 import { serviceVariations } from "@/data/services/service-variations";
 import { galleryPages } from "@/data/results/gallery";
@@ -59,6 +59,63 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 }
 
+const sitemapIds = [0, 1, 2, 3, 4, 5] as const;
+
+export function getSitemapIds(): readonly number[] {
+  return sitemapIds;
+}
+
+export function buildRawSitemapById(id: number): MetadataRoute.Sitemap {
+  switch (id) {
+    case 0:
+      return buildCoreSitemap();
+    case 1:
+      return buildBlogSitemap();
+    case 2:
+      return buildSeoContentSitemap();
+    case 3:
+      return buildGeoHubSitemap();
+    case 4:
+      return buildNearServiceSitemap("a-k");
+    case 5:
+      return buildNearServiceSitemap("l-z");
+    default:
+      return [];
+  }
+}
+
+export function buildDedupedSitemapById(id: number): MetadataRoute.Sitemap {
+  return dedupeSitemap(buildRawSitemapById(id));
+}
+
+export function getAllSitemapUrlsById(): Map<number, MetadataRoute.Sitemap> {
+  const globalSeen = new Set<string>();
+  const dedupedById = new Map<number, MetadataRoute.Sitemap>();
+
+  for (const currentId of sitemapIds) {
+    const entries = buildDedupedSitemapById(currentId).filter((entry) => {
+      if (globalSeen.has(entry.url)) return false;
+
+      globalSeen.add(entry.url);
+      return true;
+    });
+
+    dedupedById.set(currentId, entries);
+  }
+
+  return dedupedById;
+}
+
+function dedupeSitemap(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+  const seen = new Set<string>();
+
+  return entries.filter((entry) => {
+    if (seen.has(entry.url)) return false;
+    seen.add(entry.url);
+    return true;
+  });
+}
+
 // ── Sub-sitemap 0: Core pages (~250 URLs) ────────────────────────────
 function buildCoreSitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
@@ -87,6 +144,7 @@ function buildCoreSitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/guides`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/press`, lastModified: CONTENT_LAST_UPDATED, priority: 0.6, changeFrequency: "monthly" },
     { url: `${baseUrl}/glp1`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${baseUrl}/compare`, lastModified: CONTENT_LAST_UPDATED, priority: 0.9, changeFrequency: "weekly" },
     { url: `${baseUrl}/concerns`, lastModified: CONTENT_LAST_UPDATED, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy-policy`, lastModified: CONTENT_LAST_UPDATED, priority: 0.3, changeFrequency: "yearly" },
     { url: `${baseUrl}/terms`, lastModified: CONTENT_LAST_UPDATED, priority: 0.3, changeFrequency: "yearly" },
@@ -145,7 +203,7 @@ function buildCoreSitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
   }));
 
-  // Comparison pages — /vs/ URLs only (canonical). /compare/ 301-redirects here.
+  // Comparison pages: index at /compare, detail pages under /vs/.
   // Include slugs from both vsPages and comparisonPages (deduplicated)
   const allVsSlugs = new Set([
     ...vsPages.map((p) => p.slug),

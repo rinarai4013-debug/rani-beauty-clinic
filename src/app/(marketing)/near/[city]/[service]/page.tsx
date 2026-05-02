@@ -20,13 +20,49 @@ import {
   getExtendedServiceGeoEntry,
   getExtendedServiceGeoByCity,
 } from "@/data/locations/service-geo-extended";
+import { takeStableRotated } from "@/lib/seo/stable-collection";
 
 const allCities = [...pnwCities, ...waCitiesExtended];
 const allServiceGeoEntries = [...serviceGeoEntries, ...extendedServiceGeoEntries];
 const allServiceTemplates = [...serviceTemplates, ...extendedServiceTemplates];
 
+export const revalidate = 86400;
+export const dynamicParams = false;
+
+const SERVICE_TITLE_OVERRIDES: Record<string, string> = {
+  "sammamish/rf-microneedling": "Best RF Microneedling Near Sammamish - From $495",
+  "north-bend/lip-filler": "Best Lip Filler Near North Bend - From $650",
+  "issaquah/weight-loss-glp1": "Best Weight Loss (GLP-1) Near Issaquah - From $399/month",
+  "west-seattle/botox": "Best Botox Near West Seattle - From $12/unit",
+  "north-bend/weight-loss-glp1": "Best Weight Loss (GLP-1) Near North Bend",
+  "maple-valley/weight-loss-glp1": "Best Weight Loss (GLP-1) Near Maple Valley",
+  "sammamish/botox": "Best Botox Near Sammamish - From $12/unit",
+  "north-bend/laser-hair-removal": "Best Laser Hair Removal Near North Bend",
+  "vancouver-wa/lip-filler-geo": "Best Lip Filler Near Vancouver - From $650",
+  "federal-way/botox": "Best Botox Near Federal Way - From $12/unit",
+  "snoqualmie/weight-loss-glp1": "Best Weight Loss (GLP-1) Near Snoqualmie",
+  "index/laser-hair-removal": "Best Laser Hair Removal Near Index - From $79/session",
+  "spokane/laser-hair-removal": "Best Laser Hair Removal Near Spokane - From $79/session",
+  "west-seattle/laser-hair-removal": "Best Laser Hair Removal Near West Seattle",
+  "lynnwood/laser-hair-removal": "Best Laser Hair Removal Near Lynnwood - From $79/session",
+};
+
 interface PageProps {
   params: { city: string; service: string };
+}
+
+function buildShortNearServiceTitle(serviceName: string, cityName: string): string {
+  const maxTitleLength = 39; // 39 + " | Rani Beauty Clinic" = 60
+  const candidates = [
+    `Best ${serviceName} Near ${cityName}`,
+    `${serviceName} Near ${cityName}`,
+    `${serviceName} ${cityName}`,
+  ];
+
+  const best = candidates.find((candidate) => candidate.length <= maxTitleLength) ?? candidates[1];
+  return best.length <= maxTitleLength
+    ? best
+    : best.slice(0, maxTitleLength).replace(/\s+\S*$/, "").trim();
 }
 
 export function generateStaticParams() {
@@ -39,20 +75,25 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: PageProps): Metadata {
   const entry = getServiceGeoEntry(params.city, params.service) || getExtendedServiceGeoEntry(params.city, params.service);
   if (!entry) {
-    return { title: "Service Not Found | Rani Beauty Clinic" };
+    return { title: "Service Not Found" };
   }
 
+  const overrideKey = `${params.city}/${params.service}`;
+  const title = SERVICE_TITLE_OVERRIDES[overrideKey] ?? buildShortNearServiceTitle(entry.serviceName, entry.cityName);
+
   return {
-    title: { absolute: entry.title },
+    title: { absolute: title },
     description: entry.metaDescription,
     alternates: {
       canonical: `${clinicInfo.website}/near/${params.city}/${params.service}`,
     },
     openGraph: {
-      title: entry.title,
+      title: `${title} | Rani Beauty Clinic`,
       description: entry.metaDescription,
       type: "website",
       url: `${clinicInfo.website}/near/${params.city}/${params.service}`,
+      siteName: "Rani Beauty Clinic",
+      locale: "en_US",
       images: [
         {
           url: "/opengraph-image",
@@ -64,8 +105,9 @@ export function generateMetadata({ params }: PageProps): Metadata {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${entry.serviceName} Near ${entry.cityName} | Rani Beauty Clinic`,
+      title: `${title} | Rani Beauty Clinic`,
       description: entry.metaDescription,
+      images: ["/opengraph-image"],
     },
   };
 }
@@ -88,9 +130,8 @@ export default function ServiceCityPage({ params }: PageProps) {
   );
 
   const sameSvcOtherCities = allServiceGeoEntries
-    .filter((e) => e.serviceSlug === params.service && e.citySlug !== params.city)
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 6);
+    .filter((e) => e.serviceSlug === params.service && e.citySlug !== params.city);
+  const relatedCities = takeStableRotated(sameSvcOtherCities, `${params.city}/${params.service}`, 6);
 
   // LocalBusiness structured data
   const localBusinessData = {
@@ -452,7 +493,7 @@ export default function ServiceCityPage({ params }: PageProps) {
             {entry.serviceName} - Nearby Cities
           </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sameSvcOtherCities.map((svc) => (
+            {relatedCities.map((svc) => (
               <Link
                 key={svc.citySlug}
                 href={`/near/${svc.citySlug}/${svc.serviceSlug}`}

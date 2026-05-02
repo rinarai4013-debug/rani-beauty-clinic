@@ -1,27 +1,34 @@
-import { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import Hero from "@/components/sections/Hero";
-import CTABanner from "@/components/sections/CTABanner";
-import FadeInOnScroll from "@/components/animations/FadeInOnScroll";
-import SectionLabel from "@/components/ui/SectionLabel";
-import StaggerChildren from "@/components/animations/StaggerChildren";
-import Card from "@/components/ui/Card";
-import { comparisonPages } from "@/data/comparisons";
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import Hero from '@/components/sections/Hero';
+import CTABanner from '@/components/sections/CTABanner';
+import FadeInOnScroll from '@/components/animations/FadeInOnScroll';
+import SectionLabel from '@/components/ui/SectionLabel';
+import StaggerChildren from '@/components/animations/StaggerChildren';
+import Card from '@/components/ui/Card';
+import { comparisonPages } from '@/data/comparisons';
 
 export const metadata: Metadata = {
-  title: "Treatment Comparisons | Rani Beauty Clinic",
+  title: 'Treatment Comparisons | Rani Beauty Clinic',
   description:
-    "Compare popular aesthetic treatments and medical wellness programs side by side. Make informed decisions about Botox vs Dysport, Semaglutide vs Tirzepatide, and more.",
+    'Compare popular aesthetic treatments and medical wellness programs side by side. Make informed decisions about Botox vs Dysport, Semaglutide vs Tirzepatide, and more.',
   alternates: {
-    canonical: "https://www.ranibeautyclinic.com/compare",
+    canonical: 'https://www.ranibeautyclinic.com/compare',
   },
   openGraph: {
-    title: "Treatment Comparisons | Rani Beauty Clinic",
+    title: 'Treatment Comparisons | Rani Beauty Clinic',
     description:
-      "Compare popular aesthetic treatments and medical wellness programs side by side. Botox vs Dysport, Semaglutide vs Tirzepatide, and more.",
-    url: "https://www.ranibeautyclinic.com/compare",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Treatment Comparisons - Rani Beauty Clinic" }],
+      'Compare popular aesthetic treatments and medical wellness programs side by side. Botox vs Dysport, Semaglutide vs Tirzepatide, and more.',
+    url: 'https://www.ranibeautyclinic.com/compare',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Treatment Comparisons - Rani Beauty Clinic',
+      },
+    ],
   },
 };
 
@@ -47,7 +54,7 @@ export default function ComparePage() {
           <StaggerChildren className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {comparisonPages.map((page) => (
               <Card key={page.slug} className="!p-0">
-                <Link href={`/compare/${page.slug}`} className="group block p-6">
+                <Link href={`/vs/${page.slug}`} className="group block p-6">
                   <h3 className="font-body text-base font-bold text-rani-navy group-hover:text-rani-gold transition-colors">
                     {page.treatmentA} vs {page.treatmentB}
                   </h3>
@@ -56,7 +63,10 @@ export default function ComparePage() {
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1 font-body text-sm font-semibold text-rani-navy group-hover:text-rani-gold transition-colors">
                     Compare
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                    <ArrowRight
+                      size={14}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
                   </span>
                 </Link>
               </Card>
