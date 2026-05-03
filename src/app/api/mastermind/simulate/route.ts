@@ -13,6 +13,7 @@ import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/li
 import { unauthorized } from '@/lib/auth/middleware';
 import { z } from 'zod';
 import { NON_RENDERABLE_IMAGE_MARKERS, isRenderableImageValue } from '@/lib/mastermind/image-markers';
+import { buildTreatmentPlanCustomization } from '@/lib/mastermind/treatment-customization';
 import {
   isRenderableSourcePhoto,
   renderPhotoSimulationFrameImage,
@@ -327,7 +328,10 @@ export async function POST(request: NextRequest) {
             : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
 
           // Get plan cost if available
-          const planCost = session.mastermindPlan?.recommendations
+          const customizedCost = buildTreatmentPlanCustomization(session)?.selectedTotal;
+          const planCost = customizedCost && customizedCost > 0
+            ? customizedCost
+            : session.mastermindPlan?.recommendations
             ? [
                 ...(session.mastermindPlan.recommendations.primary || []),
                 ...(session.mastermindPlan.recommendations.complementary || []),

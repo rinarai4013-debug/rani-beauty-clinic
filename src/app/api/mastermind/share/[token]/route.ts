@@ -198,8 +198,68 @@ function sanitizeSequencing(
   }));
 }
 
-function sanitizePackages(packages: GeneratedPackage[]): PatientPackage[] {
-  return packages.map((p) => ({
+function buildExactPackageFromCustomization(
+  customization: TreatmentPlanCustomization,
+  tier: GeneratedPackage['tier'],
+): GeneratedPackage | null {
+  const selectedItems = customization.items.filter((item) => item.selected);
+  if (selectedItems.length === 0 || customization.selectedTotal <= 0) return null;
+
+  const originalPrice = selectedItems.reduce(
+    (sum, item) => sum + Math.max(0, item.perSession) * Math.max(1, item.sessions),
+    0,
+  );
+  const price = customization.selectedTotal;
+  const savingsVsStandalone = Math.max(0, originalPrice - price);
+  const discount = originalPrice > 0 ? Math.round((savingsVsStandalone / originalPrice) * 100) : 0;
+
+  return {
+    tier,
+    name: 'Your Selected Treatment Plan',
+    subtitle: 'Exact services, areas, dates, and session counts selected by your consultant',
+    price,
+    totalPrice: price,
+    originalPrice: Math.max(originalPrice, price),
+    discount,
+    sessions: customization.selectedSessionCount,
+    lineItems: selectedItems.map((item) => ({
+      service: item.targetAreas.length > 0
+        ? `${item.treatmentName} (${item.targetAreas.join(', ')})`
+        : item.treatmentName,
+      qty: item.sessions,
+      unitPrice: item.perSession,
+      total: item.totalEstimate,
+    })),
+    monthlyPayment12: Math.ceil(price / 12),
+    monthlyPayment24: Math.ceil(price / 24),
+    highlighted: true,
+    extras: customization.planNotes ? [customization.planNotes] : [],
+    bestFor: 'Following the exact treatment sequence selected during your consultation.',
+    resultIntensity: 'Personalized',
+    concernsAddressed: Array.from(new Set(selectedItems.map((item) => item.category))).slice(0, 6),
+    whyBest: 'This reflects the exact plan your consultant selected for your goals, treatment areas, schedule, and estimated investment.',
+    savingsVsStandalone,
+  };
+}
+
+function sanitizePackages(
+  packages: GeneratedPackage[],
+  customization?: TreatmentPlanCustomization | null,
+  selectedTier?: GeneratedPackage['tier'] | null,
+): PatientPackage[] {
+  const exactPackage = customization
+    ? buildExactPackageFromCustomization(customization, selectedTier || 'Transform')
+    : null;
+  const packageList = exactPackage
+    ? [
+        ...packages
+          .filter((p) => p.tier !== exactPackage.tier)
+          .map((p) => ({ ...p, highlighted: false })),
+        exactPackage,
+      ]
+    : packages;
+
+  return packageList.map((p) => ({
     tier: p.tier,
     name: p.name,
     subtitle: p.subtitle,
@@ -341,7 +401,7 @@ export async function GET(
         },
         sequencing: sanitizeSequencing(plan.sequencing, allTreatments),
         customPlan: sanitizeCustomization(customization),
-        packages: sanitizePackages(plan.packages),
+        packages: sanitizePackages(plan.packages, customization, session.selectedPackageTier),
         aftercare,
         simulation: session.simulationComparison
           ? sanitizeSimulation(session.simulationComparison)

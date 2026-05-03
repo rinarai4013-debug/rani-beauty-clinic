@@ -1164,6 +1164,10 @@ export default function PatientPlanPage() {
   const activeTier = selectedTier || data.selectedPackageTier || sortedPackages.find((pkg) => pkg.highlighted)?.tier || sortedPackages[0]?.tier || '';
   const selectedPackage = sortedPackages.find((pkg) => pkg.tier === activeTier) || null;
   const scanExplanation = buildScanExplanation(data);
+  const hasPhotoSimulation = Boolean(
+    data.simulation?.withTreatment.frames.some((frame) => frame.kind === 'photo-simulation' && isRenderablePlanImage(frame.imageDataUrl)) ||
+    data.simulation?.withoutTreatment.frames.some((frame) => frame.kind === 'photo-simulation' && isRenderablePlanImage(frame.imageDataUrl)),
+  );
 
   return (
     <div className="min-h-screen paper-texture patient-portal-scroll" style={{ backgroundColor: COLORS.cream }}>
@@ -1808,10 +1812,12 @@ export default function PatientPlanPage() {
                   className="text-2xl md:text-3xl font-bold mb-3 font-heading"
                   style={{ color: COLORS.navy }}
                 >
-                  Projected Results With Treatment
+                  {hasPhotoSimulation ? 'Photo-Based Projected Results' : 'Projected Results With Treatment'}
                 </h2>
                 <p className="text-sm" style={{ color: `${COLORS.navy}50` }}>
-                  AI-projected outcomes over 12 months
+                  {hasPhotoSimulation
+                    ? 'Educational photo simulation based on the uploaded clinical image and your treatment plan'
+                    : 'Data-driven score and skin-age projections. A clinical photo is needed for a visual face simulation.'}
                 </p>
               </div>
 

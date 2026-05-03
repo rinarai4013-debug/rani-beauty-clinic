@@ -1217,6 +1217,7 @@ export default function MastermindSessionPage() {
                             ? {
                                 ...current,
                                 auraScanResult: result.scanResult || current.auraScanResult,
+                                sourcePhotoUrl: result.scan.sourcePhotoUrl || current.sourcePhotoUrl,
                                 mastermindPlan: result.mastermindPlan || current.mastermindPlan,
                                 treatmentPlanCustomization: result.mastermindPlan
                                   ? undefined

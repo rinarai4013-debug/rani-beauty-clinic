@@ -195,6 +195,7 @@ export default function PlanEditor({
   const planItems = customization?.items || [];
   const selectedItems = planItems.filter((item) => item.selected);
   const totalCost = customization?.selectedTotal ?? allTreatments.reduce((sum, t) => sum + t.totalEstimate, 0);
+  const selectedPackage = plan.packages.find((pkg) => pkg.tier === session.selectedPackageTier) || null;
   const approvalStatus = review?.approvalStatus || 'pending';
 
   return (
@@ -648,12 +649,39 @@ export default function PlanEditor({
       {/* Total */}
       <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E8E4DF] shadow-sm">
         <span className="font-body text-sm font-medium text-[#0F1D2C]">
-          Plan Total
+          Exact Treatment Total
         </span>
         <span className="font-[family-name:var(--font-heading)] text-xl font-bold text-[#0F1D2C]">
           ${totalCost.toLocaleString()}
         </span>
       </div>
+
+      {selectedPackage && (
+        <div className="rounded-2xl border border-[#C9A96E]/35 bg-[#C9A96E]/10 p-4 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="font-body text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9A6F20]">
+                Selected Patient Package
+              </p>
+              <h3 className="mt-1 font-[family-name:var(--font-heading)] text-lg font-semibold text-[#0F1D2C]">
+                {selectedPackage.name}
+              </h3>
+              <p className="mt-1 font-body text-xs leading-relaxed text-[#0F1D2C]/60">
+                This is the package currently highlighted on the patient link. Selecting a different
+                package below immediately changes the recommendation state above and on share.
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#0F1D2C]">
+                ${selectedPackage.price.toLocaleString()}
+              </p>
+              <p className="font-body text-xs text-[#0F1D2C]/55">
+                ${selectedPackage.monthlyPayment12.toLocaleString()}/mo est. for 12 months
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Packages */}
       {plan.packages.length > 0 && (
