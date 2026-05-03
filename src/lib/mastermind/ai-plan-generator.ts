@@ -21,6 +21,7 @@ import type { ConsultationFormData } from '@/lib/consultation/schema';
 import type { UnifiedService } from '@/data/services/unified-catalog';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 import { generateMastermindPlan } from './plan-generator';
+import { deriveServiceClinicalLogic } from './service-clinical-logic';
 
 // ── Constants ──
 
@@ -211,6 +212,15 @@ FINANCING:
 - Offer 12-month and 24-month terms
 - Only for packages over $500
 
+SERVICE-SPECIFIC CLINICAL LOGIC:
+- Laser hair removal must infer session count from area, hair density, shaving frequency, prior laser history, hormonal/PCOS/facial pattern, Fitzpatrick type, and recent sun exposure. Use a complete growth-cycle course, usually 6-8 sessions, extending toward 8-10 for dense hair, daily shaving, hormonal facial hair, full-body/back/chest/legs, or higher pigment-risk pacing. Reduce cautiously only when prior laser sessions are documented.
+- Botox is one treatment with 12-16 week maintenance; results start in days and peak around 14 days.
+- Fillers should be staged when multiple facial balancing zones are involved; reassess 2-4 weeks before adding more.
+- HydraFacial/facials are one visit for glow, but 3+ monthly sessions when acne, congestion, pores, or barrier instability are present.
+- Peels and pigment protocols need SPF/homecare compliance; pigment-prone or Fitzpatrick IV-VI patients require conservative selection and provider review.
+- RF microneedling, scar work, lasers, and tightening are collagen/remodeling treatments; schedule them as a series and describe results building over 3-6 months.
+- Every repeated-session treatment must have matching package quantities and sequence entries. Do not list six sessions in copy but price only one.
+
 You MUST respond with valid JSON matching the exact schema specified in the user prompt.`;
 }
 
@@ -350,6 +360,7 @@ ${formatCatalogForPrompt(catalog)}
    - Formula: monthlyPayment = price * (r * (1+r)^n) / ((1+r)^n - 1) where r = 0.1499/12, n = months
 7. Write treatment-specific aftercare (see system prompt for protocols).
 8. Write personalized narratives — patient-facing should feel luxurious and caring, provider-facing should be clinically precise.
+9. Make service logic clinically specific: for laser hair removal, use hair thickness, shaving frequency, prior laser history, hormonal pattern, area, Fitzpatrick type, and sun exposure to pick session count and cadence. For every service, make sessions, dates, packages, rationale, and risks agree.
 
 ${getResponseSchemaDescription()}`;
 
@@ -445,7 +456,35 @@ const VALID_ZONES = new Set<FacialZone>([
   'marionette_right', 'jawline', 'chin', 'neck', 'decolletage',
 ]);
 
-function sanitizeTreatment(raw: AIRawTreatment): MastermindTreatment {
+function findCatalogServiceForTreatment(raw: AIRawTreatment, catalog: UnifiedService[]): UnifiedService | null {
+  const rawId = String(raw.id || '').replace(/^tx_/, '').toLowerCase();
+  const rawName = String(raw.treatmentName || '').toLowerCase().trim();
+
+  return catalog.find((service) => service.id.toLowerCase() === rawId)
+    || catalog.find((service) => service.name.toLowerCase() === rawName)
+    || catalog.find((service) => rawName.length > 0 && service.name.toLowerCase().includes(rawName))
+    || null;
+}
+
+function mergeStrings(primary: string[], secondary: string[], limit = 5): string[] {
+  const seen = new Set<string>();
+  return [...primary, ...secondary]
+    .filter(Boolean)
+    .filter((value) => {
+      const key = value.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, limit);
+}
+
+function sanitizeTreatment(
+  raw: AIRawTreatment,
+  scanResult: AuraScanResult,
+  intakeData: Partial<ConsultationFormData>,
+  catalog: UnifiedService[]
+): MastermindTreatment {
   const validZones = (raw.targetZones || []).filter(
     (z): z is FacialZone => VALID_ZONES.has(z as FacialZone)
   );
@@ -462,62 +501,45 @@ function sanitizeTreatment(raw: AIRawTreatment): MastermindTreatment {
     ? (raw.riskLevel as MastermindTreatment['riskLevel'])
     : 'low';
 
+  const catalogService = findCatalogServiceForTreatment(raw, catalog);
+  const clinicalLogic = catalogService
+    ? deriveServiceClinicalLogic(catalogService, scanResult, intakeData)
+    : null;
+  const perSession = catalogService?.price ?? Math.max(0, raw.perSession || 0);
+  const sessionsRequired = clinicalLogic?.sessionsRequired ?? Math.max(1, raw.sessionsRequired || 1);
+  const clinicalReasoning = clinicalLogic
+    ? [raw.aiReasoning, clinicalLogic.patientReasoning].filter(Boolean).join(' ')
+    : raw.aiReasoning || '';
+  const clinicalRationale = clinicalLogic
+    ? [
+        raw.clinicalRationale,
+        clinicalLogic.clinicalRationale,
+        clinicalLogic.planningSignals.length > 0 ? `Signals: ${clinicalLogic.planningSignals.join('; ')}.` : '',
+      ].filter(Boolean).join(' ')
+    : raw.clinicalRationale || '';
+
   return {
-    id: raw.id || `tx_unknown_${Date.now().toString(36)}`,
-    treatmentName: raw.treatmentName || 'Unknown Treatment',
-    category: raw.category || 'consultation',
-    targetConcerns: raw.targetConcerns || [],
-    targetZones: validZones.length > 0 ? validZones : ['forehead'],
-    sessionsRequired: Math.max(1, raw.sessionsRequired || 1),
-    intervalBetweenSessions: raw.intervalBetweenSessions || 'As needed',
-    expectedImprovement: raw.expectedImprovement || 'Improvement expected',
-    timeToResults: raw.timeToResults || '2-4 weeks',
-    longevity: raw.longevity || '3-6 months',
-    perSession: Math.max(0, raw.perSession || 0),
-    totalEstimate: Math.max(0, raw.totalEstimate || 0),
+    id: catalogService ? `tx_${catalogService.id}` : raw.id || `tx_unknown_${Date.now().toString(36)}`,
+    treatmentName: catalogService?.name || raw.treatmentName || 'Unknown Treatment',
+    category: catalogService?.category || raw.category || 'consultation',
+    targetConcerns: clinicalLogic ? mergeStrings(clinicalLogic.targetConcerns, raw.targetConcerns || []) : raw.targetConcerns || [],
+    targetZones: clinicalLogic?.targetZones.length ? clinicalLogic.targetZones : validZones.length > 0 ? validZones : ['forehead'],
+    sessionsRequired,
+    intervalBetweenSessions: clinicalLogic?.intervalBetweenSessions || raw.intervalBetweenSessions || 'As needed',
+    expectedImprovement: clinicalLogic?.expectedImprovement || raw.expectedImprovement || 'Improvement expected',
+    timeToResults: clinicalLogic?.timeToResults || raw.timeToResults || '2-4 weeks',
+    longevity: clinicalLogic?.longevity || raw.longevity || '3-6 months',
+    perSession,
+    totalEstimate: perSession * sessionsRequired,
     priority,
     urgency,
-    downtime: raw.downtime || 'Minimal',
-    riskLevel,
-    contraindications: raw.contraindications || [],
+    downtime: catalogService?.downtime || raw.downtime || 'Minimal',
+    riskLevel: clinicalLogic?.riskLevel || riskLevel,
+    contraindications: mergeStrings(clinicalLogic?.contraindications || [], raw.contraindications || [], 8),
     synergiesWith: raw.synergiesWith || [],
     aiConfidence: Math.min(100, Math.max(0, raw.aiConfidence || 75)),
-    aiReasoning: raw.aiReasoning || '',
-    clinicalRationale: raw.clinicalRationale || '',
-  };
-}
-
-function sanitizePackage(raw: AIRawPackage): GeneratedPackage {
-  const tier = (['Start', 'Transform', 'Elite'] as const).find(t => t === raw.tier) || 'Start';
-
-  // Recalculate financing with proper amortization to override any AI arithmetic errors
-  const price = Math.max(0, raw.price || 0);
-  const monthlyPayment12 = calculateMonthlyPayment(price, DEFAULT_FINANCING_APR, 12);
-  const monthlyPayment24 = calculateMonthlyPayment(price, DEFAULT_FINANCING_APR, 24);
-
-  return {
-    tier,
-    name: raw.name || `${tier} Package`,
-    subtitle: raw.subtitle || '',
-    price,
-    originalPrice: Math.max(price, raw.originalPrice || price),
-    discount: Math.min(50, Math.max(0, raw.discount || 0)),
-    sessions: Math.max(1, raw.sessions || 1),
-    lineItems: (raw.lineItems || []).map(li => ({
-      service: li.service || 'Treatment',
-      qty: Math.max(1, li.qty || 1),
-      unitPrice: Math.max(0, li.unitPrice || 0),
-      total: Math.max(0, li.total || 0),
-    })),
-    monthlyPayment12,
-    monthlyPayment24,
-    highlighted: tier === 'Transform',
-    extras: raw.extras || [],
-    bestFor: raw.bestFor || '',
-    resultIntensity: raw.resultIntensity || '',
-    concernsAddressed: raw.concernsAddressed || [],
-    ...(tier === 'Transform' && raw.whyBest ? { whyBest: raw.whyBest } : {}),
-    savingsVsStandalone: Math.max(0, raw.savingsVsStandalone || 0),
+    aiReasoning: clinicalReasoning,
+    clinicalRationale,
   };
 }
 
@@ -549,11 +571,159 @@ function parseAIResponse(responseText: string): AIRawPlan {
   return parsed as AIRawPlan;
 }
 
-function buildPlanFromAIResponse(raw: AIRawPlan): Omit<MastermindPlan, 'planId' | 'generatedAt'> {
+function buildPackagesFromTreatments(
+  treatments: MastermindTreatment[]
+): GeneratedPackage[] {
+  const buildLineItems = (items: MastermindTreatment[]) => items.map((treatment) => ({
+    service: treatment.treatmentName,
+    qty: treatment.sessionsRequired,
+    unitPrice: treatment.perSession,
+    total: treatment.perSession * treatment.sessionsRequired,
+  }));
+
+  const buildPackage = (
+    tier: 'Start' | 'Transform' | 'Elite',
+    items: MastermindTreatment[],
+    discount: number,
+    highlighted: boolean
+  ): GeneratedPackage => {
+    const originalPrice = items.reduce((sum, treatment) => sum + treatment.perSession * treatment.sessionsRequired, 0);
+    const price = Math.round(originalPrice * (1 - discount / 100));
+    return {
+      tier,
+      name: `${tier} Package`,
+      subtitle: tier === 'Start'
+        ? 'Essential first step'
+        : tier === 'Transform'
+          ? 'Most popular - complete active plan'
+          : 'Full transformation and maintenance',
+      price,
+      originalPrice,
+      discount,
+      sessions: items.reduce((sum, treatment) => sum + treatment.sessionsRequired, 0),
+      lineItems: buildLineItems(items),
+      monthlyPayment12: calculateMonthlyPayment(price, DEFAULT_FINANCING_APR, 12),
+      monthlyPayment24: calculateMonthlyPayment(price, DEFAULT_FINANCING_APR, 24),
+      highlighted,
+      extras: tier === 'Start'
+        ? ['Personalized treatment plan', 'Aftercare protocols']
+        : tier === 'Transform'
+          ? ['Personalized treatment plan', 'Aftercare protocols', 'Priority scheduling', 'Progress tracking photos']
+          : ['Personalized treatment plan', 'Aftercare protocols', 'VIP priority scheduling', 'Progress tracking photos', 'Maintenance planning'],
+      bestFor: tier === 'Start'
+        ? 'Clients who want to begin with the highest-priority treatments'
+        : tier === 'Transform'
+          ? 'Clients who want the best balance of results, timeline, and investment'
+          : 'Clients who want the most complete transformation plan',
+      resultIntensity: tier === 'Start'
+        ? 'visible improvement'
+        : tier === 'Transform'
+          ? 'significant transformation'
+          : 'comprehensive transformation',
+      concernsAddressed: mergeStrings(items.flatMap((treatment) => treatment.targetConcerns), []),
+      ...(tier === 'Transform' ? { whyBest: 'Includes the active clinical series rather than only the first appointment, so the price, dates, and expected outcome all match the actual treatment course.' } : {}),
+      savingsVsStandalone: originalPrice - price,
+    };
+  };
+
+  const primary = treatments.filter((treatment) => treatment.priority === 'essential');
+  const recommended = treatments.filter((treatment) => treatment.priority === 'recommended');
+  const optional = treatments.filter((treatment) => treatment.priority === 'optional');
+  const startItems = primary.length ? primary : treatments.slice(0, 1);
+  const transformItems = mergeTreatmentLists(startItems, recommended.length ? recommended : treatments.slice(0, 3));
+  const eliteItems = mergeTreatmentLists(transformItems, optional.length ? optional : treatments);
+
+  return [
+    buildPackage('Start', startItems, 0, false),
+    buildPackage('Transform', transformItems, 10, true),
+    buildPackage('Elite', eliteItems, 15, false),
+  ];
+}
+
+function intervalWeeksFromTreatment(treatment: MastermindTreatment): number {
+  const interval = treatment.intervalBetweenSessions.toLowerCase();
+  if (/weekly|every 1 week/.test(interval)) return 1;
+  if (/2-4|2 to 4/.test(interval)) return 3;
+  if (/3-4|3 to 4/.test(interval)) return 4;
+  if (/4-6|4 to 6|monthly/.test(interval)) return 4;
+  if (/6-8|6 to 8/.test(interval)) return 6;
+  if (/12-16|12 to 16/.test(interval)) return 14;
+  const explicitWeeks = interval.match(/every\s+(\d{1,2})\s+weeks?/);
+  if (explicitWeeks) return Math.max(1, Number(explicitWeeks[1]));
+  return treatment.sessionsRequired > 1 ? 4 : 2;
+}
+
+function buildSequencingFromTreatments(
+  recommendations: {
+    primary: MastermindTreatment[];
+    complementary: MastermindTreatment[];
+    maintenance: MastermindTreatment[];
+  }
+): TreatmentSequenceItem[] {
+  const phases = [
+    {
+      phase: 1,
+      phaseName: 'Foundation & Assessment',
+      treatments: recommendations.complementary,
+      expectedMilestone: 'Skin barrier and quick-win treatments established',
+    },
+    {
+      phase: 2,
+      phaseName: 'Active Optimization',
+      treatments: recommendations.primary,
+      expectedMilestone: 'Core treatment series underway with visible improvement',
+    },
+    {
+      phase: 3,
+      phaseName: 'Maintenance & Longevity',
+      treatments: recommendations.maintenance,
+      expectedMilestone: 'Results protected with maintenance and long-term optimization',
+    },
+  ].filter((phase) => phase.treatments.length > 0);
+
+  let weekOffset = 0;
+  return phases.map((phase) => {
+    const treatments = phase.treatments.flatMap((treatment, treatmentIndex) => {
+      const intervalWeeks = intervalWeeksFromTreatment(treatment);
+      return Array.from({ length: treatment.sessionsRequired }, (_, sessionIndex) => ({
+        treatmentId: treatment.id,
+        week: weekOffset + 1 + treatmentIndex * 2 + sessionIndex * intervalWeeks,
+        sessionNumber: sessionIndex + 1,
+      }));
+    }).sort((a, b) => a.week - b.week || a.sessionNumber - b.sessionNumber);
+
+    const maxWeek = treatments.reduce((max, treatment) => Math.max(max, treatment.week), weekOffset + 1);
+    const sequence: TreatmentSequenceItem = {
+      phase: phase.phase,
+      phaseName: phase.phaseName,
+      duration: phase.phase === 3 ? `Weeks ${weekOffset + 1}+` : `Weeks ${weekOffset + 1}-${maxWeek}`,
+      treatments,
+      expectedMilestone: phase.expectedMilestone,
+    };
+    weekOffset = maxWeek + 2;
+    return sequence;
+  });
+}
+
+function mergeTreatmentLists(primary: MastermindTreatment[], secondary: MastermindTreatment[]): MastermindTreatment[] {
+  const seen = new Set<string>();
+  return [...primary, ...secondary].filter((treatment) => {
+    if (seen.has(treatment.id)) return false;
+    seen.add(treatment.id);
+    return true;
+  });
+}
+
+function buildPlanFromAIResponse(
+  raw: AIRawPlan,
+  scanResult: AuraScanResult,
+  intakeData: Partial<ConsultationFormData>,
+  catalog: UnifiedService[]
+): Omit<MastermindPlan, 'planId' | 'generatedAt'> {
   const recommendations = {
-    primary: (raw.recommendations.primary || []).map(sanitizeTreatment),
-    complementary: (raw.recommendations.complementary || []).map(sanitizeTreatment),
-    maintenance: (raw.recommendations.maintenance || []).map(sanitizeTreatment),
+    primary: (raw.recommendations.primary || []).map((treatment) => sanitizeTreatment(treatment, scanResult, intakeData, catalog)),
+    complementary: (raw.recommendations.complementary || []).map((treatment) => sanitizeTreatment(treatment, scanResult, intakeData, catalog)),
+    maintenance: (raw.recommendations.maintenance || []).map((treatment) => sanitizeTreatment(treatment, scanResult, intakeData, catalog)),
   };
 
   // Ensure at least one primary treatment
@@ -565,53 +735,14 @@ function buildPlanFromAIResponse(raw: AIRawPlan): Omit<MastermindPlan, 'planId' 
     }
   }
 
-  // Sanitize sequencing
-  const sequencing: TreatmentSequenceItem[] = (raw.sequencing || []).map(seq => ({
-    phase: Math.min(3, Math.max(1, seq.phase || 1)),
-    phaseName: seq.phaseName || `Phase ${seq.phase}`,
-    duration: seq.duration || 'TBD',
-    treatments: (seq.treatments || []).map(t => ({
-      treatmentId: t.treatmentId || '',
-      week: Math.max(1, t.week || 1),
-      sessionNumber: Math.max(1, t.sessionNumber || 1),
-    })),
-    expectedMilestone: seq.expectedMilestone || '',
-  }));
+  // Rebuild sequencing from sanitized session counts instead of trusting
+  // model-supplied math. This keeps dates/weeks aligned with packages.
+  const sequencing = buildSequencingFromTreatments(recommendations);
 
-  // Sanitize packages — ensure all 3 tiers exist
-  const packageMap = new Map<string, GeneratedPackage>();
-  for (const pkg of (raw.packages || [])) {
-    const sanitized = sanitizePackage(pkg);
-    packageMap.set(sanitized.tier, sanitized);
-  }
-
-  // Fill missing tiers with sensible defaults based on primary treatments
+  // Rebuild packages from sanitized treatments so line item quantities,
+  // financing, and totals match the clinically derived session counts.
   const allTreatments = [...recommendations.primary, ...recommendations.complementary, ...recommendations.maintenance];
-  for (const tier of ['Start', 'Transform', 'Elite'] as const) {
-    if (!packageMap.has(tier)) {
-      const price = tier === 'Start' ? 500 : tier === 'Transform' ? 2000 : 4000;
-      packageMap.set(tier, {
-        tier,
-        name: `${tier} Package`,
-        subtitle: '',
-        price,
-        originalPrice: Math.round(price * 1.1),
-        discount: 10,
-        sessions: allTreatments.length,
-        lineItems: [],
-        monthlyPayment12: calculateMonthlyPayment(price, DEFAULT_FINANCING_APR, 12),
-        monthlyPayment24: calculateMonthlyPayment(price, DEFAULT_FINANCING_APR, 24),
-        highlighted: tier === 'Transform',
-        extras: [],
-        bestFor: '',
-        resultIntensity: '',
-        concernsAddressed: [],
-        savingsVsStandalone: 0,
-      });
-    }
-  }
-
-  const packages = ['Start', 'Transform', 'Elite'].map(tier => packageMap.get(tier)!);
+  const packages = buildPackagesFromTreatments(allTreatments);
 
   // Sanitize aftercare
   const aftercarePreview = (raw.aftercarePreview || []).map(ac => ({
@@ -674,7 +805,7 @@ export async function generateAIPlan(
 
     // Parse and sanitize the response
     const rawPlan = parseAIResponse(responseText);
-    const planData = buildPlanFromAIResponse(rawPlan);
+    const planData = buildPlanFromAIResponse(rawPlan, scanResult, intakeData, catalog);
 
     // Recalculate all package financing server-side for accuracy
     const packages = planData.packages.map(pkg => ({

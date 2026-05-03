@@ -16,19 +16,22 @@ export function generatePackages(phases: [PlanPhase, PlanPhase, PlanPhase]): Gen
 
   if (allServices.length === 0) return [];
 
+  const getSessionCount = (service: SelectedService) =>
+    Math.max(1, Math.round(service.recommendedSessions ?? service.quantity * service.service.sessions));
+
   const buildLineItems = (services: SelectedService[]) =>
     services.map((s) => ({
       service: s.service.name,
-      qty: s.quantity * s.service.sessions,
+      qty: getSessionCount(s),
       unitPrice: s.service.price,
-      total: s.service.price * s.quantity * s.service.sessions,
+      total: s.service.price * getSessionCount(s),
     }));
 
   const calcTotal = (services: SelectedService[]) =>
-    services.reduce((sum, s) => sum + s.service.price * s.quantity * s.service.sessions, 0);
+    services.reduce((sum, s) => sum + s.service.price * getSessionCount(s), 0);
 
   const calcSessions = (services: SelectedService[]) =>
-    services.reduce((sum, s) => sum + s.quantity * s.service.sessions, 0);
+    services.reduce((sum, s) => sum + getSessionCount(s), 0);
 
   const extractConcerns = (services: SelectedService[]): string[] => {
     const concerns = new Set<string>();

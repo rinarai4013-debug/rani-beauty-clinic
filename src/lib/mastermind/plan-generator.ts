@@ -25,6 +25,7 @@ import { validatePlan } from '@/lib/plan-builder/constraints';
 import { generatePackages } from '@/lib/plan-builder/package-generator';
 import { PHASE_LABELS } from '@/lib/plan-builder/types';
 import { buildMastermindMedicalOptimization } from './medical-optimization';
+import { deriveServiceClinicalLogic } from './service-clinical-logic';
 
 // ── MAIN GENERATOR ──
 
@@ -41,7 +42,7 @@ export function generateMastermindPlan(
   const recommendations = recommendTreatmentPlan(profile);
 
   // 3. Build plan phases for validation and packaging
-  const phases = buildPlanPhases(recommendations);
+  const phases = buildPlanPhases(recommendations, scanResult, intakeData);
 
   // 4. Validate the plan
   const warnings = validatePlan(phases);
@@ -50,10 +51,10 @@ export function generateMastermindPlan(
   const packages = generatePackages(phases);
 
   // 6. Categorize treatments into primary/complementary/maintenance
-  const categorized = categorizeTreatments(recommendations, scanResult);
+  const categorized = categorizeTreatments(recommendations, scanResult, intakeData);
 
   // 7. Build treatment sequencing
-  const sequencing = buildSequencing(recommendations);
+  const sequencing = buildSequencing(recommendations, scanResult, intakeData);
 
   // 8. Build aftercare preview
   const aftercarePreview = buildAftercarePreview(categorized.primary);
@@ -143,7 +144,9 @@ function mapUrgency(timeline?: string): 'relaxed' | 'moderate' | 'event-driven' 
 // ── BUILD PLAN PHASES ──
 
 function buildPlanPhases(
-  recommendations: RecommendedService[]
+  recommendations: RecommendedService[],
+  scanResult: AuraScanResult,
+  intakeData: Partial<ConsultationFormData>
 ): [PlanPhase, PlanPhase, PlanPhase] {
   const phases: [PlanPhase, PlanPhase, PlanPhase] = [
     { id: 1, ...PHASE_LABELS[1], services: [] },
@@ -152,11 +155,15 @@ function buildPlanPhases(
   ];
 
   recommendations.forEach((rec, i) => {
+    const clinicalLogic = deriveServiceClinicalLogic(rec.service, scanResult, intakeData);
     const selected: SelectedService = {
       id: `sel_${i}_${rec.service.id}`,
       serviceId: rec.service.id,
       service: rec.service,
       quantity: 1,
+      recommendedSessions: clinicalLogic.sessionsRequired,
+      recommendedIntervalWeeks: clinicalLogic.intervalWeeks,
+      clinicalNotes: clinicalLogic.planningSignals,
       notes: rec.reason,
       phase: rec.phase,
     };
@@ -170,7 +177,8 @@ function buildPlanPhases(
 
 function categorizeTreatments(
   recommendations: RecommendedService[],
-  scanResult: AuraScanResult
+  scanResult: AuraScanResult,
+  intakeData: Partial<ConsultationFormData>
 ): {
   primary: MastermindTreatment[];
   complementary: MastermindTreatment[];
@@ -181,7 +189,7 @@ function categorizeTreatments(
   const maintenance: MastermindTreatment[] = [];
 
   recommendations.forEach((rec) => {
-    const treatment = toMastermindTreatment(rec, scanResult);
+    const treatment = toMastermindTreatment(rec, scanResult, intakeData);
 
     if (rec.anchorTreatment || rec.phase === 2) {
       primary.push({ ...treatment, priority: 'essential' });
@@ -202,11 +210,23 @@ function categorizeTreatments(
 
 function toMastermindTreatment(
   rec: RecommendedService,
-  scanResult: AuraScanResult
+  scanResult: AuraScanResult,
+  intakeData: Partial<ConsultationFormData>
 ): MastermindTreatment {
   const service = rec.service;
-  const concerns = scanResult.detectedConcerns.map((c) => c.concern.replace(/_/g, ' '));
-  const zones = scanResult.zoneAnalysis.map((z) => z.zone);
+  const clinicalLogic = deriveServiceClinicalLogic(service, scanResult, intakeData);
+  const concerns = clinicalLogic.targetConcerns.length > 0
+    ? clinicalLogic.targetConcerns
+    : scanResult.detectedConcerns.map((c) => c.concern.replace(/_/g, ' '));
+  const zones = clinicalLogic.targetZones.length > 0
+    ? clinicalLogic.targetZones
+    : scanResult.zoneAnalysis.map((z) => z.zone);
+  const reasoning = [rec.reason, clinicalLogic.patientReasoning].filter(Boolean).join(' ');
+  const clinicalRationale = [
+    `${rec.whyThisPhase || rec.reason}. Fit score: ${rec.fitScore}/100.`,
+    clinicalLogic.clinicalRationale,
+    clinicalLogic.planningSignals.length > 0 ? `Signals: ${clinicalLogic.planningSignals.join('; ')}.` : '',
+  ].filter(Boolean).join(' ');
 
   return {
     id: `tx_${service.id}`,
@@ -214,28 +234,32 @@ function toMastermindTreatment(
     category: service.category,
     targetConcerns: concerns.slice(0, 3),
     targetZones: zones.slice(0, 3),
-    sessionsRequired: service.sessions || 1,
-    intervalBetweenSessions: service.sessions > 1 ? '4-6 weeks' : 'As needed',
-    expectedImprovement: `${Math.round(rec.fitScore * 0.8)}% improvement expected`,
-    timeToResults: service.results || '2-4 weeks',
-    longevity: service.results || '3-6 months',
+    sessionsRequired: clinicalLogic.sessionsRequired,
+    intervalBetweenSessions: clinicalLogic.intervalBetweenSessions,
+    expectedImprovement: clinicalLogic.expectedImprovement,
+    timeToResults: clinicalLogic.timeToResults,
+    longevity: clinicalLogic.longevity,
     perSession: service.price || 0,
-    totalEstimate: (service.price || 0) * (service.sessions || 1),
+    totalEstimate: (service.price || 0) * clinicalLogic.sessionsRequired,
     priority: 'recommended',
     urgency: rec.phase === 1 ? 'immediate' : rec.phase === 2 ? 'within-3-months' : 'when-ready',
     downtime: service.downtime || 'Minimal',
-    riskLevel: 'low',
-    contraindications: [],
+    riskLevel: clinicalLogic.riskLevel,
+    contraindications: clinicalLogic.contraindications,
     synergiesWith: [],
     aiConfidence: rec.fitScore,
-    aiReasoning: rec.reason,
-    clinicalRationale: `${rec.whyThisPhase || rec.reason}. Fit score: ${rec.fitScore}/100.`,
+    aiReasoning: reasoning,
+    clinicalRationale,
   };
 }
 
 // ── SEQUENCING ──
 
-function buildSequencing(recommendations: RecommendedService[]): TreatmentSequenceItem[] {
+function buildSequencing(
+  recommendations: RecommendedService[],
+  scanResult: AuraScanResult,
+  intakeData: Partial<ConsultationFormData>
+): TreatmentSequenceItem[] {
   const phaseGroups = new Map<number, RecommendedService[]>();
 
   recommendations.forEach((rec) => {
@@ -249,13 +273,18 @@ function buildSequencing(recommendations: RecommendedService[]): TreatmentSequen
 
   for (const [phase, services] of Array.from(phaseGroups.entries()).sort((a, b) => a[0] - b[0])) {
     const phaseName = PHASE_LABELS[phase as 1 | 2 | 3]?.label || `Phase ${phase}`;
-    const treatments = services.map((s, i) => ({
-      treatmentId: `tx_${s.service.id}`,
-      week: weekOffset + 1 + i * 2,
-      sessionNumber: 1,
-    }));
+    const treatments = services.flatMap((s, i) => {
+      const clinicalLogic = deriveServiceClinicalLogic(s.service, scanResult, intakeData);
+      const interval = Math.max(1, clinicalLogic.intervalWeeks || 2);
+      return Array.from({ length: clinicalLogic.sessionsRequired }, (_, sessionIndex) => ({
+        treatmentId: `tx_${s.service.id}`,
+        week: weekOffset + 1 + i * 2 + sessionIndex * interval,
+        sessionNumber: sessionIndex + 1,
+      }));
+    }).sort((a, b) => a.week - b.week || a.sessionNumber - b.sessionNumber);
 
-    const duration = phase === 1 ? '0-4 weeks' : phase === 2 ? '4-12 weeks' : 'Ongoing';
+    const maxWeek = treatments.reduce((max, treatment) => Math.max(max, treatment.week), weekOffset + 1);
+    const duration = phase === 3 ? `Weeks ${weekOffset + 1}+` : `Weeks ${weekOffset + 1}-${maxWeek}`;
     const milestone = phase === 1
       ? 'Foundation established, initial results visible'
       : phase === 2
@@ -263,7 +292,7 @@ function buildSequencing(recommendations: RecommendedService[]): TreatmentSequen
         : 'Maintaining and protecting results';
 
     sequencing.push({ phase, phaseName, duration, treatments, expectedMilestone: milestone });
-    weekOffset += services.length * 2 + 2;
+    weekOffset = maxWeek + 2;
   }
 
   return sequencing;

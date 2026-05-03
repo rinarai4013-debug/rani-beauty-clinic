@@ -5,6 +5,9 @@ export interface SelectedService {
   serviceId: string; // unified catalog ID
   service: UnifiedService;
   quantity: number;
+  recommendedSessions?: number;
+  recommendedIntervalWeeks?: number;
+  clinicalNotes?: string[];
   notes: string;
   phase: 1 | 2 | 3;
 }
