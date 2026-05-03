@@ -23,6 +23,7 @@ const NAV_SECTIONS = [
   { id: 'analysis', label: 'Analysis' },
   { id: 'journey', label: 'Journey' },
   { id: 'packages', label: 'Packages' },
+  { id: 'simulation', label: 'Preview' },
   { id: 'aftercare', label: 'Aftercare' },
 ] as const;
 
@@ -306,13 +307,99 @@ function SeverityBadge({ severity }: { severity: string }) {
   );
 }
 
+function formatCurrency(value: number): string {
+  return `$${Math.max(0, value || 0).toLocaleString()}`;
+}
+
+function formatConcernName(value: string): string {
+  return value.replace(/[_-]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatPatientLabel(value: string): string {
+  return value.replace(/[_-]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function isRenderablePlanImage(value: string | null | undefined): value is string {
+  if (!value) return false;
+  return (
+    value.startsWith('data:image/') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('/')
+  );
+}
+
+const EMPTY_INTAKE_SUMMARY: PatientPlanData['intakeSummary'] = {
+  goals: [],
+  timeline: null,
+  budget: null,
+  targetAreas: [],
+  treatmentInterests: [],
+  skinConcerns: [],
+  currentRoutine: {
+    morning: null,
+    evening: null,
+  },
+  relevantHistory: [],
+};
+
+function normalizePatientPlanData(value: PatientPlanData): PatientPlanData {
+  return {
+    ...value,
+    intakeSummary: {
+      ...EMPTY_INTAKE_SUMMARY,
+      ...(value.intakeSummary || {}),
+      currentRoutine: {
+        ...EMPTY_INTAKE_SUMMARY.currentRoutine,
+        ...(value.intakeSummary?.currentRoutine || {}),
+      },
+    },
+  };
+}
+
+function buildScanExplanation(data: PatientPlanData): string {
+  const severityOrder = { severe: 0, moderate: 1, mild: 2 };
+  const topConcerns = [...(data.concerns || [])]
+    .sort(
+      (a, b) =>
+        (severityOrder[a.severity as keyof typeof severityOrder] ?? 3) -
+        (severityOrder[b.severity as keyof typeof severityOrder] ?? 3),
+    )
+    .slice(0, 3)
+    .map((concern) => formatConcernName(concern.concern));
+
+  const focus = topConcerns.length > 0 ? topConcerns.join(', ') : 'overall skin quality';
+  const topDeviceMetrics = data.deviceAnalysis?.categories
+    .slice()
+    .sort((a, b) => b.absoluteScore - a.absoluteScore)
+    .slice(0, 3)
+    .map((category) => `${category.label} ${category.absoluteScore}/5`)
+    .join(', ');
+  const intakeGoals = data.intakeSummary.goals.slice(0, 2).map(formatPatientLabel).join(' and ');
+  const targetAreas = data.intakeSummary.targetAreas.slice(0, 3).map(formatPatientLabel).join(', ');
+  const personalization = [
+    intakeGoals ? `your stated goal of ${intakeGoals}` : '',
+    targetAreas ? `priority areas including ${targetAreas}` : '',
+    data.intakeSummary.timeline ? `your ${formatPatientLabel(data.intakeSummary.timeline)} timeline` : '',
+  ].filter(Boolean).join(', ');
+
+  return [
+    `Your scan gives us a clear starting point: an Aura Score of ${data.auraScore.overall} in the ${data.auraScore.grade} range, with the biggest opportunity around ${focus}.`,
+    topDeviceMetrics ? `The Aura device-level metrics most influencing the plan are ${topDeviceMetrics}.` : '',
+    personalization ? `We matched those findings with ${personalization}, so the recommendations are not generic.` : '',
+    `The plan is designed to treat the highest-impact findings first, then build collagen, improve skin quality, and maintain the result with a realistic visit schedule.`,
+  ].filter(Boolean).join(' ');
+}
+
 // ── Package Card ──
 
 function PackageCard({
   pkg,
+  isSelected,
   onSelect,
 }: {
   pkg: PatientPlanData['packages'][0];
+  isSelected: boolean;
   onSelect: (tier: string) => void;
 }) {
   const isHighlighted = pkg.highlighted;
@@ -323,15 +410,16 @@ function PackageCard({
       className={`relative flex flex-col rounded-2xl overflow-hidden ${isHighlighted ? 'gold-border-animated' : ''}`}
       style={{
         backgroundColor: COLORS.white,
-        border: isHighlighted ? `2px solid ${COLORS.gold}` : `1px solid ${COLORS.divider}`,
+        border: isSelected || isHighlighted ? `2px solid ${COLORS.gold}` : `1px solid ${COLORS.divider}`,
+        boxShadow: isSelected ? `0 22px 64px rgba(201, 169, 110, 0.18)` : undefined,
       }}
     >
-      {isHighlighted && (
+      {(isSelected || isHighlighted) && (
         <div
           className="text-center py-2 text-xs font-bold tracking-widest uppercase"
           style={{ backgroundColor: COLORS.gold, color: COLORS.white }}
         >
-          Most Popular
+          {isSelected ? 'Selected Package' : 'Most Popular'}
         </div>
       )}
 
@@ -356,21 +444,21 @@ function PackageCard({
               className="text-3xl font-bold"
               style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
             >
-              ${pkg.price.toLocaleString()}
+              {formatCurrency(pkg.price)}
             </span>
             {pkg.discount > 0 && (
               <span className="text-sm line-through" style={{ color: `${COLORS.navy}40` }}>
-                ${pkg.originalPrice.toLocaleString()}
+                {formatCurrency(pkg.originalPrice)}
               </span>
             )}
           </div>
           {pkg.discount > 0 && (
             <p className="text-xs mt-1" style={{ color: COLORS.gold }}>
-              Save ${pkg.savingsVsStandalone.toLocaleString()} ({pkg.discount}% off)
+              Save {formatCurrency(pkg.savingsVsStandalone)} ({pkg.discount}% off)
             </p>
           )}
           <p className="text-xs mt-1.5" style={{ color: `${COLORS.navy}60` }}>
-            or ${pkg.monthlyPayment12}/mo for 12 months
+            Financing estimate: {formatCurrency(pkg.monthlyPayment12)}/mo for 12 months
           </p>
         </div>
 
@@ -421,24 +509,24 @@ function PackageCard({
           onClick={() => onSelect(pkg.tier)}
           className="w-full py-3.5 min-h-[44px] rounded-xl text-sm font-bold tracking-wide transition-all duration-300 hover:shadow-lg"
           style={{
-            backgroundColor: isHighlighted ? COLORS.gold : 'transparent',
-            color: isHighlighted ? COLORS.white : COLORS.gold,
+            backgroundColor: isSelected || isHighlighted ? COLORS.gold : 'transparent',
+            color: isSelected || isHighlighted ? COLORS.white : COLORS.gold,
             border: `2px solid ${COLORS.gold}`,
           }}
           onMouseEnter={(e) => {
-            if (!isHighlighted) {
+            if (!isHighlighted && !isSelected) {
               e.currentTarget.style.backgroundColor = COLORS.gold;
               e.currentTarget.style.color = COLORS.white;
             }
           }}
           onMouseLeave={(e) => {
-            if (!isHighlighted) {
+            if (!isHighlighted && !isSelected) {
               e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.color = COLORS.gold;
             }
           }}
         >
-          I&apos;m Interested in This Package
+          {isSelected ? 'Continue With This Package' : 'Select This Package'}
         </button>
       </div>
     </motion.div>
@@ -667,10 +755,135 @@ function InterestModal({
 function TreatmentTimeline({
   sequencing,
   treatments,
+  customPlan,
 }: {
   sequencing: PatientPlanData['sequencing'];
   treatments: PatientPlanData['treatments'];
+  customPlan?: PatientPlanData['customPlan'];
 }) {
+  const customItems = customPlan?.items
+    .filter((item) => item.selected)
+    .sort((a, b) => a.scheduledDay - b.scheduledDay || a.treatmentName.localeCompare(b.treatmentName)) || [];
+
+  if (customItems.length > 0) {
+    return (
+      <div className="space-y-4">
+        <div
+          className="rounded-2xl p-5 luxury-card"
+          style={{
+            backgroundColor: COLORS.white,
+            border: `1px solid ${COLORS.divider}`,
+          }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold tracking-[0.2em] uppercase" style={{ color: COLORS.gold }}>
+                Exact Plan Selected
+              </p>
+              <h4 className="font-heading text-xl font-bold mt-1" style={{ color: COLORS.navy }}>
+                {customPlan?.selectedSessionCount || 0} planned sessions
+              </h4>
+            </div>
+            <div className="text-right">
+              <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                Estimated investment
+              </p>
+              <p className="font-heading text-3xl font-bold" style={{ color: COLORS.navy }}>
+                ${(customPlan?.selectedTotal || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {customItems.map((item, idx) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.06 }}
+            className="rounded-xl p-5 treatment-card-accent luxury-card"
+            style={{
+              backgroundColor: COLORS.white,
+              border: `1px solid ${COLORS.divider}`,
+            }}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold tracking-[0.18em] uppercase mb-1" style={{ color: COLORS.gold }}>
+                  Day {item.scheduledDay} &middot; {formatPatientDate(item.scheduledDate)}
+                </p>
+                <h5
+                  className="font-bold text-lg"
+                  style={{
+                    fontFamily: 'var(--font-heading), Playfair Display, serif',
+                    color: COLORS.navy,
+                  }}
+                >
+                  {item.treatmentName}
+                </h5>
+              </div>
+              <span
+                className="text-xs px-2.5 py-1 rounded-full shrink-0 font-medium"
+                style={{
+                  backgroundColor: `${COLORS.gold}15`,
+                  color: COLORS.gold,
+                }}
+              >
+                {item.sessions} {item.sessions === 1 ? 'session' : 'sessions'}
+              </span>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-3 mt-4 text-sm">
+              <div className="rounded-lg p-3" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Per session
+                </p>
+                <p className="font-bold" style={{ color: COLORS.navy }}>${item.perSession.toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg p-3" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Line estimate
+                </p>
+                <p className="font-bold" style={{ color: COLORS.navy }}>${item.totalEstimate.toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg p-3" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Priority
+                </p>
+                <p className="font-bold capitalize" style={{ color: COLORS.navy }}>{item.priority}</p>
+              </div>
+            </div>
+
+            {item.targetAreas.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {item.targetAreas.map((area) => (
+                  <span
+                    key={area}
+                    className="text-xs px-3 py-1.5 rounded-full"
+                    style={{
+                      backgroundColor: `${COLORS.navy}07`,
+                      color: `${COLORS.navy}80`,
+                      border: `1px solid ${COLORS.divider}`,
+                    }}
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {item.notes && (
+              <p className="text-sm italic mt-4" style={{ color: `${COLORS.navy}65` }}>
+                {item.notes}
+              </p>
+            )}
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
   // Create a lookup map for treatment details
   const allTreatments = [
     ...treatments.primary,
@@ -811,6 +1024,16 @@ function TreatmentTimeline({
   );
 }
 
+function formatPatientDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Date TBD';
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 // ── Main Page Component ──
 
 export default function PatientPlanPage() {
@@ -835,7 +1058,7 @@ export default function PatientPlanPage() {
           return;
         }
 
-        setData(json.data);
+        setData(normalizePatientPlanData(json.data));
       } catch {
         setError('Unable to connect. Please check your internet connection and try again.');
       } finally {
@@ -848,6 +1071,14 @@ export default function PatientPlanPage() {
 
   const handlePackageSelect = useCallback((tier: string) => {
     setSelectedTier(tier);
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            selectedPackageTier: tier as PatientPlanData['selectedPackageTier'],
+          }
+        : current,
+    );
     setModalOpen(true);
   }, []);
 
@@ -980,6 +1211,13 @@ export default function PatientPlanPage() {
     (a, b) =>
       (tierOrder[a.tier as keyof typeof tierOrder] ?? 0) -
       (tierOrder[b.tier as keyof typeof tierOrder] ?? 0)
+  );
+  const activeTier = selectedTier || data.selectedPackageTier || sortedPackages.find((pkg) => pkg.highlighted)?.tier || sortedPackages[0]?.tier || '';
+  const selectedPackage = sortedPackages.find((pkg) => pkg.tier === activeTier) || null;
+  const scanExplanation = buildScanExplanation(data);
+  const hasPhotoSimulation = Boolean(
+    data.simulation?.withTreatment.frames.some((frame) => frame.kind === 'photo-simulation' && isRenderablePlanImage(frame.imageDataUrl)) ||
+    data.simulation?.withoutTreatment.frames.some((frame) => frame.kind === 'photo-simulation' && isRenderablePlanImage(frame.imageDataUrl)),
   );
 
   return (
@@ -1196,6 +1434,163 @@ export default function PatientPlanPage() {
           ))}
         </div>
 
+        <div
+          className="rounded-2xl p-6 md:p-8 mb-10 luxury-card"
+          style={{
+            backgroundColor: COLORS.white,
+            border: `1px solid ${COLORS.divider}`,
+          }}
+        >
+          <p className="text-xs font-bold tracking-[0.22em] uppercase mb-3" style={{ color: COLORS.gold }}>
+            What This Means
+          </p>
+          <p className="text-sm md:text-base leading-relaxed" style={{ color: COLORS.navy }}>
+            {scanExplanation}
+          </p>
+        </div>
+
+        {/* Aura device metric detail */}
+        {data.deviceAnalysis?.categories.length ? (
+          <div
+            className="rounded-2xl p-6 mb-10 luxury-card"
+            style={{
+              backgroundColor: COLORS.white,
+              border: `1px solid ${COLORS.divider}`,
+            }}
+          >
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold tracking-[0.22em] uppercase mb-2" style={{ color: COLORS.gold }}>
+                  Aura Scan Metrics
+                </p>
+                <h4 className="font-heading text-xl font-bold" style={{ color: COLORS.navy }}>
+                  The specific scan data behind your plan
+                </h4>
+              </div>
+              <div className="rounded-xl px-4 py-2" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Composite Skin Score
+                </p>
+                <p className="font-heading text-2xl font-bold" style={{ color: COLORS.navy }}>
+                  {data.deviceAnalysis.compositeSkinScore}
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-5">
+              {data.deviceAnalysis.categories.map((category) => (
+                <div
+                  key={category.label}
+                  className="rounded-xl p-4"
+                  style={{
+                    backgroundColor: COLORS.cream,
+                    border: `1px solid ${COLORS.divider}`,
+                  }}
+                >
+                  <p className="font-bold text-sm" style={{ color: COLORS.navy }}>
+                    {category.label}
+                  </p>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="font-heading text-3xl font-bold" style={{ color: COLORS.gold }}>
+                      {category.absoluteScore}
+                    </span>
+                    <span className="pb-1 text-xs" style={{ color: `${COLORS.navy}45` }}>
+                      /5
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs capitalize" style={{ color: `${COLORS.navy}65` }}>
+                    {category.severity} finding
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed" style={{ color: `${COLORS.navy}55` }}>
+                    {category.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Intake personalization detail */}
+        <div
+          className="rounded-2xl p-6 md:p-8 mb-10 luxury-card"
+          style={{
+            backgroundColor: COLORS.white,
+            border: `1px solid ${COLORS.divider}`,
+          }}
+        >
+          <p className="text-xs font-bold tracking-[0.22em] uppercase mb-3" style={{ color: COLORS.gold }}>
+            Your Consultation Inputs
+          </p>
+          <h4 className="font-heading text-xl font-bold mb-4" style={{ color: COLORS.navy }}>
+            How your intake shaped the recommendation
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              { label: 'Goals', values: data.intakeSummary.goals },
+              { label: 'Skin Concerns', values: data.intakeSummary.skinConcerns },
+              { label: 'Treatment Interests', values: data.intakeSummary.treatmentInterests },
+              { label: 'Target Areas', values: data.intakeSummary.targetAreas },
+            ].map((group) => (
+              group.values.length > 0 ? (
+                <div key={group.label}>
+                  <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: `${COLORS.navy}45` }}>
+                    {group.label}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {group.values.map((value) => (
+                      <span
+                        key={`${group.label}-${value}`}
+                        className="rounded-full px-3 py-1.5 text-xs"
+                        style={{
+                          backgroundColor: `${COLORS.gold}10`,
+                          color: COLORS.navy,
+                          border: `1px solid ${COLORS.gold}20`,
+                        }}
+                      >
+                        {formatPatientLabel(value)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null
+            ))}
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {data.intakeSummary.timeline && (
+              <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Timeline
+                </p>
+                <p className="mt-1 font-bold" style={{ color: COLORS.navy }}>
+                  {formatPatientLabel(data.intakeSummary.timeline)}
+                </p>
+              </div>
+            )}
+            {data.intakeSummary.budget && (
+              <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Budget Preference
+                </p>
+                <p className="mt-1 font-bold" style={{ color: COLORS.navy }}>
+                  {formatPatientLabel(data.intakeSummary.budget)}
+                </p>
+              </div>
+            )}
+            {(data.intakeSummary.currentRoutine.morning || data.intakeSummary.currentRoutine.evening) && (
+              <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Current Routine
+                </p>
+                <p className="mt-1 text-sm" style={{ color: COLORS.navy }}>
+                  {[
+                    data.intakeSummary.currentRoutine.morning ? `AM: ${data.intakeSummary.currentRoutine.morning}` : '',
+                    data.intakeSummary.currentRoutine.evening ? `PM: ${data.intakeSummary.currentRoutine.evening}` : '',
+                  ].filter(Boolean).join(' | ')}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Zone Summary */}
         {data.zones.length > 0 && (
           <div
@@ -1339,10 +1734,11 @@ export default function PatientPlanPage() {
           )}
 
           {/* Visual Timeline */}
-          {data.sequencing.length > 0 && (
+          {(data.sequencing.length > 0 || (data.customPlan?.items.some((item) => item.selected) ?? false)) && (
             <TreatmentTimeline
               sequencing={data.sequencing}
               treatments={data.treatments}
+              customPlan={data.customPlan}
             />
           )}
         </div>
@@ -1375,6 +1771,62 @@ export default function PatientPlanPage() {
               </p>
             </div>
 
+            {selectedPackage && (
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-8 rounded-2xl p-5 md:p-6 luxury-card"
+                style={{
+                  backgroundColor: COLORS.white,
+                  border: `1px solid ${COLORS.gold}55`,
+                }}
+              >
+                <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+                  <div>
+                    <p className="text-xs font-bold tracking-[0.2em] uppercase mb-2" style={{ color: COLORS.gold }}>
+                      Current Recommended Path
+                    </p>
+                    <h3 className="font-heading text-2xl font-bold" style={{ color: COLORS.navy }}>
+                      {selectedPackage.name}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed" style={{ color: `${COLORS.navy}70` }}>
+                      {selectedPackage.whyBest || selectedPackage.bestFor}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {selectedPackage.lineItems.slice(0, 5).map((item) => (
+                        <span
+                          key={`${item.service}-${item.qty}`}
+                          className="rounded-full px-3 py-1.5 text-xs"
+                          style={{
+                            backgroundColor: `${COLORS.gold}10`,
+                            color: COLORS.navy,
+                            border: `1px solid ${COLORS.gold}20`,
+                          }}
+                        >
+                          {item.service} {item.qty > 1 ? `x${item.qty}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                    <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                      Estimated investment
+                    </p>
+                    <p className="font-heading text-3xl font-bold mt-1" style={{ color: COLORS.navy }}>
+                      {formatCurrency(selectedPackage.price)}
+                    </p>
+                    <p className="text-sm mt-2" style={{ color: `${COLORS.navy}70` }}>
+                      Financing from {formatCurrency(selectedPackage.monthlyPayment12)}/mo for 12 months
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: `${COLORS.navy}50` }}>
+                      {formatCurrency(selectedPackage.monthlyPayment24)}/mo estimate for 24 months
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             <div className="grid gap-6 md:grid-cols-3">
               {sortedPackages.map((pkg, i) => (
                 <motion.div
@@ -1386,6 +1838,7 @@ export default function PatientPlanPage() {
                 >
                   <PackageCard
                     pkg={pkg}
+                    isSelected={pkg.tier === activeTier}
                     onSelect={handlePackageSelect}
                   />
                 </motion.div>
@@ -1552,10 +2005,12 @@ export default function PatientPlanPage() {
                   className="text-2xl md:text-3xl font-bold mb-3 font-heading"
                   style={{ color: COLORS.navy }}
                 >
-                  Projected Results With Treatment
+                  {hasPhotoSimulation ? 'Photo-Based Projected Results' : 'Projected Results With Treatment'}
                 </h2>
                 <p className="text-sm" style={{ color: `${COLORS.navy}50` }}>
-                  AI-projected outcomes over 12 months
+                  {hasPhotoSimulation
+                    ? 'Educational photo simulation based on the uploaded clinical image and your treatment plan'
+                    : 'Data-driven score and skin-age projections. A clinical photo is needed for a visual face simulation.'}
                 </p>
               </div>
 
@@ -1583,6 +2038,9 @@ export default function PatientPlanPage() {
                         {data.simulation.withTreatment.frames[
                           data.simulation.withTreatment.frames.length - 1
                         ].imageDataUrl &&
+                        isRenderablePlanImage(data.simulation.withTreatment.frames[
+                          data.simulation.withTreatment.frames.length - 1
+                        ].imageDataUrl) &&
                         data.simulation.withTreatment.frames[
                           data.simulation.withTreatment.frames.length - 1
                         ].kind === 'photo-simulation' ? (
@@ -1668,6 +2126,9 @@ export default function PatientPlanPage() {
                         {data.simulation.withoutTreatment.frames[
                           data.simulation.withoutTreatment.frames.length - 1
                         ].imageDataUrl &&
+                        isRenderablePlanImage(data.simulation.withoutTreatment.frames[
+                          data.simulation.withoutTreatment.frames.length - 1
+                        ].imageDataUrl) &&
                         data.simulation.withoutTreatment.frames[
                           data.simulation.withoutTreatment.frames.length - 1
                         ].kind === 'photo-simulation' ? (

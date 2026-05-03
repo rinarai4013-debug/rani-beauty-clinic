@@ -13,6 +13,7 @@ import { getSessionByIdAsyncRetry, saveSessionAsync, sessionReducer } from '@/li
 import { unauthorized } from '@/lib/auth/middleware';
 import { z } from 'zod';
 import { NON_RENDERABLE_IMAGE_MARKERS, isRenderableImageValue } from '@/lib/mastermind/image-markers';
+import { buildTreatmentPlanCustomization } from '@/lib/mastermind/treatment-customization';
 import {
   isRenderableSourcePhoto,
   renderPhotoSimulationFrameImage,
@@ -24,6 +25,7 @@ import { withSentry } from '@/lib/sentry-utils';
 export const maxDuration = 30;
 const SimulateSessionSchema = z.object({
   sessionId: z.string().min(1).optional(),
+  sourcePhotoUrl: z.string().min(1).optional(),
 });
 
 function isPersistableSourcePhoto(value: string | null | undefined): value is string {
@@ -117,19 +119,22 @@ async function ensureFrameImages(
   sourcePhotoUrl: string | null | undefined,
 ): Promise<SimulationComparison> {
   const mapFrames = (
-  frames: SimulationFrame[],
-  trajectory: 'with' | 'without',
-): Promise<SimulationFrame[]> =>
-    Promise.all(frames.map(async (frame) => {
+    frames: SimulationFrame[],
+    trajectory: 'with' | 'without',
+  ): Promise<SimulationFrame[]> =>
+    Promise.all(
+      frames.map(async (frame) => {
       const existingImage = typeof frame.imageDataUrl === 'string' ? frame.imageDataUrl : '';
       const existingKind = frame.kind;
+      if (isRenderableImageValue(existingImage)) {
+        return { ...frame, imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' };
+      }
       return {
         ...frame,
-        ...(isRenderableImageValue(existingImage)
-          ? { imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' }
-          : await resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
+        ...(await resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
       };
-    }));
+    }),
+  );
 
   return {
     ...comparison,
@@ -296,7 +301,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { sessionId } = parsed.data;
+      const { sessionId, sourcePhotoUrl: requestSourcePhotoUrl } = parsed.data;
 
       let result: SimulationComparison;
       let renderMode = 'mock';
@@ -306,7 +311,9 @@ export async function POST(request: NextRequest) {
         if (!session) {
           return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
         }
-        const sessionPhoto = typeof session.sourcePhotoUrl === 'string' ? session.sourcePhotoUrl : null;
+        const sessionPhoto =
+          requestSourcePhotoUrl ||
+          (typeof session.sourcePhotoUrl === 'string' ? session.sourcePhotoUrl : null);
 
         // Use actual scan data if available
         if (session.auraScanResult?.auraScore) {
@@ -321,7 +328,10 @@ export async function POST(request: NextRequest) {
             : scan.auraScore.skinAge - (scan.auraScore.skinAgeDelta || 0);
 
           // Get plan cost if available
-          const planCost = session.mastermindPlan?.recommendations
+          const customizedCost = buildTreatmentPlanCustomization(session)?.selectedTotal;
+          const planCost = customizedCost && customizedCost > 0
+            ? customizedCost
+            : session.mastermindPlan?.recommendations
             ? [
                 ...(session.mastermindPlan.recommendations.primary || []),
                 ...(session.mastermindPlan.recommendations.complementary || []),
@@ -339,7 +349,9 @@ export async function POST(request: NextRequest) {
             planCost,
           );
           result = await ensureFrameImages(result, sessionPhoto);
-          renderMode = 'data-driven';
+          renderMode = sessionPhoto && isRenderableSourcePhoto(sessionPhoto)
+            ? 'photo-data-driven'
+            : 'data-driven';
         } else {
           result = mockSimulationComparison();
           result = await ensureFrameImages(result, sessionPhoto);
@@ -349,7 +361,7 @@ export async function POST(request: NextRequest) {
         await saveSessionAsync(updated);
       } else {
         result = mockSimulationComparison();
-        result = await ensureFrameImages(result, null);
+        result = await ensureFrameImages(result, requestSourcePhotoUrl);
       }
 
       return NextResponse.json({

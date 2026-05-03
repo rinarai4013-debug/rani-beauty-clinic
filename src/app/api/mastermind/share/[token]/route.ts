@@ -20,7 +20,14 @@ import type {
   SimulationComparison,
   AuraDeviceAnalysis,
   PredictiveMetrics,
+  TreatmentPlanCustomization,
 } from '@/types/mastermind';
+import { buildTreatmentPlanCustomization } from '@/lib/mastermind/treatment-customization';
+import { isRenderableImageValue } from '@/lib/mastermind/image-markers';
+import {
+  isRenderableSourcePhoto,
+  renderPhotoSimulationFrameImage,
+} from '@/lib/mastermind/photo-simulation-renderer';
 import type { GeneratedPackage } from '@/lib/plan-builder/types';
 import type {
   PatientPlanData,
@@ -34,6 +41,8 @@ import type {
   PatientSimulation,
   PatientDeviceAnalysis,
   PatientPredictiveMetrics,
+  PatientTreatmentPlanCustomization,
+  PatientIntakeSummary,
 } from '@/types/patient-plan';
 
 import { withSentry } from '@/lib/sentry-utils';
@@ -132,6 +141,7 @@ function sanitizeTreatment(t: MastermindTreatment): PatientTreatment {
     treatmentName: t.treatmentName,
     category: t.category,
     targetConcerns: t.targetConcerns,
+    targetZones: t.targetZones?.map((zone) => zone.replace(/_/g, ' ')),
     sessionsRequired: t.sessionsRequired,
     intervalBetweenSessions: t.intervalBetweenSessions,
     expectedImprovement: t.expectedImprovement,
@@ -145,6 +155,83 @@ function sanitizeTreatment(t: MastermindTreatment): PatientTreatment {
     aiReasoning: t.aiReasoning, // patient-facing only
     synergiesWith: t.synergiesWith,
     // Strips: id, clinicalRationale, aiConfidence, contraindications, urgency, targetZones
+  };
+}
+
+function stringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : ''))
+      .filter(Boolean);
+  }
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  return [];
+}
+
+function stringValue(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function sanitizeIntakeSummary(intakeData: unknown): PatientIntakeSummary {
+  const intake = intakeData && typeof intakeData === 'object'
+    ? intakeData as Record<string, unknown>
+    : {};
+
+  const goals = [
+    ...stringArray(intake.goals),
+    ...stringArray(intake.primaryGoals),
+    ...stringArray(intake.goal),
+  ];
+  const relevantHistory = [
+    ...stringArray(intake.conditions),
+    ...stringArray(intake.allergies),
+    ...stringArray(intake.medications),
+    ...stringArray(intake.skinHistory),
+  ];
+
+  return {
+    goals: Array.from(new Set(goals)).slice(0, 8),
+    timeline: stringValue(intake.timeline),
+    budget: stringValue(intake.budget),
+    targetAreas: Array.from(new Set([
+      ...stringArray(intake.targetAreas),
+      ...stringArray(intake.treatmentAreas),
+    ])).slice(0, 12),
+    treatmentInterests: stringArray(intake.treatmentInterests).slice(0, 12),
+    skinConcerns: stringArray(intake.skinConcerns).slice(0, 12),
+    currentRoutine: {
+      morning: stringValue(intake.skincareAM),
+      evening: stringValue(intake.skincarePM),
+    },
+    relevantHistory: Array.from(new Set(relevantHistory)).slice(0, 10),
+  };
+}
+
+function sanitizeCustomization(
+  customization: TreatmentPlanCustomization | null,
+): PatientTreatmentPlanCustomization | null {
+  if (!customization) return null;
+  return {
+    updatedAt: customization.updatedAt,
+    submissionDate: customization.submissionDate,
+    selectedTotal: customization.selectedTotal,
+    selectedSessionCount: customization.selectedSessionCount,
+    planNotes: customization.planNotes,
+    items: customization.items.map((item) => ({
+      id: item.id,
+      treatmentName: item.treatmentName,
+      category: item.category,
+      selected: item.selected,
+      sessions: item.sessions,
+      perSession: item.perSession,
+      totalEstimate: item.totalEstimate,
+      scheduledDate: item.scheduledDate,
+      scheduledDay: item.scheduledDay,
+      targetAreas: item.targetAreas,
+      notes: item.notes,
+      priority: item.priority,
+      source: item.source,
+    })),
   };
 }
 
@@ -166,8 +253,68 @@ function sanitizeSequencing(
   }));
 }
 
-function sanitizePackages(packages: GeneratedPackage[]): PatientPackage[] {
-  return packages.map((p) => ({
+function buildExactPackageFromCustomization(
+  customization: TreatmentPlanCustomization,
+  tier: GeneratedPackage['tier'],
+): GeneratedPackage | null {
+  const selectedItems = customization.items.filter((item) => item.selected);
+  if (selectedItems.length === 0 || customization.selectedTotal <= 0) return null;
+
+  const originalPrice = selectedItems.reduce(
+    (sum, item) => sum + Math.max(0, item.perSession) * Math.max(1, item.sessions),
+    0,
+  );
+  const price = customization.selectedTotal;
+  const savingsVsStandalone = Math.max(0, originalPrice - price);
+  const discount = originalPrice > 0 ? Math.round((savingsVsStandalone / originalPrice) * 100) : 0;
+
+  return {
+    tier,
+    name: 'Your Selected Treatment Plan',
+    subtitle: 'Exact services, areas, dates, and session counts selected by your consultant',
+    price,
+    totalPrice: price,
+    originalPrice: Math.max(originalPrice, price),
+    discount,
+    sessions: customization.selectedSessionCount,
+    lineItems: selectedItems.map((item) => ({
+      service: item.targetAreas.length > 0
+        ? `${item.treatmentName} (${item.targetAreas.join(', ')})`
+        : item.treatmentName,
+      qty: item.sessions,
+      unitPrice: item.perSession,
+      total: item.totalEstimate,
+    })),
+    monthlyPayment12: Math.ceil(price / 12),
+    monthlyPayment24: Math.ceil(price / 24),
+    highlighted: true,
+    extras: customization.planNotes ? [customization.planNotes] : [],
+    bestFor: 'Following the exact treatment sequence selected during your consultation.',
+    resultIntensity: 'Personalized',
+    concernsAddressed: Array.from(new Set(selectedItems.map((item) => item.category))).slice(0, 6),
+    whyBest: 'This reflects the exact plan your consultant selected for your goals, treatment areas, schedule, and estimated investment.',
+    savingsVsStandalone,
+  };
+}
+
+function sanitizePackages(
+  packages: GeneratedPackage[],
+  customization?: TreatmentPlanCustomization | null,
+  selectedTier?: GeneratedPackage['tier'] | null,
+): PatientPackage[] {
+  const exactPackage = customization
+    ? buildExactPackageFromCustomization(customization, selectedTier || 'Transform')
+    : null;
+  const packageList = exactPackage
+    ? [
+        ...packages
+          .filter((p) => p.tier !== exactPackage.tier)
+          .map((p) => ({ ...p, highlighted: false })),
+        exactPackage,
+      ]
+    : packages;
+
+  return packageList.map((p) => ({
     tier: p.tier,
     name: p.name,
     subtitle: p.subtitle,
@@ -186,6 +333,38 @@ function sanitizePackages(packages: GeneratedPackage[]): PatientPackage[] {
     whyBest: p.whyBest,
     savingsVsStandalone: p.savingsVsStandalone,
   }));
+}
+
+async function repairSimulationFramesForPatient(
+  sim: SimulationComparison,
+  sourcePhotoUrl: string | null | undefined,
+): Promise<SimulationComparison> {
+  if (!sourcePhotoUrl || !isRenderableSourcePhoto(sourcePhotoUrl)) return sim;
+
+  const repairFrames = async (
+    frames: SimulationComparison['withTreatment']['frames'],
+    trajectory: 'with' | 'without',
+  ) => Promise.all(
+    frames.map(async (frame) => {
+      if (frame.kind === 'photo-simulation' && isRenderableImageValue(frame.imageDataUrl)) {
+        return frame;
+      }
+      const rendered = await renderPhotoSimulationFrameImage(sourcePhotoUrl, trajectory, frame);
+      return rendered ? { ...frame, ...rendered } : frame;
+    }),
+  );
+
+  return {
+    ...sim,
+    withTreatment: {
+      ...sim.withTreatment,
+      frames: await repairFrames(sim.withTreatment.frames, 'with'),
+    },
+    withoutTreatment: {
+      ...sim.withoutTreatment,
+      frames: await repairFrames(sim.withoutTreatment.frames, 'without'),
+    },
+  };
 }
 
 function sanitizeSimulation(sim: SimulationComparison): PatientSimulation {
@@ -286,11 +465,14 @@ export async function GET(
         weekOneGuidance: a.weekOneGuidance,
         productsRecommended: a.productsRecommended,
       }));
+      const customization = buildTreatmentPlanCustomization(session);
 
       const patientData: PatientPlanData = {
         patientName:
           session.patientName || (session.intakeData?.firstName as string) || 'Valued Client',
         consultationDate: session.createdAt || new Date().toISOString(),
+        selectedPackageTier: session.selectedPackageTier,
+        intakeSummary: sanitizeIntakeSummary(session.intakeData),
         auraScore: sanitizeAuraScore(scan.auraScore),
         deviceAnalysis: scan.auraDeviceAnalysis
           ? sanitizeDeviceAnalysis(scan.auraDeviceAnalysis)
@@ -306,10 +488,13 @@ export async function GET(
           maintenance: plan.recommendations.maintenance.map(sanitizeTreatment),
         },
         sequencing: sanitizeSequencing(plan.sequencing, allTreatments),
-        packages: sanitizePackages(plan.packages),
+        customPlan: sanitizeCustomization(customization),
+        packages: sanitizePackages(plan.packages, customization, session.selectedPackageTier),
         aftercare,
         simulation: session.simulationComparison
-          ? sanitizeSimulation(session.simulationComparison)
+          ? sanitizeSimulation(
+              await repairSimulationFramesForPatient(session.simulationComparison, session.sourcePhotoUrl),
+            )
           : null,
         summary: {
           patientFacing: plan.aiSummary.patientFacing,

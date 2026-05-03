@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveToken } from '@/lib/mastermind/share-token';
-import { getSessionByIdAsync } from '@/lib/mastermind/session';
+import { getSessionByIdAsync, saveSessionAsync } from '@/lib/mastermind/session';
 import { Tables } from '@/lib/airtable/client';
 import { rateLimitedQuery } from '@/lib/airtable/client';
 import { z } from 'zod';
@@ -70,6 +70,32 @@ export async function POST(request: NextRequest) {
       const patientName = session?.patientName || name;
       const planPackages = session?.mastermindPlan?.packages || [];
       const selectedPackage = planPackages.find((p) => p.tier === packageTier);
+
+      if (session) {
+        try {
+          const now = new Date().toISOString();
+          await saveSessionAsync({
+            ...session,
+            updatedAt: now,
+            selectedPackageTier: packageTier,
+            activityLog: [
+              ...(session.activityLog || []),
+              {
+                timestamp: now,
+                action: 'package_selected',
+                detail: `${packageTier} package selected from patient portal`,
+                actor: 'Patient portal',
+              },
+            ],
+          });
+        } catch (err) {
+          logEvent('api', 'error', '[Interest] Package selection persistence failed', {
+            error: err instanceof Error ? err.message : String(err),
+            sessionId: tokenRecord.sessionId,
+            packageTier,
+          });
+        }
+      }
 
       // Build intake summary
       const intakeSummary = [

@@ -143,6 +143,8 @@ export async function POST(request: NextRequest) {
                   .map(([k]) => k)
               : [],
             handoutPdfPath: deviceScan.handoutPdfPath || null,
+            sourcePhotoUrl: deviceScan.images.front,
+            images: deviceScan.images,
           },
           scanResult,
           session: {

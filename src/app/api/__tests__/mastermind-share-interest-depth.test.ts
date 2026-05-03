@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const resolveTokenMock = vi.fn();
 const getSessionByIdAsyncMock = vi.fn();
+const saveSessionAsyncMock = vi.fn();
 const intakeCreateMock = vi.fn();
 const rateLimitedQueryMock = vi.fn();
 
@@ -15,6 +16,7 @@ vi.mock('@/lib/mastermind/share-token', () => ({
 
 vi.mock('@/lib/mastermind/session', () => ({
   getSessionByIdAsync: (...args: unknown[]) => getSessionByIdAsyncMock(...args),
+  saveSessionAsync: (...args: unknown[]) => saveSessionAsyncMock(...args),
 }));
 
 vi.mock('@/lib/airtable/client', () => ({
@@ -44,6 +46,7 @@ describe('POST /api/mastermind/share/interest', () => {
     getSessionByIdAsyncMock.mockResolvedValue({
       id: 'ms_001',
       patientName: 'Jane Doe',
+      activityLog: [],
       mastermindPlan: {
         packages: [
           { tier: 'Transform', name: 'Transform Package', price: 2900, sessions: 6, monthlyPayment12: 249, monthlyPayment24: 139 },
@@ -51,6 +54,7 @@ describe('POST /api/mastermind/share/interest', () => {
       },
       auraScanResult: { auraScore: { overall: 82 } },
     });
+    saveSessionAsyncMock.mockResolvedValue(undefined);
     intakeCreateMock.mockResolvedValue({ id: 'rec_intake_1' });
     rateLimitedQueryMock.mockImplementation(async (fn: () => Promise<unknown>) => fn());
     global.fetch = vi.fn().mockResolvedValue(new Response('{}', { status: 200 })) as unknown as typeof global.fetch;
@@ -124,6 +128,15 @@ describe('POST /api/mastermind/share/interest', () => {
     expect(body.success).toBe(true);
     expect(body.details.airtableRecorded).toBe(true);
     expect(rateLimitedQueryMock).toHaveBeenCalledTimes(1);
+    expect(saveSessionAsyncMock).toHaveBeenCalledWith(expect.objectContaining({
+      selectedPackageTier: 'Transform',
+      activityLog: expect.arrayContaining([
+        expect.objectContaining({
+          action: 'package_selected',
+          actor: 'Patient portal',
+        }),
+      ]),
+    }));
   });
 
   it('still succeeds when Airtable write fails', async () => {

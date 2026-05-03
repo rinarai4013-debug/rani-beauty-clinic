@@ -125,6 +125,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+input,
+textarea,
+select {
+  color-scheme: light;
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1;
+}
+
 h1 {
   font-family: var(--font-heading), "Playfair Display", serif;
   font-weight: 700;

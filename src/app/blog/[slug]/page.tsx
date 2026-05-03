@@ -17,8 +17,6 @@ interface BlogPostPageProps {
   params: { slug: string };
 }
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return blogPosts.map((post) => ({
     slug: post.slug,

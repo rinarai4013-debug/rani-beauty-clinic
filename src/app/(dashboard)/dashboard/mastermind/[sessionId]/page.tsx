@@ -79,6 +79,16 @@ const PHASE_TO_STEP: Record<MastermindPhase, number> = {
   completed: 6,
 };
 
+function isRenderableSimulationImage(value: string | null | undefined): value is string {
+  if (!value) return false;
+  return (
+    value.startsWith('data:image/') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('/')
+  );
+}
+
 const PHASE_LABELS: Record<MastermindPhase, string> = {
   intake: 'Intake',
   scanning: 'Scanning',
@@ -263,13 +273,30 @@ export default function MastermindSessionPage() {
     () =>
       runAction(async () => {
         await dispatch({ type: 'SET_PHASE', phase: 'simulating' });
-        await fetch(`/api/mastermind/simulate`, {
+        const res = await fetch(`/api/mastermind/simulate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId }),
+          body: JSON.stringify({
+            sessionId,
+            sourcePhotoUrl: session?.sourcePhotoUrl || undefined,
+          }),
         });
+        const json = res.ok ? await res.json().catch(() => null) : null;
+        if (json?.data) {
+          mutate(
+            (current) => current
+              ? {
+                  ...current,
+                  phase: 'simulation_ready',
+                  simulationComparison: json.data,
+                  updatedAt: new Date().toISOString(),
+                }
+              : current,
+            false,
+          );
+        }
       }),
-    [dispatch, runAction, sessionId]
+    [dispatch, mutate, runAction, sessionId, session?.sourcePhotoUrl]
   );
 
   const handleStartPresentation = useCallback(
@@ -1170,7 +1197,10 @@ export default function MastermindSessionPage() {
           </div>
 
           {/* ── TAB CONTENT ── */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 scrollbar-luxury">
+          <div
+            className="flex-1 overflow-y-auto bg-[#FAF8F5] px-6 py-5 text-[#0F1D2C] scrollbar-luxury"
+            style={{ boxShadow: 'inset 0 1px 0 rgba(201, 169, 110, 0.08)' }}
+          >
             <AnimatePresence mode="wait">
               {activeTab === 'scan' && (
                 <motion.div
@@ -1183,7 +1213,34 @@ export default function MastermindSessionPage() {
                   {/* Aura Device Import — always available to (re)import */}
                   <AuraImportPanel
                     session={session}
-                    onImportComplete={() => mutate()}
+                    onImportComplete={(result) => {
+                      if (result.scanResult || result.mastermindPlan || result.simulationComparison) {
+                        mutate(
+                          (current) => current
+                            ? {
+                                ...current,
+                                auraScanResult: result.scanResult || current.auraScanResult,
+                                sourcePhotoUrl: result.scan.sourcePhotoUrl || current.sourcePhotoUrl,
+                                mastermindPlan: result.mastermindPlan || current.mastermindPlan,
+                                treatmentPlanCustomization: result.mastermindPlan
+                                  ? undefined
+                                  : current.treatmentPlanCustomization,
+                                providerReview: result.mastermindPlan
+                                  ? null
+                                  : current.providerReview,
+                                phase: result.simulationComparison
+                                  ? 'simulation_ready'
+                                  : result.session.phase as typeof current.phase,
+                                simulationComparison: result.simulationComparison || current.simulationComparison,
+                                updatedAt: result.session.updatedAt,
+                              }
+                            : current,
+                          false,
+                        );
+                        return;
+                      }
+                      mutate();
+                    }}
                   />
                   <ScanResultsPanel session={session} />
                 </motion.div>
@@ -1213,7 +1270,7 @@ export default function MastermindSessionPage() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25, ease: 'easeOut' }}
                 >
-                  <SimulationTab session={session} />
+                  <SimulationTab session={session} onRegenerate={handleGenerateSimulation} />
                 </motion.div>
               )}
 
@@ -1608,10 +1665,26 @@ function ProjectionFrameCard({
   );
 }
 
-function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof useMastermindSession>['session']> }) {
+function SimulationTab({
+  session,
+  onRegenerate,
+}: {
+  session: NonNullable<ReturnType<typeof useMastermindSession>['session']>;
+  onRegenerate: () => void | Promise<void>;
+}) {
   const sim = session.simulationComparison;
   const [activeView, setActiveView] = useState<'with' | 'without'>('with');
   const [selectedFrame, setSelectedFrame] = useState(0);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const regenerate = useCallback(async () => {
+    setIsRegenerating(true);
+    try {
+      await onRegenerate();
+    } finally {
+      setIsRegenerating(false);
+    }
+  }, [onRegenerate]);
 
   if (!sim) {
     return (
@@ -1631,15 +1704,39 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
 
   const currentPath = activeView === 'with' ? sim.withTreatment : sim.withoutTreatment;
   const frame = currentPath.frames[selectedFrame];
-  const projectionMode = currentPath.frames.some((candidate) => candidate.kind !== 'photo-simulation');
+  const projectionMode = currentPath.frames.some(
+    (candidate) =>
+      candidate.kind !== 'photo-simulation' ||
+      !isRenderableSimulationImage(candidate.imageDataUrl),
+  );
 
   return (
     <div className="space-y-6">
       {projectionMode && (
-        <div className="rounded-2xl border border-[#C9A96E]/20 bg-[#C9A96E]/10 px-4 py-3">
-          <p className="font-body text-xs font-medium text-[#0F1D2C]/70">
-            These are data projections from consultation findings. They are not face transformations.
-          </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#C9A96E]/20 bg-[#C9A96E]/10 px-4 py-3">
+          <div>
+            <p className="font-body text-xs font-semibold text-[#0F1D2C]/80">
+              Projection mode is showing because saved photo frames were not available.
+            </p>
+            <p className="font-body text-xs text-[#0F1D2C]/55">
+              If an Aura preview image is saved, regenerate to rebuild the visual before/after frames.
+            </p>
+          </div>
+          {session.sourcePhotoUrl && isRenderableSimulationImage(session.sourcePhotoUrl) && (
+            <button
+              type="button"
+              onClick={regenerate}
+              disabled={isRegenerating}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#0F1D2C] px-4 py-2 font-body text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#182B3F] disabled:cursor-wait disabled:opacity-60"
+            >
+              {isRegenerating ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Image className="h-3.5 w-3.5" />
+              )}
+              Regenerate Photo Simulation
+            </button>
+          )}
         </div>
       )}
 
@@ -1678,7 +1775,7 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
           className="rounded-2xl border border-[#E8E4DF] overflow-hidden bg-white"
         >
           <div className="aspect-[4/3] bg-[#0F1D2C]/5 relative">
-            {frame.kind === 'photo-simulation' && frame.imageDataUrl ? (
+            {frame.kind === 'photo-simulation' && isRenderableSimulationImage(frame.imageDataUrl) ? (
               <>
                 <img
                   src={frame.imageDataUrl}

@@ -142,14 +142,14 @@ export async function saveSessionToAirtable(session: MastermindSession): Promise
         ...stripped.simulationComparison.withTreatment,
         frames: stripped.simulationComparison.withTreatment.frames.map((f: SimulationFrame) => ({
           ...f,
-          imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 5000 ? '[base64_stripped]' : f.imageDataUrl,
+          imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 20000 ? '[base64_stripped]' : f.imageDataUrl,
         })),
       } : stripped.simulationComparison.withTreatment,
       withoutTreatment: stripped.simulationComparison.withoutTreatment ? {
         ...stripped.simulationComparison.withoutTreatment,
         frames: stripped.simulationComparison.withoutTreatment.frames.map((f: SimulationFrame) => ({
           ...f,
-          imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 5000 ? '[base64_stripped]' : f.imageDataUrl,
+          imageDataUrl: f.imageDataUrl && f.imageDataUrl.length > 20000 ? '[base64_stripped]' : f.imageDataUrl,
         })),
       } : stripped.simulationComparison.withoutTreatment,
     };
