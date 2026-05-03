@@ -130,7 +130,6 @@ export async function POST(request: NextRequest) {
           clinicalNotes: [existingClinicalNotes, auraNoteParts.join('\n')].filter(Boolean).join('\n\n'),
         },
       });
-      updated = sessionReducer(updated, { type: 'SET_SOURCE_PHOTO', url: '[image_unavailable]' });
       updated = sessionReducer(updated, { type: 'SET_SCAN_RESULT', result: scanResult });
 
       try {

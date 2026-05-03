@@ -79,6 +79,16 @@ const PHASE_TO_STEP: Record<MastermindPhase, number> = {
   completed: 6,
 };
 
+function isRenderableSimulationImage(value: string | null | undefined): value is string {
+  if (!value) return false;
+  return (
+    value.startsWith('data:image/') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('/')
+  );
+}
+
 const PHASE_LABELS: Record<MastermindPhase, string> = {
   intake: 'Intake',
   scanning: 'Scanning',
@@ -1674,7 +1684,11 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
 
   const currentPath = activeView === 'with' ? sim.withTreatment : sim.withoutTreatment;
   const frame = currentPath.frames[selectedFrame];
-  const projectionMode = currentPath.frames.some((candidate) => candidate.kind !== 'photo-simulation');
+  const projectionMode = currentPath.frames.some(
+    (candidate) =>
+      candidate.kind !== 'photo-simulation' ||
+      !isRenderableSimulationImage(candidate.imageDataUrl),
+  );
 
   return (
     <div className="space-y-6">
@@ -1721,7 +1735,7 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
           className="rounded-2xl border border-[#E8E4DF] overflow-hidden bg-white"
         >
           <div className="aspect-[4/3] bg-[#0F1D2C]/5 relative">
-            {frame.kind === 'photo-simulation' && frame.imageDataUrl ? (
+            {frame.kind === 'photo-simulation' && isRenderableSimulationImage(frame.imageDataUrl) ? (
               <>
                 <img
                   src={frame.imageDataUrl}

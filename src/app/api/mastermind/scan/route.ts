@@ -60,16 +60,15 @@ export async function POST(request: NextRequest) {
         return apiError('Missing intake data', 400);
       }
 
-      // 424 — photo reference placeholder means the source file is not yet available
-      if (sourcePhotoUrl && isUnrenderablePhoto(sourcePhotoUrl)) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Source photo is temporarily unavailable. Please re-upload the Aura image/PDF.',
-            meta: { photoUnavailable: true },
-          },
-          { status: 424 },
-        );
+      const hadUnrenderableSourcePhoto = Boolean(
+        sourcePhotoUrl && isUnrenderablePhoto(sourcePhotoUrl)
+      );
+
+      // If the source photo is a placeholder marker, continue with fallback
+      // intake-only scan; the downstream UI handles data-driven simulation.
+      if (hadUnrenderableSourcePhoto) {
+        console.warn('[Scan] Source photo unavailable, continuing with fallback scan data path.');
+        sourcePhotoUrl = undefined;
       }
 
       const useMock = process.env.USE_MOCK_AI === 'true';
@@ -128,7 +127,7 @@ export async function POST(request: NextRequest) {
         await saveSessionAsync(updated);
       }
 
-      return apiSuccess(result, { source });
+      return apiSuccess(result, { source, photoUnavailable: hadUnrenderableSourcePhoto });
     } catch (error) {
       console.error('[Aura Scan API] Error:', error);
       try {

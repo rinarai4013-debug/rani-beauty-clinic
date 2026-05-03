@@ -214,6 +214,7 @@ export function sessionReducer(
         ...state,
         updatedAt: now,
         selectedPackageTier: action.tier,
+        activityLog: appendLog(state.activityLog, 'package_selected', `${action.tier} package selected`),
       };
 
     case 'SET_PDF_URL':

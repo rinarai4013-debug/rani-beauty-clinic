@@ -165,6 +165,7 @@ export interface PatientPredictiveMetrics {
 export interface PatientPlanData {
   patientName: string;
   consultationDate: string;
+  selectedPackageTier?: 'Start' | 'Transform' | 'Elite' | 'Essential' | null;
   auraScore: PatientAuraScore;
   deviceAnalysis: PatientDeviceAnalysis | null;
   concerns: PatientConcern[];

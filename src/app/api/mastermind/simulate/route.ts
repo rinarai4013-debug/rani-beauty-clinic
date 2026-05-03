@@ -121,23 +121,19 @@ async function ensureFrameImages(
     frames: SimulationFrame[],
     trajectory: 'with' | 'without',
   ): Promise<SimulationFrame[]> =>
-    Promise.all(frames.map(async (frame, index) => {
+    Promise.all(
+      frames.map(async (frame) => {
       const existingImage = typeof frame.imageDataUrl === 'string' ? frame.imageDataUrl : '';
       const existingKind = frame.kind;
       if (isRenderableImageValue(existingImage)) {
         return { ...frame, imageDataUrl: existingImage, kind: existingKind ?? 'photo-simulation' };
       }
-      if (index < frames.length - 1) {
-        return {
-          ...frame,
-          ...buildSimulationPlaceholderImage(trajectory, frame),
-        };
-      }
       return {
         ...frame,
         ...(await resolveFrameImage(sourcePhotoUrl, trajectory, frame)),
       };
-    }));
+    }),
+  );
 
   return {
     ...comparison,

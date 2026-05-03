@@ -9,7 +9,6 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import type { MastermindPlan, MastermindSession, SimulationComparison } from '@/types/mastermind';
 import { convertAuraPdfFaceToJpeg, extractPdfTextSummary } from '@/lib/client/pdf-image';
@@ -44,6 +43,8 @@ interface ImportResult {
     imageKeys: string[];
     expressionKeys: string[];
     handoutPdfPath: string | null;
+    images?: ImportedScanImages;
+    sourcePhotoUrl?: string | null;
   };
   scanResult: any;
   session: {
@@ -143,28 +144,74 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
   const [fileUploading, setFileUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Convert an image file to a JPEG data URL client-side
-  const fileToDataUrl = useCallback(async (file: File): Promise<string> => {
-    // For images: load into canvas, resize if needed, compress to JPEG.
+  // Convert an image file to a compact JPEG data URL that survives Airtable persistence.
+  const fileToDataUrl = useCallback(async (
+    file: File,
+    options: { maxDimension?: number; maxBytes?: number; quality?: number } = {},
+  ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new window.Image();
       img.onload = () => {
-        const MAX = 1200;
+        const MAX = options.maxDimension ?? 560;
         let w = img.width;
         let h = img.height;
         if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         if (!ctx) { reject(new Error('Canvas context unavailable')); return; }
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.85));
+        const maxBytes = options.maxBytes ?? 28 * 1024;
+        const qualities = [options.quality ?? 0.72, 0.62, 0.52, 0.42, 0.34];
+        const scales = [1, 0.86, 0.72, 0.6, 0.5];
+
+        let bestDataUrl = '';
+        let bestBytes = Number.POSITIVE_INFINITY;
+        for (const scale of scales) {
+          const working = scale === 1 ? canvas : document.createElement('canvas');
+          if (scale !== 1) {
+            working.width = Math.max(1, Math.round(w * scale));
+            working.height = Math.max(1, Math.round(h * scale));
+            const workingCtx = working.getContext('2d');
+            if (!workingCtx) continue;
+            workingCtx.drawImage(canvas, 0, 0, working.width, working.height);
+          }
+
+          for (const quality of qualities) {
+            const dataUrl = working.toDataURL('image/jpeg', quality);
+            const approxBytes = Math.round((dataUrl.length * 3) / 4);
+            if (approxBytes < bestBytes) {
+              bestDataUrl = dataUrl;
+              bestBytes = approxBytes;
+            }
+            if (approxBytes <= maxBytes) {
+              resolve(dataUrl);
+              return;
+            }
+          }
+        }
+
+        resolve(bestDataUrl || canvas.toDataURL('image/jpeg', 0.34));
       };
       img.onerror = () => reject(new Error('Failed to load image'));
       img.src = URL.createObjectURL(file);
     });
   }, []);
+
+  const buildImportedImages = useCallback(
+    (scan: ImportResult['scan'], fallbackPhotoUrl?: string | null): ImportedScanImages => {
+      const images: ImportedScanImages = { ...(scan.images || {}) };
+      const sourcePhotoUrl = scan.sourcePhotoUrl || fallbackPhotoUrl || session.sourcePhotoUrl || null;
+      if (sourcePhotoUrl && !images.front) images.front = sourcePhotoUrl;
+      if (sourcePhotoUrl && scan.imageKeys.includes('overview') && !images.overview) {
+        images.overview = sourcePhotoUrl;
+      }
+      return images;
+    },
+    [session.sourcePhotoUrl],
+  );
 
   const handlePdfUpload = useCallback(
     async (file: File) => {
@@ -216,6 +263,36 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         };
       };
 
+      let sourcePhotoUrl: string | null = null;
+      try {
+        const jpegPreview = await convertAuraPdfFaceToJpeg(file, {
+          maxDimension: 420,
+          quality: 0.66,
+          maxBytes: 24 * 1024,
+        });
+        sourcePhotoUrl = await fileToDataUrl(jpegPreview, {
+          maxDimension: 420,
+          maxBytes: 28 * 1024,
+          quality: 0.66,
+        });
+      } catch {
+        sourcePhotoUrl = null;
+      }
+
+      if (sourcePhotoUrl) {
+        const photoPatchResult = await postJsonWithRetry(
+          `/api/mastermind/sessions/${session.id}`,
+          {
+            action: { type: 'SET_SOURCE_PHOTO', url: sourcePhotoUrl },
+          },
+          'Failed to save Aura preview image to session.',
+          'PATCH',
+        );
+        if (!photoPatchResult.response.ok) {
+          console.warn('[AuraImport] Preview image persistence warning:', photoPatchResult.message);
+        }
+      }
+
       const runClientSidePdfFallback = async (): Promise<{
         scanResult: unknown;
         warning: string | null;
@@ -229,6 +306,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
         let pdfTextSummary = '';
         let extractionWarning: string | null = null;
+        const nonBlockingWarnings: string[] = [];
         try {
           pdfTextSummary = await extractPdfTextSummary(file, { maxPages: 4, maxChars: 6500 });
         } catch {
@@ -262,33 +340,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           'PATCH',
         );
         if (!intakePatchResult.response.ok) {
-          throw new Error(intakePatchResult.message);
-        }
-
-        let sourcePhotoUrl: string | null = null;
-        try {
-          const jpegPreview = await convertAuraPdfFaceToJpeg(file, {
-            maxDimension: 420,
-            quality: 0.66,
-            maxBytes: 28 * 1024,
-          });
-          sourcePhotoUrl = await fileToDataUrl(jpegPreview);
-        } catch {
-          sourcePhotoUrl = null;
-        }
-
-        if (sourcePhotoUrl) {
-          const photoPatchResult = await postJsonWithRetry(
-            `/api/mastermind/sessions/${session.id}`,
-            {
-              action: { type: 'SET_SOURCE_PHOTO', url: sourcePhotoUrl },
-            },
-            'Failed to save Aura preview image to session.',
-            'PATCH',
-          );
-          if (!photoPatchResult.response.ok) {
-            throw new Error(photoPatchResult.message);
-          }
+          nonBlockingWarnings.push(`Unable to save fallback notes: ${intakePatchResult.message}`);
         }
 
         const scanPayload: Record<string, unknown> = { sessionId: session.id };
@@ -316,9 +368,13 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           );
         }
 
+        const fallbackWarnings = [
+          extractionWarning,
+          ...nonBlockingWarnings,
+        ].filter(Boolean).join(' ');
         return {
           scanResult: scanJson.data ?? scanJson,
-          warning: extractionWarning,
+          warning: fallbackWarnings || null,
         };
       };
 
@@ -397,7 +453,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
       const simulateResult = await postJsonWithRetry(
         '/api/mastermind/simulate',
-        { sessionId: importedSessionId },
+        sourcePhotoUrl ? { sessionId: importedSessionId, sourcePhotoUrl } : { sessionId: importedSessionId },
         'Simulation generation failed after Aura import.',
       );
       if (!simulateResult.response.ok) {
@@ -407,13 +463,16 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         data?: SimulationComparison;
       };
 
-      onImportComplete?.({
+      const imageKeys = sourcePhotoUrl ? ['front', 'overview'] : [];
+      const importPayload: ImportResult = {
         scan: {
           patientName: session.patientName || 'Patient',
           scanDate: new Date().toISOString(),
-          imageKeys: [],
+          imageKeys,
           expressionKeys: [],
           handoutPdfPath: file.name,
+          sourcePhotoUrl,
+          images: sourcePhotoUrl ? { front: sourcePhotoUrl, overview: sourcePhotoUrl } : {},
         },
         scanResult: importedScanResult,
         session: {
@@ -423,9 +482,12 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         },
         mastermindPlan: planJson.data,
         simulationComparison: simJson.data,
-      });
+      };
+      setImportedImages(buildImportedImages(importPayload.scan, sourcePhotoUrl));
+      setImportResult(importPayload);
+      onImportComplete?.(importPayload);
     },
-    [fileToDataUrl, onImportComplete, session.id, session.intakeData, session.patientName]
+    [buildImportedImages, fileToDataUrl, onImportComplete, session.id, session.intakeData, session.patientName]
   );
 
   // Handle file upload — process client-side then run AI scan
@@ -447,7 +509,11 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         }
 
         // Image path: convert to JPEG data URL client-side.
-        const dataUrl = await fileToDataUrl(file);
+        const dataUrl = await fileToDataUrl(file, {
+          maxDimension: 560,
+          maxBytes: 28 * 1024,
+          quality: 0.72,
+        });
         if (!dataUrl) throw new Error('Failed to process image file');
 
         // Step 2: Save photo to session
@@ -498,19 +564,24 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           : null;
 
         if (scanJson.success !== false) {
-          onImportComplete?.({
+          const importPayload: ImportResult = {
             scan: {
               patientName: session.patientName || 'Patient',
               scanDate: new Date().toISOString(),
-              imageKeys: ['front'],
+              imageKeys: ['front', 'overview'],
               expressionKeys: [],
               handoutPdfPath: null,
+              sourcePhotoUrl: dataUrl,
+              images: { front: dataUrl, overview: dataUrl },
             },
             scanResult: scanJson.data || scanJson,
             session: { id: session.id, phase: simJson?.data ? 'simulation_ready' : 'scan_complete', updatedAt: new Date().toISOString() },
             mastermindPlan: planJson?.data,
             simulationComparison: simJson?.data,
-          });
+          };
+          setImportedImages(buildImportedImages(importPayload.scan, dataUrl));
+          setImportResult(importPayload);
+          onImportComplete?.(importPayload);
         } else {
           setImportError(scanJson.error || 'AI scan failed after photo upload');
         }
@@ -599,20 +670,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
         if (res.ok && json.success && json.data) {
           setImportResult(json.data);
-
-          // Store imported images from the session's source photo
-          // The API stores images in the scan result; the front is the sourcePhotoUrl
-          const imageKeys = json.data.scan.imageKeys as string[];
-          const images: ImportedScanImages = {};
-
-          // The images are stored in the session — we need to fetch the session
-          // to get the actual base64 data. For the import panel display,
-          // we use the sourcePhotoUrl (front) and note available keys.
-          if (imageKeys.includes('front')) {
-            images.front = session.sourcePhotoUrl || undefined;
-          }
-
-          setImportedImages(images);
+          setImportedImages(buildImportedImages(json.data.scan));
           onImportComplete?.(json.data);
         } else {
           setImportError(
@@ -629,7 +687,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
         setImporting(false);
       }
     },
-    [session.id, session.sourcePhotoUrl, onImportComplete]
+    [buildImportedImages, session.id, onImportComplete]
   );
 
   // Import latest scan for this patient
@@ -655,6 +713,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
       if (res.ok && json.success && json.data) {
         setImportResult(json.data);
+        setImportedImages(buildImportedImages(json.data.scan));
         onImportComplete?.(json.data);
       } else {
         setImportError(
@@ -670,7 +729,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
     } finally {
       setImporting(false);
     }
-  }, [session.id, session.patientName, onImportComplete]);
+  }, [buildImportedImages, session.id, session.patientName, onImportComplete]);
 
   // Open scan selector
   const handleOpenSelector = useCallback(() => {
@@ -735,10 +794,6 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
 
   if (importResult) {
     const scanData = importResult.scan;
-    const analysisKeys = scanData.imageKeys.filter(
-      (k) => !['front', 'overview'].includes(k)
-    );
-
     return (
       <div className="rounded-xl border border-[#C9A96E]/30 bg-gradient-to-br from-[#0F1D2C] to-[#1A2D40] p-6 space-y-5">
         {/* Header with success badge */}
@@ -806,6 +861,7 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
           {/* Analysis images in a 2x3 grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {[
+              { key: 'front', label: 'Neutral Front', color: '#F8F6F1' },
               { key: 'brownAreas', label: 'Hyperpigmentation', color: '#8B6914' },
               { key: 'redAreas', label: 'Redness/Vascular', color: '#DC2626' },
               { key: 'wrinkles', label: 'Wrinkles', color: '#65A30D' },
@@ -813,14 +869,15 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
               { key: 'smoothness', label: 'Texture Mesh', color: '#0EA5E9' },
               { key: 'overview', label: 'Overview', color: '#C9A96E' },
             ].map(({ key, label, color }) => {
-              const hasImage = scanData.imageKeys.includes(key);
+              const imageSrc = importedImages?.[key as keyof ImportedScanImages];
+              const hasImage = scanData.imageKeys.includes(key) || !!imageSrc;
               return (
                 <button
                   key={key}
                   disabled={!hasImage}
                   onClick={() => {
-                    if (hasImage) {
-                      setLightboxImage({ src: key, label });
+                    if (hasImage && imageSrc) {
+                      setLightboxImage({ src: imageSrc, label });
                     }
                   }}
                   className={`relative aspect-[4/3] rounded-lg overflow-hidden border transition-all ${
@@ -831,9 +888,14 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
                 >
                   {/* Placeholder background */}
                   <div className="absolute inset-0 bg-[#0F1D2C] flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#F8F6F1]/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
+                    {imageSrc ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={imageSrc} alt={`${label} Aura scan layer`} className="h-full w-full object-cover" />
+                    ) : (
+                      <svg className="w-6 h-6 text-[#F8F6F1]/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                      </svg>
+                    )}
                   </div>
                   {/* Label */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
@@ -879,7 +941,10 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
                 .map(({ key, label }) => (
                   <button
                     key={key}
-                    onClick={() => setLightboxImage({ src: key, label })}
+                    onClick={() => {
+                      const imageSrc = importedImages?.[key as keyof ImportedScanImages];
+                      if (imageSrc) setLightboxImage({ src: imageSrc, label });
+                    }}
                     className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[#C9A96E]/20 hover:border-[#C9A96E]/50 transition-all cursor-pointer group bg-[#0F1D2C]"
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -931,9 +996,12 @@ export default function AuraImportPanel({ session, onImportComplete }: AuraImpor
                 </button>
               </div>
               <div className="rounded-xl overflow-hidden border-2 border-[#C9A96E]/30 bg-[#0F1D2C] flex items-center justify-center min-h-[300px]">
-                <p className="font-body text-sm text-[#F8F6F1]/40">
-                  {lightboxImage.label} — Full resolution view
-                </p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={lightboxImage.src}
+                  alt={`${lightboxImage.label} full view`}
+                  className="max-h-[82vh] w-full object-contain"
+                />
               </div>
             </div>
           </div>

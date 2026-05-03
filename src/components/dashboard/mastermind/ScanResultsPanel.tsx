@@ -10,6 +10,36 @@ interface ScanResultsPanelProps {
   session: MastermindSession;
 }
 
+function isRenderableImage(value: string | null | undefined): value is string {
+  if (!value) return false;
+  return (
+    value.startsWith('data:image/') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('/')
+  );
+}
+
+function formatConcern(value: string): string {
+  return value.replace(/[_-]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function buildConsultantScript(scan: NonNullable<MastermindSession['auraScanResult']>): string {
+  const topConcerns = scan.detectedConcerns
+    .slice(0, 3)
+    .map((concern) => formatConcern(concern.concern));
+  const score = scan.auraScore;
+  const strongestFinding = topConcerns[0] || 'overall skin health';
+  const supportingFindings = topConcerns.slice(1).join(' and ');
+
+  return [
+    `Your Aura Score today is ${score.overall}, which places you in the ${score.grade} range. I want you to see this as a roadmap, not a judgment.`,
+    `The scan is showing ${strongestFinding}${supportingFindings ? `, with secondary focus on ${supportingFindings}` : ''}. That tells us where to start first so we are not guessing with your treatments.`,
+    `The reason I recommend treating this soon is that these patterns usually respond best when we improve skin quality, inflammation, collagen support, and pigment control before they become harder to correct.`,
+    `Our plan is to start with the highest-impact treatments first, space the visits safely, then reassess your skin response and adjust the plan based on your results.`,
+  ].join(' ');
+}
+
 export default function ScanResultsPanel({ session }: ScanResultsPanelProps) {
   const scan = session.auraScanResult;
   const [selectedCategory, setSelectedCategory] = useState<CategoryScore | null>(null);
@@ -51,6 +81,9 @@ export default function ScanResultsPanel({ session }: ScanResultsPanelProps) {
           c.concern.replace(/_/g, '') === selectedCategory.category.toLowerCase()
       )
     : [];
+  const patientPhoto = isRenderableImage(session.sourcePhotoUrl) ? session.sourcePhotoUrl : undefined;
+  const patientPhotos = patientPhoto ? Array.from({ length: 6 }, () => patientPhoto) : [];
+  const consultantScript = buildConsultantScript(scan);
 
   return (
     <div className="space-y-6">
@@ -62,8 +95,24 @@ export default function ScanResultsPanel({ session }: ScanResultsPanelProps) {
       {/* AURA-style Grid */}
       <SkinAnalysisGrid
         analysis={scan.auraDeviceAnalysis}
+        patientPhotos={patientPhotos}
         onCategoryClick={handleCategoryClick}
       />
+
+      {/* Consultant read-off script */}
+      <div className="rounded-2xl border border-[#C9A96E]/25 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="font-body text-xs font-semibold text-[#0F1D2C]/75 uppercase tracking-wide">
+            Consultant Scan Talk Track
+          </h3>
+          <span className="rounded-full bg-[#C9A96E]/10 px-2.5 py-1 font-body text-[10px] font-semibold uppercase tracking-wide text-[#9A6F20]">
+            Read aloud
+          </span>
+        </div>
+        <p className="font-body text-sm leading-relaxed text-[#0F1D2C]">
+          {consultantScript}
+        </p>
+      </div>
 
       {/* Top Concerns Quick List */}
       <div className="space-y-2">
@@ -84,7 +133,7 @@ export default function ScanResultsPanel({ session }: ScanResultsPanelProps) {
                 }}
               />
               <span className="font-body text-xs text-[#0F1D2C] capitalize">
-                {concern.concern.replace(/_/g, ' ')}
+                {formatConcern(concern.concern)}
               </span>
             </div>
             <span className="font-body text-xs text-[#0F1D2C]/40">

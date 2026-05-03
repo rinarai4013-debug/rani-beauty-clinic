@@ -132,7 +132,7 @@ export default function PlanEditor({
           if (patch.scheduledDate) {
             next.scheduledDay = daysFromSubmission(customization.submissionDate, patch.scheduledDate);
           }
-          if (patch.sessions || patch.perSession) {
+          if ('sessions' in patch || 'perSession' in patch) {
             next.totalEstimate = Math.max(1, next.sessions) * Math.max(0, next.perSession);
           }
           return next;
@@ -663,27 +663,33 @@ export default function PlanEditor({
           </h3>
           <div className="grid grid-cols-3 gap-2">
             {plan.packages.map((pkg) => (
-              <div
+              <button
+                type="button"
                 key={pkg.tier}
+                onClick={() => onDispatch({ type: 'SELECT_PACKAGE', tier: pkg.tier })}
                 className={`p-3 rounded-xl border text-center ${
-                  pkg.highlighted
+                  session.selectedPackageTier === pkg.tier
+                    ? 'border-[#0F1D2C] bg-[#0F1D2C] text-white shadow-sm'
+                    : pkg.highlighted
                     ? 'border-[#C9A96E] bg-[#C9A96E]/10'
                     : 'border-[#E8E4DF] bg-[#F8F6F1]/60'
-                }`}
+                } transition-colors hover:border-[#C9A96E]`}
               >
-                <p className="font-body text-xs font-semibold text-[#0F1D2C]">{pkg.tier}</p>
-                <p className="font-[family-name:var(--font-heading)] text-lg font-bold text-[#0F1D2C] mt-1">
+                <p className={`font-body text-xs font-semibold ${session.selectedPackageTier === pkg.tier ? 'text-white' : 'text-[#0F1D2C]'}`}>
+                  {pkg.tier}
+                </p>
+                <p className={`font-[family-name:var(--font-heading)] text-lg font-bold mt-1 ${session.selectedPackageTier === pkg.tier ? 'text-white' : 'text-[#0F1D2C]'}`}>
                   ${pkg.price.toLocaleString()}
                 </p>
-                <p className="font-body text-xs text-[#0F1D2C]/40">
+                <p className={`font-body text-xs ${session.selectedPackageTier === pkg.tier ? 'text-white/55' : 'text-[#0F1D2C]/40'}`}>
                   {pkg.sessions} sessions
                 </p>
                 {pkg.discount > 0 && (
-                  <p className="font-body text-xs text-[#059669] font-medium mt-1">
+                  <p className={`font-body text-xs font-medium mt-1 ${session.selectedPackageTier === pkg.tier ? 'text-[#C9A96E]' : 'text-[#059669]'}`}>
                     Save {pkg.discount}%
                   </p>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         </div>

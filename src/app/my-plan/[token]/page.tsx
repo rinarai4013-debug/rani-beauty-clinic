@@ -23,6 +23,7 @@ const NAV_SECTIONS = [
   { id: 'analysis', label: 'Analysis' },
   { id: 'journey', label: 'Journey' },
   { id: 'packages', label: 'Packages' },
+  { id: 'simulation', label: 'Preview' },
   { id: 'aftercare', label: 'Aftercare' },
 ] as const;
 
@@ -306,13 +307,48 @@ function SeverityBadge({ severity }: { severity: string }) {
   );
 }
 
+function formatCurrency(value: number): string {
+  return `$${Math.max(0, value || 0).toLocaleString()}`;
+}
+
+function formatConcernName(value: string): string {
+  return value.replace(/[_-]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function isRenderablePlanImage(value: string | null | undefined): value is string {
+  if (!value) return false;
+  return (
+    value.startsWith('data:image/') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('/')
+  );
+}
+
+function buildScanExplanation(data: PatientPlanData): string {
+  const severityOrder = { severe: 0, moderate: 1, mild: 2 };
+  const topConcerns = [...(data.concerns || [])]
+    .sort(
+      (a, b) =>
+        (severityOrder[a.severity as keyof typeof severityOrder] ?? 3) -
+        (severityOrder[b.severity as keyof typeof severityOrder] ?? 3),
+    )
+    .slice(0, 3)
+    .map((concern) => formatConcernName(concern.concern));
+
+  const focus = topConcerns.length > 0 ? topConcerns.join(', ') : 'overall skin quality';
+  return `Your scan gives us a clear starting point: an Aura Score of ${data.auraScore.overall} in the ${data.auraScore.grade} range, with the biggest opportunity around ${focus}. The plan is designed to treat the highest-impact findings first, then build collagen, improve skin quality, and maintain the result with a realistic visit schedule.`;
+}
+
 // ── Package Card ──
 
 function PackageCard({
   pkg,
+  isSelected,
   onSelect,
 }: {
   pkg: PatientPlanData['packages'][0];
+  isSelected: boolean;
   onSelect: (tier: string) => void;
 }) {
   const isHighlighted = pkg.highlighted;
@@ -323,15 +359,16 @@ function PackageCard({
       className={`relative flex flex-col rounded-2xl overflow-hidden ${isHighlighted ? 'gold-border-animated' : ''}`}
       style={{
         backgroundColor: COLORS.white,
-        border: isHighlighted ? `2px solid ${COLORS.gold}` : `1px solid ${COLORS.divider}`,
+        border: isSelected || isHighlighted ? `2px solid ${COLORS.gold}` : `1px solid ${COLORS.divider}`,
+        boxShadow: isSelected ? `0 22px 64px rgba(201, 169, 110, 0.18)` : undefined,
       }}
     >
-      {isHighlighted && (
+      {(isSelected || isHighlighted) && (
         <div
           className="text-center py-2 text-xs font-bold tracking-widest uppercase"
           style={{ backgroundColor: COLORS.gold, color: COLORS.white }}
         >
-          Most Popular
+          {isSelected ? 'Selected Package' : 'Most Popular'}
         </div>
       )}
 
@@ -356,21 +393,21 @@ function PackageCard({
               className="text-3xl font-bold"
               style={{ fontFamily: 'var(--font-heading), Playfair Display, serif', color: COLORS.navy }}
             >
-              ${pkg.price.toLocaleString()}
+              {formatCurrency(pkg.price)}
             </span>
             {pkg.discount > 0 && (
               <span className="text-sm line-through" style={{ color: `${COLORS.navy}40` }}>
-                ${pkg.originalPrice.toLocaleString()}
+                {formatCurrency(pkg.originalPrice)}
               </span>
             )}
           </div>
           {pkg.discount > 0 && (
             <p className="text-xs mt-1" style={{ color: COLORS.gold }}>
-              Save ${pkg.savingsVsStandalone.toLocaleString()} ({pkg.discount}% off)
+              Save {formatCurrency(pkg.savingsVsStandalone)} ({pkg.discount}% off)
             </p>
           )}
           <p className="text-xs mt-1.5" style={{ color: `${COLORS.navy}60` }}>
-            or ${pkg.monthlyPayment12}/mo for 12 months
+            Financing estimate: {formatCurrency(pkg.monthlyPayment12)}/mo for 12 months
           </p>
         </div>
 
@@ -421,24 +458,24 @@ function PackageCard({
           onClick={() => onSelect(pkg.tier)}
           className="w-full py-3.5 min-h-[44px] rounded-xl text-sm font-bold tracking-wide transition-all duration-300 hover:shadow-lg"
           style={{
-            backgroundColor: isHighlighted ? COLORS.gold : 'transparent',
-            color: isHighlighted ? COLORS.white : COLORS.gold,
+            backgroundColor: isSelected || isHighlighted ? COLORS.gold : 'transparent',
+            color: isSelected || isHighlighted ? COLORS.white : COLORS.gold,
             border: `2px solid ${COLORS.gold}`,
           }}
           onMouseEnter={(e) => {
-            if (!isHighlighted) {
+            if (!isHighlighted && !isSelected) {
               e.currentTarget.style.backgroundColor = COLORS.gold;
               e.currentTarget.style.color = COLORS.white;
             }
           }}
           onMouseLeave={(e) => {
-            if (!isHighlighted) {
+            if (!isHighlighted && !isSelected) {
               e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.color = COLORS.gold;
             }
           }}
         >
-          I&apos;m Interested in This Package
+          {isSelected ? 'Continue With This Package' : 'Select This Package'}
         </button>
       </div>
     </motion.div>
@@ -983,6 +1020,14 @@ export default function PatientPlanPage() {
 
   const handlePackageSelect = useCallback((tier: string) => {
     setSelectedTier(tier);
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            selectedPackageTier: tier as PatientPlanData['selectedPackageTier'],
+          }
+        : current,
+    );
     setModalOpen(true);
   }, []);
 
@@ -1116,6 +1161,9 @@ export default function PatientPlanPage() {
       (tierOrder[a.tier as keyof typeof tierOrder] ?? 0) -
       (tierOrder[b.tier as keyof typeof tierOrder] ?? 0)
   );
+  const activeTier = selectedTier || data.selectedPackageTier || sortedPackages.find((pkg) => pkg.highlighted)?.tier || sortedPackages[0]?.tier || '';
+  const selectedPackage = sortedPackages.find((pkg) => pkg.tier === activeTier) || null;
+  const scanExplanation = buildScanExplanation(data);
 
   return (
     <div className="min-h-screen paper-texture patient-portal-scroll" style={{ backgroundColor: COLORS.cream }}>
@@ -1331,6 +1379,21 @@ export default function PatientPlanPage() {
           ))}
         </div>
 
+        <div
+          className="rounded-2xl p-6 md:p-8 mb-10 luxury-card"
+          style={{
+            backgroundColor: COLORS.white,
+            border: `1px solid ${COLORS.divider}`,
+          }}
+        >
+          <p className="text-xs font-bold tracking-[0.22em] uppercase mb-3" style={{ color: COLORS.gold }}>
+            What This Means
+          </p>
+          <p className="text-sm md:text-base leading-relaxed" style={{ color: COLORS.navy }}>
+            {scanExplanation}
+          </p>
+        </div>
+
         {/* Zone Summary */}
         {data.zones.length > 0 && (
           <div
@@ -1511,6 +1574,62 @@ export default function PatientPlanPage() {
               </p>
             </div>
 
+            {selectedPackage && (
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-8 rounded-2xl p-5 md:p-6 luxury-card"
+                style={{
+                  backgroundColor: COLORS.white,
+                  border: `1px solid ${COLORS.gold}55`,
+                }}
+              >
+                <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+                  <div>
+                    <p className="text-xs font-bold tracking-[0.2em] uppercase mb-2" style={{ color: COLORS.gold }}>
+                      Current Recommended Path
+                    </p>
+                    <h3 className="font-heading text-2xl font-bold" style={{ color: COLORS.navy }}>
+                      {selectedPackage.name}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed" style={{ color: `${COLORS.navy}70` }}>
+                      {selectedPackage.whyBest || selectedPackage.bestFor}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {selectedPackage.lineItems.slice(0, 5).map((item) => (
+                        <span
+                          key={`${item.service}-${item.qty}`}
+                          className="rounded-full px-3 py-1.5 text-xs"
+                          style={{
+                            backgroundColor: `${COLORS.gold}10`,
+                            color: COLORS.navy,
+                            border: `1px solid ${COLORS.gold}20`,
+                          }}
+                        >
+                          {item.service} {item.qty > 1 ? `x${item.qty}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                    <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                      Estimated investment
+                    </p>
+                    <p className="font-heading text-3xl font-bold mt-1" style={{ color: COLORS.navy }}>
+                      {formatCurrency(selectedPackage.price)}
+                    </p>
+                    <p className="text-sm mt-2" style={{ color: `${COLORS.navy}70` }}>
+                      Financing from {formatCurrency(selectedPackage.monthlyPayment12)}/mo for 12 months
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: `${COLORS.navy}50` }}>
+                      {formatCurrency(selectedPackage.monthlyPayment24)}/mo estimate for 24 months
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             <div className="grid gap-6 md:grid-cols-3">
               {sortedPackages.map((pkg, i) => (
                 <motion.div
@@ -1522,6 +1641,7 @@ export default function PatientPlanPage() {
                 >
                   <PackageCard
                     pkg={pkg}
+                    isSelected={pkg.tier === activeTier}
                     onSelect={handlePackageSelect}
                   />
                 </motion.div>
@@ -1719,6 +1839,9 @@ export default function PatientPlanPage() {
                         {data.simulation.withTreatment.frames[
                           data.simulation.withTreatment.frames.length - 1
                         ].imageDataUrl &&
+                        isRenderablePlanImage(data.simulation.withTreatment.frames[
+                          data.simulation.withTreatment.frames.length - 1
+                        ].imageDataUrl) &&
                         data.simulation.withTreatment.frames[
                           data.simulation.withTreatment.frames.length - 1
                         ].kind === 'photo-simulation' ? (
@@ -1804,6 +1927,9 @@ export default function PatientPlanPage() {
                         {data.simulation.withoutTreatment.frames[
                           data.simulation.withoutTreatment.frames.length - 1
                         ].imageDataUrl &&
+                        isRenderablePlanImage(data.simulation.withoutTreatment.frames[
+                          data.simulation.withoutTreatment.frames.length - 1
+                        ].imageDataUrl) &&
                         data.simulation.withoutTreatment.frames[
                           data.simulation.withoutTreatment.frames.length - 1
                         ].kind === 'photo-simulation' ? (

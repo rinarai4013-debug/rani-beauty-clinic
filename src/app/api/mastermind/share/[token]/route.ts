@@ -324,6 +324,7 @@ export async function GET(
         patientName:
           session.patientName || (session.intakeData?.firstName as string) || 'Valued Client',
         consultationDate: session.createdAt || new Date().toISOString(),
+        selectedPackageTier: session.selectedPackageTier,
         auraScore: sanitizeAuraScore(scan.auraScore),
         deviceAnalysis: scan.auraDeviceAnalysis
           ? sanitizeDeviceAnalysis(scan.auraDeviceAnalysis)
