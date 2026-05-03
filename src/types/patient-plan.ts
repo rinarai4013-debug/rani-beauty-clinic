@@ -162,10 +162,25 @@ export interface PatientPredictiveMetrics {
   };
 }
 
+export interface PatientIntakeSummary {
+  goals: string[];
+  timeline: string | null;
+  budget: string | null;
+  targetAreas: string[];
+  treatmentInterests: string[];
+  skinConcerns: string[];
+  currentRoutine: {
+    morning: string | null;
+    evening: string | null;
+  };
+  relevantHistory: string[];
+}
+
 export interface PatientPlanData {
   patientName: string;
   consultationDate: string;
   selectedPackageTier?: 'Start' | 'Transform' | 'Elite' | 'Essential' | null;
+  intakeSummary: PatientIntakeSummary;
   auraScore: PatientAuraScore;
   deviceAnalysis: PatientDeviceAnalysis | null;
   concerns: PatientConcern[];

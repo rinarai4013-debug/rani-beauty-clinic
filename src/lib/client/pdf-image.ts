@@ -29,6 +29,13 @@ type PdfTextExtractOptions = {
   maxChars?: number;
 };
 
+type CropCandidate = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
 let pdfJsPromise: Promise<PdfJsModule> | null = null;
 
 async function loadPdfJs(): Promise<PdfJsModule> {
@@ -116,6 +123,63 @@ function resizeCanvasToFit(
   const largerSide = Math.max(source.width, source.height);
   if (largerSide <= maxDimension) return source;
   return scaleCanvas(source, maxDimension / largerSide);
+}
+
+function scorePhotoCandidate(canvas: HTMLCanvasElement): number {
+  const context = canvas.getContext('2d', { alpha: false });
+  if (!context) return 0;
+
+  const width = canvas.width;
+  const height = canvas.height;
+  const sampleStep = Math.max(4, Math.floor(Math.min(width, height) / 36));
+  const image = context.getImageData(0, 0, width, height).data;
+  let samples = 0;
+  let whitePixels = 0;
+  let darkPixels = 0;
+  let chromaTotal = 0;
+  let luminanceTotal = 0;
+  let luminanceSquaredTotal = 0;
+  let skinTonePixels = 0;
+
+  for (let y = 0; y < height; y += sampleStep) {
+    for (let x = 0; x < width; x += sampleStep) {
+      const offset = (y * width + x) * 4;
+      const r = image[offset] ?? 255;
+      const g = image[offset + 1] ?? 255;
+      const b = image[offset + 2] ?? 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const luminance = (r * 0.299) + (g * 0.587) + (b * 0.114);
+      const chroma = max - min;
+
+      samples += 1;
+      luminanceTotal += luminance;
+      luminanceSquaredTotal += luminance * luminance;
+      chromaTotal += chroma;
+      if (r > 238 && g > 238 && b > 238) whitePixels += 1;
+      if (r < 38 && g < 38 && b < 38) darkPixels += 1;
+      if (r > 80 && g > 45 && b > 28 && r > b && g > b && chroma > 12) {
+        skinTonePixels += 1;
+      }
+    }
+  }
+
+  if (!samples) return 0;
+
+  const whiteRatio = whitePixels / samples;
+  const darkRatio = darkPixels / samples;
+  const chromaAverage = chromaTotal / samples;
+  const luminanceAverage = luminanceTotal / samples;
+  const luminanceVariance = Math.max(0, (luminanceSquaredTotal / samples) - (luminanceAverage * luminanceAverage));
+  const skinRatio = skinTonePixels / samples;
+
+  return (
+    chromaAverage * 0.9 +
+    Math.sqrt(luminanceVariance) * 0.75 +
+    skinRatio * 70 -
+    whiteRatio * 95 -
+    darkRatio * 35
+  );
 }
 
 async function encodeCanvasToBudget(
@@ -232,16 +296,36 @@ export async function convertAuraPdfFaceToJpeg(
 
     await page.render({ canvasContext: context, viewport }).promise;
 
-    // Aura handouts place the neutral front-face image in a stable position on
-    // page 1. Cropping this region gives the simulator an actual face source
-    // while keeping the persisted data URL small enough for Airtable.
-    const crop = {
-      left: pageCanvas.width * 0.079,
-      top: pageCanvas.height * 0.323,
-      width: pageCanvas.width * 0.252,
-      height: pageCanvas.height * 0.186,
-    };
-    const faceCanvas = resizeCanvasToFit(cropCanvas(pageCanvas, crop), maxDimension);
+    // Aura handout layouts vary by export version. Try several likely face
+    // regions and keep the most photo-like crop so the simulator receives an
+    // actual patient image instead of a blank metric/table region.
+    const candidates: CropCandidate[] = [
+      { left: 0.079, top: 0.323, width: 0.252, height: 0.186 },
+      { left: 0.045, top: 0.16, width: 0.36, height: 0.34 },
+      { left: 0.31, top: 0.16, width: 0.36, height: 0.34 },
+      { left: 0.045, top: 0.27, width: 0.38, height: 0.34 },
+      { left: 0.23, top: 0.25, width: 0.42, height: 0.36 },
+      { left: 0.04, top: 0.20, width: 0.46, height: 0.46 },
+    ];
+
+    let bestCanvas: HTMLCanvasElement | null = null;
+    let bestScore = Number.NEGATIVE_INFINITY;
+    for (const candidate of candidates) {
+      const crop = {
+        left: pageCanvas.width * candidate.left,
+        top: pageCanvas.height * candidate.top,
+        width: pageCanvas.width * candidate.width,
+        height: pageCanvas.height * candidate.height,
+      };
+      const candidateCanvas = cropCanvas(pageCanvas, crop);
+      const score = scorePhotoCandidate(candidateCanvas);
+      if (score > bestScore) {
+        bestScore = score;
+        bestCanvas = candidateCanvas;
+      }
+    }
+
+    const faceCanvas = resizeCanvasToFit(bestCanvas || pageCanvas, maxDimension);
     const blob = await encodeCanvasToBudget(faceCanvas, maxBytes, quality);
 
     return new File([blob], `${baseName(pdfFile.name)}-aura-face.jpg`, {

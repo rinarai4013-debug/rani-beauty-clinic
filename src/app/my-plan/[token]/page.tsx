@@ -315,6 +315,10 @@ function formatConcernName(value: string): string {
   return value.replace(/[_-]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function formatPatientLabel(value: string): string {
+  return value.replace(/[_-]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function isRenderablePlanImage(value: string | null | undefined): value is string {
   if (!value) return false;
   return (
@@ -323,6 +327,34 @@ function isRenderablePlanImage(value: string | null | undefined): value is strin
     value.startsWith('https://') ||
     value.startsWith('/')
   );
+}
+
+const EMPTY_INTAKE_SUMMARY: PatientPlanData['intakeSummary'] = {
+  goals: [],
+  timeline: null,
+  budget: null,
+  targetAreas: [],
+  treatmentInterests: [],
+  skinConcerns: [],
+  currentRoutine: {
+    morning: null,
+    evening: null,
+  },
+  relevantHistory: [],
+};
+
+function normalizePatientPlanData(value: PatientPlanData): PatientPlanData {
+  return {
+    ...value,
+    intakeSummary: {
+      ...EMPTY_INTAKE_SUMMARY,
+      ...(value.intakeSummary || {}),
+      currentRoutine: {
+        ...EMPTY_INTAKE_SUMMARY.currentRoutine,
+        ...(value.intakeSummary?.currentRoutine || {}),
+      },
+    },
+  };
 }
 
 function buildScanExplanation(data: PatientPlanData): string {
@@ -337,7 +369,26 @@ function buildScanExplanation(data: PatientPlanData): string {
     .map((concern) => formatConcernName(concern.concern));
 
   const focus = topConcerns.length > 0 ? topConcerns.join(', ') : 'overall skin quality';
-  return `Your scan gives us a clear starting point: an Aura Score of ${data.auraScore.overall} in the ${data.auraScore.grade} range, with the biggest opportunity around ${focus}. The plan is designed to treat the highest-impact findings first, then build collagen, improve skin quality, and maintain the result with a realistic visit schedule.`;
+  const topDeviceMetrics = data.deviceAnalysis?.categories
+    .slice()
+    .sort((a, b) => b.absoluteScore - a.absoluteScore)
+    .slice(0, 3)
+    .map((category) => `${category.label} ${category.absoluteScore}/5`)
+    .join(', ');
+  const intakeGoals = data.intakeSummary.goals.slice(0, 2).map(formatPatientLabel).join(' and ');
+  const targetAreas = data.intakeSummary.targetAreas.slice(0, 3).map(formatPatientLabel).join(', ');
+  const personalization = [
+    intakeGoals ? `your stated goal of ${intakeGoals}` : '',
+    targetAreas ? `priority areas including ${targetAreas}` : '',
+    data.intakeSummary.timeline ? `your ${formatPatientLabel(data.intakeSummary.timeline)} timeline` : '',
+  ].filter(Boolean).join(', ');
+
+  return [
+    `Your scan gives us a clear starting point: an Aura Score of ${data.auraScore.overall} in the ${data.auraScore.grade} range, with the biggest opportunity around ${focus}.`,
+    topDeviceMetrics ? `The Aura device-level metrics most influencing the plan are ${topDeviceMetrics}.` : '',
+    personalization ? `We matched those findings with ${personalization}, so the recommendations are not generic.` : '',
+    `The plan is designed to treat the highest-impact findings first, then build collagen, improve skin quality, and maintain the result with a realistic visit schedule.`,
+  ].filter(Boolean).join(' ');
 }
 
 // ── Package Card ──
@@ -1007,7 +1058,7 @@ export default function PatientPlanPage() {
           return;
         }
 
-        setData(json.data);
+        setData(normalizePatientPlanData(json.data));
       } catch {
         setError('Unable to connect. Please check your internet connection and try again.');
       } finally {
@@ -1396,6 +1447,148 @@ export default function PatientPlanPage() {
           <p className="text-sm md:text-base leading-relaxed" style={{ color: COLORS.navy }}>
             {scanExplanation}
           </p>
+        </div>
+
+        {/* Aura device metric detail */}
+        {data.deviceAnalysis?.categories.length ? (
+          <div
+            className="rounded-2xl p-6 mb-10 luxury-card"
+            style={{
+              backgroundColor: COLORS.white,
+              border: `1px solid ${COLORS.divider}`,
+            }}
+          >
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold tracking-[0.22em] uppercase mb-2" style={{ color: COLORS.gold }}>
+                  Aura Scan Metrics
+                </p>
+                <h4 className="font-heading text-xl font-bold" style={{ color: COLORS.navy }}>
+                  The specific scan data behind your plan
+                </h4>
+              </div>
+              <div className="rounded-xl px-4 py-2" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Composite Skin Score
+                </p>
+                <p className="font-heading text-2xl font-bold" style={{ color: COLORS.navy }}>
+                  {data.deviceAnalysis.compositeSkinScore}
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-5">
+              {data.deviceAnalysis.categories.map((category) => (
+                <div
+                  key={category.label}
+                  className="rounded-xl p-4"
+                  style={{
+                    backgroundColor: COLORS.cream,
+                    border: `1px solid ${COLORS.divider}`,
+                  }}
+                >
+                  <p className="font-bold text-sm" style={{ color: COLORS.navy }}>
+                    {category.label}
+                  </p>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="font-heading text-3xl font-bold" style={{ color: COLORS.gold }}>
+                      {category.absoluteScore}
+                    </span>
+                    <span className="pb-1 text-xs" style={{ color: `${COLORS.navy}45` }}>
+                      /5
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs capitalize" style={{ color: `${COLORS.navy}65` }}>
+                    {category.severity} finding
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed" style={{ color: `${COLORS.navy}55` }}>
+                    {category.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Intake personalization detail */}
+        <div
+          className="rounded-2xl p-6 md:p-8 mb-10 luxury-card"
+          style={{
+            backgroundColor: COLORS.white,
+            border: `1px solid ${COLORS.divider}`,
+          }}
+        >
+          <p className="text-xs font-bold tracking-[0.22em] uppercase mb-3" style={{ color: COLORS.gold }}>
+            Your Consultation Inputs
+          </p>
+          <h4 className="font-heading text-xl font-bold mb-4" style={{ color: COLORS.navy }}>
+            How your intake shaped the recommendation
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              { label: 'Goals', values: data.intakeSummary.goals },
+              { label: 'Skin Concerns', values: data.intakeSummary.skinConcerns },
+              { label: 'Treatment Interests', values: data.intakeSummary.treatmentInterests },
+              { label: 'Target Areas', values: data.intakeSummary.targetAreas },
+            ].map((group) => (
+              group.values.length > 0 ? (
+                <div key={group.label}>
+                  <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: `${COLORS.navy}45` }}>
+                    {group.label}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {group.values.map((value) => (
+                      <span
+                        key={`${group.label}-${value}`}
+                        className="rounded-full px-3 py-1.5 text-xs"
+                        style={{
+                          backgroundColor: `${COLORS.gold}10`,
+                          color: COLORS.navy,
+                          border: `1px solid ${COLORS.gold}20`,
+                        }}
+                      >
+                        {formatPatientLabel(value)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null
+            ))}
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {data.intakeSummary.timeline && (
+              <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Timeline
+                </p>
+                <p className="mt-1 font-bold" style={{ color: COLORS.navy }}>
+                  {formatPatientLabel(data.intakeSummary.timeline)}
+                </p>
+              </div>
+            )}
+            {data.intakeSummary.budget && (
+              <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Budget Preference
+                </p>
+                <p className="mt-1 font-bold" style={{ color: COLORS.navy }}>
+                  {formatPatientLabel(data.intakeSummary.budget)}
+                </p>
+              </div>
+            )}
+            {(data.intakeSummary.currentRoutine.morning || data.intakeSummary.currentRoutine.evening) && (
+              <div className="rounded-xl p-4" style={{ backgroundColor: COLORS.cream }}>
+                <p className="text-xs uppercase tracking-wide" style={{ color: `${COLORS.navy}45` }}>
+                  Current Routine
+                </p>
+                <p className="mt-1 text-sm" style={{ color: COLORS.navy }}>
+                  {[
+                    data.intakeSummary.currentRoutine.morning ? `AM: ${data.intakeSummary.currentRoutine.morning}` : '',
+                    data.intakeSummary.currentRoutine.evening ? `PM: ${data.intakeSummary.currentRoutine.evening}` : '',
+                  ].filter(Boolean).join(' | ')}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Zone Summary */}

@@ -15,9 +15,66 @@ import {
 } from '@/lib/mastermind/session';
 import { forbidden, unauthorized } from '@/lib/auth/middleware';
 import { parseJsonBody, apiError, apiSuccess } from '@/lib/mastermind/api-helpers';
-import type { MastermindSessionAction } from '@/types/mastermind';
+import { isRenderableImageValue } from '@/lib/mastermind/image-markers';
+import {
+  isRenderableSourcePhoto,
+  renderPhotoSimulationFrameImage,
+} from '@/lib/mastermind/photo-simulation-renderer';
+import type { MastermindSession, MastermindSessionAction, SimulationComparison } from '@/types/mastermind';
 
 import { withSentry } from '@/lib/sentry-utils';
+
+async function repairSimulationFramesForStaffView(
+  sim: SimulationComparison,
+  sourcePhotoUrl: string | null | undefined,
+): Promise<SimulationComparison> {
+  if (!sourcePhotoUrl || !isRenderableSourcePhoto(sourcePhotoUrl)) return sim;
+
+  const needsRepair =
+    sim.withTreatment.frames.some((frame) => !isRenderableImageValue(frame.imageDataUrl)) ||
+    sim.withoutTreatment.frames.some((frame) => !isRenderableImageValue(frame.imageDataUrl));
+
+  if (!needsRepair) return sim;
+
+  const repairFrames = async (
+    frames: SimulationComparison['withTreatment']['frames'],
+    trajectory: 'with' | 'without',
+  ) => Promise.all(
+    frames.map(async (frame) => {
+      if (frame.kind === 'photo-simulation' && isRenderableImageValue(frame.imageDataUrl)) {
+        return frame;
+      }
+
+      const rendered = await renderPhotoSimulationFrameImage(sourcePhotoUrl, trajectory, frame);
+      return rendered ? { ...frame, ...rendered } : frame;
+    }),
+  );
+
+  return {
+    ...sim,
+    withTreatment: {
+      ...sim.withTreatment,
+      frames: await repairFrames(sim.withTreatment.frames, 'with'),
+    },
+    withoutTreatment: {
+      ...sim.withoutTreatment,
+      frames: await repairFrames(sim.withoutTreatment.frames, 'without'),
+    },
+  };
+}
+
+async function repairSessionForStaffView(session: MastermindSession): Promise<MastermindSession> {
+  if (!session.simulationComparison) return session;
+
+  const repairedSimulation = await repairSimulationFramesForStaffView(
+    session.simulationComparison,
+    session.sourcePhotoUrl,
+  );
+
+  return repairedSimulation === session.simulationComparison
+    ? session
+    : { ...session, simulationComparison: repairedSimulation };
+}
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withSentry('mastermind/sessions/[id]', async () => {
@@ -42,7 +99,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         return apiError('Session not found', 404);
       }
 
-      return apiSuccess(session);
+      return apiSuccess(await repairSessionForStaffView(session));
     } catch (error) {
       console.error('[Mastermind Session] GET error:', error);
       return apiError('Failed to fetch session');

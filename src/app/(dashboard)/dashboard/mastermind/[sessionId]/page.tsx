@@ -1197,7 +1197,10 @@ export default function MastermindSessionPage() {
           </div>
 
           {/* ── TAB CONTENT ── */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 scrollbar-luxury">
+          <div
+            className="flex-1 overflow-y-auto bg-[#FAF8F5] px-6 py-5 text-[#0F1D2C] scrollbar-luxury"
+            style={{ boxShadow: 'inset 0 1px 0 rgba(201, 169, 110, 0.08)' }}
+          >
             <AnimatePresence mode="wait">
               {activeTab === 'scan' && (
                 <motion.div
@@ -1267,7 +1270,7 @@ export default function MastermindSessionPage() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25, ease: 'easeOut' }}
                 >
-                  <SimulationTab session={session} />
+                  <SimulationTab session={session} onRegenerate={handleGenerateSimulation} />
                 </motion.div>
               )}
 
@@ -1662,10 +1665,26 @@ function ProjectionFrameCard({
   );
 }
 
-function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof useMastermindSession>['session']> }) {
+function SimulationTab({
+  session,
+  onRegenerate,
+}: {
+  session: NonNullable<ReturnType<typeof useMastermindSession>['session']>;
+  onRegenerate: () => void | Promise<void>;
+}) {
   const sim = session.simulationComparison;
   const [activeView, setActiveView] = useState<'with' | 'without'>('with');
   const [selectedFrame, setSelectedFrame] = useState(0);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const regenerate = useCallback(async () => {
+    setIsRegenerating(true);
+    try {
+      await onRegenerate();
+    } finally {
+      setIsRegenerating(false);
+    }
+  }, [onRegenerate]);
 
   if (!sim) {
     return (
@@ -1694,10 +1713,30 @@ function SimulationTab({ session }: { session: NonNullable<ReturnType<typeof use
   return (
     <div className="space-y-6">
       {projectionMode && (
-        <div className="rounded-2xl border border-[#C9A96E]/20 bg-[#C9A96E]/10 px-4 py-3">
-          <p className="font-body text-xs font-medium text-[#0F1D2C]/70">
-            These are data projections from consultation findings. They are not face transformations.
-          </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#C9A96E]/20 bg-[#C9A96E]/10 px-4 py-3">
+          <div>
+            <p className="font-body text-xs font-semibold text-[#0F1D2C]/80">
+              Projection mode is showing because saved photo frames were not available.
+            </p>
+            <p className="font-body text-xs text-[#0F1D2C]/55">
+              If an Aura preview image is saved, regenerate to rebuild the visual before/after frames.
+            </p>
+          </div>
+          {session.sourcePhotoUrl && isRenderableSimulationImage(session.sourcePhotoUrl) && (
+            <button
+              type="button"
+              onClick={regenerate}
+              disabled={isRegenerating}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#0F1D2C] px-4 py-2 font-body text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#182B3F] disabled:cursor-wait disabled:opacity-60"
+            >
+              {isRegenerating ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Image className="h-3.5 w-3.5" />
+              )}
+              Regenerate Photo Simulation
+            </button>
+          )}
         </div>
       )}
 
