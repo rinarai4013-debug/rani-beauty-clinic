@@ -48,36 +48,41 @@ export async function renderPhotoSimulationFrameImage(
   if (!parsed) return null;
 
   const progress = progressForFrame(trajectory, frame);
-  let pipeline = sharp(parsed.buffer, { failOn: 'none' })
-    .rotate()
-    .resize({ width: 168, height: 224, fit: 'inside', withoutEnlargement: true });
+  try {
+    let pipeline = sharp(parsed.buffer, { failOn: 'none' })
+      .rotate()
+      .resize({ width: 168, height: 224, fit: 'inside', withoutEnlargement: true });
 
-  if (trajectory === 'with') {
-    pipeline = pipeline
-      .modulate({
-        brightness: 1 + progress * 0.035,
-        saturation: 1 + progress * 0.045,
-      })
-      .sharpen({ sigma: 0.35 + progress * 0.45, m1: 0.55, m2: 1.05 });
-  } else {
-    pipeline = pipeline
-      .modulate({
-        brightness: 1 - progress * 0.04,
-        saturation: 1 - progress * 0.09,
-      })
-      .tint({
-        r: Math.round(255 - progress * 6),
-        g: Math.round(239 - progress * 10),
-        b: Math.round(229 - progress * 15),
-      });
-    if (progress >= 0.2) {
-      pipeline = pipeline.blur(0.22 + progress * 0.42);
+    if (trajectory === 'with') {
+      pipeline = pipeline
+        .modulate({
+          brightness: 1 + progress * 0.035,
+          saturation: 1 + progress * 0.045,
+        })
+        .sharpen({ sigma: 0.35 + progress * 0.45, m1: 0.55, m2: 1.05 });
+    } else {
+      pipeline = pipeline
+        .modulate({
+          brightness: 1 - progress * 0.04,
+          saturation: 1 - progress * 0.09,
+        })
+        .tint({
+          r: Math.round(255 - progress * 6),
+          g: Math.round(239 - progress * 10),
+          b: Math.round(229 - progress * 15),
+        });
+      if (progress >= 0.2) {
+        pipeline = pipeline.blur(0.22 + progress * 0.42);
+      }
     }
-  }
 
-  const output = await pipeline.jpeg({ quality: 30, mozjpeg: true }).toBuffer();
-  return {
-    imageDataUrl: `data:image/jpeg;base64,${output.toString('base64')}`,
-    kind: 'photo-simulation',
-  };
+    const output = await pipeline.jpeg({ quality: 30, mozjpeg: true }).toBuffer();
+    return {
+      imageDataUrl: `data:image/jpeg;base64,${output.toString('base64')}`,
+      kind: 'photo-simulation',
+    };
+  } catch (error) {
+    console.warn('[PhotoSimulation] Unable to render source photo frame:', error);
+    return null;
+  }
 }
